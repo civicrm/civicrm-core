@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -286,127 +287,98 @@ class Extension extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'type' => array(
-      
-        'name' => 'type',
-        'propertyName' => 'type',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Type'),
-                        'required' => true,
-                         'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::getExtensionTypes',
-                    )
-                 ),
-      
-              'full_name' => array(
-      
-        'name' => 'full_name',
-        'propertyName' => 'fullName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Key'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_extension.name',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'label' => array(
-      
-        'name' => 'label',
-        'propertyName' => 'label',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Label'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_extension.label',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'file' => array(
-      
-        'name' => 'file',
-        'propertyName' => 'file',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('File'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_extension.file',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'schema_version' => array(
-      
-        'name' => 'schema_version',
-        'propertyName' => 'schemaVersion',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Schema Version'),
-                                 'maxlength' => 63,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_extension.schema_version',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Extension ID'),
+          'required' => true,
+        ),
+        'type' => array(
+          'name' => 'type',
+          'propertyName' => 'type',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Type'),
+          'required' => true,
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::getExtensionTypes',
+          )
+        ),
+        'full_name' => array(
+          'name' => 'full_name',
+          'propertyName' => 'fullName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Key'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_extension.name',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'label' => array(
+          'name' => 'label',
+          'propertyName' => 'label',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Label'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_extension.label',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'file' => array(
+          'name' => 'file',
+          'propertyName' => 'file',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('File'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_extension.file',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'schema_version' => array(
+          'name' => 'schema_version',
+          'propertyName' => 'schemaVersion',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Schema Version'),
+          'maxlength' => 63,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_extension.schema_version',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Extension is Active?'),
+          'default' => '1',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -86,6 +87,7 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $label;
@@ -460,165 +462,114 @@ class Dashboard extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Dashlet Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'label' => array(
-      
-        'name' => 'label',
-        'propertyName' => 'label',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Label'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'url' => array(
-      
-        'name' => 'url',
-        'propertyName' => 'url',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Url'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'permission' => array(
-      
-        'name' => 'permission',
-        'propertyName' => 'permission',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Permission'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'permission_operator' => array(
-      
-        'name' => 'permission_operator',
-        'propertyName' => 'permissionOperator',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Permission Operator'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                                    
-                          ),
-      
-              'column_no' => array(
-      
-        'name' => 'column_no',
-        'propertyName' => 'columnNo',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Column No'),
-                                                             
-                                    
-                          ),
-      
-              'is_minimized' => array(
-      
-        'name' => 'is_minimized',
-        'propertyName' => 'isMinimized',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'fullscreen_url' => array(
-      
-        'name' => 'fullscreen_url',
-        'propertyName' => 'fullscreenUrl',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Fullscreen Url'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_fullscreen' => array(
-      
-        'name' => 'is_fullscreen',
-        'propertyName' => 'isFullscreen',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('DashletID'),
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Dashlet Domain'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Dashlet Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'label' => array(
+          'name' => 'label',
+          'propertyName' => 'label',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Dashlet Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'url' => array(
+          'name' => 'url',
+          'propertyName' => 'url',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Dashlet URL'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'permission' => array(
+          'name' => 'permission',
+          'propertyName' => 'permission',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Dashlet Permission'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'permission_operator' => array(
+          'name' => 'permission_operator',
+          'propertyName' => 'permissionOperator',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Dashlet Permission Operator'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+        ),
+        'column_no' => array(
+          'name' => 'column_no',
+          'propertyName' => 'columnNo',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Dashlet Column'),
+        ),
+        'is_minimized' => array(
+          'name' => 'is_minimized',
+          'propertyName' => 'isMinimized',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Minimize Dashlet?'),
+        ),
+        'fullscreen_url' => array(
+          'name' => 'fullscreen_url',
+          'propertyName' => 'fullscreenUrl',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Fullscreen URL'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_fullscreen' => array(
+          'name' => 'is_fullscreen',
+          'propertyName' => 'isFullscreen',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Fullscreen?'),
+          'default' => '1',
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Dashlet Active?'),
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Dashlet Reserved?'),
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Dashlet Weight'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -68,6 +69,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $title;
@@ -77,6 +79,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="summary", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $summary;
@@ -86,6 +89,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $description;
@@ -149,6 +153,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="registration_link_text", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $registrationLinkText;
@@ -185,6 +190,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="event_full_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $eventFullText;
@@ -239,6 +245,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="fee_label", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $feeLabel;
@@ -275,6 +282,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="intro_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $introText;
@@ -284,6 +292,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="footer_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $footerText;
@@ -293,6 +302,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="confirm_title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $confirmTitle = 'NULL';
@@ -302,6 +312,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="confirm_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $confirmText;
@@ -311,6 +322,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="confirm_footer_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $confirmFooterText;
@@ -329,6 +341,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="confirm_email_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $confirmEmailText;
@@ -338,6 +351,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="confirm_from_name", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $confirmFromName;
@@ -392,6 +406,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $thankyouTitle = 'NULL';
@@ -401,6 +416,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="thankyou_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $thankyouText;
@@ -410,6 +426,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="thankyou_footer_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $thankyouFooterText;
@@ -428,6 +445,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="pay_later_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $payLaterText;
@@ -437,6 +455,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="pay_later_receipt", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $payLaterReceipt;
@@ -455,6 +474,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="initial_amount_label", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $initialAmountLabel;
@@ -464,6 +484,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="initial_amount_help_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $initialAmountHelpText;
@@ -527,6 +548,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="waitlist_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $waitlistText;
@@ -536,6 +558,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="approval_req_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $approvalReqText;
@@ -554,6 +577,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="template_title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $templateTitle;
@@ -1939,815 +1963,753 @@ class Event extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Event'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'event_title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Event Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_event.title',
-        'headerPattern' => '/(event.)?title$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'summary' => array(
-      
-        'name' => 'summary',
-        'propertyName' => 'summary',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Event Summary'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'event_description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Event Description'),
-                                 'maxlength' => 65535,
-                                          'rows' => 8,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'event_type_id' => array(
-      
-        'name' => 'event_type_id',
-        'propertyName' => 'eventTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Event Type'),
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'event_type',
-                    )
-                 ),
-      
-              'participant_listing_id' => array(
-      
-        'name' => 'participant_listing_id',
-        'propertyName' => 'participantListingId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Participant Listing'),
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'participant_listing',
-                    )
-                 ),
-      
-              'is_public' => array(
-      
-        'name' => 'is_public',
-        'propertyName' => 'isPublic',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Event Public'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'event_start_date' => array(
-      
-        'name' => 'start_date',
-        'propertyName' => 'startDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Event Start Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_event.start_date',
-        'headerPattern' => '/^start|(s(tart\s)?date)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'event_end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Event End Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_event.end_date',
-        'headerPattern' => '/^end|(e(nd\s)?date)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'is_online_registration' => array(
-      
-        'name' => 'is_online_registration',
-        'propertyName' => 'isOnlineRegistration',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Online Registration'),
-                                                             
-                                    
-                          ),
-      
-              'registration_link_text' => array(
-      
-        'name' => 'registration_link_text',
-        'propertyName' => 'registrationLinkText',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Event Registration Link Text'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'registration_start_date' => array(
-      
-        'name' => 'registration_start_date',
-        'propertyName' => 'registrationStartDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Registration Start Date'),
-                                                             
-                                    
-                          ),
-      
-              'registration_end_date' => array(
-      
-        'name' => 'registration_end_date',
-        'propertyName' => 'registrationEndDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Registration End Date'),
-                                                             
-                                    
-                          ),
-      
-              'max_participants' => array(
-      
-        'name' => 'max_participants',
-        'propertyName' => 'maxParticipants',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Max Participants'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'event_full_text' => array(
-      
-        'name' => 'event_full_text',
-        'propertyName' => 'eventFullText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Event Information'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'is_monetary' => array(
-      
-        'name' => 'is_monetary',
-        'propertyName' => 'isMonetary',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is this a PAID event?'),
-                                                             
-                                    
-                          ),
-      
-              'financial_type_id' => array(
-      
-        'name' => 'financial_type_id',
-        'propertyName' => 'financialTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Financial Type'),
-                                                             
-                                           'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_financial_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'payment_processor' => array(
-      
-        'name' => 'payment_processor',
-        'propertyName' => 'paymentProcessor',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Payment Processor'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_payment_processor',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'is_map' => array(
-      
-        'name' => 'is_map',
-        'propertyName' => 'isMap',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Map Enabled'),
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Active'),
-                                                             
-                                    
-                          ),
-      
-              'fee_label' => array(
-      
-        'name' => 'fee_label',
-        'propertyName' => 'feeLabel',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Fee Label'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_event.fee_label',
-        'headerPattern' => '/^fee|(f(ee\s)?label)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'is_show_location' => array(
-      
-        'name' => 'is_show_location',
-        'propertyName' => 'isShowLocation',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('show location'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'loc_block_id' => array(
-      
-        'name' => 'loc_block_id',
-        'propertyName' => 'locBlock',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Location Block ID'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_LocBlock',
-                          ),
-      
-              'default_role_id' => array(
-      
-        'name' => 'default_role_id',
-        'propertyName' => 'defaultRoleId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Participant Role'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_event.default_role_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => '1',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'participant_role',
-                    )
-                 ),
-      
-              'intro_text' => array(
-      
-        'name' => 'intro_text',
-        'propertyName' => 'introText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Introductory Message'),
-                                 'maxlength' => 65535,
-                                          'rows' => 6,
-                         'cols' => 50,
-         
-                                    
-                          ),
-      
-              'footer_text' => array(
-      
-        'name' => 'footer_text',
-        'propertyName' => 'footerText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Footer Message'),
-                                 'maxlength' => 65535,
-                                          'rows' => 6,
-                         'cols' => 50,
-         
-                                    
-                          ),
-      
-              'confirm_title' => array(
-      
-        'name' => 'confirm_title',
-        'propertyName' => 'confirmTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Confirmation Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'confirm_text' => array(
-      
-        'name' => 'confirm_text',
-        'propertyName' => 'confirmText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Confirm Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 6,
-                         'cols' => 50,
-         
-                                    
-                          ),
-      
-              'confirm_footer_text' => array(
-      
-        'name' => 'confirm_footer_text',
-        'propertyName' => 'confirmFooterText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Footer Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 6,
-                         'cols' => 50,
-         
-                                    
-                          ),
-      
-              'is_email_confirm' => array(
-      
-        'name' => 'is_email_confirm',
-        'propertyName' => 'isEmailConfirm',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is confirm email'),
-                                                             
-                                    
-                          ),
-      
-              'confirm_email_text' => array(
-      
-        'name' => 'confirm_email_text',
-        'propertyName' => 'confirmEmailText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Confirmation Email Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 50,
-         
-                                    
-                          ),
-      
-              'confirm_from_name' => array(
-      
-        'name' => 'confirm_from_name',
-        'propertyName' => 'confirmFromName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Confirm From Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'confirm_from_email' => array(
-      
-        'name' => 'confirm_from_email',
-        'propertyName' => 'confirmFromEmail',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Confirm From Email'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'cc_confirm' => array(
-      
-        'name' => 'cc_confirm',
-        'propertyName' => 'ccConfirm',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Cc Confirm'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'bcc_confirm' => array(
-      
-        'name' => 'bcc_confirm',
-        'propertyName' => 'bccConfirm',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Bcc Confirm'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'default_fee_id' => array(
-      
-        'name' => 'default_fee_id',
-        'propertyName' => 'defaultFeeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Default Fee ID'),
-                                                             
-                                    
-                          ),
-      
-              'default_discount_fee_id' => array(
-      
-        'name' => 'default_discount_fee_id',
-        'propertyName' => 'defaultDiscountFeeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Default Discount Fee ID'),
-                                                             
-                                    
-                          ),
-      
-              'thankyou_title' => array(
-      
-        'name' => 'thankyou_title',
-        'propertyName' => 'thankyouTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('ThankYou Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'thankyou_text' => array(
-      
-        'name' => 'thankyou_text',
-        'propertyName' => 'thankyouText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('ThankYou Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 6,
-                         'cols' => 50,
-         
-                                    
-                          ),
-      
-              'thankyou_footer_text' => array(
-      
-        'name' => 'thankyou_footer_text',
-        'propertyName' => 'thankyouFooterText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Footer Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 6,
-                         'cols' => 50,
-         
-                                    
-                          ),
-      
-              'is_pay_later' => array(
-      
-        'name' => 'is_pay_later',
-        'propertyName' => 'isPayLater',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Pay Later Allowed'),
-                                                             
-                                    
-                          ),
-      
-              'pay_later_text' => array(
-      
-        'name' => 'pay_later_text',
-        'propertyName' => 'payLaterText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Pay Later Text'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'pay_later_receipt' => array(
-      
-        'name' => 'pay_later_receipt',
-        'propertyName' => 'payLaterReceipt',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Pay Later Receipt Text'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'is_partial_payment' => array(
-      
-        'name' => 'is_partial_payment',
-        'propertyName' => 'isPartialPayment',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Partial Payments Enabled'),
-                                                             
-                                    
-                          ),
-      
-              'initial_amount_label' => array(
-      
-        'name' => 'initial_amount_label',
-        'propertyName' => 'initialAmountLabel',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Initial Amount Label'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'initial_amount_help_text' => array(
-      
-        'name' => 'initial_amount_help_text',
-        'propertyName' => 'initialAmountHelpText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Initial Amount Help Text'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'min_initial_amount' => array(
-      
-        'name' => 'min_initial_amount',
-        'propertyName' => 'minInitialAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Minimum Initial Amount'),
-                                          'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'is_multiple_registrations' => array(
-      
-        'name' => 'is_multiple_registrations',
-        'propertyName' => 'isMultipleRegistrations',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Allow Multiple Registrations'),
-                                                             
-                                    
-                          ),
-      
-              'allow_same_participant_emails' => array(
-      
-        'name' => 'allow_same_participant_emails',
-        'propertyName' => 'allowSameParticipantEmails',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Does Event allow multiple registrations from same email address?'),
-                                                             
-                                    
-                          ),
-      
-              'has_waitlist' => array(
-      
-        'name' => 'has_waitlist',
-        'propertyName' => 'hasWaitlist',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Waitlist Enabled'),
-                                                             
-                                    
-                          ),
-      
-              'requires_approval' => array(
-      
-        'name' => 'requires_approval',
-        'propertyName' => 'requiresApproval',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Requires Approval'),
-                                                             
-                                    
-                          ),
-      
-              'expiration_time' => array(
-      
-        'name' => 'expiration_time',
-        'propertyName' => 'expirationTime',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Expiration Time'),
-                                                             
-                                    
-                          ),
-      
-              'waitlist_text' => array(
-      
-        'name' => 'waitlist_text',
-        'propertyName' => 'waitlistText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Waitlist Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'approval_req_text' => array(
-      
-        'name' => 'approval_req_text',
-        'propertyName' => 'approvalReqText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Approval Req Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'is_template' => array(
-      
-        'name' => 'is_template',
-        'propertyName' => 'isTemplate',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is an Event Template'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'template_title' => array(
-      
-        'name' => 'template_title',
-        'propertyName' => 'templateTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Event Template Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_event.template_title',
-        'headerPattern' => '/(template.)?title$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Created By Contact ID'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Event Created Date'),
-                                                             
-                                    
-                          ),
-      
-              'currency' => array(
-      
-        'name' => 'currency',
-        'propertyName' => 'currency',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Currency'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                'import' => true,
-        'where' => 'civicrm_event.currency',
-        'headerPattern' => '/cur(rency)?/i',
-        'dataPattern' => '/^[A-Z]{3}$/i',
-                         'export' => true,
-                                   
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_currency',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'full_name',
-                      'nameColumn' => 'numeric_code',
-                    )
-                 ),
-      
-              'campaign_id' => array(
-      
-        'name' => 'campaign_id',
-        'propertyName' => 'campaign',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Campaign'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_campaign',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'is_share' => array(
-      
-        'name' => 'is_share',
-        'propertyName' => 'isShare',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is shared through social media'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_confirm_enabled' => array(
-      
-        'name' => 'is_confirm_enabled',
-        'propertyName' => 'isConfirmEnabled',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is the booking confirmation screen enabled?'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'parent_event_id' => array(
-      
-        'name' => 'parent_event_id',
-        'propertyName' => 'parentEventId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Parent Event ID'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'slot_label_id' => array(
-      
-        'name' => 'slot_label_id',
-        'propertyName' => 'slotLabelId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Subevent Slot Label ID'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'dedupe_rule_group_id' => array(
-      
-        'name' => 'dedupe_rule_group_id',
-        'propertyName' => 'dedupeRuleGroup',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Dedupe Rule'),
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Dedupe_DAO_RuleGroup',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_dedupe_rule_group',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                      'nameColumn' => 'name',
-                    )
-                 ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Event'),
+          'required' => true,
+        ),
+        'event_title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Event Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_event.title',
+          'headerPattern' => '/(event.)?title$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'summary' => array(
+          'name' => 'summary',
+          'propertyName' => 'summary',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Event Summary'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'event_description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Event Description'),
+          'maxlength' => 65535,
+          'rows' => 8,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'event_type_id' => array(
+          'name' => 'event_type_id',
+          'propertyName' => 'eventTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Event Type'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'event_type',
+          )
+        ),
+        'participant_listing_id' => array(
+          'name' => 'participant_listing_id',
+          'propertyName' => 'participantListingId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Participant Listing'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'participant_listing',
+          )
+        ),
+        'is_public' => array(
+          'name' => 'is_public',
+          'propertyName' => 'isPublic',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Event Public'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'event_start_date' => array(
+          'name' => 'start_date',
+          'propertyName' => 'startDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Event Start Date'),
+          'import' => true,
+          'where' => 'civicrm_event.start_date',
+          'headerPattern' => '/^start|(s(tart\s)?date)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'event_end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Event End Date'),
+          'import' => true,
+          'where' => 'civicrm_event.end_date',
+          'headerPattern' => '/^end|(e(nd\s)?date)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'is_online_registration' => array(
+          'name' => 'is_online_registration',
+          'propertyName' => 'isOnlineRegistration',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Online Registration'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'registration_link_text' => array(
+          'name' => 'registration_link_text',
+          'propertyName' => 'registrationLinkText',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Event Registration Link Text'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'registration_start_date' => array(
+          'name' => 'registration_start_date',
+          'propertyName' => 'registrationStartDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Registration Start Date'),
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'registration_end_date' => array(
+          'name' => 'registration_end_date',
+          'propertyName' => 'registrationEndDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Registration End Date'),
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'max_participants' => array(
+          'name' => 'max_participants',
+          'propertyName' => 'maxParticipants',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Max Participants'),
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'event_full_text' => array(
+          'name' => 'event_full_text',
+          'propertyName' => 'eventFullText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Event Information'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'is_monetary' => array(
+          'name' => 'is_monetary',
+          'propertyName' => 'isMonetary',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is this a PAID event?'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'financial_type_id' => array(
+          'name' => 'financial_type_id',
+          'propertyName' => 'financialTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Type'),
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_financial_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'payment_processor' => array(
+          'name' => 'payment_processor',
+          'propertyName' => 'paymentProcessor',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Payment Processor'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_payment_processor',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'is_map' => array(
+          'name' => 'is_map',
+          'propertyName' => 'isMap',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Map Enabled'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Active'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'fee_label' => array(
+          'name' => 'fee_label',
+          'propertyName' => 'feeLabel',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Fee Label'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_event.fee_label',
+          'headerPattern' => '/^fee|(f(ee\s)?label)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'is_show_location' => array(
+          'name' => 'is_show_location',
+          'propertyName' => 'isShowLocation',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('show location'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'loc_block_id' => array(
+          'name' => 'loc_block_id',
+          'propertyName' => 'locBlock',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Location Block ID'),
+          'FKClassName' => 'CRM_Core_DAO_LocBlock',
+        ),
+        'default_role_id' => array(
+          'name' => 'default_role_id',
+          'propertyName' => 'defaultRoleId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Participant Role'),
+          'import' => true,
+          'where' => 'civicrm_event.default_role_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => '1',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'participant_role',
+          )
+        ),
+        'intro_text' => array(
+          'name' => 'intro_text',
+          'propertyName' => 'introText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Introductory Message'),
+          'maxlength' => 65535,
+          'rows' => 6,
+          'cols' => 50,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'footer_text' => array(
+          'name' => 'footer_text',
+          'propertyName' => 'footerText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Footer Message'),
+          'maxlength' => 65535,
+          'rows' => 6,
+          'cols' => 50,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'confirm_title' => array(
+          'name' => 'confirm_title',
+          'propertyName' => 'confirmTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Confirmation Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'confirm_text' => array(
+          'name' => 'confirm_text',
+          'propertyName' => 'confirmText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Confirm Text'),
+          'maxlength' => 65535,
+          'rows' => 6,
+          'cols' => 50,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'confirm_footer_text' => array(
+          'name' => 'confirm_footer_text',
+          'propertyName' => 'confirmFooterText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Footer Text'),
+          'maxlength' => 65535,
+          'rows' => 6,
+          'cols' => 50,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'is_email_confirm' => array(
+          'name' => 'is_email_confirm',
+          'propertyName' => 'isEmailConfirm',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is confirm email'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'confirm_email_text' => array(
+          'name' => 'confirm_email_text',
+          'propertyName' => 'confirmEmailText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Confirmation Email Text'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 50,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'confirm_from_name' => array(
+          'name' => 'confirm_from_name',
+          'propertyName' => 'confirmFromName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Confirm From Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'confirm_from_email' => array(
+          'name' => 'confirm_from_email',
+          'propertyName' => 'confirmFromEmail',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Confirm From Email'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'cc_confirm' => array(
+          'name' => 'cc_confirm',
+          'propertyName' => 'ccConfirm',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Cc Confirm'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'bcc_confirm' => array(
+          'name' => 'bcc_confirm',
+          'propertyName' => 'bccConfirm',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Bcc Confirm'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'default_fee_id' => array(
+          'name' => 'default_fee_id',
+          'propertyName' => 'defaultFeeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Default Fee ID'),
+        ),
+        'default_discount_fee_id' => array(
+          'name' => 'default_discount_fee_id',
+          'propertyName' => 'defaultDiscountFeeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Default Discount Fee ID'),
+        ),
+        'thankyou_title' => array(
+          'name' => 'thankyou_title',
+          'propertyName' => 'thankyouTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('ThankYou Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'thankyou_text' => array(
+          'name' => 'thankyou_text',
+          'propertyName' => 'thankyouText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('ThankYou Text'),
+          'maxlength' => 65535,
+          'rows' => 6,
+          'cols' => 50,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'thankyou_footer_text' => array(
+          'name' => 'thankyou_footer_text',
+          'propertyName' => 'thankyouFooterText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Footer Text'),
+          'maxlength' => 65535,
+          'rows' => 6,
+          'cols' => 50,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'is_pay_later' => array(
+          'name' => 'is_pay_later',
+          'propertyName' => 'isPayLater',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Pay Later Allowed'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'pay_later_text' => array(
+          'name' => 'pay_later_text',
+          'propertyName' => 'payLaterText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Pay Later Text'),
+          'maxlength' => 65535,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'pay_later_receipt' => array(
+          'name' => 'pay_later_receipt',
+          'propertyName' => 'payLaterReceipt',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Pay Later Receipt Text'),
+          'maxlength' => 65535,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'is_partial_payment' => array(
+          'name' => 'is_partial_payment',
+          'propertyName' => 'isPartialPayment',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Partial Payments Enabled'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'initial_amount_label' => array(
+          'name' => 'initial_amount_label',
+          'propertyName' => 'initialAmountLabel',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Initial Amount Label'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'initial_amount_help_text' => array(
+          'name' => 'initial_amount_help_text',
+          'propertyName' => 'initialAmountHelpText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Initial Amount Help Text'),
+          'maxlength' => 65535,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'min_initial_amount' => array(
+          'name' => 'min_initial_amount',
+          'propertyName' => 'minInitialAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Minimum Initial Amount'),
+          'precision' => array(20,2),
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'is_multiple_registrations' => array(
+          'name' => 'is_multiple_registrations',
+          'propertyName' => 'isMultipleRegistrations',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Allow Multiple Registrations'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'allow_same_participant_emails' => array(
+          'name' => 'allow_same_participant_emails',
+          'propertyName' => 'allowSameParticipantEmails',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Does Event allow multiple registrations from same email address?'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'has_waitlist' => array(
+          'name' => 'has_waitlist',
+          'propertyName' => 'hasWaitlist',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Waitlist Enabled'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'requires_approval' => array(
+          'name' => 'requires_approval',
+          'propertyName' => 'requiresApproval',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Requires Approval'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'expiration_time' => array(
+          'name' => 'expiration_time',
+          'propertyName' => 'expirationTime',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Expiration Time'),
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'waitlist_text' => array(
+          'name' => 'waitlist_text',
+          'propertyName' => 'waitlistText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Waitlist Text'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'approval_req_text' => array(
+          'name' => 'approval_req_text',
+          'propertyName' => 'approvalReqText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Approval Req Text'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'is_template' => array(
+          'name' => 'is_template',
+          'propertyName' => 'isTemplate',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is an Event Template'),
+          'required' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'template_title' => array(
+          'name' => 'template_title',
+          'propertyName' => 'templateTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Event Template Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_event.template_title',
+          'headerPattern' => '/(template.)?title$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Created By Contact ID'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Event Created Date'),
+        ),
+        'currency' => array(
+          'name' => 'currency',
+          'propertyName' => 'currency',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Currency'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+          'import' => true,
+          'where' => 'civicrm_event.currency',
+          'headerPattern' => '/cur(rency)?/i',
+          'dataPattern' => '/^[A-Z]{3}$/i',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_currency',
+            'keyColumn' => 'name',
+            'labelColumn' => 'full_name',
+            'nameColumn' => 'numeric_code',
+          )
+        ),
+        'campaign_id' => array(
+          'name' => 'campaign_id',
+          'propertyName' => 'campaign',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Campaign'),
+          'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+          'html' => array(
+            'type' => 'Autocomplete-Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_campaign',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'is_share' => array(
+          'name' => 'is_share',
+          'propertyName' => 'isShare',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is shared through social media'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'is_confirm_enabled' => array(
+          'name' => 'is_confirm_enabled',
+          'propertyName' => 'isConfirmEnabled',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is the booking confirmation screen enabled?'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'parent_event_id' => array(
+          'name' => 'parent_event_id',
+          'propertyName' => 'parentEventId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Parent Event ID'),
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Autocomplete-Select',
+          ),
+        ),
+        'slot_label_id' => array(
+          'name' => 'slot_label_id',
+          'propertyName' => 'slotLabelId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Subevent Slot Label ID'),
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+        'dedupe_rule_group_id' => array(
+          'name' => 'dedupe_rule_group_id',
+          'propertyName' => 'dedupeRuleGroup',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Dedupe Rule'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Dedupe_DAO_RuleGroup',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_dedupe_rule_group',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+            'nameColumn' => 'name',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -122,6 +123,7 @@ class UFField extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPost;
@@ -131,6 +133,7 @@ class UFField extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPre;
@@ -194,6 +197,7 @@ class UFField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=false)
+   * @Field(localizable=true)
    * 
    */
   private $label;
@@ -605,217 +609,159 @@ class UFField extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'uf_group_id' => array(
-      
-        'name' => 'uf_group_id',
-        'propertyName' => 'ufGroup',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_UFGroup',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_uf_group',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'field_name' => array(
-      
-        'name' => 'field_name',
-        'propertyName' => 'fieldName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Field Name'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_view' => array(
-      
-        'name' => 'is_view',
-        'propertyName' => 'isView',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_required' => array(
-      
-        'name' => 'is_required',
-        'propertyName' => 'isRequired',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                        'required' => true,
-                                                     
-                                           'default' => '1',
-         
-                          ),
-      
-              'help_post' => array(
-      
-        'name' => 'help_post',
-        'propertyName' => 'helpPost',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Post'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'help_pre' => array(
-      
-        'name' => 'help_pre',
-        'propertyName' => 'helpPre',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Pre'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'visibility' => array(
-      
-        'name' => 'visibility',
-        'propertyName' => 'visibility',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Visibility'),
-                                 'maxlength' => 32,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                                           'default' => 'User and User Admin Only',
-         
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::ufVisibility',
-                    )
-                 ),
-      
-              'in_selector' => array(
-      
-        'name' => 'in_selector',
-        'propertyName' => 'inSelector',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('In Selector'),
-                                                             
-                                    
-                          ),
-      
-              'is_searchable' => array(
-      
-        'name' => 'is_searchable',
-        'propertyName' => 'isSearchable',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'location_type_id' => array(
-      
-        'name' => 'location_type_id',
-        'propertyName' => 'locationType',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_LocationType',
-                          ),
-      
-              'phone_type_id' => array(
-      
-        'name' => 'phone_type_id',
-        'propertyName' => 'phoneTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'website_type_id' => array(
-      
-        'name' => 'website_type_id',
-        'propertyName' => 'websiteTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'label' => array(
-      
-        'name' => 'label',
-        'propertyName' => 'label',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Label'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'field_type' => array(
-      
-        'name' => 'field_type',
-        'propertyName' => 'fieldType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Field Type'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_multi_summary' => array(
-      
-        'name' => 'is_multi_summary',
-        'propertyName' => 'isMultiSummary',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile Field ID'),
+          'required' => true,
+        ),
+        'uf_group_id' => array(
+          'name' => 'uf_group_id',
+          'propertyName' => 'ufGroup',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_UFGroup',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_uf_group',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'field_name' => array(
+          'name' => 'field_name',
+          'propertyName' => 'fieldName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Profile Field Name'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Profile Field Is Active'),
+          'default' => '1',
+        ),
+        'is_view' => array(
+          'name' => 'is_view',
+          'propertyName' => 'isView',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Profile Is View Only'),
+        ),
+        'is_required' => array(
+          'name' => 'is_required',
+          'propertyName' => 'isRequired',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Profile Field Is Required'),
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile Field Weight'),
+          'required' => true,
+          'default' => '1',
+        ),
+        'help_post' => array(
+          'name' => 'help_post',
+          'propertyName' => 'helpPost',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Profile Field Post Help'),
+          'maxlength' => 65535,
+          'localizable' => true,
+        ),
+        'help_pre' => array(
+          'name' => 'help_pre',
+          'propertyName' => 'helpPre',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Profile Field Pre Help'),
+          'maxlength' => 65535,
+          'localizable' => true,
+        ),
+        'visibility' => array(
+          'name' => 'visibility',
+          'propertyName' => 'visibility',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Profile Field Visibility'),
+          'maxlength' => 32,
+          'size' => \CRM_Utils_Type::MEDIUM,
+          'default' => 'User and User Admin Only',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::ufVisibility',
+          )
+        ),
+        'in_selector' => array(
+          'name' => 'in_selector',
+          'propertyName' => 'inSelector',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Profile Field Is a Filter'),
+        ),
+        'is_searchable' => array(
+          'name' => 'is_searchable',
+          'propertyName' => 'isSearchable',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Profile Field Is Searchable'),
+        ),
+        'location_type_id' => array(
+          'name' => 'location_type_id',
+          'propertyName' => 'locationType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile Field Location Type'),
+          'FKClassName' => 'CRM_Core_DAO_LocationType',
+        ),
+        'phone_type_id' => array(
+          'name' => 'phone_type_id',
+          'propertyName' => 'phoneTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile Field Phone Type'),
+        ),
+        'website_type_id' => array(
+          'name' => 'website_type_id',
+          'propertyName' => 'websiteTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile Field Website Type'),
+        ),
+        'label' => array(
+          'name' => 'label',
+          'propertyName' => 'label',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Profile Field Label'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'field_type' => array(
+          'name' => 'field_type',
+          'propertyName' => 'fieldType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Profile Field Type'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Profile Field Is Reserved'),
+        ),
+        'is_multi_summary' => array(
+          'name' => 'is_multi_summary',
+          'propertyName' => 'isMultiSummary',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Profile Field Supports Multiple'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

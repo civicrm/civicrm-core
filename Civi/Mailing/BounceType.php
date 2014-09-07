@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -170,56 +171,38 @@ class BounceType extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                        'required' => true,
-                         'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'hold_threshold' => array(
-      
-        'name' => 'hold_threshold',
-        'propertyName' => 'holdThreshold',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Hold Threshold'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'required' => true,
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'hold_threshold' => array(
+          'name' => 'hold_threshold',
+          'propertyName' => 'holdThreshold',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Hold Threshold'),
+          'required' => true,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

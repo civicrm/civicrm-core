@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -257,89 +258,66 @@ class MailingGroup extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'mailing_id' => array(
-      
-        'name' => 'mailing_id',
-        'propertyName' => 'mailing',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Mailing_DAO_Mailing',
-                          ),
-      
-              'group_type' => array(
-      
-        'name' => 'group_type',
-        'propertyName' => 'groupType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Group Type'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::getMailingGroupTypes',
-                    )
-                 ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'search_id' => array(
-      
-        'name' => 'search_id',
-        'propertyName' => 'searchId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'search_args' => array(
-      
-        'name' => 'search_args',
-        'propertyName' => 'searchArgs',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Search Args'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Group ID'),
+          'required' => true,
+        ),
+        'mailing_id' => array(
+          'name' => 'mailing_id',
+          'propertyName' => 'mailing',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing'),
+          'required' => true,
+          'FKClassName' => 'CRM_Mailing_DAO_Mailing',
+        ),
+        'group_type' => array(
+          'name' => 'group_type',
+          'propertyName' => 'groupType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mailing Group Type'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::getMailingGroupTypes',
+          )
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mailing Group Entity Table'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Group Entity'),
+          'required' => true,
+        ),
+        'search_id' => array(
+          'name' => 'search_id',
+          'propertyName' => 'searchId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Group Search'),
+        ),
+        'search_args' => array(
+          'name' => 'search_args',
+          'propertyName' => 'searchArgs',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Mailing Group Search Arguments'),
+          'maxlength' => 65535,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

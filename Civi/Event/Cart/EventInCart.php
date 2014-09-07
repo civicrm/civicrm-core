@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -141,40 +142,26 @@ class EventInCart extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'event_in_cart_id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'event_id' => array(
-      
-        'name' => 'event_id',
-        'propertyName' => 'event',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Event_DAO_Event',
-                          ),
-      
-              'event_cart_id' => array(
-      
-        'name' => 'event_cart_id',
-        'propertyName' => 'eventCart',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Event_Cart_DAO_Cart',
-                          ),
-             );
-    }
+        'event_in_cart_id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'event_id' => array(
+          'name' => 'event_id',
+          'propertyName' => 'event',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Event_DAO_Event',
+        ),
+        'event_cart_id' => array(
+          'name' => 'event_cart_id',
+          'propertyName' => 'eventCart',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Event_Cart_DAO_Cart',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

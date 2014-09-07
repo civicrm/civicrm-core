@@ -34,8 +34,8 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
         continue;
       }
       foreach ($table['fields'] as $field) {
-        if ($field['localizable']) {
-          $columns[$table['name']][$field['name']] = $field['sqlType'];
+        if (array_key_exists('localizable', $field) && $field['localizable']) {
+          $columns[$table['name']][$field['name']] = strtolower($field['sqlType']);
         }
       }
       if (isset($table['index'])) {

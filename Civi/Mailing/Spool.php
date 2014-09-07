@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -257,84 +258,54 @@ class Spool extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'job_id' => array(
-      
-        'name' => 'job_id',
-        'propertyName' => 'job',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
-                          ),
-      
-              'recipient_email' => array(
-      
-        'name' => 'recipient_email',
-        'propertyName' => 'recipientEmail',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Recipient Email'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'headers' => array(
-      
-        'name' => 'headers',
-        'propertyName' => 'headers',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Headers'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'body' => array(
-      
-        'name' => 'body',
-        'propertyName' => 'body',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Body'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'added_at' => array(
-      
-        'name' => 'added_at',
-        'propertyName' => 'addedAt',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Added At'),
-                                                             
-                                    
-                          ),
-      
-              'removed_at' => array(
-      
-        'name' => 'removed_at',
-        'propertyName' => 'removedAt',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Removed At'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'job_id' => array(
+          'name' => 'job_id',
+          'propertyName' => 'job',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
+        ),
+        'recipient_email' => array(
+          'name' => 'recipient_email',
+          'propertyName' => 'recipientEmail',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Recipient Email'),
+          'maxlength' => 65535,
+        ),
+        'headers' => array(
+          'name' => 'headers',
+          'propertyName' => 'headers',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Headers'),
+          'maxlength' => 65535,
+        ),
+        'body' => array(
+          'name' => 'body',
+          'propertyName' => 'body',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Body'),
+          'maxlength' => 65535,
+        ),
+        'added_at' => array(
+          'name' => 'added_at',
+          'propertyName' => 'addedAt',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Added At'),
+        ),
+        'removed_at' => array(
+          'name' => 'removed_at',
+          'propertyName' => 'removedAt',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Removed At'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

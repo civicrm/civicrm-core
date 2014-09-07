@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -605,251 +606,215 @@ class ReportInstance extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Report Instance ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Report Instance Domain ID'),
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Report Instance Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'report_id' => array(
-      
-        'name' => 'report_id',
-        'propertyName' => 'reportId',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Report template ID'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Report instance Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'args' => array(
-      
-        'name' => 'args',
-        'propertyName' => 'args',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Report Instance Arguments'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Report Instance description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'permission' => array(
-      
-        'name' => 'permission',
-        'propertyName' => 'permission',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Report Instance Permissions'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'grouprole' => array(
-      
-        'name' => 'grouprole',
-        'propertyName' => 'grouprole',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Report Instance Assigned to Roles'),
-                                 'maxlength' => 1024,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'form_values' => array(
-      
-        'name' => 'form_values',
-        'propertyName' => 'formValues',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Submitted Form Values'),
-                                 'maxlength' => 65535,
-                                            
-                'import' => true,
-        'where' => 'civicrm_report_instance.form_values',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Report Instance is Active'),
-                                                             
-                                    
-                          ),
-      
-              'email_subject' => array(
-      
-        'name' => 'email_subject',
-        'propertyName' => 'emailSubject',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Report Instance email Subject'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'email_to' => array(
-      
-        'name' => 'email_to',
-        'propertyName' => 'emailTo',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Email Report Instance To'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'email_cc' => array(
-      
-        'name' => 'email_cc',
-        'propertyName' => 'emailCc',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('cc Email Report Instance To'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'header' => array(
-      
-        'name' => 'header',
-        'propertyName' => 'header',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Report Instance Header'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'footer' => array(
-      
-        'name' => 'footer',
-        'propertyName' => 'footer',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Report Instance Footer'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'navigation_id' => array(
-      
-        'name' => 'navigation_id',
-        'propertyName' => 'navigation',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Navigation ID'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_report_instance.navigation_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Core_DAO_Navigation',
-                          ),
-      
-              'drilldown_id' => array(
-      
-        'name' => 'drilldown_id',
-        'propertyName' => 'drilldown',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Drilldown Report ID'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_report_instance.drilldown_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Report_DAO_ReportInstance',
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Instance is Reserved'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Report Instance ID'),
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Report Instance Domain ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Report Instance Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'report_id' => array(
+          'name' => 'report_id',
+          'propertyName' => 'reportId',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Report template ID'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Report instance Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'args' => array(
+          'name' => 'args',
+          'propertyName' => 'args',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Report Instance Arguments'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Report Instance description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'permission' => array(
+          'name' => 'permission',
+          'propertyName' => 'permission',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Report Instance Permissions'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'grouprole' => array(
+          'name' => 'grouprole',
+          'propertyName' => 'grouprole',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Report Instance Assigned to Roles'),
+          'maxlength' => 1024,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'form_values' => array(
+          'name' => 'form_values',
+          'propertyName' => 'formValues',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Submitted Form Values'),
+          'maxlength' => 65535,
+          'import' => true,
+          'where' => 'civicrm_report_instance.form_values',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Report Instance is Active'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'email_subject' => array(
+          'name' => 'email_subject',
+          'propertyName' => 'emailSubject',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Report Instance email Subject'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'email_to' => array(
+          'name' => 'email_to',
+          'propertyName' => 'emailTo',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Email Report Instance To'),
+          'maxlength' => 65535,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'email_cc' => array(
+          'name' => 'email_cc',
+          'propertyName' => 'emailCc',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('cc Email Report Instance To'),
+          'maxlength' => 65535,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'header' => array(
+          'name' => 'header',
+          'propertyName' => 'header',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Report Instance Header'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'footer' => array(
+          'name' => 'footer',
+          'propertyName' => 'footer',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Report Instance Footer'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'navigation_id' => array(
+          'name' => 'navigation_id',
+          'propertyName' => 'navigation',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Navigation ID'),
+          'import' => true,
+          'where' => 'civicrm_report_instance.navigation_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'FKClassName' => 'CRM_Core_DAO_Navigation',
+        ),
+        'drilldown_id' => array(
+          'name' => 'drilldown_id',
+          'propertyName' => 'drilldown',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Drilldown Report ID'),
+          'import' => true,
+          'where' => 'civicrm_report_instance.drilldown_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'FKClassName' => 'CRM_Report_DAO_ReportInstance',
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Instance is Reserved'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -286,102 +287,75 @@ class UFJoin extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'module' => array(
-      
-        'name' => 'module',
-        'propertyName' => 'module',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Module'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                        'required' => true,
-                                                     
-                                           'default' => '1',
-         
-                          ),
-      
-              'uf_group_id' => array(
-      
-        'name' => 'uf_group_id',
-        'propertyName' => 'ufGroup',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_UFGroup',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_uf_group',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'module_data' => array(
-      
-        'name' => 'module_data',
-        'propertyName' => 'moduleData',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Module Data'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('UF Join ID'),
+          'required' => true,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Profile Use is active'),
+          'default' => '1',
+        ),
+        'module' => array(
+          'name' => 'module',
+          'propertyName' => 'module',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Profile Module'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Profile Entity Table'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile Entity ID'),
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile Weight'),
+          'required' => true,
+          'default' => '1',
+        ),
+        'uf_group_id' => array(
+          'name' => 'uf_group_id',
+          'propertyName' => 'ufGroup',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_UFGroup',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_uf_group',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'module_data' => array(
+          'name' => 'module_data',
+          'propertyName' => 'moduleData',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Profile Use Data'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

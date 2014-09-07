@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -257,86 +258,58 @@ class File extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'file_type_id' => array(
-      
-        'name' => 'file_type_id',
-        'propertyName' => 'fileTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'mime_type' => array(
-      
-        'name' => 'mime_type',
-        'propertyName' => 'mimeType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Mime Type'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'uri' => array(
-      
-        'name' => 'uri',
-        'propertyName' => 'uri',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Uri'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'document' => array(
-      
-        'name' => 'document',
-        'propertyName' => 'document',
-        'type' => \CRM_Utils_Type::T_MEDIUMBLOB,
-                'title' => ts('Document'),
-                                 'maxlength' => 16777215,
-                                            
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'upload_date' => array(
-      
-        'name' => 'upload_date',
-        'propertyName' => 'uploadDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Upload Date'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('File ID'),
+          'required' => true,
+        ),
+        'file_type_id' => array(
+          'name' => 'file_type_id',
+          'propertyName' => 'fileTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('File Type'),
+        ),
+        'mime_type' => array(
+          'name' => 'mime_type',
+          'propertyName' => 'mimeType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mime Type'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'uri' => array(
+          'name' => 'uri',
+          'propertyName' => 'uri',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Path'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'document' => array(
+          'name' => 'document',
+          'propertyName' => 'document',
+          'type' => \CRM_Utils_Type::T_MEDIUMBLOB,
+          'title' => ts('File Contents'),
+          'maxlength' => 16777215,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('File Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'upload_date' => array(
+          'name' => 'upload_date',
+          'propertyName' => 'uploadDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('File Upload Date'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -228,77 +229,51 @@ class Timezone extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'abbreviation' => array(
-      
-        'name' => 'abbreviation',
-        'propertyName' => 'abbreviation',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Abbreviation'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                                    
-                          ),
-      
-              'gmt' => array(
-      
-        'name' => 'gmt',
-        'propertyName' => 'gmt',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Gmt'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'offset' => array(
-      
-        'name' => 'offset',
-        'propertyName' => 'offset',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Offset'),
-                                                             
-                                    
-                          ),
-      
-              'country_id' => array(
-      
-        'name' => 'country_id',
-        'propertyName' => 'country',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Country',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'abbreviation' => array(
+          'name' => 'abbreviation',
+          'propertyName' => 'abbreviation',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Abbreviation'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+        ),
+        'gmt' => array(
+          'name' => 'gmt',
+          'propertyName' => 'gmt',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Gmt'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'offset' => array(
+          'name' => 'offset',
+          'propertyName' => 'offset',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Offset'),
+        ),
+        'country_id' => array(
+          'name' => 'country_id',
+          'propertyName' => 'country',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Country',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

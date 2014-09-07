@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -315,100 +316,71 @@ class LocBlock extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'address_id' => array(
-      
-        'name' => 'address_id',
-        'propertyName' => 'address',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Address',
-                          ),
-      
-              'email_id' => array(
-      
-        'name' => 'email_id',
-        'propertyName' => 'email',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Email',
-                          ),
-      
-              'phone_id' => array(
-      
-        'name' => 'phone_id',
-        'propertyName' => 'phone',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Phone',
-                          ),
-      
-              'im_id' => array(
-      
-        'name' => 'im_id',
-        'propertyName' => 'im',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_IM',
-                          ),
-      
-              'address_2_id' => array(
-      
-        'name' => 'address_2_id',
-        'propertyName' => 'address2',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Address',
-                          ),
-      
-              'email_2_id' => array(
-      
-        'name' => 'email_2_id',
-        'propertyName' => 'email2',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Email',
-                          ),
-      
-              'phone_2_id' => array(
-      
-        'name' => 'phone_2_id',
-        'propertyName' => 'phone2',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Phone',
-                          ),
-      
-              'im_2_id' => array(
-      
-        'name' => 'im_2_id',
-        'propertyName' => 'im2',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_IM',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Location Block ID'),
+          'required' => true,
+        ),
+        'address_id' => array(
+          'name' => 'address_id',
+          'propertyName' => 'address',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Location Block Address'),
+          'FKClassName' => 'CRM_Core_DAO_Address',
+        ),
+        'email_id' => array(
+          'name' => 'email_id',
+          'propertyName' => 'email',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Location Block Email'),
+          'FKClassName' => 'CRM_Core_DAO_Email',
+        ),
+        'phone_id' => array(
+          'name' => 'phone_id',
+          'propertyName' => 'phone',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Location Block Phone'),
+          'FKClassName' => 'CRM_Core_DAO_Phone',
+        ),
+        'im_id' => array(
+          'name' => 'im_id',
+          'propertyName' => 'im',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Location Block IM'),
+          'FKClassName' => 'CRM_Core_DAO_IM',
+        ),
+        'address_2_id' => array(
+          'name' => 'address_2_id',
+          'propertyName' => 'address2',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Location Block IM 2'),
+          'FKClassName' => 'CRM_Core_DAO_Address',
+        ),
+        'email_2_id' => array(
+          'name' => 'email_2_id',
+          'propertyName' => 'email2',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Email 2'),
+          'FKClassName' => 'CRM_Core_DAO_Email',
+        ),
+        'phone_2_id' => array(
+          'name' => 'phone_2_id',
+          'propertyName' => 'phone2',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Phone 2'),
+          'FKClassName' => 'CRM_Core_DAO_Phone',
+        ),
+        'im_2_id' => array(
+          'name' => 'im_2_id',
+          'propertyName' => 'im2',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Instant Messenger 2'),
+          'FKClassName' => 'CRM_Core_DAO_IM',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

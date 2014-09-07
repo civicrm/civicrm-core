@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -199,68 +200,49 @@ class Bounce extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'event_queue_id' => array(
-      
-        'name' => 'event_queue_id',
-        'propertyName' => 'eventQueue',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
-                          ),
-      
-              'bounce_type_id' => array(
-      
-        'name' => 'bounce_type_id',
-        'propertyName' => 'bounceTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_mailing_bounce_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'bounce_reason' => array(
-      
-        'name' => 'bounce_reason',
-        'propertyName' => 'bounceReason',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Bounce Reason'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'time_stamp' => array(
-      
-        'name' => 'time_stamp',
-        'propertyName' => 'timeStamp',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Time Stamp'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'event_queue_id' => array(
+          'name' => 'event_queue_id',
+          'propertyName' => 'eventQueue',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
+        ),
+        'bounce_type_id' => array(
+          'name' => 'bounce_type_id',
+          'propertyName' => 'bounceTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_mailing_bounce_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'bounce_reason' => array(
+          'name' => 'bounce_reason',
+          'propertyName' => 'bounceReason',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Bounce Reason'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'time_stamp' => array(
+          'name' => 'time_stamp',
+          'propertyName' => 'timeStamp',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Time Stamp'),
+          'required' => true,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

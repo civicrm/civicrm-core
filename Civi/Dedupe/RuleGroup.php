@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -257,98 +258,74 @@ class RuleGroup extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_type' => array(
-      
-        'name' => 'contact_type',
-        'propertyName' => 'contactType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contact Type'),
-                                 'maxlength' => 12,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_contact_type',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'label',
-                      'condition' => 'parent_id IS NULL',
-                    )
-                 ),
-      
-              'threshold' => array(
-      
-        'name' => 'threshold',
-        'propertyName' => 'threshold',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Threshold'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'used' => array(
-      
-        'name' => 'used',
-        'propertyName' => 'used',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Used'),
-                        'required' => true,
-                         'maxlength' => 12,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::getDedupeRuleTypes',
-                    )
-                 ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'contact_type' => array(
+          'name' => 'contact_type',
+          'propertyName' => 'contactType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contact Type'),
+          'maxlength' => 12,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_contact_type',
+            'keyColumn' => 'name',
+            'labelColumn' => 'label',
+            'condition' => 'parent_id IS NULL',
+          )
+        ),
+        'threshold' => array(
+          'name' => 'threshold',
+          'propertyName' => 'threshold',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Threshold'),
+          'required' => true,
+        ),
+        'used' => array(
+          'name' => 'used',
+          'propertyName' => 'used',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Used'),
+          'required' => true,
+          'maxlength' => 12,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::getDedupeRuleTypes',
+          )
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

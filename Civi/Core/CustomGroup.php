@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -77,6 +78,7 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=false)
+   * @Field(localizable=true)
    * 
    */
   private $title;
@@ -131,6 +133,7 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPre;
@@ -140,6 +143,7 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPost;
@@ -634,232 +638,168 @@ class CustomGroup extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'extends' => array(
-      
-        'name' => 'extends',
-        'propertyName' => 'extends',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Extends'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'Contact',
-         
-                          ),
-      
-              'extends_entity_column_id' => array(
-      
-        'name' => 'extends_entity_column_id',
-        'propertyName' => 'extendsEntityColumnId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'extends_entity_column_value' => array(
-      
-        'name' => 'extends_entity_column_value',
-        'propertyName' => 'extendsEntityColumnValue',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Extends Entity Column Value'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'style' => array(
-      
-        'name' => 'style',
-        'propertyName' => 'style',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Style'),
-                                 'maxlength' => 15,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::customGroupStyle',
-                    )
-                 ),
-      
-              'collapse_display' => array(
-      
-        'name' => 'collapse_display',
-        'propertyName' => 'collapseDisplay',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Collapse Display'),
-                                                             
-                                    
-                          ),
-      
-              'help_pre' => array(
-      
-        'name' => 'help_pre',
-        'propertyName' => 'helpPre',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Pre'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'help_post' => array(
-      
-        'name' => 'help_post',
-        'propertyName' => 'helpPost',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Post'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                        'required' => true,
-                                                     
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'table_name' => array(
-      
-        'name' => 'table_name',
-        'propertyName' => 'tableName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Table Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_multiple' => array(
-      
-        'name' => 'is_multiple',
-        'propertyName' => 'isMultiple',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'min_multiple' => array(
-      
-        'name' => 'min_multiple',
-        'propertyName' => 'minMultiple',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Min Multiple'),
-                                                             
-                                    
-                          ),
-      
-              'max_multiple' => array(
-      
-        'name' => 'max_multiple',
-        'propertyName' => 'maxMultiple',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Max Multiple'),
-                                                             
-                                    
-                          ),
-      
-              'collapse_adv_display' => array(
-      
-        'name' => 'collapse_adv_display',
-        'propertyName' => 'collapseAdvDisplay',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Collapse Adv Display'),
-                                                             
-                                    
-                          ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Custom Group Created Date'),
-                                                             
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Custom Group ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Group Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Group Title'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'localizable' => true,
+        ),
+        'extends' => array(
+          'name' => 'extends',
+          'propertyName' => 'extends',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Group Extends'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'Contact',
+        ),
+        'extends_entity_column_id' => array(
+          'name' => 'extends_entity_column_id',
+          'propertyName' => 'extendsEntityColumnId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Custom Group Subtype List'),
+          'default' => 'NULL',
+        ),
+        'extends_entity_column_value' => array(
+          'name' => 'extends_entity_column_value',
+          'propertyName' => 'extendsEntityColumnValue',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Group Subtype'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'style' => array(
+          'name' => 'style',
+          'propertyName' => 'style',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Group Style'),
+          'maxlength' => 15,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::customGroupStyle',
+          )
+        ),
+        'collapse_display' => array(
+          'name' => 'collapse_display',
+          'propertyName' => 'collapseDisplay',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Collapse Custom Group?'),
+        ),
+        'help_pre' => array(
+          'name' => 'help_pre',
+          'propertyName' => 'helpPre',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Custom Group Pre Text'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'help_post' => array(
+          'name' => 'help_post',
+          'propertyName' => 'helpPost',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Custom Group Post Text'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Custom Group Weight'),
+          'required' => true,
+          'default' => '1',
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Custom Group Is Active?'),
+        ),
+        'table_name' => array(
+          'name' => 'table_name',
+          'propertyName' => 'tableName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Table Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_multiple' => array(
+          'name' => 'is_multiple',
+          'propertyName' => 'isMultiple',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Supports Multiple Records'),
+        ),
+        'min_multiple' => array(
+          'name' => 'min_multiple',
+          'propertyName' => 'minMultiple',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Minimum Multiple Records'),
+        ),
+        'max_multiple' => array(
+          'name' => 'max_multiple',
+          'propertyName' => 'maxMultiple',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Maximum Multiple Records'),
+        ),
+        'collapse_adv_display' => array(
+          'name' => 'collapse_adv_display',
+          'propertyName' => 'collapseAdvDisplay',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Collapse Group Display'),
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Custom Group Created By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Custom Group Created Date'),
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Reserved Group?'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

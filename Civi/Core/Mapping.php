@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -170,56 +171,41 @@ class Mapping extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'mapping_type_id' => array(
-      
-        'name' => 'mapping_type_id',
-        'propertyName' => 'mappingTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'mapping_type',
-                    )
-                 ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'mapping_type_id' => array(
+          'name' => 'mapping_type_id',
+          'propertyName' => 'mappingTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'mapping_type',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

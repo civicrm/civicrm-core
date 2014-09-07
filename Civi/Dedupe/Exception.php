@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -141,42 +142,28 @@ class Exception extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_id1' => array(
-      
-        'name' => 'contact_id1',
-        'propertyName' => 'contact1',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('First Dupe Contact ID'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'contact_id2' => array(
-      
-        'name' => 'contact_id2',
-        'propertyName' => 'contact2',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Second Dupe Contact ID'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'contact_id1' => array(
+          'name' => 'contact_id1',
+          'propertyName' => 'contact1',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('First Dupe Contact ID'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'contact_id2' => array(
+          'name' => 'contact_id2',
+          'propertyName' => 'contact2',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Second Dupe Contact ID'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

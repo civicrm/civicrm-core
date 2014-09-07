@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -576,303 +577,238 @@ class Participant extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'participant_id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Participant ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_participant.id',
-        'headerPattern' => '/(^(participant(.)?)?id$)/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'participant_contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_participant.contact_id',
-        'headerPattern' => '/contact(.?id)?/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'event_id' => array(
-      
-        'name' => 'event_id',
-        'propertyName' => 'event',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Event'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_participant.event_id',
-        'headerPattern' => '/event id$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Event_DAO_Event',
-                          ),
-      
-              'participant_status_id' => array(
-      
-        'name' => 'status_id',
-        'propertyName' => 'status',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Participant Status'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_participant.status_id',
-        'headerPattern' => '/(participant.)?(status)$/i',
-        'dataPattern' => '',
-                         'export' => false,
-                                          'default' => '1',
-         
-                'FKClassName' => 'CRM_Event_DAO_ParticipantStatusType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_participant_status_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'label',
-                    )
-                 ),
-      
-              'participant_role_id' => array(
-      
-        'name' => 'role_id',
-        'propertyName' => 'roleId',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Participant Role(s)'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_participant.role_id',
-        'headerPattern' => '/(participant.)?(role)$/i',
-        'dataPattern' => '',
-                         'export' => false,
-                                          'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'participant_role',
-                    )
-                 ),
-      
-              'participant_register_date' => array(
-      
-        'name' => 'register_date',
-        'propertyName' => 'registerDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Register date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_participant.register_date',
-        'headerPattern' => '/^(r(egister\s)?date)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'participant_source' => array(
-      
-        'name' => 'source',
-        'propertyName' => 'source',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Participant Source'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_participant.source',
-        'headerPattern' => '/(participant.)?(source)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'participant_fee_level' => array(
-      
-        'name' => 'fee_level',
-        'propertyName' => 'feeLevel',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Fee level'),
-                                 'maxlength' => 65535,
-                                            
-                'import' => true,
-        'where' => 'civicrm_participant.fee_level',
-        'headerPattern' => '/^(f(ee\s)?level)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'participant_is_test' => array(
-      
-        'name' => 'is_test',
-        'propertyName' => 'isTest',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Test'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_participant.is_test',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'participant_is_pay_later' => array(
-      
-        'name' => 'is_pay_later',
-        'propertyName' => 'isPayLater',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Pay Later'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_participant.is_pay_later',
-        'headerPattern' => '/(is.)?(pay(.)?later)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'participant_fee_amount' => array(
-      
-        'name' => 'fee_amount',
-        'propertyName' => 'feeAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Fee Amount'),
-                                          'precision'      => array(20,2),
-                                   
-                'import' => true,
-        'where' => 'civicrm_participant.fee_amount',
-        'headerPattern' => '/fee(.?am(ou)?nt)?/i',
-        'dataPattern' => '/^\d+(\.\d{2})?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'participant_registered_by_id' => array(
-      
-        'name' => 'registered_by_id',
-        'propertyName' => 'registeredBy',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Registered By ID'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_participant.registered_by_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Event_DAO_Participant',
-                          ),
-      
-              'participant_discount_id' => array(
-      
-        'name' => 'discount_id',
-        'propertyName' => 'discount',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Discount ID'),
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Core_DAO_Discount',
-                          ),
-      
-              'participant_fee_currency' => array(
-      
-        'name' => 'fee_currency',
-        'propertyName' => 'feeCurrency',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Fee Currency'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                'import' => true,
-        'where' => 'civicrm_participant.fee_currency',
-        'headerPattern' => '/(fee)?.?cur(rency)?/i',
-        'dataPattern' => '/^[A-Z]{3}$/i',
-                         'export' => true,
-                                          'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_currency',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'full_name',
-                      'nameColumn' => 'numeric_code',
-                    )
-                 ),
-      
-              'participant_campaign_id' => array(
-      
-        'name' => 'campaign_id',
-        'propertyName' => 'campaign',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Campaign'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_participant.campaign_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_campaign',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'discount_amount' => array(
-      
-        'name' => 'discount_amount',
-        'propertyName' => 'discountAmount',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Discount Amount'),
-                                                             
-                                    
-                          ),
-      
-              'cart_id' => array(
-      
-        'name' => 'cart_id',
-        'propertyName' => 'cart',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Event Cart ID'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Event_Cart_DAO_Cart',
-                          ),
-      
-              'must_wait' => array(
-      
-        'name' => 'must_wait',
-        'propertyName' => 'mustWait',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Must Wait on List'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'participant_id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Participant ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_participant.id',
+          'headerPattern' => '/(^(participant(.)?)?id$)/i',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'participant_contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_participant.contact_id',
+          'headerPattern' => '/contact(.?id)?/i',
+          'dataPattern' => '',
+          'export' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'event_id' => array(
+          'name' => 'event_id',
+          'propertyName' => 'event',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Event'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_participant.event_id',
+          'headerPattern' => '/event id$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'FKClassName' => 'CRM_Event_DAO_Event',
+        ),
+        'participant_status_id' => array(
+          'name' => 'status_id',
+          'propertyName' => 'status',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Participant Status'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_participant.status_id',
+          'headerPattern' => '/(participant.)?(status)$/i',
+          'dataPattern' => '',
+          'export' => false,
+          'default' => '1',
+          'FKClassName' => 'CRM_Event_DAO_ParticipantStatusType',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_participant_status_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'label',
+          )
+        ),
+        'participant_role_id' => array(
+          'name' => 'role_id',
+          'propertyName' => 'roleId',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Participant Role(s)'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_participant.role_id',
+          'headerPattern' => '/(participant.)?(role)$/i',
+          'dataPattern' => '',
+          'export' => false,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'participant_role',
+          )
+        ),
+        'participant_register_date' => array(
+          'name' => 'register_date',
+          'propertyName' => 'registerDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Register date'),
+          'import' => true,
+          'where' => 'civicrm_participant.register_date',
+          'headerPattern' => '/^(r(egister\s)?date)$/i',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'participant_source' => array(
+          'name' => 'source',
+          'propertyName' => 'source',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Participant Source'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_participant.source',
+          'headerPattern' => '/(participant.)?(source)$/i',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'participant_fee_level' => array(
+          'name' => 'fee_level',
+          'propertyName' => 'feeLevel',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Fee level'),
+          'maxlength' => 65535,
+          'import' => true,
+          'where' => 'civicrm_participant.fee_level',
+          'headerPattern' => '/^(f(ee\s)?level)$/i',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'participant_is_test' => array(
+          'name' => 'is_test',
+          'propertyName' => 'isTest',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Test'),
+          'import' => true,
+          'where' => 'civicrm_participant.is_test',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'participant_is_pay_later' => array(
+          'name' => 'is_pay_later',
+          'propertyName' => 'isPayLater',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Pay Later'),
+          'import' => true,
+          'where' => 'civicrm_participant.is_pay_later',
+          'headerPattern' => '/(is.)?(pay(.)?later)$/i',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'participant_fee_amount' => array(
+          'name' => 'fee_amount',
+          'propertyName' => 'feeAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Fee Amount'),
+          'precision' => array(20,2),
+          'import' => true,
+          'where' => 'civicrm_participant.fee_amount',
+          'headerPattern' => '/fee(.?am(ou)?nt)?/i',
+          'dataPattern' => '/^\d+(\.\d{2})?$/',
+          'export' => true,
+        ),
+        'participant_registered_by_id' => array(
+          'name' => 'registered_by_id',
+          'propertyName' => 'registeredBy',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Registered By ID'),
+          'import' => true,
+          'where' => 'civicrm_participant.registered_by_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Event_DAO_Participant',
+        ),
+        'participant_discount_id' => array(
+          'name' => 'discount_id',
+          'propertyName' => 'discount',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Discount ID'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Core_DAO_Discount',
+        ),
+        'participant_fee_currency' => array(
+          'name' => 'fee_currency',
+          'propertyName' => 'feeCurrency',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Fee Currency'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+          'import' => true,
+          'where' => 'civicrm_participant.fee_currency',
+          'headerPattern' => '/(fee)?.?cur(rency)?/i',
+          'dataPattern' => '/^[A-Z]{3}$/i',
+          'export' => true,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_currency',
+            'keyColumn' => 'name',
+            'labelColumn' => 'full_name',
+            'nameColumn' => 'numeric_code',
+          )
+        ),
+        'participant_campaign_id' => array(
+          'name' => 'campaign_id',
+          'propertyName' => 'campaign',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Campaign'),
+          'import' => true,
+          'where' => 'civicrm_participant.campaign_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_campaign',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'discount_amount' => array(
+          'name' => 'discount_amount',
+          'propertyName' => 'discountAmount',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Discount Amount'),
+        ),
+        'cart_id' => array(
+          'name' => 'cart_id',
+          'propertyName' => 'cart',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Event Cart ID'),
+          'FKClassName' => 'CRM_Event_Cart_DAO_Cart',
+        ),
+        'must_wait' => array(
+          'name' => 'must_wait',
+          'propertyName' => 'mustWait',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Must Wait on List'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

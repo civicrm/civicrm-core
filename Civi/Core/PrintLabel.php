@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -373,133 +374,98 @@ class PrintLabel extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Description'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'label_format_name' => array(
-      
-        'name' => 'label_format_name',
-        'propertyName' => 'labelFormatName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Label Format Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'name_badge',
-                    )
-                 ),
-      
-              'label_type_id' => array(
-      
-        'name' => 'label_type_id',
-        'propertyName' => 'labelTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'label_type',
-                    )
-                 ),
-      
-              'data' => array(
-      
-        'name' => 'data',
-        'propertyName' => 'data',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Data'),
-                                                             
-                                    
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Created By Contact ID'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Print Label ID'),
+          'required' => true,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Description'),
+          'maxlength' => 65535,
+        ),
+        'label_format_name' => array(
+          'name' => 'label_format_name',
+          'propertyName' => 'labelFormatName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Label Format'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'name_badge',
+          )
+        ),
+        'label_type_id' => array(
+          'name' => 'label_type_id',
+          'propertyName' => 'labelTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Label Type'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'label_type',
+          )
+        ),
+        'data' => array(
+          'name' => 'data',
+          'propertyName' => 'data',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Data'),
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Label is Default?'),
+          'default' => '1',
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Label Is Active?'),
+          'default' => '1',
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Label Reserved?'),
+          'default' => '1',
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Label Created By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

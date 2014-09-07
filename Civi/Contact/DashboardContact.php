@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -344,110 +345,74 @@ class DashboardContact extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'dashboard_id' => array(
-      
-        'name' => 'dashboard_id',
-        'propertyName' => 'dashboard',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Dashboard',
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'column_no' => array(
-      
-        'name' => 'column_no',
-        'propertyName' => 'columnNo',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Column No'),
-                                                             
-                                    
-                          ),
-      
-              'is_minimized' => array(
-      
-        'name' => 'is_minimized',
-        'propertyName' => 'isMinimized',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_fullscreen' => array(
-      
-        'name' => 'is_fullscreen',
-        'propertyName' => 'isFullscreen',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                                                             
-                                    
-                          ),
-      
-              'content' => array(
-      
-        'name' => 'content',
-        'propertyName' => 'content',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Content'),
-                                                             
-                                    
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Created Date'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Dashboard Contact ID'),
+          'required' => true,
+        ),
+        'dashboard_id' => array(
+          'name' => 'dashboard_id',
+          'propertyName' => 'dashboard',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Dashboard'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Dashboard',
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Dashboard Contact'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'column_no' => array(
+          'name' => 'column_no',
+          'propertyName' => 'columnNo',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Column No'),
+        ),
+        'is_minimized' => array(
+          'name' => 'is_minimized',
+          'propertyName' => 'isMinimized',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Dashlet is Minimized?'),
+        ),
+        'is_fullscreen' => array(
+          'name' => 'is_fullscreen',
+          'propertyName' => 'isFullscreen',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Dashlet is FullScreen?'),
+          'default' => '1',
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Dashlet is Active?'),
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Weight'),
+        ),
+        'content' => array(
+          'name' => 'content',
+          'propertyName' => 'content',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Content'),
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Dashlet Created On'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

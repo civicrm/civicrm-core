@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -344,133 +345,100 @@ class Job extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'run_frequency' => array(
-      
-        'name' => 'run_frequency',
-        'propertyName' => 'runFrequency',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Run Frequency'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                           'default' => 'Daily',
-         
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::getJobFrequency',
-                    )
-                 ),
-      
-              'last_run' => array(
-      
-        'name' => 'last_run',
-        'propertyName' => 'lastRun',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Last Run'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'api_entity' => array(
-      
-        'name' => 'api_entity',
-        'propertyName' => 'apiEntity',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Api Entity'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'api_action' => array(
-      
-        'name' => 'api_action',
-        'propertyName' => 'apiAction',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Api Action'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'parameters' => array(
-      
-        'name' => 'parameters',
-        'propertyName' => 'parameters',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Parameters'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Job ID'),
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Job Domain'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'run_frequency' => array(
+          'name' => 'run_frequency',
+          'propertyName' => 'runFrequency',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Job Frequency'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'default' => 'Daily',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::getJobFrequency',
+          )
+        ),
+        'last_run' => array(
+          'name' => 'last_run',
+          'propertyName' => 'lastRun',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Last Run'),
+          'default' => 'NULL',
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Job Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Job Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'api_entity' => array(
+          'name' => 'api_entity',
+          'propertyName' => 'apiEntity',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('API Entity'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'api_action' => array(
+          'name' => 'api_action',
+          'propertyName' => 'apiAction',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('API Action'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'parameters' => array(
+          'name' => 'parameters',
+          'propertyName' => 'parameters',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('API Parameters'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Job Is Active?'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

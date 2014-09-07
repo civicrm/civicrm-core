@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -1011,396 +1012,286 @@ class ActionSchedule extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'recipient' => array(
-      
-        'name' => 'recipient',
-        'propertyName' => 'recipient',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Recipient'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'limit_to' => array(
-      
-        'name' => 'limit_to',
-        'propertyName' => 'limitTo',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Limit To'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'entity_value' => array(
-      
-        'name' => 'entity_value',
-        'propertyName' => 'entityValue',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Value'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_status' => array(
-      
-        'name' => 'entity_status',
-        'propertyName' => 'entityStatus',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Status'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'start_action_offset' => array(
-      
-        'name' => 'start_action_offset',
-        'propertyName' => 'startActionOffset',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Start Action Offset'),
-                                                             
-                                    
-                          ),
-      
-              'start_action_unit' => array(
-      
-        'name' => 'start_action_unit',
-        'propertyName' => 'startActionUnit',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Start Action Unit'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::getScheduleReminderFrequencyUnits',
-                    )
-                 ),
-      
-              'start_action_condition' => array(
-      
-        'name' => 'start_action_condition',
-        'propertyName' => 'startActionCondition',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Start Action Condition'),
-                                 'maxlength' => 32,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                                    
-                          ),
-      
-              'start_action_date' => array(
-      
-        'name' => 'start_action_date',
-        'propertyName' => 'startActionDate',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Start Action Date'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'is_repeat' => array(
-      
-        'name' => 'is_repeat',
-        'propertyName' => 'isRepeat',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Repeat?'),
-                                                             
-                                    
-                          ),
-      
-              'repetition_frequency_unit' => array(
-      
-        'name' => 'repetition_frequency_unit',
-        'propertyName' => 'repetitionFrequencyUnit',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Repetition Frequency Unit'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::getScheduleReminderFrequencyUnits',
-                    )
-                 ),
-      
-              'repetition_frequency_interval' => array(
-      
-        'name' => 'repetition_frequency_interval',
-        'propertyName' => 'repetitionFrequencyInterval',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Repetition Frequency Interval'),
-                                                             
-                                    
-                          ),
-      
-              'end_frequency_unit' => array(
-      
-        'name' => 'end_frequency_unit',
-        'propertyName' => 'endFrequencyUnit',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('End Frequency Unit'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::getScheduleReminderFrequencyUnits',
-                    )
-                 ),
-      
-              'end_frequency_interval' => array(
-      
-        'name' => 'end_frequency_interval',
-        'propertyName' => 'endFrequencyInterval',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('End Frequency Interval'),
-                                                             
-                                    
-                          ),
-      
-              'end_action' => array(
-      
-        'name' => 'end_action',
-        'propertyName' => 'endAction',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('End Action'),
-                                 'maxlength' => 32,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                                    
-                          ),
-      
-              'end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('End Date'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'recipient_manual' => array(
-      
-        'name' => 'recipient_manual',
-        'propertyName' => 'recipientManual',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Recipient Manual'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'recipient_listing' => array(
-      
-        'name' => 'recipient_listing',
-        'propertyName' => 'recipientListing',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Recipient Listing'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'body_text' => array(
-      
-        'name' => 'body_text',
-        'propertyName' => 'bodyText',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Body Text'),
-                                                             
-                                    
-                          ),
-      
-              'body_html' => array(
-      
-        'name' => 'body_html',
-        'propertyName' => 'bodyHtml',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Body Html'),
-                                                             
-                                    
-                          ),
-      
-              'subject' => array(
-      
-        'name' => 'subject',
-        'propertyName' => 'subject',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Subject'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'record_activity' => array(
-      
-        'name' => 'record_activity',
-        'propertyName' => 'recordActivity',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Record Activity'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'mapping_id' => array(
-      
-        'name' => 'mapping_id',
-        'propertyName' => 'mapping',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_ActionMapping',
-                          ),
-      
-              'group_id' => array(
-      
-        'name' => 'group_id',
-        'propertyName' => 'group',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Group',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_group',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'msg_template_id' => array(
-      
-        'name' => 'msg_template_id',
-        'propertyName' => 'msgTemplate',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_MessageTemplate',
-                          ),
-      
-              'absolute_date' => array(
-      
-        'name' => 'absolute_date',
-        'propertyName' => 'absoluteDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Absolute Date'),
-                                                             
-                                    
-                          ),
-      
-              'from_name' => array(
-      
-        'name' => 'from_name',
-        'propertyName' => 'fromName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('From Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'from_email' => array(
-      
-        'name' => 'from_email',
-        'propertyName' => 'fromEmail',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('From Email'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'mode' => array(
-      
-        'name' => 'mode',
-        'propertyName' => 'mode',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Message Mode'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'Email',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'msg_mode',
-                    )
-                 ),
-      
-              'sms_provider_id' => array(
-      
-        'name' => 'sms_provider_id',
-        'propertyName' => 'smsProvider',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_SMS_DAO_Provider',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Action Schedule ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Title'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'recipient' => array(
+          'name' => 'recipient',
+          'propertyName' => 'recipient',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Recipient'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'limit_to' => array(
+          'name' => 'limit_to',
+          'propertyName' => 'limitTo',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Limit To'),
+          'default' => '1',
+        ),
+        'entity_value' => array(
+          'name' => 'entity_value',
+          'propertyName' => 'entityValue',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Entity Value'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_status' => array(
+          'name' => 'entity_status',
+          'propertyName' => 'entityStatus',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Entity Status'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'start_action_offset' => array(
+          'name' => 'start_action_offset',
+          'propertyName' => 'startActionOffset',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Start Action Offset'),
+        ),
+        'start_action_unit' => array(
+          'name' => 'start_action_unit',
+          'propertyName' => 'startActionUnit',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Start Action Unit'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::getScheduleReminderFrequencyUnits',
+          )
+        ),
+        'start_action_condition' => array(
+          'name' => 'start_action_condition',
+          'propertyName' => 'startActionCondition',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Start Action Condition'),
+          'maxlength' => 32,
+          'size' => \CRM_Utils_Type::MEDIUM,
+        ),
+        'start_action_date' => array(
+          'name' => 'start_action_date',
+          'propertyName' => 'startActionDate',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Start Action Date'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'is_repeat' => array(
+          'name' => 'is_repeat',
+          'propertyName' => 'isRepeat',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Repeat?'),
+        ),
+        'repetition_frequency_unit' => array(
+          'name' => 'repetition_frequency_unit',
+          'propertyName' => 'repetitionFrequencyUnit',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Repetition Frequency Unit'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::getScheduleReminderFrequencyUnits',
+          )
+        ),
+        'repetition_frequency_interval' => array(
+          'name' => 'repetition_frequency_interval',
+          'propertyName' => 'repetitionFrequencyInterval',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Repetition Frequency Interval'),
+        ),
+        'end_frequency_unit' => array(
+          'name' => 'end_frequency_unit',
+          'propertyName' => 'endFrequencyUnit',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('End Frequency Unit'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::getScheduleReminderFrequencyUnits',
+          )
+        ),
+        'end_frequency_interval' => array(
+          'name' => 'end_frequency_interval',
+          'propertyName' => 'endFrequencyInterval',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('End Frequency Interval'),
+        ),
+        'end_action' => array(
+          'name' => 'end_action',
+          'propertyName' => 'endAction',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('End Action'),
+          'maxlength' => 32,
+          'size' => \CRM_Utils_Type::MEDIUM,
+        ),
+        'end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('End Date'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Schedule is Active?'),
+          'default' => '1',
+        ),
+        'recipient_manual' => array(
+          'name' => 'recipient_manual',
+          'propertyName' => 'recipientManual',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Recipient Manual'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'recipient_listing' => array(
+          'name' => 'recipient_listing',
+          'propertyName' => 'recipientListing',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Recipient Listing'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'body_text' => array(
+          'name' => 'body_text',
+          'propertyName' => 'bodyText',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Reminder Text'),
+        ),
+        'body_html' => array(
+          'name' => 'body_html',
+          'propertyName' => 'bodyHtml',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Reminder HTML'),
+        ),
+        'subject' => array(
+          'name' => 'subject',
+          'propertyName' => 'subject',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Reminder Subject'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'record_activity' => array(
+          'name' => 'record_activity',
+          'propertyName' => 'recordActivity',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Record Activity for Reminder?'),
+          'default' => 'NULL',
+        ),
+        'mapping_id' => array(
+          'name' => 'mapping_id',
+          'propertyName' => 'mapping',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Reminder Mapping'),
+          'FKClassName' => 'CRM_Core_DAO_ActionMapping',
+        ),
+        'group_id' => array(
+          'name' => 'group_id',
+          'propertyName' => 'group',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Reminder Group'),
+          'FKClassName' => 'CRM_Contact_DAO_Group',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_group',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'msg_template_id' => array(
+          'name' => 'msg_template_id',
+          'propertyName' => 'msgTemplate',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Reminder Template'),
+          'FKClassName' => 'CRM_Core_DAO_MessageTemplate',
+        ),
+        'absolute_date' => array(
+          'name' => 'absolute_date',
+          'propertyName' => 'absoluteDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Fixed Date for Reminder'),
+        ),
+        'from_name' => array(
+          'name' => 'from_name',
+          'propertyName' => 'fromName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Reminder from Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'from_email' => array(
+          'name' => 'from_email',
+          'propertyName' => 'fromEmail',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Reminder From Email'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'mode' => array(
+          'name' => 'mode',
+          'propertyName' => 'mode',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Message Mode'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'Email',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'msg_mode',
+          )
+        ),
+        'sms_provider_id' => array(
+          'name' => 'sms_provider_id',
+          'propertyName' => 'smsProvider',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('SMS Provider'),
+          'FKClassName' => 'CRM_SMS_DAO_Provider',
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

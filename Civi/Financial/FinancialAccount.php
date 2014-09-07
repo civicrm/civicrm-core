@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -489,178 +490,128 @@ class FinancialAccount extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'financial_account_contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact ID'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'financial_account_type_id' => array(
-      
-        'name' => 'financial_account_type_id',
-        'propertyName' => 'financialAccountTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                           'default' => '3',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'financial_account_type',
-                    )
-                 ),
-      
-              'accounting_code' => array(
-      
-        'name' => 'accounting_code',
-        'propertyName' => 'accountingCode',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Accounting Code'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                         'export' => true,
-                'where' => 'civicrm_financial_account.accounting_code',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'account_type_code' => array(
-      
-        'name' => 'account_type_code',
-        'propertyName' => 'accountTypeCode',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Account Type Code'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                         'export' => true,
-                'where' => 'civicrm_financial_account.account_type_code',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'parent_id' => array(
-      
-        'name' => 'parent_id',
-        'propertyName' => 'parent',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
-                          ),
-      
-              'is_header_account' => array(
-      
-        'name' => 'is_header_account',
-        'propertyName' => 'isHeaderAccount',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_deductible' => array(
-      
-        'name' => 'is_deductible',
-        'propertyName' => 'isDeductible',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_tax' => array(
-      
-        'name' => 'is_tax',
-        'propertyName' => 'isTax',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'tax_rate' => array(
-      
-        'name' => 'tax_rate',
-        'propertyName' => 'taxRate',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Tax Rate'),
-                                          'precision'      => array(10,8),
-                                   
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Account ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Financial Account Name'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'financial_account_contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'financial_account_type_id' => array(
+          'name' => 'financial_account_type_id',
+          'propertyName' => 'financialAccountTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Account Type'),
+          'required' => true,
+          'default' => '3',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'financial_account_type',
+          )
+        ),
+        'accounting_code' => array(
+          'name' => 'accounting_code',
+          'propertyName' => 'accountingCode',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Accounting Code'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'export' => true,
+          'where' => 'civicrm_financial_account.accounting_code',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ),
+        'account_type_code' => array(
+          'name' => 'account_type_code',
+          'propertyName' => 'accountTypeCode',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Account Type Code'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'export' => true,
+          'where' => 'civicrm_financial_account.account_type_code',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Financial Account Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'parent_id' => array(
+          'name' => 'parent_id',
+          'propertyName' => 'parent',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Account Parent'),
+          'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
+        ),
+        'is_header_account' => array(
+          'name' => 'is_header_account',
+          'propertyName' => 'isHeaderAccount',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Header Financial Account?'),
+        ),
+        'is_deductible' => array(
+          'name' => 'is_deductible',
+          'propertyName' => 'isDeductible',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Deductible Financial Account?'),
+          'default' => '1',
+        ),
+        'is_tax' => array(
+          'name' => 'is_tax',
+          'propertyName' => 'isTax',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Tax Financial Account?'),
+        ),
+        'tax_rate' => array(
+          'name' => 'tax_rate',
+          'propertyName' => 'taxRate',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Financial Account Tax Rate'),
+          'precision' => array(10,8),
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Reserved Financial Account?'),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Financial Account is Active'),
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Default Financial Account'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

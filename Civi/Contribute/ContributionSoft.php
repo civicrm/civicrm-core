@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -344,151 +345,114 @@ class ContributionSoft extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'contribution_soft_id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Soft Contribution ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_contribution_soft.id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'contribution_id' => array(
-      
-        'name' => 'contribution_id',
-        'propertyName' => 'contribution',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contribute_DAO_Contribution',
-                          ),
-      
-              'contribution_soft_contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_contribution_soft.contact_id',
-        'headerPattern' => '/contact(.?id)?/i',
-        'dataPattern' => '/^\d+$/',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'amount' => array(
-      
-        'name' => 'amount',
-        'propertyName' => 'amount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Amount'),
-                        'required' => true,
-                                  'precision'      => array(20,2),
-                                   
-                'import' => true,
-        'where' => 'civicrm_contribution_soft.amount',
-        'headerPattern' => '/total(.?am(ou)?nt)?/i',
-        'dataPattern' => '/^\d+(\.\d{2})?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'currency' => array(
-      
-        'name' => 'currency',
-        'propertyName' => 'currency',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Currency'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                                           'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_currency',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'full_name',
-                      'nameColumn' => 'numeric_code',
-                    )
-                 ),
-      
-              'pcp_id' => array(
-      
-        'name' => 'pcp_id',
-        'propertyName' => 'pcp',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_PCP_DAO_PCP',
-                          ),
-      
-              'pcp_display_in_roll' => array(
-      
-        'name' => 'pcp_display_in_roll',
-        'propertyName' => 'pcpDisplayInRoll',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Pcp Display In Roll'),
-                                                             
-                                    
-                          ),
-      
-              'pcp_roll_nickname' => array(
-      
-        'name' => 'pcp_roll_nickname',
-        'propertyName' => 'pcpRollNickname',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Pcp Roll Nickname'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'pcp_personal_note' => array(
-      
-        'name' => 'pcp_personal_note',
-        'propertyName' => 'pcpPersonalNote',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Pcp Personal Note'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'soft_credit_type_id' => array(
-      
-        'name' => 'soft_credit_type_id',
-        'propertyName' => 'softCreditTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Soft Credit Type'),
-                                                             
-                                           'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'soft_credit_type',
-                    )
-                 ),
-             );
-    }
+        'contribution_soft_id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Soft Contribution ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_contribution_soft.id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'contribution_id' => array(
+          'name' => 'contribution_id',
+          'propertyName' => 'contribution',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Soft Contribution - Contribution'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contribute_DAO_Contribution',
+        ),
+        'contribution_soft_contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_contribution_soft.contact_id',
+          'headerPattern' => '/contact(.?id)?/i',
+          'dataPattern' => '/^\d+$/',
+          'export' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'amount' => array(
+          'name' => 'amount',
+          'propertyName' => 'amount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Soft Contribution Amount'),
+          'required' => true,
+          'precision' => array(20,2),
+          'import' => true,
+          'where' => 'civicrm_contribution_soft.amount',
+          'headerPattern' => '/total(.?am(ou)?nt)?/i',
+          'dataPattern' => '/^\d+(\.\d{2})?$/',
+          'export' => true,
+        ),
+        'currency' => array(
+          'name' => 'currency',
+          'propertyName' => 'currency',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Soft Contribution Currency'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_currency',
+            'keyColumn' => 'name',
+            'labelColumn' => 'full_name',
+            'nameColumn' => 'numeric_code',
+          )
+        ),
+        'pcp_id' => array(
+          'name' => 'pcp_id',
+          'propertyName' => 'pcp',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Soft Contribution PCP'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_PCP_DAO_PCP',
+        ),
+        'pcp_display_in_roll' => array(
+          'name' => 'pcp_display_in_roll',
+          'propertyName' => 'pcpDisplayInRoll',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Soft Contribution Display on PCP'),
+        ),
+        'pcp_roll_nickname' => array(
+          'name' => 'pcp_roll_nickname',
+          'propertyName' => 'pcpRollNickname',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Soft Contribution PCP Nickname'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'NULL',
+        ),
+        'pcp_personal_note' => array(
+          'name' => 'pcp_personal_note',
+          'propertyName' => 'pcpPersonalNote',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Soft Contribution PCP Note'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'NULL',
+        ),
+        'soft_credit_type_id' => array(
+          'name' => 'soft_credit_type_id',
+          'propertyName' => 'softCreditTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Soft Credit Type'),
+          'default' => 'NULL',
+          'pseudoconstant' => array(
+            'optionGroupName' => 'soft_credit_type',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -68,6 +69,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $title;
@@ -77,6 +79,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="intro_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $introText;
@@ -176,6 +179,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="pay_later_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $payLaterText;
@@ -185,6 +189,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="pay_later_receipt", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $payLaterReceipt;
@@ -203,6 +208,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="initial_amount_label", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $initialAmountLabel;
@@ -212,6 +218,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="initial_amount_help_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $initialAmountHelpText;
@@ -275,6 +282,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $thankyouTitle;
@@ -284,6 +292,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="thankyou_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $thankyouText;
@@ -293,6 +302,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="thankyou_footer", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $thankyouFooter;
@@ -311,6 +321,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="for_organization", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $forOrganization;
@@ -329,6 +340,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="receipt_from_name", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $receiptFromName;
@@ -365,6 +377,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="receipt_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $receiptText;
@@ -383,6 +396,7 @@ class ContributionPage extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="footer_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $footerText;
@@ -1359,520 +1373,393 @@ class ContributionPage extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contribution Page Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'intro_text' => array(
-      
-        'name' => 'intro_text',
-        'propertyName' => 'introText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Contribution Page Introduction Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 6,
-                         'cols' => 50,
-         
-                                    
-                          ),
-      
-              'financial_type_id' => array(
-      
-        'name' => 'financial_type_id',
-        'propertyName' => 'financialType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Financial Type'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_financial_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'payment_processor' => array(
-      
-        'name' => 'payment_processor',
-        'propertyName' => 'paymentProcessor',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Payment Processor'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_payment_processor',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'is_credit_card_only' => array(
-      
-        'name' => 'is_credit_card_only',
-        'propertyName' => 'isCreditCardOnly',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_monetary' => array(
-      
-        'name' => 'is_monetary',
-        'propertyName' => 'isMonetary',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_recur' => array(
-      
-        'name' => 'is_recur',
-        'propertyName' => 'isRecur',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_confirm_enabled' => array(
-      
-        'name' => 'is_confirm_enabled',
-        'propertyName' => 'isConfirmEnabled',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'recur_frequency_unit' => array(
-      
-        'name' => 'recur_frequency_unit',
-        'propertyName' => 'recurFrequencyUnit',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Recur Frequency Unit'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_recur_interval' => array(
-      
-        'name' => 'is_recur_interval',
-        'propertyName' => 'isRecurInterval',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_recur_installments' => array(
-      
-        'name' => 'is_recur_installments',
-        'propertyName' => 'isRecurInstallments',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_pay_later' => array(
-      
-        'name' => 'is_pay_later',
-        'propertyName' => 'isPayLater',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'pay_later_text' => array(
-      
-        'name' => 'pay_later_text',
-        'propertyName' => 'payLaterText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Pay Later Text'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'pay_later_receipt' => array(
-      
-        'name' => 'pay_later_receipt',
-        'propertyName' => 'payLaterReceipt',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Pay Later Receipt'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'is_partial_payment' => array(
-      
-        'name' => 'is_partial_payment',
-        'propertyName' => 'isPartialPayment',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'initial_amount_label' => array(
-      
-        'name' => 'initial_amount_label',
-        'propertyName' => 'initialAmountLabel',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Initial Amount Label'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'initial_amount_help_text' => array(
-      
-        'name' => 'initial_amount_help_text',
-        'propertyName' => 'initialAmountHelpText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Initial Amount Help Text'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'min_initial_amount' => array(
-      
-        'name' => 'min_initial_amount',
-        'propertyName' => 'minInitialAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Min Initial Amount'),
-                                          'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'is_allow_other_amount' => array(
-      
-        'name' => 'is_allow_other_amount',
-        'propertyName' => 'isAllowOtherAmount',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'default_amount_id' => array(
-      
-        'name' => 'default_amount_id',
-        'propertyName' => 'defaultAmountId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'min_amount' => array(
-      
-        'name' => 'min_amount',
-        'propertyName' => 'minAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Min Amount'),
-                                          'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'max_amount' => array(
-      
-        'name' => 'max_amount',
-        'propertyName' => 'maxAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Max Amount'),
-                                          'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'goal_amount' => array(
-      
-        'name' => 'goal_amount',
-        'propertyName' => 'goalAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Goal Amount'),
-                                          'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'thankyou_title' => array(
-      
-        'name' => 'thankyou_title',
-        'propertyName' => 'thankyouTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Thank-you Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'thankyou_text' => array(
-      
-        'name' => 'thankyou_text',
-        'propertyName' => 'thankyouText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Thank-you Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 8,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'thankyou_footer' => array(
-      
-        'name' => 'thankyou_footer',
-        'propertyName' => 'thankyouFooter',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Thank-you Footer'),
-                                 'maxlength' => 65535,
-                                          'rows' => 8,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'is_for_organization' => array(
-      
-        'name' => 'is_for_organization',
-        'propertyName' => 'isForOrganization',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'for_organization' => array(
-      
-        'name' => 'for_organization',
-        'propertyName' => 'forOrganization',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('On Behalf Of Organization'),
-                                 'maxlength' => 65535,
-                                          'rows' => 2,
-                         'cols' => 50,
-         
-                                    
-                          ),
-      
-              'is_email_receipt' => array(
-      
-        'name' => 'is_email_receipt',
-        'propertyName' => 'isEmailReceipt',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'receipt_from_name' => array(
-      
-        'name' => 'receipt_from_name',
-        'propertyName' => 'receiptFromName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Receipt From Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'receipt_from_email' => array(
-      
-        'name' => 'receipt_from_email',
-        'propertyName' => 'receiptFromEmail',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Receipt From Email'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'cc_receipt' => array(
-      
-        'name' => 'cc_receipt',
-        'propertyName' => 'ccReceipt',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Cc Receipt'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'bcc_receipt' => array(
-      
-        'name' => 'bcc_receipt',
-        'propertyName' => 'bccReceipt',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Bcc Receipt'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'receipt_text' => array(
-      
-        'name' => 'receipt_text',
-        'propertyName' => 'receiptText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Receipt Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 6,
-                         'cols' => 50,
-         
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'footer_text' => array(
-      
-        'name' => 'footer_text',
-        'propertyName' => 'footerText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Footer Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 6,
-                         'cols' => 50,
-         
-                                    
-                          ),
-      
-              'amount_block_is_active' => array(
-      
-        'name' => 'amount_block_is_active',
-        'propertyName' => 'amountBlockIsActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'start_date' => array(
-      
-        'name' => 'start_date',
-        'propertyName' => 'startDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Contribution Page Start Date'),
-                                                             
-                                    
-                          ),
-      
-              'end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Contribution Page End Date'),
-                                                             
-                                    
-                          ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contribution Page Created By'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Contribution Page Created Date'),
-                                                             
-                                    
-                          ),
-      
-              'currency' => array(
-      
-        'name' => 'currency',
-        'propertyName' => 'currency',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contribution Page Currency'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                                           'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_currency',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'full_name',
-                      'nameColumn' => 'numeric_code',
-                    )
-                 ),
-      
-              'campaign_id' => array(
-      
-        'name' => 'campaign_id',
-        'propertyName' => 'campaign',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contribution Page Campaign ID'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_campaign',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'is_share' => array(
-      
-        'name' => 'is_share',
-        'propertyName' => 'isShare',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Contribution Page Shared?'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contribution Page ID'),
+          'required' => true,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contribution Page Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'intro_text' => array(
+          'name' => 'intro_text',
+          'propertyName' => 'introText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Contribution Page Introduction Text'),
+          'maxlength' => 65535,
+          'rows' => 6,
+          'cols' => 50,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'financial_type_id' => array(
+          'name' => 'financial_type_id',
+          'propertyName' => 'financialType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Type'),
+          'FKClassName' => 'CRM_Financial_DAO_FinancialType',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_financial_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'payment_processor' => array(
+          'name' => 'payment_processor',
+          'propertyName' => 'paymentProcessor',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Payment Processor'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_payment_processor',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'is_credit_card_only' => array(
+          'name' => 'is_credit_card_only',
+          'propertyName' => 'isCreditCardOnly',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Credit Card Only?'),
+        ),
+        'is_monetary' => array(
+          'name' => 'is_monetary',
+          'propertyName' => 'isMonetary',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Monetary'),
+          'default' => '1',
+        ),
+        'is_recur' => array(
+          'name' => 'is_recur',
+          'propertyName' => 'isRecur',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Recurring'),
+        ),
+        'is_confirm_enabled' => array(
+          'name' => 'is_confirm_enabled',
+          'propertyName' => 'isConfirmEnabled',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Confirmation Page?'),
+          'default' => '1',
+        ),
+        'recur_frequency_unit' => array(
+          'name' => 'recur_frequency_unit',
+          'propertyName' => 'recurFrequencyUnit',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Recurring Frequency'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_recur_interval' => array(
+          'name' => 'is_recur_interval',
+          'propertyName' => 'isRecurInterval',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Support Recurring Intervals'),
+        ),
+        'is_recur_installments' => array(
+          'name' => 'is_recur_installments',
+          'propertyName' => 'isRecurInstallments',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Recurring Installments?'),
+        ),
+        'is_pay_later' => array(
+          'name' => 'is_pay_later',
+          'propertyName' => 'isPayLater',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Pay Later'),
+        ),
+        'pay_later_text' => array(
+          'name' => 'pay_later_text',
+          'propertyName' => 'payLaterText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Pay Later Text'),
+          'maxlength' => 65535,
+          'localizable' => true,
+        ),
+        'pay_later_receipt' => array(
+          'name' => 'pay_later_receipt',
+          'propertyName' => 'payLaterReceipt',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Pay Later Receipt'),
+          'maxlength' => 65535,
+          'localizable' => true,
+        ),
+        'is_partial_payment' => array(
+          'name' => 'is_partial_payment',
+          'propertyName' => 'isPartialPayment',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Allow Partial Payment'),
+        ),
+        'initial_amount_label' => array(
+          'name' => 'initial_amount_label',
+          'propertyName' => 'initialAmountLabel',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Initial Amount Label'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'initial_amount_help_text' => array(
+          'name' => 'initial_amount_help_text',
+          'propertyName' => 'initialAmountHelpText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Initial Amount Help Text'),
+          'maxlength' => 65535,
+          'localizable' => true,
+        ),
+        'min_initial_amount' => array(
+          'name' => 'min_initial_amount',
+          'propertyName' => 'minInitialAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Min Initial Amount'),
+          'precision' => array(20,2),
+        ),
+        'is_allow_other_amount' => array(
+          'name' => 'is_allow_other_amount',
+          'propertyName' => 'isAllowOtherAmount',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Allow Other Amounts'),
+        ),
+        'default_amount_id' => array(
+          'name' => 'default_amount_id',
+          'propertyName' => 'defaultAmountId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Default Amount'),
+        ),
+        'min_amount' => array(
+          'name' => 'min_amount',
+          'propertyName' => 'minAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Minimum Amount'),
+          'precision' => array(20,2),
+        ),
+        'max_amount' => array(
+          'name' => 'max_amount',
+          'propertyName' => 'maxAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Maximum Amount'),
+          'precision' => array(20,2),
+        ),
+        'goal_amount' => array(
+          'name' => 'goal_amount',
+          'propertyName' => 'goalAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Goal Amount'),
+          'precision' => array(20,2),
+        ),
+        'thankyou_title' => array(
+          'name' => 'thankyou_title',
+          'propertyName' => 'thankyouTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Thank-you Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'thankyou_text' => array(
+          'name' => 'thankyou_text',
+          'propertyName' => 'thankyouText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Thank-you Text'),
+          'maxlength' => 65535,
+          'rows' => 8,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'thankyou_footer' => array(
+          'name' => 'thankyou_footer',
+          'propertyName' => 'thankyouFooter',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Thank-you Footer'),
+          'maxlength' => 65535,
+          'rows' => 8,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'is_for_organization' => array(
+          'name' => 'is_for_organization',
+          'propertyName' => 'isForOrganization',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Allow For Organization'),
+        ),
+        'for_organization' => array(
+          'name' => 'for_organization',
+          'propertyName' => 'forOrganization',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('On Behalf Of Organization'),
+          'maxlength' => 65535,
+          'rows' => 2,
+          'cols' => 50,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'is_email_receipt' => array(
+          'name' => 'is_email_receipt',
+          'propertyName' => 'isEmailReceipt',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Send email Receipt'),
+        ),
+        'receipt_from_name' => array(
+          'name' => 'receipt_from_name',
+          'propertyName' => 'receiptFromName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Receipt From'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'receipt_from_email' => array(
+          'name' => 'receipt_from_email',
+          'propertyName' => 'receiptFromEmail',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Receipt From email'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'cc_receipt' => array(
+          'name' => 'cc_receipt',
+          'propertyName' => 'ccReceipt',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Receipt cc'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'bcc_receipt' => array(
+          'name' => 'bcc_receipt',
+          'propertyName' => 'bccReceipt',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Receipt bcc'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'receipt_text' => array(
+          'name' => 'receipt_text',
+          'propertyName' => 'receiptText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Receipt Text'),
+          'maxlength' => 65535,
+          'rows' => 6,
+          'cols' => 50,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Page Active?'),
+        ),
+        'footer_text' => array(
+          'name' => 'footer_text',
+          'propertyName' => 'footerText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Footer Text'),
+          'maxlength' => 65535,
+          'rows' => 6,
+          'cols' => 50,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'amount_block_is_active' => array(
+          'name' => 'amount_block_is_active',
+          'propertyName' => 'amountBlockIsActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Amount Block Active?'),
+          'default' => '1',
+        ),
+        'start_date' => array(
+          'name' => 'start_date',
+          'propertyName' => 'startDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Contribution Page Start Date'),
+        ),
+        'end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Contribution Page End Date'),
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contribution Page Created By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Contribution Page Created Date'),
+        ),
+        'currency' => array(
+          'name' => 'currency',
+          'propertyName' => 'currency',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contribution Page Currency'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_currency',
+            'keyColumn' => 'name',
+            'labelColumn' => 'full_name',
+            'nameColumn' => 'numeric_code',
+          )
+        ),
+        'campaign_id' => array(
+          'name' => 'campaign_id',
+          'propertyName' => 'campaign',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contribution Page Campaign ID'),
+          'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_campaign',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'is_share' => array(
+          'name' => 'is_share',
+          'propertyName' => 'isShare',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Contribution Page Shared?'),
+          'default' => '1',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

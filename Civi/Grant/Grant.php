@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -489,246 +490,220 @@ class Grant extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'grant_id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Grant ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_grant.id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'grant_contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact ID'),
-                        'required' => true,
-                                                     
-                         'export' => true,
-                'where' => 'civicrm_grant.contact_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'application_received_date' => array(
-      
-        'name' => 'application_received_date',
-        'propertyName' => 'applicationReceivedDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Application received date'),
-                                                             
-                         'export' => true,
-                'where' => 'civicrm_grant.application_received_date',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'decision_date' => array(
-      
-        'name' => 'decision_date',
-        'propertyName' => 'decisionDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Decision date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_grant.decision_date',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'grant_money_transfer_date' => array(
-      
-        'name' => 'money_transfer_date',
-        'propertyName' => 'moneyTransferDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Grant Money transfer date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_grant.money_transfer_date',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'grant_due_date' => array(
-      
-        'name' => 'grant_due_date',
-        'propertyName' => 'grantDueDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Grant Due Date'),
-                                                             
-                                    
-                          ),
-      
-              'grant_report_received' => array(
-      
-        'name' => 'grant_report_received',
-        'propertyName' => 'grantReportReceived',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Grant report received'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_grant.grant_report_received',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'grant_type_id' => array(
-      
-        'name' => 'grant_type_id',
-        'propertyName' => 'grantTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Grant Type'),
-                        'required' => true,
-                                                     
-                         'export' => true,
-                'where' => 'civicrm_grant.grant_type_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'grant_type',
-                    )
-                 ),
-      
-              'amount_total' => array(
-      
-        'name' => 'amount_total',
-        'propertyName' => 'amountTotal',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Total Amount'),
-                        'required' => true,
-                                  'precision'      => array(20,2),
-                                   
-                'import' => true,
-        'where' => 'civicrm_grant.amount_total',
-        'headerPattern' => '',
-        'dataPattern' => '/^\d+(\.\d{2})?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'amount_requested' => array(
-      
-        'name' => 'amount_requested',
-        'propertyName' => 'amountRequested',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Amount Requested'),
-                                          'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'amount_granted' => array(
-      
-        'name' => 'amount_granted',
-        'propertyName' => 'amountGranted',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Amount granted'),
-                                          'precision'      => array(20,2),
-                                   
-                'import' => true,
-        'where' => 'civicrm_grant.amount_granted',
-        'headerPattern' => '',
-        'dataPattern' => '/^\d+(\.\d{2})?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'currency' => array(
-      
-        'name' => 'currency',
-        'propertyName' => 'currency',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Grant Currency'),
-                        'required' => true,
-                         'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_currency',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'full_name',
-                      'nameColumn' => 'numeric_code',
-                    )
-                 ),
-      
-              'rationale' => array(
-      
-        'name' => 'rationale',
-        'propertyName' => 'rationale',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Grant Rationale'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 60,
-         
-                'import' => true,
-        'where' => 'civicrm_grant.rationale',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'grant_status_id' => array(
-      
-        'name' => 'status_id',
-        'propertyName' => 'statusId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Grant Status'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_grant.status_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => false,
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'grant_status',
-                    )
-                 ),
-      
-              'financial_type_id' => array(
-      
-        'name' => 'financial_type_id',
-        'propertyName' => 'financialType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Financial Type'),
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_financial_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-             );
-    }
+        'grant_id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Grant ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_grant.id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'grant_contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID'),
+          'required' => true,
+          'export' => true,
+          'where' => 'civicrm_grant.contact_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'html' => array(
+            'type' => 'Autocomplete-Select',
+          ),
+        ),
+        'application_received_date' => array(
+          'name' => 'application_received_date',
+          'propertyName' => 'applicationReceivedDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Application received date'),
+          'export' => true,
+          'where' => 'civicrm_grant.application_received_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ),
+        'decision_date' => array(
+          'name' => 'decision_date',
+          'propertyName' => 'decisionDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Decision date'),
+          'import' => true,
+          'where' => 'civicrm_grant.decision_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'grant_money_transfer_date' => array(
+          'name' => 'money_transfer_date',
+          'propertyName' => 'moneyTransferDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Grant Money transfer date'),
+          'import' => true,
+          'where' => 'civicrm_grant.money_transfer_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'grant_due_date' => array(
+          'name' => 'grant_due_date',
+          'propertyName' => 'grantDueDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Grant Due Date'),
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'grant_report_received' => array(
+          'name' => 'grant_report_received',
+          'propertyName' => 'grantReportReceived',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Grant report received'),
+          'import' => true,
+          'where' => 'civicrm_grant.grant_report_received',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'grant_type_id' => array(
+          'name' => 'grant_type_id',
+          'propertyName' => 'grantTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Grant Type'),
+          'required' => true,
+          'export' => true,
+          'where' => 'civicrm_grant.grant_type_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'grant_type',
+          )
+        ),
+        'amount_total' => array(
+          'name' => 'amount_total',
+          'propertyName' => 'amountTotal',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Total Amount'),
+          'required' => true,
+          'precision' => array(20,2),
+          'import' => true,
+          'where' => 'civicrm_grant.amount_total',
+          'headerPattern' => '',
+          'dataPattern' => '/^\d+(\.\d{2})?$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'amount_requested' => array(
+          'name' => 'amount_requested',
+          'propertyName' => 'amountRequested',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Amount Requested'),
+          'precision' => array(20,2),
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'amount_granted' => array(
+          'name' => 'amount_granted',
+          'propertyName' => 'amountGranted',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Amount granted'),
+          'precision' => array(20,2),
+          'import' => true,
+          'where' => 'civicrm_grant.amount_granted',
+          'headerPattern' => '',
+          'dataPattern' => '/^\d+(\.\d{2})?$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'currency' => array(
+          'name' => 'currency',
+          'propertyName' => 'currency',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Grant Currency'),
+          'required' => true,
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_currency',
+            'keyColumn' => 'name',
+            'labelColumn' => 'full_name',
+            'nameColumn' => 'numeric_code',
+          )
+        ),
+        'rationale' => array(
+          'name' => 'rationale',
+          'propertyName' => 'rationale',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Grant Rationale'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 60,
+          'import' => true,
+          'where' => 'civicrm_grant.rationale',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'grant_status_id' => array(
+          'name' => 'status_id',
+          'propertyName' => 'statusId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Grant Status'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_grant.status_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => false,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'grant_status',
+          )
+        ),
+        'financial_type_id' => array(
+          'name' => 'financial_type_id',
+          'propertyName' => 'financialType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Type'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Financial_DAO_FinancialType',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_financial_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

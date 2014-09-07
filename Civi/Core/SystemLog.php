@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -257,90 +258,60 @@ class SystemLog extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('System Log ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'message' => array(
-      
-        'name' => 'message',
-        'propertyName' => 'message',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('System Log Message'),
-                        'required' => true,
-                         'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'context' => array(
-      
-        'name' => 'context',
-        'propertyName' => 'context',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Detailed Log Data'),
-                                                             
-                                    
-                          ),
-      
-              'level' => array(
-      
-        'name' => 'level',
-        'propertyName' => 'level',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Detailed Log Data'),
-                                 'maxlength' => 9,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                           'default' => 'info',
-         
-                          ),
-      
-              'timestamp' => array(
-      
-        'name' => 'timestamp',
-        'propertyName' => 'timestamp',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Log Timestamp'),
-                                                             
-                                           'default' => 'CURRENT_TIMESTAMP',
-         
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contactId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Log Contact ID'),
-                                                             
-                                    
-                          ),
-      
-              'hostname' => array(
-      
-        'name' => 'hostname',
-        'propertyName' => 'hostname',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Log Host'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('System Log ID'),
+          'required' => true,
+        ),
+        'message' => array(
+          'name' => 'message',
+          'propertyName' => 'message',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('System Log Message'),
+          'required' => true,
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'context' => array(
+          'name' => 'context',
+          'propertyName' => 'context',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Detailed Log Data'),
+        ),
+        'level' => array(
+          'name' => 'level',
+          'propertyName' => 'level',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Detailed Log Data'),
+          'maxlength' => 9,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'default' => 'info',
+        ),
+        'timestamp' => array(
+          'name' => 'timestamp',
+          'propertyName' => 'timestamp',
+          'type' => \CRM_Utils_Type::T_TIMESTAMP,
+          'title' => ts('Log Timestamp'),
+          'default' => 'CURRENT_TIMESTAMP',
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contactId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Log Contact ID'),
+        ),
+        'hostname' => array(
+          'name' => 'hostname',
+          'propertyName' => 'hostname',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Log Host'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

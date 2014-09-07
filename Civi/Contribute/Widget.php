@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -547,206 +548,136 @@ class Widget extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contribution_page_id' => array(
-      
-        'name' => 'contribution_page_id',
-        'propertyName' => 'contributionPage',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'url_logo' => array(
-      
-        'name' => 'url_logo',
-        'propertyName' => 'urlLogo',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Url Logo'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'button_title' => array(
-      
-        'name' => 'button_title',
-        'propertyName' => 'buttonTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Button Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'about' => array(
-      
-        'name' => 'about',
-        'propertyName' => 'about',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('About'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'url_homepage' => array(
-      
-        'name' => 'url_homepage',
-        'propertyName' => 'urlHomepage',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Url Homepage'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'color_title' => array(
-      
-        'name' => 'color_title',
-        'propertyName' => 'colorTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Color Title'),
-                                 'maxlength' => 10,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                          ),
-      
-              'color_button' => array(
-      
-        'name' => 'color_button',
-        'propertyName' => 'colorButton',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Color Button'),
-                                 'maxlength' => 10,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                          ),
-      
-              'color_bar' => array(
-      
-        'name' => 'color_bar',
-        'propertyName' => 'colorBar',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Color Bar'),
-                                 'maxlength' => 10,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                          ),
-      
-              'color_main_text' => array(
-      
-        'name' => 'color_main_text',
-        'propertyName' => 'colorMainText',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Color Main Text'),
-                                 'maxlength' => 10,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                          ),
-      
-              'color_main' => array(
-      
-        'name' => 'color_main',
-        'propertyName' => 'colorMain',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Color Main'),
-                                 'maxlength' => 10,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                          ),
-      
-              'color_main_bg' => array(
-      
-        'name' => 'color_main_bg',
-        'propertyName' => 'colorMainBg',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Color Main Bg'),
-                                 'maxlength' => 10,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                          ),
-      
-              'color_bg' => array(
-      
-        'name' => 'color_bg',
-        'propertyName' => 'colorBg',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Color Bg'),
-                                 'maxlength' => 10,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                          ),
-      
-              'color_about_link' => array(
-      
-        'name' => 'color_about_link',
-        'propertyName' => 'colorAboutLink',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Color About Link'),
-                                 'maxlength' => 10,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                          ),
-      
-              'color_homepage_link' => array(
-      
-        'name' => 'color_homepage_link',
-        'propertyName' => 'colorHomepageLink',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Color Homepage Link'),
-                                 'maxlength' => 10,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'contribution_page_id' => array(
+          'name' => 'contribution_page_id',
+          'propertyName' => 'contributionPage',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'url_logo' => array(
+          'name' => 'url_logo',
+          'propertyName' => 'urlLogo',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Url Logo'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'button_title' => array(
+          'name' => 'button_title',
+          'propertyName' => 'buttonTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Button Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'about' => array(
+          'name' => 'about',
+          'propertyName' => 'about',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('About'),
+          'maxlength' => 65535,
+        ),
+        'url_homepage' => array(
+          'name' => 'url_homepage',
+          'propertyName' => 'urlHomepage',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Url Homepage'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'color_title' => array(
+          'name' => 'color_title',
+          'propertyName' => 'colorTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Color Title'),
+          'maxlength' => 10,
+          'size' => \CRM_Utils_Type::TWELVE,
+        ),
+        'color_button' => array(
+          'name' => 'color_button',
+          'propertyName' => 'colorButton',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Color Button'),
+          'maxlength' => 10,
+          'size' => \CRM_Utils_Type::TWELVE,
+        ),
+        'color_bar' => array(
+          'name' => 'color_bar',
+          'propertyName' => 'colorBar',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Color Bar'),
+          'maxlength' => 10,
+          'size' => \CRM_Utils_Type::TWELVE,
+        ),
+        'color_main_text' => array(
+          'name' => 'color_main_text',
+          'propertyName' => 'colorMainText',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Color Main Text'),
+          'maxlength' => 10,
+          'size' => \CRM_Utils_Type::TWELVE,
+        ),
+        'color_main' => array(
+          'name' => 'color_main',
+          'propertyName' => 'colorMain',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Color Main'),
+          'maxlength' => 10,
+          'size' => \CRM_Utils_Type::TWELVE,
+        ),
+        'color_main_bg' => array(
+          'name' => 'color_main_bg',
+          'propertyName' => 'colorMainBg',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Color Main Bg'),
+          'maxlength' => 10,
+          'size' => \CRM_Utils_Type::TWELVE,
+        ),
+        'color_bg' => array(
+          'name' => 'color_bg',
+          'propertyName' => 'colorBg',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Color Bg'),
+          'maxlength' => 10,
+          'size' => \CRM_Utils_Type::TWELVE,
+        ),
+        'color_about_link' => array(
+          'name' => 'color_about_link',
+          'propertyName' => 'colorAboutLink',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Color About Link'),
+          'maxlength' => 10,
+          'size' => \CRM_Utils_Type::TWELVE,
+        ),
+        'color_homepage_link' => array(
+          'name' => 'color_homepage_link',
+          'propertyName' => 'colorHomepageLink',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Color Homepage Link'),
+          'maxlength' => 10,
+          'size' => \CRM_Utils_Type::TWELVE,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -86,6 +87,7 @@ class PriceSet extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=false)
+   * @Field(localizable=true)
    * 
    */
   private $title;
@@ -104,6 +106,7 @@ class PriceSet extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPre;
@@ -113,6 +116,7 @@ class PriceSet extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPost;
@@ -402,162 +406,153 @@ class PriceSet extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'help_pre' => array(
-      
-        'name' => 'help_pre',
-        'propertyName' => 'helpPre',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Pre'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'help_post' => array(
-      
-        'name' => 'help_post',
-        'propertyName' => 'helpPost',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Post'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'javascript' => array(
-      
-        'name' => 'javascript',
-        'propertyName' => 'javascript',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Javascript'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'extends' => array(
-      
-        'name' => 'extends',
-        'propertyName' => 'extends',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Extends'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_component',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'financial_type_id' => array(
-      
-        'name' => 'financial_type_id',
-        'propertyName' => 'financialType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Financial Type'),
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_financial_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'is_quick_config' => array(
-      
-        'name' => 'is_quick_config',
-        'propertyName' => 'isQuickConfig',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Price Set ID'),
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Price Set Domain'),
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Price Set Title'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Price Set Is Active?'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'help_pre' => array(
+          'name' => 'help_pre',
+          'propertyName' => 'helpPre',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Price Set Pre Help'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'help_post' => array(
+          'name' => 'help_post',
+          'propertyName' => 'helpPost',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Price Set Post Help'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'javascript' => array(
+          'name' => 'javascript',
+          'propertyName' => 'javascript',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Price Set Javascript'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'extends' => array(
+          'name' => 'extends',
+          'propertyName' => 'extends',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Price Set Extends'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_component',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'financial_type_id' => array(
+          'name' => 'financial_type_id',
+          'propertyName' => 'financialType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Type'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Financial_DAO_FinancialType',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_financial_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'is_quick_config' => array(
+          'name' => 'is_quick_config',
+          'propertyName' => 'isQuickConfig',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Price Set Quick Config?'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Price Set Is Reserved'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

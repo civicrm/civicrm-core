@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -141,44 +142,31 @@ class ParticipantPayment extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Payment ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'participant_id' => array(
-      
-        'name' => 'participant_id',
-        'propertyName' => 'participant',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Participant ID'),
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Event_DAO_Participant',
-                          ),
-      
-              'contribution_id' => array(
-      
-        'name' => 'contribution_id',
-        'propertyName' => 'contribution',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contribute_DAO_Contribution',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Payment ID'),
+          'required' => true,
+        ),
+        'participant_id' => array(
+          'name' => 'participant_id',
+          'propertyName' => 'participant',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Participant ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Event_DAO_Participant',
+        ),
+        'contribution_id' => array(
+          'name' => 'contribution_id',
+          'propertyName' => 'contribution',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contribution'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contribute_DAO_Contribution',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

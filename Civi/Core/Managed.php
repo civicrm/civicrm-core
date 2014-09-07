@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -228,83 +229,60 @@ class Managed extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'module' => array(
-      
-        'name' => 'module',
-        'propertyName' => 'module',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Module'),
-                        'required' => true,
-                         'maxlength' => 127,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 127,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'entity_type' => array(
-      
-        'name' => 'entity_type',
-        'propertyName' => 'entityType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Type'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'cleanup' => array(
-      
-        'name' => 'cleanup',
-        'propertyName' => 'cleanup',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Cleanup'),
-                                 'maxlength' => 32,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_ManagedEntities::getCleanupOptions',
-                    )
-                 ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'module' => array(
+          'name' => 'module',
+          'propertyName' => 'module',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Module'),
+          'required' => true,
+          'maxlength' => 127,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 127,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'entity_type' => array(
+          'name' => 'entity_type',
+          'propertyName' => 'entityType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Entity Type'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'cleanup' => array(
+          'name' => 'cleanup',
+          'propertyName' => 'cleanup',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Cleanup'),
+          'maxlength' => 32,
+          'size' => \CRM_Utils_Type::MEDIUM,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_ManagedEntities::getCleanupOptions',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

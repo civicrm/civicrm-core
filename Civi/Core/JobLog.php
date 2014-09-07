@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -286,103 +287,69 @@ class JobLog extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'run_time' => array(
-      
-        'name' => 'run_time',
-        'propertyName' => 'runTime',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Run Time'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'job_id' => array(
-      
-        'name' => 'job_id',
-        'propertyName' => 'jobId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'command' => array(
-      
-        'name' => 'command',
-        'propertyName' => 'command',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Command'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'data' => array(
-      
-        'name' => 'data',
-        'propertyName' => 'data',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Data'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'run_time' => array(
+          'name' => 'run_time',
+          'propertyName' => 'runTime',
+          'type' => \CRM_Utils_Type::T_TIMESTAMP,
+          'title' => ts('Run Time'),
+          'default' => 'NULL',
+        ),
+        'job_id' => array(
+          'name' => 'job_id',
+          'propertyName' => 'jobId',
+          'type' => \CRM_Utils_Type::T_INT,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'command' => array(
+          'name' => 'command',
+          'propertyName' => 'command',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Command'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'data' => array(
+          'name' => 'data',
+          'propertyName' => 'data',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Data'),
+          'maxlength' => 65535,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

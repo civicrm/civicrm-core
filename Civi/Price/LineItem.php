@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -431,163 +432,132 @@ class LineItem extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contribution_id' => array(
-      
-        'name' => 'contribution_id',
-        'propertyName' => 'contribution',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contribute_DAO_Contribution',
-                          ),
-      
-              'price_field_id' => array(
-      
-        'name' => 'price_field_id',
-        'propertyName' => 'priceField',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Price_DAO_PriceField',
-                          ),
-      
-              'label' => array(
-      
-        'name' => 'label',
-        'propertyName' => 'label',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Label'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'qty' => array(
-      
-        'name' => 'qty',
-        'propertyName' => 'qty',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Qty'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'unit_price' => array(
-      
-        'name' => 'unit_price',
-        'propertyName' => 'unitPrice',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Unit Price'),
-                        'required' => true,
-                                  'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'line_total' => array(
-      
-        'name' => 'line_total',
-        'propertyName' => 'lineTotal',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Line Total'),
-                        'required' => true,
-                                  'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'participant_count' => array(
-      
-        'name' => 'participant_count',
-        'propertyName' => 'participantCount',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Participant Count'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'price_field_value_id' => array(
-      
-        'name' => 'price_field_value_id',
-        'propertyName' => 'priceFieldValue',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Price_DAO_PriceFieldValue',
-                          ),
-      
-              'financial_type_id' => array(
-      
-        'name' => 'financial_type_id',
-        'propertyName' => 'financialType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Financial Type'),
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_financial_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'deductible_amount' => array(
-      
-        'name' => 'deductible_amount',
-        'propertyName' => 'deductibleAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Deductible Amount'),
-                        'required' => true,
-                                  'precision'      => array(20,2),
-                                   
-                                           'default' => '0.0',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Line Item ID'),
+          'required' => true,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Line Item Entity Type'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Line Item Entity'),
+          'required' => true,
+        ),
+        'contribution_id' => array(
+          'name' => 'contribution_id',
+          'propertyName' => 'contribution',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Line Item Contribution'),
+          'FKClassName' => 'CRM_Contribute_DAO_Contribution',
+        ),
+        'price_field_id' => array(
+          'name' => 'price_field_id',
+          'propertyName' => 'priceField',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Line Item Price Field'),
+          'FKClassName' => 'CRM_Price_DAO_PriceField',
+        ),
+        'label' => array(
+          'name' => 'label',
+          'propertyName' => 'label',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Line Item Label'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'qty' => array(
+          'name' => 'qty',
+          'propertyName' => 'qty',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Line Item Quantity'),
+          'required' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'unit_price' => array(
+          'name' => 'unit_price',
+          'propertyName' => 'unitPrice',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Unit Price'),
+          'required' => true,
+          'precision' => array(20,2),
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'line_total' => array(
+          'name' => 'line_total',
+          'propertyName' => 'lineTotal',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Line Item Total'),
+          'required' => true,
+          'precision' => array(20,2),
+        ),
+        'participant_count' => array(
+          'name' => 'participant_count',
+          'propertyName' => 'participantCount',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Line Item Participant Count'),
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'price_field_value_id' => array(
+          'name' => 'price_field_value_id',
+          'propertyName' => 'priceFieldValue',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Line Item Option'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Price_DAO_PriceFieldValue',
+        ),
+        'financial_type_id' => array(
+          'name' => 'financial_type_id',
+          'propertyName' => 'financialType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Type'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Financial_DAO_FinancialType',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_financial_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'deductible_amount' => array(
+          'name' => 'deductible_amount',
+          'propertyName' => 'deductibleAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Deductible Amount'),
+          'required' => true,
+          'precision' => array(20,2),
+          'default' => '0.0',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

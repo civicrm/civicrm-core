@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -141,47 +142,39 @@ class GroupOrganization extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'group_id' => array(
-      
-        'name' => 'group_id',
-        'propertyName' => 'group',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Group',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_group',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'organization_id' => array(
-      
-        'name' => 'organization_id',
-        'propertyName' => 'organization',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Group Organization ID'),
+          'required' => true,
+        ),
+        'group_id' => array(
+          'name' => 'group_id',
+          'propertyName' => 'group',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Group'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Group',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_group',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'organization_id' => array(
+          'name' => 'organization_id',
+          'propertyName' => 'organization',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Organization'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

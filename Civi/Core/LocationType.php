@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -77,6 +78,7 @@ class LocationType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="display_name", type="string", length=64, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $displayName;
@@ -286,95 +288,66 @@ class LocationType extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Location Type'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'display_name' => array(
-      
-        'name' => 'display_name',
-        'propertyName' => 'displayName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Display Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'vcard_name' => array(
-      
-        'name' => 'vcard_name',
-        'propertyName' => 'vcardName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('vCard Location Type'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Location Type ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Location Type'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'display_name' => array(
+          'name' => 'display_name',
+          'propertyName' => 'displayName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Display Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'localizable' => true,
+        ),
+        'vcard_name' => array(
+          'name' => 'vcard_name',
+          'propertyName' => 'vcardName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('vCard Location Type'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Location Type is Reserved?'),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Location Type is Active?'),
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Default Location Type?'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

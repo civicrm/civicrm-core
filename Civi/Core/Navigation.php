@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -373,135 +374,89 @@ class Navigation extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'label' => array(
-      
-        'name' => 'label',
-        'propertyName' => 'label',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Label'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'url' => array(
-      
-        'name' => 'url',
-        'propertyName' => 'url',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Url'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'permission' => array(
-      
-        'name' => 'permission',
-        'propertyName' => 'permission',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Permission'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'permission_operator' => array(
-      
-        'name' => 'permission_operator',
-        'propertyName' => 'permissionOperator',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Permission Operator'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                                    
-                          ),
-      
-              'parent_id' => array(
-      
-        'name' => 'parent_id',
-        'propertyName' => 'parent',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Navigation',
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'has_separator' => array(
-      
-        'name' => 'has_separator',
-        'propertyName' => 'hasSeparator',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Has Separator'),
-                                                             
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'label' => array(
+          'name' => 'label',
+          'propertyName' => 'label',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Label'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'url' => array(
+          'name' => 'url',
+          'propertyName' => 'url',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Url'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'permission' => array(
+          'name' => 'permission',
+          'propertyName' => 'permission',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Permission'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'permission_operator' => array(
+          'name' => 'permission_operator',
+          'propertyName' => 'permissionOperator',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Permission Operator'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+        ),
+        'parent_id' => array(
+          'name' => 'parent_id',
+          'propertyName' => 'parent',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Core_DAO_Navigation',
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+        ),
+        'has_separator' => array(
+          'name' => 'has_separator',
+          'propertyName' => 'hasSeparator',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Has Separator'),
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Weight'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

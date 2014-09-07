@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -489,187 +490,161 @@ class PCP extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'pcp_id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Personal Campaign Page ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'pcp_contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact ID'),
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'status_id' => array(
-      
-        'name' => 'status_id',
-        'propertyName' => 'statusId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Personal Campaign Page Status'),
-                        'required' => true,
-                                                     
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'pcp_status',
-                    )
-                 ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Personal Campaign Page Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'intro_text' => array(
-      
-        'name' => 'intro_text',
-        'propertyName' => 'introText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Intro Text'),
-                                 'maxlength' => 65535,
-                                            
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'page_text' => array(
-      
-        'name' => 'page_text',
-        'propertyName' => 'pageText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Page Text'),
-                                 'maxlength' => 65535,
-                                            
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'donate_link_text' => array(
-      
-        'name' => 'donate_link_text',
-        'propertyName' => 'donateLinkText',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Donate Link Text'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'page_id' => array(
-      
-        'name' => 'page_id',
-        'propertyName' => 'pageId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'page_type' => array(
-      
-        'name' => 'page_type',
-        'propertyName' => 'pageType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('PCP Page Type'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                           'default' => 'contribute',
-         
-                          ),
-      
-              'pcp_block_id' => array(
-      
-        'name' => 'pcp_block_id',
-        'propertyName' => 'pcpBlockId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'is_thermometer' => array(
-      
-        'name' => 'is_thermometer',
-        'propertyName' => 'isThermometer',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'is_honor_roll' => array(
-      
-        'name' => 'is_honor_roll',
-        'propertyName' => 'isHonorRoll',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'goal_amount' => array(
-      
-        'name' => 'goal_amount',
-        'propertyName' => 'goalAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Goal Amount'),
-                                          'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'currency' => array(
-      
-        'name' => 'currency',
-        'propertyName' => 'currency',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Currency'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                                           'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_currency',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'full_name',
-                      'nameColumn' => 'numeric_code',
-                    )
-                 ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'pcp_id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Personal Campaign Page ID'),
+          'required' => true,
+        ),
+        'pcp_contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'html' => array(
+            'type' => 'Autocomplete-Select',
+          ),
+        ),
+        'status_id' => array(
+          'name' => 'status_id',
+          'propertyName' => 'statusId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Personal Campaign Page Status'),
+          'required' => true,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'pcp_status',
+          )
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Personal Campaign Page Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'intro_text' => array(
+          'name' => 'intro_text',
+          'propertyName' => 'introText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Intro Text'),
+          'maxlength' => 65535,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'TexArea',
+          ),
+        ),
+        'page_text' => array(
+          'name' => 'page_text',
+          'propertyName' => 'pageText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Page Text'),
+          'maxlength' => 65535,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'TexArea',
+          ),
+        ),
+        'donate_link_text' => array(
+          'name' => 'donate_link_text',
+          'propertyName' => 'donateLinkText',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Donate Link Text'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'page_id' => array(
+          'name' => 'page_id',
+          'propertyName' => 'pageId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'page_type' => array(
+          'name' => 'page_type',
+          'propertyName' => 'pageType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('PCP Page Type'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'default' => 'contribute',
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+        'pcp_block_id' => array(
+          'name' => 'pcp_block_id',
+          'propertyName' => 'pcpBlockId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'is_thermometer' => array(
+          'name' => 'is_thermometer',
+          'propertyName' => 'isThermometer',
+          'type' => \CRM_Utils_Type::T_INT,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'is_honor_roll' => array(
+          'name' => 'is_honor_roll',
+          'propertyName' => 'isHonorRoll',
+          'type' => \CRM_Utils_Type::T_INT,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'goal_amount' => array(
+          'name' => 'goal_amount',
+          'propertyName' => 'goalAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Goal Amount'),
+          'precision' => array(20,2),
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'currency' => array(
+          'name' => 'currency',
+          'propertyName' => 'currency',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Currency'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_currency',
+            'keyColumn' => 'name',
+            'labelColumn' => 'full_name',
+            'nameColumn' => 'numeric_code',
+          )
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

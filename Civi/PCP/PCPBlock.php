@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -140,6 +141,7 @@ class PCPBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="link_text", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $linkText = 'NULL';
@@ -402,144 +404,95 @@ class PCPBlock extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'target_entity_type' => array(
-      
-        'name' => 'target_entity_type',
-        'propertyName' => 'targetEntityType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Target Entity Type'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'contribute',
-         
-                          ),
-      
-              'target_entity_id' => array(
-      
-        'name' => 'target_entity_id',
-        'propertyName' => 'targetEntityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'supporter_profile_id' => array(
-      
-        'name' => 'supporter_profile_id',
-        'propertyName' => 'supporterProfile',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Core_DAO_UFGroup',
-                          ),
-      
-              'is_approval_needed' => array(
-      
-        'name' => 'is_approval_needed',
-        'propertyName' => 'isApprovalNeeded',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'is_tellfriend_enabled' => array(
-      
-        'name' => 'is_tellfriend_enabled',
-        'propertyName' => 'isTellfriendEnabled',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'tellfriend_limit' => array(
-      
-        'name' => 'tellfriend_limit',
-        'propertyName' => 'tellfriendLimit',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Tellfriend Limit'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'link_text' => array(
-      
-        'name' => 'link_text',
-        'propertyName' => 'linkText',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Link Text'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'notify_email' => array(
-      
-        'name' => 'notify_email',
-        'propertyName' => 'notifyEmail',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Notify Email'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                           'default' => 'NULL',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Entity Table'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'target_entity_type' => array(
+          'name' => 'target_entity_type',
+          'propertyName' => 'targetEntityType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Target Entity Type'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'contribute',
+        ),
+        'target_entity_id' => array(
+          'name' => 'target_entity_id',
+          'propertyName' => 'targetEntityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'supporter_profile_id' => array(
+          'name' => 'supporter_profile_id',
+          'propertyName' => 'supporterProfile',
+          'type' => \CRM_Utils_Type::T_INT,
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Core_DAO_UFGroup',
+        ),
+        'is_approval_needed' => array(
+          'name' => 'is_approval_needed',
+          'propertyName' => 'isApprovalNeeded',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'default' => 'NULL',
+        ),
+        'is_tellfriend_enabled' => array(
+          'name' => 'is_tellfriend_enabled',
+          'propertyName' => 'isTellfriendEnabled',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'default' => 'NULL',
+        ),
+        'tellfriend_limit' => array(
+          'name' => 'tellfriend_limit',
+          'propertyName' => 'tellfriendLimit',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Tellfriend Limit'),
+          'default' => 'NULL',
+        ),
+        'link_text' => array(
+          'name' => 'link_text',
+          'propertyName' => 'linkText',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Link Text'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'NULL',
+          'localizable' => true,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'default' => '1',
+        ),
+        'notify_email' => array(
+          'name' => 'notify_email',
+          'propertyName' => 'notifyEmail',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Notify Email'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'default' => 'NULL',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

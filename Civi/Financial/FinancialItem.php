@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -373,156 +374,119 @@ class FinancialItem extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Created Date'),
-                        'required' => true,
-                                                     
-                                           'default' => 'CURRENT_TIMESTAMP',
-         
-                          ),
-      
-              'transaction_date' => array(
-      
-        'name' => 'transaction_date',
-        'propertyName' => 'transactionDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Transaction Date'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                         'export' => true,
-                'where' => 'civicrm_financial_item.contact_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'amount' => array(
-      
-        'name' => 'amount',
-        'propertyName' => 'amount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Amount'),
-                        'required' => true,
-                                  'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'currency' => array(
-      
-        'name' => 'currency',
-        'propertyName' => 'currency',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Currency'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                         'export' => true,
-                'where' => 'civicrm_financial_item.currency',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_currency',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'full_name',
-                      'nameColumn' => 'numeric_code',
-                    )
-                 ),
-      
-              'financial_account_id' => array(
-      
-        'name' => 'financial_account_id',
-        'propertyName' => 'financialAccount',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_financial_account',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'status_id' => array(
-      
-        'name' => 'status_id',
-        'propertyName' => 'statusId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                         'export' => true,
-                'where' => 'civicrm_financial_item.status_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'financial_item_status',
-                    )
-                 ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_TIMESTAMP,
+          'title' => ts('Created Date'),
+          'required' => true,
+          'default' => 'CURRENT_TIMESTAMP',
+        ),
+        'transaction_date' => array(
+          'name' => 'transaction_date',
+          'propertyName' => 'transactionDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Transaction Date'),
+          'required' => true,
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'export' => true,
+          'where' => 'civicrm_financial_item.contact_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'amount' => array(
+          'name' => 'amount',
+          'propertyName' => 'amount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Amount'),
+          'required' => true,
+          'precision' => array(20,2),
+        ),
+        'currency' => array(
+          'name' => 'currency',
+          'propertyName' => 'currency',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Currency'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+          'export' => true,
+          'where' => 'civicrm_financial_item.currency',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_currency',
+            'keyColumn' => 'name',
+            'labelColumn' => 'full_name',
+            'nameColumn' => 'numeric_code',
+          )
+        ),
+        'financial_account_id' => array(
+          'name' => 'financial_account_id',
+          'propertyName' => 'financialAccount',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_financial_account',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'status_id' => array(
+          'name' => 'status_id',
+          'propertyName' => 'statusId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'export' => true,
+          'where' => 'civicrm_financial_item.status_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'financial_item_status',
+          )
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Entity Table'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

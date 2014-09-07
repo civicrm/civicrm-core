@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -141,42 +142,30 @@ class Confirm extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'event_subscribe_id' => array(
-      
-        'name' => 'event_subscribe_id',
-        'propertyName' => 'eventSubscribe',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Mailing_Event_DAO_Subscribe',
-                          ),
-      
-              'time_stamp' => array(
-      
-        'name' => 'time_stamp',
-        'propertyName' => 'timeStamp',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Time Stamp'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Confirmation ID'),
+          'required' => true,
+        ),
+        'event_subscribe_id' => array(
+          'name' => 'event_subscribe_id',
+          'propertyName' => 'eventSubscribe',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Subscribe ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Mailing_Event_DAO_Subscribe',
+        ),
+        'time_stamp' => array(
+          'name' => 'time_stamp',
+          'propertyName' => 'timeStamp',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Confirm Timestamp'),
+          'required' => true,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

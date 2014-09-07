@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -77,6 +78,7 @@ class Group extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $title;
@@ -634,236 +636,161 @@ class Group extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Group ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Group Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Group Title'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Group Description'),
-                                 'maxlength' => 65535,
-                                          'rows' => 2,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'source' => array(
-      
-        'name' => 'source',
-        'propertyName' => 'source',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Group Source'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'saved_search_id' => array(
-      
-        'name' => 'saved_search_id',
-        'propertyName' => 'savedSearch',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Saved Search ID'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_SavedSearch',
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Group Enabled'),
-                                                             
-                                    
-                          ),
-      
-              'visibility' => array(
-      
-        'name' => 'visibility',
-        'propertyName' => 'visibility',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Group Visibility Setting'),
-                                 'maxlength' => 24,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                                           'default' => 'User and User Admin Only',
-         
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::groupVisibility',
-                    )
-                 ),
-      
-              'where_clause' => array(
-      
-        'name' => 'where_clause',
-        'propertyName' => 'whereClause',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Group Where Clause'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'select_tables' => array(
-      
-        'name' => 'select_tables',
-        'propertyName' => 'selectTables',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Tables For Select Clause'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'where_tables' => array(
-      
-        'name' => 'where_tables',
-        'propertyName' => 'whereTables',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Tables For Where Clause'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'group_type' => array(
-      
-        'name' => 'group_type',
-        'propertyName' => 'groupType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Group Type'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'cache_date' => array(
-      
-        'name' => 'cache_date',
-        'propertyName' => 'cacheDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Group Cache Date'),
-                                                             
-                                    
-                          ),
-      
-              'refresh_date' => array(
-      
-        'name' => 'refresh_date',
-        'propertyName' => 'refreshDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Next Group Refresh Time'),
-                                                             
-                                    
-                          ),
-      
-              'parents' => array(
-      
-        'name' => 'parents',
-        'propertyName' => 'parents',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Group Parents'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'children' => array(
-      
-        'name' => 'children',
-        'propertyName' => 'children',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Group Children'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'is_hidden' => array(
-      
-        'name' => 'is_hidden',
-        'propertyName' => 'isHidden',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Group is Hidden'),
-                                                             
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Group is Reserved'),
-                                                             
-                                    
-                          ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Group Created By'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'modified_id' => array(
-      
-        'name' => 'modified_id',
-        'propertyName' => 'modified',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Group Modified By'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Group ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Group Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Group Title'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'localizable' => true,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Group Description'),
+          'maxlength' => 65535,
+          'rows' => 2,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'source' => array(
+          'name' => 'source',
+          'propertyName' => 'source',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Group Source'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'saved_search_id' => array(
+          'name' => 'saved_search_id',
+          'propertyName' => 'savedSearch',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Saved Search ID'),
+          'FKClassName' => 'CRM_Contact_DAO_SavedSearch',
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Group Enabled'),
+        ),
+        'visibility' => array(
+          'name' => 'visibility',
+          'propertyName' => 'visibility',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Group Visibility Setting'),
+          'maxlength' => 24,
+          'size' => \CRM_Utils_Type::MEDIUM,
+          'default' => 'User and User Admin Only',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::groupVisibility',
+          )
+        ),
+        'where_clause' => array(
+          'name' => 'where_clause',
+          'propertyName' => 'whereClause',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Group Where Clause'),
+          'maxlength' => 65535,
+        ),
+        'select_tables' => array(
+          'name' => 'select_tables',
+          'propertyName' => 'selectTables',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Tables For Select Clause'),
+          'maxlength' => 65535,
+        ),
+        'where_tables' => array(
+          'name' => 'where_tables',
+          'propertyName' => 'whereTables',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Tables For Where Clause'),
+          'maxlength' => 65535,
+        ),
+        'group_type' => array(
+          'name' => 'group_type',
+          'propertyName' => 'groupType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Group Type'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'cache_date' => array(
+          'name' => 'cache_date',
+          'propertyName' => 'cacheDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Group Cache Date'),
+        ),
+        'refresh_date' => array(
+          'name' => 'refresh_date',
+          'propertyName' => 'refreshDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Next Group Refresh Time'),
+        ),
+        'parents' => array(
+          'name' => 'parents',
+          'propertyName' => 'parents',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Group Parents'),
+          'maxlength' => 65535,
+        ),
+        'children' => array(
+          'name' => 'children',
+          'propertyName' => 'children',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Group Children'),
+          'maxlength' => 65535,
+        ),
+        'is_hidden' => array(
+          'name' => 'is_hidden',
+          'propertyName' => 'isHidden',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Group is Hidden'),
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Group is Reserved'),
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Group Created By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'modified_id' => array(
+          'name' => 'modified_id',
+          'propertyName' => 'modified',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Group Modified By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

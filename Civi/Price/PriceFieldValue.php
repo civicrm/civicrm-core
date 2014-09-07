@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -86,6 +87,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $label;
@@ -95,6 +97,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $description = 'NULL';
@@ -489,186 +492,168 @@ class PriceFieldValue extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'price_field_id' => array(
-      
-        'name' => 'price_field_id',
-        'propertyName' => 'priceField',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Price_DAO_PriceField',
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'label' => array(
-      
-        'name' => 'label',
-        'propertyName' => 'label',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Label'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Description'),
-                                 'maxlength' => 65535,
-                                          'rows' => 2,
-                         'cols' => 60,
-         
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'amount' => array(
-      
-        'name' => 'amount',
-        'propertyName' => 'amount',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Amount'),
-                        'required' => true,
-                         'maxlength' => 512,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                          ),
-      
-              'count' => array(
-      
-        'name' => 'count',
-        'propertyName' => 'count',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Count'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'max_value' => array(
-      
-        'name' => 'max_value',
-        'propertyName' => 'maxValue',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Max Value'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'membership_type_id' => array(
-      
-        'name' => 'membership_type_id',
-        'propertyName' => 'membershipType',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Member_DAO_MembershipType',
-                          ),
-      
-              'membership_num_terms' => array(
-      
-        'name' => 'membership_num_terms',
-        'propertyName' => 'membershipNumTerms',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Membership Num Terms'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'financial_type_id' => array(
-      
-        'name' => 'financial_type_id',
-        'propertyName' => 'financialType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Financial Type'),
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_financial_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'deductible_amount' => array(
-      
-        'name' => 'deductible_amount',
-        'propertyName' => 'deductibleAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Deductible Amount'),
-                        'required' => true,
-                                  'precision'      => array(20,2),
-                                   
-                                           'default' => '0.0',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Price Field Value ID'),
+          'required' => true,
+        ),
+        'price_field_id' => array(
+          'name' => 'price_field_id',
+          'propertyName' => 'priceField',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Price Field'),
+          'required' => true,
+          'FKClassName' => 'CRM_Price_DAO_PriceField',
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'label' => array(
+          'name' => 'label',
+          'propertyName' => 'label',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Label'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Description'),
+          'maxlength' => 65535,
+          'rows' => 2,
+          'cols' => 60,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'amount' => array(
+          'name' => 'amount',
+          'propertyName' => 'amount',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Amount'),
+          'required' => true,
+          'maxlength' => 512,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'EIGHT',
+          ),
+        ),
+        'count' => array(
+          'name' => 'count',
+          'propertyName' => 'count',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Count'),
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'max_value' => array(
+          'name' => 'max_value',
+          'propertyName' => 'maxValue',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Max Value'),
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Weight'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'membership_type_id' => array(
+          'name' => 'membership_type_id',
+          'propertyName' => 'membershipType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Type'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Member_DAO_MembershipType',
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+        'membership_num_terms' => array(
+          'name' => 'membership_num_terms',
+          'propertyName' => 'membershipNumTerms',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Num Terms'),
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Default Price Field Option?'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Price Field Value is Active'),
+          'default' => '1',
+        ),
+        'financial_type_id' => array(
+          'name' => 'financial_type_id',
+          'propertyName' => 'financialType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Type'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Financial_DAO_FinancialType',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_financial_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'deductible_amount' => array(
+          'name' => 'deductible_amount',
+          'propertyName' => 'deductibleAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Deductible Amount'),
+          'required' => true,
+          'precision' => array(20,2),
+          'default' => '0.0',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

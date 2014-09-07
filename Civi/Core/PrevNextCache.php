@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -257,85 +258,55 @@ class PrevNextCache extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id1' => array(
-      
-        'name' => 'entity_id1',
-        'propertyName' => 'entityId1',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Entity Id1'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_id2' => array(
-      
-        'name' => 'entity_id2',
-        'propertyName' => 'entityId2',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Entity Id2'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'cacheKey' => array(
-      
-        'name' => 'cacheKey',
-        'propertyName' => 'cacheKey',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Cachekey'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'data' => array(
-      
-        'name' => 'data',
-        'propertyName' => 'data',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Data'),
-                                                             
-                                    
-                          ),
-      
-              'is_selected' => array(
-      
-        'name' => 'is_selected',
-        'propertyName' => 'isSelected',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Entity Table'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id1' => array(
+          'name' => 'entity_id1',
+          'propertyName' => 'entityId1',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Entity Id1'),
+          'required' => true,
+        ),
+        'entity_id2' => array(
+          'name' => 'entity_id2',
+          'propertyName' => 'entityId2',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Entity Id2'),
+          'required' => true,
+        ),
+        'cacheKey' => array(
+          'name' => 'cacheKey',
+          'propertyName' => 'cacheKey',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Cachekey'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'data' => array(
+          'name' => 'data',
+          'propertyName' => 'data',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Data'),
+        ),
+        'is_selected' => array(
+          'name' => 'is_selected',
+          'propertyName' => 'isSelected',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -77,6 +78,7 @@ class ContactType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=64, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $label;
@@ -86,6 +88,7 @@ class ContactType extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $description;
@@ -286,97 +289,72 @@ class ContactType extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'label' => array(
-      
-        'name' => 'label',
-        'propertyName' => 'label',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Label'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Description'),
-                                 'maxlength' => 65535,
-                                          'rows' => 2,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'image_URL' => array(
-      
-        'name' => 'image_URL',
-        'propertyName' => 'imageURL',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Image Url'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'parent_id' => array(
-      
-        'name' => 'parent_id',
-        'propertyName' => 'parent',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_ContactType',
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact Type ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'label' => array(
+          'name' => 'label',
+          'propertyName' => 'label',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contact Type Label'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'localizable' => true,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Contact Type Description'),
+          'maxlength' => 65535,
+          'rows' => 2,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'image_URL' => array(
+          'name' => 'image_URL',
+          'propertyName' => 'imageURL',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contact Type Image URL'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'parent_id' => array(
+          'name' => 'parent_id',
+          'propertyName' => 'parent',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact Type Parent'),
+          'FKClassName' => 'CRM_Contact_DAO_ContactType',
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Contact Type Is Active?'),
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Contact Type is Reserved?'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

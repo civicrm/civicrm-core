@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -228,79 +229,53 @@ class OpenID extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'location_type_id' => array(
-      
-        'name' => 'location_type_id',
-        'propertyName' => 'locationTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('OpenID Location Type'),
-                                                             
-                                    
-                          ),
-      
-              'openid' => array(
-      
-        'name' => 'openid',
-        'propertyName' => 'openid',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('OpenID'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_openid.openid',
-        'headerPattern' => '/^Open.?ID|u(niq\w*)?.?ID/i',
-        'dataPattern' => '/^[\w\/\:\.]+$/',
-                         'export' => true,
-                                 'rule' => 'url',
-                  
-                          ),
-      
-              'allowed_to_login' => array(
-      
-        'name' => 'allowed_to_login',
-        'propertyName' => 'allowedToLogin',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Allowed To Login'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'is_primary' => array(
-      
-        'name' => 'is_primary',
-        'propertyName' => 'isPrimary',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is OpenID Primary?'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'location_type_id' => array(
+          'name' => 'location_type_id',
+          'propertyName' => 'locationTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('OpenID Location Type'),
+        ),
+        'openid' => array(
+          'name' => 'openid',
+          'propertyName' => 'openid',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('OpenID'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_openid.openid',
+          'headerPattern' => '/^Open.?ID|u(niq\w*)?.?ID/i',
+          'dataPattern' => '/^[\w\/\:\.]+$/',
+          'export' => true,
+          'rule' => 'url',
+        ),
+        'allowed_to_login' => array(
+          'name' => 'allowed_to_login',
+          'propertyName' => 'allowedToLogin',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Allowed To Login'),
+          'required' => true,
+        ),
+        'is_primary' => array(
+          'name' => 'is_primary',
+          'propertyName' => 'isPrimary',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is OpenID Primary?'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

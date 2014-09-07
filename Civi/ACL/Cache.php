@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -170,51 +171,33 @@ class Cache extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'acl_id' => array(
-      
-        'name' => 'acl_id',
-        'propertyName' => 'acl',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_ACL_DAO_ACL',
-                          ),
-      
-              'modified_date' => array(
-      
-        'name' => 'modified_date',
-        'propertyName' => 'modifiedDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Modified Date'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'acl_id' => array(
+          'name' => 'acl_id',
+          'propertyName' => 'acl',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_ACL_DAO_ACL',
+        ),
+        'modified_date' => array(
+          'name' => 'modified_date',
+          'propertyName' => 'modifiedDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Modified Date'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

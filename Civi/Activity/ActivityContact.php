@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -170,63 +171,48 @@ class ActivityContact extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Activity Contact ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'activity_id' => array(
-      
-        'name' => 'activity_id',
-        'propertyName' => 'activity',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Activity ID'),
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Activity_DAO_Activity',
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact ID (match to contact)'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_activity_contact.contact_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'record_type_id' => array(
-      
-        'name' => 'record_type_id',
-        'propertyName' => 'recordTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Record Type ID'),
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'activity_contacts',
-                    )
-                 ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Activity Contact ID'),
+          'required' => true,
+        ),
+        'activity_id' => array(
+          'name' => 'activity_id',
+          'propertyName' => 'activity',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Activity ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Activity_DAO_Activity',
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID (match to contact)'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_activity_contact.contact_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'record_type_id' => array(
+          'name' => 'record_type_id',
+          'propertyName' => 'recordTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Record Type ID'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'activity_contacts',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

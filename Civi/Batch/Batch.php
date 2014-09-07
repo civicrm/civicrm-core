@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -77,6 +78,7 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $title;
@@ -86,6 +88,7 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $description;
@@ -547,197 +550,170 @@ class Batch extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Description'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Created Date'),
-                                                             
-                                    
-                          ),
-      
-              'modified_id' => array(
-      
-        'name' => 'modified_id',
-        'propertyName' => 'modified',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'modified_date' => array(
-      
-        'name' => 'modified_date',
-        'propertyName' => 'modifiedDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Modified Date'),
-                                                             
-                                    
-                          ),
-      
-              'saved_search_id' => array(
-      
-        'name' => 'saved_search_id',
-        'propertyName' => 'savedSearch',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_SavedSearch',
-                          ),
-      
-              'status_id' => array(
-      
-        'name' => 'status_id',
-        'propertyName' => 'statusId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'batch_status',
-                    )
-                 ),
-      
-              'type_id' => array(
-      
-        'name' => 'type_id',
-        'propertyName' => 'typeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'batch_type',
-                    )
-                 ),
-      
-              'mode_id' => array(
-      
-        'name' => 'mode_id',
-        'propertyName' => 'modeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'batch_mode',
-                    )
-                 ),
-      
-              'total' => array(
-      
-        'name' => 'total',
-        'propertyName' => 'total',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Total'),
-                                          'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'item_count' => array(
-      
-        'name' => 'item_count',
-        'propertyName' => 'itemCount',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Item Count'),
-                                                             
-                                    
-                          ),
-      
-              'payment_instrument_id' => array(
-      
-        'name' => 'payment_instrument_id',
-        'propertyName' => 'paymentInstrumentId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'payment_instrument',
-                    )
-                 ),
-      
-              'exported_date' => array(
-      
-        'name' => 'exported_date',
-        'propertyName' => 'exportedDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Exported Date'),
-                                                             
-                                    
-                          ),
-      
-              'data' => array(
-      
-        'name' => 'data',
-        'propertyName' => 'data',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Data'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Batch ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Batch Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Batch Title'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Batch Description'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Batch Created By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Batch Created Date'),
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'modified_id' => array(
+          'name' => 'modified_id',
+          'propertyName' => 'modified',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Batch Modified By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'modified_date' => array(
+          'name' => 'modified_date',
+          'propertyName' => 'modifiedDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Batch Modified Date'),
+        ),
+        'saved_search_id' => array(
+          'name' => 'saved_search_id',
+          'propertyName' => 'savedSearch',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Batch Smart Group'),
+          'FKClassName' => 'CRM_Contact_DAO_SavedSearch',
+          'html' => array(
+            'type' => 'Autocomplete-Select',
+          ),
+        ),
+        'status_id' => array(
+          'name' => 'status_id',
+          'propertyName' => 'statusId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Batch Status'),
+          'required' => true,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'batch_status',
+          )
+        ),
+        'type_id' => array(
+          'name' => 'type_id',
+          'propertyName' => 'typeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Batch Type'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'batch_type',
+          )
+        ),
+        'mode_id' => array(
+          'name' => 'mode_id',
+          'propertyName' => 'modeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Batch Mode'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'batch_mode',
+          )
+        ),
+        'total' => array(
+          'name' => 'total',
+          'propertyName' => 'total',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Batch Total'),
+          'precision' => array(20,2),
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'item_count' => array(
+          'name' => 'item_count',
+          'propertyName' => 'itemCount',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Batch Number of Items'),
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'payment_instrument_id' => array(
+          'name' => 'payment_instrument_id',
+          'propertyName' => 'paymentInstrumentId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Batch Payment Instrument'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'payment_instrument',
+          )
+        ),
+        'exported_date' => array(
+          'name' => 'exported_date',
+          'propertyName' => 'exportedDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Batch Exported Date'),
+        ),
+        'data' => array(
+          'name' => 'data',
+          'propertyName' => 'data',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Batch Data'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

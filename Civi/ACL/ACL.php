@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -373,133 +374,103 @@ class ACL extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('ACL ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('ACL Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'deny' => array(
-      
-        'name' => 'deny',
-        'propertyName' => 'deny',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Deny'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'operation' => array(
-      
-        'name' => 'operation',
-        'propertyName' => 'operation',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Operation'),
-                        'required' => true,
-                         'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_ACL_BAO_ACL::operation',
-                    )
-                 ),
-      
-              'object_table' => array(
-      
-        'name' => 'object_table',
-        'propertyName' => 'objectTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Object Table'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'object_id' => array(
-      
-        'name' => 'object_id',
-        'propertyName' => 'objectId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'acl_table' => array(
-      
-        'name' => 'acl_table',
-        'propertyName' => 'aclTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Acl Table'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'acl_id' => array(
-      
-        'name' => 'acl_id',
-        'propertyName' => 'aclId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('ACL ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('ACL Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'deny' => array(
+          'name' => 'deny',
+          'propertyName' => 'deny',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Deny ACl?'),
+          'required' => true,
+          'html' => array(
+            'type' => 'Radio',
+          ),
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('ACL Entity'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Entity ID'),
+        ),
+        'operation' => array(
+          'name' => 'operation',
+          'propertyName' => 'operation',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('ACL Operation'),
+          'required' => true,
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_ACL_BAO_ACL::operation',
+          )
+        ),
+        'object_table' => array(
+          'name' => 'object_table',
+          'propertyName' => 'objectTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('ACL Object'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'object_id' => array(
+          'name' => 'object_id',
+          'propertyName' => 'objectId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('ACL Object ID'),
+        ),
+        'acl_table' => array(
+          'name' => 'acl_table',
+          'propertyName' => 'aclTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('ACL Table'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'acl_id' => array(
+          'name' => 'acl_id',
+          'propertyName' => 'aclId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('ACL Group ID'),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('ACL Is Active?'),
+          'html' => array(
+            'type' => 'Checkbox',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

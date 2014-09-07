@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -1562,846 +1563,777 @@ class Contact extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Internal Contact ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_contact.id',
-        'headerPattern' => '/internal|contact?|id$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'contact_type' => array(
-      
-        'name' => 'contact_type',
-        'propertyName' => 'contactType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contact Type'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                         'export' => true,
-                'where' => 'civicrm_contact.contact_type',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_contact_type',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'label',
-                      'condition' => 'parent_id IS NULL',
-                    )
-                 ),
-      
-              'contact_sub_type' => array(
-      
-        'name' => 'contact_sub_type',
-        'propertyName' => 'contactSubType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contact Subtype'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.contact_sub_type',
-        'headerPattern' => '/C(ontact )?(subtype|sub-type|sub type)/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_contact_type',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'label',
-                      'condition' => 'parent_id IS NOT NULL',
-                    )
-                 ),
-      
-              'do_not_email' => array(
-      
-        'name' => 'do_not_email',
-        'propertyName' => 'doNotEmail',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Do Not Email'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contact.do_not_email',
-        'headerPattern' => '/d(o )?(not )?(email)/i',
-        'dataPattern' => '/^\d{1,}$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'do_not_phone' => array(
-      
-        'name' => 'do_not_phone',
-        'propertyName' => 'doNotPhone',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Do Not Phone'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contact.do_not_phone',
-        'headerPattern' => '/d(o )?(not )?(call|phone)/i',
-        'dataPattern' => '/^\d{1,}$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'do_not_mail' => array(
-      
-        'name' => 'do_not_mail',
-        'propertyName' => 'doNotMail',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Do Not Mail'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contact.do_not_mail',
-        'headerPattern' => '/^(d(o\s)?n(ot\s)?mail)|(\w*)?bulk\s?(\w*)$/i',
-        'dataPattern' => '/^\d{1,}$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'do_not_sms' => array(
-      
-        'name' => 'do_not_sms',
-        'propertyName' => 'doNotSms',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Do Not Sms'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contact.do_not_sms',
-        'headerPattern' => '/d(o )?(not )?(sms)/i',
-        'dataPattern' => '/^\d{1,}$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'do_not_trade' => array(
-      
-        'name' => 'do_not_trade',
-        'propertyName' => 'doNotTrade',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Do Not Trade'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contact.do_not_trade',
-        'headerPattern' => '/d(o )?(not )?(trade)/i',
-        'dataPattern' => '/^\d{1,}$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'is_opt_out' => array(
-      
-        'name' => 'is_opt_out',
-        'propertyName' => 'isOptOut',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('No Bulk Emails (User Opt Out)'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_contact.is_opt_out',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'legal_identifier' => array(
-      
-        'name' => 'legal_identifier',
-        'propertyName' => 'legalIdentifier',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Legal Identifier'),
-                                 'maxlength' => 32,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.legal_identifier',
-        'headerPattern' => '/legal\s?id/i',
-        'dataPattern' => '/\w+?\d{5,}/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'external_identifier' => array(
-      
-        'name' => 'external_identifier',
-        'propertyName' => 'externalIdentifier',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('External Identifier'),
-                                 'maxlength' => 32,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.external_identifier',
-        'headerPattern' => '/external\s?id/i',
-        'dataPattern' => '/^\d{11,}$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'sort_name' => array(
-      
-        'name' => 'sort_name',
-        'propertyName' => 'sortName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Sort Name'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                         'export' => true,
-                'where' => 'civicrm_contact.sort_name',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'display_name' => array(
-      
-        'name' => 'display_name',
-        'propertyName' => 'displayName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Display Name'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                         'export' => true,
-                'where' => 'civicrm_contact.display_name',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'nick_name' => array(
-      
-        'name' => 'nick_name',
-        'propertyName' => 'nickName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Nickname'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.nick_name',
-        'headerPattern' => '/n(ick\s)name|nick$/i',
-        'dataPattern' => '/^\w+$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'legal_name' => array(
-      
-        'name' => 'legal_name',
-        'propertyName' => 'legalName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Legal Name'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.legal_name',
-        'headerPattern' => '/^legal|(l(egal\s)?name)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'image_URL' => array(
-      
-        'name' => 'image_URL',
-        'propertyName' => 'imageURL',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Image Url'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.image_URL',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'preferred_communication_method' => array(
-      
-        'name' => 'preferred_communication_method',
-        'propertyName' => 'preferredCommunicationMethod',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Preferred Communication Method'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.preferred_communication_method',
-        'headerPattern' => '/^p(ref\w*\s)?c(omm\w*)|( meth\w*)$/i',
-        'dataPattern' => '/^\w+$/',
-                         'export' => true,
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'preferred_communication_method',
-                    )
-                 ),
-      
-              'preferred_language' => array(
-      
-        'name' => 'preferred_language',
-        'propertyName' => 'preferredLanguage',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Preferred Language'),
-                                 'maxlength' => 5,
-                                 'size' => \CRM_Utils_Type::SIX,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.preferred_language',
-        'headerPattern' => '/^lang/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'languages',
-                      'keyColumn' => 'name',
-                    )
-                 ),
-      
-              'preferred_mail_format' => array(
-      
-        'name' => 'preferred_mail_format',
-        'propertyName' => 'preferredMailFormat',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Preferred Mail Format'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.preferred_mail_format',
-        'headerPattern' => '/^p(ref\w*\s)?m(ail\s)?f(orm\w*)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => 'Both',
-         
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::pmf',
-                    )
-                 ),
-      
-              'hash' => array(
-      
-        'name' => 'hash',
-        'propertyName' => 'hash',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contact Hash'),
-                                 'maxlength' => 32,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                         'export' => true,
-                'where' => 'civicrm_contact.hash',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'api_key' => array(
-      
-        'name' => 'api_key',
-        'propertyName' => 'apiKey',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Api Key'),
-                                 'maxlength' => 32,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                                    
-                          ),
-      
-              'contact_source' => array(
-      
-        'name' => 'source',
-        'propertyName' => 'source',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Source of Contact Data'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.source',
-        'headerPattern' => '/(S(ource\s)?o(f\s)?C(ontact\s)?Data)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'first_name' => array(
-      
-        'name' => 'first_name',
-        'propertyName' => 'firstName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('First Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.first_name',
-        'headerPattern' => '/^first|(f(irst\s)?name)$/i',
-        'dataPattern' => '/^\w+$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'middle_name' => array(
-      
-        'name' => 'middle_name',
-        'propertyName' => 'middleName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Middle Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.middle_name',
-        'headerPattern' => '/^middle|(m(iddle\s)?name)$/i',
-        'dataPattern' => '/^\w+$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'last_name' => array(
-      
-        'name' => 'last_name',
-        'propertyName' => 'lastName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Last Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.last_name',
-        'headerPattern' => '/^last|(l(ast\s)?name)$/i',
-        'dataPattern' => '/^\w+(\s\w+)?+$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'prefix_id' => array(
-      
-        'name' => 'prefix_id',
-        'propertyName' => 'prefixId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Individual Prefix'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contact.prefix_id',
-        'headerPattern' => '/^(prefix|title)/i',
-        'dataPattern' => '/^(mr|ms|mrs|sir|dr)\.?$/i',
-                         'export' => true,
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'individual_prefix',
-                    )
-                 ),
-      
-              'suffix_id' => array(
-      
-        'name' => 'suffix_id',
-        'propertyName' => 'suffixId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Individual Suffix'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contact.suffix_id',
-        'headerPattern' => '/^suffix$/i',
-        'dataPattern' => '/^(sr|jr)\.?|i{2,}$/',
-                         'export' => true,
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'individual_suffix',
-                    )
-                 ),
-      
-              'formal_title' => array(
-      
-        'name' => 'formal_title',
-        'propertyName' => 'formalTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Formal Title'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.formal_title',
-        'headerPattern' => '/^title/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'communication_style_id' => array(
-      
-        'name' => 'communication_style_id',
-        'propertyName' => 'communicationStyleId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Communication Style'),
-                                                             
-                         'export' => true,
-                'where' => 'civicrm_contact.communication_style_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'communication_style',
-                    )
-                 ),
-      
-              'email_greeting_id' => array(
-      
-        'name' => 'email_greeting_id',
-        'propertyName' => 'emailGreetingId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Email Greeting ID'),
-                                                             
-                                    
-                          ),
-      
-              'email_greeting_custom' => array(
-      
-        'name' => 'email_greeting_custom',
-        'propertyName' => 'emailGreetingCustom',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Email Greeting Custom'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.email_greeting_custom',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => false,
-                                   
-                          ),
-      
-              'email_greeting_display' => array(
-      
-        'name' => 'email_greeting_display',
-        'propertyName' => 'emailGreetingDisplay',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Email Greeting'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'postal_greeting_id' => array(
-      
-        'name' => 'postal_greeting_id',
-        'propertyName' => 'postalGreetingId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Postal Greeting ID'),
-                                                             
-                                    
-                          ),
-      
-              'postal_greeting_custom' => array(
-      
-        'name' => 'postal_greeting_custom',
-        'propertyName' => 'postalGreetingCustom',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Postal Greeting Custom'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.postal_greeting_custom',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => false,
-                                   
-                          ),
-      
-              'postal_greeting_display' => array(
-      
-        'name' => 'postal_greeting_display',
-        'propertyName' => 'postalGreetingDisplay',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Postal Greeting'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'addressee_id' => array(
-      
-        'name' => 'addressee_id',
-        'propertyName' => 'addresseeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Addressee ID'),
-                                                             
-                                    
-                          ),
-      
-              'addressee_custom' => array(
-      
-        'name' => 'addressee_custom',
-        'propertyName' => 'addresseeCustom',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Addressee Custom'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.addressee_custom',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => false,
-                                   
-                          ),
-      
-              'addressee_display' => array(
-      
-        'name' => 'addressee_display',
-        'propertyName' => 'addresseeDisplay',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Addressee'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'job_title' => array(
-      
-        'name' => 'job_title',
-        'propertyName' => 'jobTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Job Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.job_title',
-        'headerPattern' => '/^job|(j(ob\s)?title)$/i',
-        'dataPattern' => '//',
-                         'export' => true,
-                                   
-                          ),
-      
-              'gender_id' => array(
-      
-        'name' => 'gender_id',
-        'propertyName' => 'genderId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Gender'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contact.gender_id',
-        'headerPattern' => '/^gender$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'gender',
-                    )
-                 ),
-      
-              'birth_date' => array(
-      
-        'name' => 'birth_date',
-        'propertyName' => 'birthDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Birth Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contact.birth_date',
-        'headerPattern' => '/^birth|(b(irth\s)?date)|D(\W*)O(\W*)B(\W*)$/i',
-        'dataPattern' => '/\d{4}-?\d{2}-?\d{2}/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'is_deceased' => array(
-      
-        'name' => 'is_deceased',
-        'propertyName' => 'isDeceased',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Deceased'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contact.is_deceased',
-        'headerPattern' => '/i(s\s)?d(eceased)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'deceased_date' => array(
-      
-        'name' => 'deceased_date',
-        'propertyName' => 'deceasedDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Deceased Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contact.deceased_date',
-        'headerPattern' => '/^deceased|(d(eceased\s)?date)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'household_name' => array(
-      
-        'name' => 'household_name',
-        'propertyName' => 'householdName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Household Name'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.household_name',
-        'headerPattern' => '/^household|(h(ousehold\s)?name)$/i',
-        'dataPattern' => '/^\w+$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'primary_contact_id' => array(
-      
-        'name' => 'primary_contact_id',
-        'propertyName' => 'primaryContact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Household Primary Contact ID'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'organization_name' => array(
-      
-        'name' => 'organization_name',
-        'propertyName' => 'organizationName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Organization Name'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.organization_name',
-        'headerPattern' => '/^organization|(o(rganization\s)?name)$/i',
-        'dataPattern' => '/^\w+$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'sic_code' => array(
-      
-        'name' => 'sic_code',
-        'propertyName' => 'sicCode',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Sic Code'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.sic_code',
-        'headerPattern' => '/^sic|(s(ic\s)?code)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'user_unique_id' => array(
-      
-        'name' => 'user_unique_id',
-        'propertyName' => 'userUniqueId',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Unique ID (OpenID)'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_contact.user_unique_id',
-        'headerPattern' => '/^Open\s?ID|u(niq\w*)?\s?ID/i',
-        'dataPattern' => '/^[\w\/\:\.]+$/',
-                         'export' => true,
-                                 'rule' => 'url',
-                  
-                          ),
-      
-              'current_employer_id' => array(
-      
-        'name' => 'employer_id',
-        'propertyName' => 'employer',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Current Employer ID'),
-                                                             
-                         'export' => true,
-                'where' => 'civicrm_contact.employer_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'contact_is_deleted' => array(
-      
-        'name' => 'is_deleted',
-        'propertyName' => 'isDeleted',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Contact is in Trash'),
-                        'required' => true,
-                                                     
-                         'export' => true,
-                'where' => 'civicrm_contact.is_deleted',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Created Date'),
-                        'required' => false,
-                                                     
-                         'export' => true,
-                'where' => 'civicrm_contact.created_date',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                          'default' => 'NULL',
-         
-                          ),
-      
-              'modified_date' => array(
-      
-        'name' => 'modified_date',
-        'propertyName' => 'modifiedDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Modified Date'),
-                        'required' => false,
-                                                     
-                         'export' => true,
-                'where' => 'civicrm_contact.modified_date',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                          'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Internal Contact ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_contact.id',
+          'headerPattern' => '/internal|contact?|id$/i',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'contact_type' => array(
+          'name' => 'contact_type',
+          'propertyName' => 'contactType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contact Type'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'export' => true,
+          'where' => 'civicrm_contact.contact_type',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_contact_type',
+            'keyColumn' => 'name',
+            'labelColumn' => 'label',
+            'condition' => 'parent_id IS NULL',
+          )
+        ),
+        'contact_sub_type' => array(
+          'name' => 'contact_sub_type',
+          'propertyName' => 'contactSubType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contact Subtype'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_contact.contact_sub_type',
+          'headerPattern' => '/C(ontact )?(subtype|sub-type|sub type)/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Multi-Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_contact_type',
+            'keyColumn' => 'name',
+            'labelColumn' => 'label',
+            'condition' => 'parent_id IS NOT NULL',
+          )
+        ),
+        'do_not_email' => array(
+          'name' => 'do_not_email',
+          'propertyName' => 'doNotEmail',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Do Not Email'),
+          'import' => true,
+          'where' => 'civicrm_contact.do_not_email',
+          'headerPattern' => '/d(o )?(not )?(email)/i',
+          'dataPattern' => '/^\d{1,}$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'do_not_phone' => array(
+          'name' => 'do_not_phone',
+          'propertyName' => 'doNotPhone',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Do Not Phone'),
+          'import' => true,
+          'where' => 'civicrm_contact.do_not_phone',
+          'headerPattern' => '/d(o )?(not )?(call|phone)/i',
+          'dataPattern' => '/^\d{1,}$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'do_not_mail' => array(
+          'name' => 'do_not_mail',
+          'propertyName' => 'doNotMail',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Do Not Mail'),
+          'import' => true,
+          'where' => 'civicrm_contact.do_not_mail',
+          'headerPattern' => '/^(d(o\s)?n(ot\s)?mail)|(\w*)?bulk\s?(\w*)$/i',
+          'dataPattern' => '/^\d{1,}$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'do_not_sms' => array(
+          'name' => 'do_not_sms',
+          'propertyName' => 'doNotSms',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Do Not Sms'),
+          'import' => true,
+          'where' => 'civicrm_contact.do_not_sms',
+          'headerPattern' => '/d(o )?(not )?(sms)/i',
+          'dataPattern' => '/^\d{1,}$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'do_not_trade' => array(
+          'name' => 'do_not_trade',
+          'propertyName' => 'doNotTrade',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Do Not Trade'),
+          'import' => true,
+          'where' => 'civicrm_contact.do_not_trade',
+          'headerPattern' => '/d(o )?(not )?(trade)/i',
+          'dataPattern' => '/^\d{1,}$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'is_opt_out' => array(
+          'name' => 'is_opt_out',
+          'propertyName' => 'isOptOut',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('No Bulk Emails (User Opt Out)'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_contact.is_opt_out',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'legal_identifier' => array(
+          'name' => 'legal_identifier',
+          'propertyName' => 'legalIdentifier',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Legal Identifier'),
+          'maxlength' => 32,
+          'size' => \CRM_Utils_Type::MEDIUM,
+          'import' => true,
+          'where' => 'civicrm_contact.legal_identifier',
+          'headerPattern' => '/legal\s?id/i',
+          'dataPattern' => '/\w+?\d{5,}/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'external_identifier' => array(
+          'name' => 'external_identifier',
+          'propertyName' => 'externalIdentifier',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('External Identifier'),
+          'maxlength' => 32,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'import' => true,
+          'where' => 'civicrm_contact.external_identifier',
+          'headerPattern' => '/external\s?id/i',
+          'dataPattern' => '/^\d{11,}$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'EIGHT',
+          ),
+        ),
+        'sort_name' => array(
+          'name' => 'sort_name',
+          'propertyName' => 'sortName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Sort Name'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::BIG,
+          'export' => true,
+          'where' => 'civicrm_contact.sort_name',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'BIG',
+          ),
+        ),
+        'display_name' => array(
+          'name' => 'display_name',
+          'propertyName' => 'displayName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Display Name'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::BIG,
+          'export' => true,
+          'where' => 'civicrm_contact.display_name',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'BIG',
+          ),
+        ),
+        'nick_name' => array(
+          'name' => 'nick_name',
+          'propertyName' => 'nickName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Nickname'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_contact.nick_name',
+          'headerPattern' => '/n(ick\s)name|nick$/i',
+          'dataPattern' => '/^\w+$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'BIG',
+          ),
+        ),
+        'legal_name' => array(
+          'name' => 'legal_name',
+          'propertyName' => 'legalName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Legal Name'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_contact.legal_name',
+          'headerPattern' => '/^legal|(l(egal\s)?name)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'BIG',
+          ),
+        ),
+        'image_URL' => array(
+          'name' => 'image_URL',
+          'propertyName' => 'imageURL',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Image Url'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_contact.image_URL',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'preferred_communication_method' => array(
+          'name' => 'preferred_communication_method',
+          'propertyName' => 'preferredCommunicationMethod',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Preferred Communication Method'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_contact.preferred_communication_method',
+          'headerPattern' => '/^p(ref\w*\s)?c(omm\w*)|( meth\w*)$/i',
+          'dataPattern' => '/^\w+$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'preferred_communication_method',
+          )
+        ),
+        'preferred_language' => array(
+          'name' => 'preferred_language',
+          'propertyName' => 'preferredLanguage',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Preferred Language'),
+          'maxlength' => 5,
+          'size' => \CRM_Utils_Type::SIX,
+          'import' => true,
+          'where' => 'civicrm_contact.preferred_language',
+          'headerPattern' => '/^lang/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'languages',
+            'keyColumn' => 'name',
+          )
+        ),
+        'preferred_mail_format' => array(
+          'name' => 'preferred_mail_format',
+          'propertyName' => 'preferredMailFormat',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Preferred Mail Format'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'import' => true,
+          'where' => 'civicrm_contact.preferred_mail_format',
+          'headerPattern' => '/^p(ref\w*\s)?m(ail\s)?f(orm\w*)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => 'Both',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::pmf',
+          )
+        ),
+        'hash' => array(
+          'name' => 'hash',
+          'propertyName' => 'hash',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contact Hash'),
+          'maxlength' => 32,
+          'size' => \CRM_Utils_Type::MEDIUM,
+          'export' => true,
+          'where' => 'civicrm_contact.hash',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ),
+        'api_key' => array(
+          'name' => 'api_key',
+          'propertyName' => 'apiKey',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Api Key'),
+          'maxlength' => 32,
+          'size' => \CRM_Utils_Type::MEDIUM,
+        ),
+        'contact_source' => array(
+          'name' => 'source',
+          'propertyName' => 'source',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Source of Contact Data'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_contact.source',
+          'headerPattern' => '/(S(ource\s)?o(f\s)?C(ontact\s)?Data)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'BIG',
+          ),
+        ),
+        'first_name' => array(
+          'name' => 'first_name',
+          'propertyName' => 'firstName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('First Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_contact.first_name',
+          'headerPattern' => '/^first|(f(irst\s)?name)$/i',
+          'dataPattern' => '/^\w+$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'BIG',
+          ),
+        ),
+        'middle_name' => array(
+          'name' => 'middle_name',
+          'propertyName' => 'middleName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Middle Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::MEDIUM,
+          'import' => true,
+          'where' => 'civicrm_contact.middle_name',
+          'headerPattern' => '/^middle|(m(iddle\s)?name)$/i',
+          'dataPattern' => '/^\w+$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'MEDIUM',
+          ),
+        ),
+        'last_name' => array(
+          'name' => 'last_name',
+          'propertyName' => 'lastName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Last Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_contact.last_name',
+          'headerPattern' => '/^last|(l(ast\s)?name)$/i',
+          'dataPattern' => '/^\w+(\s\w+)?+$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'BIG',
+          ),
+        ),
+        'prefix_id' => array(
+          'name' => 'prefix_id',
+          'propertyName' => 'prefixId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Individual Prefix'),
+          'import' => true,
+          'where' => 'civicrm_contact.prefix_id',
+          'headerPattern' => '/^(prefix|title)/i',
+          'dataPattern' => '/^(mr|ms|mrs|sir|dr)\.?$/i',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'individual_prefix',
+          )
+        ),
+        'suffix_id' => array(
+          'name' => 'suffix_id',
+          'propertyName' => 'suffixId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Individual Suffix'),
+          'import' => true,
+          'where' => 'civicrm_contact.suffix_id',
+          'headerPattern' => '/^suffix$/i',
+          'dataPattern' => '/^(sr|jr)\.?|i{2,}$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'individual_suffix',
+          )
+        ),
+        'formal_title' => array(
+          'name' => 'formal_title',
+          'propertyName' => 'formalTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Formal Title'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_contact.formal_title',
+          'headerPattern' => '/^title/i',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'communication_style_id' => array(
+          'name' => 'communication_style_id',
+          'propertyName' => 'communicationStyleId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Communication Style'),
+          'export' => true,
+          'where' => 'civicrm_contact.communication_style_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'pseudoconstant' => array(
+            'optionGroupName' => 'communication_style',
+          )
+        ),
+        'email_greeting_id' => array(
+          'name' => 'email_greeting_id',
+          'propertyName' => 'emailGreetingId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Email Greeting ID'),
+        ),
+        'email_greeting_custom' => array(
+          'name' => 'email_greeting_custom',
+          'propertyName' => 'emailGreetingCustom',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Email Greeting Custom'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_contact.email_greeting_custom',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => false,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'email_greeting_display' => array(
+          'name' => 'email_greeting_display',
+          'propertyName' => 'emailGreetingDisplay',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Email Greeting'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'postal_greeting_id' => array(
+          'name' => 'postal_greeting_id',
+          'propertyName' => 'postalGreetingId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Postal Greeting ID'),
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'postal_greeting_custom' => array(
+          'name' => 'postal_greeting_custom',
+          'propertyName' => 'postalGreetingCustom',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Postal Greeting Custom'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_contact.postal_greeting_custom',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => false,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'postal_greeting_display' => array(
+          'name' => 'postal_greeting_display',
+          'propertyName' => 'postalGreetingDisplay',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Postal Greeting'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'addressee_id' => array(
+          'name' => 'addressee_id',
+          'propertyName' => 'addresseeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Addressee ID'),
+        ),
+        'addressee_custom' => array(
+          'name' => 'addressee_custom',
+          'propertyName' => 'addresseeCustom',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Addressee Custom'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_contact.addressee_custom',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => false,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'addressee_display' => array(
+          'name' => 'addressee_display',
+          'propertyName' => 'addresseeDisplay',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Addressee'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'job_title' => array(
+          'name' => 'job_title',
+          'propertyName' => 'jobTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Job Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::MEDIUM,
+          'import' => true,
+          'where' => 'civicrm_contact.job_title',
+          'headerPattern' => '/^job|(j(ob\s)?title)$/i',
+          'dataPattern' => '//',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'MEDIUM',
+          ),
+        ),
+        'gender_id' => array(
+          'name' => 'gender_id',
+          'propertyName' => 'genderId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Gender'),
+          'import' => true,
+          'where' => 'civicrm_contact.gender_id',
+          'headerPattern' => '/^gender$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'gender',
+          )
+        ),
+        'birth_date' => array(
+          'name' => 'birth_date',
+          'propertyName' => 'birthDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Birth Date'),
+          'import' => true,
+          'where' => 'civicrm_contact.birth_date',
+          'headerPattern' => '/^birth|(b(irth\s)?date)|D(\W*)O(\W*)B(\W*)$/i',
+          'dataPattern' => '/\d{4}-?\d{2}-?\d{2}/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'is_deceased' => array(
+          'name' => 'is_deceased',
+          'propertyName' => 'isDeceased',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Deceased'),
+          'import' => true,
+          'where' => 'civicrm_contact.is_deceased',
+          'headerPattern' => '/i(s\s)?d(eceased)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'deceased_date' => array(
+          'name' => 'deceased_date',
+          'propertyName' => 'deceasedDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Deceased Date'),
+          'import' => true,
+          'where' => 'civicrm_contact.deceased_date',
+          'headerPattern' => '/^deceased|(d(eceased\s)?date)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'household_name' => array(
+          'name' => 'household_name',
+          'propertyName' => 'householdName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Household Name'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_contact.household_name',
+          'headerPattern' => '/^household|(h(ousehold\s)?name)$/i',
+          'dataPattern' => '/^\w+$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'BIG',
+          ),
+        ),
+        'primary_contact_id' => array(
+          'name' => 'primary_contact_id',
+          'propertyName' => 'primaryContact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Household Primary Contact ID'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+        'organization_name' => array(
+          'name' => 'organization_name',
+          'propertyName' => 'organizationName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Organization Name'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_contact.organization_name',
+          'headerPattern' => '/^organization|(o(rganization\s)?name)$/i',
+          'dataPattern' => '/^\w+$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'BIG',
+          ),
+        ),
+        'sic_code' => array(
+          'name' => 'sic_code',
+          'propertyName' => 'sicCode',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Sic Code'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'import' => true,
+          'where' => 'civicrm_contact.sic_code',
+          'headerPattern' => '/^sic|(s(ic\s)?code)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'user_unique_id' => array(
+          'name' => 'user_unique_id',
+          'propertyName' => 'userUniqueId',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Unique ID (OpenID)'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_contact.user_unique_id',
+          'headerPattern' => '/^Open\s?ID|u(niq\w*)?\s?ID/i',
+          'dataPattern' => '/^[\w\/\:\.]+$/',
+          'export' => true,
+          'rule' => 'url',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'current_employer_id' => array(
+          'name' => 'employer_id',
+          'propertyName' => 'employer',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Current Employer ID'),
+          'export' => true,
+          'where' => 'civicrm_contact.employer_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'html' => array(
+            'type' => 'Autocomplete-Select',
+          ),
+        ),
+        'contact_is_deleted' => array(
+          'name' => 'is_deleted',
+          'propertyName' => 'isDeleted',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Contact is in Trash'),
+          'required' => true,
+          'export' => true,
+          'where' => 'civicrm_contact.is_deleted',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_TIMESTAMP,
+          'title' => ts('Created Date'),
+          'required' => false,
+          'export' => true,
+          'where' => 'civicrm_contact.created_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'default' => 'NULL',
+        ),
+        'modified_date' => array(
+          'name' => 'modified_date',
+          'propertyName' => 'modifiedDate',
+          'type' => \CRM_Utils_Type::T_TIMESTAMP,
+          'title' => ts('Modified Date'),
+          'required' => false,
+          'export' => true,
+          'where' => 'civicrm_contact.modified_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

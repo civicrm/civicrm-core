@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -315,103 +316,65 @@ class MembershipLog extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'membership_id' => array(
-      
-        'name' => 'membership_id',
-        'propertyName' => 'membership',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Member_DAO_Membership',
-                          ),
-      
-              'status_id' => array(
-      
-        'name' => 'status_id',
-        'propertyName' => 'status',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Membership Status'),
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Member_DAO_MembershipStatus',
-                          ),
-      
-              'start_date' => array(
-      
-        'name' => 'start_date',
-        'propertyName' => 'startDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Start Date'),
-                                                             
-                                    
-                          ),
-      
-              'end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('End Date'),
-                                                             
-                                    
-                          ),
-      
-              'modified_id' => array(
-      
-        'name' => 'modified_id',
-        'propertyName' => 'modified',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'modified_date' => array(
-      
-        'name' => 'modified_date',
-        'propertyName' => 'modifiedDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Membership Change Date'),
-                                                             
-                                    
-                          ),
-      
-              'membership_type_id' => array(
-      
-        'name' => 'membership_type_id',
-        'propertyName' => 'membershipType',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Member_DAO_MembershipType',
-                          ),
-      
-              'max_related' => array(
-      
-        'name' => 'max_related',
-        'propertyName' => 'maxRelated',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Max Related'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'membership_id' => array(
+          'name' => 'membership_id',
+          'propertyName' => 'membership',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Member_DAO_Membership',
+        ),
+        'status_id' => array(
+          'name' => 'status_id',
+          'propertyName' => 'status',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Status'),
+          'required' => true,
+          'FKClassName' => 'CRM_Member_DAO_MembershipStatus',
+        ),
+        'start_date' => array(
+          'name' => 'start_date',
+          'propertyName' => 'startDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Start Date'),
+        ),
+        'end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('End Date'),
+        ),
+        'modified_id' => array(
+          'name' => 'modified_id',
+          'propertyName' => 'modified',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'modified_date' => array(
+          'name' => 'modified_date',
+          'propertyName' => 'modifiedDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Membership Change Date'),
+        ),
+        'membership_type_id' => array(
+          'name' => 'membership_type_id',
+          'propertyName' => 'membershipType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Member_DAO_MembershipType',
+        ),
+        'max_related' => array(
+          'name' => 'max_related',
+          'propertyName' => 'maxRelated',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Max Related'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -663,249 +664,166 @@ class Menu extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'path' => array(
-      
-        'name' => 'path',
-        'propertyName' => 'path',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Path'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'path_arguments' => array(
-      
-        'name' => 'path_arguments',
-        'propertyName' => 'pathArguments',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Path Arguments'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'access_callback' => array(
-      
-        'name' => 'access_callback',
-        'propertyName' => 'accessCallback',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Access Callback'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'access_arguments' => array(
-      
-        'name' => 'access_arguments',
-        'propertyName' => 'accessArguments',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Access Arguments'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'page_callback' => array(
-      
-        'name' => 'page_callback',
-        'propertyName' => 'pageCallback',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Page Callback'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'page_arguments' => array(
-      
-        'name' => 'page_arguments',
-        'propertyName' => 'pageArguments',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Page Arguments'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'breadcrumb' => array(
-      
-        'name' => 'breadcrumb',
-        'propertyName' => 'breadcrumb',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Breadcrumb'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'return_url' => array(
-      
-        'name' => 'return_url',
-        'propertyName' => 'returnUrl',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Return Url'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'return_url_args' => array(
-      
-        'name' => 'return_url_args',
-        'propertyName' => 'returnUrlArgs',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Return Url Args'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'component_id' => array(
-      
-        'name' => 'component_id',
-        'propertyName' => 'component',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Component',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_component',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_public' => array(
-      
-        'name' => 'is_public',
-        'propertyName' => 'isPublic',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_exposed' => array(
-      
-        'name' => 'is_exposed',
-        'propertyName' => 'isExposed',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_ssl' => array(
-      
-        'name' => 'is_ssl',
-        'propertyName' => 'isSsl',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                        'required' => true,
-                                                     
-                                           'default' => '1',
-         
-                          ),
-      
-              'type' => array(
-      
-        'name' => 'type',
-        'propertyName' => 'type',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Type'),
-                        'required' => true,
-                                                     
-                                           'default' => '1',
-         
-                          ),
-      
-              'page_type' => array(
-      
-        'name' => 'page_type',
-        'propertyName' => 'pageType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Page Type'),
-                        'required' => true,
-                                                     
-                                           'default' => '1',
-         
-                          ),
-      
-              'skipBreadcrumb' => array(
-      
-        'name' => 'skipBreadcrumb',
-        'propertyName' => 'skipBreadcrumb',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Skipbreadcrumb'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'path' => array(
+          'name' => 'path',
+          'propertyName' => 'path',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Path'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'path_arguments' => array(
+          'name' => 'path_arguments',
+          'propertyName' => 'pathArguments',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Path Arguments'),
+          'maxlength' => 65535,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'access_callback' => array(
+          'name' => 'access_callback',
+          'propertyName' => 'accessCallback',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Access Callback'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'access_arguments' => array(
+          'name' => 'access_arguments',
+          'propertyName' => 'accessArguments',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Access Arguments'),
+          'maxlength' => 65535,
+        ),
+        'page_callback' => array(
+          'name' => 'page_callback',
+          'propertyName' => 'pageCallback',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Page Callback'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'page_arguments' => array(
+          'name' => 'page_arguments',
+          'propertyName' => 'pageArguments',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Page Arguments'),
+          'maxlength' => 65535,
+        ),
+        'breadcrumb' => array(
+          'name' => 'breadcrumb',
+          'propertyName' => 'breadcrumb',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Breadcrumb'),
+          'maxlength' => 65535,
+        ),
+        'return_url' => array(
+          'name' => 'return_url',
+          'propertyName' => 'returnUrl',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Return Url'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'return_url_args' => array(
+          'name' => 'return_url_args',
+          'propertyName' => 'returnUrlArgs',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Return Url Args'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'component_id' => array(
+          'name' => 'component_id',
+          'propertyName' => 'component',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Core_DAO_Component',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_component',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+        ),
+        'is_public' => array(
+          'name' => 'is_public',
+          'propertyName' => 'isPublic',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+        ),
+        'is_exposed' => array(
+          'name' => 'is_exposed',
+          'propertyName' => 'isExposed',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+        ),
+        'is_ssl' => array(
+          'name' => 'is_ssl',
+          'propertyName' => 'isSsl',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Weight'),
+          'required' => true,
+          'default' => '1',
+        ),
+        'type' => array(
+          'name' => 'type',
+          'propertyName' => 'type',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Type'),
+          'required' => true,
+          'default' => '1',
+        ),
+        'page_type' => array(
+          'name' => 'page_type',
+          'propertyName' => 'pageType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Page Type'),
+          'required' => true,
+          'default' => '1',
+        ),
+        'skipBreadcrumb' => array(
+          'name' => 'skipBreadcrumb',
+          'propertyName' => 'skipBreadcrumb',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Skipbreadcrumb'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

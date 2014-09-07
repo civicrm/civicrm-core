@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -634,235 +635,160 @@ class PaymentProcessor extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Payment Processor'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'payment_processor_type_id' => array(
-      
-        'name' => 'payment_processor_type_id',
-        'propertyName' => 'paymentProcessorType',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Financial_DAO_PaymentProcessorType',
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_test' => array(
-      
-        'name' => 'is_test',
-        'propertyName' => 'isTest',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'user_name' => array(
-      
-        'name' => 'user_name',
-        'propertyName' => 'userName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('User Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'password' => array(
-      
-        'name' => 'password',
-        'propertyName' => 'password',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Password'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'signature' => array(
-      
-        'name' => 'signature',
-        'propertyName' => 'signature',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Signature'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'url_site' => array(
-      
-        'name' => 'url_site',
-        'propertyName' => 'urlSite',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Site URL'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'url_api' => array(
-      
-        'name' => 'url_api',
-        'propertyName' => 'urlApi',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('API URL'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'url_recur' => array(
-      
-        'name' => 'url_recur',
-        'propertyName' => 'urlRecur',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Recurring Payments URL'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'url_button' => array(
-      
-        'name' => 'url_button',
-        'propertyName' => 'urlButton',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Button URL'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'subject' => array(
-      
-        'name' => 'subject',
-        'propertyName' => 'subject',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Subject'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'class_name' => array(
-      
-        'name' => 'class_name',
-        'propertyName' => 'className',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Suffix for PHP clas name implementation'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'billing_mode' => array(
-      
-        'name' => 'billing_mode',
-        'propertyName' => 'billingMode',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Billing Mode'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'is_recur' => array(
-      
-        'name' => 'is_recur',
-        'propertyName' => 'isRecur',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'payment_type' => array(
-      
-        'name' => 'payment_type',
-        'propertyName' => 'paymentType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Payment Type'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Payment Processor ID'),
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Payment Processor Domain'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Payment Processor'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Processor Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'payment_processor_type_id' => array(
+          'name' => 'payment_processor_type_id',
+          'propertyName' => 'paymentProcessorType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Payment Processor Type ID'),
+          'FKClassName' => 'CRM_Financial_DAO_PaymentProcessorType',
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Processor is Active?'),
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Processor Is Default?'),
+        ),
+        'is_test' => array(
+          'name' => 'is_test',
+          'propertyName' => 'isTest',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Test Processor?'),
+        ),
+        'user_name' => array(
+          'name' => 'user_name',
+          'propertyName' => 'userName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('User Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'password' => array(
+          'name' => 'password',
+          'propertyName' => 'password',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Password'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'signature' => array(
+          'name' => 'signature',
+          'propertyName' => 'signature',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Signature'),
+          'maxlength' => 65535,
+        ),
+        'url_site' => array(
+          'name' => 'url_site',
+          'propertyName' => 'urlSite',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Site URL'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'url_api' => array(
+          'name' => 'url_api',
+          'propertyName' => 'urlApi',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('API URL'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'url_recur' => array(
+          'name' => 'url_recur',
+          'propertyName' => 'urlRecur',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Recurring Payments URL'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'url_button' => array(
+          'name' => 'url_button',
+          'propertyName' => 'urlButton',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Button URL'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'subject' => array(
+          'name' => 'subject',
+          'propertyName' => 'subject',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Subject'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'class_name' => array(
+          'name' => 'class_name',
+          'propertyName' => 'className',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Suffix for PHP clas name implementation'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'billing_mode' => array(
+          'name' => 'billing_mode',
+          'propertyName' => 'billingMode',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Processor Billing Mode'),
+          'required' => true,
+        ),
+        'is_recur' => array(
+          'name' => 'is_recur',
+          'propertyName' => 'isRecur',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Processor Supports Recurring?'),
+        ),
+        'payment_type' => array(
+          'name' => 'payment_type',
+          'propertyName' => 'paymentType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Payment Type'),
+          'default' => '1',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

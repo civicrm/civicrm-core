@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -86,6 +87,7 @@ class UFGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=false)
+   * @Field(localizable=true)
    * 
    */
   private $title;
@@ -104,6 +106,7 @@ class UFGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPre;
@@ -113,6 +116,7 @@ class UFGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPost;
@@ -721,259 +725,189 @@ class UFGroup extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'group_type' => array(
-      
-        'name' => 'group_type',
-        'propertyName' => 'groupType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Group Type'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_uf_group.group_type',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Profile Description'),
-                                 'maxlength' => 65535,
-                                          'rows' => 2,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'help_pre' => array(
-      
-        'name' => 'help_pre',
-        'propertyName' => 'helpPre',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Pre'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'help_post' => array(
-      
-        'name' => 'help_post',
-        'propertyName' => 'helpPost',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Post'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'limit_listings_group_id' => array(
-      
-        'name' => 'limit_listings_group_id',
-        'propertyName' => 'limitListingsGroup',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Group',
-                          ),
-      
-              'post_URL' => array(
-      
-        'name' => 'post_URL',
-        'propertyName' => 'postURL',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Post Url'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'add_to_group_id' => array(
-      
-        'name' => 'add_to_group_id',
-        'propertyName' => 'addToGroup',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Group',
-                          ),
-      
-              'add_captcha' => array(
-      
-        'name' => 'add_captcha',
-        'propertyName' => 'addCaptcha',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Add Captcha'),
-                                                             
-                                    
-                          ),
-      
-              'is_map' => array(
-      
-        'name' => 'is_map',
-        'propertyName' => 'isMap',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_edit_link' => array(
-      
-        'name' => 'is_edit_link',
-        'propertyName' => 'isEditLink',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_uf_link' => array(
-      
-        'name' => 'is_uf_link',
-        'propertyName' => 'isUfLink',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_update_dupe' => array(
-      
-        'name' => 'is_update_dupe',
-        'propertyName' => 'isUpdateDupe',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'cancel_URL' => array(
-      
-        'name' => 'cancel_URL',
-        'propertyName' => 'cancelURL',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Cancel Url'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_cms_user' => array(
-      
-        'name' => 'is_cms_user',
-        'propertyName' => 'isCmsUser',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'notify' => array(
-      
-        'name' => 'notify',
-        'propertyName' => 'notify',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Notify'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('UF Group Created Date'),
-                                                             
-                                    
-                          ),
-      
-              'is_proximity_search' => array(
-      
-        'name' => 'is_proximity_search',
-        'propertyName' => 'isProximitySearch',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile ID'),
+          'required' => true,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Profile Is Active'),
+          'default' => '1',
+        ),
+        'group_type' => array(
+          'name' => 'group_type',
+          'propertyName' => 'groupType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Profile Group Type'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_uf_group.group_type',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Title'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'localizable' => true,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Profile Description'),
+          'maxlength' => 65535,
+          'rows' => 2,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'help_pre' => array(
+          'name' => 'help_pre',
+          'propertyName' => 'helpPre',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Help Pre'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'help_post' => array(
+          'name' => 'help_post',
+          'propertyName' => 'helpPost',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Profile Post Text'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'limit_listings_group_id' => array(
+          'name' => 'limit_listings_group_id',
+          'propertyName' => 'limitListingsGroup',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile Search Limit Group'),
+          'FKClassName' => 'CRM_Contact_DAO_Group',
+        ),
+        'post_URL' => array(
+          'name' => 'post_URL',
+          'propertyName' => 'postURL',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Post Url'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'add_to_group_id' => array(
+          'name' => 'add_to_group_id',
+          'propertyName' => 'addToGroup',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Add Contact To Group'),
+          'FKClassName' => 'CRM_Contact_DAO_Group',
+        ),
+        'add_captcha' => array(
+          'name' => 'add_captcha',
+          'propertyName' => 'addCaptcha',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Show Captcha On Profile'),
+        ),
+        'is_map' => array(
+          'name' => 'is_map',
+          'propertyName' => 'isMap',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Map Profile'),
+        ),
+        'is_edit_link' => array(
+          'name' => 'is_edit_link',
+          'propertyName' => 'isEditLink',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Show Edit Link?'),
+        ),
+        'is_uf_link' => array(
+          'name' => 'is_uf_link',
+          'propertyName' => 'isUfLink',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Show Link to CMS User'),
+        ),
+        'is_update_dupe' => array(
+          'name' => 'is_update_dupe',
+          'propertyName' => 'isUpdateDupe',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Update on Duplicate'),
+        ),
+        'cancel_URL' => array(
+          'name' => 'cancel_URL',
+          'propertyName' => 'cancelURL',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Profile Cancel URL'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_cms_user' => array(
+          'name' => 'is_cms_user',
+          'propertyName' => 'isCmsUser',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Create CMS User?'),
+        ),
+        'notify' => array(
+          'name' => 'notify',
+          'propertyName' => 'notify',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Notify on Profile Submit'),
+          'maxlength' => 65535,
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Profile Is Reserved'),
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Profile Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Profile Created By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('UF Group Created Date'),
+        ),
+        'is_proximity_search' => array(
+          'name' => 'is_proximity_search',
+          'propertyName' => 'isProximitySearch',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Include Proximity Search?'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

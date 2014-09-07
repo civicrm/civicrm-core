@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -170,57 +171,42 @@ class ACLContactCache extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'user_id' => array(
-      
-        'name' => 'user_id',
-        'propertyName' => 'user',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'operation' => array(
-      
-        'name' => 'operation',
-        'propertyName' => 'operation',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Operation'),
-                        'required' => true,
-                         'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_ACL_BAO_ACL::operation',
-                    )
-                 ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'user_id' => array(
+          'name' => 'user_id',
+          'propertyName' => 'user',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'operation' => array(
+          'name' => 'operation',
+          'propertyName' => 'operation',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Operation'),
+          'required' => true,
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_ACL_BAO_ACL::operation',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

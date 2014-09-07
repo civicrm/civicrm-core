@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -199,75 +200,53 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_entity_financial_trxn.entity_table',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'financial_trxn_id' => array(
-      
-        'name' => 'financial_trxn_id',
-        'propertyName' => 'financialTrxn',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Financial_DAO_FinancialTrxn',
-                          ),
-      
-              'amount' => array(
-      
-        'name' => 'amount',
-        'propertyName' => 'amount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Amount'),
-                        'required' => true,
-                                  'precision'      => array(20,2),
-                                   
-                'import' => true,
-        'where' => 'civicrm_entity_financial_trxn.amount',
-        'headerPattern' => '/amount/i',
-        'dataPattern' => '/^\d+(\.\d{2})?$/',
-                         'export' => true,
-                                   
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Entity Table'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_entity_financial_trxn.entity_table',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'financial_trxn_id' => array(
+          'name' => 'financial_trxn_id',
+          'propertyName' => 'financialTrxn',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Financial_DAO_FinancialTrxn',
+        ),
+        'amount' => array(
+          'name' => 'amount',
+          'propertyName' => 'amount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Amount'),
+          'required' => true,
+          'precision' => array(20,2),
+          'import' => true,
+          'where' => 'civicrm_entity_financial_trxn.amount',
+          'headerPattern' => '/amount/i',
+          'dataPattern' => '/^\d+(\.\d{2})?$/',
+          'export' => true,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

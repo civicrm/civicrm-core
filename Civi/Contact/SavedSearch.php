@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -257,88 +258,58 @@ class SavedSearch extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'form_values' => array(
-      
-        'name' => 'form_values',
-        'propertyName' => 'formValues',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Submitted Form Values'),
-                                 'maxlength' => 65535,
-                                            
-                'import' => true,
-        'where' => 'civicrm_saved_search.form_values',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'mapping_id' => array(
-      
-        'name' => 'mapping_id',
-        'propertyName' => 'mapping',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Mapping',
-                          ),
-      
-              'search_custom_id' => array(
-      
-        'name' => 'search_custom_id',
-        'propertyName' => 'searchCustomId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'where_clause' => array(
-      
-        'name' => 'where_clause',
-        'propertyName' => 'whereClause',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Where Clause'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'select_tables' => array(
-      
-        'name' => 'select_tables',
-        'propertyName' => 'selectTables',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Select Tables'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'where_tables' => array(
-      
-        'name' => 'where_tables',
-        'propertyName' => 'whereTables',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Where Tables'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'form_values' => array(
+          'name' => 'form_values',
+          'propertyName' => 'formValues',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Submitted Form Values'),
+          'maxlength' => 65535,
+          'import' => true,
+          'where' => 'civicrm_saved_search.form_values',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'mapping_id' => array(
+          'name' => 'mapping_id',
+          'propertyName' => 'mapping',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Core_DAO_Mapping',
+        ),
+        'search_custom_id' => array(
+          'name' => 'search_custom_id',
+          'propertyName' => 'searchCustomId',
+          'type' => \CRM_Utils_Type::T_INT,
+        ),
+        'where_clause' => array(
+          'name' => 'where_clause',
+          'propertyName' => 'whereClause',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Where Clause'),
+          'maxlength' => 65535,
+        ),
+        'select_tables' => array(
+          'name' => 'select_tables',
+          'propertyName' => 'selectTables',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Select Tables'),
+          'maxlength' => 65535,
+        ),
+        'where_tables' => array(
+          'name' => 'where_tables',
+          'propertyName' => 'whereTables',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Where Tables'),
+          'maxlength' => 65535,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

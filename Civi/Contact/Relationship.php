@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -373,132 +374,86 @@ class Relationship extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Relationship ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_id_a' => array(
-      
-        'name' => 'contact_id_a',
-        'propertyName' => 'contactA',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact A'),
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'contact_id_b' => array(
-      
-        'name' => 'contact_id_b',
-        'propertyName' => 'contactB',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact B'),
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'relationship_type_id' => array(
-      
-        'name' => 'relationship_type_id',
-        'propertyName' => 'relationshipType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Relationship Type'),
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_RelationshipType',
-                          ),
-      
-              'start_date' => array(
-      
-        'name' => 'start_date',
-        'propertyName' => 'startDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Relationship Start Date'),
-                                                             
-                                    
-                          ),
-      
-              'end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Relationship End Date'),
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Relationship Is Active'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Relationship Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_permission_a_b' => array(
-      
-        'name' => 'is_permission_a_b',
-        'propertyName' => 'isPermissionAB',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Contact A has Permission Over Contact B'),
-                                                             
-                                    
-                          ),
-      
-              'is_permission_b_a' => array(
-      
-        'name' => 'is_permission_b_a',
-        'propertyName' => 'isPermissionBA',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Contact B has Permission Over Contact A'),
-                                                             
-                                    
-                          ),
-      
-              'case_id' => array(
-      
-        'name' => 'case_id',
-        'propertyName' => 'case',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Relationship Case'),
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Case_DAO_Case',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Relationship ID'),
+          'required' => true,
+        ),
+        'contact_id_a' => array(
+          'name' => 'contact_id_a',
+          'propertyName' => 'contactA',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact A'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'contact_id_b' => array(
+          'name' => 'contact_id_b',
+          'propertyName' => 'contactB',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact B'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'relationship_type_id' => array(
+          'name' => 'relationship_type_id',
+          'propertyName' => 'relationshipType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Relationship Type'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_RelationshipType',
+        ),
+        'start_date' => array(
+          'name' => 'start_date',
+          'propertyName' => 'startDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Relationship Start Date'),
+        ),
+        'end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Relationship End Date'),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Relationship Is Active'),
+          'default' => '1',
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Relationship Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_permission_a_b' => array(
+          'name' => 'is_permission_a_b',
+          'propertyName' => 'isPermissionAB',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Contact A has Permission Over Contact B'),
+        ),
+        'is_permission_b_a' => array(
+          'name' => 'is_permission_b_a',
+          'propertyName' => 'isPermissionBA',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Contact B has Permission Over Contact A'),
+        ),
+        'case_id' => array(
+          'name' => 'case_id',
+          'propertyName' => 'case',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Relationship Case'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Case_DAO_Case',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

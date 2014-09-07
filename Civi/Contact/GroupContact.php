@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -228,87 +229,67 @@ class GroupContact extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Group Contact ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'group_id' => array(
-      
-        'name' => 'group_id',
-        'propertyName' => 'group',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Group ID'),
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Group',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_group',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact ID'),
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'status' => array(
-      
-        'name' => 'status',
-        'propertyName' => 'status',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Group Contact Status'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::groupContactStatus',
-                    )
-                 ),
-      
-              'location_id' => array(
-      
-        'name' => 'location_id',
-        'propertyName' => 'location',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Group Contact Location'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_LocBlock',
-                          ),
-      
-              'email_id' => array(
-      
-        'name' => 'email_id',
-        'propertyName' => 'email',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Group Contact Email'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Email',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Group Contact ID'),
+          'required' => true,
+        ),
+        'group_id' => array(
+          'name' => 'group_id',
+          'propertyName' => 'group',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Group ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Group',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_group',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'status' => array(
+          'name' => 'status',
+          'propertyName' => 'status',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Group Contact Status'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::groupContactStatus',
+          )
+        ),
+        'location_id' => array(
+          'name' => 'location_id',
+          'propertyName' => 'location',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Group Contact Location'),
+          'FKClassName' => 'CRM_Core_DAO_LocBlock',
+        ),
+        'email_id' => array(
+          'name' => 'email_id',
+          'propertyName' => 'email',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Group Contact Email'),
+          'FKClassName' => 'CRM_Core_DAO_Email',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

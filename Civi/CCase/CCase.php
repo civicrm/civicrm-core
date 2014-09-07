@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -286,141 +287,125 @@ class CCase extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'case_id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Case ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_case.id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'case_type_id' => array(
-      
-        'name' => 'case_type_id',
-        'propertyName' => 'caseType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Case Type'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_case.case_type_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => false,
-                                   
-                'FKClassName' => 'CRM_Case_DAO_CaseType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_case_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'case_subject' => array(
-      
-        'name' => 'subject',
-        'propertyName' => 'subject',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Case Subject'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_case.subject',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'case_start_date' => array(
-      
-        'name' => 'start_date',
-        'propertyName' => 'startDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Case Start Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_case.start_date',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'case_end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Case End Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_case.end_date',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'details' => array(
-      
-        'name' => 'details',
-        'propertyName' => 'details',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Details'),
-                                 'maxlength' => 65535,
-                                          'rows' => 8,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'case_status_id' => array(
-      
-        'name' => 'status_id',
-        'propertyName' => 'statusId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Case Status'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_case.status_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => false,
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'case_status',
-                    )
-                 ),
-      
-              'case_deleted' => array(
-      
-        'name' => 'is_deleted',
-        'propertyName' => 'isDeleted',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Case is in the Trash'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_case.is_deleted',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-             );
-    }
+        'case_id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Case ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_case.id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'case_type_id' => array(
+          'name' => 'case_type_id',
+          'propertyName' => 'caseType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Case Type'),
+          'import' => true,
+          'where' => 'civicrm_case.case_type_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => false,
+          'FKClassName' => 'CRM_Case_DAO_CaseType',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_case_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'case_subject' => array(
+          'name' => 'subject',
+          'propertyName' => 'subject',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Case Subject'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_case.subject',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'case_start_date' => array(
+          'name' => 'start_date',
+          'propertyName' => 'startDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Case Start Date'),
+          'import' => true,
+          'where' => 'civicrm_case.start_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'case_end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Case End Date'),
+          'import' => true,
+          'where' => 'civicrm_case.end_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'details' => array(
+          'name' => 'details',
+          'propertyName' => 'details',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Details'),
+          'maxlength' => 65535,
+          'rows' => 8,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'case_status_id' => array(
+          'name' => 'status_id',
+          'propertyName' => 'statusId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Case Status'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_case.status_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => false,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'case_status',
+          )
+        ),
+        'case_deleted' => array(
+          'name' => 'is_deleted',
+          'propertyName' => 'isDeleted',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Case is in the Trash'),
+          'import' => true,
+          'where' => 'civicrm_case.is_deleted',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

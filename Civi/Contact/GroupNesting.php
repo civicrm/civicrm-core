@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -141,42 +142,31 @@ class GroupNesting extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'child_group_id' => array(
-      
-        'name' => 'child_group_id',
-        'propertyName' => 'childGroup',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Group',
-                          ),
-      
-              'parent_group_id' => array(
-      
-        'name' => 'parent_group_id',
-        'propertyName' => 'parentGroup',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Group',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Group Nesting ID'),
+          'required' => true,
+        ),
+        'child_group_id' => array(
+          'name' => 'child_group_id',
+          'propertyName' => 'childGroup',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Child Group'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Group',
+        ),
+        'parent_group_id' => array(
+          'name' => 'parent_group_id',
+          'propertyName' => 'parentGroup',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Parent Group'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Group',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

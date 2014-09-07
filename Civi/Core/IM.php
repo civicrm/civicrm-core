@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -257,94 +258,70 @@ class IM extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'location_type_id' => array(
-      
-        'name' => 'location_type_id',
-        'propertyName' => 'locationTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('IM Location Type'),
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_location_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'display_name',
-                    )
-                 ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('IM Screen Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_im.name',
-        'headerPattern' => '/I(nstant )?M(ess.*)?|screen(\s+)?name/i',
-        'dataPattern' => '/^[A-Za-z][0-9A-Za-z]{20,}$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'provider_id' => array(
-      
-        'name' => 'provider_id',
-        'propertyName' => 'providerId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('IM Provider'),
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'instant_messenger_service',
-                    )
-                 ),
-      
-              'is_primary' => array(
-      
-        'name' => 'is_primary',
-        'propertyName' => 'isPrimary',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is IM Primary?'),
-                                                             
-                                    
-                          ),
-      
-              'is_billing' => array(
-      
-        'name' => 'is_billing',
-        'propertyName' => 'isBilling',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Instant Messenger ID'),
+          'required' => true,
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('IM Contact'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'location_type_id' => array(
+          'name' => 'location_type_id',
+          'propertyName' => 'locationTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('IM Location Type'),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_location_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'display_name',
+          )
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('IM Screen Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_im.name',
+          'headerPattern' => '/I(nstant )?M(ess.*)?|screen(\s+)?name/i',
+          'dataPattern' => '/^[A-Za-z][0-9A-Za-z]{20,}$/',
+          'export' => true,
+        ),
+        'provider_id' => array(
+          'name' => 'provider_id',
+          'propertyName' => 'providerId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('IM Provider'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'instant_messenger_service',
+          )
+        ),
+        'is_primary' => array(
+          'name' => 'is_primary',
+          'propertyName' => 'isPrimary',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is IM Primary?'),
+        ),
+        'is_billing' => array(
+          'name' => 'is_billing',
+          'propertyName' => 'isBilling',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is IM Billing?'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

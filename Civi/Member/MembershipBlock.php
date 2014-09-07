@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -122,6 +123,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="new_title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $newTitle;
@@ -131,6 +133,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="new_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $newText;
@@ -140,6 +143,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="renewal_title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $renewalTitle;
@@ -149,6 +153,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="renewal_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $renewalText;
@@ -431,154 +436,107 @@ class MembershipBlock extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entity',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
-                          ),
-      
-              'membership_types' => array(
-      
-        'name' => 'membership_types',
-        'propertyName' => 'membershipTypes',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Membership Types'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'membership_type_default' => array(
-      
-        'name' => 'membership_type_default',
-        'propertyName' => 'membershipTypeDefault',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Membership Type Default'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Member_DAO_MembershipType',
-                          ),
-      
-              'display_min_fee' => array(
-      
-        'name' => 'display_min_fee',
-        'propertyName' => 'displayMinFee',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Display Min Fee'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_separate_payment' => array(
-      
-        'name' => 'is_separate_payment',
-        'propertyName' => 'isSeparatePayment',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'new_title' => array(
-      
-        'name' => 'new_title',
-        'propertyName' => 'newTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('New Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'new_text' => array(
-      
-        'name' => 'new_text',
-        'propertyName' => 'newText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('New Text'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'renewal_title' => array(
-      
-        'name' => 'renewal_title',
-        'propertyName' => 'renewalTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Renewal Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'renewal_text' => array(
-      
-        'name' => 'renewal_text',
-        'propertyName' => 'renewalText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Renewal Text'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'is_required' => array(
-      
-        'name' => 'is_required',
-        'propertyName' => 'isRequired',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Required'),
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Active'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Block ID'),
+          'required' => true,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Block Entity Table'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entity',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Block Entity ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
+        ),
+        'membership_types' => array(
+          'name' => 'membership_types',
+          'propertyName' => 'membershipTypes',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Block Membership Types'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'membership_type_default' => array(
+          'name' => 'membership_type_default',
+          'propertyName' => 'membershipTypeDefault',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Block Default Type'),
+          'FKClassName' => 'CRM_Member_DAO_MembershipType',
+        ),
+        'display_min_fee' => array(
+          'name' => 'display_min_fee',
+          'propertyName' => 'displayMinFee',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Membership Block Display Minimum Fee'),
+          'default' => '1',
+        ),
+        'is_separate_payment' => array(
+          'name' => 'is_separate_payment',
+          'propertyName' => 'isSeparatePayment',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Membership Block Is Separate Payment'),
+          'default' => '1',
+        ),
+        'new_title' => array(
+          'name' => 'new_title',
+          'propertyName' => 'newTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Block New Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'new_text' => array(
+          'name' => 'new_text',
+          'propertyName' => 'newText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Membership Block New Text'),
+          'maxlength' => 65535,
+          'localizable' => true,
+        ),
+        'renewal_title' => array(
+          'name' => 'renewal_title',
+          'propertyName' => 'renewalTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Block Renewal Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'renewal_text' => array(
+          'name' => 'renewal_text',
+          'propertyName' => 'renewalText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Membership Block Renewal Text'),
+          'maxlength' => 65535,
+          'localizable' => true,
+        ),
+        'is_required' => array(
+          'name' => 'is_required',
+          'propertyName' => 'isRequired',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Required'),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Active'),
+          'default' => '1',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

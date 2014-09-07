@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -344,126 +345,93 @@ class Setting extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'group_name' => array(
-      
-        'name' => 'group_name',
-        'propertyName' => 'groupName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Group Name'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'value' => array(
-      
-        'name' => 'value',
-        'propertyName' => 'value',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Value'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'is_domain' => array(
-      
-        'name' => 'is_domain',
-        'propertyName' => 'isDomain',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'component_id' => array(
-      
-        'name' => 'component_id',
-        'propertyName' => 'component',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Component',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_component',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Created Date'),
-                                                             
-                                    
-                          ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Setting ID'),
+          'required' => true,
+        ),
+        'group_name' => array(
+          'name' => 'group_name',
+          'propertyName' => 'groupName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Setting Group'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Setting Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'value' => array(
+          'name' => 'value',
+          'propertyName' => 'value',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Value'),
+          'maxlength' => 65535,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Setting Domain'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Setting Contact'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'is_domain' => array(
+          'name' => 'is_domain',
+          'propertyName' => 'isDomain',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Domain Setting?'),
+        ),
+        'component_id' => array(
+          'name' => 'component_id',
+          'propertyName' => 'component',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Setting Component'),
+          'FKClassName' => 'CRM_Core_DAO_Component',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_component',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Setting Created Date'),
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Setting Created By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

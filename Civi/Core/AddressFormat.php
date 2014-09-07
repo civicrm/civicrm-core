@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -112,31 +113,21 @@ class AddressFormat extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'format' => array(
-      
-        'name' => 'format',
-        'propertyName' => 'format',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Address Format'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'format' => array(
+          'name' => 'format',
+          'propertyName' => 'format',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Address Format'),
+          'maxlength' => 65535,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

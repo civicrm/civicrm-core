@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -460,175 +461,124 @@ class MailSettings extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'civiDomain',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'domain' => array(
-      
-        'name' => 'domain',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Domain'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'localpart' => array(
-      
-        'name' => 'localpart',
-        'propertyName' => 'localpart',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Localpart'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'return_path' => array(
-      
-        'name' => 'return_path',
-        'propertyName' => 'returnPath',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Return Path'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'protocol' => array(
-      
-        'name' => 'protocol',
-        'propertyName' => 'protocol',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Protocol'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'mail_protocol',
-                    )
-                 ),
-      
-              'server' => array(
-      
-        'name' => 'server',
-        'propertyName' => 'server',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Server'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'port' => array(
-      
-        'name' => 'port',
-        'propertyName' => 'port',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Port'),
-                                                             
-                                    
-                          ),
-      
-              'username' => array(
-      
-        'name' => 'username',
-        'propertyName' => 'username',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Username'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'password' => array(
-      
-        'name' => 'password',
-        'propertyName' => 'password',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Password'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_ssl' => array(
-      
-        'name' => 'is_ssl',
-        'propertyName' => 'isSsl',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'source' => array(
-      
-        'name' => 'source',
-        'propertyName' => 'source',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Source'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mail Settings ID'),
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'civiDomain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mail Settings Domain'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mail Settings Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Default Mail Settings?'),
+        ),
+        'domain' => array(
+          'name' => 'domain',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('email Domain'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'localpart' => array(
+          'name' => 'localpart',
+          'propertyName' => 'localpart',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('email Local Part'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'return_path' => array(
+          'name' => 'return_path',
+          'propertyName' => 'returnPath',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Return Path'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'protocol' => array(
+          'name' => 'protocol',
+          'propertyName' => 'protocol',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Protocol'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'mail_protocol',
+          )
+        ),
+        'server' => array(
+          'name' => 'server',
+          'propertyName' => 'server',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mail Server'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'port' => array(
+          'name' => 'port',
+          'propertyName' => 'port',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mail Port'),
+        ),
+        'username' => array(
+          'name' => 'username',
+          'propertyName' => 'username',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mail Account Username'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'password' => array(
+          'name' => 'password',
+          'propertyName' => 'password',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mail Account Password'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_ssl' => array(
+          'name' => 'is_ssl',
+          'propertyName' => 'isSsl',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Mail Account Uses SSL'),
+        ),
+        'source' => array(
+          'name' => 'source',
+          'propertyName' => 'source',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mail Folder'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

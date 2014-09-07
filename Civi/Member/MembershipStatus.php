@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -77,6 +78,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=128, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $label;
@@ -489,190 +491,142 @@ class MembershipStatus extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'membership_status' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Membership Status'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_membership_status.name',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'label' => array(
-      
-        'name' => 'label',
-        'propertyName' => 'label',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Label'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'start_event' => array(
-      
-        'name' => 'start_event',
-        'propertyName' => 'startEvent',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Start Event'),
-                                 'maxlength' => 12,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::eventDate',
-                    )
-                 ),
-      
-              'start_event_adjust_unit' => array(
-      
-        'name' => 'start_event_adjust_unit',
-        'propertyName' => 'startEventAdjustUnit',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Start Event Adjust Unit'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::unitList',
-                    )
-                 ),
-      
-              'start_event_adjust_interval' => array(
-      
-        'name' => 'start_event_adjust_interval',
-        'propertyName' => 'startEventAdjustInterval',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Start Event Adjust Interval'),
-                                                             
-                                    
-                          ),
-      
-              'end_event' => array(
-      
-        'name' => 'end_event',
-        'propertyName' => 'endEvent',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('End Event'),
-                                 'maxlength' => 12,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::eventDate',
-                    )
-                 ),
-      
-              'end_event_adjust_unit' => array(
-      
-        'name' => 'end_event_adjust_unit',
-        'propertyName' => 'endEventAdjustUnit',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('End Event Adjust Unit'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::unitList',
-                    )
-                 ),
-      
-              'end_event_adjust_interval' => array(
-      
-        'name' => 'end_event_adjust_interval',
-        'propertyName' => 'endEventAdjustInterval',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('End Event Adjust Interval'),
-                                                             
-                                    
-                          ),
-      
-              'is_current_member' => array(
-      
-        'name' => 'is_current_member',
-        'propertyName' => 'isCurrentMember',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Current Membership?'),
-                                                             
-                                    
-                          ),
-      
-              'is_admin' => array(
-      
-        'name' => 'is_admin',
-        'propertyName' => 'isAdmin',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Admin Assigned Only?'),
-                                                             
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                                                             
-                                    
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Default Status?'),
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Active'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Reserved'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Status ID'),
+          'required' => true,
+        ),
+        'membership_status' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Status'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_membership_status.name',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'label' => array(
+          'name' => 'label',
+          'propertyName' => 'label',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Label'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'start_event' => array(
+          'name' => 'start_event',
+          'propertyName' => 'startEvent',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Start Event'),
+          'maxlength' => 12,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::eventDate',
+          )
+        ),
+        'start_event_adjust_unit' => array(
+          'name' => 'start_event_adjust_unit',
+          'propertyName' => 'startEventAdjustUnit',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Start Event Adjust Unit'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::unitList',
+          )
+        ),
+        'start_event_adjust_interval' => array(
+          'name' => 'start_event_adjust_interval',
+          'propertyName' => 'startEventAdjustInterval',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Start Event Adjust Interval'),
+        ),
+        'end_event' => array(
+          'name' => 'end_event',
+          'propertyName' => 'endEvent',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('End Event'),
+          'maxlength' => 12,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::eventDate',
+          )
+        ),
+        'end_event_adjust_unit' => array(
+          'name' => 'end_event_adjust_unit',
+          'propertyName' => 'endEventAdjustUnit',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('End Event Adjust Unit'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::unitList',
+          )
+        ),
+        'end_event_adjust_interval' => array(
+          'name' => 'end_event_adjust_interval',
+          'propertyName' => 'endEventAdjustInterval',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('End Event Adjust Interval'),
+        ),
+        'is_current_member' => array(
+          'name' => 'is_current_member',
+          'propertyName' => 'isCurrentMember',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Current Membership?'),
+        ),
+        'is_admin' => array(
+          'name' => 'is_admin',
+          'propertyName' => 'isAdmin',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Admin Assigned Only?'),
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Weight'),
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Default Status?'),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Active'),
+          'default' => '1',
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Reserved'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

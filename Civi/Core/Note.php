@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -286,105 +287,77 @@ class Note extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'note' => array(
-      
-        'name' => 'note',
-        'propertyName' => 'note',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Note'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 60,
-         
-                'import' => true,
-        'where' => 'civicrm_note.note',
-        'headerPattern' => '/Note|Comment/i',
-        'dataPattern' => '//',
-                         'export' => true,
-                                   
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'modified_date' => array(
-      
-        'name' => 'modified_date',
-        'propertyName' => 'modifiedDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Modified Date'),
-                                                             
-                                    
-                          ),
-      
-              'subject' => array(
-      
-        'name' => 'subject',
-        'propertyName' => 'subject',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Subject'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'privacy' => array(
-      
-        'name' => 'privacy',
-        'propertyName' => 'privacy',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Privacy'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Note ID'),
+          'required' => true,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Note Entity'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Note Entity ID'),
+          'required' => true,
+        ),
+        'note' => array(
+          'name' => 'note',
+          'propertyName' => 'note',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Note'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 60,
+          'import' => true,
+          'where' => 'civicrm_note.note',
+          'headerPattern' => '/Note|Comment/i',
+          'dataPattern' => '//',
+          'export' => true,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Note Created By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'modified_date' => array(
+          'name' => 'modified_date',
+          'propertyName' => 'modifiedDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Note Modified By'),
+        ),
+        'subject' => array(
+          'name' => 'subject',
+          'propertyName' => 'subject',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Subject'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'privacy' => array(
+          'name' => 'privacy',
+          'propertyName' => 'privacy',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Privacy'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

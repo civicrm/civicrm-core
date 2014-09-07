@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -228,80 +229,58 @@ class UFMatch extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'uf_id' => array(
-      
-        'name' => 'uf_id',
-        'propertyName' => 'ufId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'uf_name' => array(
-      
-        'name' => 'uf_name',
-        'propertyName' => 'ufName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Uf Name'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'language' => array(
-      
-        'name' => 'language',
-        'propertyName' => 'language',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Language'),
-                                 'maxlength' => 5,
-                                 'size' => \CRM_Utils_Type::SIX,
-                           
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('UF Match ID'),
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('UF Match Domain ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'uf_id' => array(
+          'name' => 'uf_id',
+          'propertyName' => 'ufId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('CMS ID'),
+          'required' => true,
+        ),
+        'uf_name' => array(
+          'name' => 'uf_name',
+          'propertyName' => 'ufName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('CMS Unique Identifier'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('CiviCRM Contact ID'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'language' => array(
+          'name' => 'language',
+          'propertyName' => 'language',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Preferred Language'),
+          'maxlength' => 5,
+          'size' => \CRM_Utils_Type::SIX,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

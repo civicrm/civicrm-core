@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -199,71 +200,55 @@ class Subscribe extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'group_id' => array(
-      
-        'name' => 'group_id',
-        'propertyName' => 'group',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Group',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_group',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'hash' => array(
-      
-        'name' => 'hash',
-        'propertyName' => 'hash',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Hash'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'time_stamp' => array(
-      
-        'name' => 'time_stamp',
-        'propertyName' => 'timeStamp',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Time Stamp'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Subscribe ID'),
+          'required' => true,
+        ),
+        'group_id' => array(
+          'name' => 'group_id',
+          'propertyName' => 'group',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Subscribe Group'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Group',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_group',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Subscribe Contact'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'hash' => array(
+          'name' => 'hash',
+          'propertyName' => 'hash',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mailing Subscribe Hash'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'time_stamp' => array(
+          'name' => 'time_stamp',
+          'propertyName' => 'timeStamp',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Mailing Subscribe Timestamp'),
+          'required' => true,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

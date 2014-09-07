@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -228,86 +229,65 @@ class WordReplacement extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'find_word' => array(
-      
-        'name' => 'find_word',
-        'propertyName' => 'findWord',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Find Word'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'replace_word' => array(
-      
-        'name' => 'replace_word',
-        'propertyName' => 'replaceWord',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Replace Word'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Word Replacement is Active'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'match_type' => array(
-      
-        'name' => 'match_type',
-        'propertyName' => 'matchType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Match Type'),
-                                 'maxlength' => 16,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                           'default' => 'wildcardMatch',
-         
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::getWordReplacementMatchType',
-                    )
-                 ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Word Replacement ID'),
+          'required' => true,
+        ),
+        'find_word' => array(
+          'name' => 'find_word',
+          'propertyName' => 'findWord',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Replaced Word'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'replace_word' => array(
+          'name' => 'replace_word',
+          'propertyName' => 'replaceWord',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Replacement Word'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Word Replacement is Active'),
+          'default' => '1',
+        ),
+        'match_type' => array(
+          'name' => 'match_type',
+          'propertyName' => 'matchType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Word Replacement Match Type'),
+          'maxlength' => 16,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'default' => 'wildcardMatch',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::getWordReplacementMatchType',
+          )
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Word Replacement Domain ID'),
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

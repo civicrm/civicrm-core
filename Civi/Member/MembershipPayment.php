@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -141,41 +142,30 @@ class MembershipPayment extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'membership_id' => array(
-      
-        'name' => 'membership_id',
-        'propertyName' => 'membership',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Member_DAO_Membership',
-                          ),
-      
-              'contribution_id' => array(
-      
-        'name' => 'contribution_id',
-        'propertyName' => 'contribution',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contribute_DAO_Contribution',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Payment ID'),
+          'required' => true,
+        ),
+        'membership_id' => array(
+          'name' => 'membership_id',
+          'propertyName' => 'membership',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership'),
+          'required' => true,
+          'FKClassName' => 'CRM_Member_DAO_Membership',
+        ),
+        'contribution_id' => array(
+          'name' => 'contribution_id',
+          'propertyName' => 'contribution',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contribution'),
+          'FKClassName' => 'CRM_Contribute_DAO_Contribution',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

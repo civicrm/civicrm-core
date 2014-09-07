@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -344,114 +345,83 @@ class MessageTemplate extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'msg_title' => array(
-      
-        'name' => 'msg_title',
-        'propertyName' => 'msgTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Msg Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'msg_subject' => array(
-      
-        'name' => 'msg_subject',
-        'propertyName' => 'msgSubject',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Msg Subject'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'msg_text' => array(
-      
-        'name' => 'msg_text',
-        'propertyName' => 'msgText',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Msg Text'),
-                                                             
-                                    
-                          ),
-      
-              'msg_html' => array(
-      
-        'name' => 'msg_html',
-        'propertyName' => 'msgHtml',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Msg Html'),
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Active'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'workflow_id' => array(
-      
-        'name' => 'workflow_id',
-        'propertyName' => 'workflowId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'pdf_format_id' => array(
-      
-        'name' => 'pdf_format_id',
-        'propertyName' => 'pdfFormatId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'pdf_format',
-                    )
-                 ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Message Template ID'),
+          'required' => true,
+        ),
+        'msg_title' => array(
+          'name' => 'msg_title',
+          'propertyName' => 'msgTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Message Template Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'msg_subject' => array(
+          'name' => 'msg_subject',
+          'propertyName' => 'msgSubject',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Message Template Subject'),
+          'maxlength' => 65535,
+        ),
+        'msg_text' => array(
+          'name' => 'msg_text',
+          'propertyName' => 'msgText',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Message Template Text'),
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'msg_html' => array(
+          'name' => 'msg_html',
+          'propertyName' => 'msgHtml',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Message Template HTML'),
+          'html' => array(
+            'type' => 'RichTextEditor',
+          ),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Active'),
+          'default' => '1',
+        ),
+        'workflow_id' => array(
+          'name' => 'workflow_id',
+          'propertyName' => 'workflowId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Message Template Workflow'),
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Message Template Is Default?'),
+          'default' => '1',
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Message Template Is Reserved?'),
+        ),
+        'pdf_format_id' => array(
+          'name' => 'pdf_format_id',
+          'propertyName' => 'pdfFormatId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Message Template Format'),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'pdf_format',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -344,141 +345,99 @@ class ContributionProduct extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'product_id' => array(
-      
-        'name' => 'product_id',
-        'propertyName' => 'productId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contribution_id' => array(
-      
-        'name' => 'contribution_id',
-        'propertyName' => 'contribution',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contribute_DAO_Contribution',
-                          ),
-      
-              'product_option' => array(
-      
-        'name' => 'product_option',
-        'propertyName' => 'productOption',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Product Option'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                         'export' => true,
-                'where' => 'civicrm_contribution_product.product_option',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'quantity' => array(
-      
-        'name' => 'quantity',
-        'propertyName' => 'quantity',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Quantity'),
-                                                             
-                         'export' => true,
-                'where' => 'civicrm_contribution_product.quantity',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'fulfilled_date' => array(
-      
-        'name' => 'fulfilled_date',
-        'propertyName' => 'fulfilledDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Fulfilled Date'),
-                                                             
-                         'export' => true,
-                'where' => 'civicrm_contribution_product.fulfilled_date',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'contribution_start_date' => array(
-      
-        'name' => 'start_date',
-        'propertyName' => 'startDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Start Date'),
-                                                             
-                         'export' => true,
-                'where' => 'civicrm_contribution_product.start_date',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'contribution_end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('End Date'),
-                                                             
-                         'export' => true,
-                'where' => 'civicrm_contribution_product.end_date',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'comment' => array(
-      
-        'name' => 'comment',
-        'propertyName' => 'comment',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Comment'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'financial_type_id' => array(
-      
-        'name' => 'financial_type_id',
-        'propertyName' => 'financialType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Financial Type'),
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_financial_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'product_id' => array(
+          'name' => 'product_id',
+          'propertyName' => 'productId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'contribution_id' => array(
+          'name' => 'contribution_id',
+          'propertyName' => 'contribution',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Contribute_DAO_Contribution',
+        ),
+        'product_option' => array(
+          'name' => 'product_option',
+          'propertyName' => 'productOption',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Product Option'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'export' => true,
+          'where' => 'civicrm_contribution_product.product_option',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ),
+        'quantity' => array(
+          'name' => 'quantity',
+          'propertyName' => 'quantity',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Quantity'),
+          'export' => true,
+          'where' => 'civicrm_contribution_product.quantity',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ),
+        'fulfilled_date' => array(
+          'name' => 'fulfilled_date',
+          'propertyName' => 'fulfilledDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Fulfilled Date'),
+          'export' => true,
+          'where' => 'civicrm_contribution_product.fulfilled_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ),
+        'contribution_start_date' => array(
+          'name' => 'start_date',
+          'propertyName' => 'startDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Start Date'),
+          'export' => true,
+          'where' => 'civicrm_contribution_product.start_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ),
+        'contribution_end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('End Date'),
+          'export' => true,
+          'where' => 'civicrm_contribution_product.end_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ),
+        'comment' => array(
+          'name' => 'comment',
+          'propertyName' => 'comment',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Comment'),
+          'maxlength' => 65535,
+        ),
+        'financial_type_id' => array(
+          'name' => 'financial_type_id',
+          'propertyName' => 'financialType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Type'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Financial_DAO_FinancialType',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_financial_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

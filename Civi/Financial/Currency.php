@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -199,78 +200,65 @@ class Currency extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Currency'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_currency.name',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'symbol' => array(
-      
-        'name' => 'symbol',
-        'propertyName' => 'symbol',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Symbol'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                          ),
-      
-              'numeric_code' => array(
-      
-        'name' => 'numeric_code',
-        'propertyName' => 'numericCode',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Numeric Code'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                'import' => true,
-        'where' => 'civicrm_currency.numeric_code',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'full_name' => array(
-      
-        'name' => 'full_name',
-        'propertyName' => 'fullName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Full Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Currency'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_currency.name',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'symbol' => array(
+          'name' => 'symbol',
+          'propertyName' => 'symbol',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Symbol'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'numeric_code' => array(
+          'name' => 'numeric_code',
+          'propertyName' => 'numericCode',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Numeric Code'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+          'import' => true,
+          'where' => 'civicrm_currency.numeric_code',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'full_name' => array(
+          'name' => 'full_name',
+          'propertyName' => 'fullName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Full Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

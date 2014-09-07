@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -170,53 +171,37 @@ class Unsubscribe extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'event_queue_id' => array(
-      
-        'name' => 'event_queue_id',
-        'propertyName' => 'eventQueue',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
-                          ),
-      
-              'org_unsubscribe' => array(
-      
-        'name' => 'org_unsubscribe',
-        'propertyName' => 'orgUnsubscribe',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Org Unsubscribe'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'time_stamp' => array(
-      
-        'name' => 'time_stamp',
-        'propertyName' => 'timeStamp',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Time Stamp'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Unsubscribe ID'),
+          'required' => true,
+        ),
+        'event_queue_id' => array(
+          'name' => 'event_queue_id',
+          'propertyName' => 'eventQueue',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Event Queue'),
+          'required' => true,
+          'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
+        ),
+        'org_unsubscribe' => array(
+          'name' => 'org_unsubscribe',
+          'propertyName' => 'orgUnsubscribe',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Unsubscribe is for Organization?'),
+          'required' => true,
+        ),
+        'time_stamp' => array(
+          'name' => 'time_stamp',
+          'propertyName' => 'timeStamp',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Unsubscribe Timestamp'),
+          'required' => true,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

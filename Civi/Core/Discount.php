@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -228,78 +229,52 @@ class Discount extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'participant_discount_name' => array(
-      
-        'name' => 'price_set_id',
-        'propertyName' => 'priceSet',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Discount Name'),
-                        'required' => true,
-                                                     
-                         'export' => true,
-                'where' => 'civicrm_discount.price_set_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                'FKClassName' => 'CRM_Price_DAO_PriceSet',
-                          ),
-      
-              'start_date' => array(
-      
-        'name' => 'start_date',
-        'propertyName' => 'startDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Start Date'),
-                                                             
-                                    
-                          ),
-      
-              'end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('End Date'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Entity Table'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'participant_discount_name' => array(
+          'name' => 'price_set_id',
+          'propertyName' => 'priceSet',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Discount Name'),
+          'required' => true,
+          'export' => true,
+          'where' => 'civicrm_discount.price_set_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'FKClassName' => 'CRM_Price_DAO_PriceSet',
+        ),
+        'start_date' => array(
+          'name' => 'start_date',
+          'propertyName' => 'startDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Start Date'),
+        ),
+        'end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('End Date'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -315,103 +316,65 @@ class ActionLog extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'action_schedule_id' => array(
-      
-        'name' => 'action_schedule_id',
-        'propertyName' => 'actionSchedule',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_ActionSchedule',
-                          ),
-      
-              'action_date_time' => array(
-      
-        'name' => 'action_date_time',
-        'propertyName' => 'actionDateTime',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Action Date Time'),
-                                                             
-                                    
-                          ),
-      
-              'is_error' => array(
-      
-        'name' => 'is_error',
-        'propertyName' => 'isError',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'message' => array(
-      
-        'name' => 'message',
-        'propertyName' => 'message',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Message'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'repetition_number' => array(
-      
-        'name' => 'repetition_number',
-        'propertyName' => 'repetitionNumber',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Repetition Number'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Entity Table'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'action_schedule_id' => array(
+          'name' => 'action_schedule_id',
+          'propertyName' => 'actionSchedule',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_ActionSchedule',
+        ),
+        'action_date_time' => array(
+          'name' => 'action_date_time',
+          'propertyName' => 'actionDateTime',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Action Date Time'),
+        ),
+        'is_error' => array(
+          'name' => 'is_error',
+          'propertyName' => 'isError',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+        ),
+        'message' => array(
+          'name' => 'message',
+          'propertyName' => 'message',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Message'),
+          'maxlength' => 65535,
+        ),
+        'repetition_number' => array(
+          'name' => 'repetition_number',
+          'propertyName' => 'repetitionNumber',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Repetition Number'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -141,40 +142,26 @@ class Cart extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'cart_id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'user_id' => array(
-      
-        'name' => 'user_id',
-        'propertyName' => 'user',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'completed' => array(
-      
-        'name' => 'completed',
-        'propertyName' => 'completed',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Completed'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'cart_id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'user_id' => array(
+          'name' => 'user_id',
+          'propertyName' => 'user',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'completed' => array(
+          'name' => 'completed',
+          'propertyName' => 'completed',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Completed'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

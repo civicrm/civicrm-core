@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -315,115 +316,81 @@ class Country extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Country'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_country.name',
-        'headerPattern' => '/country/i',
-        'dataPattern' => '/^[A-Z][a-z]+\.?(\s+[A-Z][a-z]+){0,3}$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'iso_code' => array(
-      
-        'name' => 'iso_code',
-        'propertyName' => 'isoCode',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Iso Code'),
-                                 'maxlength' => 2,
-                                 'size' => \CRM_Utils_Type::TWO,
-                           
-                                    
-                          ),
-      
-              'country_code' => array(
-      
-        'name' => 'country_code',
-        'propertyName' => 'countryCode',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Country Code'),
-                                 'maxlength' => 4,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                                    
-                          ),
-      
-              'address_format_id' => array(
-      
-        'name' => 'address_format_id',
-        'propertyName' => 'addressFormat',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_AddressFormat',
-                          ),
-      
-              'idd_prefix' => array(
-      
-        'name' => 'idd_prefix',
-        'propertyName' => 'iddPrefix',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Idd Prefix'),
-                                 'maxlength' => 4,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                                    
-                          ),
-      
-              'ndd_prefix' => array(
-      
-        'name' => 'ndd_prefix',
-        'propertyName' => 'nddPrefix',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Ndd Prefix'),
-                                 'maxlength' => 4,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                                    
-                          ),
-      
-              'region_id' => array(
-      
-        'name' => 'region_id',
-        'propertyName' => 'region',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Worldregion',
-                          ),
-      
-              'is_province_abbreviated' => array(
-      
-        'name' => 'is_province_abbreviated',
-        'propertyName' => 'isProvinceAbbreviated',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Country ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Country'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_country.name',
+          'headerPattern' => '/country/i',
+          'dataPattern' => '/^[A-Z][a-z]+\.?(\s+[A-Z][a-z]+){0,3}$/',
+          'export' => true,
+        ),
+        'iso_code' => array(
+          'name' => 'iso_code',
+          'propertyName' => 'isoCode',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Country ISO Code'),
+          'maxlength' => 2,
+          'size' => \CRM_Utils_Type::TWO,
+        ),
+        'country_code' => array(
+          'name' => 'country_code',
+          'propertyName' => 'countryCode',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Country Phone Prefix'),
+          'maxlength' => 4,
+          'size' => \CRM_Utils_Type::FOUR,
+        ),
+        'address_format_id' => array(
+          'name' => 'address_format_id',
+          'propertyName' => 'addressFormat',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Address Format'),
+          'FKClassName' => 'CRM_Core_DAO_AddressFormat',
+        ),
+        'idd_prefix' => array(
+          'name' => 'idd_prefix',
+          'propertyName' => 'iddPrefix',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Outgoing Phone Prefix'),
+          'maxlength' => 4,
+          'size' => \CRM_Utils_Type::FOUR,
+        ),
+        'ndd_prefix' => array(
+          'name' => 'ndd_prefix',
+          'propertyName' => 'nddPrefix',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Area Code'),
+          'maxlength' => 4,
+          'size' => \CRM_Utils_Type::FOUR,
+        ),
+        'region_id' => array(
+          'name' => 'region_id',
+          'propertyName' => 'region',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Region'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Worldregion',
+        ),
+        'is_province_abbreviated' => array(
+          'name' => 'is_province_abbreviated',
+          'propertyName' => 'isProvinceAbbreviated',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Abbreviate Province?'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -86,6 +87,7 @@ class Friend extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $title;
@@ -95,6 +97,7 @@ class Friend extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="intro", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $intro;
@@ -104,6 +107,7 @@ class Friend extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="suggested_message", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $suggestedMessage;
@@ -122,6 +126,7 @@ class Friend extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $thankyouTitle;
@@ -131,6 +136,7 @@ class Friend extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="thankyou_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $thankyouText;
@@ -344,126 +350,110 @@ class Friend extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'intro' => array(
-      
-        'name' => 'intro',
-        'propertyName' => 'intro',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Intro'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'suggested_message' => array(
-      
-        'name' => 'suggested_message',
-        'propertyName' => 'suggestedMessage',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Suggested Message'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'general_link' => array(
-      
-        'name' => 'general_link',
-        'propertyName' => 'generalLink',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('General Link'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_tell_friend.general_link',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'thankyou_title' => array(
-      
-        'name' => 'thankyou_title',
-        'propertyName' => 'thankyouTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Thankyou Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'thankyou_text' => array(
-      
-        'name' => 'thankyou_text',
-        'propertyName' => 'thankyouText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Thankyou Text'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Entity Table'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'intro' => array(
+          'name' => 'intro',
+          'propertyName' => 'intro',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Intro'),
+          'maxlength' => 65535,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'suggested_message' => array(
+          'name' => 'suggested_message',
+          'propertyName' => 'suggestedMessage',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Suggested Message'),
+          'maxlength' => 65535,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'general_link' => array(
+          'name' => 'general_link',
+          'propertyName' => 'generalLink',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('General Link'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_tell_friend.general_link',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'thankyou_title' => array(
+          'name' => 'thankyou_title',
+          'propertyName' => 'thankyouTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Thankyou Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'thankyou_text' => array(
+          'name' => 'thankyou_text',
+          'propertyName' => 'thankyouText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Thankyou Text'),
+          'maxlength' => 65535,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -286,97 +287,63 @@ class PledgeBlock extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Entity Id'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'pledge_frequency_unit' => array(
-      
-        'name' => 'pledge_frequency_unit',
-        'propertyName' => 'pledgeFrequencyUnit',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Pledge Frequency Unit'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_pledge_interval' => array(
-      
-        'name' => 'is_pledge_interval',
-        'propertyName' => 'isPledgeInterval',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'max_reminders' => array(
-      
-        'name' => 'max_reminders',
-        'propertyName' => 'maxReminders',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Maximum Number of Reminders'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'initial_reminder_day' => array(
-      
-        'name' => 'initial_reminder_day',
-        'propertyName' => 'initialReminderDay',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Initial Reminder Day'),
-                                                             
-                                           'default' => '5',
-         
-                          ),
-      
-              'additional_reminder_day' => array(
-      
-        'name' => 'additional_reminder_day',
-        'propertyName' => 'additionalReminderDay',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Additional Reminder Days'),
-                                                             
-                                           'default' => '5',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Entity Table'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Entity Id'),
+          'required' => true,
+        ),
+        'pledge_frequency_unit' => array(
+          'name' => 'pledge_frequency_unit',
+          'propertyName' => 'pledgeFrequencyUnit',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Pledge Frequency Unit'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_pledge_interval' => array(
+          'name' => 'is_pledge_interval',
+          'propertyName' => 'isPledgeInterval',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+        ),
+        'max_reminders' => array(
+          'name' => 'max_reminders',
+          'propertyName' => 'maxReminders',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Maximum Number of Reminders'),
+          'default' => '1',
+        ),
+        'initial_reminder_day' => array(
+          'name' => 'initial_reminder_day',
+          'propertyName' => 'initialReminderDay',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Initial Reminder Day'),
+          'default' => '5',
+        ),
+        'additional_reminder_day' => array(
+          'name' => 'additional_reminder_day',
+          'propertyName' => 'additionalReminderDay',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Additional Reminder Days'),
+          'default' => '5',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

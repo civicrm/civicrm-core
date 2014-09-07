@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -344,123 +345,87 @@ class Tag extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Tag Name'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'parent_id' => array(
-      
-        'name' => 'parent_id',
-        'propertyName' => 'parent',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Parent Tag'),
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Core_DAO_Tag',
-                          ),
-      
-              'is_selectable' => array(
-      
-        'name' => 'is_selectable',
-        'propertyName' => 'isSelectable',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Reserved'),
-                                                             
-                                    
-                          ),
-      
-              'is_tagset' => array(
-      
-        'name' => 'is_tagset',
-        'propertyName' => 'isTagset',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Tagset'),
-                                                             
-                                    
-                          ),
-      
-              'used_for' => array(
-      
-        'name' => 'used_for',
-        'propertyName' => 'usedFor',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Used For'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                           'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'tag_used_for',
-                    )
-                 ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Tag Created Date'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Tag ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Tag Name'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'parent_id' => array(
+          'name' => 'parent_id',
+          'propertyName' => 'parent',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Parent Tag'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Core_DAO_Tag',
+        ),
+        'is_selectable' => array(
+          'name' => 'is_selectable',
+          'propertyName' => 'isSelectable',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Display Tag?'),
+          'default' => '1',
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Reserved'),
+        ),
+        'is_tagset' => array(
+          'name' => 'is_tagset',
+          'propertyName' => 'isTagset',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Tagset'),
+        ),
+        'used_for' => array(
+          'name' => 'used_for',
+          'propertyName' => 'usedFor',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Used For'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'tag_used_for',
+          )
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Tag Created By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Tag Created Date'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

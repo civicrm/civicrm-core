@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -373,128 +374,89 @@ class MailingJob extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'mailing_id' => array(
-      
-        'name' => 'mailing_id',
-        'propertyName' => 'mailing',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Mailing_DAO_Mailing',
-                          ),
-      
-              'scheduled_date' => array(
-      
-        'name' => 'scheduled_date',
-        'propertyName' => 'scheduledDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Scheduled Date'),
-                                                             
-                                    
-                          ),
-      
-              'start_date' => array(
-      
-        'name' => 'start_date',
-        'propertyName' => 'startDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Start Date'),
-                                                             
-                                    
-                          ),
-      
-              'end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('End Date'),
-                                                             
-                                    
-                          ),
-      
-              'status' => array(
-      
-        'name' => 'status',
-        'propertyName' => 'status',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Status'),
-                                 'maxlength' => 12,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::getMailingJobStatus',
-                    )
-                 ),
-      
-              'is_test' => array(
-      
-        'name' => 'is_test',
-        'propertyName' => 'isTest',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'job_type' => array(
-      
-        'name' => 'job_type',
-        'propertyName' => 'jobType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Job Type'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'parent_id' => array(
-      
-        'name' => 'parent_id',
-        'propertyName' => 'parent',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
-                          ),
-      
-              'job_offset' => array(
-      
-        'name' => 'job_offset',
-        'propertyName' => 'jobOffset',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Job Offset'),
-                                                             
-                                    
-                          ),
-      
-              'job_limit' => array(
-      
-        'name' => 'job_limit',
-        'propertyName' => 'jobLimit',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Job Limit'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing JOb ID'),
+          'required' => true,
+        ),
+        'mailing_id' => array(
+          'name' => 'mailing_id',
+          'propertyName' => 'mailing',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing'),
+          'required' => true,
+          'FKClassName' => 'CRM_Mailing_DAO_Mailing',
+        ),
+        'scheduled_date' => array(
+          'name' => 'scheduled_date',
+          'propertyName' => 'scheduledDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Mailing Scheduled Date'),
+        ),
+        'start_date' => array(
+          'name' => 'start_date',
+          'propertyName' => 'startDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Mailing Job Start Date'),
+        ),
+        'end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Mailing Job End Date'),
+        ),
+        'status' => array(
+          'name' => 'status',
+          'propertyName' => 'status',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mailing Job Status'),
+          'maxlength' => 12,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::getMailingJobStatus',
+          )
+        ),
+        'is_test' => array(
+          'name' => 'is_test',
+          'propertyName' => 'isTest',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Mailing Job Is Test?'),
+        ),
+        'job_type' => array(
+          'name' => 'job_type',
+          'propertyName' => 'jobType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mailing Job Type'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'parent_id' => array(
+          'name' => 'parent_id',
+          'propertyName' => 'parent',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Job Parent'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
+        ),
+        'job_offset' => array(
+          'name' => 'job_offset',
+          'propertyName' => 'jobOffset',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Job Offset'),
+        ),
+        'job_limit' => array(
+          'name' => 'job_limit',
+          'propertyName' => 'jobLimit',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Job Limit'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

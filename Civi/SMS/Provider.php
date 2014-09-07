@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -344,120 +345,105 @@ class Provider extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'username' => array(
-      
-        'name' => 'username',
-        'propertyName' => 'username',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Username'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'password' => array(
-      
-        'name' => 'password',
-        'propertyName' => 'password',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Password'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'api_type' => array(
-      
-        'name' => 'api_type',
-        'propertyName' => 'apiType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Api Type'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'api_url' => array(
-      
-        'name' => 'api_url',
-        'propertyName' => 'apiUrl',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Api Url'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'api_params' => array(
-      
-        'name' => 'api_params',
-        'propertyName' => 'apiParams',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Api Params'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('SMS Provider ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('SMS Provider Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('SMS Provider Title'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'username' => array(
+          'name' => 'username',
+          'propertyName' => 'username',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('SMS Provider Username'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'password' => array(
+          'name' => 'password',
+          'propertyName' => 'password',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('SMS Provider Password'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'api_type' => array(
+          'name' => 'api_type',
+          'propertyName' => 'apiType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('SMS Provider API'),
+          'required' => true,
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+        'api_url' => array(
+          'name' => 'api_url',
+          'propertyName' => 'apiUrl',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('SMS Provider API URL'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'api_params' => array(
+          'name' => 'api_params',
+          'propertyName' => 'apiParams',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('SMS Provider API Params'),
+          'maxlength' => 65535,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('SMS Provider is Default?'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('SMS Provider is Active?'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

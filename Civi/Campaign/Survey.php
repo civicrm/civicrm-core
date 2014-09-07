@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -68,6 +69,7 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=false)
+   * @Field(localizable=true)
    * 
    */
   private $title;
@@ -104,6 +106,7 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="instructions", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $instructions;
@@ -212,6 +215,7 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $thankyouTitle;
@@ -221,6 +225,7 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="thankyou_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $thankyouText;
@@ -634,247 +639,188 @@ class Survey extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Survey Title'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_survey.title',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'campaign_id' => array(
-      
-        'name' => 'campaign_id',
-        'propertyName' => 'campaign',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_campaign',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'activity_type_id' => array(
-      
-        'name' => 'activity_type_id',
-        'propertyName' => 'activityTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Activity Type'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_survey.activity_type_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'activity_type',
-                    )
-                 ),
-      
-              'recontact_interval' => array(
-      
-        'name' => 'recontact_interval',
-        'propertyName' => 'recontactInterval',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Recontact Interval'),
-                                 'maxlength' => 65535,
-                                          'rows' => 20,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'instructions' => array(
-      
-        'name' => 'instructions',
-        'propertyName' => 'instructions',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Instructions'),
-                                 'maxlength' => 65535,
-                                          'rows' => 20,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'release_frequency' => array(
-      
-        'name' => 'release_frequency',
-        'propertyName' => 'releaseFrequency',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Release Frequency'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'max_number_of_contacts' => array(
-      
-        'name' => 'max_number_of_contacts',
-        'propertyName' => 'maxNumberOfContacts',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Maximum number of contacts'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'default_number_of_contacts' => array(
-      
-        'name' => 'default_number_of_contacts',
-        'propertyName' => 'defaultNumberOfContacts',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Default number of contacts'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Campaign Created Date'),
-                                                             
-                                    
-                          ),
-      
-              'last_modified_id' => array(
-      
-        'name' => 'last_modified_id',
-        'propertyName' => 'lastModified',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'last_modified_date' => array(
-      
-        'name' => 'last_modified_date',
-        'propertyName' => 'lastModifiedDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Last Modified Date'),
-                                                             
-                                    
-                          ),
-      
-              'result_id' => array(
-      
-        'name' => 'result_id',
-        'propertyName' => 'resultId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'bypass_confirm' => array(
-      
-        'name' => 'bypass_confirm',
-        'propertyName' => 'bypassConfirm',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Bypass Confirm'),
-                                                             
-                                    
-                          ),
-      
-              'thankyou_title' => array(
-      
-        'name' => 'thankyou_title',
-        'propertyName' => 'thankyouTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Thank-you Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'thankyou_text' => array(
-      
-        'name' => 'thankyou_text',
-        'propertyName' => 'thankyouText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Thank-you Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 8,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'is_share' => array(
-      
-        'name' => 'is_share',
-        'propertyName' => 'isShare',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is shared through social media'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Survey ID'),
+          'required' => true,
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Survey Title'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_survey.title',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'localizable' => true,
+        ),
+        'campaign_id' => array(
+          'name' => 'campaign_id',
+          'propertyName' => 'campaign',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Survey Campaign ID'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_campaign',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'activity_type_id' => array(
+          'name' => 'activity_type_id',
+          'propertyName' => 'activityTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Activity Type'),
+          'import' => true,
+          'where' => 'civicrm_survey.activity_type_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'activity_type',
+          )
+        ),
+        'recontact_interval' => array(
+          'name' => 'recontact_interval',
+          'propertyName' => 'recontactInterval',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Follow up Interval'),
+          'maxlength' => 65535,
+          'rows' => 20,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'instructions' => array(
+          'name' => 'instructions',
+          'propertyName' => 'instructions',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Instructions'),
+          'maxlength' => 65535,
+          'rows' => 20,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'release_frequency' => array(
+          'name' => 'release_frequency',
+          'propertyName' => 'releaseFrequency',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Survey Hold Duration'),
+          'default' => 'NULL',
+        ),
+        'max_number_of_contacts' => array(
+          'name' => 'max_number_of_contacts',
+          'propertyName' => 'maxNumberOfContacts',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Maximum number of contacts'),
+          'default' => 'NULL',
+        ),
+        'default_number_of_contacts' => array(
+          'name' => 'default_number_of_contacts',
+          'propertyName' => 'defaultNumberOfContacts',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Default number of contacts'),
+          'default' => 'NULL',
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Survey Is Active'),
+          'default' => '1',
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Default Survey'),
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Survey Created By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Campaign Created Date'),
+        ),
+        'last_modified_id' => array(
+          'name' => 'last_modified_id',
+          'propertyName' => 'lastModified',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Survey Modified'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'last_modified_date' => array(
+          'name' => 'last_modified_date',
+          'propertyName' => 'lastModifiedDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Survey Modified On'),
+        ),
+        'result_id' => array(
+          'name' => 'result_id',
+          'propertyName' => 'resultId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Survey Result'),
+          'default' => 'NULL',
+        ),
+        'bypass_confirm' => array(
+          'name' => 'bypass_confirm',
+          'propertyName' => 'bypassConfirm',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('No Email Verification'),
+        ),
+        'thankyou_title' => array(
+          'name' => 'thankyou_title',
+          'propertyName' => 'thankyouTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Thank-you Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'thankyou_text' => array(
+          'name' => 'thankyou_text',
+          'propertyName' => 'thankyouText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Thank-you Text'),
+          'maxlength' => 65535,
+          'rows' => 8,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'is_share' => array(
+          'name' => 'is_share',
+          'propertyName' => 'isShare',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is shared through social media'),
+          'default' => '1',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

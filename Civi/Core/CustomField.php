@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -86,6 +87,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=false)
+   * @Field(localizable=true)
    * 
    */
   private $label;
@@ -158,6 +160,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPre;
@@ -167,6 +170,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPost;
@@ -924,345 +928,240 @@ class CustomField extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'custom_group_id' => array(
-      
-        'name' => 'custom_group_id',
-        'propertyName' => 'customGroup',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_CustomGroup',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_custom_group',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'label' => array(
-      
-        'name' => 'label',
-        'propertyName' => 'label',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Label'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'data_type' => array(
-      
-        'name' => 'data_type',
-        'propertyName' => 'dataType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Data Type'),
-                        'required' => true,
-                         'maxlength' => 16,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_BAO_CustomField::dataType',
-                    )
-                 ),
-      
-              'html_type' => array(
-      
-        'name' => 'html_type',
-        'propertyName' => 'htmlType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Html Type'),
-                        'required' => true,
-                         'maxlength' => 32,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::customHtmlType',
-                    )
-                 ),
-      
-              'default_value' => array(
-      
-        'name' => 'default_value',
-        'propertyName' => 'defaultValue',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Default Value'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_required' => array(
-      
-        'name' => 'is_required',
-        'propertyName' => 'isRequired',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_searchable' => array(
-      
-        'name' => 'is_searchable',
-        'propertyName' => 'isSearchable',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_search_range' => array(
-      
-        'name' => 'is_search_range',
-        'propertyName' => 'isSearchRange',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                        'required' => true,
-                                                     
-                                           'default' => '1',
-         
-                          ),
-      
-              'help_pre' => array(
-      
-        'name' => 'help_pre',
-        'propertyName' => 'helpPre',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Pre'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'help_post' => array(
-      
-        'name' => 'help_post',
-        'propertyName' => 'helpPost',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Post'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'mask' => array(
-      
-        'name' => 'mask',
-        'propertyName' => 'mask',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Mask'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'attributes' => array(
-      
-        'name' => 'attributes',
-        'propertyName' => 'attributes',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Attributes'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'javascript' => array(
-      
-        'name' => 'javascript',
-        'propertyName' => 'javascript',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Javascript'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_view' => array(
-      
-        'name' => 'is_view',
-        'propertyName' => 'isView',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'options_per_line' => array(
-      
-        'name' => 'options_per_line',
-        'propertyName' => 'optionsPerLine',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Options Per Line'),
-                                                             
-                                    
-                          ),
-      
-              'text_length' => array(
-      
-        'name' => 'text_length',
-        'propertyName' => 'textLength',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Text Length'),
-                                                             
-                                    
-                          ),
-      
-              'start_date_years' => array(
-      
-        'name' => 'start_date_years',
-        'propertyName' => 'startDateYears',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Start Date Years'),
-                                                             
-                                    
-                          ),
-      
-              'end_date_years' => array(
-      
-        'name' => 'end_date_years',
-        'propertyName' => 'endDateYears',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('End Date Years'),
-                                                             
-                                    
-                          ),
-      
-              'date_format' => array(
-      
-        'name' => 'date_format',
-        'propertyName' => 'dateFormat',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Date Format'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'time_format' => array(
-      
-        'name' => 'time_format',
-        'propertyName' => 'timeFormat',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Time Format'),
-                                                             
-                                    
-                          ),
-      
-              'note_columns' => array(
-      
-        'name' => 'note_columns',
-        'propertyName' => 'noteColumns',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Note Columns'),
-                                                             
-                                    
-                          ),
-      
-              'note_rows' => array(
-      
-        'name' => 'note_rows',
-        'propertyName' => 'noteRows',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Note Rows'),
-                                                             
-                                    
-                          ),
-      
-              'column_name' => array(
-      
-        'name' => 'column_name',
-        'propertyName' => 'columnName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Column Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'option_group_id' => array(
-      
-        'name' => 'option_group_id',
-        'propertyName' => 'optionGroupId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'filter' => array(
-      
-        'name' => 'filter',
-        'propertyName' => 'filter',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Filter'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'in_selector' => array(
-      
-        'name' => 'in_selector',
-        'propertyName' => 'inSelector',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('In Selector'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Custom Field ID'),
+          'required' => true,
+        ),
+        'custom_group_id' => array(
+          'name' => 'custom_group_id',
+          'propertyName' => 'customGroup',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Custom Group'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_CustomGroup',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_custom_group',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Field Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'label' => array(
+          'name' => 'label',
+          'propertyName' => 'label',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Field Label'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'data_type' => array(
+          'name' => 'data_type',
+          'propertyName' => 'dataType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Field Data Type'),
+          'required' => true,
+          'maxlength' => 16,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_BAO_CustomField::dataType',
+          )
+        ),
+        'html_type' => array(
+          'name' => 'html_type',
+          'propertyName' => 'htmlType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Field HTMl Type'),
+          'required' => true,
+          'maxlength' => 32,
+          'size' => \CRM_Utils_Type::MEDIUM,
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::customHtmlType',
+          )
+        ),
+        'default_value' => array(
+          'name' => 'default_value',
+          'propertyName' => 'defaultValue',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Field Default'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_required' => array(
+          'name' => 'is_required',
+          'propertyName' => 'isRequired',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Custom Field Is Required?'),
+        ),
+        'is_searchable' => array(
+          'name' => 'is_searchable',
+          'propertyName' => 'isSearchable',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Allow Searching on Field?'),
+        ),
+        'is_search_range' => array(
+          'name' => 'is_search_range',
+          'propertyName' => 'isSearchRange',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Search as a Range'),
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Custom Field Weight'),
+          'required' => true,
+          'default' => '1',
+        ),
+        'help_pre' => array(
+          'name' => 'help_pre',
+          'propertyName' => 'helpPre',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Custom Field Pre Text'),
+          'maxlength' => 65535,
+          'localizable' => true,
+        ),
+        'help_post' => array(
+          'name' => 'help_post',
+          'propertyName' => 'helpPost',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Custom Field Post Text'),
+          'maxlength' => 65535,
+          'localizable' => true,
+        ),
+        'mask' => array(
+          'name' => 'mask',
+          'propertyName' => 'mask',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Field Formatting'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'attributes' => array(
+          'name' => 'attributes',
+          'propertyName' => 'attributes',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Field Attributes'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'javascript' => array(
+          'name' => 'javascript',
+          'propertyName' => 'javascript',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Custom Field Javascript'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Custom Field Is Active?'),
+        ),
+        'is_view' => array(
+          'name' => 'is_view',
+          'propertyName' => 'isView',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Field is Viewable'),
+        ),
+        'options_per_line' => array(
+          'name' => 'options_per_line',
+          'propertyName' => 'optionsPerLine',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Field Options Per Line'),
+        ),
+        'text_length' => array(
+          'name' => 'text_length',
+          'propertyName' => 'textLength',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Field Length'),
+        ),
+        'start_date_years' => array(
+          'name' => 'start_date_years',
+          'propertyName' => 'startDateYears',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Field Start Date'),
+        ),
+        'end_date_years' => array(
+          'name' => 'end_date_years',
+          'propertyName' => 'endDateYears',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Field End Date'),
+        ),
+        'date_format' => array(
+          'name' => 'date_format',
+          'propertyName' => 'dateFormat',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Field Data Format'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'time_format' => array(
+          'name' => 'time_format',
+          'propertyName' => 'timeFormat',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Field Time Format'),
+        ),
+        'note_columns' => array(
+          'name' => 'note_columns',
+          'propertyName' => 'noteColumns',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Field Note Columns'),
+        ),
+        'note_rows' => array(
+          'name' => 'note_rows',
+          'propertyName' => 'noteRows',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Field Note Rows'),
+        ),
+        'column_name' => array(
+          'name' => 'column_name',
+          'propertyName' => 'columnName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Field Column Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'option_group_id' => array(
+          'name' => 'option_group_id',
+          'propertyName' => 'optionGroupId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Field Option Group'),
+        ),
+        'filter' => array(
+          'name' => 'filter',
+          'propertyName' => 'filter',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Field Filter'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'in_selector' => array(
+          'name' => 'in_selector',
+          'propertyName' => 'inSelector',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Field Display'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

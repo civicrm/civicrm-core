@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -837,353 +838,252 @@ class ContributionRecur extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Recurring Contribution ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact ID'),
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'amount' => array(
-      
-        'name' => 'amount',
-        'propertyName' => 'amount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Amount'),
-                        'required' => true,
-                                  'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'currency' => array(
-      
-        'name' => 'currency',
-        'propertyName' => 'currency',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Currency'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                                           'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_currency',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'full_name',
-                      'nameColumn' => 'numeric_code',
-                    )
-                 ),
-      
-              'frequency_unit' => array(
-      
-        'name' => 'frequency_unit',
-        'propertyName' => 'frequencyUnit',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Frequency Unit'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                           'default' => 'month',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'recur_frequency_units',
-                      'keyColumn' => 'name',
-                    )
-                 ),
-      
-              'frequency_interval' => array(
-      
-        'name' => 'frequency_interval',
-        'propertyName' => 'frequencyInterval',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Interval (number of units)'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'installments' => array(
-      
-        'name' => 'installments',
-        'propertyName' => 'installments',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Number of Installments'),
-                                                             
-                                    
-                          ),
-      
-              'start_date' => array(
-      
-        'name' => 'start_date',
-        'propertyName' => 'startDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Recurring Contribution Started Date'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'create_date' => array(
-      
-        'name' => 'create_date',
-        'propertyName' => 'createDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Recurring Contribution Created Date'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'modified_date' => array(
-      
-        'name' => 'modified_date',
-        'propertyName' => 'modifiedDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Recurring Contribution Modified Date'),
-                                                             
-                                    
-                          ),
-      
-              'cancel_date' => array(
-      
-        'name' => 'cancel_date',
-        'propertyName' => 'cancelDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Recurring Contribution Cancel Date'),
-                                                             
-                                    
-                          ),
-      
-              'end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Recurring Contribution End Date'),
-                                                             
-                                    
-                          ),
-      
-              'processor_id' => array(
-      
-        'name' => 'processor_id',
-        'propertyName' => 'processorId',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Payment Processor'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'trxn_id' => array(
-      
-        'name' => 'trxn_id',
-        'propertyName' => 'trxnId',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Transaction ID'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'invoice_id' => array(
-      
-        'name' => 'invoice_id',
-        'propertyName' => 'invoiceId',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Invoice ID'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'contribution_status_id' => array(
-      
-        'name' => 'contribution_status_id',
-        'propertyName' => 'contributionStatusId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Recurring Contribution Status'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution_recur.contribution_status_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => '1',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'contribution_status',
-                    )
-                 ),
-      
-              'is_test' => array(
-      
-        'name' => 'is_test',
-        'propertyName' => 'isTest',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Test'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution_recur.is_test',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'cycle_day' => array(
-      
-        'name' => 'cycle_day',
-        'propertyName' => 'cycleDay',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Number of Cycle Day'),
-                        'required' => true,
-                                                     
-                                           'default' => '1',
-         
-                          ),
-      
-              'next_sched_contribution_date' => array(
-      
-        'name' => 'next_sched_contribution_date',
-        'propertyName' => 'nextSchedContributionDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Next Scheduled Contribution Date'),
-                                                             
-                                    
-                          ),
-      
-              'failure_count' => array(
-      
-        'name' => 'failure_count',
-        'propertyName' => 'failureCount',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Number of Failures'),
-                                                             
-                                    
-                          ),
-      
-              'failure_retry_date' => array(
-      
-        'name' => 'failure_retry_date',
-        'propertyName' => 'failureRetryDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Retry Failed Attempt Date'),
-                                                             
-                                    
-                          ),
-      
-              'auto_renew' => array(
-      
-        'name' => 'auto_renew',
-        'propertyName' => 'autoRenew',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Auto Renew'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'payment_processor_id' => array(
-      
-        'name' => 'payment_processor_id',
-        'propertyName' => 'paymentProcessor',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Payment Processor'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Financial_DAO_PaymentProcessor',
-                          ),
-      
-              'financial_type_id' => array(
-      
-        'name' => 'financial_type_id',
-        'propertyName' => 'financialType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Financial Type'),
-                                                             
-                         'export' => false,
-                'where' => 'civicrm_contribution_recur.financial_type_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_financial_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'payment_instrument_id' => array(
-      
-        'name' => 'payment_instrument_id',
-        'propertyName' => 'paymentInstrumentId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Payment Instrument'),
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'payment_instrument',
-                    )
-                 ),
-      
-              'contribution_campaign_id' => array(
-      
-        'name' => 'campaign_id',
-        'propertyName' => 'campaign',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Campaign'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution_recur.campaign_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_campaign',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'is_email_receipt' => array(
-      
-        'name' => 'is_email_receipt',
-        'propertyName' => 'isEmailReceipt',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Send email Receipt?'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Recurring Contribution ID'),
+          'required' => true,
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'amount' => array(
+          'name' => 'amount',
+          'propertyName' => 'amount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Amount'),
+          'required' => true,
+          'precision' => array(20,2),
+        ),
+        'currency' => array(
+          'name' => 'currency',
+          'propertyName' => 'currency',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Currency'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_currency',
+            'keyColumn' => 'name',
+            'labelColumn' => 'full_name',
+            'nameColumn' => 'numeric_code',
+          )
+        ),
+        'frequency_unit' => array(
+          'name' => 'frequency_unit',
+          'propertyName' => 'frequencyUnit',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Frequency Unit'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'default' => 'month',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'recur_frequency_units',
+            'keyColumn' => 'name',
+          )
+        ),
+        'frequency_interval' => array(
+          'name' => 'frequency_interval',
+          'propertyName' => 'frequencyInterval',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Interval (number of units)'),
+          'required' => true,
+        ),
+        'installments' => array(
+          'name' => 'installments',
+          'propertyName' => 'installments',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Number of Installments'),
+        ),
+        'start_date' => array(
+          'name' => 'start_date',
+          'propertyName' => 'startDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Recurring Contribution Started Date'),
+          'required' => true,
+        ),
+        'create_date' => array(
+          'name' => 'create_date',
+          'propertyName' => 'createDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Recurring Contribution Created Date'),
+          'required' => true,
+        ),
+        'modified_date' => array(
+          'name' => 'modified_date',
+          'propertyName' => 'modifiedDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Recurring Contribution Modified Date'),
+        ),
+        'cancel_date' => array(
+          'name' => 'cancel_date',
+          'propertyName' => 'cancelDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Recurring Contribution Cancel Date'),
+        ),
+        'end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Recurring Contribution End Date'),
+        ),
+        'processor_id' => array(
+          'name' => 'processor_id',
+          'propertyName' => 'processorId',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Payment Processor'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'trxn_id' => array(
+          'name' => 'trxn_id',
+          'propertyName' => 'trxnId',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Transaction ID'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'invoice_id' => array(
+          'name' => 'invoice_id',
+          'propertyName' => 'invoiceId',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Invoice ID'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'contribution_status_id' => array(
+          'name' => 'contribution_status_id',
+          'propertyName' => 'contributionStatusId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Recurring Contribution Status'),
+          'import' => true,
+          'where' => 'civicrm_contribution_recur.contribution_status_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => '1',
+          'pseudoconstant' => array(
+            'optionGroupName' => 'contribution_status',
+          )
+        ),
+        'is_test' => array(
+          'name' => 'is_test',
+          'propertyName' => 'isTest',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Test'),
+          'import' => true,
+          'where' => 'civicrm_contribution_recur.is_test',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'cycle_day' => array(
+          'name' => 'cycle_day',
+          'propertyName' => 'cycleDay',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Number of Cycle Day'),
+          'required' => true,
+          'default' => '1',
+        ),
+        'next_sched_contribution_date' => array(
+          'name' => 'next_sched_contribution_date',
+          'propertyName' => 'nextSchedContributionDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Next Scheduled Contribution Date'),
+        ),
+        'failure_count' => array(
+          'name' => 'failure_count',
+          'propertyName' => 'failureCount',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Number of Failures'),
+        ),
+        'failure_retry_date' => array(
+          'name' => 'failure_retry_date',
+          'propertyName' => 'failureRetryDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Retry Failed Attempt Date'),
+        ),
+        'auto_renew' => array(
+          'name' => 'auto_renew',
+          'propertyName' => 'autoRenew',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Auto Renew'),
+          'required' => true,
+        ),
+        'payment_processor_id' => array(
+          'name' => 'payment_processor_id',
+          'propertyName' => 'paymentProcessor',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Payment Processor'),
+          'FKClassName' => 'CRM_Financial_DAO_PaymentProcessor',
+        ),
+        'financial_type_id' => array(
+          'name' => 'financial_type_id',
+          'propertyName' => 'financialType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Type'),
+          'export' => false,
+          'where' => 'civicrm_contribution_recur.financial_type_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'FKClassName' => 'CRM_Financial_DAO_FinancialType',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_financial_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'payment_instrument_id' => array(
+          'name' => 'payment_instrument_id',
+          'propertyName' => 'paymentInstrumentId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Payment Instrument'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'payment_instrument',
+          )
+        ),
+        'contribution_campaign_id' => array(
+          'name' => 'campaign_id',
+          'propertyName' => 'campaign',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Campaign'),
+          'import' => true,
+          'where' => 'civicrm_contribution_recur.campaign_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_campaign',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'is_email_receipt' => array(
+          'name' => 'is_email_receipt',
+          'propertyName' => 'isEmailReceipt',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Send email Receipt?'),
+          'default' => '1',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

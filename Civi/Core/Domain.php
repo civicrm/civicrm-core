@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -286,103 +287,77 @@ class Domain extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'config_backend' => array(
-      
-        'name' => 'config_backend',
-        'propertyName' => 'configBackend',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Config Backend'),
-                                 'maxlength' => 65535,
-                                          'rows' => 20,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'version' => array(
-      
-        'name' => 'version',
-        'propertyName' => 'version',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Version'),
-                                 'maxlength' => 32,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                                    
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'locales' => array(
-      
-        'name' => 'locales',
-        'propertyName' => 'locales',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Locales'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'locale_custom_strings' => array(
-      
-        'name' => 'locale_custom_strings',
-        'propertyName' => 'localeCustomStrings',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Locale Custom Strings'),
-                                 'maxlength' => 65535,
-                                          'rows' => 20,
-                         'cols' => 80,
-         
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Domain ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Domain Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Domain Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'config_backend' => array(
+          'name' => 'config_backend',
+          'propertyName' => 'configBackend',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Domain Configuration'),
+          'maxlength' => 65535,
+          'rows' => 20,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'version' => array(
+          'name' => 'version',
+          'propertyName' => 'version',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('CiviCRM Version'),
+          'maxlength' => 32,
+          'size' => \CRM_Utils_Type::MEDIUM,
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Domain Contact'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'locales' => array(
+          'name' => 'locales',
+          'propertyName' => 'locales',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Supported Languages'),
+          'maxlength' => 65535,
+        ),
+        'locale_custom_strings' => array(
+          'name' => 'locale_custom_strings',
+          'propertyName' => 'localeCustomStrings',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Language Customizations'),
+          'maxlength' => 65535,
+          'rows' => 20,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

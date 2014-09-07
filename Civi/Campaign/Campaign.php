@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -547,251 +548,220 @@ class Campaign extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Campaign ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_campaign.id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Campaign Name'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_campaign.name',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'title' => array(
-      
-        'name' => 'title',
-        'propertyName' => 'title',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Campaign Title'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_campaign.title',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Campaign Description'),
-                                 'maxlength' => 65535,
-                                          'rows' => 8,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'start_date' => array(
-      
-        'name' => 'start_date',
-        'propertyName' => 'startDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Campaign Start Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_campaign.start_date',
-        'headerPattern' => '/^start|(s(tart\s)?date)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Campaign End Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_campaign.end_date',
-        'headerPattern' => '/^end|(e(nd\s)?date)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'campaign_type_id' => array(
-      
-        'name' => 'campaign_type_id',
-        'propertyName' => 'campaignTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Campaign Type'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_campaign.campaign_type_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'campaign_type',
-                    )
-                 ),
-      
-              'status_id' => array(
-      
-        'name' => 'status_id',
-        'propertyName' => 'statusId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Campaign Status'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_campaign.status_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'campaign_status',
-                    )
-                 ),
-      
-              'external_identifier' => array(
-      
-        'name' => 'external_identifier',
-        'propertyName' => 'externalIdentifier',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Campaign External Identifier'),
-                                 'maxlength' => 32,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                'import' => true,
-        'where' => 'civicrm_campaign.external_identifier',
-        'headerPattern' => '/external\s?id/i',
-        'dataPattern' => '/^\d{11,}$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'parent_id' => array(
-      
-        'name' => 'parent_id',
-        'propertyName' => 'parent',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Parent Campaign'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_campaign.parent_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Campaign Active?'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Campaign Created By'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Campaign Created Date'),
-                                                             
-                                    
-                          ),
-      
-              'last_modified_id' => array(
-      
-        'name' => 'last_modified_id',
-        'propertyName' => 'lastModified',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Campaign Modified By'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'last_modified_date' => array(
-      
-        'name' => 'last_modified_date',
-        'propertyName' => 'lastModifiedDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Campaign Modified Date'),
-                                                             
-                                    
-                          ),
-      
-              'goal_general' => array(
-      
-        'name' => 'goal_general',
-        'propertyName' => 'goalGeneral',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Campaign Goals'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'goal_revenue' => array(
-      
-        'name' => 'goal_revenue',
-        'propertyName' => 'goalRevenue',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Goal Revenue'),
-                                          'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Campaign ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_campaign.id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Campaign Name'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_campaign.name',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'title' => array(
+          'name' => 'title',
+          'propertyName' => 'title',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Campaign Title'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_campaign.title',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Campaign Description'),
+          'maxlength' => 65535,
+          'rows' => 8,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'start_date' => array(
+          'name' => 'start_date',
+          'propertyName' => 'startDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Campaign Start Date'),
+          'import' => true,
+          'where' => 'civicrm_campaign.start_date',
+          'headerPattern' => '/^start|(s(tart\s)?date)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Campaign End Date'),
+          'import' => true,
+          'where' => 'civicrm_campaign.end_date',
+          'headerPattern' => '/^end|(e(nd\s)?date)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'campaign_type_id' => array(
+          'name' => 'campaign_type_id',
+          'propertyName' => 'campaignTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Campaign Type'),
+          'import' => true,
+          'where' => 'civicrm_campaign.campaign_type_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'campaign_type',
+          )
+        ),
+        'status_id' => array(
+          'name' => 'status_id',
+          'propertyName' => 'statusId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Campaign Status'),
+          'import' => true,
+          'where' => 'civicrm_campaign.status_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'campaign_status',
+          )
+        ),
+        'external_identifier' => array(
+          'name' => 'external_identifier',
+          'propertyName' => 'externalIdentifier',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Campaign External ID'),
+          'maxlength' => 32,
+          'size' => \CRM_Utils_Type::MEDIUM,
+          'import' => true,
+          'where' => 'civicrm_campaign.external_identifier',
+          'headerPattern' => '/external\s?id/i',
+          'dataPattern' => '/^\d{11,}$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'parent_id' => array(
+          'name' => 'parent_id',
+          'propertyName' => 'parent',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Parent Campaign'),
+          'import' => true,
+          'where' => 'civicrm_campaign.parent_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+          'html' => array(
+            'type' => 'Autocomplete-Select',
+          ),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Campaign Active?'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Campaign Created By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Campaign Created Date'),
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'last_modified_id' => array(
+          'name' => 'last_modified_id',
+          'propertyName' => 'lastModified',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Campaign Modified By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'last_modified_date' => array(
+          'name' => 'last_modified_date',
+          'propertyName' => 'lastModifiedDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Campaign Modified Date'),
+        ),
+        'goal_general' => array(
+          'name' => 'goal_general',
+          'propertyName' => 'goalGeneral',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Campaign Goals'),
+          'maxlength' => 65535,
+          'html' => array(
+            'type' => 'RichTextEditor',
+          ),
+        ),
+        'goal_revenue' => array(
+          'name' => 'goal_revenue',
+          'propertyName' => 'goalRevenue',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Goal Revenue'),
+          'precision' => array(20,2),
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

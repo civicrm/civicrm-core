@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -1098,398 +1099,322 @@ class Mailing extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'header_id' => array(
-      
-        'name' => 'header_id',
-        'propertyName' => 'header',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Mailing_DAO_Component',
-                          ),
-      
-              'footer_id' => array(
-      
-        'name' => 'footer_id',
-        'propertyName' => 'footer',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Mailing_DAO_Component',
-                          ),
-      
-              'reply_id' => array(
-      
-        'name' => 'reply_id',
-        'propertyName' => 'reply',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Mailing_DAO_Component',
-                          ),
-      
-              'unsubscribe_id' => array(
-      
-        'name' => 'unsubscribe_id',
-        'propertyName' => 'unsubscribe',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Mailing_DAO_Component',
-                          ),
-      
-              'resubscribe_id' => array(
-      
-        'name' => 'resubscribe_id',
-        'propertyName' => 'resubscribeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'optout_id' => array(
-      
-        'name' => 'optout_id',
-        'propertyName' => 'optout',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Mailing_DAO_Component',
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'from_name' => array(
-      
-        'name' => 'from_name',
-        'propertyName' => 'fromName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('From Name'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'from_email' => array(
-      
-        'name' => 'from_email',
-        'propertyName' => 'fromEmail',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('From Email'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'replyto_email' => array(
-      
-        'name' => 'replyto_email',
-        'propertyName' => 'replytoEmail',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Replyto Email'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'subject' => array(
-      
-        'name' => 'subject',
-        'propertyName' => 'subject',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Subject'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'body_text' => array(
-      
-        'name' => 'body_text',
-        'propertyName' => 'bodyText',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Body Text'),
-                                                             
-                                    
-                          ),
-      
-              'body_html' => array(
-      
-        'name' => 'body_html',
-        'propertyName' => 'bodyHtml',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Body Html'),
-                                                             
-                                    
-                          ),
-      
-              'url_tracking' => array(
-      
-        'name' => 'url_tracking',
-        'propertyName' => 'urlTracking',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Url Tracking'),
-                                                             
-                                    
-                          ),
-      
-              'forward_replies' => array(
-      
-        'name' => 'forward_replies',
-        'propertyName' => 'forwardReplies',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Forward Replies'),
-                                                             
-                                    
-                          ),
-      
-              'auto_responder' => array(
-      
-        'name' => 'auto_responder',
-        'propertyName' => 'autoResponder',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Auto Responder'),
-                                                             
-                                    
-                          ),
-      
-              'open_tracking' => array(
-      
-        'name' => 'open_tracking',
-        'propertyName' => 'openTracking',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Open Tracking'),
-                                                             
-                                    
-                          ),
-      
-              'is_completed' => array(
-      
-        'name' => 'is_completed',
-        'propertyName' => 'isCompleted',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'msg_template_id' => array(
-      
-        'name' => 'msg_template_id',
-        'propertyName' => 'msgTemplate',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_MessageTemplate',
-                          ),
-      
-              'override_verp' => array(
-      
-        'name' => 'override_verp',
-        'propertyName' => 'overrideVerp',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Override Verp'),
-                                                             
-                                    
-                          ),
-      
-              'created_id' => array(
-      
-        'name' => 'created_id',
-        'propertyName' => 'created',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'created_date' => array(
-      
-        'name' => 'created_date',
-        'propertyName' => 'createdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Mailing Created Date'),
-                                                             
-                                    
-                          ),
-      
-              'scheduled_id' => array(
-      
-        'name' => 'scheduled_id',
-        'propertyName' => 'scheduled',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'scheduled_date' => array(
-      
-        'name' => 'scheduled_date',
-        'propertyName' => 'scheduledDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Mailing Scheduled Date'),
-                                                             
-                                    
-                          ),
-      
-              'approver_id' => array(
-      
-        'name' => 'approver_id',
-        'propertyName' => 'approver',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'approval_date' => array(
-      
-        'name' => 'approval_date',
-        'propertyName' => 'approvalDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Mailing Approved Date'),
-                                                             
-                                    
-                          ),
-      
-              'approval_status_id' => array(
-      
-        'name' => 'approval_status_id',
-        'propertyName' => 'approvalStatusId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Approval Status'),
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'mail_approval_status',
-                    )
-                 ),
-      
-              'approval_note' => array(
-      
-        'name' => 'approval_note',
-        'propertyName' => 'approvalNote',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Approval Note'),
-                                                             
-                                    
-                          ),
-      
-              'is_archived' => array(
-      
-        'name' => 'is_archived',
-        'propertyName' => 'isArchived',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'visibility' => array(
-      
-        'name' => 'visibility',
-        'propertyName' => 'visibility',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Visibility'),
-                                 'maxlength' => 40,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                           'default' => 'Public Pages',
-         
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::groupVisibility',
-                    )
-                 ),
-      
-              'campaign_id' => array(
-      
-        'name' => 'campaign_id',
-        'propertyName' => 'campaign',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_campaign',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'dedupe_email' => array(
-      
-        'name' => 'dedupe_email',
-        'propertyName' => 'dedupeEmail',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Dedupe Email'),
-                                                             
-                                    
-                          ),
-      
-              'sms_provider_id' => array(
-      
-        'name' => 'sms_provider_id',
-        'propertyName' => 'smsProvider',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_SMS_DAO_Provider',
-                          ),
-      
-              'hash' => array(
-      
-        'name' => 'hash',
-        'propertyName' => 'hash',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Mailing Hash'),
-                                 'maxlength' => 16,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing ID'),
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Domain'),
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'header_id' => array(
+          'name' => 'header_id',
+          'propertyName' => 'header',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Header'),
+          'FKClassName' => 'CRM_Mailing_DAO_Component',
+        ),
+        'footer_id' => array(
+          'name' => 'footer_id',
+          'propertyName' => 'footer',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Footer'),
+          'FKClassName' => 'CRM_Mailing_DAO_Component',
+        ),
+        'reply_id' => array(
+          'name' => 'reply_id',
+          'propertyName' => 'reply',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Reply'),
+          'FKClassName' => 'CRM_Mailing_DAO_Component',
+        ),
+        'unsubscribe_id' => array(
+          'name' => 'unsubscribe_id',
+          'propertyName' => 'unsubscribe',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Unsubscribe'),
+          'FKClassName' => 'CRM_Mailing_DAO_Component',
+        ),
+        'resubscribe_id' => array(
+          'name' => 'resubscribe_id',
+          'propertyName' => 'resubscribeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Resubscribe'),
+        ),
+        'optout_id' => array(
+          'name' => 'optout_id',
+          'propertyName' => 'optout',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Opt Out'),
+          'FKClassName' => 'CRM_Mailing_DAO_Component',
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mailing Name'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'from_name' => array(
+          'name' => 'from_name',
+          'propertyName' => 'fromName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mailing From Name'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'from_email' => array(
+          'name' => 'from_email',
+          'propertyName' => 'fromEmail',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mailing From Email'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'replyto_email' => array(
+          'name' => 'replyto_email',
+          'propertyName' => 'replytoEmail',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Replyto Email'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'subject' => array(
+          'name' => 'subject',
+          'propertyName' => 'subject',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Subject'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'body_text' => array(
+          'name' => 'body_text',
+          'propertyName' => 'bodyText',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Body Text'),
+        ),
+        'body_html' => array(
+          'name' => 'body_html',
+          'propertyName' => 'bodyHtml',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Body Html'),
+        ),
+        'url_tracking' => array(
+          'name' => 'url_tracking',
+          'propertyName' => 'urlTracking',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Url Tracking'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'forward_replies' => array(
+          'name' => 'forward_replies',
+          'propertyName' => 'forwardReplies',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Forward Replies'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'auto_responder' => array(
+          'name' => 'auto_responder',
+          'propertyName' => 'autoResponder',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Auto Responder'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'open_tracking' => array(
+          'name' => 'open_tracking',
+          'propertyName' => 'openTracking',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Track Mailing?'),
+        ),
+        'is_completed' => array(
+          'name' => 'is_completed',
+          'propertyName' => 'isCompleted',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Mailing Completed'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'msg_template_id' => array(
+          'name' => 'msg_template_id',
+          'propertyName' => 'msgTemplate',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Message Template'),
+          'FKClassName' => 'CRM_Core_DAO_MessageTemplate',
+        ),
+        'override_verp' => array(
+          'name' => 'override_verp',
+          'propertyName' => 'overrideVerp',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Override Verp'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'created_id' => array(
+          'name' => 'created_id',
+          'propertyName' => 'created',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Creator'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'created_date' => array(
+          'name' => 'created_date',
+          'propertyName' => 'createdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Mailing Created Date'),
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'scheduled_id' => array(
+          'name' => 'scheduled_id',
+          'propertyName' => 'scheduled',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Scheduled By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'scheduled_date' => array(
+          'name' => 'scheduled_date',
+          'propertyName' => 'scheduledDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Mailing Scheduled Date'),
+        ),
+        'approver_id' => array(
+          'name' => 'approver_id',
+          'propertyName' => 'approver',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Approved By'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'approval_date' => array(
+          'name' => 'approval_date',
+          'propertyName' => 'approvalDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Mailing Approved Date'),
+        ),
+        'approval_status_id' => array(
+          'name' => 'approval_status_id',
+          'propertyName' => 'approvalStatusId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Approval Status'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'mail_approval_status',
+          )
+        ),
+        'approval_note' => array(
+          'name' => 'approval_note',
+          'propertyName' => 'approvalNote',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Approval Note'),
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'is_archived' => array(
+          'name' => 'is_archived',
+          'propertyName' => 'isArchived',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Mailing Archived?'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'visibility' => array(
+          'name' => 'visibility',
+          'propertyName' => 'visibility',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mailing Visibility'),
+          'maxlength' => 40,
+          'size' => \CRM_Utils_Type::BIG,
+          'default' => 'Public Pages',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::groupVisibility',
+          )
+        ),
+        'campaign_id' => array(
+          'name' => 'campaign_id',
+          'propertyName' => 'campaign',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Campaign'),
+          'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_campaign',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'dedupe_email' => array(
+          'name' => 'dedupe_email',
+          'propertyName' => 'dedupeEmail',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('No Duplicate emails?'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'sms_provider_id' => array(
+          'name' => 'sms_provider_id',
+          'propertyName' => 'smsProvider',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing SMS Provider'),
+          'FKClassName' => 'CRM_SMS_DAO_Provider',
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+        'hash' => array(
+          'name' => 'hash',
+          'propertyName' => 'hash',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mailing Hash'),
+          'maxlength' => 16,
+          'size' => \CRM_Utils_Type::TWELVE,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

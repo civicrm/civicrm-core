@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -77,6 +78,7 @@ class OptionValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=false)
+   * @Field(localizable=true)
    * 
    */
   private $label;
@@ -140,6 +142,7 @@ class OptionValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $description;
@@ -518,202 +521,156 @@ class OptionValue extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'option_group_id' => array(
-      
-        'name' => 'option_group_id',
-        'propertyName' => 'optionGroup',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_OptionGroup',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_option_group',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'label' => array(
-      
-        'name' => 'label',
-        'propertyName' => 'label',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Option Label'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'value' => array(
-      
-        'name' => 'value',
-        'propertyName' => 'value',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Option Value'),
-                        'required' => true,
-                         'maxlength' => 512,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Option Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_option_value.name',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'grouping' => array(
-      
-        'name' => 'grouping',
-        'propertyName' => 'grouping',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Option Grouping Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'filter' => array(
-      
-        'name' => 'filter',
-        'propertyName' => 'filter',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Filter'),
-                                                             
-                                    
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Description'),
-                                 'maxlength' => 65535,
-                                          'rows' => 8,
-                         'cols' => 60,
-         
-                                    
-                          ),
-      
-              'is_optgroup' => array(
-      
-        'name' => 'is_optgroup',
-        'propertyName' => 'isOptgroup',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'component_id' => array(
-      
-        'name' => 'component_id',
-        'propertyName' => 'component',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Component',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_component',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'visibility_id' => array(
-      
-        'name' => 'visibility_id',
-        'propertyName' => 'visibilityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Option Value ID'),
+          'required' => true,
+        ),
+        'option_group_id' => array(
+          'name' => 'option_group_id',
+          'propertyName' => 'optionGroup',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Option Group ID'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_OptionGroup',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_option_group',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'label' => array(
+          'name' => 'label',
+          'propertyName' => 'label',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Option Label'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'value' => array(
+          'name' => 'value',
+          'propertyName' => 'value',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Option Value'),
+          'required' => true,
+          'maxlength' => 512,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Option Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_option_value.name',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'grouping' => array(
+          'name' => 'grouping',
+          'propertyName' => 'grouping',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Option Grouping Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'filter' => array(
+          'name' => 'filter',
+          'propertyName' => 'filter',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Filter'),
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Option is Default?'),
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Option Weight'),
+          'required' => true,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Option Description'),
+          'maxlength' => 65535,
+          'rows' => 8,
+          'cols' => 60,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'is_optgroup' => array(
+          'name' => 'is_optgroup',
+          'propertyName' => 'isOptgroup',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Option is Header?'),
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Option Is Reserved?'),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Option Is Active'),
+          'default' => '1',
+        ),
+        'component_id' => array(
+          'name' => 'component_id',
+          'propertyName' => 'component',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Option Component'),
+          'FKClassName' => 'CRM_Core_DAO_Component',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_component',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Option Domain'),
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'visibility_id' => array(
+          'name' => 'visibility_id',
+          'propertyName' => 'visibilityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Option Visibility'),
+          'default' => 'NULL',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

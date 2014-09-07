@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -170,62 +171,51 @@ class Website extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Website ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'url' => array(
-      
-        'name' => 'url',
-        'propertyName' => 'url',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Website'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                'import' => true,
-        'where' => 'civicrm_website.url',
-        'headerPattern' => '/Website/i',
-        'dataPattern' => '/^[A-Za-z][0-9A-Za-z]{20,}$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'website_type_id' => array(
-      
-        'name' => 'website_type_id',
-        'propertyName' => 'websiteTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Website Type'),
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'website_type',
-                    )
-                 ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Website ID'),
+          'required' => true,
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'url' => array(
+          'name' => 'url',
+          'propertyName' => 'url',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Website'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::BIG,
+          'import' => true,
+          'where' => 'civicrm_website.url',
+          'headerPattern' => '/Website/i',
+          'dataPattern' => '/^[A-Za-z][0-9A-Za-z]{20,}$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'BIG',
+          ),
+        ),
+        'website_type_id' => array(
+          'name' => 'website_type_id',
+          'propertyName' => 'websiteTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Website Type'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'website_type',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

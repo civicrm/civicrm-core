@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -402,156 +403,118 @@ class RelationshipType extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Relationship Type ID'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name_a_b' => array(
-      
-        'name' => 'name_a_b',
-        'propertyName' => 'nameAB',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Relationship Type Name A to B'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'label_a_b' => array(
-      
-        'name' => 'label_a_b',
-        'propertyName' => 'labelAB',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Relationship Type Label A to B'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'name_b_a' => array(
-      
-        'name' => 'name_b_a',
-        'propertyName' => 'nameBA',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Relationship Type Name B to A'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'label_b_a' => array(
-      
-        'name' => 'label_b_a',
-        'propertyName' => 'labelBA',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Relationship Type Label B to A'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Relationship Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'contact_type_a' => array(
-      
-        'name' => 'contact_type_a',
-        'propertyName' => 'contactTypeA',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contact Type for Contact A'),
-                                 'maxlength' => 12,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Contact_BAO_ContactType::getSelectElements',
-                    )
-                 ),
-      
-              'contact_type_b' => array(
-      
-        'name' => 'contact_type_b',
-        'propertyName' => 'contactTypeB',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contact Type for Contact B'),
-                                 'maxlength' => 12,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Contact_BAO_ContactType::getSelectElements',
-                    )
-                 ),
-      
-              'contact_sub_type_a' => array(
-      
-        'name' => 'contact_sub_type_a',
-        'propertyName' => 'contactSubTypeA',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contact Subtype A'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'contact_sub_type_b' => array(
-      
-        'name' => 'contact_sub_type_b',
-        'propertyName' => 'contactSubTypeB',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contact Subtype B'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'is_reserved' => array(
-      
-        'name' => 'is_reserved',
-        'propertyName' => 'isReserved',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Relationship Type is Reserved'),
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Relationship Type is Active'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Relationship Type ID'),
+          'required' => true,
+        ),
+        'name_a_b' => array(
+          'name' => 'name_a_b',
+          'propertyName' => 'nameAB',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Relationship Type Name A to B'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'label_a_b' => array(
+          'name' => 'label_a_b',
+          'propertyName' => 'labelAB',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Relationship Type Label A to B'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'name_b_a' => array(
+          'name' => 'name_b_a',
+          'propertyName' => 'nameBA',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Relationship Type Name B to A'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'label_b_a' => array(
+          'name' => 'label_b_a',
+          'propertyName' => 'labelBA',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Relationship Type Label B to A'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Relationship Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'contact_type_a' => array(
+          'name' => 'contact_type_a',
+          'propertyName' => 'contactTypeA',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contact Type for Contact A'),
+          'maxlength' => 12,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Contact_BAO_ContactType::getSelectElements',
+          )
+        ),
+        'contact_type_b' => array(
+          'name' => 'contact_type_b',
+          'propertyName' => 'contactTypeB',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contact Type for Contact B'),
+          'maxlength' => 12,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Contact_BAO_ContactType::getSelectElements',
+          )
+        ),
+        'contact_sub_type_a' => array(
+          'name' => 'contact_sub_type_a',
+          'propertyName' => 'contactSubTypeA',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contact Subtype A'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+        'contact_sub_type_b' => array(
+          'name' => 'contact_sub_type_b',
+          'propertyName' => 'contactSubTypeB',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contact Subtype B'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+        'is_reserved' => array(
+          'name' => 'is_reserved',
+          'propertyName' => 'isReserved',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Relationship Type is Reserved'),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Relationship Type is Active'),
+          'default' => '1',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

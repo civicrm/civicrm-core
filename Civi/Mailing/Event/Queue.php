@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -228,77 +229,51 @@ class Queue extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'job_id' => array(
-      
-        'name' => 'job_id',
-        'propertyName' => 'job',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
-                          ),
-      
-              'email_id' => array(
-      
-        'name' => 'email_id',
-        'propertyName' => 'email',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Core_DAO_Email',
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'hash' => array(
-      
-        'name' => 'hash',
-        'propertyName' => 'hash',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Hash'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'phone_id' => array(
-      
-        'name' => 'phone_id',
-        'propertyName' => 'phone',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Core_DAO_Phone',
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'job_id' => array(
+          'name' => 'job_id',
+          'propertyName' => 'job',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
+        ),
+        'email_id' => array(
+          'name' => 'email_id',
+          'propertyName' => 'email',
+          'type' => \CRM_Utils_Type::T_INT,
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Core_DAO_Email',
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'hash' => array(
+          'name' => 'hash',
+          'propertyName' => 'hash',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Hash'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'phone_id' => array(
+          'name' => 'phone_id',
+          'propertyName' => 'phone',
+          'type' => \CRM_Utils_Type::T_INT,
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Core_DAO_Phone',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

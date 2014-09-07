@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -95,6 +96,7 @@ class Premium extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="premiums_intro_title", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $premiumsIntroTitle;
@@ -104,6 +106,7 @@ class Premium extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="premiums_intro_text", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $premiumsIntroText;
@@ -140,6 +143,7 @@ class Premium extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="premiums_nothankyou_label", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $premiumsNothankyouLabel;
@@ -373,135 +377,94 @@ class Premium extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'entity_table' => array(
-      
-        'name' => 'entity_table',
-        'propertyName' => 'entityTable',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Entity Table'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'entity_id' => array(
-      
-        'name' => 'entity_id',
-        'propertyName' => 'entityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'premiums_active' => array(
-      
-        'name' => 'premiums_active',
-        'propertyName' => 'premiumsActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Premiums Active'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'premiums_intro_title' => array(
-      
-        'name' => 'premiums_intro_title',
-        'propertyName' => 'premiumsIntroTitle',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Title for Premiums section'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'premiums_intro_text' => array(
-      
-        'name' => 'premiums_intro_text',
-        'propertyName' => 'premiumsIntroText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Premiums Intro Text'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-      
-              'premiums_contact_email' => array(
-      
-        'name' => 'premiums_contact_email',
-        'propertyName' => 'premiumsContactEmail',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Premiums Contact Email'),
-                                 'maxlength' => 100,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'premiums_contact_phone' => array(
-      
-        'name' => 'premiums_contact_phone',
-        'propertyName' => 'premiumsContactPhone',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Premiums Contact Phone'),
-                                 'maxlength' => 50,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'premiums_display_min_contribution' => array(
-      
-        'name' => 'premiums_display_min_contribution',
-        'propertyName' => 'premiumsDisplayMinContribution',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Premiums Display Min Contribution'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'premiums_nothankyou_label' => array(
-      
-        'name' => 'premiums_nothankyou_label',
-        'propertyName' => 'premiumsNothankyouLabel',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('No Thank-you Text'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'premiums_nothankyou_position' => array(
-      
-        'name' => 'premiums_nothankyou_position',
-        'propertyName' => 'premiumsNothankyouPosition',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('No Thank-you Position'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Premium ID'),
+          'required' => true,
+        ),
+        'entity_table' => array(
+          'name' => 'entity_table',
+          'propertyName' => 'entityTable',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Premium Entity'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'entity_id' => array(
+          'name' => 'entity_id',
+          'propertyName' => 'entityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Premium entity ID'),
+          'required' => true,
+        ),
+        'premiums_active' => array(
+          'name' => 'premiums_active',
+          'propertyName' => 'premiumsActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Premium Active?'),
+          'required' => true,
+        ),
+        'premiums_intro_title' => array(
+          'name' => 'premiums_intro_title',
+          'propertyName' => 'premiumsIntroTitle',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Title for Premiums section'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'premiums_intro_text' => array(
+          'name' => 'premiums_intro_text',
+          'propertyName' => 'premiumsIntroText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Premium Introductory Text'),
+          'maxlength' => 65535,
+          'localizable' => true,
+        ),
+        'premiums_contact_email' => array(
+          'name' => 'premiums_contact_email',
+          'propertyName' => 'premiumsContactEmail',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Premium Contact Email'),
+          'maxlength' => 100,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'premiums_contact_phone' => array(
+          'name' => 'premiums_contact_phone',
+          'propertyName' => 'premiumsContactPhone',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Premiums Contact Phone'),
+          'maxlength' => 50,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'premiums_display_min_contribution' => array(
+          'name' => 'premiums_display_min_contribution',
+          'propertyName' => 'premiumsDisplayMinContribution',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Display Minimum Contribution?'),
+          'required' => true,
+        ),
+        'premiums_nothankyou_label' => array(
+          'name' => 'premiums_nothankyou_label',
+          'propertyName' => 'premiumsNothankyouLabel',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('No Thank-you Text'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'localizable' => true,
+        ),
+        'premiums_nothankyou_position' => array(
+          'name' => 'premiums_nothankyou_position',
+          'propertyName' => 'premiumsNothankyouPosition',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('No Thank-you Position'),
+          'default' => '1',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

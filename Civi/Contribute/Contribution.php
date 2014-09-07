@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -808,436 +809,402 @@ class Contribution extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'contribution_id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contribution ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_contribution.id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'contribution_contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_contribution.contact_id',
-        'headerPattern' => '/contact(.?id)?/i',
-        'dataPattern' => '/^\d+$/',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'financial_type_id' => array(
-      
-        'name' => 'financial_type_id',
-        'propertyName' => 'financialType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Financial Type'),
-                                                             
-                         'export' => false,
-                'where' => 'civicrm_contribution.financial_type_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_financial_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'contribution_page_id' => array(
-      
-        'name' => 'contribution_page_id',
-        'propertyName' => 'contributionPage',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contribution Page'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution.contribution_page_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_contribution_page',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'contribution_payment_instrument_id' => array(
-      
-        'name' => 'payment_instrument_id',
-        'propertyName' => 'paymentInstrumentId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Payment Instrument'),
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'payment_instrument',
-                    )
-                 ),
-      
-              'receive_date' => array(
-      
-        'name' => 'receive_date',
-        'propertyName' => 'receiveDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Receive Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution.receive_date',
-        'headerPattern' => '/receive(.?date)?/i',
-        'dataPattern' => '/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'non_deductible_amount' => array(
-      
-        'name' => 'non_deductible_amount',
-        'propertyName' => 'nonDeductibleAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Non-deductible Amount'),
-                                          'precision'      => array(20,2),
-                                   
-                'import' => true,
-        'where' => 'civicrm_contribution.non_deductible_amount',
-        'headerPattern' => '/non?.?deduct/i',
-        'dataPattern' => '/^\d+(\.\d{2})?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'total_amount' => array(
-      
-        'name' => 'total_amount',
-        'propertyName' => 'totalAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Total Amount'),
-                        'required' => true,
-                                  'precision'      => array(20,2),
-                                   
-                'import' => true,
-        'where' => 'civicrm_contribution.total_amount',
-        'headerPattern' => '/^total|(.?^am(ou)?nt)/i',
-        'dataPattern' => '/^\d+(\.\d{2})?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'fee_amount' => array(
-      
-        'name' => 'fee_amount',
-        'propertyName' => 'feeAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Fee Amount'),
-                                          'precision'      => array(20,2),
-                                   
-                'import' => true,
-        'where' => 'civicrm_contribution.fee_amount',
-        'headerPattern' => '/fee(.?am(ou)?nt)?/i',
-        'dataPattern' => '/^\d+(\.\d{2})?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'net_amount' => array(
-      
-        'name' => 'net_amount',
-        'propertyName' => 'netAmount',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Net Amount'),
-                                          'precision'      => array(20,2),
-                                   
-                'import' => true,
-        'where' => 'civicrm_contribution.net_amount',
-        'headerPattern' => '/net(.?am(ou)?nt)?/i',
-        'dataPattern' => '/^\d+(\.\d{2})?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'trxn_id' => array(
-      
-        'name' => 'trxn_id',
-        'propertyName' => 'trxnId',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Transaction ID'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_contribution.trxn_id',
-        'headerPattern' => '/tr(ansactio|x)n(.?id)?/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'invoice_id' => array(
-      
-        'name' => 'invoice_id',
-        'propertyName' => 'invoiceId',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Invoice ID'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_contribution.invoice_id',
-        'headerPattern' => '/invoice(.?id)?/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'currency' => array(
-      
-        'name' => 'currency',
-        'propertyName' => 'currency',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Currency'),
-                                 'maxlength' => 3,
-                                 'size' => \CRM_Utils_Type::FOUR,
-                           
-                'import' => true,
-        'where' => 'civicrm_contribution.currency',
-        'headerPattern' => '/cur(rency)?/i',
-        'dataPattern' => '/^[A-Z]{3}$/i',
-                         'export' => true,
-                                          'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_currency',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'full_name',
-                      'nameColumn' => 'numeric_code',
-                    )
-                 ),
-      
-              'cancel_date' => array(
-      
-        'name' => 'cancel_date',
-        'propertyName' => 'cancelDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Cancel Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution.cancel_date',
-        'headerPattern' => '/cancel(.?date)?/i',
-        'dataPattern' => '/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'cancel_reason' => array(
-      
-        'name' => 'cancel_reason',
-        'propertyName' => 'cancelReason',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Cancel Reason'),
-                                 'maxlength' => 65535,
-                                            
-                'import' => true,
-        'where' => 'civicrm_contribution.cancel_reason',
-        'headerPattern' => '/(cancel.?)?reason/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'receipt_date' => array(
-      
-        'name' => 'receipt_date',
-        'propertyName' => 'receiptDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Receipt Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution.receipt_date',
-        'headerPattern' => '/receipt(.?date)?/i',
-        'dataPattern' => '/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'thankyou_date' => array(
-      
-        'name' => 'thankyou_date',
-        'propertyName' => 'thankyouDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Thank-you Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution.thankyou_date',
-        'headerPattern' => '/thank(s|(.?you))?(.?date)?/i',
-        'dataPattern' => '/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'contribution_source' => array(
-      
-        'name' => 'source',
-        'propertyName' => 'source',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contribution Source'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_contribution.source',
-        'headerPattern' => '/source/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'amount_level' => array(
-      
-        'name' => 'amount_level',
-        'propertyName' => 'amountLevel',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Amount Label'),
-                                 'maxlength' => 65535,
-                                            
-                'import' => true,
-        'where' => 'civicrm_contribution.amount_level',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'contribution_recur_id' => array(
-      
-        'name' => 'contribution_recur_id',
-        'propertyName' => 'contributionRecur',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contribute_DAO_ContributionRecur',
-                          ),
-      
-              'is_test' => array(
-      
-        'name' => 'is_test',
-        'propertyName' => 'isTest',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Test'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution.is_test',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'is_pay_later' => array(
-      
-        'name' => 'is_pay_later',
-        'propertyName' => 'isPayLater',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Pay Later'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution.is_pay_later',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'contribution_status_id' => array(
-      
-        'name' => 'contribution_status_id',
-        'propertyName' => 'contributionStatusId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contribution Status'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution.contribution_status_id',
-        'headerPattern' => '/status/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => '1',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'contribution_status',
-                    )
-                 ),
-      
-              'address_id' => array(
-      
-        'name' => 'address_id',
-        'propertyName' => 'address',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Address',
-                          ),
-      
-              'check_number' => array(
-      
-        'name' => 'check_number',
-        'propertyName' => 'checkNumber',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Check Number'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::SIX,
-                           
-                'import' => true,
-        'where' => 'civicrm_contribution.check_number',
-        'headerPattern' => '/check(.?number)?/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'contribution_campaign_id' => array(
-      
-        'name' => 'campaign_id',
-        'propertyName' => 'campaign',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Campaign'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_contribution.campaign_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_campaign',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-             );
-    }
+        'contribution_id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contribution ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_contribution.id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'contribution_contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_contribution.contact_id',
+          'headerPattern' => '/contact(.?id)?/i',
+          'dataPattern' => '/^\d+$/',
+          'export' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'html' => array(
+            'type' => 'Autocomplete-Select',
+          ),
+        ),
+        'financial_type_id' => array(
+          'name' => 'financial_type_id',
+          'propertyName' => 'financialType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Type'),
+          'export' => false,
+          'where' => 'civicrm_contribution.financial_type_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'FKClassName' => 'CRM_Financial_DAO_FinancialType',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_financial_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'contribution_page_id' => array(
+          'name' => 'contribution_page_id',
+          'propertyName' => 'contributionPage',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contribution Page'),
+          'import' => true,
+          'where' => 'civicrm_contribution.contribution_page_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_contribution_page',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'contribution_payment_instrument_id' => array(
+          'name' => 'payment_instrument_id',
+          'propertyName' => 'paymentInstrumentId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Payment Instrument'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'payment_instrument',
+          )
+        ),
+        'receive_date' => array(
+          'name' => 'receive_date',
+          'propertyName' => 'receiveDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Receive Date'),
+          'import' => true,
+          'where' => 'civicrm_contribution.receive_date',
+          'headerPattern' => '/receive(.?date)?/i',
+          'dataPattern' => '/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'non_deductible_amount' => array(
+          'name' => 'non_deductible_amount',
+          'propertyName' => 'nonDeductibleAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Non-deductible Amount'),
+          'precision' => array(20,2),
+          'import' => true,
+          'where' => 'civicrm_contribution.non_deductible_amount',
+          'headerPattern' => '/non?.?deduct/i',
+          'dataPattern' => '/^\d+(\.\d{2})?$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'total_amount' => array(
+          'name' => 'total_amount',
+          'propertyName' => 'totalAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Total Amount'),
+          'required' => true,
+          'precision' => array(20,2),
+          'import' => true,
+          'where' => 'civicrm_contribution.total_amount',
+          'headerPattern' => '/^total|(.?^am(ou)?nt)/i',
+          'dataPattern' => '/^\d+(\.\d{2})?$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'fee_amount' => array(
+          'name' => 'fee_amount',
+          'propertyName' => 'feeAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Fee Amount'),
+          'precision' => array(20,2),
+          'import' => true,
+          'where' => 'civicrm_contribution.fee_amount',
+          'headerPattern' => '/fee(.?am(ou)?nt)?/i',
+          'dataPattern' => '/^\d+(\.\d{2})?$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'net_amount' => array(
+          'name' => 'net_amount',
+          'propertyName' => 'netAmount',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('Net Amount'),
+          'precision' => array(20,2),
+          'import' => true,
+          'where' => 'civicrm_contribution.net_amount',
+          'headerPattern' => '/net(.?am(ou)?nt)?/i',
+          'dataPattern' => '/^\d+(\.\d{2})?$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'trxn_id' => array(
+          'name' => 'trxn_id',
+          'propertyName' => 'trxnId',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Transaction ID'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_contribution.trxn_id',
+          'headerPattern' => '/tr(ansactio|x)n(.?id)?/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'invoice_id' => array(
+          'name' => 'invoice_id',
+          'propertyName' => 'invoiceId',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Invoice ID'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_contribution.invoice_id',
+          'headerPattern' => '/invoice(.?id)?/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'currency' => array(
+          'name' => 'currency',
+          'propertyName' => 'currency',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Currency'),
+          'maxlength' => 3,
+          'size' => \CRM_Utils_Type::FOUR,
+          'import' => true,
+          'where' => 'civicrm_contribution.currency',
+          'headerPattern' => '/cur(rency)?/i',
+          'dataPattern' => '/^[A-Z]{3}$/i',
+          'export' => true,
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_currency',
+            'keyColumn' => 'name',
+            'labelColumn' => 'full_name',
+            'nameColumn' => 'numeric_code',
+          )
+        ),
+        'cancel_date' => array(
+          'name' => 'cancel_date',
+          'propertyName' => 'cancelDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Cancel Date'),
+          'import' => true,
+          'where' => 'civicrm_contribution.cancel_date',
+          'headerPattern' => '/cancel(.?date)?/i',
+          'dataPattern' => '/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'cancel_reason' => array(
+          'name' => 'cancel_reason',
+          'propertyName' => 'cancelReason',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Cancel Reason'),
+          'maxlength' => 65535,
+          'import' => true,
+          'where' => 'civicrm_contribution.cancel_reason',
+          'headerPattern' => '/(cancel.?)?reason/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'receipt_date' => array(
+          'name' => 'receipt_date',
+          'propertyName' => 'receiptDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Receipt Date'),
+          'import' => true,
+          'where' => 'civicrm_contribution.receipt_date',
+          'headerPattern' => '/receipt(.?date)?/i',
+          'dataPattern' => '/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'thankyou_date' => array(
+          'name' => 'thankyou_date',
+          'propertyName' => 'thankyouDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Thank-you Date'),
+          'import' => true,
+          'where' => 'civicrm_contribution.thankyou_date',
+          'headerPattern' => '/thank(s|(.?you))?(.?date)?/i',
+          'dataPattern' => '/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'contribution_source' => array(
+          'name' => 'source',
+          'propertyName' => 'source',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contribution Source'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_contribution.source',
+          'headerPattern' => '/source/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'amount_level' => array(
+          'name' => 'amount_level',
+          'propertyName' => 'amountLevel',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Amount Label'),
+          'maxlength' => 65535,
+          'import' => true,
+          'where' => 'civicrm_contribution.amount_level',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'contribution_recur_id' => array(
+          'name' => 'contribution_recur_id',
+          'propertyName' => 'contributionRecur',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Recurring Contribution ID'),
+          'FKClassName' => 'CRM_Contribute_DAO_ContributionRecur',
+        ),
+        'is_test' => array(
+          'name' => 'is_test',
+          'propertyName' => 'isTest',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Test'),
+          'import' => true,
+          'where' => 'civicrm_contribution.is_test',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'is_pay_later' => array(
+          'name' => 'is_pay_later',
+          'propertyName' => 'isPayLater',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Pay Later'),
+          'import' => true,
+          'where' => 'civicrm_contribution.is_pay_later',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'contribution_status_id' => array(
+          'name' => 'contribution_status_id',
+          'propertyName' => 'contributionStatusId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contribution Status'),
+          'import' => true,
+          'where' => 'civicrm_contribution.contribution_status_id',
+          'headerPattern' => '/status/i',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => '1',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'contribution_status',
+          )
+        ),
+        'address_id' => array(
+          'name' => 'address_id',
+          'propertyName' => 'address',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contribution Address'),
+          'FKClassName' => 'CRM_Core_DAO_Address',
+        ),
+        'check_number' => array(
+          'name' => 'check_number',
+          'propertyName' => 'checkNumber',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Check Number'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::SIX,
+          'import' => true,
+          'where' => 'civicrm_contribution.check_number',
+          'headerPattern' => '/check(.?number)?/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'SIX',
+          ),
+        ),
+        'contribution_campaign_id' => array(
+          'name' => 'campaign_id',
+          'propertyName' => 'campaign',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Campaign'),
+          'import' => true,
+          'where' => 'civicrm_contribution.campaign_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_campaign',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -257,99 +258,75 @@ class SubscriptionHistory extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'group_id' => array(
-      
-        'name' => 'group_id',
-        'propertyName' => 'group',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Group',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_group',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'date' => array(
-      
-        'name' => 'date',
-        'propertyName' => 'date',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Date'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'method' => array(
-      
-        'name' => 'method',
-        'propertyName' => 'method',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Method'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::getSubscriptionHistoryMethods',
-                    )
-                 ),
-      
-              'status' => array(
-      
-        'name' => 'status',
-        'propertyName' => 'status',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Status'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::groupContactStatus',
-                    )
-                 ),
-      
-              'tracking' => array(
-      
-        'name' => 'tracking',
-        'propertyName' => 'tracking',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Tracking'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'group_id' => array(
+          'name' => 'group_id',
+          'propertyName' => 'group',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contact_DAO_Group',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_group',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'date' => array(
+          'name' => 'date',
+          'propertyName' => 'date',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Date'),
+          'required' => true,
+        ),
+        'method' => array(
+          'name' => 'method',
+          'propertyName' => 'method',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Method'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::getSubscriptionHistoryMethods',
+          )
+        ),
+        'status' => array(
+          'name' => 'status',
+          'propertyName' => 'status',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Status'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::groupContactStatus',
+          )
+        ),
+        'tracking' => array(
+          'name' => 'tracking',
+          'propertyName' => 'tracking',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Tracking'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

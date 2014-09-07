@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -77,6 +78,7 @@ class MembershipType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=128, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $name;
@@ -86,6 +88,7 @@ class MembershipType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $description;
@@ -663,266 +666,202 @@ class MembershipType extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'domain_id' => array(
-      
-        'name' => 'domain_id',
-        'propertyName' => 'domain',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Domain',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_domain',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'membership_type' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Membership Type'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_membership_type.name',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'description' => array(
-      
-        'name' => 'description',
-        'propertyName' => 'description',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Description'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'member_of_contact_id' => array(
-      
-        'name' => 'member_of_contact_id',
-        'propertyName' => 'memberOfContact',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'financial_type_id' => array(
-      
-        'name' => 'financial_type_id',
-        'propertyName' => 'financialType',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_financial_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'minimum_fee' => array(
-      
-        'name' => 'minimum_fee',
-        'propertyName' => 'minimumFee',
-        'type' => \CRM_Utils_Type::T_MONEY,
-                'title' => ts('Minimum Fee'),
-                                          'precision'      => array(20,2),
-                                   
-                                    
-                          ),
-      
-              'duration_unit' => array(
-      
-        'name' => 'duration_unit',
-        'propertyName' => 'durationUnit',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Duration Unit'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::membershipTypeUnitList',
-                    )
-                 ),
-      
-              'duration_interval' => array(
-      
-        'name' => 'duration_interval',
-        'propertyName' => 'durationInterval',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Duration Interval'),
-                                                             
-                                    
-                          ),
-      
-              'period_type' => array(
-      
-        'name' => 'period_type',
-        'propertyName' => 'periodType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Period Type'),
-                                 'maxlength' => 8,
-                                 'size' => \CRM_Utils_Type::EIGHT,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::periodType',
-                    )
-                 ),
-      
-              'fixed_period_start_day' => array(
-      
-        'name' => 'fixed_period_start_day',
-        'propertyName' => 'fixedPeriodStartDay',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Fixed Period Start Day'),
-                                                             
-                                    
-                          ),
-      
-              'fixed_period_rollover_day' => array(
-      
-        'name' => 'fixed_period_rollover_day',
-        'propertyName' => 'fixedPeriodRolloverDay',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Fixed Period Rollover Day'),
-                                                             
-                                    
-                          ),
-      
-              'relationship_type_id' => array(
-      
-        'name' => 'relationship_type_id',
-        'propertyName' => 'relationshipTypeId',
-        'type' => \CRM_Utils_Type::T_STRING,
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'relationship_direction' => array(
-      
-        'name' => 'relationship_direction',
-        'propertyName' => 'relationshipDirection',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Relationship Direction'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'max_related' => array(
-      
-        'name' => 'max_related',
-        'propertyName' => 'maxRelated',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Max Related'),
-                                                             
-                                    
-                          ),
-      
-              'visibility' => array(
-      
-        'name' => 'visibility',
-        'propertyName' => 'visibility',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Visible'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::memberVisibility',
-                    )
-                 ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                                                             
-                                    
-                          ),
-      
-              'receipt_text_signup' => array(
-      
-        'name' => 'receipt_text_signup',
-        'propertyName' => 'receiptTextSignup',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Receipt Text Signup'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'receipt_text_renewal' => array(
-      
-        'name' => 'receipt_text_renewal',
-        'propertyName' => 'receiptTextRenewal',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Receipt Text Renewal'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'auto_renew' => array(
-      
-        'name' => 'auto_renew',
-        'propertyName' => 'autoRenew',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Auto Renew'),
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Active'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Type ID'),
+          'required' => true,
+        ),
+        'domain_id' => array(
+          'name' => 'domain_id',
+          'propertyName' => 'domain',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Type Domain'),
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Domain',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_domain',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'membership_type' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Type'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_membership_type.name',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'localizable' => true,
+        ),
+        'description' => array(
+          'name' => 'description',
+          'propertyName' => 'description',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Type Description'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'member_of_contact_id' => array(
+          'name' => 'member_of_contact_id',
+          'propertyName' => 'memberOfContact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Type Organization'),
+          'required' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'financial_type_id' => array(
+          'name' => 'financial_type_id',
+          'propertyName' => 'financialType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Financial Type'),
+          'required' => true,
+          'FKClassName' => 'CRM_Financial_DAO_FinancialType',
+          'pseudoconstant' => array(
+            'table' => 'civicrm_financial_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'minimum_fee' => array(
+          'name' => 'minimum_fee',
+          'propertyName' => 'minimumFee',
+          'type' => \CRM_Utils_Type::T_MONEY,
+          'title' => ts('membership Type Minimum Fee'),
+          'precision' => array(20,2),
+        ),
+        'duration_unit' => array(
+          'name' => 'duration_unit',
+          'propertyName' => 'durationUnit',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Type Duration Unit'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::membershipTypeUnitList',
+          )
+        ),
+        'duration_interval' => array(
+          'name' => 'duration_interval',
+          'propertyName' => 'durationInterval',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Type Duration Interval'),
+        ),
+        'period_type' => array(
+          'name' => 'period_type',
+          'propertyName' => 'periodType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Type Plan'),
+          'maxlength' => 8,
+          'size' => \CRM_Utils_Type::EIGHT,
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::periodType',
+          )
+        ),
+        'fixed_period_start_day' => array(
+          'name' => 'fixed_period_start_day',
+          'propertyName' => 'fixedPeriodStartDay',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Fixed Period Start Day'),
+        ),
+        'fixed_period_rollover_day' => array(
+          'name' => 'fixed_period_rollover_day',
+          'propertyName' => 'fixedPeriodRolloverDay',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Fixed Period Rollover Day'),
+        ),
+        'relationship_type_id' => array(
+          'name' => 'relationship_type_id',
+          'propertyName' => 'relationshipTypeId',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Type Relationship'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'relationship_direction' => array(
+          'name' => 'relationship_direction',
+          'propertyName' => 'relationshipDirection',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Relationship Direction'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'max_related' => array(
+          'name' => 'max_related',
+          'propertyName' => 'maxRelated',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Max Related Members for Type'),
+        ),
+        'visibility' => array(
+          'name' => 'visibility',
+          'propertyName' => 'visibility',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Visible'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::memberVisibility',
+          )
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Weight'),
+        ),
+        'receipt_text_signup' => array(
+          'name' => 'receipt_text_signup',
+          'propertyName' => 'receiptTextSignup',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Type Receipt Text'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'receipt_text_renewal' => array(
+          'name' => 'receipt_text_renewal',
+          'propertyName' => 'receiptTextRenewal',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Type Renewal Text'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'auto_renew' => array(
+          'name' => 'auto_renew',
+          'propertyName' => 'autoRenew',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Auto Renew'),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Active'),
+          'default' => '1',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

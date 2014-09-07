@@ -184,14 +184,6 @@ class CRM_Core_CodeGen_EntitySpecification {
     $pre = str_replace('/', '_', $base);
     $this->fkClassNames[$name] = "{$pre}_DAO_{$dao_class}";
 
-    $localizable = FALSE;
-    foreach ($tableXML->field as $fieldXML) {
-      if ($fieldXML->localizable) {
-        $localizable = TRUE;
-        break;
-      }
-    }
-
     $table = array(
       'name' => $name,
       'base' => $entity_base,
@@ -204,7 +196,6 @@ class CRM_Core_CodeGen_EntitySpecification {
       'attributes_simple' => trim($database['tableAttributes_simple']),
       'attributes_modern' => trim($database['tableAttributes_modern']),
       'comment' => $this->value('comment', $tableXML),
-      'localizable' => $localizable,
       'log' => $this->value('log', $tableXML, 'false'),
       'archive' => $this->value('archive', $tableXML, 'false'),
     );
@@ -387,12 +378,15 @@ class CRM_Core_CodeGen_EntitySpecification {
         $field['sqlType'] = $field['phpType'] = $type;
         $field['crmType'] = '\\CRM_Utils_Type::T_' . strtoupper($type);
         $field['length']  = '65535';
-        // CRM-13497 see fixme below
         $field['rows'] = isset($fieldXML->html) ? $this->value('rows', $fieldXML->html) : NULL;
         $field['cols'] = isset($fieldXML->html) ? $this->value('cols', $fieldXML->html) : NULL;
         break;
 
       case 'timestamp':
+        $field['sqlType'] = $field['phpType'] = 'datetime';
+        $field['crmType'] = '\\CRM_Utils_Type::T_TIMESTAMP';
+        break;
+
       case 'datetime':
         $field['sqlType'] = $field['phpType'] = 'datetime';
         $field['crmType'] = '\\CRM_Utils_Type::T_DATE + \\CRM_Utils_Type::T_TIME';
@@ -457,25 +451,16 @@ class CRM_Core_CodeGen_EntitySpecification {
     $field['headerPattern'] = $this->value('headerPattern', $fieldXML);
     $field['dataPattern'] = $this->value('dataPattern', $fieldXML);
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
-    $field['html'] = $this->value('html', $fieldXML);
-    if (!empty($field['html'])) {
-      $validOptions = array(
-        'type',
-        /* Fixme: prior to CRM-13497 these were in a flat structure
-        // CRM-13497 moved them to be nested within 'html' but there's no point
-        // making that change in the DAOs right now since we are in the process of
-        // moving to docrtine anyway.
-        // So translating from nested xml back to flat structure for now.
-        'rows',
-        'cols',
-        'size', */
-      );
-      $field['html'] = array();
-      foreach ($validOptions as $htmlOption) {
-        if(!empty($fieldXML->html->$htmlOption)){
-          $field['html'][$htmlOption] = $this->value($htmlOption, $fieldXML->html);
+    if (property_exists($fieldXML, 'html')) {
+      $html = array();
+      foreach ($fieldXML->html->children() as $child) {
+        if (in_array($child->getName(), array('rows', 'cols'))) {
+          continue;
         }
+        $value = $this->value($child->getName(), $fieldXML->html);
+        $html[$child->getName()] = $value;
       }
+      $field['html'] = $html;
     }
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
     if(!empty($field['pseudoconstant'])){
@@ -506,6 +491,11 @@ class CRM_Core_CodeGen_EntitySpecification {
       // That field's BAO::buildOptions fn will need to be responsible for generating the option list
       if (empty($field['pseudoconstant'])) {
         $field['pseudoconstant'] = 'not in database';
+      }
+    }
+    if (property_exists($fieldXML, 'localizable')) {
+      if ($this->value('localizable', $fieldXML) == 'true') {
+        $field['fieldAnnotation'] = '@Field(localizable=true)';
       }
     }
     $fields[$name] = &$field;

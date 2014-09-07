@@ -89,22 +89,50 @@ class CRM_Core_CodeGen_Doctrine {
     DoctrineType::TEXT => 'text',
   );
 
+  public $annotation_reader;
   public $dao_metadata = array();
+  public $db_platform;
   public $entity_manager;
   public $metadata; 
+  public $schema;
+
+  public function addFieldAnnotationsToField($class_metadata, $field_mapping, &$field)
+  {
+    $reflection_property = new ReflectionProperty($class_metadata->name, $field_mapping['fieldName']);
+    $annotation = $this->annotation_reader->getPropertyAnnotation($reflection_property, 'Civi\\Core\\Annotations\\Field');
+    if ($annotation !== NULL) {
+      if ($annotation->localizable) {
+        $field['localizable'] = TRUE;
+      }
+    }
+  }
+
+  public function anyLocalizable($fields) {
+    foreach ($fields as $field) {
+      if (array_key_exists('localizable', $field) && $field['localizable']) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
 
   public function buildDAOFieldsForClassMetadata($class_metadata)
   {
     $fields = array();
+    $table = $this->schema->getTable($class_metadata->getTableName());
     foreach ($class_metadata->fieldMappings as $field_mapping) {
+      $column = $table->getColumn($field_mapping['columnName']);
+      $column_data = $column->toArray();
+      $sql_type = $column_data['type']->getSqlDeclaration($column_data, $this->db_platform);
       $field = array(
         'crmType' => $this->crmTypeForDoctrineType($field_mapping['type']),
         'length' => $field_mapping['length'],
-        'localizable' => NULL, /* XXX */
         'name' => $field_mapping['columnName'],
         'phpType' => $this->phpTypeForDoctrineType($field_mapping['type']),
+        'sqlType' => $sql_type,
         'required' => $field_mapping['nullable'] ? NULL : 'true',
       );
+      $this->addFieldAnnotationsToField($class_metadata, $field_mapping, $field);
       if ($field_mapping['type'] == DoctrineType::STRING || $field_mapping['type'] == DoctrineType::STRING) {
         $field['size'] = $this->crmSizeForDoctrineLength($field_mapping['length']);
       }
@@ -124,7 +152,7 @@ class CRM_Core_CodeGen_Doctrine {
       $field = array(
         'crmType' => 'CRM_Utils_Type::T_INT',
         'FKClassName' => $this->entityClassNametoDAOClassName($association_mapping['targetEntity']),
-        'localizable' => NULL, /* XXX */
+        'localizable' => NULL,
         'name' => $join_info['name'],
         'phpType' => 'unsigned int',
         'required' => $join_info['nullable'] ? NULL : 'true',
@@ -168,18 +196,20 @@ class CRM_Core_CodeGen_Doctrine {
     $table['name'] = $class_metadata->getTableName();
     $table['dynamicForeignKey'] = array(); /* XXX */
     $table['log'] = 'false'; /* XXX */
-    $table['localizable'] = TRUE; /* XXX */
     $table['labelName'] = preg_replace("/^civicrm_/", '', $table['name']);
     $table['objectName'] = $dao_class_name;
     $table['fields'] = $this->buildDAOFieldsForClassMetadata($class_metadata);
     $table['fields'] = array_merge($table['fields'], $this->buildDAOFieldsForClassMetadataAssociations($class_metadata));
     $table['foreignKey'] = $this->buildDAOForeignKeyForClassMetadata($class_metadata);
+    $table['localizable'] = $this->anyLocalizable($table['fields']);
     $table['entity_class_name'] = $class_metadata->name;
     return $table;
   }
 
   function buildDAOMetadata()
   {
+    $schema_tool = new \Doctrine\ORM\Tools\SchemaTool($this->entity_manager);
+    $this->schema = $schema_tool->getSchemaFromMetadata($this->metadata);
     foreach ($this->metadata as $class_metadata) {
       $table = $this->buildDAOTableForClassMetadata($class_metadata);
       $this->dao_metadata[] = $table;
@@ -237,11 +267,13 @@ class CRM_Core_CodeGen_Doctrine {
   {
     $container = \Civi\Core\Container::singleton();
     $config = $container->get('doctrine_configuration');
+    $this->annotation_reader = \Civi\Core\Container::singleton()->get('annotation_reader');
     $this->entity_manager = new CRM_Core_CodeGen_EntityManagerWithoutConnection($config);
     $class_metadata_factory = new ClassMetadataFactory();
     $class_metadata_factory->setEntityManager($this->entity_manager);
     $this->entity_manager->metadataFactory = $class_metadata_factory;
     $this->metadata = $class_metadata_factory->getAllMetadata();
+    $this->db_platform = $this->entity_manager->getConnection()->getDatabasePlatform();
     $this->buildDAOMetadata();
   }
 
@@ -252,7 +284,6 @@ class CRM_Core_CodeGen_Doctrine {
       throw new Exception("Unable to find a phpType for doctrine type '$doctrine_type'.");
     }
   }
-
 
   function tableNameFor($entity_name)
   {

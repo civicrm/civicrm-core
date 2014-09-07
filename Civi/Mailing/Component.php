@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -286,103 +287,81 @@ class Component extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Component Name'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'component_type' => array(
-      
-        'name' => 'component_type',
-        'propertyName' => 'componentType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Component Type'),
-                                 'maxlength' => 12,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::mailingComponents',
-                    )
-                 ),
-      
-              'subject' => array(
-      
-        'name' => 'subject',
-        'propertyName' => 'subject',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Subject'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'body_html' => array(
-      
-        'name' => 'body_html',
-        'propertyName' => 'bodyHtml',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Body Html'),
-                                 'maxlength' => 65535,
-                                          'rows' => 8,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'body_text' => array(
-      
-        'name' => 'body_text',
-        'propertyName' => 'bodyText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Body Text'),
-                                 'maxlength' => 65535,
-                                          'rows' => 8,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'is_default' => array(
-      
-        'name' => 'is_default',
-        'propertyName' => 'isDefault',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Component ID'),
+          'required' => true,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Component Name'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+        ),
+        'component_type' => array(
+          'name' => 'component_type',
+          'propertyName' => 'componentType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Mailing Component Type'),
+          'maxlength' => 12,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::mailingComponents',
+          )
+        ),
+        'subject' => array(
+          'name' => 'subject',
+          'propertyName' => 'subject',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Subject'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'body_html' => array(
+          'name' => 'body_html',
+          'propertyName' => 'bodyHtml',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Mailing Component Body HTML'),
+          'maxlength' => 65535,
+          'rows' => 8,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'body_text' => array(
+          'name' => 'body_text',
+          'propertyName' => 'bodyText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Body Text'),
+          'maxlength' => 65535,
+          'rows' => 8,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+        ),
+        'is_default' => array(
+          'name' => 'is_default',
+          'propertyName' => 'isDefault',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Mailing Component is Default?'),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Mailing Component Is Active?'),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

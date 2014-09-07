@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -228,76 +229,62 @@ class QueueItem extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'queue_name' => array(
-      
-        'name' => 'queue_name',
-        'propertyName' => 'queueName',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Queue Name'),
-                        'required' => true,
-                         'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'submit_time' => array(
-      
-        'name' => 'submit_time',
-        'propertyName' => 'submitTime',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Submit Time'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'release_time' => array(
-      
-        'name' => 'release_time',
-        'propertyName' => 'releaseTime',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Release Time'),
-                                                             
-                                    
-                          ),
-      
-              'data' => array(
-      
-        'name' => 'data',
-        'propertyName' => 'data',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Queue item datas'),
-                                 'maxlength' => 65535,
-                                            
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'queue_name' => array(
+          'name' => 'queue_name',
+          'propertyName' => 'queueName',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Queue Name'),
+          'required' => true,
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Weight'),
+          'required' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'submit_time' => array(
+          'name' => 'submit_time',
+          'propertyName' => 'submitTime',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Submit Time'),
+          'required' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'release_time' => array(
+          'name' => 'release_time',
+          'propertyName' => 'releaseTime',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Release Time'),
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'data' => array(
+          'name' => 'data',
+          'propertyName' => 'data',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Queue item datas'),
+          'maxlength' => 65535,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

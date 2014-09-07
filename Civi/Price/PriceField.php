@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -86,6 +87,7 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=false)
+   * @Field(localizable=true)
    * 
    */
   private $label;
@@ -113,6 +115,7 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPre;
@@ -122,6 +125,7 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
+   * @Field(localizable=true)
    * 
    */
   private $helpPost;
@@ -547,207 +551,192 @@ class PriceField extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'price_set_id' => array(
-      
-        'name' => 'price_set_id',
-        'propertyName' => 'priceSet',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Price_DAO_PriceSet',
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'label' => array(
-      
-        'name' => 'label',
-        'propertyName' => 'label',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Label'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'html_type' => array(
-      
-        'name' => 'html_type',
-        'propertyName' => 'htmlType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Html Type'),
-                        'required' => true,
-                         'maxlength' => 12,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Price_BAO_PriceField::htmlTypes',
-                    )
-                 ),
-      
-              'is_enter_qty' => array(
-      
-        'name' => 'is_enter_qty',
-        'propertyName' => 'isEnterQty',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'help_pre' => array(
-      
-        'name' => 'help_pre',
-        'propertyName' => 'helpPre',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Pre'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'help_post' => array(
-      
-        'name' => 'help_post',
-        'propertyName' => 'helpPost',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Help Post'),
-                                 'maxlength' => 65535,
-                                          'rows' => 4,
-                         'cols' => 80,
-         
-                                    
-                          ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_display_amounts' => array(
-      
-        'name' => 'is_display_amounts',
-        'propertyName' => 'isDisplayAmounts',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'options_per_line' => array(
-      
-        'name' => 'options_per_line',
-        'propertyName' => 'optionsPerLine',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Options Per Line'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_active' => array(
-      
-        'name' => 'is_active',
-        'propertyName' => 'isActive',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'is_required' => array(
-      
-        'name' => 'is_required',
-        'propertyName' => 'isRequired',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'active_on' => array(
-      
-        'name' => 'active_on',
-        'propertyName' => 'activeOn',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Active On'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'expire_on' => array(
-      
-        'name' => 'expire_on',
-        'propertyName' => 'expireOn',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Expire On'),
-                                                             
-                                           'default' => 'NULL',
-         
-                          ),
-      
-              'javascript' => array(
-      
-        'name' => 'javascript',
-        'propertyName' => 'javascript',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Javascript'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'visibility_id' => array(
-      
-        'name' => 'visibility_id',
-        'propertyName' => 'visibilityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                           'default' => '1',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'visibility',
-                    )
-                 ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Price Field ID'),
+          'required' => true,
+        ),
+        'price_set_id' => array(
+          'name' => 'price_set_id',
+          'propertyName' => 'priceSet',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Price Set'),
+          'required' => true,
+          'FKClassName' => 'CRM_Price_DAO_PriceSet',
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'label' => array(
+          'name' => 'label',
+          'propertyName' => 'label',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Label'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+          'localizable' => true,
+        ),
+        'html_type' => array(
+          'name' => 'html_type',
+          'propertyName' => 'htmlType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Html Type'),
+          'required' => true,
+          'maxlength' => 12,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Price_BAO_PriceField::htmlTypes',
+          )
+        ),
+        'is_enter_qty' => array(
+          'name' => 'is_enter_qty',
+          'propertyName' => 'isEnterQty',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Price Field Quantity Required?'),
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'help_pre' => array(
+          'name' => 'help_pre',
+          'propertyName' => 'helpPre',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Price Field Pre Text'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'help_post' => array(
+          'name' => 'help_post',
+          'propertyName' => 'helpPost',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Price Field Post Test'),
+          'maxlength' => 65535,
+          'rows' => 4,
+          'cols' => 80,
+          'html' => array(
+            'type' => 'TextArea',
+          ),
+          'localizable' => true,
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Price Field Weight'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+        'is_display_amounts' => array(
+          'name' => 'is_display_amounts',
+          'propertyName' => 'isDisplayAmounts',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Price Field Show Amounts?'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'options_per_line' => array(
+          'name' => 'options_per_line',
+          'propertyName' => 'optionsPerLine',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Price Field Options per Row'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'is_active' => array(
+          'name' => 'is_active',
+          'propertyName' => 'isActive',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Price Field Is Active?'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'is_required' => array(
+          'name' => 'is_required',
+          'propertyName' => 'isRequired',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Price Field is Required?'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'active_on' => array(
+          'name' => 'active_on',
+          'propertyName' => 'activeOn',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Price Field Start Date'),
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'expire_on' => array(
+          'name' => 'expire_on',
+          'propertyName' => 'expireOn',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Price Field End Date'),
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'javascript' => array(
+          'name' => 'javascript',
+          'propertyName' => 'javascript',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Price Field Javascript'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'visibility_id' => array(
+          'name' => 'visibility_id',
+          'propertyName' => 'visibilityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Price Field Visibility'),
+          'default' => '1',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'visibility',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

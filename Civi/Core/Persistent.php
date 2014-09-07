@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -199,66 +200,44 @@ class Persistent extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'context' => array(
-      
-        'name' => 'context',
-        'propertyName' => 'context',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Context'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                        'required' => true,
-                         'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'data' => array(
-      
-        'name' => 'data',
-        'propertyName' => 'data',
-        'type' => \CRM_Utils_Type::T_LONGTEXT,
-                'title' => ts('Data'),
-                                                             
-                                    
-                          ),
-      
-              'is_config' => array(
-      
-        'name' => 'is_config',
-        'propertyName' => 'isConfig',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'context' => array(
+          'name' => 'context',
+          'propertyName' => 'context',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Context'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'required' => true,
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'data' => array(
+          'name' => 'data',
+          'propertyName' => 'data',
+          'type' => \CRM_Utils_Type::T_LONGTEXT,
+          'title' => ts('Data'),
+        ),
+        'is_config' => array(
+          'name' => 'is_config',
+          'propertyName' => 'isConfig',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'required' => true,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

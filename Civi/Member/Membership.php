@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -489,250 +490,225 @@ class Membership extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'membership_id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Membership ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_membership.id',
-        'headerPattern' => '/^(m(embership\s)?id)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'membership_contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Contact ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_membership.contact_id',
-        'headerPattern' => '/contact(.?id)?/i',
-        'dataPattern' => '/^\d+$/',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'membership_type_id' => array(
-      
-        'name' => 'membership_type_id',
-        'propertyName' => 'membershipType',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Membership Type Id'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_membership.membership_type_id',
-        'headerPattern' => '/^(m(embership\s)?type)$/i',
-        'dataPattern' => '',
-                         'export' => false,
-                                   
-                'FKClassName' => 'CRM_Member_DAO_MembershipType',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_membership_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'name',
-                    )
-                 ),
-      
-              'join_date' => array(
-      
-        'name' => 'join_date',
-        'propertyName' => 'joinDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Member Since'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_membership.join_date',
-        'headerPattern' => '/^join|(j(oin\s)?date)$/i',
-        'dataPattern' => '/\d{4}-?\d{2}-?\d{2}/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'membership_start_date' => array(
-      
-        'name' => 'start_date',
-        'propertyName' => 'startDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Membership Start Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_membership.start_date',
-        'headerPattern' => '/(member(ship)?.)?start(s)?(.date$)?/i',
-        'dataPattern' => '/\d{4}-?\d{2}-?\d{2}/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'membership_end_date' => array(
-      
-        'name' => 'end_date',
-        'propertyName' => 'endDate',
-        'type' => \CRM_Utils_Type::T_DATE,
-                'title' => ts('Membership Expiration Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_membership.end_date',
-        'headerPattern' => '/(member(ship)?.)?end(s)?(.date$)?/i',
-        'dataPattern' => '/\d{4}-?\d{2}-?\d{2}/',
-                         'export' => true,
-                                   
-                          ),
-      
-              'membership_source' => array(
-      
-        'name' => 'source',
-        'propertyName' => 'source',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Source'),
-                                 'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_membership.source',
-        'headerPattern' => '/^(member(ship?))?source$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'status_id' => array(
-      
-        'name' => 'status_id',
-        'propertyName' => 'status',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Membership Status Id'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_membership.status_id',
-        'headerPattern' => '/(member(ship|).)?(status)$/i',
-        'dataPattern' => '',
-                         'export' => false,
-                                   
-                'FKClassName' => 'CRM_Member_DAO_MembershipStatus',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_membership_status',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'label',
-                    )
-                 ),
-      
-              'is_override' => array(
-      
-        'name' => 'is_override',
-        'propertyName' => 'isOverride',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Status Override'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_membership.is_override',
-        'headerPattern' => '/override$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'owner_membership_id' => array(
-      
-        'name' => 'owner_membership_id',
-        'propertyName' => 'ownerMembership',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Primary Member ID'),
-                                                             
-                         'export' => true,
-                'where' => 'civicrm_membership.owner_membership_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                'FKClassName' => 'CRM_Member_DAO_Membership',
-                          ),
-      
-              'max_related' => array(
-      
-        'name' => 'max_related',
-        'propertyName' => 'maxRelated',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Max Related'),
-                                                             
-                                    
-                          ),
-      
-              'member_is_test' => array(
-      
-        'name' => 'is_test',
-        'propertyName' => 'isTest',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Test'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_membership.is_test',
-        'headerPattern' => '/(is.)?test(.member(ship)?)?/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'member_is_pay_later' => array(
-      
-        'name' => 'is_pay_later',
-        'propertyName' => 'isPayLater',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is Pay Later'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_membership.is_pay_later',
-        'headerPattern' => '/(is.)?(pay(.)?later)$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'contribution_recur_id' => array(
-      
-        'name' => 'contribution_recur_id',
-        'propertyName' => 'contributionRecur',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contribute_DAO_ContributionRecur',
-                          ),
-      
-              'member_campaign_id' => array(
-      
-        'name' => 'campaign_id',
-        'propertyName' => 'campaign',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Campaign'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_membership.campaign_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_campaign',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-             );
-    }
+        'membership_id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_membership.id',
+          'headerPattern' => '/^(m(embership\s)?id)$/i',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'membership_contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_membership.contact_id',
+          'headerPattern' => '/contact(.?id)?/i',
+          'dataPattern' => '/^\d+$/',
+          'export' => true,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'html' => array(
+            'type' => 'Autocomplete-Select',
+          ),
+        ),
+        'membership_type_id' => array(
+          'name' => 'membership_type_id',
+          'propertyName' => 'membershipType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Type Id'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_membership.membership_type_id',
+          'headerPattern' => '/^(m(embership\s)?type)$/i',
+          'dataPattern' => '',
+          'export' => false,
+          'FKClassName' => 'CRM_Member_DAO_MembershipType',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_membership_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          )
+        ),
+        'join_date' => array(
+          'name' => 'join_date',
+          'propertyName' => 'joinDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Member Since'),
+          'import' => true,
+          'where' => 'civicrm_membership.join_date',
+          'headerPattern' => '/^join|(j(oin\s)?date)$/i',
+          'dataPattern' => '/\d{4}-?\d{2}-?\d{2}/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'membership_start_date' => array(
+          'name' => 'start_date',
+          'propertyName' => 'startDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Membership Start Date'),
+          'import' => true,
+          'where' => 'civicrm_membership.start_date',
+          'headerPattern' => '/(member(ship)?.)?start(s)?(.date$)?/i',
+          'dataPattern' => '/\d{4}-?\d{2}-?\d{2}/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'membership_end_date' => array(
+          'name' => 'end_date',
+          'propertyName' => 'endDate',
+          'type' => \CRM_Utils_Type::T_DATE,
+          'title' => ts('Membership Expiration Date'),
+          'import' => true,
+          'where' => 'civicrm_membership.end_date',
+          'headerPattern' => '/(member(ship)?.)?end(s)?(.date$)?/i',
+          'dataPattern' => '/\d{4}-?\d{2}-?\d{2}/',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'membership_source' => array(
+          'name' => 'source',
+          'propertyName' => 'source',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Source'),
+          'maxlength' => 128,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_membership.source',
+          'headerPattern' => '/^(member(ship?))?source$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'status_id' => array(
+          'name' => 'status_id',
+          'propertyName' => 'status',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Membership Status Id'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_membership.status_id',
+          'headerPattern' => '/(member(ship|).)?(status)$/i',
+          'dataPattern' => '',
+          'export' => false,
+          'FKClassName' => 'CRM_Member_DAO_MembershipStatus',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_membership_status',
+            'keyColumn' => 'id',
+            'labelColumn' => 'label',
+          )
+        ),
+        'is_override' => array(
+          'name' => 'is_override',
+          'propertyName' => 'isOverride',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Status Override'),
+          'import' => true,
+          'where' => 'civicrm_membership.is_override',
+          'headerPattern' => '/override$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'owner_membership_id' => array(
+          'name' => 'owner_membership_id',
+          'propertyName' => 'ownerMembership',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Primary Member ID'),
+          'export' => true,
+          'where' => 'civicrm_membership.owner_membership_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'FKClassName' => 'CRM_Member_DAO_Membership',
+        ),
+        'max_related' => array(
+          'name' => 'max_related',
+          'propertyName' => 'maxRelated',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Max Related'),
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'member_is_test' => array(
+          'name' => 'is_test',
+          'propertyName' => 'isTest',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Test'),
+          'import' => true,
+          'where' => 'civicrm_membership.is_test',
+          'headerPattern' => '/(is.)?test(.member(ship)?)?/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'member_is_pay_later' => array(
+          'name' => 'is_pay_later',
+          'propertyName' => 'isPayLater',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Pay Later'),
+          'import' => true,
+          'where' => 'civicrm_membership.is_pay_later',
+          'headerPattern' => '/(is.)?(pay(.)?later)$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'contribution_recur_id' => array(
+          'name' => 'contribution_recur_id',
+          'propertyName' => 'contributionRecur',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Memberhip Recurring Contribution'),
+          'FKClassName' => 'CRM_Contribute_DAO_ContributionRecur',
+        ),
+        'member_campaign_id' => array(
+          'name' => 'campaign_id',
+          'propertyName' => 'campaign',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Campaign'),
+          'import' => true,
+          'where' => 'civicrm_membership.campaign_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_campaign',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

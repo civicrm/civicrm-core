@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -402,165 +403,126 @@ class Email extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'contact_id' => array(
-      
-        'name' => 'contact_id',
-        'propertyName' => 'contact',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_Contact',
-                          ),
-      
-              'location_type_id' => array(
-      
-        'name' => 'location_type_id',
-        'propertyName' => 'locationTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Email Location Type'),
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_location_type',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'display_name',
-                    )
-                 ),
-      
-              'email' => array(
-      
-        'name' => 'email',
-        'propertyName' => 'email',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Email'),
-                                 'maxlength' => 254,
-                                 'size' => \CRM_Utils_Type::MEDIUM,
-                           
-                'import' => true,
-        'where' => 'civicrm_email.email',
-        'headerPattern' => '/e.?mail/i',
-        'dataPattern' => '/^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/',
-                         'export' => true,
-                                 'rule' => 'email',
-                  
-                          ),
-      
-              'is_primary' => array(
-      
-        'name' => 'is_primary',
-        'propertyName' => 'isPrimary',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'is_billing' => array(
-      
-        'name' => 'is_billing',
-        'propertyName' => 'isBilling',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                             
-                                    
-                          ),
-      
-              'on_hold' => array(
-      
-        'name' => 'on_hold',
-        'propertyName' => 'onHold',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('On Hold'),
-                        'required' => true,
-                                                     
-                         'export' => true,
-                'where' => 'civicrm_email.on_hold',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'is_bulkmail' => array(
-      
-        'name' => 'is_bulkmail',
-        'propertyName' => 'isBulkmail',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Use for Bulk Mail'),
-                        'required' => true,
-                                                     
-                         'export' => true,
-                'where' => 'civicrm_email.is_bulkmail',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                                   
-                          ),
-      
-              'hold_date' => array(
-      
-        'name' => 'hold_date',
-        'propertyName' => 'holdDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Hold Date'),
-                                                             
-                                    
-                          ),
-      
-              'reset_date' => array(
-      
-        'name' => 'reset_date',
-        'propertyName' => 'resetDate',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Reset Date'),
-                                                             
-                                    
-                          ),
-      
-              'signature_text' => array(
-      
-        'name' => 'signature_text',
-        'propertyName' => 'signatureText',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Signature Text'),
-                                 'maxlength' => 65535,
-                                            
-                'import' => true,
-        'where' => 'civicrm_email.signature_text',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => 'NULL',
-         
-                          ),
-      
-              'signature_html' => array(
-      
-        'name' => 'signature_html',
-        'propertyName' => 'signatureHtml',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Signature Html'),
-                                 'maxlength' => 65535,
-                                            
-                'import' => true,
-        'where' => 'civicrm_email.signature_html',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => 'NULL',
-         
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Email ID'),
+          'required' => true,
+        ),
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'propertyName' => 'contact',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Email Contact'),
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ),
+        'location_type_id' => array(
+          'name' => 'location_type_id',
+          'propertyName' => 'locationTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Email Location Type'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_location_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'display_name',
+          )
+        ),
+        'email' => array(
+          'name' => 'email',
+          'propertyName' => 'email',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Email'),
+          'maxlength' => 254,
+          'size' => \CRM_Utils_Type::MEDIUM,
+          'import' => true,
+          'where' => 'civicrm_email.email',
+          'headerPattern' => '/e.?mail/i',
+          'dataPattern' => '/^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/',
+          'export' => true,
+          'rule' => 'email',
+          'html' => array(
+            'type' => 'Text',
+            'size' => 'MEDIUM',
+          ),
+        ),
+        'is_primary' => array(
+          'name' => 'is_primary',
+          'propertyName' => 'isPrimary',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Primary email'),
+        ),
+        'is_billing' => array(
+          'name' => 'is_billing',
+          'propertyName' => 'isBilling',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Billing Email?'),
+        ),
+        'on_hold' => array(
+          'name' => 'on_hold',
+          'propertyName' => 'onHold',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('On Hold'),
+          'required' => true,
+          'export' => true,
+          'where' => 'civicrm_email.on_hold',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ),
+        'is_bulkmail' => array(
+          'name' => 'is_bulkmail',
+          'propertyName' => 'isBulkmail',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Use for Bulk Mail'),
+          'required' => true,
+          'export' => true,
+          'where' => 'civicrm_email.is_bulkmail',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ),
+        'hold_date' => array(
+          'name' => 'hold_date',
+          'propertyName' => 'holdDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Hold Date'),
+        ),
+        'reset_date' => array(
+          'name' => 'reset_date',
+          'propertyName' => 'resetDate',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Reset Date'),
+        ),
+        'signature_text' => array(
+          'name' => 'signature_text',
+          'propertyName' => 'signatureText',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Signature Text'),
+          'maxlength' => 65535,
+          'import' => true,
+          'where' => 'civicrm_email.signature_text',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => 'NULL',
+        ),
+        'signature_html' => array(
+          'name' => 'signature_html',
+          'propertyName' => 'signatureHtml',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Signature Html'),
+          'maxlength' => 65535,
+          'import' => true,
+          'where' => 'civicrm_email.signature_html',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => 'NULL',
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

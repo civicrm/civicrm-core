@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -70,6 +71,9 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
    *
    * {$field.jmsType}
    * {$field.columnInfo}
+{if $field.fieldAnnotation}
+   * {$field.fieldAnnotation}
+{/if}
    * {$field.columnJoin}
    */
   private ${$field.propertyName}{if isset($field.default)} = '{$field.default}'{/if};
@@ -118,79 +122,81 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
   static function &fields( ) {ldelim}
     if ( !self::$_fields) {ldelim}
       self::$_fields = array (
-      {foreach from=$table.fields item=field}
-
-      {if $field.uniqueName}
+{foreach from=$table.fields item=field}
+{if $field.uniqueName}
         '{$field.uniqueName}' => array(
-      {else}
+{else}
         '{$field.name}' => array(
-      {/if}
-
-        'name' => '{$field.name}',
-        'propertyName' => '{$field.propertyName}',
-        'type' => {$field.crmType},
-        {if $field.title}
-        'title' => ts('{$field.title}'),
-        {/if}
-        {if $field.required}
-        'required' => {$field.required},
-        {/if} {* field.required *}
-        {if $field.length}
-        'maxlength' => {$field.length},
-        {/if} {* field.length *}
-        {if $field.precision}
-        'precision'      => array({$field.precision}),
-        {/if}
-        {if $field.size}
-        'size' => {$field.size},
-        {/if} {* field.size *}
-        {if $field.rows}
-        'rows' => {$field.rows},
-        {/if} {* field.rows *}
-        {if $field.cols}
-        'cols' => {$field.cols},
-        {/if} {* field.cols *}
-
-        {if $field.import}
-        'import' => {$field.import},
-        'where' => '{$table.name}.{$field.name}',
-        'headerPattern' => '{$field.headerPattern}',
-        'dataPattern' => '{$field.dataPattern}',
-        {/if} {* field.import *}
-        {if $field.export}
-        'export' => {$field.export},
-        {if ! $field.import}
-        'where' => '{$table.name}.{$field.name}',
-        'headerPattern' => '{$field.headerPattern}',
-        'dataPattern' => '{$field.dataPattern}',
-        {/if}
-        {/if} {* field.export *}
-        {if $field.rule}
-        'rule' => '{$field.rule}',
-        {/if} {* field.rule *}
-        {if $field.default}
-        'default' => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
-        {/if} {* field.default *}
-
-        {if $field.FKClassName}
-        'FKClassName' => '{$field.FKClassName}',
-        {/if} {* field.FKClassName *}
-        {if $field.pseudoconstant}
-          {assign var=pseudoOptions value=$field.pseudoconstant}
+{/if}
+          'name' => '{$field.name}',
+          'propertyName' => '{$field.propertyName}',
+          'type' => {$field.crmType},
+{if $field.title}
+          'title' => ts('{$field.title}'),
+{/if}
+{if $field.required}
+          'required' => {$field.required},
+{/if}
+{if $field.length}
+          'maxlength' => {$field.length},
+{/if}
+{if $field.precision}
+          'precision' => array({$field.precision}),
+{/if}
+{if $field.size}
+          'size' => {$field.size},
+{/if}
+{if $field.rows}
+          'rows' => {$field.rows},
+{/if}
+{if $field.cols}
+          'cols' => {$field.cols},
+{/if}
+{if $field.import}
+          'import' => {$field.import},
+          'where' => '{$table.name}.{$field.name}',
+          'headerPattern' => '{$field.headerPattern}',
+          'dataPattern' => '{$field.dataPattern}',
+{/if}
+{if $field.export}
+          'export' => {$field.export},
+{if ! $field.import}
+          'where' => '{$table.name}.{$field.name}',
+          'headerPattern' => '{$field.headerPattern}',
+          'dataPattern' => '{$field.dataPattern}',
+{/if}
+{/if}
+{if $field.rule}
+          'rule' => '{$field.rule}',
+{/if}
+{if $field.default}
+          'default' => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
+{/if}
+{if $field.FKClassName}
+          'FKClassName' => '{$field.FKClassName}',
+{/if}
+{if $field.html}
+          'html' => array(
+{foreach from=$field.html key=htmlKey item=htmlValue}
+            '{$htmlKey}' => '{$htmlValue}',
+{/foreach}
+          ),
+{/if}
+{if $field.pseudoconstant}
+{assign var=pseudoOptions value=$field.pseudoconstant}
           'pseudoconstant' => array(
-          {*{$pseudoOptions|@print_array}*}
-          {foreach from=$pseudoOptions key=optionKey item=optionValue}
+{foreach from=$pseudoOptions key=optionKey item=optionValue}
             '{$optionKey}' => '{$optionValue}',
-          {/foreach}
+{/foreach}
           )
-        {/if} {* field.pseudoconstant *}
+{/if}
+{if $field.localizable}
+          'localizable' => {$field.localizable},
+{/if}
         ),
-      {/foreach} {* table.fields *}
+{/foreach}
       );
-    {rdelim}
+     {rdelim}
     return self::$_fields;
   {rdelim}
-
 {rdelim}
-
-

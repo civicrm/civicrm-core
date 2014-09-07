@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -750,357 +751,313 @@ class Activity extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'activity_id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Activity ID'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_activity.id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'source_record_id' => array(
-      
-        'name' => 'source_record_id',
-        'propertyName' => 'sourceRecordId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Source Record'),
-                                                             
-                                    
-                          ),
-      
-              'activity_type_id' => array(
-      
-        'name' => 'activity_type_id',
-        'propertyName' => 'activityTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Activity Type'),
-                        'required' => true,
-                                                     
-                'import' => true,
-        'where' => 'civicrm_activity.activity_type_id',
-        'headerPattern' => '/(activity.)?type(.id$)/i',
-        'dataPattern' => '',
-                         'export' => false,
-                                          'default' => '1',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'activity_type',
-                    )
-                 ),
-      
-              'activity_subject' => array(
-      
-        'name' => 'subject',
-        'propertyName' => 'subject',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Subject'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_activity.subject',
-        'headerPattern' => '/(activity.)?subject/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'activity_date_time' => array(
-      
-        'name' => 'activity_date_time',
-        'propertyName' => 'activityDateTime',
-        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
-                'title' => ts('Activity Date'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_activity.activity_date_time',
-        'headerPattern' => '/(activity.)?date(.time$)?/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'activity_duration' => array(
-      
-        'name' => 'duration',
-        'propertyName' => 'duration',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Duration'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_activity.duration',
-        'headerPattern' => '/(activity.)?duration(s)?$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'activity_location' => array(
-      
-        'name' => 'location',
-        'propertyName' => 'location',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Location'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                'import' => true,
-        'where' => 'civicrm_activity.location',
-        'headerPattern' => '/(activity.)?location$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'phone_id' => array(
-      
-        'name' => 'phone_id',
-        'propertyName' => 'phone',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Phone (called) ID'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Phone',
-                          ),
-      
-              'phone_number' => array(
-      
-        'name' => 'phone_number',
-        'propertyName' => 'phoneNumber',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Phone (called) Number'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                          ),
-      
-              'activity_details' => array(
-      
-        'name' => 'details',
-        'propertyName' => 'details',
-        'type' => \CRM_Utils_Type::T_TEXT,
-                'title' => ts('Details'),
-                                 'maxlength' => 65535,
-                                          'rows' => 8,
-                         'cols' => 60,
-         
-                'import' => true,
-        'where' => 'civicrm_activity.details',
-        'headerPattern' => '/(activity.)?detail(s)?$/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'activity_status_id' => array(
-      
-        'name' => 'status_id',
-        'propertyName' => 'statusId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Activity Status'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_activity.status_id',
-        'headerPattern' => '/(activity.)?status(.label$)?/i',
-        'dataPattern' => '',
-                         'export' => false,
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'activity_status',
-                    )
-                 ),
-      
-              'priority_id' => array(
-      
-        'name' => 'priority_id',
-        'propertyName' => 'priorityId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Priority'),
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'priority',
-                    )
-                 ),
-      
-              'parent_id' => array(
-      
-        'name' => 'parent_id',
-        'propertyName' => 'parent',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Parent Activity Id'),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Activity_DAO_Activity',
-                          ),
-      
-              'activity_is_test' => array(
-      
-        'name' => 'is_test',
-        'propertyName' => 'isTest',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Test'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_activity.is_test',
-        'headerPattern' => '/(is.)?test(.activity)?/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'activity_medium_id' => array(
-      
-        'name' => 'medium_id',
-        'propertyName' => 'mediumId',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Activity Medium'),
-                                                             
-                                           'default' => 'NULL',
-         
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'encounter_medium',
-                    )
-                 ),
-      
-              'is_auto' => array(
-      
-        'name' => 'is_auto',
-        'propertyName' => 'isAuto',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Auto'),
-                                                             
-                                    
-                          ),
-      
-              'relationship_id' => array(
-      
-        'name' => 'relationship_id',
-        'propertyName' => 'relationship',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Relationship Id'),
-                                                             
-                                           'default' => 'NULL',
-         
-                'FKClassName' => 'CRM_Contact_DAO_Relationship',
-                          ),
-      
-              'is_current_revision' => array(
-      
-        'name' => 'is_current_revision',
-        'propertyName' => 'isCurrentRevision',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Is this activity a current revision in versioning chain?'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_activity.is_current_revision',
-        'headerPattern' => '/(is.)?(current.)?(revision|version(ing)?)/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                          'default' => '1',
-         
-                          ),
-      
-              'original_id' => array(
-      
-        'name' => 'original_id',
-        'propertyName' => 'original',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Original Activity ID '),
-                                                             
-                                    
-                'FKClassName' => 'CRM_Activity_DAO_Activity',
-                          ),
-      
-              'activity_result' => array(
-      
-        'name' => 'result',
-        'propertyName' => 'result',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Result'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'activity_is_deleted' => array(
-      
-        'name' => 'is_deleted',
-        'propertyName' => 'isDeleted',
-        'type' => \CRM_Utils_Type::T_BOOLEAN,
-                'title' => ts('Activity is in the Trash'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_activity.is_deleted',
-        'headerPattern' => '/(activity.)?(trash|deleted)/i',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                          ),
-      
-              'activity_campaign_id' => array(
-      
-        'name' => 'campaign_id',
-        'propertyName' => 'campaign',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Campaign'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_activity.campaign_id',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_campaign',
-                      'keyColumn' => 'id',
-                      'labelColumn' => 'title',
-                    )
-                 ),
-      
-              'activity_engagement_level' => array(
-      
-        'name' => 'engagement_level',
-        'propertyName' => 'engagementLevel',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Engagement Index'),
-                                                             
-                'import' => true,
-        'where' => 'civicrm_activity.engagement_level',
-        'headerPattern' => '',
-        'dataPattern' => '',
-                         'export' => true,
-                                   
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'engagement_index',
-                    )
-                 ),
-      
-              'weight' => array(
-      
-        'name' => 'weight',
-        'propertyName' => 'weight',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Weight'),
-                                                             
-                                    
-                          ),
-             );
-    }
+        'activity_id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Activity ID'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_activity.id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ),
+        'source_record_id' => array(
+          'name' => 'source_record_id',
+          'propertyName' => 'sourceRecordId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Source Record'),
+        ),
+        'activity_type_id' => array(
+          'name' => 'activity_type_id',
+          'propertyName' => 'activityTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Activity Type'),
+          'required' => true,
+          'import' => true,
+          'where' => 'civicrm_activity.activity_type_id',
+          'headerPattern' => '/(activity.)?type(.id$)/i',
+          'dataPattern' => '',
+          'export' => false,
+          'default' => '1',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'activity_type',
+          )
+        ),
+        'activity_subject' => array(
+          'name' => 'subject',
+          'propertyName' => 'subject',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Subject'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_activity.subject',
+          'headerPattern' => '/(activity.)?subject/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'activity_date_time' => array(
+          'name' => 'activity_date_time',
+          'propertyName' => 'activityDateTime',
+          'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
+          'title' => ts('Activity Date'),
+          'import' => true,
+          'where' => 'civicrm_activity.activity_date_time',
+          'headerPattern' => '/(activity.)?date(.time$)?/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select Date',
+          ),
+        ),
+        'activity_duration' => array(
+          'name' => 'duration',
+          'propertyName' => 'duration',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Duration'),
+          'import' => true,
+          'where' => 'civicrm_activity.duration',
+          'headerPattern' => '/(activity.)?duration(s)?$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'activity_location' => array(
+          'name' => 'location',
+          'propertyName' => 'location',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Location'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'import' => true,
+          'where' => 'civicrm_activity.location',
+          'headerPattern' => '/(activity.)?location$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'phone_id' => array(
+          'name' => 'phone_id',
+          'propertyName' => 'phone',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Phone (called) ID'),
+          'FKClassName' => 'CRM_Core_DAO_Phone',
+          'html' => array(
+            'type' => 'Autocomplete-Select',
+          ),
+        ),
+        'phone_number' => array(
+          'name' => 'phone_number',
+          'propertyName' => 'phoneNumber',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Phone (called) Number'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'activity_details' => array(
+          'name' => 'details',
+          'propertyName' => 'details',
+          'type' => \CRM_Utils_Type::T_TEXT,
+          'title' => ts('Details'),
+          'maxlength' => 65535,
+          'rows' => 8,
+          'cols' => 60,
+          'import' => true,
+          'where' => 'civicrm_activity.details',
+          'headerPattern' => '/(activity.)?detail(s)?$/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'RichTextEditor',
+          ),
+        ),
+        'activity_status_id' => array(
+          'name' => 'status_id',
+          'propertyName' => 'statusId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Activity Status'),
+          'import' => true,
+          'where' => 'civicrm_activity.status_id',
+          'headerPattern' => '/(activity.)?status(.label$)?/i',
+          'dataPattern' => '',
+          'export' => false,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'activity_status',
+          )
+        ),
+        'priority_id' => array(
+          'name' => 'priority_id',
+          'propertyName' => 'priorityId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Priority'),
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'priority',
+          )
+        ),
+        'parent_id' => array(
+          'name' => 'parent_id',
+          'propertyName' => 'parent',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Parent Activity Id'),
+          'FKClassName' => 'CRM_Activity_DAO_Activity',
+        ),
+        'activity_is_test' => array(
+          'name' => 'is_test',
+          'propertyName' => 'isTest',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Test'),
+          'import' => true,
+          'where' => 'civicrm_activity.is_test',
+          'headerPattern' => '/(is.)?test(.activity)?/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select',
+          ),
+        ),
+        'activity_medium_id' => array(
+          'name' => 'medium_id',
+          'propertyName' => 'mediumId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Activity Medium'),
+          'default' => 'NULL',
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'encounter_medium',
+          )
+        ),
+        'is_auto' => array(
+          'name' => 'is_auto',
+          'propertyName' => 'isAuto',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Auto'),
+        ),
+        'relationship_id' => array(
+          'name' => 'relationship_id',
+          'propertyName' => 'relationship',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Relationship Id'),
+          'default' => 'NULL',
+          'FKClassName' => 'CRM_Contact_DAO_Relationship',
+        ),
+        'is_current_revision' => array(
+          'name' => 'is_current_revision',
+          'propertyName' => 'isCurrentRevision',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is this activity a current revision in versioning chain?'),
+          'import' => true,
+          'where' => 'civicrm_activity.is_current_revision',
+          'headerPattern' => '/(is.)?(current.)?(revision|version(ing)?)/i',
+          'dataPattern' => '',
+          'export' => true,
+          'default' => '1',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+        ),
+        'original_id' => array(
+          'name' => 'original_id',
+          'propertyName' => 'original',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Original Activity ID '),
+          'FKClassName' => 'CRM_Activity_DAO_Activity',
+        ),
+        'activity_result' => array(
+          'name' => 'result',
+          'propertyName' => 'result',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Result'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'activity_is_deleted' => array(
+          'name' => 'is_deleted',
+          'propertyName' => 'isDeleted',
+          'type' => \CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Activity is in the Trash'),
+          'import' => true,
+          'where' => 'civicrm_activity.is_deleted',
+          'headerPattern' => '/(activity.)?(trash|deleted)/i',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+        'activity_campaign_id' => array(
+          'name' => 'campaign_id',
+          'propertyName' => 'campaign',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Campaign'),
+          'import' => true,
+          'where' => 'civicrm_activity.campaign_id',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+          'html' => array(
+            'type' => 'CheckBox',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_campaign',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+          )
+        ),
+        'activity_engagement_level' => array(
+          'name' => 'engagement_level',
+          'propertyName' => 'engagementLevel',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Engagement Index'),
+          'import' => true,
+          'where' => 'civicrm_activity.engagement_level',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'engagement_index',
+          )
+        ),
+        'weight' => array(
+          'name' => 'weight',
+          'propertyName' => 'weight',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Weight'),
+          'html' => array(
+            'type' => 'Text',
+          ),
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-

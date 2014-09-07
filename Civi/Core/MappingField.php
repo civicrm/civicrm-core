@@ -40,6 +40,7 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Civi\Core\Annotations\Field as Field;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -460,174 +461,128 @@ class MappingField extends \Civi\Core\Entity {
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
-      
-              'id' => array(
-      
-        'name' => 'id',
-        'propertyName' => 'id',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'mapping_id' => array(
-      
-        'name' => 'mapping_id',
-        'propertyName' => 'mapping',
-        'type' => \CRM_Utils_Type::T_INT,
-                        'required' => true,
-                                                     
-                                    
-                'FKClassName' => 'CRM_Core_DAO_Mapping',
-                          ),
-      
-              'name' => array(
-      
-        'name' => 'name',
-        'propertyName' => 'name',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Name'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-      
-              'contact_type' => array(
-      
-        'name' => 'contact_type',
-        'propertyName' => 'contactType',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Contact Type'),
-                                 'maxlength' => 64,
-                                 'size' => \CRM_Utils_Type::BIG,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'table' => 'civicrm_contact_type',
-                      'keyColumn' => 'name',
-                      'labelColumn' => 'label',
-                    )
-                 ),
-      
-              'column_number' => array(
-      
-        'name' => 'column_number',
-        'propertyName' => 'columnNumber',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Column Number'),
-                        'required' => true,
-                                                     
-                                    
-                          ),
-      
-              'location_type_id' => array(
-      
-        'name' => 'location_type_id',
-        'propertyName' => 'locationType',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Core_DAO_LocationType',
-                          ),
-      
-              'phone_type_id' => array(
-      
-        'name' => 'phone_type_id',
-        'propertyName' => 'phoneTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                          ),
-      
-              'im_provider_id' => array(
-      
-        'name' => 'im_provider_id',
-        'propertyName' => 'imProviderId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'instant_messenger_service',
-                    )
-                 ),
-      
-              'website_type_id' => array(
-      
-        'name' => 'website_type_id',
-        'propertyName' => 'websiteTypeId',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                                     'pseudoconstant' => array(
-                                'optionGroupName' => 'website_type',
-                    )
-                 ),
-      
-              'relationship_type_id' => array(
-      
-        'name' => 'relationship_type_id',
-        'propertyName' => 'relationshipType',
-        'type' => \CRM_Utils_Type::T_INT,
-                                                             
-                                    
-                'FKClassName' => 'CRM_Contact_DAO_RelationshipType',
-                          ),
-      
-              'relationship_direction' => array(
-      
-        'name' => 'relationship_direction',
-        'propertyName' => 'relationshipDirection',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Relationship Direction'),
-                                 'maxlength' => 6,
-                                 'size' => \CRM_Utils_Type::SIX,
-                           
-                                    
-                          ),
-      
-              'grouping' => array(
-      
-        'name' => 'grouping',
-        'propertyName' => 'grouping',
-        'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Grouping'),
-                                                             
-                                           'default' => '1',
-         
-                          ),
-      
-              'operator' => array(
-      
-        'name' => 'operator',
-        'propertyName' => 'operator',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Operator'),
-                                 'maxlength' => 16,
-                                 'size' => \CRM_Utils_Type::TWELVE,
-                           
-                                    
-                                     'pseudoconstant' => array(
-                                'callback' => 'CRM_Core_SelectValues::getSearchBuilderOperators',
-                    )
-                 ),
-      
-              'value' => array(
-      
-        'name' => 'value',
-        'propertyName' => 'value',
-        'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Value'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
-                                    
-                          ),
-             );
-    }
+        'id' => array(
+          'name' => 'id',
+          'propertyName' => 'id',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+        ),
+        'mapping_id' => array(
+          'name' => 'mapping_id',
+          'propertyName' => 'mapping',
+          'type' => \CRM_Utils_Type::T_INT,
+          'required' => true,
+          'FKClassName' => 'CRM_Core_DAO_Mapping',
+        ),
+        'name' => array(
+          'name' => 'name',
+          'propertyName' => 'name',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Name'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+        'contact_type' => array(
+          'name' => 'contact_type',
+          'propertyName' => 'contactType',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Contact Type'),
+          'maxlength' => 64,
+          'size' => \CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'table' => 'civicrm_contact_type',
+            'keyColumn' => 'name',
+            'labelColumn' => 'label',
+          )
+        ),
+        'column_number' => array(
+          'name' => 'column_number',
+          'propertyName' => 'columnNumber',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Column Number'),
+          'required' => true,
+        ),
+        'location_type_id' => array(
+          'name' => 'location_type_id',
+          'propertyName' => 'locationType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Core_DAO_LocationType',
+        ),
+        'phone_type_id' => array(
+          'name' => 'phone_type_id',
+          'propertyName' => 'phoneTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+        ),
+        'im_provider_id' => array(
+          'name' => 'im_provider_id',
+          'propertyName' => 'imProviderId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'instant_messenger_service',
+          )
+        ),
+        'website_type_id' => array(
+          'name' => 'website_type_id',
+          'propertyName' => 'websiteTypeId',
+          'type' => \CRM_Utils_Type::T_INT,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'optionGroupName' => 'website_type',
+          )
+        ),
+        'relationship_type_id' => array(
+          'name' => 'relationship_type_id',
+          'propertyName' => 'relationshipType',
+          'type' => \CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contact_DAO_RelationshipType',
+        ),
+        'relationship_direction' => array(
+          'name' => 'relationship_direction',
+          'propertyName' => 'relationshipDirection',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Relationship Direction'),
+          'maxlength' => 6,
+          'size' => \CRM_Utils_Type::SIX,
+        ),
+        'grouping' => array(
+          'name' => 'grouping',
+          'propertyName' => 'grouping',
+          'type' => \CRM_Utils_Type::T_INT,
+          'title' => ts('Grouping'),
+          'default' => '1',
+        ),
+        'operator' => array(
+          'name' => 'operator',
+          'propertyName' => 'operator',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Operator'),
+          'maxlength' => 16,
+          'size' => \CRM_Utils_Type::TWELVE,
+          'html' => array(
+            'type' => 'Select',
+          ),
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_SelectValues::getSearchBuilderOperators',
+          )
+        ),
+        'value' => array(
+          'name' => 'value',
+          'propertyName' => 'value',
+          'type' => \CRM_Utils_Type::T_STRING,
+          'title' => ts('Value'),
+          'maxlength' => 255,
+          'size' => \CRM_Utils_Type::HUGE,
+        ),
+      );
+     }
     return self::$_fields;
   }
-
 }
-
