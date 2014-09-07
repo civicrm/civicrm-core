@@ -129,10 +129,10 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     
     //Set Schedule Reminder Id
     $this->_scheduleReminderId = $this->_scheduleReminderDetails->id;
-    list($defaults['repetition_start_date']) = CRM_Utils_Date::setDateDefaults($this->_parentEventStartDate);
+    list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($this->_parentEventStartDate, 'activityDateTime');
     // Check if there is id for this event in Reminder table
     if($this->_scheduleReminderId){
-      list($defaults['repetition_start_date']) = CRM_Utils_Date::setDateDefaults($this->_scheduleReminderDetails->entity_status);
+      list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($this->_scheduleReminderDetails->entity_status, 'activityDateTime');
       $defaults['repetition_frequency_unit'] = $this->_scheduleReminderDetails->repetition_frequency_unit;
       $defaults['repetition_frequency_interval'] = $this->_scheduleReminderDetails->repetition_frequency_interval;
       $defaults['start_action_condition'] = array_flip(explode(",",$this->_scheduleReminderDetails->start_action_condition));
