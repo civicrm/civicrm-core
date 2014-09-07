@@ -66,7 +66,8 @@ class CRM_Core_Form_RecurringEntity {
                          );
     $form->add('select', 'repetition_frequency_unit', ts('Repeats:'), $freqUnitsDisplay, TRUE);
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 30);
-    $form->add('select', 'repetition_frequency_interval', ts('Repeats every:'), $numericOptions, TRUE, array('style' => 'width:49px;'));
+    $form->add('select', 'repetition_frequency_interval', ts('Repeats every:'), $numericOptions, TRUE, array('style' => 'width:55px;'));
+    $form->addDate('repetition_start_date', ts('Repetition Start Date'), array(), FALSE);
     foreach($dayOfTheWeek as $key => $val){
         $startActionCondition[] = $form->createElement('checkbox', $key, NULL, substr($val."&nbsp;", 0, 3));
     }
@@ -76,7 +77,7 @@ class CRM_Core_Form_RecurringEntity {
       );
     $form->addRadio('repeats_by', ts("Repeats By:"), $roptionTypes, array(), NULL);
     $getMonths = CRM_Core_SelectValues::getNumericOptions(1, 31);
-    $form->add('select', 'limit_to', '', $getMonths, FALSE, array('style' => 'width:49px;'));
+    $form->add('select', 'limit_to', '', $getMonths, FALSE, array('style' => 'width:55px;'));
     $dayOfTheWeekNo = array('first'  => 'First',
                             'second'=> 'Second',
                             'third' => 'Third',

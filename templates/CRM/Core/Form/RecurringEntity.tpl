@@ -31,6 +31,10 @@
             {include file="CRM/common/formButtons.tpl" location="top"}
         </div>
         <table class="form-layout-compressed">
+          <tr class="crm-core-form-recurringentity-block-repetition_start_date" id="tr-repetition_start_date">
+            <td class="label">{$form.repetition_start_date.label}</td>
+            <td>{include file="CRM/common/jcalendar.tpl" elementName=repetition_start_date}</td>
+          </tr>
           <tr class="crm-core-form-recurringentity-block-repetition_frequency_unit">
             <td class="label">{$form.repetition_frequency_unit.label}</td>
             <td>{$form.repetition_frequency_unit.html} {help id="id-repeats"}</td>
@@ -110,6 +114,7 @@
 </style>
 <script type="text/javascript">
   cj(document).ready(function() {
+      cj('#repetition_start_date_display').closest("tr").hide();
     /****** On load "Repeats By" and "Repeats On" blocks should be hidden if dropdown value is not week or month****** (Edit Mode)***/
     if(cj('#repetition_frequency_unit').val() == "week"){
         cj('.crm-core-form-recurringentity-block-start_action_condition').show();
