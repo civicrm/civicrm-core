@@ -217,7 +217,6 @@ class CRM_Core_Form_RecurringEntity {
       $recursionObject = CRM_Core_BAO_RecurringEntity::getRecursionFromReminder($actionScheduleObj->id);
     }
     
-    
     //TO DO - Exclude date functionality
     $excludeDateList = array();
     if(CRM_Utils_Array::value('copyExcludeDates', $params) && CRM_Utils_Array::value('parent_event_id', $params)){   
@@ -266,15 +265,80 @@ class CRM_Core_Form_RecurringEntity {
     if($params['parent_event_id']){
       CRM_Core_BAO_RecurringEntity::delEntityRelations($params['parent_event_id'], 'civicrm_event');
     }
+
     //Give call to create recursions
+    if ($params['parent_event_end_date']) {
+      $params['interval'] = CRM_Core_BAO_RecurringEntity::getInterval($params['parent_event_start_date'], $params['parent_event_end_date']);
+    }
+
     $recurResult = CRM_Core_BAO_RecurringEntity::generateRecursions($recursionObject, $params, $excludeDateList);
     if(!empty($recurResult) && $params['parent_event_id']) {
-      CRM_Core_BAO_RecurringEntity::addEntityThroughRecursion($recurResult, $params['parent_event_id']);
+      CRM_Core_Form_RecurringEntity::addEntityThroughRecursion($recurResult, $params['parent_event_id']);
     }
     $status = ts('Repeat Configuration has been saved');
     CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
   }
   //end of function
+
+  static public function addEntityThroughRecursion($recursionResult = array(), $currEntityID){
+    if(!empty($recursionResult) && $currEntityID){
+      $parent_event_id = CRM_Core_BAO_RecurringEntity::getParentFor($currEntityID, 'civicrm_event');
+      if(!$parent_event_id){
+        $parent_event_id = $currEntityID;
+      }
+
+      // add first entry just for parent
+      CRM_Core_BAO_RecurringEntity::quickAdd($parent_event_id, $parent_event_id, 'civicrm_event');
+
+      foreach ($recursionResult as $key => $value) {
+        $newEventObj = CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_event', 
+        array('id' => $parent_event_id), 
+        $value);
+
+        CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_price_set_entity', 
+          array(
+            'entity_id' => $parent_event_id, 
+            'entity_table' => 'civicrm_event'
+          ), 
+          array(
+            'entity_id' => $newEventObj->id
+          ),
+          FALSE
+        );
+
+        CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_uf_join', 
+          array(
+            'entity_id' => $parent_event_id, 
+            'entity_table' => 'civicrm_event'
+          ), 
+          array(
+            'entity_id' => $newEventObj->id
+          ),
+          FALSE
+        );
+
+        CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_tell_friend', 
+          array(
+            'entity_id' => $parent_event_id, 
+            'entity_table' => 'civicrm_event'
+          ), 
+          array(
+            'entity_id' => $newEventObj->id
+          )
+        );
+
+        CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_pcp_block', 
+          array(
+            'entity_id' => $parent_event_id, 
+            'entity_table' => 'civicrm_event'
+          ), 
+          array(
+            'entity_id' => $newEventObj->id
+          )
+        );
+      }
+    }
+  }
 
   /**
    * Return a descriptive name for the page, used in wizard header

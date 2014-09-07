@@ -51,9 +51,12 @@ class CRM_Core_Page_AJAX_RecurringEntity {
             if(!$parent_event_id){
               $parent_event_id = $formValues['event_id'];
             }
-            $params['parent_event_id'] = $parent_event_id;
-            $params['parent_event_start_date'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['parent_event_id'], 'start_date');
-            $params['parent_event_end_date'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['parent_event_id'], 'end_date');
+            $startDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $parent_event_id, 'start_date');
+            $endDate   = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $parent_event_id, 'end_date');
+
+            if ($endDate) {
+              $params['interval'] = CRM_Core_BAO_RecurringEntity::getInterval($startDate, $endDate);
+            }
             $params['start_action_offset'] = $formValues['start_action_offset'];
           }
           $recurResult = CRM_Core_BAO_RecurringEntity::generateRecursions($recursionObject, $params, $formValues['exclude_date_list']); 
