@@ -404,7 +404,7 @@ SELECT     civicrm_event.id as id, civicrm_event.title as event_title, civicrm_e
            civicrm_event.slot_label_id,
            civicrm_event.summary as summary,
            civicrm_pcp_block.id as is_pcp_enabled,
-           civicrm_recurring_entity.id as is_repeating_event
+           civicrm_recurring_entity.parent_id as is_repeating_event
 FROM       civicrm_event
 LEFT JOIN  civicrm_option_value ON (
            civicrm_event.event_type_id = civicrm_option_value.value AND

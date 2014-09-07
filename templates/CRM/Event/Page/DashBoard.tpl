@@ -57,7 +57,16 @@
     <tbody>
     {foreach from=$eventSummary.events item=values key=id}
     <tr class="crm-event_{$id}">
-        <td class="crm-event-eventTitle"><a href="{crmURL p="civicrm/event/info" q="reset=1&id=`$id`"}" title="{ts}View event info page{/ts}">{$values.eventTitle}</a></td>
+        <td class="crm-event-eventTitle"><a href="{crmURL p="civicrm/event/info" q="reset=1&id=`$id`"}" title="{ts}View event info page{/ts}">{$values.eventTitle}</a>
+            {if $values.is_repeating_event}
+                <br/>
+                {if $values.is_repeating_event eq $id}
+                    <span>Repeating Event - (Parent)</span>
+                {else}
+                    <span>Repeating Event - (Child)</span>
+                {/if}
+            {/if}
+        </td>
         <td class="crm-event-id">{$id}</td>
         <td class="crm-event-eventType">{$values.eventType}</td>
         <td class="crm-event-isPublic">{$values.isPublic}</td>
