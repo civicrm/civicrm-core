@@ -484,5 +484,28 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       return $dao->delete();
     }
   }
+  
+  static public function getParticipantCountforEvent($listOfRelatedEntities = array()){
+    if(!empty($listOfRelatedEntities)){
+      $implodeRelatedEntities = implode(',', array_map(function($entity){
+                                  return $entity['id'];
+                                }, $listOfRelatedEntities));
+      if($implodeRelatedEntities){
+        $query = "SELECT p.event_id as event_id, 
+              concat_ws(' ', e.title, concat_ws(' - ', DATE_FORMAT(e.start_date, '%b %d %Y %h:%i %p'), DATE_FORMAT(e.end_date, '%b %d %Y %h:%i %p'))) as event_data, 
+              count(p.id) as participant_count
+              FROM civicrm_participant p, civicrm_event e 
+              WHERE p.event_id = e.id AND p.event_id IN ({$implodeRelatedEntities})
+              GROUP BY p.event_id";
+        $dao = CRM_Core_DAO::executeQuery($query);
+        $participantDetails = array();
+        while($dao->fetch()) {
+          $participantDetails['countByID'][$dao->event_id] = $dao->participant_count;
+          $participantDetails['countByName'][$dao->event_id][$dao->event_data] = $dao->participant_count;
+        }
+      }
+    }
+    return $participantDetails;
+  }
     
 }
