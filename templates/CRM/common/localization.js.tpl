@@ -73,7 +73,9 @@
 
   var params = {
     errorClass: 'crm-inline-error',
-    messages: {}
+    messages: {},
+    // TODO: remove after resolution of https://github.com/jzaefferer/jquery-validation/pull/1261
+    ignore: ":hidden, [readonly]"
   };
 
   // use civicrm notifications when there are errors

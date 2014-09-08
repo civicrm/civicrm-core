@@ -146,7 +146,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     $this->type("sort_name", "$firstName $lastName");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom",FALSE);
 
     //View Contribution Record and verify data
     $expected = array(

@@ -29,7 +29,7 @@
  * A PHP cron script to run the outstanding and scheduled CiviMail jobs
  * initiated by Owen Barton from a mailing sent by Lobo to crm-mail
  *
- * The structure of the file is set to mimiic soap.php which is a stand-alone
+ * The structure of the file is set to mimic soap.php which is a stand-alone
  * script and hence does not have any UF issues. You should be able to run
  * this script using a web url or from the command line
  */

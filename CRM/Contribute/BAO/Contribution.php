@@ -2583,7 +2583,7 @@ WHERE  contribution_id = %1 ";
    * @static
    */
   static function recordFinancialAccounts(&$params, $financialTrxnValues = NULL) {
-    $skipRecords = $update = $return = FALSE;
+    $skipRecords = $update = $return = $isRelatedId = FALSE;
 
     $additionalParticipantId = array();
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -2604,6 +2604,10 @@ WHERE  contribution_id = %1 ";
       $entityTable = 'civicrm_contribution';
     }
 
+    if (CRM_Utils_Array::value('contribution_mode', $params) == 'membership') {
+      $isRelatedId = TRUE;
+    }
+    
     $entityID[] = $entityId;
     if (!empty($additionalParticipantId)) {
       $entityID += $additionalParticipantId;
@@ -2654,7 +2658,7 @@ WHERE  contribution_id = %1 ";
 
     // build line item array if its not set in $params
     if (empty($params['line_item']) || $additionalParticipantId) {
-      CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));
+      CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable), $isRelatedId);
     }
 
     if (CRM_Utils_Array::value('contribution_status_id', $params) != array_search('Failed', $contributionStatuses) &&
@@ -2718,9 +2722,15 @@ WHERE  contribution_id = %1 ";
         $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;
         $params['trxnParams']['trxn_id'] = $params['prevContribution']->trxn_id;
         $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
-        $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
-        $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
 
+
+        if (!(($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)
+          || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatuses))
+          && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatuses))) {
+          $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
+          $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
+        }
+                
         //if financial type is changed
         if (!empty($params['financial_type_id']) &&
           $params['contribution']->financial_type_id != $params['prevContribution']->financial_type_id) {

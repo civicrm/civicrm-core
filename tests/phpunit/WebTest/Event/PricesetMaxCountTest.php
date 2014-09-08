@@ -1049,7 +1049,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type('help_pre', 'This is test priceset.');
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', 'newPriceField');
   }
 
   /**
@@ -1058,6 +1058,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
   function _testAddPriceFields($fields) {
     $fieldCount = count($fields);
     $count = 1;
+    $this->click('newPriceField');
+    $this->waitForElementPresent('label');
     foreach ($fields as $label => $field) {
       $this->type('label', $label);
       $this->select('html_type', "value={$field['type']}");
@@ -1100,7 +1102,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       else {
         $this->click('_qf_Field_next-bottom');
       }
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->waitForText('crm-notification-container', "Price Field '$label' has been saved.");
 
       $count++;
     }

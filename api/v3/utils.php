@@ -48,7 +48,7 @@ function _civicrm_api3_initialize() {
 /**
  * Wrapper Function for civicrm_verify_mandatory to make it simple to pass either / or fields for checking
  *
- * @param array $params array of fields to checkl
+ * @param array $params array of fields to check
  * @param array $daoName string DAO to check for required fields (create functions only)
  * @param array $keyoptions list of required fields options. One of the options is required
  *
