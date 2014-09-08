@@ -350,9 +350,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
       //month 
       if($scheduleReminderDetails['repetition_frequency_unit'] == 'month'){
-        if($scheduleReminderDetails['limit_to']){
-          $r->bymonthday(array($scheduleReminderDetails['limit_to']));
-        }
         if($scheduleReminderDetails['start_action_date']){
           $startActionDate = explode(" ", $scheduleReminderDetails['start_action_date']);
           switch ($startActionDate[0]) {
@@ -374,6 +371,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           }
           $concatStartActionDateBits = $startActionDate1.strtoupper(substr($startActionDate[1], 0, 2));
           $r->byday(array($concatStartActionDateBits));
+        }else if($scheduleReminderDetails['limit_to']){
+          $r->bymonthday(array($scheduleReminderDetails['limit_to']));
         }
       }
 
