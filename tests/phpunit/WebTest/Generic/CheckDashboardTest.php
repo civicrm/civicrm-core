@@ -94,7 +94,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(5);
-    $this->click("xpath=//*[@class='ui-button-text'][contains(text(), 'close')]");
+    $this->click("xpath=//button[@title='Close']");
   }
 
   /**
@@ -145,11 +145,11 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     // If CiviCase enabled, click 'more' link for context menu pop-up in the widget selector
     if ($this->isElementPresent("//table[@id='contact-activity-selector-dashlet']/tbody/tr[1]/td[8]/span[text()='more ']")) {
       // click 'Delete Activity' link
-      $this->click("//table[@id='contact-activity-selector-dashlet']/tbody/tr[1]/td[8]/span[text()='more ']/ul/li[2]/a[text()='Delete']");
+      $this->click("//table[@class='contact-activity-selector-dashlet dataTable no-footer']/tbody/tr[1]/td[8]/span[text()='more ']/ul/li[2]/a[text()='Delete']");
     }
     else {
       // click 'Delete Activity' link
-      $this->click("//table[@id='contact-activity-selector-dashlet']/tbody/tr[1]/td[8]/span//a[text()='Delete']");
+      $this->click("//table[@class='contact-activity-selector-dashlet dataTable no-footer']/tbody/tr[1]/td[8]/span//a[text()='Delete']");
     }
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Activity_next-bottom");

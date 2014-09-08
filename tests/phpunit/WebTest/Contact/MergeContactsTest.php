@@ -81,7 +81,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $tag = 'Government Entity';
     $this->click("css=li#tab_tag a");
     $this->waitForElementPresent('tagtree');
-    $this->click("xpath=//div[@id='tagtree']/ul//li/input/../label[text()='$tag']");
+    $this->click("xpath=//div[@id='tagtree']/ul//li/input/../span/label[text()='$tag']");
     $this->click("css=#tab_summary a");
     $this->assertElementContainsText('css=.crm-summary-block #tags', $tag);
 
@@ -158,7 +158,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     // Ensure that the duplicate contact has been deleted
     $this->openCiviPage("contact/search/advanced", "reset=1", '_qf_Advanced_refresh');
     $this->type('sort_name', $firstName);
-    $this->check('deleted_contacts');
+    $this->click('deleted_contacts');
     $this->click('_qf_Advanced_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent('1 Contact'), "Deletion of duplicate contact during merge was not successful. Dupe contact not found when searching trash.");
@@ -399,11 +399,11 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($this->isTextPresent('Contacts Merged'));
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[2]/div[1][contains(text(), 'Home')]"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[2]/div[2]/a[text() = '{$firstName}.{$lastName}@example.com']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[2]/div[2]/a[contains(text(), '{$firstName}.{$lastName}@example.com')]"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[3]/div[1][contains(text(), 'Home')]"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[3]/div[2]/a[text() ='{$firstName}.{$lastName}@example.com']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[3]/div[2]/a[contains(text(), '{$firstName}.{$lastName}@example.com')]"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[4]/div[1][contains(text(), 'Billing')]"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[4]/div[2]/a[text() ='$firstName.$lastName@billing.com']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[4]/div[2]/a[contains(text(), '$firstName.$lastName@billing.com')]"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='phone-block']/div/div/div[2]/div[1][contains(text(), 'Home')]"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='phone-block']/div/div/div[2]/div[2][contains(text(), '9876543211')]"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='phone-block']/div/div/div[3]/div[1][contains(text(), 'Home')]"));
@@ -470,8 +470,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Select the contacts to be merged
     $this->select("name=option51_length", "value=100");
-    $this->waitForElementPresent("xpath=//*[@id='DedupeFind']//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='57e10a6 9a3de85']/../../td[2]/a[text()='57e10a6 9a3de85']");
-    $this->click("xpath=//*[@id='DedupeFind']//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']/../../td[4]/a[text()='merge']");
+    $this->waitForElementPresent("xpath=//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']");
+    $this->click("xpath=//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
     $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[4]/td[4]/span[text()='(overwrite)']");
     $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(add)']");
@@ -490,9 +490,9 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($this->isTextPresent('Contacts Merged'));
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[2]/div[1][contains(text(), 'Home')]"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[2]/div[2]/a[text() ='{$firstName1}.{$lastName1}@example.com']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[2]/div[2]/a[contains(text(), '{$firstName1}.{$lastName1}@example.com')]"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[3]/div[1][contains(text(), 'Main')]"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[3]/div[2]/a[text() ='{$firstName1}.{$lastName1}@example.com']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[3]/div[2]/a[contains(text(), '{$firstName1}.{$lastName1}@example.com')]"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='phone-block']/div/div/div[2]/div[1][contains(text(), 'Billing')]"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='phone-block']/div/div/div[2]/div[2][contains(text(), '9876543120')]"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='phone-block']/div/div/div[3]/div[1][contains(text(), 'Home')]"));
@@ -845,7 +845,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     //check the status message
     $this->waitForText('crm-notification-container', "Relationship created.");
 
-    $this->waitForElementPresent("xpath=//table[@id='crm-contact-relationship-selector-current']/tbody//tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='crm-contact-relationship-selector-current dataTable no-footer']/tbody//tr/td[9]/span/a[text()='View']");
     $this->waitForElementPresent("xpath=//a[text()='$sortName']");
     $this->click("xpath=//a[text()='$sortName']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -894,7 +894,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     //check the status message
     $this->isTextPresent("Relationship created.");
 
-    $this->waitForElementPresent("xpath=//table[@id='crm-contact-relationship-selector-current']/tbody//tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='crm-contact-relationship-selector-current dataTable no-footer']/tbody//tr/td[9]/span/a[text()='View']");
 
     // go directly to contact merge page.
     $this->openCiviPage("contact/merge", "reset=1&cid={$contactIds['mainId']}&oid={$contactIds['duplicateId']}&action=update&rgid=2");
