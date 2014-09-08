@@ -436,7 +436,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param int $membershipId membership id
    * @param int $contactId contact id
    *
-   * @param const $action
+   * @param integer $action
    *
    * @return Array    array of contact_id of all related contacts.
    * @static

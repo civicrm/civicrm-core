@@ -1593,7 +1593,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param $value
    * @param $valueArray
    *
-   * @return ture if value present in array or retun false
+   * @return bool
    *
    * @access public
    */

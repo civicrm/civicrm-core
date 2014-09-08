@@ -42,7 +42,7 @@ function civicrm_api3_setting_getfields($params) {
         'title' => 'name of setting field',
         'api.required' => 1,
         'type' => CRM_Utils_Type::T_STRING),
-      'group' => array('title' => 'name of setting field',
+      'group' => array(
         'api.required' => 0,
         'title' => 'Setting Group',
         'description' => 'Settings Group. This is required if the setting is not stored in config',
@@ -241,7 +241,7 @@ function _civicrm_api3_setting_create_spec(&$params) {
 function civicrm_api3_setting_get($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result =   $result = CRM_Core_BAO_Setting::getItems($params, $domains, CRM_Utils_Array::value('return', $params, array()));
-  return civicrm_api3_create_success($result,$params,'setting','get');
+  return civicrm_api3_create_success($result, $params,'setting','get');
 }
 /**
  * Metadata for setting create function
