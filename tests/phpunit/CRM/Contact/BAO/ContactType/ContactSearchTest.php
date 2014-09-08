@@ -11,7 +11,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
    */
   function get_info() {
     return array(
-      'name' => 'Contact Serach Subtype',
+      'name' => 'Contact Search Subtype',
       'description' => 'Test Contact for subtype.',
       'group' => 'CiviCRM BAO Tests',
     );

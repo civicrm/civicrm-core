@@ -76,7 +76,7 @@ function _civicrm_api3_location_type_create_spec(&$params) {
  *
  * @example LocationTypeDelete.php Standard Delete Example
  *
- * @return boolean | error  true if successfull, error otherwise
+ * @return array API result array
  * {@getfields LocationType_delete}
  * @access public
  */

@@ -130,9 +130,7 @@ function civicrm_api3_file_update($params) {
  *
  * @param $params
  *
- * @internal param Int $fileId Id of the file to be deleted
- *
- * @return null if successfull, object of CRM_Core_Error otherwise
+ * @return array API result array
  * @access public
  */
 function civicrm_api3_file_delete($params) {
