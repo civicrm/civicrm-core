@@ -299,7 +299,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('link=Add Membership Type');
     $this->waitForText('crm-notification-container', "Membership Type $title");
 
-    // creating another Orgnization
+    // creating another Organization
     $this->openCiviPage('contact/add', 'reset=1&ct=Organization', '_qf_Contact_cancel');
     $org1 = substr(sha1(rand()), 0, 7);
     $this->type('organization_name', "Organization $org1");

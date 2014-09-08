@@ -110,7 +110,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
     'FKClassName' => 'CRM_Contact_DAO_Contact',
   );
   // note this is a recommended option but not adding as a default to avoid
-  // creating unecessary changes for the dev
+  // creating unnecessary changes for the dev
   $params['skipRecentView'] = array(
     'name' => 'skipRecentView',
     'title' => 'Skip adding to recent view',

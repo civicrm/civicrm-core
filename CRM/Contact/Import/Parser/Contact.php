@@ -1593,7 +1593,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param $value
    * @param $valueArray
    *
-   * @return ture if value present in array or retun false
+   * @return bool
    *
    * @access public
    */
@@ -1690,7 +1690,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * format params for update and fill mode
    *
-   * @param $params       array  referance to an array containg all the
+   * @param $params       array  reference to an array containing all the
    * values for import
    * @param $onDuplicate  int
    * @param $cid          int    contact id

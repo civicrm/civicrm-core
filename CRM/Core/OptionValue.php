@@ -376,7 +376,7 @@ class CRM_Core_OptionValue {
    *
    * @param  array     $groupParams   Array containing group fields
    *                                  whose option-values is to retrieved.
-   * @param  array     $values        (referance) to the array which
+   * @param  array     $values        (reference) to the array which
    *                                  will have the values for the group
    * @param  string    $orderBy       for orderBy clause
    *

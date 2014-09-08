@@ -64,11 +64,11 @@ function _civicrm_api3_contribution_recur_create_spec(&$params) {
 /**
  * Returns array of contribution_recurs  matching a set of one or more group properties
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params  Array of one or more valid
  *                       property_name=>value pairs. If $params is set
  *                       as null, all contribution_recurs will be returned
  *
- * @return array  (referance) Array of matching contribution_recurs
+ * @return array  API result Array of matching contribution_recurs
  * {@getfields contribution_recur_get}
  * @access public
  */
@@ -95,10 +95,10 @@ function civicrm_api3_contribution_recur_cancel($params) {
  * This method is used to delete any existing contribution_recur. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params  (reference) array containing id of the group
+ * @param array $params array containing id of the group
  *                       to be deleted
  *
- * @return array  (referance) returns flag true if successfull, error
+ * @return array API result array
  *                message otherwise
  * {@getfields contribution_recur_delete}
  * @access public
