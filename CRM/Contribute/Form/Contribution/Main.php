@@ -893,7 +893,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
             if (!empty($value['options'])) {
               foreach ($value['options'] as $val) {
-                if (!empty($val['membership_type_id'])) {
+                if (!empty($val['membership_type_id']) && (
+                    ($fields['price_' . $priceId] == $val['id']) ||
+                    (isset($fields['price_' . $priceId]) && !empty($fields['price_' . $priceId][$val['id']]))
+                  )
+                ) {
                   $priceFieldMemTypes[] = $val['membership_type_id'];
                 }
               }
