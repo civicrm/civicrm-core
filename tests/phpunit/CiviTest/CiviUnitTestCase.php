@@ -2806,9 +2806,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Set up an acl allowing contact to see 2 specified groups
-   *  - $this->_permissionedGroup & $this->_permissionedDisbaledGroup
+   *  - $this->_permissionedGroup & $this->_permissionedDisabledGroup
    *
-   *  You need to have precreated these groups & created the user e.g
+   *  You need to have pre-created these groups & created the user e.g
    *  $this->createLoggedInUser();
    *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
    *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));

@@ -231,7 +231,7 @@ function _civicrm_api3_setting_create_spec(&$params) {
 /**
  * Returns array of settings matching input parameters
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params Array of one or more valid
  *                       property_name=>value pairs.
  *
  * @return array Array of matching settings

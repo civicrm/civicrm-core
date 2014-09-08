@@ -1494,7 +1494,7 @@ AND civicrm_membership.is_test = %2";
    * then status will be updated based on existing start and end
    * dates and log will be added for the status change.
    *
-   * @param  array  $currentMembership   referance to the array
+   * @param  array  $currentMembership   reference to the array
    *                                     containing all values of
    *                                     the current membership
    * @param  array  $changeToday         array of month, day, year
@@ -2844,7 +2844,7 @@ WHERE      civicrm_membership.is_test = 0";
 
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams, $ids);
 
-    //CRM-13981, create new soft-credit record as to record payment from differnt person for this membership
+    //CRM-13981, create new soft-credit record as to record payment from different person for this membership
     if (!empty($contributionSoftParams)) {
       $contributionSoftParams['contribution_id'] = $contribution->id;
       $contributionSoftParams['currency'] = $contribution->currency;

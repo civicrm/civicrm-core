@@ -60,13 +60,13 @@ function _civicrm_api3_mail_settings_create_spec(&$params) {
 }
 
 /**
- * Returns array of mail_settingss  matching a set of one or more group properties
+ * Returns array of mail_settings  matching a set of one or more group properties
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params  Array of one or more valid
  *                       property_name=>value pairs. If $params is set
- *                       as null, all mail_settingss will be returned
+ *                       as null, all mail_settings will be returned
  *
- * @return array  (referance) Array of matching mail_settingss
+ * @return array Array of matching mail_settings
  * {@getfields mail_settings_get}
  * @access public
  */
