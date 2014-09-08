@@ -151,6 +151,13 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
           }
           break;
 
+        case 'multiselect2':
+          foreach ($field['values'] as $op) {
+            $this->waitForVisible($fldLocator);
+            $this->multiselect2($fldLocator, $op);
+          }
+          break;
+
         case 'date':
           $this->webtestFillDate($fldLocator, current($field['values']));
           break;
@@ -177,8 +184,9 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
           array(
             'Location Type' =>
             array(
-              'type' => 'checkbox',
-              'values' => array('location_type[1]', 'location_type[2]'),
+              'type' => 'multiselect2',
+              'locator' => 'location_type',
+              'values' => array(array('Home', 'Work')),
             ),
             'Country' =>
             array(
@@ -188,9 +196,9 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
             ),
             'State' =>
             array(
-              'type' => 'select',
+              'type' => 'multiselect2',
               'locator' => 'state_province',
-              'values' => array('Alabama', 'California', 'New Jersey', 'New York'),
+              'values' => array(array('Alabama', 'California', 'New Jersey', 'New York')),
             ),
           ),
         ),

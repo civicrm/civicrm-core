@@ -69,7 +69,7 @@ function _civicrm_api3_tag_create_spec(&$params) {
  *
  * @example TagDelete.ph
  *
- * @return boolean | error  true if successfull, error otherwise
+ * @return array API result array
  * {@getfields tag_delete}
  * @access public
  */

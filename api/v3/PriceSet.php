@@ -107,7 +107,7 @@ function civicrm_api3_price_set_get($params) {
  * @param array $params array containing id of the group
  *  to be deleted
  *
- * @return array  returns flag true if successfull, error message otherwise
+ * @return array API result array
  * {@getfields price_set_delete}
  * @access public
  */

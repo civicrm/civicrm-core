@@ -130,7 +130,7 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * @param $page
+   * @param CRM_Core_Form $page
    * @param $actionName
    *
    * @return mixed

@@ -707,7 +707,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       );
       // modify options full to respect the selected fields
       // options on confirmation.
-      $formattedPriceSetDefaults = self::formatPriceSetParams($form, $pricesetDefaultOptions);
+      $formattedPriceSetDefaults = self::formatPriceSetParams($form, $pricesetDefaults);
 
       // to skip current registered participants fields option count on confirmation.
       $skipParticipants[] = $form->_participantId;
@@ -759,7 +759,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           $form->_allowConfirmation &&
           !empty($formattedPriceSetDefaults)
         ) {
-          if (empty($formattedPriceSetDefaults["price_{$field}"]) || empty($formattedPriceSetDefaults["price_{$fieldId}"][$opId])) {
+          if (empty($formattedPriceSetDefaults["price_{$field}"]) || empty($formattedPriceSetDefaults["price_{$fieldId}"][$optId])) {
             $optionFullIds[$optId] = $optId;
             $isFull = TRUE;
           }
@@ -867,7 +867,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $errors['payment_processor'] = ts('Please select a Payment Method');
       }
       if (is_array($self->_paymentProcessor)) {
-        $payment = CRM_Core_Payment::singleton($self->_mode, $self->_paymentProcessor, $this);
+        $payment = CRM_Core_Payment::singleton($self->_mode, $self->_paymentProcessor);
         $error = $payment->checkConfig($self->_mode);
         if ($error) {
           $errors['_qf_default'] = $error;
@@ -926,7 +926,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
         $customizedValue = CRM_Core_OptionGroup::getValue($greeting, 'Customized', 'name');
         if ($customizedValue == $greetingType && empty($fields[$greeting . '_custom'])) {
-          $errors[$customizedGreeting] = ts('Custom %1 is a required field if %1 is of type Customized.',
+          $errors[$greeting . '_custom'] = ts('Custom %1 is a required field if %1 is of type Customized.',
             array(1 => ucwords(str_replace('_', ' ', $greeting)))
           );
         }

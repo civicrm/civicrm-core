@@ -47,7 +47,7 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
     $this->click('CIVICRM_QFID_ts_all_8');
 
     $this->select('task', "label=Add Contacts to Event");
-    $this->click('Go');
+
 
     // Select event. Based on label for now.
     $this->waitForElementPresent('event_id');

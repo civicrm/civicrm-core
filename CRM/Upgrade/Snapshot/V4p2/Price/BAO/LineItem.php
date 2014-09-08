@@ -171,10 +171,10 @@ WHERE     %2.id = %1";
    * processAmount method
    *
    * @param  int   $fid       price set field id
-   * @param  array $params    referance to form values
-   * @param  array $fields    referance to array of fields belonging
+   * @param  array $params    reference to form values
+   * @param  array $fields    reference to array of fields belonging
    *                          to the price set used for particular event
-   * @param  array $values    referance to the values array(
+   * @param  array $values    reference to the values array(
      this is
    *                          lineItem array)
    *
@@ -205,7 +205,7 @@ WHERE     %2.id = %1";
     foreach ($params["price_{$fid}"] as $oid => $qty) {
       $price = $options[$oid]['amount'];
 
-      // lets clean the price in case it is not yet cleant
+      // lets clean the price in case it is not yet cleaned
       // CRM-10974
       $price = CRM_Utils_Rule::cleanMoney($price);
 

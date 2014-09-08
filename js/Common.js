@@ -775,9 +775,10 @@ CRM.strings = CRM.strings || {};
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
   CRM.confirm = function (options) {
-    var dialog, settings = {
+    var dialog, url, msg, settings = {
       title: ts('Confirm'),
       message: ts('Are you sure you want to continue?'),
+      url: null,
       width: 'auto',
       modal: true,
       resizable: false,
@@ -796,6 +797,7 @@ CRM.strings = CRM.strings || {};
       $.each(settings.options, function(key, label) {
         settings.buttons.push({
           text: label,
+          icons: {primary: key === 'no' ? 'ui-icon-close' : 'ui-icon-check'},
           click: function() {
             var event = $.Event('crmConfirm:' + key);
             $(this).trigger(event);
@@ -806,13 +808,22 @@ CRM.strings = CRM.strings || {};
         });
       });
     }
-    dialog = $('<div class="crm-confirm-dialog"></div>').html(settings.message);
+    url = settings.url;
+    msg = settings.message;
     delete settings.options;
     delete settings.message;
+    delete settings.url;
+    dialog = $('<div class="crm-confirm-dialog"></div>').dialog(settings);
     if ($.isFunction(options)) {
       dialog.on('crmConfirm:yes', options);
     }
-    return dialog.dialog(settings).trigger('crmLoad');
+    if (url) {
+      CRM.loadPage(url, {target: dialog});
+    }
+    else if (msg && msg.length) {
+      dialog.html(msg).trigger('crmLoad');
+    }
+    return dialog;
   };
 
   /** provides a local copy of ts for a domain */
@@ -897,6 +908,25 @@ CRM.strings = CRM.strings || {};
     });
   }
 
+  var originalBlock = $.fn.block,
+    originalUnblock = $.fn.unblock;
+
+  $.fn.block = function(opts) {
+    if ($(this).is('.ui-dialog-content')) {
+      originalBlock.call($(this).parents('.ui-dialog'), opts);
+      return $(this);
+    }
+    return originalBlock.call(this, opts);
+  }
+
+  $.fn.unblock = function(opts) {
+    if ($(this).is('.ui-dialog-content')) {
+      originalUnblock.call($(this).parents('.ui-dialog'), opts);
+      return $(this);
+    }
+    return originalUnblock.call(this, opts);
+  }
+
   // Preprocess all cj ajax calls to display messages
   $(document).ajaxSuccess(function(event, xhr, settings) {
     try {
@@ -915,6 +945,7 @@ CRM.strings = CRM.strings || {};
 
   $(function () {
     $.blockUI.defaults.message = null;
+    $.blockUI.defaults.ignoreIfBlocked = true;
 
     if ($('#crm-container').hasClass('crm-public')) {
       $.fn.select2.defaults.dropdownCssClass = $.ui.dialog.prototype.options.dialogClass = 'crm-container crm-public';

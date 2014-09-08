@@ -317,22 +317,30 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       );
     }
 
+    $params['skipLineItem'] = TRUE;
+
     //record contribution for this membership
     if (!empty($params['contribution_status_id']) && empty($params['relate_contribution_id'])) {
       $memInfo = array_merge($params, array('membership_id' => $membership->id));
       $params['contribution'] = self::recordMembershipContribution($memInfo, $ids);
     }
 
+    if (!empty($params['lineItems'])) {
+      $params['line_item'] = $params['lineItems'];
+    }
+
+    //do cleanup line  items if membership edit the Membership type.
+    if (empty($ids['contribution']) && !empty($ids['membership'])) {
+      CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
+    }
+
+    if (!empty($params['line_item']) && empty($ids['contribution'])) {
+      CRM_Price_BAO_LineItem::processPriceSet($membership->id, $params['line_item'], CRM_Utils_Array::value('contribution', $params));
+    }
+
     //insert payment record for this membership
     if (!empty($params['relate_contribution_id'])) {
-      $mpDAO = new CRM_Member_DAO_MembershipPayment();
-      $mpDAO->membership_id = $membership->id;
-      $mpDAO->contribution_id = $params['relate_contribution_id'];
-      if (!($mpDAO->find(TRUE))) {
-        CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $mpDAO);
-        $mpDAO->save();
-        CRM_Utils_Hook::post('create', 'MembershipPayment', $mpDAO->id, $mpDAO);
-      }
+      CRM_Member_BAO_MembershipPayment::create(array('membership_id' => $membership->id, 'contribution_id' => $params['relate_contribution_id']));
     }
 
     // add activity record only during create mode and renew mode
@@ -428,7 +436,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param int $membershipId membership id
    * @param int $contactId contact id
    *
-   * @param const $action
+   * @param integer $action
    *
    * @return Array    array of contact_id of all related contacts.
    * @static
@@ -1247,10 +1255,10 @@ AND civicrm_membership.is_test = %2";
    *
    * @param array $membershipDetails
    *
-   * @param array $membershipTypeID
+   * @param array $membershipTypeIDs
    *
    * @param bool $isPaidMembership
-   * @param integer $membershipID
+   * @param array $membershipID
    *
    * @param $isProcessSeparateMembershipTransaction
    *
@@ -1262,7 +1270,7 @@ AND civicrm_membership.is_test = %2";
    * @access public
    */
   public static function postProcessMembership($membershipParams, $contactID, &$form, $premiumParams,
-    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID, $isPaidMembership, $membershipID,
+    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
     $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems) {
     $result      = $membershipContribution = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
@@ -1307,9 +1315,9 @@ AND civicrm_membership.is_test = %2";
       $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
     }
     //@todo it should no longer be possible for it to get to this point & membership to not be an array
-    if (is_array($membershipTypeID)) {
+    if (is_array($membershipTypeIDs)) {
       $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
-      foreach ($membershipTypeID as $memType) {
+      foreach ($membershipTypeIDs as $memType) {
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
         $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $form);
       }
@@ -1319,8 +1327,8 @@ AND civicrm_membership.is_test = %2";
             isset($createdMemberships[$priceFieldOp['membership_type_id']])
           ) {
             $membershipOb = $createdMemberships[$priceFieldOp['membership_type_id']];
-            $priceFieldOp['start_date'] = $membershipOb->start_date ? CRM_Utils_Date::customFormat($membershipOb->start_date, '%d%f %b, %Y') : '-';
-            $priceFieldOp['end_date'] = $membershipOb->end_date ? CRM_Utils_Date::customFormat($membershipOb->end_date, '%d%f %b, %Y') : '-';
+            $priceFieldOp['start_date'] = $membershipOb->start_date ? CRM_Utils_Date::customFormat($membershipOb->start_date, '%B %E%f, %Y') : '-';
+            $priceFieldOp['end_date'] = $membershipOb->end_date ? CRM_Utils_Date::customFormat($membershipOb->end_date, '%B %E%f, %Y') : '-';
           }
           else {
             $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
@@ -1486,7 +1494,7 @@ AND civicrm_membership.is_test = %2";
    * then status will be updated based on existing start and end
    * dates and log will be added for the status change.
    *
-   * @param  array  $currentMembership   referance to the array
+   * @param  array  $currentMembership   reference to the array
    *                                     containing all values of
    *                                     the current membership
    * @param  array  $changeToday         array of month, day, year
@@ -2088,11 +2096,16 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @param $contactID
    * @param CRM_Contribute_Form_Contribution_Confirm $form
-   * @param $membershipDetails
    * @param $tempParams
    * @param $isTest
    *
+   * @param $lineItems
+   * @param $minimumFee
+   * @param $financialTypeID
+   *
    * @throws CRM_Core_Exception
+   * @throws Exception
+   * @internal param $membershipDetails
    * @return CRM_Contribute_BAO_Contribution
    */
   public static function processSecondaryFinancialTransaction($contactID, &$form, $tempParams, $isTest, $lineItems, $minimumFee, $financialTypeID) {
@@ -2132,6 +2145,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
       $form->set('membership_trx_id', $result['trxn_id']);
       $form->set('membership_amount', $minimumFee);
+
+      $form->assign('membership_trx_id', $result['trxn_id']);
+      $form->assign('membership_amount', $minimumFee);
 
       // we don't need to create the user twice, so lets disable cms_create_account
       // irrespective of the value, CRM-2888
@@ -2804,7 +2820,7 @@ WHERE      civicrm_membership.is_test = 0";
       'contact_id', 'total_amount', 'receive_date', 'financial_type_id',
       'payment_instrument_id', 'trxn_id', 'invoice_id', 'is_test',
       'contribution_status_id', 'check_number', 'campaign_id', 'is_pay_later',
-      'membership_id',
+      'membership_id', 'skipLineItem'
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);
@@ -2828,7 +2844,7 @@ WHERE      civicrm_membership.is_test = 0";
 
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams, $ids);
 
-    //CRM-13981, create new soft-credit record as to record payment from differnt person for this membership
+    //CRM-13981, create new soft-credit record as to record payment from different person for this membership
     if (!empty($contributionSoftParams)) {
       $contributionSoftParams['contribution_id'] = $contribution->id;
       $contributionSoftParams['currency'] = $contribution->currency;
@@ -2842,16 +2858,7 @@ WHERE      civicrm_membership.is_test = 0";
 
     //insert payment record for this membership
     if (empty($ids['contribution']) || !empty($params['is_recur'])) {
-      $mpDAO = new CRM_Member_DAO_MembershipPayment();
-      $mpDAO->membership_id = $membershipId;
-      $mpDAO->contribution_id = $contribution->id;
-      if (!empty($params['is_recur'])) {
-        $mpDAO->find();
-      }
-
-      CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $mpDAO);
-      $mpDAO->save();
-      CRM_Utils_Hook::post('create', 'MembershipPayment', $mpDAO->id, $mpDAO);
+      CRM_Member_BAO_MembershipPayment::create(array('membership_id' => $membershipId, 'contribution_id' => $contribution->id));
     }
     return $contribution;
   }
