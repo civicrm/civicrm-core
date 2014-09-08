@@ -62,7 +62,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     else {
       CRM_Utils_Hook::pre('create', 'LineItem', $params['entity_id'], $params);
     }
-    
+
     // unset entity table and entity id in $params
     // we never update the entity table and entity id during update mode
     if ($id) {
@@ -221,10 +221,10 @@ AND li.entity_id = {$entityId}
    * processAmount method
    *
    * @param  int   $fid       price set field id
-   * @param  array $params    referance to form values
-   * @param  array $fields    referance to array of fields belonging
+   * @param  array $params    reference to form values
+   * @param  array $fields    reference to array of fields belonging
    *                          to the price set used for particular event
-   * @param  array $values    referance to the values array(
+   * @param  array $values    reference to the values array(
      this is
    *                          lineItem array)
    *
@@ -349,7 +349,7 @@ AND li.entity_id = {$entityId}
             $line['entity_id'] = $contributionDetails->id;
           }
         }
-        
+
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
         if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
@@ -436,7 +436,7 @@ AND li.entity_id = {$entityId}
       $totalAmount = CRM_Utils_Array::value('total_amount', $params);
       $financialType = CRM_Utils_Array::value('financial_type_id', $params);
       foreach ($priceSetDetails as $values) {
-        if ($entityTable == 'membership') { 
+        if ($entityTable == 'membership') {
           if ($isRelatedID != $values['membership_type_id']) {
             continue;
           }
