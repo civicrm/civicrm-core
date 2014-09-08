@@ -437,6 +437,7 @@ WHERE   cas.entity_value = $id AND
     if ($schedule->find(TRUE)) {
       $body_text    = $schedule->body_text;
       $body_html    = $schedule->body_html;
+      $sms_body_text = $schedule->sms_body_text;
       $body_subject = $schedule->subject;
       if (!$body_text) {
         $body_text = CRM_Utils_String::htmlToText($body_html);
@@ -461,12 +462,16 @@ WHERE   cas.entity_value = $id AND
       CRM_Utils_Hook::tokens($hookTokens);
       $categories = array_keys($hookTokens);
 
-      $type = array('html', 'text');
+      $type = array('body_html', 'body_text', 'sms_body_text');
 
-      foreach ($type as $key => $value) {
+      foreach ($type as $key => $bodyType) {
         $dummy_mail = new CRM_Mailing_BAO_Mailing();
-        $bodyType = "body_{$value}";
-        $dummy_mail->$bodyType = $$bodyType;
+        if ($bodyType == 'sms_body_text') {
+          $dummy_mail->body_text = $$bodyType;
+        }
+        else {
+          $dummy_mail->$$bodyType = $$bodyType;
+        }
         $tokens = $dummy_mail->getTokens();
 
         if ($$bodyType) {
@@ -479,10 +484,11 @@ WHERE   cas.entity_value = $id AND
       }
       $html = $body_html;
       $text = $body_text;
+      $sms_text = $sms_body_text;
 
       $smarty = CRM_Core_Smarty::singleton();
       foreach (array(
-          'text', 'html') as $elem) {
+          'text', 'html', 'sms_text') as $elem) {
         $$elem = $smarty->fetch("string:{$$elem}");
       }
 
@@ -521,20 +527,19 @@ WHERE   cas.entity_value = $id AND
           'SMS',
           'name'
         );
-        $details = $html ? $html : $text;
         $activityParams = array(
           'source_contact_id' => $userID,
           'activity_type_id' => $activityTypeID,
           'activity_date_time' => date('YmdHis'),
           'subject' => $messageSubject,
-          'details' => $details,
+          'details' => $sms_text,
           'status_id' => CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name'),
         );
 
         $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
         CRM_Activity_BAO_Activity::sendSMSMessage($contactId,
-          $text,
+          $sms_text,
           $html,
           $smsParams,
           $activity->id,

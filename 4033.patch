@@ -1,0 +1,32 @@
+From f4bdec6a7429a951686b33bf15fdbb2bcffb1afa Mon Sep 17 00:00:00 2001
+From: Tim Otten <totten@civicrm.org>
+Date: Tue, 2 Sep 2014 21:39:47 -0700
+Subject: [PATCH] CRM-14973 - CRM_Core_Menu::buildAdminLinks - Force backend
+ URLs
+
+----------------------------------------
+* CRM-14973: Administration console does not work in WordPress
+  https://issues.civicrm.org/jira/browse/CRM-14973
+---
+ CRM/Core/Menu.php | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/CRM/Core/Menu.php b/CRM/Core/Menu.php
+index a18006f..0cb7b29 100644
+--- a/CRM/Core/Menu.php
++++ b/CRM/Core/Menu.php
+@@ -285,7 +285,13 @@ static function buildAdminLinks(&$menu) {
+             ',' => '_', '/' => '_',
+           )
+         ),
+-        'url' => CRM_Utils_System::url($path, $query, FALSE),
++        'url' => CRM_Utils_System::url($path, $query, 
++            FALSE, // absolute
++            NULL, // fragment
++            TRUE, // htmlize
++            FALSE, // frontend
++            TRUE // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
++        ),
+         'icon' => CRM_Utils_Array::value('icon', $item),
+         'extra' => CRM_Utils_Array::value('extra', $item),
+       );

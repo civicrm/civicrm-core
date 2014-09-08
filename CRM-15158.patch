@@ -1,0 +1,30 @@
+diff --git a/CRM/Event/BAO/Participant.php b/CRM/Event/BAO/Participant.php
+index 000ba93..f33b33a 100644
+--- a/CRM/Event/BAO/Participant.php
++++ b/CRM/Event/BAO/Participant.php
+@@ -1984,6 +1984,9 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
+     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
+     $pendngRefundStatusId = array_search('Pending refund', $contributionStatuses);
++    $completedStatusId = array_search('Completed', $contributionStatuses);
++
++    $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
+ 
+     if ($balanceAmt) {
+       if ($balanceAmt > 0 && $paidAmount != 0) {
+@@ -1992,10 +1995,14 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
+       elseif ($balanceAmt < 0 && $paidAmount != 0) {
+         $contributionStatusVal = $pendngRefundStatusId;
+       }
++      elseif ($paidAmount == 0) {
++        $contributionStatusVal = $completedStatusId;
++        $updatedContributionDAO->cancel_date = 'null';
++        $updatedContributionDAO->cancel_reason = NULL;
++      }
+ 
+       // update contribution status and total amount without trigger financial code
+       // as this is handled in current BAO function used for change selection
+-      $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
+       $updatedContributionDAO->id = $contributionId;
+       $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
+       $updatedContributionDAO->total_amount = $updatedAmount;

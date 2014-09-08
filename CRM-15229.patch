@@ -1,0 +1,63 @@
+diff --git a/CRM/Contribute/Form/Contribution/Confirm.php b/CRM/Contribute/Form/Contribution/Confirm.php
+index 8728e80..8cb333b 100644
+--- a/CRM/Contribute/Form/Contribution/Confirm.php
++++ b/CRM/Contribute/Form/Contribution/Confirm.php
+@@ -1808,6 +1808,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
+       // contribution amount same as membership amount.
+       //@todo - merge with section above
+       if ($this->_membershipBlock['is_separate_payment']
++        && !empty($this->_values['fee'][$priceField->id])
+         && CRM_Utils_Array::value('name', $this->_values['fee'][$priceField->id]) == 'contribution_amount'
+         && CRM_Utils_Array::value("price_{$priceField->id}", $this->_params) == '-1'
+       ) {
+diff --git a/CRM/Member/BAO/Membership.php b/CRM/Member/BAO/Membership.php
+index 1b6331f..bba9658 100644
+--- a/CRM/Member/BAO/Membership.php
++++ b/CRM/Member/BAO/Membership.php
+@@ -316,15 +316,15 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
+         'membership_id'
+       );
+     }
+-    
++
+     $params['skipLineItem'] = TRUE;
+-    
++
+     //record contribution for this membership
+     if (!empty($params['contribution_status_id']) && empty($params['relate_contribution_id'])) {
+       $memInfo = array_merge($params, array('membership_id' => $membership->id));
+       $params['contribution'] = self::recordMembershipContribution($memInfo, $ids);
+     }
+-    
++
+     if (!empty($params['lineItems'])) {
+       $params['line_item'] = $params['lineItems'];
+     }
+@@ -333,7 +333,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
+     if (empty($ids['contribution']) && !empty($ids['membership'])) {
+       CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
+     }
+-    
++
+     if (!empty($params['line_item']) && empty($ids['contribution'])) {
+       CRM_Price_BAO_LineItem::processPriceSet($membership->id, $params['line_item'], CRM_Utils_Array::value('contribution', $params));
+     }
+@@ -1275,7 +1275,7 @@ AND civicrm_membership.is_test = %2";
+     $result      = $membershipContribution = NULL;
+     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
+     $errors = $createdMemberships = array();
+-        
++
+     if ($isPaidMembership) {
+       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
+         $premiumParams, $contactID,
+@@ -2146,6 +2146,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND
+       $form->set('membership_trx_id', $result['trxn_id']);
+       $form->set('membership_amount', $minimumFee);
+ 
++      $form->assign('membership_trx_id', $result['trxn_id']);
++      $form->assign('membership_amount', $minimumFee);
++
+       // we don't need to create the user twice, so lets disable cms_create_account
+       // irrespective of the value, CRM-2888
+       $tempParams['cms_create_account'] = 0;

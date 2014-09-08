@@ -1,0 +1,24 @@
+From e08c4bd25c2d934ec25d5bec32ebe2f6d1b78674 Mon Sep 17 00:00:00 2001
+From: monishdeb <monish.deb@webaccessglobal.com>
+Date: Tue, 9 Sep 2014 14:02:58 +0530
+Subject: [PATCH] CRM-15250 fix - membership created and marked current when
+ transaction declined (authorize.net)
+
+https://issues.civicrm.org/jira/browse/CRM-15250
+---
+ CRM/Member/BAO/Membership.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CRM/Member/BAO/Membership.php b/CRM/Member/BAO/Membership.php
+index 3ce2457..3ba0997 100644
+--- a/CRM/Member/BAO/Membership.php
++++ b/CRM/Member/BAO/Membership.php
+@@ -1315,7 +1315,7 @@ public static function postProcessMembership($membershipParams, $contactID, &$fo
+       $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
+     }
+     //@todo it should no longer be possible for it to get to this point & membership to not be an array
+-    if (is_array($membershipTypeIDs)) {
++    if (is_array($membershipTypeIDs) && !empty($membershipContributionID)) {
+       $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
+       foreach ($membershipTypeIDs as $memType) {
+         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);

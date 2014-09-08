@@ -1,0 +1,44 @@
+From 81f8f858478aa4c0da05a9326685d6b40c572058 Mon Sep 17 00:00:00 2001
+From: Nileema <nileema@nileema.(none)>
+Date: Wed, 13 Aug 2014 15:32:29 +0530
+Subject: [PATCH] HR-405 CSS changes for icon overlay display
+
+---
+ css/civicrm.css | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/css/civicrm.css b/css/civicrm.css
+index e6e14e6..330a763 100644
+--- a/css/civicrm.css
++++ b/css/civicrm.css
+@@ -2996,8 +2996,10 @@ div a.helpicon:focus {
+ }
+ #crm-container .crm-tooltip table,
+ #crm-container .crm-tooltip table tr td {
++  background-color: #2f2f2e;
+   border: none;
+   color: #FFF;
++  word-wrap: break-word;
+ }
+ .crm-container .crm-tooltip .crm-summary-group {
+   width: 700px;
+@@ -3034,6 +3036,16 @@ div a.helpicon:focus {
+   margin-left: 41%;
+ }
+ 
++#crm-container .crm-tooltip table .crm-summary-col-1,
++.crm-container .crm-tooltip table .crm-summary-col-1 {
++  width: 350px;
++}
++
++#crm-container .crm-tooltip table .crm-summary-col-1 div,
++.crm-container .crm-tooltip table .crm-summary-col-1 div {
++  width: auto;
++}
++
+ /* Class for tokens and helpicon */
+ .crm-container .helpIcon {
+   float: right;
+-- 
+2.0.3
+

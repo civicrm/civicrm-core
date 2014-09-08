@@ -1,0 +1,13 @@
+diff --git a/CRM/Member/Form/Membership.php b/CRM/Member/Form/Membership.php
+index cfc3ee0..eee9323 100644
+--- a/CRM/Member/Form/Membership.php
++++ b/CRM/Member/Form/Membership.php
+@@ -1178,7 +1178,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
+       $$dateVariable = CRM_Utils_Date::processDate($formValues[$dateField]);
+     }
+ 
+-    $memTypeNumTerms = CRM_Utils_Array::value('num_terms', $formValues);
++    $memTypeNumTerms =  empty($termsByType) ? CRM_Utils_Array::value('num_terms', $formValues) : NULL;
+ 
+     $calcDates = array();
+     foreach ($this->_memTypeSelected as $memType) {
