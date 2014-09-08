@@ -36,7 +36,7 @@ class CRM_Core_Page_AJAX_RecurringEntity {
   }
   
   public static function generatePreview(){
-    $params = $formValues = $recurDates = array();
+    $params = $formValues = $genericResult = array();
     $formValues = $_REQUEST;
     if(!empty($formValues)){
       $dbParams = CRM_Core_BAO_RecurringEntity::mapFormValuesToDB($formValues);
@@ -44,17 +44,25 @@ class CRM_Core_Page_AJAX_RecurringEntity {
         $recursionObject = CRM_Core_BAO_RecurringEntity::getRecursionFromReminderByDBParams($dbParams);
         // Check if there were any errors
         if($recursionObject->errors){
-          $recurDates['errors'] = $recursionObject->errors;
+          $genericResult['errors'] = $recursionObject->errors;
         }else{
           if(CRM_Utils_Array::value('event_id', $formValues)){
             $parent_event_id = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['event_id'], 'civicrm_event');
             if(!$parent_event_id){
               $parent_event_id = $formValues['event_id'];
             }
+            //Show the list of participants registered for the events if any
+            $getConnectedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($parent_event_id, 'civicrm_event', FALSE);
+            if($getConnectedEntities){
+              $participantDetails = CRM_Core_BAO_RecurringEntity::getParticipantCountforEvent($getConnectedEntities);
+              if(!empty($participantDetails['countByName'])){
+                $genericResult['participantData'] = $participantDetails['countByName'];
+              }
+            }
             $startDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $parent_event_id, 'start_date');
             $endDate   = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $parent_event_id, 'end_date');
 
-            if ($endDate) {
+            if($endDate) {
               $params['interval'] = CRM_Core_BAO_RecurringEntity::getInterval($startDate, $endDate);
             }
             $params['start_action_offset'] = $formValues['start_action_offset'];
@@ -62,16 +70,16 @@ class CRM_Core_Page_AJAX_RecurringEntity {
           $recurResult = CRM_Core_BAO_RecurringEntity::generateRecursions($recursionObject, $params, $formValues['exclude_date_list']); 
           $count = 1;
           foreach ($recurResult as $key => $value) {
-            $recurDates[$count]['start_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['start_date']));
+            $genericResult[$count]['start_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['start_date']));
             if($value['end_date']){
-              $recurDates[$count]['end_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['end_date']));
+              $genericResult[$count]['end_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['end_date']));
             }
             $count++;
           }
         }
       }
     }
-    echo json_encode($recurDates);
+    echo json_encode($genericResult);
     CRM_Utils_System::civiExit();
   }
   
