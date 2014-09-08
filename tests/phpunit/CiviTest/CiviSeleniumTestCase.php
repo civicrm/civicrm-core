@@ -1474,10 +1474,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "Activity '$subject' has been saved.");
 
-    $this->waitForElementPresent("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
 
     // parse URL to grab the activity id
