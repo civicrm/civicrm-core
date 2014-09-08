@@ -70,16 +70,6 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
         'update_value' => substr(sha1(rand()), 0, 7),
         'element_name' => 'city-Primary',
       ),
-      'state_province' => array(
-        'type' => 'Contact',
-        'label' => 'State',
-        'location' => 0,
-        'default_value' => '1004',
-        'update_value' => '1031',
-        'update_value_label' => 'NY',
-        'element_name' => 'state_province-Primary',
-        'html_type' => 'select',
-      ),
       'country' => array(
         'type' => 'Contact',
         'label' => 'Country',
@@ -88,6 +78,16 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
         'update_value' => '1228',
         'update_value_label' => 'United States',
         'element_name' => 'country-Primary',
+        'html_type' => 'select',
+      ),
+      'state_province' => array(
+        'type' => 'Contact',
+        'label' => 'State',
+        'location' => 0,
+        'default_value' => '1004',
+        'update_value' => '1031',
+        'update_value_label' => 'NY',
+        'element_name' => 'state_province-Primary',
         'html_type' => 'select',
       ),
     );
@@ -120,6 +120,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     foreach ($fields as $field) {
       $this->assertTrue($this->isElementPresent($field['element_name']), "Missing Field: {$field['label']}.");
       if (isset($field['html_type']) && $field['html_type'] == 'select') {
+        $this->waitForVisible($field['element_name']);
         $this->select($field['element_name'], "value={$field['update_value']}");
       }
       else {
