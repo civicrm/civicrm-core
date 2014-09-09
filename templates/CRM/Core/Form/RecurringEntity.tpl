@@ -320,7 +320,6 @@
                 }
             }
             if(warningHtml != ""){
-                cj('button span.ui-button-text:contains("Ok")').hide();
                 cj('#generated_dates').append(warningHtml).append(html);
             }else{
                 cj('#generated_dates').html(html);

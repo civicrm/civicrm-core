@@ -432,7 +432,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   
   static public function generateRecursions($recursionObj, $params = array(), $excludeDates = array()) { 
     $newParams = $recursionResult = array();
-    if ($recursionObj && !empty($params)) { 
+    if (is_a($recursionObj, 'When')) { 
       $initialCount = CRM_Utils_Array::value('start_action_offset', $params);
       $interval     = CRM_Utils_Array::value('interval',    $params);
 
