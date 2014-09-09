@@ -799,6 +799,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
+    //let's do set defaults for the profile
+    $this->setDefaultsValues();
+
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, NULL);
     if ($this->_mode == self::MODE_CREATE) {
       CRM_Core_BAO_CMSUser::buildForm($this, $this->_gid, $emailPresent, $action);
