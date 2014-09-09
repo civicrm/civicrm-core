@@ -1359,9 +1359,14 @@ AND civicrm_membership.is_test = %2";
     }
     if(count($createdMemberships) == 1) {
       //presumably this is only relevant for exactly 1 membership
-      $form->_params['membershipID'] = $form->_values['membership_id'] = $createdMembership->id;
+      $form->_params['membershipID'] = $createdMembership->id;
     }
 
+    //CRM-15232: Check if membership is created and on the basis of it use
+    //membership reciept template to send payment reciept
+    if (count($createdMemberships)) {
+      $form->_values['isMembership'] = TRUE;
+    }
     if ($form->_contributeMode == 'notify') {
       if ($form->_values['is_monetary'] && $form->_amount > 0.0 && !$form->_params['is_pay_later']) {
         // call postProcess hook before leaving
