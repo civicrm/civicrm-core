@@ -4249,6 +4249,7 @@ span.crm-status-icon {
   padding: 5px;
   border-radius: 3px;
   vertical-align: middle;
+  max-width: 100%;
 }
 
 #crm-container.crm-public .label {
