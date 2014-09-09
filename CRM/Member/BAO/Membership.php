@@ -1315,7 +1315,7 @@ AND civicrm_membership.is_test = %2";
       $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
     }
     //@todo it should no longer be possible for it to get to this point & membership to not be an array
-    if (is_array($membershipTypeIDs)) {
+    if (is_array($membershipTypeIDs) && !empty($membershipContributionID)) {
       $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
       foreach ($membershipTypeIDs as $memType) {
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
