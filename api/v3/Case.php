@@ -338,8 +338,9 @@ function civicrm_api3_case_update($params) {
   $case = array();
 
   _civicrm_api3_object_to_array($dao, $case);
+  $values[$dao->id] = $case;
 
-  return civicrm_api3_create_success($case, $params, 'case', 'update', $dao);
+  return civicrm_api3_create_success($values, $params, 'case', 'update', $dao);
 }
 
 /**
