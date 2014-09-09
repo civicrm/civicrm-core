@@ -88,10 +88,10 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
   function testLinkCases() {
     $this->webtestLogin();
-	
-	// Enable CiviCase module if necessary
+
+    // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
-    
+
     //Add Case 1
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
@@ -420,7 +420,6 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$textFieldLabel' has been saved.");
-    //$this->waitForElementPresent("xpath=//div[@id='field_page']//div//table/tbody//tr/td/span[text()='$textFieldLabel']");
     $textFieldId = explode('&id=', $this->getAttribute("xpath=//table[@id='options']/tbody//tr/td[1]/span[text()='$textFieldLabel']/../../td[8]/span/a[1][text()='Edit Field']/@href"));
     $textFieldId = $textFieldId[1];
 
