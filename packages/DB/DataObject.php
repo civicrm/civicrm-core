@@ -4150,7 +4150,7 @@ class DB_DataObject extends DB_DataObject_Overload
      * @access  public
      * @return  none
      */
-    function debugLevel($v = null)
+    public static function debugLevel($v = null)
     {
         global $_DB_DATAOBJECT;
         if (empty($_DB_DATAOBJECT['CONFIG'])) {
@@ -4230,7 +4230,7 @@ class DB_DataObject extends DB_DataObject_Overload
      * @access   public
      * @return   object an error object
      */
-    function _loadConfig()
+    public static function _loadConfig()
     {
         global $_DB_DATAOBJECT;
 
