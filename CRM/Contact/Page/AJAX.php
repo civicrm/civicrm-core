@@ -36,6 +36,15 @@
  * This class contains all contact related functions that are called using AJAX (jQuery)
  */
 class CRM_Contact_Page_AJAX {
+  /**
+   * When a user chooses a username, CHECK_USERNAME_TTL
+   * is the time window in which they can check usernames
+   * (without reloading the overall form).
+   */
+  const CHECK_USERNAME_TTL = 10800; // 3hr; 3*60*60
+
+  const AUTOCOMPLETE_TTL = 21600; // 6hr; 6*60*60
+
   static function getContactList() {
     // if context is 'customfield'
     if (CRM_Utils_Array::value('context', $_GET) == 'customfield') {
@@ -253,6 +262,13 @@ class CRM_Contact_Page_AJAX {
    * Function to fetch the values
    */
   static function autocomplete() {
+    $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('cfid', 'ogid', 'sigts'));
+    if (CRM_Utils_Time::getTimeRaw() > $_REQUEST['sigts'] + self::AUTOCOMPLETE_TTL
+      || !$signer->validate($_REQUEST['sig'], $_REQUEST)
+    ) {
+      CRM_Utils_System::civiExit();
+    }
+
     $fieldID       = CRM_Utils_Type::escape($_GET['cfid'], 'Integer');
     $optionGroupID = CRM_Utils_Type::escape($_GET['ogid'], 'Integer');
     $label         = CRM_Utils_Type::escape($_GET['s'], 'String');
@@ -615,6 +631,17 @@ WHERE sort_name LIKE '%$name%'";
      *
     */
   static public function checkUserName() {
+    $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('for', 'ts'));
+    if (
+      CRM_Utils_Time::getTimeRaw() > $_REQUEST['ts'] + self::CHECK_USERNAME_TTL
+      || $_REQUEST['for'] != 'civicrm/ajax/cmsuser'
+      || !$signer->validate($_REQUEST['sig'], $_REQUEST)
+    ) {
+      $user = array('name' => 'error');
+      echo json_encode($user);
+      CRM_Utils_System::civiExit();
+    }
+
     $config = CRM_Core_Config::singleton();
     $username = trim($_REQUEST['cms_name']);
 
@@ -642,6 +669,9 @@ WHERE sort_name LIKE '%$name%'";
   static function getContactEmail() {
     if (CRM_Utils_Array::value('contact_id', $_REQUEST)) {
       $contactID = CRM_Utils_Type::escape($_REQUEST['contact_id'], 'Positive');
+      if (!CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::EDIT)) {
+        return;
+      }
       list($displayName,
         $userEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
