@@ -1336,6 +1336,8 @@ AND civicrm_membership.is_test = %2";
         }
         $form->_values['lineItem'] = $form->_lineItem;
         $form->assign('lineItem', $form->_lineItem);
+
+        $form->_values['priceSetID'] = $form->_priceSetId;
       }
     }
 
