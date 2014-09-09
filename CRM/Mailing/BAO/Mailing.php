@@ -1482,7 +1482,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       CRM_Utils_Hook::pre('create', 'Mailing', NULL, $params);
     }
 
-    $mailing            = new CRM_Mailing_DAO_Mailing();
+    $mailing            = new static();
     $mailing->id        = $id;
     $mailing->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
 
