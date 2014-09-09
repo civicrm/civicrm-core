@@ -4597,6 +4597,7 @@ civicrm_relationship.is_permission_a_b = 0
     }
 
     // note : this modifies _fromClause and _simpleFromClause
+    $this->_sort = $sort;
     $this->includePseudoFieldsJoin($sort);
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
@@ -4694,13 +4695,11 @@ civicrm_relationship.is_permission_a_b = 0
         if (!$count) {
           $this->_useDistinct = TRUE;
         }
-
-        if (empty($this->_fromClause)) {
-          $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-        }
-
-        if (empty($this->_simpleFromClause)) {
-          $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+        //CRM-15231
+        $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+        $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+        if (!empty($_GET['crmSID'])) {
+          $this->includePseudoFieldsJoin($this->_sort);
         }
       }
     }
