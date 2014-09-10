@@ -79,19 +79,19 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     $this->openCiviPage("campaign/add", "reset=1", "_qf_Campaign_upload-bottom");
-
+    $this->waitForElementPresent('title');
     $this->type("title", "Campaign $title");
 
     // select the campaign type
+    $this->waitForElementPresent('campaign_type_id');
     $this->select("campaign_type_id", "value=2");
 
     // fill in the description
     $this->type("description", "This is a test campaign");
 
     // include groups for the campaign
-    $this->addSelection("includeGroups-f", "label=$groupName");
+    $this->addSelection("includeGroups", "label=$groupName");
     $this->click("//option[@value=4]");
-    $this->click("add");
 
     // fill the end date for campaign
     $this->webtestFillDate("end_date", "+1 year");
@@ -120,6 +120,9 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // add a custom field to the custom group
+    $this->waitForElementPresent('newCustomField');
+    $this->click('newCustomField');
+    $this->waitForElementPresent('label');
     $this->type("label", "Field $title");
 
     $this->select("data_type[1]", "value=Radio");
@@ -134,7 +137,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->type("option_value_2", "2");
 
     // save the custom field
-    $this->click("_qf_Field_next-bottom");
+    $this->click("_qf_Field_done-bottom");
 
     $this->waitForElementPresent("newCustomField");
     $this->waitForText('crm-notification-container', "$title");
@@ -148,16 +151,17 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // save the profile
     $this->click("_qf_Group_next-bottom");
 
-    $this->waitForElementPresent("_qf_Field_next-bottom");
-    $this->waitForText('crm-notification-container', "$title");
+    $this->waitForElementPresent("xpath=//div[@id='crm-main-content-wrapper']/div/div[2]/a/span");
+    $this->click("xpath=//div[@id='crm-main-content-wrapper']/div/div[2]/a/span");
 
     // add a profile field for activity
+    $this->waitForElementPresent('field_name[0]');
     $this->select("field_name[0]", "value=Activity");
     $this->waitForElementPresent("field_name[1]");
     $this->select("field_name[1]", "label=Field $title :: Group $title");
 
-    $this->click("_qf_Field_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
     $this->waitForText('crm-notification-container', "$title");
 
     // create a survey
@@ -210,11 +214,9 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select("campaign_survey_id", "label=Survey $title");
 
     $this->click("_qf_Search_refresh");
-
-    $this->waitForElementPresent("Go");
-    $this->click("CIVICRM_QFID_ts_all_4");
+    $this->waitForElementPresent('toggleSelect');
+    $this->click('toggleSelect');
     $this->select('task', "Reserve Respondents");
-    $this->click("Go");
 
     $this->waitForElementPresent("_qf_Reserve_done_reserve-bottom");
     $this->click("_qf_Reserve_done_reserve-bottom");
@@ -223,26 +225,24 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     // Interview Respondents
     $this->openCiviPage("survey/search", "reset=1&op=interview", "_qf_Search_refresh");
-
     // search for the respondents
+    $this->waitForElementPresent('campaign_survey_id');
     $this->select("campaign_survey_id", "label=Survey $title");
-
     $this->click("_qf_Search_refresh");
 
-    $this->waitForElementPresent("Go");
-    $this->click("CIVICRM_QFID_ts_all_4");
-    $this->click("Go");
-
+    $this->waitForElementPresent('toggleSelect');
+    $this->click('toggleSelect');
+    $this->select('task', "Record Survey Responses");
     $this->waitForElementPresent("_qf_Interview_cancel_interview");
 
     $this->click("CIVICRM_QFID_1_2");
-    $this->select("css=#voterRecords .odd .result select", "value=Label $title 1");
-    $this->click("css=#voterRecords .odd td a");
+    $this->select("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[1]/td[8]/select","value=Label $title 1");
+    $this->click("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[1]/td[9]/a");
 
     $this->click("CIVICRM_QFID_2_8");
-    $this->select("css=#voterRecords .even .result select", "value=Label $title 2");
-    $this->click("css=#voterRecords .even td a");
 
+    $this->select("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[2]/td[8]/select","value=Label $title 2");
+    $this->click("xpath=//table[@class='display crm-copy-fields dataTable no-footer']/tbody/tr[2]/td[9]/a");
     $this->click("_qf_Interview_cancel_interview");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -269,15 +269,12 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select("campaign_survey_id", "label=Survey $title");
 
     $this->click("_qf_Search_refresh");
-
-    $this->waitForElementPresent("Go");
-    $this->click("CIVICRM_QFID_ts_all_4");
+    $this->waitForElementPresent('toggleSelect');
+    $this->click('toggleSelect');
+    $this->waitForElementPresent('task');
     $this->select('task', "Reserve Respondents");
-    $this->click("Go");
-
     $this->waitForElementPresent("_qf_Reserve_done_reserve-bottom");
     $this->click("_qf_Reserve_done_reserve-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "1 Contact\(s\) have been reserved");
 
     // Release Respondents
@@ -287,13 +284,12 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select("campaign_survey_id", "label=Survey $title");
 
     $this->click("_qf_Search_refresh");
-
-    $this->waitForElementPresent("Go");
-    $this->click("xpath=id('mark_x_$id')");
-    $this->click("CIVICRM_QFID_ts_sel_2");
+    $this->waitForElementPresent('toggleSelect');
+    $this->click('toggleSelect');
+    $this->waitForElementPresent('task');
     $this->select("task", "label=Release Respondents");
-    $this->clickLink("Go", "_qf_Release_done-bottom", FALSE);
-    $this->clickLink("_qf_Release_done-bottom", 'access', FALSE);
+    $this->waitForElementPresent('_qf_Release_done-bottom');
+    $this->click("_qf_Release_done-bottom");
     $this->waitForText('crm-notification-container', "released");
 
     // check whether contact is available for reserving again
@@ -302,9 +298,10 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // search for the respondents
     $this->select("campaign_survey_id", "label=Survey $title");
 
+    $this->waitForElementPresent('_qf_Search_refresh');
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("1 Result"), "Result didn't show up after saving!");
+    $this->waitForText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]",'1 Result');
   }
 
   function testSurveyReportTest() {
