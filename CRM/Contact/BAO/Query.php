@@ -4596,7 +4596,7 @@ civicrm_relationship.is_permission_a_b = 0
       }
     }
 
-    // note : this modifies _fromClause and _simpleFromClause
+    // CRM-15231
     $this->_sort = $sort;
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
@@ -4697,6 +4697,7 @@ civicrm_relationship.is_permission_a_b = 0
         //CRM-15231
         $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
         $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+        // note : this modifies _fromClause and _simpleFromClause
         $this->includePseudoFieldsJoin($this->_sort);
       }
     }
