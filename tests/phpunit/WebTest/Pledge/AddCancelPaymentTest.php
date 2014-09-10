@@ -74,16 +74,17 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
         'Pledge Status' => 'Pending',
       )
     );
-    $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']", FALSE);
-    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
     //Edit and add the first payment for 300.00
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a", FALSE);
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span[2]/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
     $this->click("xpath=//div[@class='view-content']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->click("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->type('total_amount', '300.00');
     $this->click('_qf_Contribution_upload-bottom');
-    $this->waitForPageToLoad("30000");
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
@@ -103,6 +104,8 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Contribution_upload-bottom");
     $this->select('contribution_status_id', 'value=3');
     $this->click("_qf_Contribution_upload-bottom");
+    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+    $this->click("_qf_ContributionView_cancel-bottom");
 
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[1]/span/a");
