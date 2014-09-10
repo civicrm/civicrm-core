@@ -784,6 +784,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->type('billing_city-5', 'San Bernadino');
     $this->select('billing_country_id-5', 'value=1228');
     $this->click('billing_state_province_id-5');
+    $this->waitForVisible('billing_state_province_id-5');
     $this->select('billing_state_province_id-5', 'label=California');
     $this->type('billing_postal_code-5', '93245');
 
@@ -1871,9 +1872,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $text = "Your Financial \"{$financialType['name']}\" Type has been created, along with a corresponding income account \"{$financialType['name']}\". That income account, along with standard financial accounts \"Accounts Receivable\", \"Banking Fees\" and \"Premiums\" have been linked to the financial type. You may edit or replace those relationships here.";
     }
     else {
-      $text = "The financial type '{$financialType['name']}' has been saved.";
+      $text = "The financial type \"{$financialType['name']}\" has been updated.";
     }
-    $this->waitForText("xpath=//div[@class='notify-content']", $text);
+    $this->waitForElementPresent("xpath=//div[@class='notify-content']");
+    $this->assertElementContainsText('crm-notification-container', $text);
   }
 
   /**
@@ -1934,7 +1936,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $financialType
    */
   function addPremium($name, $sku, $amount, $price, $cost, $financialType) {
-    $this->waitForElementPresent("_qf_ManagePremiums_upload-bottom");
+    $this->waitForElementPresent("_qf_ManagePremiums_next-bottom");
     $this->type("name", $name);
     $this->type("sku", $sku);
     $this->click("CIVICRM_QFID_noImage_16");
@@ -1944,7 +1946,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if ($financialType) {
       $this->select("financial_type_id", "label={$financialType}");
     }
-    $this->click("_qf_ManagePremiums_upload-bottom");
+    $this->click("_qf_ManagePremiums_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
