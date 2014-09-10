@@ -314,7 +314,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'displayName' => $displayName,
         'contributionID' => CRM_Utils_Array::value('contribution_id', $values),
         'contributionOtherID' => CRM_Utils_Array::value('contribution_other_id', $values),
-        'membershipID' => CRM_Utils_Array::value('membership_id', $values),
         // CRM-5095
         'lineItem' => CRM_Utils_Array::value('lineItem', $values),
         // CRM-5095
@@ -370,8 +369,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
       // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
       $sendTemplateParams = array(
-        'groupName' => $tplParams['membershipID'] ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
-        'valueName' => $tplParams['membershipID'] ? 'membership_online_receipt' : 'contribution_online_receipt',
+        'groupName' => !empty($values['isMembership']) ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
+        'valueName' => !empty($values['isMembership']) ? 'membership_online_receipt' : 'contribution_online_receipt',
         'contactId' => $contactID,
         'tplParams' => $tplParams,
         'isTest' => $isTest,
