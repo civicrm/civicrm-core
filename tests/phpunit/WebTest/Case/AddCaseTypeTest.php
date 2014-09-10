@@ -90,8 +90,9 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->fireEvent('activity_details', 'focus');
     $this->fillRichTextField("activity_details", $details, 'CKEditor');
     $this->type("activity_subject", $subject);
-
+    $this->waitForElementPresent('case_type_id');
     $this->select("case_type_id", "label={$caseTypeLabel}");
+    $this->waitForElementPresent('status_id');
     $this->select("status_id", "label={$caseStatusLabel}");
 
     $this->webtestFillDate('start_date', 'now');
