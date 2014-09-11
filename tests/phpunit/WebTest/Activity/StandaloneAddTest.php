@@ -136,10 +136,10 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
 
     $this->type("sort_name", $firstName1);
     $this->click("_qf_Search_refresh");
-    $this->waitForElementPresent("Go");
 
-    $this->click("xpath=id('Search')/div[3]/div/div[2]/table/tbody/tr[3]/td[9]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_Activity_cancel-bottom");
+    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody//tr/td[6]/a[text()='Summerson, $firstName2']/../../td[9]/span/a[text()='View']");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody//tr/td[6]/a[text()='Summerson, $firstName2']/../../td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
 
     $this->VerifyTabularData(
       array(
