@@ -92,33 +92,39 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->select("extends[0]", "value=Contact");
     $this->click("//option[@value='Contact']");
     $this->click("_qf_Group_next-bottom");
-    $this->waitForElementPresent("_qf_Field_cancel-bottom");
+    $this->waitForElementPresent("newCustomField");
 
     //Is custom group created?
+    $this->click("newCustomField");
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     $customGroupId = $this->urlArg('gid');
 
     // Add contact reference fields
     $contactRefFieldLabel1 = 'contact_ref_' . substr(sha1(rand()), 0, 4);
+    $this->waitForElementPresent("label");
     $this->click("label");
+    $this->waitForElementPresent("label");
     $this->type("label", $contactRefFieldLabel1);
+    $this->waitForElementPresent("data_type[0]");
     $this->select("data_type[0]", "label=Contact Reference");
 
     $this->waitForElementPresent("group_id");
     $this->select("group_id", $groupName);
 
     //clicking save
-    $this->click("_qf_Field_next_new-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[2]/span[2]/");
 
     //Is custom field created?
     $this->waitForText('crm-notification-container', "Custom field '$contactRefFieldLabel1' has been saved.");
-
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]/");
     //add custom field - alphanumeric checkbox
     $contactRefFieldLabel2 = 'contact_ref_' . substr(sha1(rand()), 0, 4);
+
     $this->click("label");
+    $this->waitForElementPresent("label");
     $this->type("label", $contactRefFieldLabel2);
+    $this->waitForElementPresent("data_type[0]");
     $this->select("data_type[0]", "label=Contact Reference");
 
     $this->waitForElementPresent("group_id");
@@ -128,8 +134,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->type("filter", "action=get&contact_type=Organization");
 
     //clicking save
-    $this->click("_qf_Field_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]/");
 
     //Is custom field created?
     $this->waitForText('crm-notification-container', "Custom field '$contactRefFieldLabel2' has been saved.");
