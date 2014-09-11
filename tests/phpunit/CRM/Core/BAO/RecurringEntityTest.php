@@ -26,12 +26,12 @@
 */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
-require_once "CRM/Core/BAO/RecurringEntity.php";
+require_once 'CRM/Core/BAO/RecurringEntity.php';
 
 /**
- * Class CRM_Event_BAO_RecurringEntityTest
+ * Class CRM_Core_BAO_RecurringEntityTest
  */
-class CRM_Event_BAO_RecurringEntityTest extends CiviUnitTestCase {
+class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   /**
    * @return array
    */
@@ -59,7 +59,7 @@ class CRM_Event_BAO_RecurringEntityTest extends CiviUnitTestCase {
   }
 
   /**
-   * add() method for RecurringEntity 
+   * quickAdd() method for RecurringEntity 
    */
   function testAdd() {
     if( $this->_parentID ){
@@ -130,6 +130,9 @@ class CRM_Event_BAO_RecurringEntityTest extends CiviUnitTestCase {
     }
   }
   
+  /**
+   * Check change occurs across related entities for RecurringEntity 
+   */
   function testModifyEntity() {
     /**
      * Lets modify an activity and see if other related activities get cascaded
