@@ -149,7 +149,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
       $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
     }
 
-    $caseType = $form->_caseType;
+    $caseType = CRM_Utils_Array::first($form->_caseType);
     $caseId = CRM_Utils_Array::first($form->_caseId);
 
     if (!$caseType && $caseId) {
