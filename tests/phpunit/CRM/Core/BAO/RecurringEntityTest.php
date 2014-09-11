@@ -25,9 +25,8 @@
  +--------------------------------------------------------------------+
 */
 
-
-
 require_once 'CiviTest/CiviUnitTestCase.php';
+require_once "CRM/Core/BAO/RecurringEntity.php";
 
 /**
  * Class CRM_Event_BAO_RecurringEntityTest
@@ -63,7 +62,6 @@ class CRM_Event_BAO_RecurringEntityTest extends CiviUnitTestCase {
    * add() method for RecurringEntity 
    */
   function testAdd() {
-    require_once "CRM/Core/BAO/RecurringEntity.php";
     if( $this->_parentID ){
       //Add parent to civicrm_recurring_entity table
       $newCreatedParentID = CRM_Core_BAO_RecurringEntity::quickAdd($this->_parentID, $this->_parentID, 'civicrm_activity');
@@ -132,8 +130,7 @@ class CRM_Event_BAO_RecurringEntityTest extends CiviUnitTestCase {
     }
   }
   
-  public static function testModifyEntity() {
-    require_once "CRM/Core/BAO/RecurringEntity.php";
+  function testModifyEntity() {
     /**
      * Lets modify an activity and see if other related activities get cascaded
      */
