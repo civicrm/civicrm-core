@@ -48,6 +48,9 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
+    if (count($form->_caseId) != 1) {
+      CRM_Core_Resources::fatal(ts('Expected one case-type'));
+    }
   }
 
   /**
@@ -67,8 +70,9 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
       'Open Case',
       'name'
     );
+    $caseId = CRM_Utils_Array::first($form->_caseId);
     $openCaseParams = array('activity_type_id' => $openCaseActivityType);
-    $openCaseInfo = CRM_Case_BAO_Case::getCaseActivityDates($form->_caseId, $openCaseParams, TRUE);
+    $openCaseInfo = CRM_Case_BAO_Case::getCaseActivityDates($caseId, $openCaseParams, TRUE);
     if (empty($openCaseInfo)) {
       list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults();
     }
@@ -90,8 +94,9 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
   static function buildQuickForm(&$form) {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
+    $caseId = CRM_Utils_Array::first($form->_caseId);
 
-    $currentStartDate = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $form->_caseId, 'start_date');
+    $currentStartDate = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $caseId, 'start_date');
     $form->assign('current_start_date', $currentStartDate);
     $form->addDate('start_date', ts('New Start Date'), FALSE, array('formatType' => 'activityDateTime'));
   }
@@ -145,14 +150,15 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
     }
 
     $caseType = $form->_caseType;
+    $caseId = CRM_Utils_Array::first($form->_caseId);
 
-    if (!$caseType && $form->_caseId) {
-      $caseType = CRM_Case_BAO_Case::getCaseType($form->_caseId, 'title');
+    if (!$caseType && $caseId) {
+      $caseType = CRM_Case_BAO_Case::getCaseType($caseId, 'title');
     }
 
     if (!$form->_currentlyViewedContactId ||
       !$form->_currentUserId ||
-      !$form->_caseId ||
+      !$caseId ||
       !$caseType
     ) {
       CRM_Core_Error::fatal('Required parameter missing for ChangeCaseType - end post processing');
@@ -167,7 +173,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
 
     // 1. save activity subject with new start date
     $currentStartDate = CRM_Utils_Date::customFormat(CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
-        $form->_caseId, 'start_date'
+        $caseId, 'start_date'
       ), $config->dateformatFull);
     $newStartDate      = CRM_Utils_Date::customFormat(CRM_Utils_Date::mysqlToIso($params['start_date']), $config->dateformatFull);
     $subject           = 'Change Case Start Date from ' . $currentStartDate . ' to ' . $newStartDate;
@@ -180,7 +186,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
       'creatorID' => $form->_currentUserId,
       'standardTimeline' => 0,
       'activity_date_time' => $params['start_date'],
-      'caseID' => $form->_caseId,
+      'caseID' => $caseId,
       'caseType' => $caseType,
       'activityTypeName' => 'Change Case Start Date',
       'activitySetName' => 'standard_timeline',
@@ -232,7 +238,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
         // Create linkage to case
         $caseActivityParams = array(
           'activity_id' => $newActivity->id,
-          'case_id' => $form->_caseId,
+          'case_id' => $caseId,
         );
 
         CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
