@@ -57,6 +57,11 @@
            <td>{$form.is_reserved.html} <br /><span class="description">{ts}Reserved tags can not be deleted. Users with 'administer reserved tags' permission can set or unset the reserved flag. You must uncheck 'Reserved' (and delete any child tags) before you can delete a tag.{/ts}
            </td>
         </tr>
+        <tr class="crm-tag-form-block-is_slectable">
+           <td class="label">{$form.is_selectable.label}</td>
+           <td>{$form.is_selectable.html}<br /><span class="description">{ts}Defines if you can select this tag.{/ts}
+           </td>
+        </tr>
     </table>
         {if $parent_tags|@count > 0}
         <table class="form-layout-compressed">
