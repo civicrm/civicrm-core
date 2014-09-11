@@ -775,9 +775,10 @@ CRM.strings = CRM.strings || {};
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
   CRM.confirm = function (options) {
-    var dialog, settings = {
+    var dialog, url, msg, settings = {
       title: ts('Confirm'),
       message: ts('Are you sure you want to continue?'),
+      url: null,
       width: 'auto',
       modal: true,
       resizable: false,
@@ -807,13 +808,22 @@ CRM.strings = CRM.strings || {};
         });
       });
     }
-    dialog = $('<div class="crm-confirm-dialog"></div>').html(settings.message);
+    url = settings.url;
+    msg = settings.message;
     delete settings.options;
     delete settings.message;
+    delete settings.url;
+    dialog = $('<div class="crm-confirm-dialog"></div>').dialog(settings);
     if ($.isFunction(options)) {
       dialog.on('crmConfirm:yes', options);
     }
-    return dialog.dialog(settings).trigger('crmLoad');
+    if (url) {
+      CRM.loadPage(url, {target: dialog});
+    }
+    else if (msg && msg.length) {
+      dialog.html(msg).trigger('crmLoad');
+    }
+    return dialog;
   };
 
   /** provides a local copy of ts for a domain */

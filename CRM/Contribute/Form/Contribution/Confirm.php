@@ -268,9 +268,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     // if onbehalf-of-organization
     if (!empty($this->_params['hidden_onbehalf_profile'])) {
-      if (!empty($this->_params['org_option']) && !empty($this->_params['organization_id'])) {
+      // CRM-15182
+      if (empty($this->_params['org_option']) && empty($this->_params['organization_id'])) {
         if (!empty($this->_params['onbehalfof_id'])) {
           $this->_params['organization_id'] = $this->_params['onbehalfof_id'];
+        }
+        else {
+          $this->_params['organization_id'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_params['onbehalf']['organization_name'], 'id', 'display_name');
         }
       }
 
@@ -1529,7 +1533,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isCurrentEmployer = FALSE;
     $dupeIDs = array();
     $orgID = NULL;
-    if (!empty($behalfOrganization['organization_id']) && !empty($behalfOrganization['org_option'])) {
+    if (!empty($behalfOrganization['organization_id']) && empty($behalfOrganization['org_option'])) {
       $orgID = $behalfOrganization['organization_id'];
       unset($behalfOrganization['organization_id']);
       $isCurrentEmployer = TRUE;
@@ -1808,6 +1812,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // contribution amount same as membership amount.
       //@todo - merge with section above
       if ($this->_membershipBlock['is_separate_payment']
+        && !empty($this->_values['fee'][$priceField->id])
         && CRM_Utils_Array::value('name', $this->_values['fee'][$priceField->id]) == 'contribution_amount'
         && CRM_Utils_Array::value("price_{$priceField->id}", $this->_params) == '-1'
       ) {

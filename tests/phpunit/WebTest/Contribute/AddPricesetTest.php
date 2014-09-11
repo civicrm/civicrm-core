@@ -92,7 +92,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', 'newPriceField');
   }
 
   /**
@@ -103,6 +103,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
    */
   function _testAddPriceFields(&$fields, &$validateString, $financialType, $dateSpecificFields = FALSE) {
     $validateStrings[] = $financialType;
+    $this->click('newPriceField');
+    $this->waitForElementPresent('label');
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
 
@@ -177,7 +179,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
           break;
       }
       $this->select('financial_type_id', "label={$financialType}");
-      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom', FALSE);
+      $this->waitForText('crm-notification-container', "Price Field '$label' has been saved.");
     }
   }
 

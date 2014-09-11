@@ -202,13 +202,13 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['gender_id']['title'] = 'Gender ID';
   $params['gender']['title'] = 'Gender';
   $params['on_hold']['title'] = 'Primary Email On Hold';
-  $params['im']['title'] = 'Primary Instant Messanger';
-  $params['im_id']['title'] = 'Primary Instant Messanger ID';
+  $params['im']['title'] = 'Primary Instant Messenger';
+  $params['im_id']['title'] = 'Primary Instant Messenger ID';
   $params['group_id']['title'] = 'Group Memberships (filter)';
   $params['group']['title'] = 'Group Memberships (filter, array)';
   $params['tag']['title'] = 'Assigned tags (filter, array)';
-  $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birthdate is equal to or greater than'));
-  $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birthdate is equal to or less than'));
+  $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or greater than'));
+  $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or less than'));
   $params['deceased_date_low'] = array('name' => 'deceased_date_low','type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or greater than'));
   $params['deceased_date_high'] = array('name' => 'deceased_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or less than'));
 }

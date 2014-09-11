@@ -316,15 +316,15 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         'membership_id'
       );
     }
-    
+
     $params['skipLineItem'] = TRUE;
-    
+
     //record contribution for this membership
     if (!empty($params['contribution_status_id']) && empty($params['relate_contribution_id'])) {
       $memInfo = array_merge($params, array('membership_id' => $membership->id));
       $params['contribution'] = self::recordMembershipContribution($memInfo, $ids);
     }
-    
+
     if (!empty($params['lineItems'])) {
       $params['line_item'] = $params['lineItems'];
     }
@@ -333,7 +333,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     if (empty($ids['contribution']) && !empty($ids['membership'])) {
       CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
     }
-    
+
     if (!empty($params['line_item']) && empty($ids['contribution'])) {
       CRM_Price_BAO_LineItem::processPriceSet($membership->id, $params['line_item'], CRM_Utils_Array::value('contribution', $params));
     }
@@ -436,7 +436,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param int $membershipId membership id
    * @param int $contactId contact id
    *
-   * @param const $action
+   * @param integer $action
    *
    * @return Array    array of contact_id of all related contacts.
    * @static
@@ -1275,7 +1275,7 @@ AND civicrm_membership.is_test = %2";
     $result      = $membershipContribution = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = array();
-        
+
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $premiumParams, $contactID,
@@ -1494,7 +1494,7 @@ AND civicrm_membership.is_test = %2";
    * then status will be updated based on existing start and end
    * dates and log will be added for the status change.
    *
-   * @param  array  $currentMembership   referance to the array
+   * @param  array  $currentMembership   reference to the array
    *                                     containing all values of
    *                                     the current membership
    * @param  array  $changeToday         array of month, day, year
@@ -2145,6 +2145,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
       $form->set('membership_trx_id', $result['trxn_id']);
       $form->set('membership_amount', $minimumFee);
+
+      $form->assign('membership_trx_id', $result['trxn_id']);
+      $form->assign('membership_amount', $minimumFee);
 
       // we don't need to create the user twice, so lets disable cms_create_account
       // irrespective of the value, CRM-2888
@@ -2841,7 +2844,7 @@ WHERE      civicrm_membership.is_test = 0";
 
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams, $ids);
 
-    //CRM-13981, create new soft-credit record as to record payment from differnt person for this membership
+    //CRM-13981, create new soft-credit record as to record payment from different person for this membership
     if (!empty($contributionSoftParams)) {
       $contributionSoftParams['contribution_id'] = $contribution->id;
       $contributionSoftParams['currency'] = $contribution->currency;

@@ -452,27 +452,29 @@
       }
       // Show form buttons as part of the dialog
       if ($el.data('uiDialog')) {
-        var buttons = [], added = [];
-        $('input.crm-form-submit, a.button', $el).each(function() {
+        var buttonContainers = '.crm-submit-buttons, .action-link',
+          buttons = [],
+          added = [];
+        $(buttonContainers, $el).find('input.crm-form-submit, a.button').each(function() {
           var $el = $(this),
             label = $el.is('input') ? $el.attr('value') : $el.text(),
             identifier = $el.attr('name') || $el.attr('href');
           if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
-            var button = {text: label, click: function () {
-              $el.click();
-            }};
-            if ($el.find('.icon').length) {
-              button.icons = {primary: $el.find('.icon').attr('class')};
+            var $icon = $el.find('.icon'),
+              button = {text: label, click: function() {
+                $el.click();
+              }};
+            if ($icon.length) {
+              button.icons = {primary: $icon.attr('class')};
             } else {
-              button.icons = {primary: $el.hasClass('cancel') ? 'ui-icon-close' : 'ui-icon-check'};
-              if (identifier.substr(identifier.length-4) === '_new') {
-                button.icons.secondary = 'ui-icon-plus';
-              }
+              var action = $el.hasClass('cancel') ? 'close' : (identifier.substr(identifier.length-4) === '_new' ? 'plus' : 'check');
+              button.icons = {primary: 'ui-icon-' + action};
             }
             buttons.push(button);
             added.push(identifier);
           }
-          $el.hide().parents('.crm-button, .crm-submit-buttons, .action-link').hide();
+          // display:none causes the form to not submit when pressing "enter"
+          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'});
         });
         $el.dialog('option', 'buttons', buttons);
       }
@@ -505,9 +507,6 @@
     }
     else if ($el.hasClass('medium-popup')) {
       settings.dialog.width = settings.dialog.height = '50%';
-    }
-    else if ($el.hasClass('huge-popup')) {
-      settings.dialog.height = '90%';
     }
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element
