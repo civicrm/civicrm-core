@@ -46,7 +46,6 @@ class civicrm_cli {
   var $_action = NULL;
   var $_output = FALSE;
   var $_joblog = FALSE;
-  var $_semicolon = FALSE;
   var $_config;
 
   // optional arguments
@@ -174,9 +173,6 @@ class civicrm_cli {
       }
       elseif ($arg == '-j' || $arg == '--joblog') {
         $this->_joblog = TRUE;
-      }
-      elseif ($arg == '-sem' || $arg == '--semicolon') {
-        $this->_semicolon = TRUE;
       }
       else {
         while(list($short, $long) = each ($this->_additional_arguments)) {
@@ -331,9 +327,6 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
   }
 
   function run() {
-  	if($this->_semicolon)
-  		$this->separator = ';';
-  	
     $out = fopen("php://output", 'w');
     fputcsv($out, $this->columns, $this->separator, '"');
 
