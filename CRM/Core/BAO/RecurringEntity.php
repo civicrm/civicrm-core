@@ -229,17 +229,17 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     if(CRM_Utils_Array::value('used_for', $formParams)){
       $dbParams['used_for'] = $formParams['used_for'];
     }
-	
+
     if(CRM_Utils_Array::value('parent_event_id', $formParams)){
-        $dbParams['entity_value'] = $formParams['parent_event_id'];
+      $dbParams['entity_value'] = $formParams['parent_event_id'];
     }
-    
+
     if(CRM_Utils_Array::value('repetition_start_date', $formParams) &&
-        CRM_Utils_Array::value('repetition_start_date_time', $formParams)){
-      $repetition_start_date = new DateTime($formParams['repetition_start_date']." ".$formParams['repetition_start_date_time']);
-      $repetition_start_date->modify('+1 day');
-      $dbParams['entity_status'] = CRM_Utils_Date::processDate($repetition_start_date->format('Y-m-d H:i:s'));
-    }
+      CRM_Utils_Array::value('repetition_start_date_time', $formParams)){
+        $repetition_start_date = new DateTime($formParams['repetition_start_date']." ".$formParams['repetition_start_date_time']);
+        $repetition_start_date->modify('+1 day');
+        $dbParams['entity_status'] = CRM_Utils_Date::processDate($repetition_start_date->format('Y-m-d H:i:s'));
+      }
 
     if(CRM_Utils_Array::value('repetition_frequency_unit', $formParams)){
       $dbParams['repetition_frequency_unit'] = $formParams['repetition_frequency_unit'];
@@ -289,20 +289,20 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
   static public function getScheduleReminderDetailsById($scheduleReminderId){
     $query = "SELECT *
-              FROM civicrm_action_schedule WHERE 1";
+      FROM civicrm_action_schedule WHERE 1";
     if($scheduleReminderId){
       $query .= "
-      AND id = %1";
+        AND id = %1";
     }
     $dao = CRM_Core_DAO::executeQuery($query,
-          array(
-            1 => array($scheduleReminderId, 'Integer')
-          )
-        );
+      array(
+        1 => array($scheduleReminderId, 'Integer')
+      )
+    );
     $dao->fetch();
     return $dao;
   }
-    
+
   static function getRecursionFromReminder($scheduleReminderId){
     if($scheduleReminderId){
       //Get all the details from schedule reminder table
@@ -312,7 +312,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
     return $recursionDetails;
   }
-    
+
   static function getRecursionFromReminderByDBParams($scheduleReminderDetails = array()){
     $r = new When();
     //If there is some data for this id
@@ -356,21 +356,21 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         if($scheduleReminderDetails['start_action_date']){
           $startActionDate = explode(" ", $scheduleReminderDetails['start_action_date']);
           switch ($startActionDate[0]) {
-            case 'first':
-                $startActionDate1 = 1;
-                break;
-            case 'second':
-                $startActionDate1 = 2;
-                break;
-            case 'third':
-                $startActionDate1 = 3;
-                break;
-            case 'fourth':
-                $startActionDate1 = 4;
-                break;
-            case 'last':
-                $startActionDate1 = -1;
-                break;
+          case 'first':
+            $startActionDate1 = 1;
+            break;
+          case 'second':
+            $startActionDate1 = 2;
+            break;
+          case 'third':
+            $startActionDate1 = 3;
+            break;
+          case 'fourth':
+            $startActionDate1 = 4;
+            break;
+          case 'last':
+            $startActionDate1 = -1;
+            break;
           }
           $concatStartActionDateBits = $startActionDate1.strtoupper(substr($startActionDate[1], 0, 2));
           $r->byday(array($concatStartActionDateBits));
@@ -396,43 +396,43 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       if(!$scheduleReminderDetails['start_action_offset'] && !$scheduleReminderDetails['absolute_date']){
         $r->errors[] = 'Ends: is a required field';
       }
-   }else{
-     $r->errors[] = 'Repeats: is a required field';
-   }
+    }else{
+      $r->errors[] = 'Repeats: is a required field';
+    }
     return $r;
   }
-    
-    /*
-     * Get Reminder id based on event id
-     */
-    static public function getReminderDetailsByEventId($eventId, $used_for){
-      if($eventId){
-        $query = "
-          SELECT *
-          FROM   civicrm_action_schedule 
-          WHERE  entity_value = %1";
-        if($used_for){
-          $query .= " AND used_for = %2";
-        }
-        $params = array(
-          1 => array($eventId, 'Integer'),
-          2 => array($used_for, 'String')
-        );
-        $dao = CRM_Core_DAO::executeQuery($query, $params);
-        $dao->fetch();
-      }
-      return $dao;
-    }  
-  
-    static public function getInterval($startDate, $endDate) { 
-      if ($startDate && $endDate) {
-        $startDate = new DateTime($startDate);
-        $endDate   = new DateTime($endDate);
 
-        return $startDate->diff($endDate);
+  /*
+   * Get Reminder id based on event id
+   */
+  static public function getReminderDetailsByEventId($eventId, $used_for){
+    if($eventId){
+      $query = "
+        SELECT *
+        FROM   civicrm_action_schedule 
+        WHERE  entity_value = %1";
+      if($used_for){
+        $query .= " AND used_for = %2";
       }
+      $params = array(
+        1 => array($eventId, 'Integer'),
+        2 => array($used_for, 'String')
+      );
+      $dao = CRM_Core_DAO::executeQuery($query, $params);
+      $dao->fetch();
     }
-  
+    return $dao;
+  }  
+
+  static public function getInterval($startDate, $endDate) { 
+    if ($startDate && $endDate) {
+      $startDate = new DateTime($startDate);
+      $endDate   = new DateTime($endDate);
+
+      return $startDate->diff($endDate);
+    }
+  }
+
   static public function generateRecursions($recursionObj, $params = array(), $excludeDates = array()) { 
     $newParams = $recursionResult = array();
     if (is_a($recursionObj, 'When')) { 
@@ -474,7 +474,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
     return $recursionResult;
   }
-  
+
   static public function delEntityRelations($entityId, $entityTable){
     if(!$entityId && !$entityTable){
       return FALSE;
@@ -486,19 +486,19 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       return $dao->delete();
     }
   }
-  
+
   static public function getParticipantCountforEvent($listOfRelatedEntities = array()){
     if(!empty($listOfRelatedEntities)){
       $implodeRelatedEntities = implode(',', array_map(function($entity){
-                                  return $entity['id'];
-                                }, $listOfRelatedEntities));
+        return $entity['id'];
+      }, $listOfRelatedEntities));
       if($implodeRelatedEntities){
         $query = "SELECT p.event_id as event_id, 
-              concat_ws(' ', e.title, concat_ws(' - ', DATE_FORMAT(e.start_date, '%b %d %Y %h:%i %p'), DATE_FORMAT(e.end_date, '%b %d %Y %h:%i %p'))) as event_data, 
-              count(p.id) as participant_count
-              FROM civicrm_participant p, civicrm_event e 
-              WHERE p.event_id = e.id AND p.event_id IN ({$implodeRelatedEntities})
-              GROUP BY p.event_id";
+          concat_ws(' ', e.title, concat_ws(' - ', DATE_FORMAT(e.start_date, '%b %d %Y %h:%i %p'), DATE_FORMAT(e.end_date, '%b %d %Y %h:%i %p'))) as event_data, 
+          count(p.id) as participant_count
+          FROM civicrm_participant p, civicrm_event e 
+          WHERE p.event_id = e.id AND p.event_id IN ({$implodeRelatedEntities})
+          GROUP BY p.event_id";
         $dao = CRM_Core_DAO::executeQuery($query);
         $participantDetails = array();
         while($dao->fetch()) {
