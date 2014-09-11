@@ -84,6 +84,7 @@ class CRM_Contact_BAO_Query {
 
   public $_paramLookup;
 
+  public $_sort;
   /**
    * the set of output params
    *
@@ -4698,9 +4699,7 @@ civicrm_relationship.is_permission_a_b = 0
         $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
         $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
         // note : this modifies _fromClause and _simpleFromClause
-        if (!empty($this->_sort)) {
-          $this->includePseudoFieldsJoin($this->_sort);
-        }
+        $this->includePseudoFieldsJoin($this->_sort);
       }
     }
     else {
