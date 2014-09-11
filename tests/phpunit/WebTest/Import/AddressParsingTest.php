@@ -79,6 +79,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
       $actualvalue = $this->getValue($key);
       $this->assertEquals($expectedvalue, $actualvalue);
     }
+    $this->clickLink('_qf_Contact_upload_view-top');
 
     //Go to the URL of Address Setting to disable street address parsing option
     $this->openCiviPage("admin/setting/preferences/address", "reset=1");
