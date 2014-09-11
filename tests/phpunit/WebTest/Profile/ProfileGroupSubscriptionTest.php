@@ -76,6 +76,8 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     //Add email field to profile
+    $this->click("xpath=//a/span[text()='Add Field']");
+    $this->waitForElementPresent("field_name[0]");
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
     $this->click("//option[@value='Contact']");
@@ -85,7 +87,8 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
 
     //click on save
     $this->click('_qf_Field_next_new-top');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
+    $this->waitForText('crm-notification-container', 'You can add another profile field.');
 
     //Add email field to profile
     $this->click('field_name[0]');
@@ -98,7 +101,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     //click on save
     $this->click('_qf_Field_next');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@id='field_page']/div/a[4]/span");
 
     //now use profile create mode for group subscription
     $this->click("xpath=//div[@id='field_page']/div/a[4]/span");
@@ -134,8 +137,8 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
    * @param $profileTitle
    */
   function _testdeleteProfile($profileTitle) {
-    $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
-    $this->click("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
+    $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[5]/a[text()='Delete']");
+    $this->click("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[5]/a[text()='Delete']");
     $this->waitForElementPresent('_qf_Group_next-bottom');
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('newCiviCRMProfile-bottom');

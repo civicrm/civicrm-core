@@ -1907,8 +1907,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->waitForElementPresent('_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
     $this->click('_qf_Group_next-bottom');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
+    $this->click("xpath=//a/span[text()='Add Field']");
+    $this->waitForElementPresent("field_name[0]");
     //$this->assertTrue($this->isTextPresent("Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now."));
 
     foreach ($profileFields as $field) {
@@ -1922,7 +1925,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->waitForElementPresent('label');
       $this->type("id=label", $field['label']);
       $this->click("id=_qf_Field_next_new-top");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
       //$this->assertTrue($this->isTextPresent("Your CiviCRM Profile Field '" . $field['name'] . "' has been saved to '" . $profileTitle . "'. You can add another profile field."));
     }
   }
