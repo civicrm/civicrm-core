@@ -168,7 +168,7 @@
         $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
       }
 
-      $('#entity_0', $form).change(buildSelects);
+      $('#entity_0', $form).change(buildSelects).change(showHideLimitTo);
 
       loadMsgBox();
       $('#mode', $form).change(loadMsgBox);
@@ -211,6 +211,10 @@
           $('#is_recipient_listing', $form).val('');
         }
       }
+      // CRM-14070 Hide limit-to when entity is activity
+      function showHideLimitTo() {
+        $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
+      }
     });
 
   function loadMsgBox() {
@@ -229,15 +233,6 @@
         cj('#sms').show();
         cj('#smsProvider').show();
       }
-  }
-
-  function showHideLimitTo() {
-    if (cj('#entity_0').val() == 1) {
-      cj('#limit_to').hide();
-    }
-    else {
-      cj('#limit_to').show();
-    }
   }
 
  </script>
