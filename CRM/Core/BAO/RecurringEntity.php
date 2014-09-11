@@ -39,11 +39,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
   static $_tableDAOMapper = 
     array(
-      'civicrm_event' => 'CRM_Event_DAO_Event',
+      'civicrm_event'       => 'CRM_Event_DAO_Event',
       'civicrm_price_set_entity' => 'CRM_Price_DAO_PriceSetEntity',
       'civicrm_uf_join'     => 'CRM_Core_DAO_UFJoin',
       'civicrm_tell_friend' => 'CRM_Friend_DAO_Friend',
       'civicrm_pcp_block'   => 'CRM_PCP_DAO_PCPBlock',
+      'civicrm_activity'    => 'CRM_Activity_DAO_Activity',
     );
 
   static function add(&$params) {
@@ -215,6 +216,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
         $updateDAO = CRM_Core_DAO::cascadeUpdate($daoName, $obj->id, $entityID, $skipData);
         CRM_Core_DAO::freeResult();
+      } else {
+        CRM_Core_Error::fatal("DAO Mapper missing for $entityTable.");
       }
     }
     // done with processing. lets unset static var.
@@ -471,7 +474,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
     return $recursionResult;
   }
-
   
   static public function delEntityRelations($entityId, $entityTable){
     if(!$entityId && !$entityTable){
@@ -507,5 +509,4 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
     return $participantDetails;
   }
-    
 }
