@@ -37,19 +37,19 @@ require_once 'packages/When/When.php';
 
 class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
-  protected $schedule = array();
-  protected $scheduleId = NULL;
-  protected $scheduleDBParams = array();
+  public $schedule = array();
+  public $scheduleId = NULL;
+  public $scheduleDBParams = array();
 
-  protected $dateColumns = array();
-  protected $overwriteColumns = array();
-  protected $intervalDateColumns = array();
+  public $dateColumns = array();
+  public $overwriteColumns = array();
+  public $intervalDateColumns = array();
 
-  protected $excludeDates = array();
+  public $excludeDates = array();
 
-  protected $recursion = NULL;
+  public $recursion = NULL;
 
-  protected $isGenRecurringEntity = TRUE;
+  public $isGenRecurringEntity = TRUE;
 
   static $_tableDAOMapper = 
     array(
@@ -92,23 +92,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return self::add($params);
   }
 
-  function entityId($entityId) {
-    $this->entity_id = $entityId;
-  }
-
-  function entityTable($entityTable) {
-    $this->entity_table = $entityTable;
-  }
-
-  function dateColumns($dateColumns = array()) {
-    $this->dateColumns = $dateColumns;
-  }
-
-  function scheduleDBParams($scheduleDBParams = array()) {
-    $this->scheduleDBParams = $scheduleDBParams;
-  }
-
-  function setMode($mode) {
+  function mode($mode) {
     $this->mode = $mode;
     $this->parent_id = $this->entity_id;
     $this->save();
@@ -648,10 +632,10 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     $daoActivity->save();
  
     $recursion = new CRM_Core_BAO_RecurringEntity();
-    $recursion->entityId($daoActivity->id);
-    $recursion->entityTable('civicrm_activity');
-    $recursion->dateColumns(array('activity_date_time'));
-    $recursion->scheduleDBParams(array(
+    $recursion->entity_id    = $daoActivity->id;
+    $recursion->entity_table = 'civicrm_activity';
+    $recursion->dateColumns  = array('activity_date_time');
+    $recursion->scheduleDBParams = array(
       'entity_value'      => $daoActivity->id,
       'entity_status'     => $daoActivity->activity_date_time,
       'start_action_date' => 'fourth saturday',
@@ -659,7 +643,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       'repetition_frequency_interval' => 3,
       'start_action_offset' => 5,
       //'used_for' => 'activity'
-    ));
+    );
 
     // skip copying these column when creating new daos
     // or populate with values provided here
@@ -669,7 +653,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     $generatedEntities = $recursion->generate(); 
 
     // try changing something
-    $recursion->setMode(3); // sets ->mode var & saves in DB
+    $recursion->mode(3); // sets ->mode var & saves in DB
 
     // lets change subject of initial activity that we created in begining
     $daoActivity->find(TRUE);
