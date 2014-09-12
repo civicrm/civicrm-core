@@ -535,7 +535,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         $r->count($scheduleReminderDetails['start_action_offset']);
       }
 
-      if($scheduleReminderDetails['absolute_date']){
+      if(CRM_Utils_Array::value('absolute_date', $scheduleReminderDetails)) {
         $absoluteDate = CRM_Utils_Date::setDateDefaults($scheduleReminderDetails['absolute_date']);
         $endDate = new DateTime($absoluteDate[0].' '.$absoluteDate[1]);
         $r->until($endDate);
@@ -677,13 +677,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       'repetition_frequency_unit' => 'month',
       'repetition_frequency_interval' => 3,
       'start_action_offset' => 5,
-      //'used_for' => 'activity'
+      'used_for' => 'activity'
     );
-
-    // skip copying these column when creating new daos
-    // or populate with values provided here
-    //$recursion->overwriteColumns = array(); 
-    //$recursion->intervalDateColumns = array('end_date' => '1 day'); 
 
     $generatedEntities = $recursion->generate(); 
 
