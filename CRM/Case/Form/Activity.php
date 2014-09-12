@@ -599,9 +599,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       // update existing case record if needed
       $caseParams = $params;
       $caseParams['id'] = $vval['case_id'];
-      if (!empty($caseParams['case_type_id'])) {
-        $caseParams['case_type_id'] = CRM_Core_DAO::VALUE_SEPARATOR . $caseParams['case_type_id'] . CRM_Core_DAO::VALUE_SEPARATOR;
-      }
       if (!empty($caseParams['case_status_id'])) {
         $caseParams['status_id'] = $caseParams['case_status_id'];
       }
