@@ -220,7 +220,7 @@ class CRM_Activity_BAO_Query {
           break;
         }
         $value = CRM_Utils_Type::escape($value, 'Integer');
-        $query->_where[$grouping][] = " source_record_id = $value";
+        $query->_where[$grouping][] = " civicrm_activity.source_record_id = $value";
         $query->_qill[$grouping][] = ts('Survey') . ' - ' . CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $value, 'title');
         break;
 
