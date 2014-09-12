@@ -462,9 +462,9 @@ WHERE   cas.entity_value = $id AND
       CRM_Utils_Hook::tokens($hookTokens);
       $categories = array_keys($hookTokens);
 
-      $type = array('body_html', 'body_text', 'sms_body_text');
+      $type = array('body_html' => 'html', 'body_text' => 'text', 'sms_body_text' => 'text');
 
-      foreach ($type as $key => $bodyType) {
+      foreach ($type as $bodyType => $value) {
         $dummy_mail = new CRM_Mailing_BAO_Mailing();
         if ($bodyType == 'sms_body_text') {
           $dummy_mail->body_text = $$bodyType;
