@@ -48,6 +48,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   public $excludeDates = array();
 
   public $recursion = NULL;
+  public $recursionCounter = NULL;
 
   public $isGenRecurringEntity = TRUE;
 
@@ -101,7 +102,17 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   // generate all new entities based on object vars
   function generate() {
     // fixme: check if entityid & entitytable set
-    $entities = array();
+    $this->generateRecursiveDates();
+    CRM_Core_Error::debug_var('$this->recursionDates1', $this->recursionDates);
+
+    return $this->generateEntities();
+  }
+
+  function generateRecursion2() {
+    // return if already generated
+    if (is_a($this->recursion, 'When')) { 
+      return $this->recursion;
+    }
 
     if ($this->scheduleId) {
       // get params by ID
@@ -109,86 +120,107 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     } else if (!empty($this->schedule)) {
       $this->scheduleDBParams = $this->mapFormValuesToDB($this->schedule);//call using obj
     }
+
     CRM_Core_Error::debug_var('$this->scheduleDBParams', $this->scheduleDBParams);
     if (!empty($this->scheduleDBParams)) {
       $this->recursion = $this->getRecursionFromReminderByDBParams($this->scheduleDBParams);
     }
-    //CRM_Core_Error::debug_var('$this->recursion', $this->recursion);
+    return $this->recursion;
+  }
 
-    if (!empty($this->recursion)) {
-      $this->recursionDates = $this->generateRecursions2();
-      CRM_Core_Error::debug_var('$this->recursionDates1', $this->recursionDates);
-
+  // generate new DAOs and along with entries in recurring_entity table
+  function generateEntities() {
+    $newEntities = array();
+    if (!empty($this->recursionDates)) {
       // save an entry with initiating entity-id & entity-table
       if (!$this->find(TRUE)) {
         $this->parent_id = $this->entity_id;
         $this->save();
       }
-      CRM_Core_Error::debug_var('$this', $this);
 
-      // generate new DAOs and along with entries in recurring_entity table
-      $entities = $this->copyCreateEntities();
-    }
-    CRM_Core_Error::debug_var('$entities', $entities);
-    return $entities;
-  }
-
-  function copyCreateEntities() {
-    CRM_Core_Error::debug_var('$this->recursionDates post save', $this->recursionDates);
-    $newEntities = array();
-    foreach ($this->recursionDates as $key => $date) {
-      $newCriteria = array();
-      foreach ($this->dateColumns as $col) {
-        //$newCriteria[$col] = $date;
-        $newCriteria[$col] = '20121230';
-        //$newCriteria[$col] = CRM_Utils_Date::isoToMysql($date);
+      foreach ($this->recursionDates as $key => $dateCols) {
+        $newCriteria = $dateCols;
+        foreach ($this->overwriteColumns as $col => $val) {
+          $newCriteria[$col] = $val;
+        }
+        CRM_Core_Error::debug_var('$newCriteria', $newCriteria);
+        $obj = CRM_Core_BAO_RecurringEntity::copyCreateEntity($this->entity_table, 
+          array('id' => $this->entity_id), 
+          $newCriteria,
+          $this->isGenRecurringEntity
+        );
+        $newEntities[] = $obj->id;
       }
-      foreach ($this->overwriteColumns as $col => $val) {
-        $newCriteria[$col] = $val;
-      }
-      CRM_Core_Error::debug_var('$newCriteria', $newCriteria);
-      $obj = CRM_Core_BAO_RecurringEntity::copyCreateEntity($this->entity_table, 
-        array('id' => $this->entity_id), 
-        $newCriteria,
-        $this->isGenRecurringEntity
-      );
-      $newEntities[] = $obj->id;
     }
     return $newEntities;
   }
 
-  function generateRecursions2() {
-    $newParams = $recursionResult = array();
+  function generateRecursiveDates() {
+    $this->generateRecursion2();
+
+    $recursionDates = array();
     if (is_a($this->recursion, 'When')) { 
       $initialCount = CRM_Utils_Array::value('start_action_offset', $this->scheduleDBParams);
-      $interval     = CRM_Utils_Array::value('interval',    $this->scheduleDBParams);
+
+      $exRangeStart = $exRangeEnd = NULL;
+      if (!empty($this->excludeDateRangeColumns)) {
+        $exRangeStart = $this->excludeDateRangeColumns[0];
+        $exRangeEnd   = $this->excludeDateRangeColumns[1];
+      }
 
       $count = 1;
+      CRM_Core_Error::debug_var('$this->intervalDateColumns', $this->intervalDateColumns);
       while ($result = $this->recursion->next()) {
-        $recursionResult[$count] = CRM_Utils_Date::processDate($result->format('Y-m-d H:i:s'));
+        $baseDate = CRM_Utils_Date::processDate($result->format('Y-m-d H:i:s'));
+
+        foreach ($this->dateColumns as $col) {
+          $recursionDates[$count][$col] = $baseDate;
+        }
+        foreach ($this->intervalDateColumns as $col => $interval) {
+          $newDate = new DateTime($baseDate);
+          $newDate->add($interval);
+          $recursionDates[$count][$col] = CRM_Utils_Date::processDate($newDate->format('Y-m-d H:i:s'));
+        }
+        if ($exRangeStart) {
+          $exRangeStartDate = CRM_Utils_Date::processDate($recursionDates[$count][$exRangeStart], NULL, FALSE, 'Ymd');
+          $exRangeEndDate   = CRM_Utils_Date::processDate($recursionDates[$count][$exRangeEnd], NULL, FALSE, 'Ymd');
+        }
 
         $skip = FALSE;
-        foreach ($this->excludeDates as $date) {
-          $date = CRM_Utils_Date::processDate($date, NULL, FALSE, 'Ymd');
-          if ($date == $result->format('Ymd')) {
-            $skip = TRUE;
-            break;
+        foreach ($this->excludeDates as $exDate) {
+          $exDate = CRM_Utils_Date::processDate($exDate, NULL, FALSE, 'Ymd');
+          if (!$exRangeStart) {
+            if ($exDate == $result->format('Ymd')) {
+              $skip = TRUE;
+              break;
+            }
+          } else {
+            if (($exDate == $exRangeStartDate) ||
+              ($exRangeEndDate && ($exDate > $exRangeStartDate) && ($exDate <= $exRangeEndDate))
+            ) {
+              $skip = TRUE;
+              break;
+            }
           }
         }
 
         if ($skip) {
-          unset($recursionResult[$count]);
+          unset($recursionDates[$count]);
           if ($initialCount && ($initialCount > 0)) {
             // lets increase the counter, so we get correct number of occurrences
             $initialCount++;
             $this->recursion->count($initialCount);
+            $this->recursionCounter = $initialCount;
           }
           continue;
         }
         $count++;
       }
     }
-    return $recursionResult;
+    $this->recursionDates = $recursionDates;
+    CRM_Core_Error::debug_var('$recursionDates', $recursionDates);
+
+    return $recursionDates;
   }
 
   // MODE = 3 (ALL)
@@ -347,12 +379,15 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       $dbParams['entity_value'] = $formParams['parent_event_id'];
     }
 
-    if(CRM_Utils_Array::value('repetition_start_date', $formParams) &&
-      CRM_Utils_Array::value('repetition_start_date_time', $formParams)){
-        $repetition_start_date = new DateTime($formParams['repetition_start_date']." ".$formParams['repetition_start_date_time']);
-        $repetition_start_date->modify('+1 day');
-        $dbParams['entity_status'] = CRM_Utils_Date::processDate($repetition_start_date->format('Y-m-d H:i:s'));
+    if(CRM_Utils_Array::value('repetition_start_date', $formParams)) {
+      $repetitionStartDate = $formParams['repetition_start_date'];
+      if (CRM_Utils_Array::value('repetition_start_date_time', $formParams)){
+        $repetitionStartDate = $repetitionStartDate . " " . $formParams['repetition_start_date_time'];
       }
+      $repetition_start_date = new DateTime($repetitionStartDate);
+      $repetition_start_date->modify('+1 day');
+      $dbParams['entity_status'] = CRM_Utils_Date::processDate($repetition_start_date->format('Y-m-d H:i:s'));
+    }
 
     if(CRM_Utils_Array::value('repetition_frequency_unit', $formParams)){
       $dbParams['repetition_frequency_unit'] = $formParams['repetition_frequency_unit'];
@@ -670,15 +705,9 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     $daoEvent->start_date = date('YmdHis', strtotime('2014-09-24 10:30:00'));
     $daoEvent->end_date =   date('YmdHis', strtotime('2014-09-26 10:30:00'));
     $daoEvent->created_date = date('YmdHis');
+    $daoEvent->is_active = 1;
     $daoEvent->save();
 
-    //Lets assume you saved the repeat configuration with these criterias
-    /**
-     * Event occurs every 2 weeks
-     * on monday, wednesday and friday
-     * for 4 times
-     * For eg - A small course on art and craft
-     */
     $recursion = new CRM_Core_BAO_RecurringEntity();
     $recursion->entity_id    = $daoEvent->id;
     $recursion->entity_table = 'civicrm_event';
@@ -686,14 +715,21 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     $recursion->scheduleDBParams = array (
       'entity_value'                  => $daoEvent->id,
       'entity_status'                 => $daoEvent->start_date,
-      'start_action_condition'        => 'monday,wednesday,friday',
+      'start_action_condition'        => 'wednesday',
       'repetition_frequency_unit'     => 'week',
-      'repetition_frequency_interval' => 2,
+      'repetition_frequency_interval' => 1,
       'start_action_offset'           => 4,
       'used_for'                      => 'event'
     );
 
+    $interval = $recursion->getInterval($daoEvent->start_date, $daoEvent->end_date);
+    $recursion->intervalDateColumns  = array('end_date' => $interval);
+
+    $recursion->excludeDates = array(date('Ymd', strtotime('2014-10-02')), '20141008');// = array('date1', date2, date2)
+    $recursion->excludeDateRangeColumns = array('start_date', 'end_date');
+
     $generatedEntities = $recursion->generate(); 
+    CRM_Core_Error::debug_var('$generatedEntities', $generatedEntities);
 
     // try changing something
     $recursion->mode(3); // sets ->mode var & saves in DB
