@@ -212,12 +212,7 @@ class CRM_Core_Form_RecurringEntity {
     $dbParams = CRM_Core_BAO_RecurringEntity::mapFormValuesToDB($params);
     $actionScheduleObj = CRM_Core_BAO_ActionSchedule::add($dbParams);
     
-    //Build Recursion Object
-    if($actionScheduleObj->id){
-      $recursionObject = CRM_Core_BAO_RecurringEntity::getRecursionFromReminder($actionScheduleObj->id);
-    }
-    
-    //TO DO - Exclude date functionality
+    //exclude dates 
     $excludeDateList = array();
     if(CRM_Utils_Array::value('copyExcludeDates', $params) && CRM_Utils_Array::value('parent_event_id', $params)){   
       //Since we get comma separated values lets get them in array
@@ -260,7 +255,7 @@ class CRM_Core_Form_RecurringEntity {
         }
       }
     }
-    
+
     //Delete relations if any from recurring entity tables before inserting new relations for this entity id
     if($params['parent_event_id']){
       $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($params['parent_event_id'], 'civicrm_event', FALSE);
@@ -287,12 +282,23 @@ class CRM_Core_Form_RecurringEntity {
       CRM_Core_BAO_RecurringEntity::delEntityRelations($params['parent_event_id'], 'civicrm_event');
     }
 
-    //Give call to create recursions
-    if ($params['parent_event_end_date']) {
-      $params['interval'] = CRM_Core_BAO_RecurringEntity::getInterval($params['parent_event_start_date'], $params['parent_event_end_date']);
+    $recursion = new CRM_Core_BAO_RecurringEntity();
+    $recursion->dateColumns  = array('start_date');
+    $recursion->scheduleId   = $actionScheduleObj->id;
+
+    if (!empty($excludeDateList)) {
+      $recursion->excludeDates = $excludeDateList;
+      $recursion->excludeDateRangeColumns = array('start_date', 'end_date');
     }
 
-    $recurResult = CRM_Core_BAO_RecurringEntity::generateRecursions($recursionObject, $params, $excludeDateList);
+    if ($params['parent_event_end_date']) {
+      $interval = $recursion->getInterval($params['parent_event_start_date'], $params['parent_event_end_date']);
+      $recursion->intervalDateColumns = array('end_date' => $interval);
+    }
+
+    $recurResult = $recursion->generateRecursiveDates(); 
+
+    //$recurResult = CRM_Core_BAO_RecurringEntity::generateRecursions($recursionObject, $params, $excludeDateList);
     if(!empty($recurResult) && $params['parent_event_id']) {
       CRM_Core_Form_RecurringEntity::addEntityThroughRecursion($recurResult, $params['parent_event_id']);
     }
@@ -303,22 +309,22 @@ class CRM_Core_Form_RecurringEntity {
 
   static public function addEntityThroughRecursion($recursionResult = array(), $currEntityID){
     if(!empty($recursionResult) && $currEntityID){
-      $parent_event_id = CRM_Core_BAO_RecurringEntity::getParentFor($currEntityID, 'civicrm_event');
-      if(!$parent_event_id){
-        $parent_event_id = $currEntityID;
+      $parentEventId = CRM_Core_BAO_RecurringEntity::getParentFor($currEntityID, 'civicrm_event');
+      if(!$parentEventId){
+        $parentEventId = $currEntityID;
       }
 
       // add first entry just for parent
-      CRM_Core_BAO_RecurringEntity::quickAdd($parent_event_id, $parent_event_id, 'civicrm_event');
+      CRM_Core_BAO_RecurringEntity::quickAdd($parentEventId, $parentEventId, 'civicrm_event');
 
       foreach ($recursionResult as $key => $value) {
         $newEventObj = CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_event', 
-        array('id' => $parent_event_id), 
+        array('id' => $parentEventId), 
         $value);
 
         CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_price_set_entity', 
           array(
-            'entity_id' => $parent_event_id, 
+            'entity_id' => $parentEventId, 
             'entity_table' => 'civicrm_event'
           ), 
           array(
@@ -329,7 +335,7 @@ class CRM_Core_Form_RecurringEntity {
 
         CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_uf_join', 
           array(
-            'entity_id' => $parent_event_id, 
+            'entity_id' => $parentEventId, 
             'entity_table' => 'civicrm_event'
           ), 
           array(
@@ -340,7 +346,7 @@ class CRM_Core_Form_RecurringEntity {
 
         CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_tell_friend', 
           array(
-            'entity_id' => $parent_event_id, 
+            'entity_id' => $parentEventId, 
             'entity_table' => 'civicrm_event'
           ), 
           array(
@@ -350,7 +356,7 @@ class CRM_Core_Form_RecurringEntity {
 
         CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_pcp_block', 
           array(
-            'entity_id' => $parent_event_id, 
+            'entity_id' => $parentEventId, 
             'entity_table' => 'civicrm_event'
           ), 
           array(

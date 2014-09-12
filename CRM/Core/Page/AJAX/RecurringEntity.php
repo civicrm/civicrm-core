@@ -39,49 +39,45 @@ class CRM_Core_Page_AJAX_RecurringEntity {
     $params = $formValues = $genericResult = array();
     $formValues = $_REQUEST;
     if(!empty($formValues)){
-      $dbParams = CRM_Core_BAO_RecurringEntity::mapFormValuesToDB($formValues);
-      if(!empty($dbParams)){
-        $recursionObject = CRM_Core_BAO_RecurringEntity::getRecursionFromReminderByDBParams($dbParams);
-        // Check if there were any errors
-        if($recursionObject->errors){
-          $genericResult['errors'] = $recursionObject->errors;
-        }else{
-          if(CRM_Utils_Array::value('event_id', $formValues)){
-            $parent_event_id = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['event_id'], 'civicrm_event');
-            if(!$parent_event_id){
-              $parent_event_id = $formValues['event_id'];
-            }
-            //Show the list of participants registered for the events if any
-            $getConnectedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($parent_event_id, 'civicrm_event', FALSE);
-            if($getConnectedEntities){
-              $participantDetails = CRM_Core_BAO_RecurringEntity::getParticipantCountforEvent($getConnectedEntities);
-              if(!empty($participantDetails['countByName'])){
-                $genericResult['participantData'] = $participantDetails['countByName'];
-              }
-            }
-            $startDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $parent_event_id, 'start_date');
-            $endDate   = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $parent_event_id, 'end_date');
+      $recursion = new CRM_Core_BAO_RecurringEntity();
+      $recursion->dateColumns  = array('start_date');
+      $recursion->schedule     = $formValues;
+      if (!empty($formValues['exclude_date_list'])) {
+        $recursion->excludeDates = $formValues['exclude_date_list'];
+        $recursion->excludeDateRangeColumns = array('start_date', 'end_date');
+      }
 
-            if($endDate) {
-              $params['interval'] = CRM_Core_BAO_RecurringEntity::getInterval($startDate, $endDate);
-            }
-            $params['start_action_offset'] = $formValues['start_action_offset'];
-          }
-          $recurResult = CRM_Core_BAO_RecurringEntity::generateRecursions($recursionObject, $params, $formValues['exclude_date_list']); 
-          $count = 1;
-          foreach ($recurResult as $key => $value) {
-            $genericResult[$count]['start_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['start_date']));
-            if($value['end_date']){
-              $genericResult[$count]['end_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['end_date']));
-            }
-            $count++;
-          }
+      $parentEventId = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['event_id'], 'civicrm_event');
+      if(!$parentEventId){
+        $parentEventId = $formValues['event_id'];
+      }
+
+      $endDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $parentEventId, 'end_date');
+      if ($endDate) {
+        $startDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $parentEventId, 'start_date');
+        $interval  = $recursion->getInterval($startDate, $endDate);
+        $recursion->intervalDateColumns = array('end_date' => $interval);
+      }
+
+      $result = $recursion->generateRecursiveDates(); 
+
+      foreach ($result as $key => $value) {
+        $result[$key]['start_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['start_date']));
+        if($value['end_date']){
+          $result[$key]['end_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['end_date']));
+        }
+      }
+
+      //Show the list of participants registered for the events if any
+      $getConnectedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($parentEventId, 'civicrm_event', FALSE);
+      if($getConnectedEntities){
+        $participantDetails = CRM_Core_BAO_RecurringEntity::getParticipantCountforEvent($getConnectedEntities);
+        if(!empty($participantDetails['countByName'])){
+          $result['participantData'] = $participantDetails['countByName'];
         }
       }
     }
-    echo json_encode($genericResult);
+    echo json_encode($result);
     CRM_Utils_System::civiExit();
   }
-  
 }
-
