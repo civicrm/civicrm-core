@@ -94,11 +94,15 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   function mode($mode) {
-    $this->mode = $mode;
-    if (!$this->parent_id) {
-      $this->parent_id = $this->entity_id;
+    if ($this->entity_id && $this->entity_table) {
+      if ($this->find(TRUE)) {
+        $this->mode = $mode;
+      } else {
+        $this->parent_id = $this->entity_id;
+        $this->mode = $mode;
+      }
+      $this->save();
     }
-    $this->save();
   }
 
   // generate all new entities based on object vars
@@ -612,80 +616,5 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       }
     }
     return $participantDetails;
-  }
-
-  static function testActivityGeneration() {
-    //Activity set initial params
-    $daoActivity = new CRM_Activity_DAO_Activity();
-    $daoActivity->activity_type_id = 1;
-    $daoActivity->subject = "Initial Activity";
-    $daoActivity->activity_date_time = date('YmdHis');
-    $daoActivity->save();
- 
-    $recursion = new CRM_Core_BAO_RecurringEntity();
-    $recursion->entity_id    = $daoActivity->id;
-    $recursion->entity_table = 'civicrm_activity';
-    $recursion->dateColumns  = array('activity_date_time');
-    $recursion->scheduleDBParams = array(
-      'entity_value'      => $daoActivity->id,
-      'entity_status'     => $daoActivity->activity_date_time,
-      'start_action_date' => 'fourth saturday',
-      'repetition_frequency_unit' => 'month',
-      'repetition_frequency_interval' => 3,
-      'start_action_offset' => 5,
-      'used_for' => 'activity'
-    );
-
-    $generatedEntities = $recursion->generate(); 
-
-    // try changing something
-    $recursion->mode(3); // sets ->mode var & saves in DB
-
-    // lets change subject of initial activity that we created in begining
-    $daoActivity->find(TRUE);
-    $daoActivity->subject = 'I changed it';
-    $daoActivity->save();
-  }
-
-  static function testEventGeneration(){
-    //Event set initial params
-    $daoEvent = new CRM_Event_DAO_Event();
-    $daoEvent->title = 'Test event for Recurring Entity';
-    $daoEvent->event_type_id = 3;
-    $daoEvent->is_public = 1;
-    $daoEvent->start_date = date('YmdHis', strtotime('2014-09-24 10:30:00'));
-    $daoEvent->end_date =   date('YmdHis', strtotime('2014-09-26 10:30:00'));
-    $daoEvent->created_date = date('YmdHis');
-    $daoEvent->is_active = 1;
-    $daoEvent->save();
-
-    $recursion = new CRM_Core_BAO_RecurringEntity();
-    $recursion->entity_id    = $daoEvent->id;
-    $recursion->entity_table = 'civicrm_event';
-    $recursion->dateColumns  = array('start_date');
-    $recursion->scheduleDBParams = array (
-      'entity_value'                  => $daoEvent->id,
-      'entity_status'                 => $daoEvent->start_date,
-      'start_action_condition'        => 'wednesday',
-      'repetition_frequency_unit'     => 'week',
-      'repetition_frequency_interval' => 1,
-      'start_action_offset'           => 4,
-      'used_for'                      => 'event'
-    );
-
-    $interval = $recursion->getInterval($daoEvent->start_date, $daoEvent->end_date);
-    $recursion->intervalDateColumns  = array('end_date' => $interval);
-
-    $recursion->excludeDates = array(date('Ymd', strtotime('2014-10-02')), '20141008');// = array('date1', date2, date2)
-    $recursion->excludeDateRangeColumns = array('start_date', 'end_date');
-
-    $generatedEntities = $recursion->generate(); 
-
-    // try changing something
-    $recursion->mode(3); // sets ->mode var & saves in DB
-
-    $daoEvent->find(TRUE);
-    $daoEvent->title = 'I changed event';
-    $daoEvent->save();
   }
 }

@@ -65,16 +65,12 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
    * Testing Activity Generation through Entity Recursion
    */
   function testActivityGeneration() {
-    //create an activity 
+    //Activity set initial params
     $daoActivity = new CRM_Activity_DAO_Activity();
     $daoActivity->activity_type_id = 1;
     $daoActivity->subject = "Initial Activity";
     $daoActivity->activity_date_time = date('YmdHis');
     $daoActivity->save();
- 
-    $this->assertDBNotNull('CRM_Activity_DAO_Activity', $daoActivity->id, 'id',
-      'id', 'Check DB if activity was created'
-    );
 
     $recursion = new CRM_Core_BAO_RecurringEntity();
     $recursion->entity_id    = $daoActivity->id;
@@ -87,8 +83,9 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       'repetition_frequency_unit' => 'month',
       'repetition_frequency_interval' => 3,
       'start_action_offset' => 5,
-      'used_for' => 'activity'
+      'used_for'            => 'activity'
     );
+
     $generatedEntities = $recursion->generate(); 
     foreach ($generatedEntities as $entityID) {
       $this->assertDBNotNull('CRM_Activity_DAO_Activity', $entityID, 'id',
@@ -96,8 +93,8 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       );
     }
 
-    // try changing something
-    $recursion->mode(3); // sets ->mode var & saves in DB
+    // set mode to ALL, i.e any change to changing activity affects all related recurring activities
+    $recursion->mode(3);
 
     // lets change subject of initial activity that we created in begining
     $daoActivity->find(TRUE);
@@ -120,7 +117,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $daoEvent->event_type_id = 3;
     $daoEvent->is_public = 1;
     $daoEvent->start_date = date('YmdHis', strtotime('2014-09-24 10:30:00'));
-    $daoEvent->end_date =   date('YmdHis', strtotime('2014-09-26 10:30:00'));
+    $daoEvent->end_date   = date('YmdHis', strtotime('2014-09-26 10:30:00'));
     $daoEvent->created_date = date('YmdHis');
     $daoEvent->is_active = 1;
     $daoEvent->save();
@@ -139,17 +136,10 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       'used_for'                      => 'event'
     );
 
-    //$interval = $recursion->getInterval($daoEvent->start_date, $daoEvent->end_date);
-    //$recursion->intervalDateColumns  = array('end_date' => $interval);
-
-    //$recursion->excludeDates = array(date('Ymd', strtotime('2014-10-02')), '20141008');// = array('date1', date2, date2)
-    //$recursion->excludeDateRangeColumns = array('start_date', 'end_date');
-
     $generatedEntities = $recursion->generate(); 
-    CRM_Core_Error::debug_var('$generatedEntities', $generatedEntities);
 
-    // try changing something
-    $recursion->mode(3); // sets ->mode var & saves in DB
+    // set mode to ALL, i.e any change to changing event affects all related recurring activities
+    $recursion->mode(3);
 
     $daoEvent->find(TRUE);
     $daoEvent->title = 'Event Changed';
@@ -160,7 +150,4 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       $this->assertDBCompareValue('CRM_Event_DAO_Event', $entityID, 'title', 'id', 'Event Changed', 'Check if title was updated');
     }
   }
-  
 }
-
-  
