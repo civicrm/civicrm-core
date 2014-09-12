@@ -94,22 +94,22 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     );
 
     $recursion = new CRM_Core_BAO_RecurringEntity();
-    $recursion->entity_id    = $daoActivity->id;
-    $recursion->entity_table = 'civicrm_activity';
-    $recursion->dateColumns  = array('activity_date_time');
-    $recursion->schedule     = array (
-      'entity_value'      => $this->_parentID,
-      'entity_status'     => $this->_activityDateTime,
+    $recursion->entityId($daoActivity->id);
+    $recursion->entityTable('civicrm_activity');
+    $recursion->dateColumns(array('activity_date_time'));
+    $recursion->scheduleDBParams(array(
+      'entity_value'      => $daoActivity->id,
+      'entity_status'     => $daoActivity->activity_date_time,
       'start_action_date' => 'fourth saturday',
       'repetition_frequency_unit' => 'month',
       'repetition_frequency_interval' => 3,
       'start_action_offset' => 5,
-      'used_for' => 'activity'
-    );
+      //'used_for' => 'activity'
+    ));
 
     // skip copying these column when creating new daos
     // or populate with values provided here
-    $recursion->overwriteColumns = array(); 
+    //$recursion->overwriteColumns = array(); 
     //$recursion->intervalDateColumns = array('end_date' => '1 day'); 
 
     $generatedEntities = $recursion->generate(); 
