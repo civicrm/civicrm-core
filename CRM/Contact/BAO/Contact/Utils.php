@@ -850,6 +850,7 @@ Group By  componentId";
         $contactNames[$dao->id] = array(
           'name' => "<a href='{$contactViewUrl}'>{$dao->display_name}</a>",
           'is_deleted' => $dao->is_deleted,
+          'contact_id' => $dao->cid,
         );
       }
     }
