@@ -59,7 +59,7 @@
           </tr>
           <tr class="crm-core-form-recurringentity-block-repeats_by">
             <td class="label"></td>
-            <td>{$form.repeats_by.2.html}&nbsp;&nbsp;{$form.start_action_date_1.html}&nbsp;&nbsp;{$form.start_action_date_2.html} {help id="id-repeats-by-week"}
+            <td>{$form.repeats_by.2.html}&nbsp;&nbsp;{$form.entity_status_1.html}&nbsp;&nbsp;{$form.entity_status_2.html} {help id="id-repeats-by-week"}
             </td>
           </tr>
           {*<tr class="crm-core-form-recurringentity-block-event_start_date">
@@ -145,13 +145,13 @@
     /******On Load set Repeats by section******************/
     if(cj('input:radio[name=repeats_by]:checked').val() == 1){
         cj('#limit_to').removeAttr('disabled').attr('enabled','enabled');
-        cj('#start_action_date_1, #start_action_date_2').removeAttr("enabled").attr('disabled','disabled');
+        cj('#entity_status_1, #entity_status_2').removeAttr("enabled").attr('disabled','disabled');
     }else if(cj('input:radio[name=repeats_by]:checked').val() == 2){
-        cj('#start_action_date_1, #start_action_date_2').removeAttr("disabled").attr('enabled','enabled');
+        cj('#entity_status_1, #entity_status_2').removeAttr("disabled").attr('enabled','enabled');
         cj('#limit_to').removeAttr('enabled').attr('disabled','disabled');
     }else{
         //Just in-case block shows up, disable it
-        cj('#limit_to, #start_action_date_1, #start_action_date_2').removeAttr('enabled').attr('disabled','disabled');
+        cj('#limit_to, #entity_status_1, #entity_status_2').removeAttr('enabled').attr('disabled','disabled');
     }
     
     cj('#repetition_frequency_unit').change(function () {
@@ -203,11 +203,11 @@
             cj('#limit_to').removeAttr('enabled').attr('disabled','disabled');
         }
         if(cj(this).val() == 2){
-            cj('#start_action_date_1').removeAttr('disabled').attr('enabled','enabled');
-            cj('#start_action_date_2').removeAttr('disabled').attr('enabled','enabled');
+            cj('#entity_status_1').removeAttr('disabled').attr('enabled','enabled');
+            cj('#entity_status_2').removeAttr('disabled').attr('enabled','enabled');
         }else{
-            cj('#start_action_date_1').removeAttr('enabled').attr('disabled','disabled');
-            cj('#start_action_date_2').removeAttr('enabled').attr('disabled','disabled');
+            cj('#entity_status_1').removeAttr('enabled').attr('disabled','disabled');
+            cj('#entity_status_2').removeAttr('enabled').attr('disabled','disabled');
         }
     });
     
@@ -369,7 +369,7 @@
             finalSummary += ' on day ' + cj('#limit_to').val();
         }
         if(cj('input:radio[name=repeats_by]:checked').val() == 2){
-            finalSummary += ' on ' + cj('#start_action_date_1').val().substr(0, 1).toUpperCase() + cj('#start_action_date_1').val().substr(1).toLowerCase() + ' ' + cj('#start_action_date_2').val().substr(0, 1).toUpperCase() + cj('#start_action_date_2').val().substr(1).toLowerCase();
+            finalSummary += ' on ' + cj('#entity_status_1').val().substr(0, 1).toUpperCase() + cj('#entity_status_1').val().substr(1).toLowerCase() + ' ' + cj('#entity_status_2').val().substr(0, 1).toUpperCase() + cj('#entity_status_2').val().substr(1).toLowerCase();
         }
     }
     

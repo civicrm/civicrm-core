@@ -132,7 +132,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($this->_parentEventStartDate, 'activityDateTime');
     // Check if there is id for this event in Reminder table
     if($this->_scheduleReminderId){
-      list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($this->_scheduleReminderDetails->entity_status, 'activityDateTime');
+      list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($this->_scheduleReminderDetails->start_action_date, 'activityDateTime');
       $defaults['repetition_frequency_unit'] = $this->_scheduleReminderDetails->repetition_frequency_unit;
       $defaults['repetition_frequency_interval'] = $this->_scheduleReminderDetails->repetition_frequency_interval;
       $defaults['start_action_condition'] = array_flip(explode(",",$this->_scheduleReminderDetails->start_action_condition));
@@ -154,10 +154,10 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         $defaults['repeats_by'] = 1;
       }
       $explodeStartActionCondition = array();
-      $explodeStartActionCondition = explode(" ", $this->_scheduleReminderDetails->start_action_date);
-      $defaults['start_action_date_1'] = $explodeStartActionCondition[0];
-      $defaults['start_action_date_2'] = $explodeStartActionCondition[1];
-      if($this->_scheduleReminderDetails->start_action_date){
+      $explodeStartActionCondition = explode(" ", $this->_scheduleReminderDetails->entity_status);
+      $defaults['entity_status_1'] = $explodeStartActionCondition[0];
+      $defaults['entity_status_2'] = $explodeStartActionCondition[1];
+      if($this->_scheduleReminderDetails->entity_status){
         $defaults['repeats_by'] = 2;
       }
       //echo "<pre>"; print_r($this->_excludeDateInfo);
