@@ -330,7 +330,7 @@
     <name>used_for</name>
     <type>varchar</type>
     <length>64</length>
-    <comment>Maintained for recurring entity</comment>
+    <comment>Used for repeating entity</comment>
     <add>4.6</add>
   </field>
 </table>

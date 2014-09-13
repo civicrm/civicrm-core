@@ -24,6 +24,7 @@
       <length>10</length>
       <title>Parent ID</title>
       <required>true</required>
+      <comment>Recurring Entity Parent ID</comment>
       <add>4.6</add>
   </field>
   <field>
@@ -31,6 +32,7 @@
       <type>int unsigned</type>
       <length>10</length>
       <title>Entity ID</title>
+      <comment>Recurring Entity Child ID</comment>
       <add>4.6</add>
   </field>
   <field>
@@ -39,6 +41,7 @@
       <length>64</length>
       <title>Entity Table</title>
       <required>true</required>
+      <comment>Physical tablename for entity, e.g. civicrm_event</comment>
       <add>4.6</add>
   </field>
   <field>
@@ -47,6 +50,7 @@
       <default>1</default>
       <title>Cascade Type</title>
       <required>true</required>
+      <comment>1-this entity, 2-this and the following entities, 3-all the entities</comment>
       <add>4.6</add>
   </field>
 </table>
