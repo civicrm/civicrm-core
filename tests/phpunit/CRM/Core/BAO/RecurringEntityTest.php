@@ -76,7 +76,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $recursion->entity_id    = $daoActivity->id;
     $recursion->entity_table = 'civicrm_activity';
     $recursion->dateColumns  = array('activity_date_time');
-    $recursion->scheduleDBParams = array(
+    $recursion->schedule     = array(
       'entity_value'      => $daoActivity->id,
       'start_action_date'     => $daoActivity->activity_date_time,
       'entity_status' => 'fourth saturday',
@@ -87,7 +87,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     );
 
     $generatedEntities = $recursion->generate(); 
-    foreach ($generatedEntities as $entityID) {
+    foreach ($generatedEntities['civicrm_activity'] as $entityID) {
       $this->assertDBNotNull('CRM_Activity_DAO_Activity', $entityID, 'id',
         'id', 'Check DB if repeating activities were created'
       );
@@ -102,7 +102,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $daoActivity->save();
 
     // check if other activities were affected
-    foreach ($generatedEntities as $entityID) {
+    foreach ($generatedEntities['civicrm_activity'] as $entityID) {
       $this->assertDBCompareValue('CRM_Activity_DAO_Activity', $entityID, 'subject', 'id', 'Changed Activity', 'Check if subject was updated');
     }
   }
@@ -146,7 +146,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $recursion->entity_id    = $daoEvent->id;
     $recursion->entity_table = 'civicrm_event';
     $recursion->dateColumns  = array('start_date');
-    $recursion->scheduleDBParams = array (
+    $recursion->schedule     = array (
       'entity_value'                  => $daoEvent->id,
       'start_action_date'             => $daoEvent->start_date,
       'start_action_condition'        => 'wednesday',
@@ -239,7 +239,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $daoEvent->save();
 
     // check if other events were affected
-    foreach ($generatedEntities as $entityID) {
+    foreach ($generatedEntities['civicrm_event'] as $entityID) {
       $this->assertDBCompareValue('CRM_Event_DAO_Event', $entityID, 'title', 'id', 'Event Changed', 'Check if title was updated');
     }
   }

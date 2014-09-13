@@ -36,21 +36,21 @@
 require_once 'packages/When/When.php'; 
 
 class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
-  public $linkedEntities = array();
+
   public $schedule = array();
   public $scheduleId = NULL;
-  public $scheduleDBParams = array();
+  public $scheduleFormValues = array();
 
   public $dateColumns = array();
   public $overwriteColumns = array();
   public $intervalDateColumns = array();
-
   public $excludeDates = array();
-
-  public $recursion = NULL;
-  public $recursionCounter = NULL;
+  
+  public $linkedEntities = array();
 
   public $isRecurringEntityRecord = TRUE;
+
+  protected $recursion = NULL;
 
   static $_tableDAOMapper = 
     array(
@@ -61,6 +61,15 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       'civicrm_pcp_block'   => 'CRM_PCP_DAO_PCPBlock',
       'civicrm_activity'    => 'CRM_Activity_DAO_Activity',
       'civicrm_activity_contact'  => 'CRM_Activity_DAO_ActivityContact',
+    );
+
+
+  static $_updateSkipFields = 
+    array(
+      'civicrm_event'       => array('start_date', 'end_date'),
+      'civicrm_tell_friend' => array('entity_id'),
+      'civicrm_pcp_block'   => array('entity_id'),
+      'civicrm_activity'    => array('activity_date_time'),
     );
 
   static function add(&$params) {
@@ -121,13 +130,13 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
     if ($this->scheduleId) {
       // get params by ID
-      $this->recursion = $this->getRecursionFromReminder($this->scheduleId);
-    } else if (!empty($this->schedule)) {
-      $this->scheduleDBParams = $this->mapFormValuesToDB($this->schedule);//call using obj
+      $this->schedule = $this->getScheduleParams($this->scheduleId);
+    } else if (!empty($this->scheduleFormValues)) {
+      $this->schedule = $this->mapFormValuesToDB($this->scheduleFormValues);
     }
 
-    if (!empty($this->scheduleDBParams)) {
-      $this->recursion = $this->getRecursionFromReminderByDBParams($this->scheduleDBParams);
+    if (!empty($this->schedule)) {
+      $this->recursion = $this->getRecursionFromSchedule($this->schedule);
     }
     return $this->recursion;
   }
@@ -162,7 +171,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           $this->isRecurringEntityRecord
         );
 
-        if ($obj->id) {
+        if (is_a($obj, 'CRM_Core_DAO') && $obj->id) {
           $newCriteria = array();
           $newEntities[$this->entity_table][$count] = $obj->id;
 
@@ -176,7 +185,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
               CRM_Utils_Array::value('isRecurringEntityRecord', $linkedInfo, TRUE)
             );
 
-            if ($linkedObj->id) {
+            if (is_a($linkedObj, 'CRM_Core_DAO') && $linkedObj->id) {
               $newEntities[$linkedInfo['table']][$count] = $linkedObj->id;
             }
           }
@@ -193,7 +202,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
     $recursionDates = array();
     if (is_a($this->recursion, 'When')) { 
-      $initialCount = CRM_Utils_Array::value('start_action_offset', $this->scheduleDBParams);
+      $initialCount = CRM_Utils_Array::value('start_action_offset', $this->scheduleFormValues);
 
       $exRangeStart = $exRangeEnd = NULL;
       if (!empty($this->excludeDateRangeColumns)) {
@@ -242,7 +251,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
             // lets increase the counter, so we get correct number of occurrences
             $initialCount++;
             $this->recursion->count($initialCount);
-            $this->recursionCounter = $initialCount;
           }
           continue;
         }
@@ -334,7 +342,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
     $newObject = CRM_Core_DAO::copyGeneric($daoName, $fromCriteria, $newParams);
 
-    if ($newObject && $newObject->id && $createRecurringEntity) {
+    if (is_a($newObject, 'CRM_Core_DAO') && $newObject->id && $createRecurringEntity) {
       $object = new $daoName( );
       foreach ($fromCriteria as $key => $value) {
         $object->$key = $value;
@@ -386,12 +394,15 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       $processedEntities[$key] = 1;
 
       if (array_key_exists($entityTable, self::$_tableDAOMapper)) {
-        $daoName = self::$_tableDAOMapper[$entityTable];
+        $daoName  = self::$_tableDAOMapper[$entityTable];
 
-        // FIXME: generalize me
-        $skipData = array('start_date' => NULL, 
-          'end_date' => NULL,
-        );
+        $skipData = array();
+        if (array_key_exists($entityTable, self::$_updateSkipFields)) {
+          $skipFields = self::$_updateSkipFields[$entityTable];
+          foreach ($skipFields as $sfield) {
+            $skipData[$sfield] = NULL;
+          }
+        }
 
         $updateDAO = CRM_Core_DAO::cascadeUpdate($daoName, $obj->id, $entityID, $skipData);
         CRM_Core_DAO::freeResult();
@@ -485,17 +496,17 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $dao;
   }
 
-  function getRecursionFromReminder($scheduleReminderId){
-    if($scheduleReminderId){
+  function getScheduleParams($scheduleReminderId) {
+    $scheduleReminderDetails = array();
+    if ($scheduleReminderId){
       //Get all the details from schedule reminder table
       $scheduleReminderDetails = self::getScheduleReminderDetailsById($scheduleReminderId);
       $scheduleReminderDetails = (array) $scheduleReminderDetails;
-      $recursionDetails = self::getRecursionFromReminderByDBParams($scheduleReminderDetails);
     }
-    return $recursionDetails;
+    return $scheduleReminderDetails;
   }
 
-  function getRecursionFromReminderByDBParams($scheduleReminderDetails = array()){
+  function getRecursionFromSchedule($scheduleReminderDetails = array()){
     $r = new When();
     //If there is some data for this id
     if($scheduleReminderDetails['repetition_frequency_unit']){
