@@ -50,7 +50,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   public $recursion = NULL;
   public $recursionCounter = NULL;
 
-  public $isGenRecurringEntity = TRUE;
+  public $isRecurringEntityRecord = TRUE;
 
   static $_tableDAOMapper = 
     array(
@@ -60,6 +60,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       'civicrm_tell_friend' => 'CRM_Friend_DAO_Friend',
       'civicrm_pcp_block'   => 'CRM_PCP_DAO_PCPBlock',
       'civicrm_activity'    => 'CRM_Activity_DAO_Activity',
+      'civicrm_activity_contact'  => 'CRM_Activity_DAO_ActivityContact',
     );
 
   static function add(&$params) {
@@ -133,14 +134,20 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
   // generate new DAOs and along with entries in recurring_entity table
   function generateEntities() {
-    // fixme: check if entityid & entitytable set
-
-    $newEntities = array();
+    $newEntities  = array();
+    $findCriteria = array();
     if (!empty($this->recursionDates)) {
-      // save an entry with initiating entity-id & entity-table
-      if (!$this->find(TRUE)) {
-        $this->parent_id = $this->entity_id;
-        $this->save();
+      if ($this->entity_id) {
+        $findCriteria = array('id' => $this->entity_id);
+
+        // save an entry with initiating entity-id & entity-table
+        if ($this->entity_table && !$this->find(TRUE)) {
+          $this->parent_id = $this->entity_id;
+          $this->save();
+        }
+      }
+      if (empty($findCriteria)) {
+        CRM_Core_Error::fatal("Find criteria missing to generate from. Make sure entity_id and table is set.");
       }
 
       foreach ($this->recursionDates as $key => $dateCols) {
@@ -149,13 +156,28 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           $newCriteria[$col] = $val;
         }
         $obj = CRM_Core_BAO_RecurringEntity::copyCreateEntity($this->entity_table, 
-          array('id' => $this->entity_id), 
+          $findCriteria,
           $newCriteria,
-          $this->isGenRecurringEntity
+          $this->isRecurringEntityRecord
         );
+
+        if ($obj->id) {
+          $newCriteria = array();
+          foreach ($this->linkedEntities as $linkedInfo) {
+            foreach ($linkedInfo['linkedColumns'] as $col) {
+              $newCriteria[$col] = $obj->id;
+            }
+            $linkedObj = CRM_Core_BAO_RecurringEntity::copyCreateEntity($linkedInfo['table'], 
+              $linkedInfo['findCriteria'],
+              $newCriteria,
+              CRM_Utils_Array::value('isRecurringEntityRecord', $linkedInfo, TRUE)
+            );
+          }
+        }
         $newEntities[] = $obj->id;
       }
     }
+
     return $newEntities;
   }
 
@@ -300,6 +322,9 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
   static public function copyCreateEntity($entityTable, $fromCriteria, $newParams, $createRecurringEntity = TRUE) {
     $daoName = self::$_tableDAOMapper[$entityTable];
+    if (!$daoName) {
+      CRM_Core_Error::fatal("DAO Mapper missing for $entityTable.");
+    }
     $newObject = CRM_Core_DAO::copyGeneric($daoName, $fromCriteria, $newParams);
 
     if ($newObject->id && $createRecurringEntity) {
