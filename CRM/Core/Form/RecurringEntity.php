@@ -296,76 +296,53 @@ class CRM_Core_Form_RecurringEntity {
       $recursion->intervalDateColumns = array('end_date' => $interval);
     }
 
-    $recurResult = $recursion->generateRecursiveDates(); 
+    $recursion->entity_id = $params['current_event_id'];
+    $recursion->entity_table = 'civicrm_event';
+    $recursion->linkedEntities = array(
+      array(
+        'table'         => 'civicrm_price_set_entity',
+        'findCriteria'  => array(
+          'entity_id'    => $recursion->entity_id, 
+          'entity_table' => 'civicrm_event'
+        ),
+        'linkedColumns' => array('entity_id'),
+        'isRecurringEntityRecord' => FALSE,
+      ),
+      array(
+        'table'         => 'civicrm_uf_join',
+        'findCriteria'  => array(
+          'entity_id'    => $recursion->entity_id, 
+          'entity_table' => 'civicrm_event'
+        ),
+        'linkedColumns' => array('entity_id'),
+        'isRecurringEntityRecord' => FALSE,
+      ),
+      array(
+        'table'         => 'civicrm_tell_friend',
+        'findCriteria'  => array(
+          'entity_id'    => $recursion->entity_id, 
+          'entity_table' => 'civicrm_event'
+        ),
+        'linkedColumns' => array('entity_id'),
+        'isRecurringEntityRecord' => TRUE,
+      ),
+      array(
+        'table'         => 'civicrm_pcp_block',
+        'findCriteria'  => array(
+          'entity_id'    => $recursion->entity_id, 
+          'entity_table' => 'civicrm_event'
+        ),
+        'linkedColumns' => array('entity_id'),
+        'isRecurringEntityRecord' => TRUE,
+      ),
+    );
 
-    //$recurResult = CRM_Core_BAO_RecurringEntity::generateRecursions($recursionObject, $params, $excludeDateList);
-    if(!empty($recurResult) && $params['parent_event_id']) {
-      CRM_Core_Form_RecurringEntity::addEntityThroughRecursion($recurResult, $params['parent_event_id']);
-    }
+    $recurResult = $recursion->generate(); 
+
     $status = ts('Repeat Configuration has been saved');
     CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
   }
   //end of function
-
-  static public function addEntityThroughRecursion($recursionResult = array(), $currEntityID){
-    if(!empty($recursionResult) && $currEntityID){
-      $parentEventId = CRM_Core_BAO_RecurringEntity::getParentFor($currEntityID, 'civicrm_event');
-      if(!$parentEventId){
-        $parentEventId = $currEntityID;
-      }
-
-      // add first entry just for parent
-      CRM_Core_BAO_RecurringEntity::quickAdd($parentEventId, $parentEventId, 'civicrm_event');
-
-      foreach ($recursionResult as $key => $value) {
-        $newEventObj = CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_event', 
-        array('id' => $parentEventId), 
-        $value);
-
-        CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_price_set_entity', 
-          array(
-            'entity_id' => $parentEventId, 
-            'entity_table' => 'civicrm_event'
-          ), 
-          array(
-            'entity_id' => $newEventObj->id
-          ),
-          FALSE
-        );
-
-        CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_uf_join', 
-          array(
-            'entity_id' => $parentEventId, 
-            'entity_table' => 'civicrm_event'
-          ), 
-          array(
-            'entity_id' => $newEventObj->id
-          ),
-          FALSE
-        );
-
-        CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_tell_friend', 
-          array(
-            'entity_id' => $parentEventId, 
-            'entity_table' => 'civicrm_event'
-          ), 
-          array(
-            'entity_id' => $newEventObj->id
-          )
-        );
-
-        CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_pcp_block', 
-          array(
-            'entity_id' => $parentEventId, 
-            'entity_table' => 'civicrm_event'
-          ), 
-          array(
-            'entity_id' => $newEventObj->id
-          )
-        );
-      }
-    }
-  }
 
   /**
    * Return a descriptive name for the page, used in wizard header

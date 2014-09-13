@@ -178,7 +178,8 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
   public function postProcess() {
     if($this->_id){
       $params = $this->controller->exportValues($this->_name); 
-      $params['parent_event_id'] = $this->_parentEventId;
+      $params['current_event_id'] = $this->_id;
+      $params['parent_event_id']  = $this->_parentEventId;
       $params['parent_event_start_date'] = $this->_parentEventStartDate;
       $params['parent_event_end_date'] = $this->_parentEventEndDate;
       //Unset event id
