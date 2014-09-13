@@ -41,7 +41,7 @@ class CRM_Core_Page_AJAX_RecurringEntity {
     if(!empty($formValues)){
       $recursion = new CRM_Core_BAO_RecurringEntity();
       $recursion->dateColumns  = array('start_date');
-      $recursion->schedule     = $formValues;
+      $recursion->scheduleFormValues = $formValues;
       if (!empty($formValues['exclude_date_list'])) {
         $recursion->excludeDates = $formValues['exclude_date_list'];
         $recursion->excludeDateRangeColumns = array('start_date', 'end_date');
