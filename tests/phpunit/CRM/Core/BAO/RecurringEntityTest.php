@@ -121,6 +121,26 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $daoEvent->created_date = date('YmdHis');
     $daoEvent->is_active = 1;
     $daoEvent->save();
+    $this->assertDBNotNull('CRM_Event_DAO_Event', $daoEvent->id, 'id', 'id', 'Check DB if event was created');
+    
+    //Create profile for event
+    $daoUF = new CRM_Core_DAO_UFJoin();
+    $daoUF->is_active = 1;
+    $daoUF->entity_table = 'civicrm_event';
+    $daoUF->entity_id = $daoEvent->id;
+    $daoUF->uf_group_id = 12;
+    $daoUF->module = 'Test';
+    $daoUF->save();
+    $this->assertDBNotNull('CRM_Core_DAO_UFJoin', $daoUF->id, 'id', 'id', 'Check DB if profile was created');
+    
+    //Create tell a friend for event
+    $daoTellAFriend = new CRM_Friend_DAO_Friend();
+    $daoTellAFriend->entity_table = 'civicrm_event';
+    $daoTellAFriend->entity_id = $daoEvent->id;
+    $daoTellAFriend->title = 'Testing tell a friend';
+    $daoTellAFriend->is_active = 1;
+    $daoTellAFriend->save();
+    $this->assertDBNotNull('CRM_Friend_DAO_Friend', $daoTellAFriend->id, 'id', 'id', 'Check DB if tell a freind was created');
 
     $recursion = new CRM_Core_BAO_RecurringEntity();
     $recursion->entity_id    = $daoEvent->id;
@@ -128,7 +148,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $recursion->dateColumns  = array('start_date');
     $recursion->scheduleDBParams = array (
       'entity_value'                  => $daoEvent->id,
-      'start_action_date'                 => $daoEvent->start_date,
+      'start_action_date'             => $daoEvent->start_date,
       'start_action_condition'        => 'wednesday',
       'repetition_frequency_unit'     => 'week',
       'repetition_frequency_interval' => 1,
@@ -176,6 +196,40 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     );
 
     $generatedEntities = $recursion->generate(); 
+    $this->assertArrayHasKey('civicrm_event', $generatedEntities, 'Check if generatedEntities has civicrm_event as required key');
+    
+    if(CRM_Utils_Array::value('civicrm_event', $generatedEntities)){
+      $expCountEvent = count($generatedEntities['civicrm_event']);
+      $actCountEvent = 0;
+      foreach($generatedEntities['civicrm_event'] as $key => $val){
+        $this->assertDBNotNull('CRM_Event_DAO_Event', $val, 'id', 'id', 'Check if events were created in loop');
+        $actCountEvent++;
+      }
+      $this->assertCount($expCountEvent, $actCountEvent, 'Check if the number of events created are right');
+    }
+    
+    if(CRM_Utils_Array::value('civicrm_uf_join', $generatedEntities) && CRM_Utils_Array::value('civicrm_event', $generatedEntities)){
+      $expCountUFJoin = count($generatedEntities['civicrm_uf_join']);
+      $actCountUFJoin = 0;
+      foreach($generatedEntities['civicrm_uf_join'] as $key => $val){
+        $this->assertDBNotNull('CRM_Core_DAO_UFJoin', $val, 'id', 'id', 'Check if profile were created in loop');
+        $this->assertDBCompareValue('CRM_Core_DAO_UFJoin', $val, 'entity_id', 'id', $generatedEntities['civicrm_event'][$key], 'Check DB if correct FK was maintained with event for UF Join');
+        $actCountUFJoin++;
+      }
+      $this->assertCount($expCountUFJoin, $actCountUFJoin, 'Check if the number of profiles created are right');
+    }
+    
+    if(CRM_Utils_Array::value('civicrm_tell_friend', $generatedEntities) && CRM_Utils_Array::value('civicrm_event', $generatedEntities)){
+      $expCountTellAFriend = count($generatedEntities['civicrm_tell_friend']);
+      $actCountTellAFriend = 0;
+      foreach($generatedEntities['civicrm_tell_friend'] as $key => $val){
+        $this->assertDBNotNull('CRM_Friend_DAO_Friend', $val, 'id', 'id', 'Check if friends were created in loop');
+        $this->assertDBCompareValue('CRM_Friend_DAO_Friend', $val, 'entity_id', 'id', $generatedEntities['civicrm_event'][$key], 'Check DB if correct FK was maintained with event for Friend');
+        $actCountTellAFriend++;
+      }
+      $this->assertCount($expCountTellAFriend, $actCountTellAFriend, 'Check if the number of friends created are right');
+    }
+    
 
     // set mode to ALL, i.e any change to changing event affects all related recurring activities
     $recursion->mode(3);
