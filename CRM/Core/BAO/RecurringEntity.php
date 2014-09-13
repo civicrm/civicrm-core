@@ -388,7 +388,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       }
       $repetition_start_date = new DateTime($repetitionStartDate);
       $repetition_start_date->modify('+1 day');
-      $dbParams['entity_status'] = CRM_Utils_Date::processDate($repetition_start_date->format('Y-m-d H:i:s'));
+      $dbParams['start_action_date'] = CRM_Utils_Date::processDate($repetition_start_date->format('Y-m-d H:i:s'));
     }
 
     if(CRM_Utils_Array::value('repetition_frequency_unit', $formParams)){
@@ -415,8 +415,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         }
       }
       if($formParams['repeats_by'] == 2){
-        if(CRM_Utils_Array::value('start_action_date_1', $formParams) && CRM_Utils_Array::value('start_action_date_2', $formParams)){
-          $dbParams['start_action_date'] = $formParams['start_action_date_1']." ".$formParams['start_action_date_2'];
+        if(CRM_Utils_Array::value('entity_status_1', $formParams) && CRM_Utils_Array::value('entity_status_2', $formParams)){
+          $dbParams['entity_status'] = $formParams['entity_status_1']." ".$formParams['entity_status_2'];
         }
       }
     }
@@ -467,8 +467,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     $r = new When();
     //If there is some data for this id
     if($scheduleReminderDetails['repetition_frequency_unit']){
-      if($scheduleReminderDetails['entity_status']){
-        $currDate = date('Y-m-d H:i:s', strtotime($scheduleReminderDetails['entity_status']));
+      if($scheduleReminderDetails['start_action_date']){
+        $currDate = date('Y-m-d H:i:s', strtotime($scheduleReminderDetails['start_action_date']));
       }else{
         $currDate = date("Y-m-d H:i:s");
       }
@@ -503,8 +503,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
       //month 
       if($scheduleReminderDetails['repetition_frequency_unit'] == 'month'){
-        if($scheduleReminderDetails['start_action_date']){
-          $startActionDate = explode(" ", $scheduleReminderDetails['start_action_date']);
+        if($scheduleReminderDetails['entity_status']){
+          $startActionDate = explode(" ", $scheduleReminderDetails['entity_status']);
           switch ($startActionDate[0]) {
           case 'first':
             $startActionDate1 = 1;

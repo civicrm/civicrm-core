@@ -78,8 +78,8 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $recursion->dateColumns  = array('activity_date_time');
     $recursion->scheduleDBParams = array(
       'entity_value'      => $daoActivity->id,
-      'entity_status'     => $daoActivity->activity_date_time,
-      'start_action_date' => 'fourth saturday',
+      'start_action_date'     => $daoActivity->activity_date_time,
+      'entity_status' => 'fourth saturday',
       'repetition_frequency_unit' => 'month',
       'repetition_frequency_interval' => 3,
       'start_action_offset' => 5,
@@ -128,7 +128,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $recursion->dateColumns  = array('start_date');
     $recursion->scheduleDBParams = array (
       'entity_value'                  => $daoEvent->id,
-      'entity_status'                 => $daoEvent->start_date,
+      'start_action_date'                 => $daoEvent->start_date,
       'start_action_condition'        => 'wednesday',
       'repetition_frequency_unit'     => 'week',
       'repetition_frequency_interval' => 1,

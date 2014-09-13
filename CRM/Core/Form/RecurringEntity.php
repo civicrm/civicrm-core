@@ -84,8 +84,8 @@ class CRM_Core_Form_RecurringEntity {
                             'fourth'=> 'Fourth',
                             'last'  => 'Last'
                          );
-    $form->add('select', 'start_action_date_1', ts(''), $dayOfTheWeekNo);
-    $form->add('select', 'start_action_date_2', ts(''), $dayOfTheWeek);
+    $form->add('select', 'entity_status_1', ts(''), $dayOfTheWeekNo);
+    $form->add('select', 'entity_status_2', ts(''), $dayOfTheWeek);
     $eoptionTypes = array('1' => ts('After'),
         '2' => ts('On'),
       );
@@ -172,20 +172,20 @@ class CRM_Core_Form_RecurringEntity {
         }
       }
       if($values['repeats_by'] == 2){
-        if($values['start_action_date_1'] != "" ) {
+        if($values['entity_status_1'] != "" ) {
           $dayOfTheWeekNo = array(first, second, third, fourth, last);
-          if(!in_array($values['start_action_date_1'], $dayOfTheWeekNo)){
-             $errors['start_action_date_1'] = ts('Invalid option');
+          if(!in_array($values['entity_status_1'], $dayOfTheWeekNo)){
+             $errors['entity_status_1'] = ts('Invalid option');
           }
         }else{
-          $errors['start_action_date_1'] = ts('Invalid option');
+          $errors['entity_status_1'] = ts('Invalid option');
         }
-        if($values['start_action_date_2'] != "" ) {
-          if(!in_array($values['start_action_date_2'], $dayOfTheWeek)){
-             $errors['start_action_date_2'] = ts('Invalid day name');
+        if($values['entity_status_2'] != "" ) {
+          if(!in_array($values['entity_status_2'], $dayOfTheWeek)){
+             $errors['entity_status_2'] = ts('Invalid day name');
           }
         }else{
-          $errors['start_action_date_2'] = ts('Invalid day name');
+          $errors['entity_status_2'] = ts('Invalid day name');
         }
       }
     }
