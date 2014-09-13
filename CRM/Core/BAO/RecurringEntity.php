@@ -150,6 +150,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         CRM_Core_Error::fatal("Find criteria missing to generate from. Make sure entity_id and table is set.");
       }
 
+      $count = 0;
       foreach ($this->recursionDates as $key => $dateCols) {
         $newCriteria = $dateCols;
         foreach ($this->overwriteColumns as $col => $val) {
@@ -163,6 +164,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
         if ($obj->id) {
           $newCriteria = array();
+          $newEntities[$this->entity_table][$count] = $obj->id;
+
           foreach ($this->linkedEntities as $linkedInfo) {
             foreach ($linkedInfo['linkedColumns'] as $col) {
               $newCriteria[$col] = $obj->id;
@@ -172,9 +175,13 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
               $newCriteria,
               CRM_Utils_Array::value('isRecurringEntityRecord', $linkedInfo, TRUE)
             );
+
+            if ($linkedObj->id) {
+              $newEntities[$linkedInfo['table']][$count] = $linkedObj->id;
+            }
           }
         }
-        $newEntities[] = $obj->id;
+        $count++;
       }
     }
 

@@ -136,6 +136,45 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       'used_for'                      => 'event'
     );
 
+    $recursion->linkedEntities = array(
+      array(
+        'table'         => 'civicrm_price_set_entity',
+        'findCriteria'  => array(
+          'entity_id'    => $recursion->entity_id, 
+          'entity_table' => 'civicrm_event'
+        ),
+        'linkedColumns' => array('entity_id'),
+        'isRecurringEntityRecord' => FALSE,
+      ),
+      array(
+        'table'         => 'civicrm_uf_join',
+        'findCriteria'  => array(
+          'entity_id'    => $recursion->entity_id, 
+          'entity_table' => 'civicrm_event'
+        ),
+        'linkedColumns' => array('entity_id'),
+        'isRecurringEntityRecord' => FALSE,
+      ),
+      array(
+        'table'         => 'civicrm_tell_friend',
+        'findCriteria'  => array(
+          'entity_id'    => $recursion->entity_id, 
+          'entity_table' => 'civicrm_event'
+        ),
+        'linkedColumns' => array('entity_id'),
+        'isRecurringEntityRecord' => TRUE,
+      ),
+      array(
+        'table'         => 'civicrm_pcp_block',
+        'findCriteria'  => array(
+          'entity_id'    => $recursion->entity_id, 
+          'entity_table' => 'civicrm_event'
+        ),
+        'linkedColumns' => array('entity_id'),
+        'isRecurringEntityRecord' => TRUE,
+      ),
+    );
+
     $generatedEntities = $recursion->generate(); 
 
     // set mode to ALL, i.e any change to changing event affects all related recurring activities
