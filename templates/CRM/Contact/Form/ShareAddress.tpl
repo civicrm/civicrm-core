@@ -26,25 +26,20 @@
 {* template for handling share address functionality*}
 <tr>
   <td>
-    {$form.address.$blockId.use_shared_address.html}{$form.address.$blockId.use_shared_address.label} {help id="id-sharedAddress" file="CRM/Contact/Form/Contact.hlp"}<br />
-    {if !empty($sharedAddresses.$blockId.shared_address_display)}
-      <span class="shared-address-display" id="shared-address-display-name-{$blockId}">
-        {$sharedAddresses.$blockId.shared_address_display.name}
-      </span>
-
-      <span class="shared-address-display" id="shared-address-display-{$blockId}" onclick="cj(this).hide( );cj('#shared-address-display-name-{$blockId}').hide( );cj('#shared-address-display-cancel-{$blockId}').show( );cj('#shared-address-{$blockId}').show( );">
-              {$sharedAddresses.$blockId.shared_address_display.address} <a href='#' onclick='return false;'>( {ts}Change current shared address{/ts} )</a>
-      </span>
-
-      <span id="shared-address-display-cancel-{$blockId}" class="hiddenElement" onclick="cj(this).hide( );cj('#shared-address-display-name-{$blockId}').show( );cj('#shared-address-display-{$blockId}').show( );cj('#shared-address-{$blockId}').hide( );">
-              <a href='#' onclick='return false;'>( {ts}Cancel{/ts} )</a>
-      </span>
-    {/if}
-
-    <div id="shared-address-{$blockId}" class="form-layout-compressed hiddenElement">
+    {$form.address.$blockId.use_shared_address.html}{$form.address.$blockId.use_shared_address.label} {help id="id-sharedAddress" file="CRM/Contact/Form/Contact.hlp"}
+    <div id="shared-address-{$blockId}" class="form-layout-compressed">
       {$form.address.$blockId.master_contact_id.label}
       {$form.address.$blockId.master_contact_id.html}
-      <div class="shared-address-list"></div>
+      <div class="shared-address-list">
+        {if !empty($sharedAddresses.$blockId.shared_address_display)}
+          {foreach item='sa' from=$sharedAddresses.$blockId.shared_address_display.options}
+            {assign var="sa_name" value="selected_shared_address-`$blockId`"}
+            {assign var="sa_id" value="`$sa_name`-`$sa.id`"}
+            <input type="radio" name="{$sa_name}" id="{$sa_id}" value="{$sa.id}" {if $sa.id eq $sharedAddresses.$blockId.shared_address_display.master_id}checked="checked"{/if}>
+            <label for="{$sa_id}">{$sa.display_text}</label><br/>
+          {/foreach}
+        {/if}
+      </div>
     </div>
   </td>
 </tr>
@@ -53,24 +48,32 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    var blockNo = {/literal}{$blockId}{literal};
+    var blockNo = {/literal}{$blockId}{literal},
+      $contentArea = $('#shared-address-' + blockNo + ' .shared-address-list'),
+      $masterElement = $('input[name="address[' + blockNo + '][master_id]"]');
 
     function showHideSharedAddress() {
       // based on checkbox, show or hide
       var share = $(this).prop('checked');
-      $('#shared-address-' + blockNo + ', #shared-address-display-' + blockNo + ', #shared-address-display-name-' + blockNo).toggle(!!share);
-      $('table#address_table_' + blockNo +', #shared-address-display-cancel-' + blockNo + ', .crm-address-custom-set-block-' + blockNo).toggle(!share);
+      $('#shared-address-' + blockNo).toggle(!!share);
+      $('table#address_table_' + blockNo +', .crm-address-custom-set-block-' + blockNo).toggle(!share);
     }
 
     // "Use another contact's address" checkbox
     $('#address\\[' + blockNo + '\\]\\[use_shared_address\\]').each(showHideSharedAddress).click(showHideSharedAddress);
 
+    // When an address is selected
+    $contentArea.off().on('click', 'input', function() {
+      $masterElement.val($(this).val());
+    });
+
     // When shared contact is selected/unselected
     $('input[name="address[' + blockNo +'][master_contact_id]"]').change(function() {
       var $el = $(this),
-        sharedContactId = $el.val(),
-        $contentArea = $('#shared-address-' + blockNo + ' .shared-address-list').html('').off(),
-        $masterElement = $('input[name="address[' + blockNo + '][master_id]"]').val('');
+        sharedContactId = $el.val();
+
+      $contentArea.html('');
+      $masterElement.val('');
 
       if (!sharedContactId || isNaN(sharedContactId)) {
         return;
@@ -103,9 +106,7 @@
               addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
             }
 
-            $contentArea.html(addressHTML).on('click', 'input', function() {
-              $masterElement.val($(this).val());
-            });
+            $contentArea.html(addressHTML);
           }
         },'json');
     });
