@@ -196,13 +196,12 @@ function loadPanes( id ) {
      <script type="text/javascript">
 
      function verify( ) {
-       var element = document.getElementsByName("is_acknowledge");
-        if ( element[0].checked ) {
+        if (cj('#is_acknowledge').is(':checked')) {
             var emailAddress = '{/literal}{$email}{literal}';
       if ( !emailAddress ) {
       var emailAddress = cj('#email-address').html();
       }
-      var message = '{/literal}{ts 1="'+emailAddress+'"}Click OK to save this Pledge record AND send an acknowledgment to %1 now{/ts}{literal}.';
+      var message = '{/literal}{ts escape="js" 1="'+emailAddress+'"}Click OK to save this Pledge record AND send an acknowledgment to %1 now{/ts}{literal}.';
             if (!confirm( message) ) {
                 return false;
             }
