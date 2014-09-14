@@ -112,4 +112,10 @@ class api_v3_SystemTest extends CiviUnitTestCase {
 
     $this->assertTrue(NULL === CRM_Core_BAO_Cache::getItem(self::TEST_CACHE_GROUP, self::TEST_CACHE_PATH));
   }
+
+  function testSystemGet() {
+    $result = $this->callAPISuccess('system', 'get', array());
+    $this->assertRegExp('/^[0-9]+\.[0-9]+\.[0-9a-z\-]+$/', $result['values'][0]['version']);
+    $this->assertEquals('UnitTests', $result['values'][0]['uf']);
+  }
 }
