@@ -461,7 +461,7 @@
             identifier = $el.attr('name') || $el.attr('href');
           if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
             var $icon = $el.find('.icon'),
-              button = {text: label, click: function() {
+              button = {'data-identifier': identifier, text: label, click: function() {
                 $el.click();
               }};
             if ($icon.length) {
