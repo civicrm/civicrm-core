@@ -1628,3 +1628,13 @@ function t( $str, $sub = NULL ) {
   }
   return $str;
 }
+
+/**
+ * Incorporate WP-CLI Integration
+ * Based on drush civicrm functionality, work done by Andy Walker
+ * https://github.com/andy-walker/wp-cli-civicrm
+ */
+
+if ( defined('WP_CLI') && WP_CLI ) {
+    include __DIR__ . '/wp-cli/civicrm.php';
+}
