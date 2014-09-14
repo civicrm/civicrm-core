@@ -1,0 +1,37 @@
+From 3d6d5abecfb44197b316f67cbce49b19c4a72282 Mon Sep 17 00:00:00 2001
+From: Tyrell Cook <tyrell@aghstrategies.com>
+Date: Wed, 3 Sep 2014 12:23:20 -0400
+Subject: [PATCH] CRM-15041 makes sure partial payment do not include
+ trasaction fees from payment processors
+
+---
+ CRM/Contribute/BAO/Contribution.php | 2 +-
+ CRM/Core/BAO/FinancialTrxn.php      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CRM/Contribute/BAO/Contribution.php b/CRM/Contribute/BAO/Contribution.php
+index 90e0575..b98aa00 100644
+--- a/CRM/Contribute/BAO/Contribution.php
++++ b/CRM/Contribute/BAO/Contribution.php
+@@ -3402,7 +3402,7 @@ static function getPaymentInfo($id, $component, $getTrxnInfo = FALSE, $usingLine
+       // conditioned WHERE clause
+       if ($isBalance) {
+         // if balance trxn exists don't include details of it in transaction info
+-        $sql .= " AND ft.id != {$baseTrxnId} ";
++        $sql .= " AND ft.id != {$baseTrxnId} AND ft.from_financial_account_id IS NULL";
+       }
+       $resultDAO = CRM_Core_DAO::executeQuery($sql);
+ 
+diff --git a/CRM/Core/BAO/FinancialTrxn.php b/CRM/Core/BAO/FinancialTrxn.php
+index 7008bf9..6aaf503 100644
+--- a/CRM/Core/BAO/FinancialTrxn.php
++++ b/CRM/Core/BAO/FinancialTrxn.php
+@@ -480,7 +480,7 @@ static function getPartialPaymentWithType($entityId, $entityName = 'participant'
+   LEFT JOIN civicrm_contribution c ON (eft.entity_id = c.id)
+   LEFT JOIN civicrm_participant_payment pp ON (pp.contribution_id = c.id)
+ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFinancialAccount}
+-  AND ft.status_id IN ({$statusId}, {$refundStatusId})
++  AND ft.status_id IN ({$statusId}, {$refundStatusId}) AND ft.from_financial_account IS NULL
+ ";
+         $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
+         $value = 0;

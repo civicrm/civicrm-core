@@ -1,0 +1,27 @@
+diff --git a/CRM/Contact/BAO/Contact/Utils.php b/CRM/Contact/BAO/Contact/Utils.php
+index 67a0e1f..5da54ba 100644
+--- a/CRM/Contact/BAO/Contact/Utils.php
++++ b/CRM/Contact/BAO/Contact/Utils.php
+@@ -933,6 +933,8 @@ Group By  componentId";
+     }
+ 
+     if ($idFldName) {
++      $queryParams = array(1 => array($contactType, 'String'));
++
+       // if $force == 1 then update all contacts else only
+       // those with NULL greeting or addressee value CRM-9476
+       if ($processAll) {
+@@ -948,10 +950,11 @@ Group By  componentId";
+       }
+ 
+       if ($limit) {
+-        $sql .= " LIMIT $limit";
++        $sql .= " LIMIT 0, %2";
++        $queryParams += array(2 => array($limit, 'Integer'));
+       }
+ 
+-      $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contactType, 'String')));
++      $dao = CRM_Core_DAO::executeQuery($sql, $queryParams);
+       while ($dao->fetch()) {
+         $filterContactFldIds[$dao->id] = $dao->$idFldName;
+ 

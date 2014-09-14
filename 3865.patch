@@ -1,0 +1,48 @@
+From e10c798305202698e784295e6b6f2535f5514bc6 Mon Sep 17 00:00:00 2001
+From: Jon goldberg - Linux laptop <jon@palantetech.coop>
+Date: Sat, 16 Aug 2014 16:24:01 -0400
+Subject: [PATCH] CRM-14584 - Core Advanced Search - fix incorrect boolean
+ logic on privacy preferences when privacy toggle = 'exclude'
+
+---
+ CRM/Contact/BAO/Query.php | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/CRM/Contact/BAO/Query.php b/CRM/Contact/BAO/Query.php
+index 0c7df55..a636a96 100644
+--- a/CRM/Contact/BAO/Query.php
++++ b/CRM/Contact/BAO/Query.php
+@@ -3943,24 +3943,24 @@ function privacyOptions($values) {
+     }
+ 
+     $toggleValues = $this->getWhereValues('privacy_toggle', $grouping);
+-    $compareOP = '!=';
++    $compareOP = '!';
+     if ($toggleValues &&
+       $toggleValues[2] == 2
+     ) {
+-      $compareOP = '=';
++      $compareOP = '';
+     }
+ 
+     $clauses = array();
+     $qill = array();
+     foreach ($value as $dontCare => $pOption) {
+-      $clauses[] = " ( contact_a.{$pOption} $compareOP 1 ) ";
++      $clauses[] = " ( contact_a.{$pOption} = 1 ) ";
+       $field = CRM_Utils_Array::value($pOption, $this->_fields);
+       $title = $field ? $field['title'] : $pOption;
+-      $qill[] = " $title $compareOP 1 ";
++      $qill[] = " $title = 1 ";
+     }
+ 
+-    $this->_where[$grouping][] = '( ' . implode($operator, $clauses) . ' )';
+-    $this->_qill[$grouping][] = implode($operator, $qill);
++    $this->_where[$grouping][] = $compareOP . '( ' . implode($operator, $clauses) . ' )';
++    $this->_qill[$grouping][] = $compareOP . '( ' . implode($operator, $qill) . ' )';
+   }
+ 
+   /**
+-- 
+2.0.3
+

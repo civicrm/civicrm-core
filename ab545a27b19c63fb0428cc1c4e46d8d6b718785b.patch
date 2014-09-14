@@ -1,0 +1,529 @@
+From ab545a27b19c63fb0428cc1c4e46d8d6b718785b Mon Sep 17 00:00:00 2001
+From: monishdeb <monish.deb@webaccessglobal.com>
+Date: Wed, 3 Sep 2014 15:06:11 +0530
+Subject: [PATCH] CRM-13912 changes phase I
+
+----------------------------------------
+* CRM-13912: Add SMS support to scheduled reminders
+  https://issues.civicrm.org/jira/browse/CRM-13912
+---
+ CRM/Admin/Form/ScheduleReminders.php          | 13 ++++++-
+ CRM/Contact/Form/Task/SMSCommon.php           | 16 ++++----
+ CRM/Mailing/BAO/Mailing.php                   | 53 +++++++++++++++++++--------
+ CRM/SMS/Form/Upload.php                       | 34 ++++++++---------
+ templates/CRM/Contact/Form/Task/SMSCommon.tpl | 25 +++++++------
+ templates/CRM/Mailing/Form/InsertTokens.tpl   | 51 +++++++++++++++++---------
+ templates/CRM/SMS/Form/Upload.tpl             |  3 +-
+ 7 files changed, 121 insertions(+), 74 deletions(-)
+
+diff --git a/CRM/Admin/Form/ScheduleReminders.php b/CRM/Admin/Form/ScheduleReminders.php
+index 9f81d2e..9666780 100644
+--- a/CRM/Admin/Form/ScheduleReminders.php
++++ b/CRM/Admin/Form/ScheduleReminders.php
+@@ -187,7 +187,7 @@ public function buildQuickForm() {
+     $this->add('select', 'end_date', ts('Date Field'), $sel4, TRUE);
+ 
+     $this->add('text', 'from_name', ts('From Name'));
+-    $this->add('text', 'from_email', ts('From Email'));    
++    $this->add('text', 'from_email', ts('From Email'));
+ 
+     $recipient = 'activity_contacts';
+     $recipientListingOptions = array();
+@@ -445,6 +445,17 @@ public function postProcess() {
+       $params['name'] = CRM_Utils_String::munge($params['title'], '_', 64);
+     }
+ 
++    $modePrefixes = array('Mail' => NULL, 'SMS' => 'SMS');
++
++    if ($params['mode'] == 'Email') {
++      unset($modePrefixes['SMS']);
++    }
++    elseif ($params['mode'] == 'SMS') {
++      unset($modePrefixes['Mail']);
++    }
++
++    //TODO: handle postprocessing of SMS and/or Email info based on $modePrefixes
++
+     $composeFields = array(
+       'template', 'saveTemplate',
+       'updateTemplate', 'saveTemplateName',
+diff --git a/CRM/Contact/Form/Task/SMSCommon.php b/CRM/Contact/Form/Task/SMSCommon.php
+index b632b15..b04ec2d 100644
+--- a/CRM/Contact/Form/Task/SMSCommon.php
++++ b/CRM/Contact/Form/Task/SMSCommon.php
+@@ -95,8 +95,6 @@ static function buildQuickForm(&$form) {
+ 
+     $toArray = array();
+ 
+-    $form->assign('max_sms_length', CRM_SMS_Provider::MAX_SMS_CHAR);
+-
+     $providers = CRM_SMS_BAO_Provider::getProviders(NULL, NULL, TRUE, 'is_default desc');
+ 
+     $providerSelect = array();
+@@ -317,15 +315,15 @@ static function formRule($fields, $dontCare, $self) {
+ 
+     $template = CRM_Core_Smarty::singleton();
+ 
+-    if (empty($fields['text_message'])) {
+-      $errors['text_message'] = ts('Please provide Text message.');
++    if (empty($fields['sms_text_message'])) {
++      $errors['sms_text_message'] = ts('Please provide Text message.');
+     }
+     else {
+-      if (!empty($fields['text_message'])) {
+-        $messageCheck = CRM_Utils_Array::value('text_message', $fields);
++      if (!empty($fields['sms_text_message'])) {
++        $messageCheck = CRM_Utils_Array::value('sms_text_message', $fields);
+         $messageCheck = str_replace("\r\n", "\n", $messageCheck);
+         if ($messageCheck && (strlen($messageCheck) > CRM_SMS_Provider::MAX_SMS_CHAR)) {
+-          $errors['text_message'] = ts("You can configure the SMS message body up to %1 characters", array(1 => CRM_SMS_Provider::MAX_SMS_CHAR));
++          $errors['sms_text_message'] = ts("You can configure the SMS message body up to %1 characters", array(1 => CRM_SMS_Provider::MAX_SMS_CHAR));
+         }
+       }
+     }
+@@ -357,7 +355,7 @@ static function postProcess(&$form) {
+     // process message template
+     if (!empty($thisValues['saveTemplate']) || !empty($thisValues['updateTemplate'])) {
+       $messageTemplate = array(
+-        'msg_text' => $thisValues['text_message'],
++        'msg_text' => $thisValues['sms_text_message'],
+         'is_active' => TRUE,
+       );
+ 
+@@ -394,7 +392,7 @@ static function postProcess(&$form) {
+     // $smsParams carries all the arguments provided on form (or via hooks), to the provider->send() method
+     // this gives flexibity to the users / implementors to add their own args via hooks specific to their sms providers
+     $smsParams = $thisValues;
+-    unset($smsParams['text_message']);
++    unset($smsParams['sms_text_message']);
+     $smsParams['provider_id'] = $fromSmsProviderId;
+     $contactIds = array_keys($form->_contactDetails);
+     $allContactIds = array_keys($form->_allContactDetails);
+diff --git a/CRM/Mailing/BAO/Mailing.php b/CRM/Mailing/BAO/Mailing.php
+index a7bd0f0..b12f252 100644
+--- a/CRM/Mailing/BAO/Mailing.php
++++ b/CRM/Mailing/BAO/Mailing.php
+@@ -2483,29 +2483,16 @@ public static function commonCompose(&$form) {
+     $form->_templates = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
+     if (!empty($form->_templates)) {
+       $form->assign('templates', TRUE);
+-      $form->add('select', 'template', ts('Use Template'),
++      $form->add('select', "template", ts('Use Template'),
+         array(
+           '' => ts('- select -')) + $form->_templates, FALSE,
+         array('onChange' => "selectValue( this.value );")
+       );
+-      $form->add('checkbox', 'updateTemplate', ts('Update Template'), NULL);
+     }
+ 
+-    $form->add('checkbox', 'saveTemplate', ts('Save As New Template'), NULL, FALSE,
+-      array('onclick' => "showSaveDetails(this);")
+-    );
+-    $form->add('text', 'saveTemplateName', ts('Template Title'));
+-
+ 
+-    //insert message Text by selecting "Select Template option"
+-    $form->add('textarea',
+-      'text_message',
+-      ts('Plain-text format'),
+-      array(
+-        'cols' => '80', 'rows' => '8',
+-        'onkeyup' => "return verify(this)",
+-      )
+-    );
++    $textFields = array('text_message' => ts('HTML format'), 'sms_text_message' => ts('SMS Message'));
++    $modePrefixes = array('Mail' => NULL, 'SMS' => 'SMS');
+ 
+     if ($className != 'CRM_SMS_Form_Upload' && $className != 'CRM_Contact_Form_Task_SMS' &&
+       $className != 'CRM_Contact_Form_Task_SMS'
+@@ -2517,7 +2504,41 @@ public static function commonCompose(&$form) {
+           'onkeyup' => "return verify(this)",
+         )
+       );
++
++      if ($className != 'CRM_Admin_Form_ScheduleReminders') {
++        unset($modePrefixes['SMS']);
++      }
++    }
++    else {
++      unset($textFields['text_message']);
++      unset($modePrefixes['Mail']);
++    }
++
++    //insert message Text by selecting "Select Template option"
++    foreach ($textFields as $id => $label) {
++      if ($id == 'sms_text_message') {
++        $form->assign('max_sms_length', CRM_SMS_Provider::MAX_SMS_CHAR);
++      }
++      $form->add('textarea', $id, $label,
++        array(
++          'cols' => '80', 'rows' => '8',
++          'onkeyup' => "return verify(this)",
++        )
++      );
++    }
++
++    foreach ($modePrefixes as $prefix) {
++      if (!empty($form->_templates)) {
++
++        $form->add('checkbox', "{$prefix}updateTemplate", ts('Update Template'), NULL);
++      }
++
++      $form->add('checkbox', "{$prefix}saveTemplate", ts('Save As New Template'), NULL, FALSE,
++        array('onclick' => "showSaveDetails(this);")
++      );
++      $form->add('text', "{$prefix}saveTemplateName", ts('Template Title'));
+     }
++
+   }
+ 
+   /**
+diff --git a/CRM/SMS/Form/Upload.php b/CRM/SMS/Form/Upload.php
+index 37d24a0..a698127 100644
+--- a/CRM/SMS/Form/Upload.php
++++ b/CRM/SMS/Form/Upload.php
+@@ -91,11 +91,11 @@ function setDefaultValues() {
+         $messageTemplate->selectAdd('msg_text');
+         $messageTemplate->find(TRUE);
+ 
+-        $defaults['text_message'] = $messageTemplate->msg_text;
++        $defaults['sms_text_message'] = $messageTemplate->msg_text;
+       }
+ 
+       if (isset($defaults['body_text'])) {
+-        $defaults['text_message'] = $defaults['body_text'];
++        $defaults['sms_text_message'] = $defaults['body_text'];
+         $this->set('textFile', $defaults['body_text']);
+         $this->set('skipTextFile', TRUE);
+       }
+@@ -107,8 +107,8 @@ function setDefaultValues() {
+       if ($textFilePath &&
+         file_exists($textFilePath)
+       ) {
+-        $defaults['text_message'] = file_get_contents($textFilePath);
+-        if (strlen($defaults['text_message']) > 0) {
++        $defaults['sms_text_message'] = file_get_contents($textFilePath);
++        if (strlen($defaults['sms_text_message']) > 0) {
+           $this->set('skipTextFile', TRUE);
+         }
+       }
+@@ -219,7 +219,7 @@ public function postProcess() {
+       }
+     }
+     else {
+-      $text_message = $formValues['text_message'];
++      $text_message = $formValues['sms_text_message'];
+       $params['body_text'] = $text_message;
+       $this->set('textFile', $params['body_text']);
+       $this->set('text_message', $params['body_text']);
+@@ -230,8 +230,8 @@ public function postProcess() {
+     $session = CRM_Core_Session::singleton();
+     $params['contact_id'] = $session->get('userID');
+     $composeFields = array(
+-      'template', 'saveTemplate',
+-      'updateTemplate', 'saveTemplateName',
++      'template', 'SMSsaveTemplate',
++      'SMSupdateTemplate', 'SMSsaveTemplateName',
+     );
+     $msgTemplate = NULL;
+     //mail template is composed
+@@ -244,7 +244,7 @@ public function postProcess() {
+         }
+       }
+ 
+-      if (!empty($composeParams['updateTemplate'])) {
++      if (!empty($composeParams['SMSupdateTemplate'])) {
+         $templateParams = array(
+           'msg_text' => $text_message,
+           'is_active' => TRUE,
+@@ -255,13 +255,13 @@ public function postProcess() {
+         $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
+       }
+ 
+-      if (!empty($composeParams['saveTemplate'])) {
++      if (!empty($composeParams['SMSsaveTemplate'])) {
+         $templateParams = array(
+           'msg_text' => $text_message,
+           'is_active' => TRUE,
+         );
+ 
+-        $templateParams['msg_title'] = $composeParams['saveTemplateName'];
++        $templateParams['msg_title'] = $composeParams['SMSsaveTemplateName'];
+ 
+         $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
+       }
+@@ -344,8 +344,8 @@ static function formRule($params, $files, $self) {
+       }
+     }
+     else {
+-      if (empty($params['text_message'])) {
+-        $errors['text_message'] = ts('Please provide a Text');
++      if (empty($params['sms_text_message'])) {
++        $errors['sms_text_message'] = ts('Please provide a Text');
+       }
+       else {
+         if (!empty($params['text_message'])) {
+@@ -355,8 +355,8 @@ static function formRule($params, $files, $self) {
+           }
+         }
+       }
+-      if (!empty($params['saveTemplate']) && empty($params['saveTemplateName'])) {
+-        $errors['saveTemplateName'] = ts('Please provide a Template Name.');
++      if (!empty($params['SMSsaveTemplate']) && empty($params['SMSsaveTemplateName'])) {
++        $errors['SMSsaveTemplateName'] = ts('Please provide a Template Name.');
+       }
+     }
+ 
+@@ -369,7 +369,7 @@ static function formRule($params, $files, $self) {
+         $name = $files['textFile']['name'];
+       }
+       else {
+-        $str = $params['text_message'];
++        $str = $params['sms_text_message'];
+         $name = 'text message';
+       }
+ 
+@@ -416,9 +416,9 @@ static function formRule($params, $files, $self) {
+     }
+ 
+     $templateName = CRM_Core_BAO_MessageTemplate::getMessageTemplates();
+-    if (!empty($params['saveTemplate']) && in_array(CRM_Utils_Array::value('saveTemplateName', $params), $templateName)
++    if (!empty($params['SMSsaveTemplate']) && in_array(CRM_Utils_Array::value('SMSsaveTemplateName', $params), $templateName)
+     ) {
+-      $errors['saveTemplate'] = ts('Duplicate Template Name.');
++      $errors['SMSsaveTemplate'] = ts('Duplicate Template Name.');
+     }
+     return empty($errors) ? TRUE : $errors;
+   }
+diff --git a/templates/CRM/Contact/Form/Task/SMSCommon.tpl b/templates/CRM/Contact/Form/Task/SMSCommon.tpl
+index 0fce2cb..408ad12 100644
+--- a/templates/CRM/Contact/Form/Task/SMSCommon.tpl
++++ b/templates/CRM/Contact/Form/Task/SMSCommon.tpl
+@@ -27,31 +27,31 @@
+ 
+ <div class="crm-accordion-wrapper crm-plaint_text_sms-accordion ">
+ <div class="crm-accordion-header">
+-  {ts}SMS Message{/ts}
++  {$form.sms_text_message.label}
+   </div><!-- /.crm-accordion-header -->
+  <div class="crm-accordion-body">
+  <div id='char-count-message'></div>
+    <div class="helpIcon" id="helptext">
+-     <input class="crm-token-selector big" data-field="text_message" />
++     <input class="crm-token-selector big" data-field="sms_text_message" />
+      {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/SMS.hlp"}
+    </div>
+     <div class='text'>
+-  {$form.text_message.html}<br />
++  {$form.sms_text_message.html}<br />
+     </div>
+   </div><!-- /.crm-accordion-body -->
+ </div><!-- /.crm-accordion-wrapper -->
+ <div id="editMessageDetails" class="section">
+     <div id="updateDetails" class="section" >
+-  {$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}
++  {$form.SMSupdateTemplate.html}&nbsp;{$form.SMSupdateTemplate.label}
+     </div>
+     <div class="section">
+-  {$form.saveTemplate.html}&nbsp;{$form.saveTemplate.label}
++  {$form.SMSsaveTemplate.html}&nbsp;{$form.SMSsaveTemplate.label}
+     </div>
+ </div>
+ 
+ <div id="saveDetails" class="section">
+-   <div class="label">{$form.saveTemplateName.label}</div>
+-   <div class="content">{$form.saveTemplateName.html|crmAddClass:huge}</div>
++   <div class="label">{$form.SMSsaveTemplateName.label}</div>
++   <div class="content">{$form.SMSsaveTemplateName.html|crmAddClass:huge}</div>
+ </div>
+ 
+ {include file="CRM/Mailing/Form/InsertTokens.tpl"}
+@@ -61,21 +61,22 @@
+ {/literal}{if $max_sms_length}{literal}
+ maxCharInfoDisplay();
+ 
+-cj('#text_message').bind({
++cj('#sms_text_message').bind({
+   change: function() {
+    maxLengthMessage();
+   },
+   keyup:  function() {
+    maxCharInfoDisplay();
++   showSaveUpdateChkBox('SMS');
+   }
+ });
+ 
+ function maxLengthMessage()
+ {
+-   var len = cj('#text_message').val().length;
++   var len = cj('#sms_text_message').val().length;
+    var maxLength = {/literal}{$max_sms_length}{literal};
+    if (len > maxLength) {
+-      cj('#text_message').crmError({/literal}'{ts escape="js"}SMS body exceeding limit of 160 characters{/ts}'{literal});
++      cj('#sms_text_message').crmError({/literal}'{ts escape="js"}SMS body exceeding limit of 160 characters{/ts}'{literal});
+       return false;
+    }
+ return true;
+@@ -83,11 +84,11 @@ return true;
+ 
+ function maxCharInfoDisplay(){
+    var maxLength = {/literal}{$max_sms_length}{literal};
+-   var enteredCharLength = cj('#text_message').val().length;
++   var enteredCharLength = cj('#sms_text_message').val().length;
+    var count = enteredCharLength;
+ 
+    if( count < 0 ) {
+-      cj('#text_message').val(cj('#text_message').val().substring(0, maxLength));
++      cj('#sms_text_message').val(cj('#sms_text_message').val().substring(0, maxLength));
+       count = 0;
+    }
+    cj('#char-count-message').text( "You can insert up to " + maxLength + " characters. You have entered " + count + " characters." );
+diff --git a/templates/CRM/Mailing/Form/InsertTokens.tpl b/templates/CRM/Mailing/Form/InsertTokens.tpl
+index 9e61294..1ef62bc 100644
+--- a/templates/CRM/Mailing/Form/InsertTokens.tpl
++++ b/templates/CRM/Mailing/Form/InsertTokens.tpl
+@@ -32,10 +32,12 @@
+ cj('form.{$form.formClass}').data('tokens', {$tokens|@json_encode});
+ var text_message = null;
+ var html_message = null;
++var saveTemplate = "saveTemplate";
++var saveTemplateName = "saveTemplateName";
++var updateTemplate = "updateTemplate";
+ var isPDF        = false;
+ var isMailing    = false;
+ 
+-
+ {if $form.formName eq 'MessageTemplates'}
+   {literal}
+   text_message = "msg_text";
+@@ -46,6 +48,14 @@ var isMailing    = false;
+   text_message = "mailing_format";
+   isMailing = false;
+   {/literal}
++  {elseif $form.formClass eq 'CRM_SMS_Form_Upload'}
++  {literal}
++  text_message = "sms_text_message";
++  saveTemplate = "SMSsaveTemplate";
++  saveTemplateName = "SMSsaveTemplateName";
++  updateTemplate = "SMSupdateTemplate";
++  isMailing = true;
++  {/literal}
+   {else}
+   {literal}
+   text_message = "text_message";
+@@ -62,7 +72,7 @@ var isMailing    = false;
+ 
+ {if $templateSelected}
+   {literal}
+-  if ( document.getElementsByName("saveTemplate")[0].checked ) {
++  if ( document.getElementsByName(saveTemplate)[0].checked ) {
+     document.getElementById('template').selectedIndex = {/literal}{$templateSelected}{literal};
+   }
+ {/literal}
+@@ -70,9 +80,16 @@ var isMailing    = false;
+ {literal}
+ 
+ var editor = {/literal}"{$editor}"{literal};
+-function showSaveUpdateChkBox() {
++function showSaveUpdateChkBox(prefix = '') {
++
++{/literal}{if $form.formName eq 'ScheduleReminders'}{literal}
++var saveTemplate = prefix + "saveTemplate";
++var saveTemplateName = prefix + "saveTemplateName";
++var updateTemplate = prefix + "updateTemplate";
++{/literal}{/if}{literal}
++
+   if (document.getElementById('template') == null) {
+-    if (document.getElementsByName("saveTemplate")[0].checked){
++    if (document.getElementsByName(saveTemplate)[0].checked){
+       document.getElementById("saveDetails").style.display = "block";
+       document.getElementById("editMessageDetails").style.display = "block";
+     }
+@@ -83,17 +100,17 @@ function showSaveUpdateChkBox() {
+     return;
+   }
+ 
+-  if (document.getElementsByName("saveTemplate")[0].checked &&
+-    document.getElementsByName("updateTemplate")[0].checked == false) {
++  if (document.getElementsByName(saveTemplate)[0].checked &&
++    document.getElementsByName(updateTemplate)[0].checked == false) {
+     document.getElementById("updateDetails").style.display = "none";
+   }
+-  else if ( document.getElementsByName("saveTemplate")[0].checked &&
+-    document.getElementsByName("updateTemplate")[0].checked ){
++  else if ( document.getElementsByName(saveTemplate)[0].checked &&
++    document.getElementsByName(updateTemplate)[0].checked ){
+     document.getElementById("editMessageDetails").style.display = "block";
+     document.getElementById("saveDetails").style.display = "block";
+   }
+-  else if ( document.getElementsByName("saveTemplate")[0].checked == false &&
+-      document.getElementsByName("updateTemplate")[0].checked ) {
++  else if ( document.getElementsByName(saveTemplate)[0].checked == false &&
++      document.getElementsByName(updateTemplate)[0].checked ) {
+     document.getElementById("saveDetails").style.display = "none";
+     document.getElementById("editMessageDetails").style.display = "block";
+   }
+@@ -103,9 +120,9 @@ function showSaveUpdateChkBox() {
+   }
+ }
+ 
+-function selectValue( val ) {
+-  document.getElementsByName("saveTemplate")[0].checked = false;
+-  document.getElementsByName("updateTemplate")[0].checked = false;
++function selectValue( val) {
++  document.getElementsByName(saveTemplate)[0].checked = false;
++  document.getElementsByName(updateTemplate)[0].checked = false;
+   showSaveUpdateChkBox();
+   if ( !val ) {
+     document.getElementById("subject").value ="";
+@@ -206,7 +223,7 @@ if ( isMailing ) {
+   document.getElementById("editMessageDetails").style.display = "block";
+ 
+   function verify(select) {
+-    if (document.getElementsByName("saveTemplate")[0].checked  == false) {
++    if (document.getElementsByName(saveTemplate)[0].checked  == false) {
+       document.getElementById("saveDetails").style.display = "none";
+     }
+     document.getElementById("editMessageDetails").style.display = "block";
+@@ -223,17 +240,17 @@ if ( isMailing ) {
+       document.getElementById("updateDetails").style.display = 'none';
+     }
+ 
+-    document.getElementById("saveTemplateName").disabled = false;
++    document.getElementById(saveTemplateName).disabled = false;
+   }
+ 
+   function showSaveDetails(chkbox) {
+     if (chkbox.checked) {
+       document.getElementById("saveDetails").style.display = "block";
+-      document.getElementById("saveTemplateName").disabled = false;
++      document.getElementById(saveTemplateName).disabled = false;
+     }
+     else {
+       document.getElementById("saveDetails").style.display = "none";
+-      document.getElementById("saveTemplateName").disabled = true;
++      document.getElementById(saveTemplateName).disabled = true;
+     }
+   }
+ 
+diff --git a/templates/CRM/SMS/Form/Upload.tpl b/templates/CRM/SMS/Form/Upload.tpl
+index b0f4404..afecd75 100644
+--- a/templates/CRM/SMS/Form/Upload.tpl
++++ b/templates/CRM/SMS/Form/Upload.tpl
+@@ -38,7 +38,7 @@
+     </tr>
+ 
+     <tr class="crm-mailing-upload-form-block-template">
+-      <td class="label">{$form.template.label}</td>
++      <td class="label">{$form.SMStemplate.label}</td>
+   <td>{$form.template.html}</td>
+     </tr>
+     <tr class="crm-mailing-upload-form-block-upload_type"><td></td><td colspan="2">{$form.upload_type.label} {$form.upload_type.html} {help id="upload-compose"}</td></tr>
+@@ -77,7 +77,6 @@
+             cj('#compose_id').show();
+       cj('.crm-mailing-upload-form-block-template').show();
+       cj('#upload_id').hide();
+-            verify( );
+         }
+     }
+ </script>

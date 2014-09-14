@@ -1,0 +1,47 @@
+From 4131304ee7b033d9060f62862e79c3fc0355c5f8 Mon Sep 17 00:00:00 2001
+From: Coleman Watts <coleman@civicrm.org>
+Date: Mon, 1 Sep 2014 17:19:00 +0100
+Subject: [PATCH] CRM-13912 - Fix redundant js template usage
+
+---
+ templates/CRM/Contact/Form/Task/SMS.tpl       | 1 +
+ templates/CRM/Contact/Form/Task/SMSCommon.tpl | 1 -
+ templates/CRM/SMS/Form/Upload.tpl             | 1 +
+ 3 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/templates/CRM/Contact/Form/Task/SMS.tpl b/templates/CRM/Contact/Form/Task/SMS.tpl
+index f1fd590..f54f657 100644
+--- a/templates/CRM/Contact/Form/Task/SMS.tpl
++++ b/templates/CRM/Contact/Form/Task/SMS.tpl
+@@ -66,6 +66,7 @@
+ 
+ </table>
+ {include file="CRM/Contact/Form/Task/SMSCommon.tpl"}
++{include file="CRM/Mailing/Form/InsertTokens.tpl"}
+ 
+ <div class="spacer"> </div>
+ 
+diff --git a/templates/CRM/Contact/Form/Task/SMSCommon.tpl b/templates/CRM/Contact/Form/Task/SMSCommon.tpl
+index 0fce2cb..ee13b8e 100644
+--- a/templates/CRM/Contact/Form/Task/SMSCommon.tpl
++++ b/templates/CRM/Contact/Form/Task/SMSCommon.tpl
+@@ -54,7 +54,6 @@
+    <div class="content">{$form.saveTemplateName.html|crmAddClass:huge}</div>
+ </div>
+ 
+-{include file="CRM/Mailing/Form/InsertTokens.tpl"}
+ {literal}
+ <script type="text/javascript">
+ 
+diff --git a/templates/CRM/SMS/Form/Upload.tpl b/templates/CRM/SMS/Form/Upload.tpl
+index b0f4404..e63b547 100644
+--- a/templates/CRM/SMS/Form/Upload.tpl
++++ b/templates/CRM/SMS/Form/Upload.tpl
+@@ -46,6 +46,7 @@
+ 
+ <fieldset id="compose_id"><legend>{ts}Compose On-screen{/ts}</legend>
+ {include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}
++{include file="CRM/Mailing/Form/InsertTokens.tpl"}
+ </fieldset>
+ 
+    <fieldset id="upload_id"><legend>{ts}Upload Content{/ts}</legend>
