@@ -65,19 +65,22 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $isTest = ($form->_mode == 'test') ? 1 : 0;
     $lineItems = $form->_lineItem;
 
-    $contributionType = new CRM_Financial_DAO_FinancialType();
+    //do overrides that should have been done in the calling function - ie the calling function should pass the correct
+    //variable for $contributionTypeId but we need to ensure it is doing so.
+    // before we remove this cruft
     if (isset($paymentParams['financial_type'])) {
-      $contributionType->id = $paymentParams['financial_type'];
+      $contributionTypeId = $paymentParams['financial_type'];
     }
     elseif (!empty($form->_values['pledge_id'])) {
-      $contributionType->id = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
+      $contributionTypeId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
         $form->_values['pledge_id'],
         'financial_type_id'
       );
     }
-    else {
-      $contributionType->id = $contributionTypeId;
-    }
+
+    $contributionType = new CRM_Financial_DAO_FinancialType();
+    $contributionType->id = $contributionTypeId;
+
     if (!$contributionType->find(TRUE)) {
       CRM_Core_Error::fatal('Could not find a system table');
     }
@@ -86,7 +89,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
     // if folks need to use it
     $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $contributionType->name;
     //CRM-11456
-    $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionType->id);
+    $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionTypeId);
     $paymentParams['contributionPageID'] = $form->_params['contributionPageID'] = $form->_values['id'];
 
 
@@ -122,7 +125,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->_params['contributionID'] = $contribution->id;
       }
 
-      $form->_params['contributionTypeID'] = $contributionType->id;
+      $form->_params['contributionTypeID'] = $contributionTypeId;
       $form->_params['item_name'] = $form->_params['description'];
       $form->_params['receive_date'] = $now;
 
