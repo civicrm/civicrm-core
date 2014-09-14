@@ -784,6 +784,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->type('billing_city-5', 'San Bernadino');
     $this->select('billing_country_id-5', 'value=1228');
     $this->click('billing_state_province_id-5');
+    $this->waitForVisible('billing_state_province_id-5');
     $this->select('billing_state_province_id-5', 'label=California');
     $this->type('billing_postal_code-5', '93245');
 
@@ -1474,10 +1475,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "Activity '$subject' has been saved.");
 
-    $this->waitForElementPresent("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
 
     // parse URL to grab the activity id
@@ -1871,9 +1872,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $text = "Your Financial \"{$financialType['name']}\" Type has been created, along with a corresponding income account \"{$financialType['name']}\". That income account, along with standard financial accounts \"Accounts Receivable\", \"Banking Fees\" and \"Premiums\" have been linked to the financial type. You may edit or replace those relationships here.";
     }
     else {
-      $text = "The financial type '{$financialType['name']}' has been saved.";
+      $text = "The financial type \"{$financialType['name']}\" has been updated.";
     }
-    $this->waitForText("xpath=//div[@class='notify-content']", $text);
+    $this->waitForElementPresent("xpath=//div[@class='notify-content']");
+    $this->assertElementContainsText('crm-notification-container', $text);
   }
 
   /**
@@ -1905,8 +1907,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->waitForElementPresent('_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
     $this->click('_qf_Group_next-bottom');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
+    $this->click("xpath=//a/span[text()='Add Field']");
+    $this->waitForElementPresent("field_name[0]");
     //$this->assertTrue($this->isTextPresent("Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now."));
 
     foreach ($profileFields as $field) {
@@ -1920,7 +1925,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->waitForElementPresent('label');
       $this->type("id=label", $field['label']);
       $this->click("id=_qf_Field_next_new-top");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
       //$this->assertTrue($this->isTextPresent("Your CiviCRM Profile Field '" . $field['name'] . "' has been saved to '" . $profileTitle . "'. You can add another profile field."));
     }
   }
@@ -1934,7 +1939,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $financialType
    */
   function addPremium($name, $sku, $amount, $price, $cost, $financialType) {
-    $this->waitForElementPresent("_qf_ManagePremiums_upload-bottom");
+    $this->waitForElementPresent("_qf_ManagePremiums_next-bottom");
     $this->type("name", $name);
     $this->type("sku", $sku);
     $this->click("CIVICRM_QFID_noImage_16");
@@ -1944,7 +1949,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if ($financialType) {
       $this->select("financial_type_id", "label={$financialType}");
     }
-    $this->click("_qf_ManagePremiums_upload-bottom");
+    $this->click("_qf_ManagePremiums_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
@@ -2129,6 +2134,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->assertElementContainsText("xpath=//*[@id='$fieldid']/preceding-sibling::div[1]/", $value);
     }
   }
+
+  /**
+   * Wait for unobtrusive status message as set by CRM.status
+   */
+  function waitForStatusMsg() {
+    $this->waitForElementPresent("css=.crm-status-box-outer.status-success");
+  }
   
   /**
    * function to enable or disable Pop-ups via Display Preferences
@@ -2145,7 +2157,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     else {
       $this->assertNotChecked('ajaxPopupsEnabled');
     }
-    $this->click("_qf_Display_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());    
+    $this->clickLink("_qf_Display_next-bottom");
   }
 }

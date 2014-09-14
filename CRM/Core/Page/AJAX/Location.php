@@ -137,12 +137,16 @@ class CRM_Core_Page_AJAX_Location {
       foreach ($addressFields as $field) {
         if (array_key_exists($field, $addressSequence)) {
           $addField = $field;
+          $type = 'Text';
           if (in_array($field, array(
             'state_province', 'country'))) {
             $addField = "{$field}_id";
+            $type = 'Select2';
           }
           $elements["onbehalf_{$field}-{$locTypeId}"] = array(
-            'type' => 'Text',
+            'fld' => $field,
+            'locTypeId' => $locTypeId,
+            'type' => $type,
             'value' =>  isset($location['address'][1]) ? $location['address'][1][$addField] : null,
           );
           unset($profileFields["{$field}-{$locTypeId}"]);

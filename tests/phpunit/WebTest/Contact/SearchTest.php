@@ -126,7 +126,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
 
     // select tag
     $this->click("xpath=//ul/li/span/label[text()=\"$tagName\"]");
-    $this->waitForElementPresent("css=.success");
+    $this->waitForStatusMsg();
 
     // visit contact search page
     $this->openCiviPage("contact/search", "reset=1");

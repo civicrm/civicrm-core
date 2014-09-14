@@ -850,6 +850,7 @@ Group By  componentId";
         $contactNames[$dao->id] = array(
           'name' => "<a href='{$contactViewUrl}'>{$dao->display_name}</a>",
           'is_deleted' => $dao->is_deleted,
+          'contact_id' => $dao->cid,
         );
       }
     }
@@ -933,6 +934,8 @@ Group By  componentId";
     }
 
     if ($idFldName) {
+      $queryParams = array(1 => array($contactType, 'String'));
+
       // if $force == 1 then update all contacts else only
       // those with NULL greeting or addressee value CRM-9476
       if ($processAll) {
@@ -948,10 +951,11 @@ Group By  componentId";
       }
 
       if ($limit) {
-        $sql .= " LIMIT $limit";
+        $sql .= " LIMIT 0, %2";
+        $queryParams += array(2 => array($limit, 'Integer'));
       }
 
-      $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contactType, 'String')));
+      $dao = CRM_Core_DAO::executeQuery($sql, $queryParams);
       while ($dao->fetch()) {
         $filterContactFldIds[$dao->id] = $dao->$idFldName;
 
