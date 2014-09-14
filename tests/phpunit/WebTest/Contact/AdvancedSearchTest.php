@@ -65,11 +65,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->click("css=li#tab_tag a");
     $this->waitForElementPresent("css=div#tagtree");
     $this->click("xpath=//ul/li/span/label[text()=\"$tagName\"]");
-    $this->waitForElementPresent("css=.success");
-
-    // is status message correct?
-    $this->waitForTextPresent("Saved");
-    $this->waitForText('crm-notification-container', "Saved");
+    $this->waitForStatusMsg();
 
     // go to event tab and register for event ( auto add activity and contribution )
     $this->click("css=li#tab_participant a");

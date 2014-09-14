@@ -2134,6 +2134,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->assertElementContainsText("xpath=//*[@id='$fieldid']/preceding-sibling::div[1]/", $value);
     }
   }
+
+  /**
+   * Wait for unobtrusive status message as set by CRM.status
+   */
+  function waitForStatusMsg() {
+    $this->waitForElementPresent("css=.crm-status-box-outer.status-success");
+  }
   
   /**
    * function to enable or disable Pop-ups via Display Preferences
@@ -2150,7 +2157,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     else {
       $this->assertNotChecked('ajaxPopupsEnabled');
     }
-    $this->click("_qf_Display_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());    
+    $this->clickLink("_qf_Display_next-bottom");
   }
 }
