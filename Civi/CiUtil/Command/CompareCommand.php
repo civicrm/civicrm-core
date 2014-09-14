@@ -20,6 +20,9 @@ class CompareCommand {
         case '--jenkins-xml':
           $parser = array('\Civi\CiUtil\JenkinsParser', 'parseXmlResults');
           break;
+        case '--csv':
+          $parser = array('\Civi\CiUtil\CSVParser', 'parseResults');
+          break;
         case '--out=txt':
           $printerType = 'txt';
           break;

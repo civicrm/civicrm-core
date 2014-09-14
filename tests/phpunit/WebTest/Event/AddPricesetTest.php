@@ -458,9 +458,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestAddContact($firstName, 'Anderson', TRUE);
-    $contactName = "Anderson, $firstName";
-    $displayName = "$firstName Anderson";
+    $lastName = 'Anderson'. substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, $lastName, TRUE);
+    $contactName = "$lastName, $firstName";
+    $displayName = "$firstName $lastName";
 
     $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone', '_qf_Participant_upload-bottom');
 
@@ -472,6 +473,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Select role
     $this->multiselect2('role_id', array('Volunteer'));
 
+    $this->waitForElementPresent("xpath=//input[@class='crm-form-radio']");
     $this->click("xpath=//input[@class='crm-form-radio']");
     $this->click("xpath=//input[@class='crm-form-checkbox']");
 
@@ -512,9 +514,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestAddContact($firstName, 'Anderson', TRUE);
-    $contactName = "Anderson, $firstName";
-    $displayName = "$firstName Anderson";
+    $lastName = 'Anderson'. substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, $lastName, TRUE);
+    $contactName = "$lastName, $firstName";
+    $displayName = "$firstName $lastName";
 
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
     $usedFor = 'Event';

@@ -58,6 +58,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     //click on save
     $this->click('_qf_Group_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
 
     //check for  profile create
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
@@ -66,6 +67,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $profileId = $this->urlArg('gid');
 
     // Add Last Name field.
+    $this->click("xpath=//a/span[text()='Add Field']");
+    $this->waitForElementPresent("field_name[0]");
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Individual');
     $this->click('field_name[1]');
@@ -77,7 +80,6 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('in_selector');
     // click on save
     $this->click('_qf_Field_next_new-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Last Name' has been saved to '$profileTitle'.");
     $this->waitForText('crm-notification-container', 'You can add another profile field.');
@@ -94,7 +96,6 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('in_selector');
     // click on save
     $this->click('_qf_Field_next_new-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
     $this->waitForText('crm-notification-container', 'You can add another profile field.');
@@ -109,7 +110,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->select('visibility', 'value=Public Pages');
     $this->click('is_searchable');
     $this->click('in_selector');
-    $this->clickLink('_qf_Field_next_new-bottom');
+    $this->clickLink('_qf_Field_next_new-bottom', 'field_name[0]', FALSE);
+    $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
 
     // Add state, country and county field
     $this->click('field_name[0]');
@@ -122,7 +124,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
     $this->click('in_selector');
     // click on save and new
-    $this->clickLink('_qf_Field_next_new-bottom');
+    $this->clickLink('_qf_Field_next_new-bottom', 'field_name[0]', FALSE);
+    $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
 
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
@@ -134,7 +137,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
     $this->click('in_selector');
     // click on save and new
-    $this->clickLink('_qf_Field_next_new-bottom');
+    $this->clickLink('_qf_Field_next_new-bottom', 'field_name[0]', FALSE);
+    $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
 
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
@@ -147,7 +151,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('in_selector');
 
     // click on save
-    $this->clickLink('_qf_Field_next-bottom', "xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
+    $this->clickLink('_qf_Field_next-bottom', "xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']", FALSE);
 
     $uselink = explode('?', $this->getAttribute("xpath=//*[@id='field_page']/div[1]/a[4]@href"));
     $this->openCiviPage('profile/create', "$uselink[1]", '_qf_Edit_cancel');
@@ -198,7 +202,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->select('county-Primary', "Alameda");
 
     // Select Custom option
-    $this->click('CIVICRM_QFID_Edu_2');
+    $this->select('custom_1', 'Education');
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

@@ -89,6 +89,9 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
   function testLinkCases() {
     $this->webtestLogin();
 
+    // Enable CiviCase module if necessary
+    $this->enableComponents("CiviCase");
+
     //Add Case 1
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
@@ -283,15 +286,18 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', $subject);
 
     // click through to the Activity view screen
-    $this->waitForElementPresent("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[1]/td[8]");
-    $this->click("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[2]/td[8]/span[2]/ul/li/a[text()='File On Case']");
-    $this->waitForElementPresent('file_on_case_activity_subject');
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[5]/a[text()='Summerson, $firstName1']/../../td[8]/span/a[1][text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[5]/a[text()='Summerson, $firstName1']/../../td[8]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[5]/a[text()='Summerson, $firstName1']/../../td[8]/span[2][text()='more']/ul[1]/li[1]/a");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[5]/a[text()='Summerson, $firstName1']/../../td[8]/span[2][text()='more']/ul[1]/li[1]/a");
 
     // file activity on case
+    $this->waitForElementPresent('file_on_case_unclosed_case_id');
     $this->select2('file_on_case_unclosed_case_id', $firstName);
     $this->assertElementContainsText("xpath=//div[@id='s2id_file_on_case_unclosed_case_id']", "$firstName", 'Contact not found in line ' . __LINE__);
+    $this->type('file_on_case_activity_subject', $subject);
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
-    $this->waitForElementPresent("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[5]/a[text()='Summerson, $firstName1']/../../td[8]/span/a[1][text()='View']");
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
@@ -305,7 +311,6 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent('ActivityView');
     $this->waitForElementPresent("css=table#crm-activity-view-table tr.crm-case-activityview-form-block-groupTitle");
-    $this->assertElementContainsText('crm-activity-view-table', "$customDataParams[0]");
     $this->assertElementContainsText('crm-activity-view-table', "$textField");
     $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
     $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody/tr[1]/td[2]");
@@ -350,6 +355,8 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->select("extends[0]", "value=Activity");
     $this->click("//option[@value='Activity']");
     $this->click('_qf_Group_next-bottom');
+    $this->waitForElementPresent('newCustomField');
+    $this->click('newCustomField');
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
@@ -385,15 +392,15 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
 
     //Is custom field created
+    $this->waitForElementPresent("newCustomField");
     $this->waitForText('crm-notification-container', "Custom field '$radioFieldLabel' has been saved.");
 
     // create another custom field - text field
-    $this->click("//a[@id='newCustomField']/span");
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    $this->click("newCustomField");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
 
     $textFieldLabel = 'Custom Field Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $textFieldLabel);
@@ -408,13 +415,12 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
 
     //clicking save
-    $this->click('_qf_Field_next');
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
     $this->waitForElementPresent("//a[@id='newCustomField']/span");
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$textFieldLabel' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//div//table/tbody//tr/td/span[text()='$textFieldLabel']");
-    $textFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//div//table/tbody//tr/td/span[text()='$textFieldLabel']/../../td[8]/span/a[text()='Edit Field']/@href"));
+    $textFieldId = explode('&id=', $this->getAttribute("xpath=//table[@id='options']/tbody//tr/td[1]/span[text()='$textFieldLabel']/../../td[8]/span/a[1][text()='Edit Field']/@href"));
     $textFieldId = $textFieldId[1];
 
     return array($radioOptionLabel1, "custom_{$textFieldId}_-1");

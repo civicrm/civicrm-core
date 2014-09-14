@@ -125,13 +125,13 @@
       return false;
     });
 
-    $('input[name^="soft_credit_contact["]').change(function(){
-      var rowNum = $(this).prop('id').replace('soft_credit_contact_','');
+    $('input[name^="soft_credit_contact_"]').on('change', function(){
+      var rowNum = $(this).prop('id').replace('soft_credit_contact_id_','');
       var totalAmount = $('#total_amount').val();
       //assign total amount as default soft credit amount
       $('#soft_credit_amount_'+ rowNum).val(totalAmount);
       var thousandMarker = {/literal}{$config->monetaryThousandSeparator|json_encode}{literal};
-      $('#soft_credit_type_'+ rowNum).val($('#sct_default_id').val());
+      $('#soft_credit_type_'+ rowNum).select2('val', $('#sct_default_id').val());
       totalAmount = Number(totalAmount.replace(thousandMarker,''));
       if (rowNum > 1) {
         var scAmount = Number($('#soft_credit_amount_'+ (rowNum - 1)).val().replace(thousandMarker,''));
