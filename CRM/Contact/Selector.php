@@ -888,6 +888,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             'name' => ts('View'),
             'url' => 'civicrm/contact/view',
             'qs' => 'reset=1&cid=%%id%%',
+            'class' => 'no-popup',
             'title' => ts('View Contact Details'),
           ),
           array(
