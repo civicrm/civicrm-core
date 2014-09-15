@@ -115,7 +115,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param $fieldName
    * @param $fieldDef
    * @param $params
-   * @param $daoName
+   *
    */
   protected function assignTestFK($fieldName, $fieldDef, $params) {
     $required = CRM_Utils_Array::value('required', $fieldDef);
@@ -1351,6 +1351,11 @@ FROM   civicrm_domain
   /**
    * Given the component id, compute the contact id
    * since its used for things like send email
+   *
+   * @param $componentIDs
+   * @param $tableName
+   *
+   * @return array
    */
   public static function &getContactIDsFromComponent(&$componentIDs, $tableName) {
     $contactIDs = array();
@@ -1488,8 +1493,15 @@ SELECT contact_id
 
   /**
    * Creates a test object, including any required objects it needs via recursion
-   *createOnly: only create in database, do not store or return the objects (useful for perf testing)
-   *ONLY USE FOR TESTING
+   * createOnly: only create in database, do not store or return the objects (useful for perf testing)
+   * ONLY USE FOR TESTING
+   *
+   * @param $daoName
+   * @param array $params
+   * @param int $numObjects
+   * @param bool $createOnly
+   *
+   * @return
    */
   static function createTestObject(
     $daoName,
@@ -1535,6 +1547,7 @@ SELECT contact_id
           }
         }
       }
+
       $object->save();
 
       if (!$createOnly) {
@@ -1559,6 +1572,9 @@ SELECT contact_id
   /**
    * deletes the this object plus any dependent objects that are associated with it
    * ONLY USE FOR TESTING
+   *
+   * @param $daoName
+   * @param array $params
    */
   static function deleteTestObjects($daoName, $params = array(
     )) {
