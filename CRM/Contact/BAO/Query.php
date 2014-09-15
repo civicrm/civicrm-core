@@ -4030,7 +4030,7 @@ WHERE  id IN ( $groupIDs )
     }
     // also get values array for relation_target_name
     // for relatinship search we always do wildcard
-    $relationType = $this->getWhereValues('relation_type_id', $grouping);    
+    $relationType = $this->getWhereValues('relation_type_id', $grouping);
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
     $relPermission = $this->getWhereValues('relation_permission', $grouping);
@@ -4059,7 +4059,7 @@ WHERE  id IN ( $groupIDs )
       $params = array('id' => $rel[0]);
       $rType = CRM_Contact_BAO_RelationshipType::retrieve($params, $rTypeValues);
     }
-    if ( empty($rTypeValues) ) {    
+    if (empty($rTypeValues)) {
       // if we don't know which end of the relationship we are dealing with we'll create a temp table
       //@todo unless we are dealing with a target group
       self::$_relType = 'reciprocal';
