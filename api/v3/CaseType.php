@@ -76,9 +76,10 @@ function civicrm_api3_case_type_create($params) {
  * @access public
  */
 function civicrm_api3_case_type_get($params) {
-  civicrm_api3_verify_mandatory($params);
+  if (!empty($params['options']) && !empty($params['options']['is_count'])) {
+    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  }
   $caseTypes = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-
   // format case type, to fetch xml definition
   return _civicrm_api3_case_type_get_formatResult($caseTypes);
 }

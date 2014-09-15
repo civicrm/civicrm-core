@@ -548,14 +548,12 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
  */
 function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
   $entity = substr($dao->__table, 8);
-
-  $allfields = _civicrm_api3_build_fields_array($dao, $unique);
-
-  $fields = array_intersect(array_keys($allfields), array_keys($params));
-  if (isset($params[$entity . "_id"])) {
+  if (!empty($params[$entity . "_id"]) && empty($params['id'])) {
     //if entity_id is set then treat it as ID (will be overridden by id if set)
-    $dao->id = $params[$entity . "_id"];
+    $params['id'] = $params[$entity . "_id"];
   }
+  $allfields = _civicrm_api3_build_fields_array($dao, $unique);
+  $fields = array_intersect(array_keys($allfields), array_keys($params));
 
   $options = _civicrm_api3_get_options_from_params($params);
   //apply options like sort

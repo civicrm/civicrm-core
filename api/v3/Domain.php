@@ -52,6 +52,9 @@ function civicrm_api3_domain_get($params) {
     $domainBAO = CRM_Core_Config::domainID();
     $params['id'] = $domainBAO;
   }
+  if (!empty($params['options']) && !empty($params['options']['is_count'])) {
+    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  }
 
   _civicrm_api3_dao_set_filter($bao, $params, true, 'domain');
   $domains = _civicrm_api3_dao_to_array($bao, $params, true,'domain');
