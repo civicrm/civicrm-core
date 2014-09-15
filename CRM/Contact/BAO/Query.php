@@ -4432,7 +4432,8 @@ civicrm_relationship.is_permission_a_b = 0
    */
   function getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds) {
     $this->_includeContactIds = $includeContactIds;
-    list($select, $from, $where) = $this->query();
+    $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
+    list($select, $from, $where) = $this->query(FALSE, FALSE, FALSE, $onlyDeleted);
     $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
     $order = " ORDER BY pnc.id";
     $groupBy = " GROUP BY contact_a.id";
