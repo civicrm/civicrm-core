@@ -420,8 +420,13 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       $dbParams['used_for'] = $formParams['used_for'];
     }
 
-    if(CRM_Utils_Array::value('parent_event_id', $formParams)){
-      $dbParams['entity_value'] = $formParams['parent_event_id'];
+    if(CRM_Utils_Array::value('event_id', $formParams)){
+      $parent_event_id = self::getParentFor($formParams['event_id'], 'civicrm_event');
+      if($parent_event_id){
+        $dbParams['entity_value'] = $parent_event_id;
+      }else{
+        $dbParams['entity_value'] = $formParams['event_id'];
+      }
     }
 
     if(CRM_Utils_Array::value('repetition_start_date', $formParams)) {

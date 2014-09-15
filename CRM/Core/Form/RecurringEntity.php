@@ -259,16 +259,16 @@ class CRM_Core_Form_RecurringEntity {
     }
 
     //Delete relations if any from recurring entity tables before inserting new relations for this entity id
-    if($params['parent_event_id']){
-      $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($params['parent_event_id'], 'civicrm_event', FALSE);
+    if($params['event_id']){
+      $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['event_id'], 'civicrm_event', TRUE);
       $participantDetails = CRM_Core_BAO_RecurringEntity::getParticipantCountforEvent($getRelatedEntities);
       //Check if participants exists for events
       foreach ($getRelatedEntities as $key => $value) {
-        if(!CRM_Utils_Array::value($value['id'], $participantDetails['countByID'])){
+        if(!CRM_Utils_Array::value($value['id'], $participantDetails['countByID']) && $value['id'] != $params['event_id']){
           CRM_Event_BAO_Event::del($value['id']);
         }
       }
-      CRM_Core_BAO_RecurringEntity::delEntityRelations($params['parent_event_id'], 'civicrm_event');
+      CRM_Core_BAO_RecurringEntity::delEntityRelations($params['event_id'], 'civicrm_event');
     }
 
     $recursion = new CRM_Core_BAO_RecurringEntity();
