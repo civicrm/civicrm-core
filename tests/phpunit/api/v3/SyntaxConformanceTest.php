@@ -388,12 +388,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public static function toBeSkipped_getSqlOperators() {
     $entitiesWithout = array(
       'Case',//case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
-      'Contact', // on the todo list!
       'EntityTag', // non-standard api - has inappropriate mandatory fields & doesn't implement limit
       'Extension', // can't handle creating 25
       'Note', // note has a default get that isn't implemented in createTestObject -meaning you don't 'get' them
       'MailingGroup', // no get call on MailingGroup
-      'Setting', //a bit of a pseudoapi - keys by domain
+      'Setting', //a bit of a pseudo api - keys by domain
     );
     return $entitiesWithout;
   }

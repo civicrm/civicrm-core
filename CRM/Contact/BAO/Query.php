@@ -1807,15 +1807,21 @@ class CRM_Contact_BAO_Query {
         if (empty($this->_params[$id][0])) {
           continue;
         }
+
         // check for both id and contact_id
         if ($this->_params[$id][0] == 'id' || $this->_params[$id][0] == 'contact_id') {
           if (
-            $this->_params[$id][1] == 'IS NULL' ||
-            $this->_params[$id][1] == 'IS NOT NULL'
+           ($this->_params[$id][1] == 'IS NULL' ||
+            $this->_params[$id][1] == 'IS NOT NULL')
           ) {
+            if (is_array($this->_params[$id][2])) {
+              //this could have come in from the API
+              $this->_where[0][] = self::buildClause("contact_a.id", "{$this->_params[$id][1]}", "{$this->_params[$id][2]}");
+            }
             $this->_where[0][] = "contact_a.id {$this->_params[$id][1]}";
           }
           elseif (is_array($this->_params[$id][2])) {
+
             $idList = implode("','", $this->_params[$id][2]);
             //why on earth do they put ' in the middle & not on the outside? We have to assume it's
             //to support 'something' so lets add them conditionally to support the api (which is a tested flow
