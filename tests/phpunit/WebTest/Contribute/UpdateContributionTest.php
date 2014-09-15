@@ -277,7 +277,9 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->select("payment_instrument_id", "label=$label");
    $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
    //Assertions
-   $totalAmount = $this->_getPremiumActualCost($contId, 'Payment Processor Account', 'Accounts Receivable');
+   $subtractedTotal = $this->_getPremiumActualCost($contId, NULL, 'Payment Processor Account');
+   $this->assertEquals($subtractedTotal, -$amount, "Verify amount deleted from old account");
+   $totalAmount = $this->_getPremiumActualCost($contId, NULL, 'Accounts Receivable');
    $this->assertEquals($totalAmount, $amount, "Verify amount for newly inserted values");
  }
 
@@ -420,6 +422,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    if (!empty($cost)) {
      $query .= " AND eft.amount = {$cost}";
    }
+   $query .= " ORDER BY ft.id DESC LIMIT 1";
    $result = CRM_Core_DAO::singleValueQuery($query);
    return $result;
  }
