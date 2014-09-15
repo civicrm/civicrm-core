@@ -131,6 +131,9 @@
       {if $config->userSystem->is_drupal}
         <tr><td>Drush</td><td><pre class="prettyprint" id="api-drush" title='drush syntax'></pre></td></tr>
       {/if}
+      {if $config->userSystem->is_wordpress}
+        <tr><td>WP-CLI</td><td><pre class="prettyprint" id="api-wpcli" title='wp-cli syntax'></pre></td></tr>
+      {/if}
     </table>
   </div>
   <input type="submit" value="{ts}Execute{/ts}" class="crm-form-submit"/>

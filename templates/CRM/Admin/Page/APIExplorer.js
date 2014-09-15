@@ -327,7 +327,8 @@
       smarty: "{crmAPI var='result' entity='" + entity + "' action='" + action + "'",
       php: "$result = civicrm_api3('" + entity + "', '" + action + "'",
       json: "CRM.api3('" + entity + "', '" + action + "'",
-      drush: "drush civicrm-api " + entity + '.' + action + ' ',
+      drush: "drush cvapi " + entity + '.' + action + ' ',
+      wpcli: "wp cv api " + entity + '.' + action + ' ',
       rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&json=" + JSON.stringify(params) + "&api_key=yoursitekey&key=yourkey"
     };
     smartyStub = false;
@@ -343,6 +344,7 @@
       q.json += "  \"" + key + '": ' + js;
       q.smarty += ' ' + key + '=' + smartyFormat(js, key);
       q.drush += key + '=' + js + ' ';
+      q.wpcli += key + '=' + js + ' ';
     });
     if (i) {
       q.php += ")";
