@@ -4030,7 +4030,7 @@ WHERE  id IN ( $groupIDs )
     }
     // also get values array for relation_target_name
     // for relatinship search we always do wildcard
-    $relationType = $this->getWhereValues('relation_type_id', $grouping);    
+    $relationType = $this->getWhereValues('relation_type_id', $grouping);
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
     $relPermission = $this->getWhereValues('relation_permission', $grouping);
@@ -4059,7 +4059,7 @@ WHERE  id IN ( $groupIDs )
       $params = array('id' => $rel[0]);
       $rType = CRM_Contact_BAO_RelationshipType::retrieve($params, $rTypeValues);
     }
-    if ( empty($rTypeValues) ) {    
+    if (empty($rTypeValues)) {
       // if we don't know which end of the relationship we are dealing with we'll create a temp table
       //@todo unless we are dealing with a target group
       self::$_relType = 'reciprocal';
@@ -4654,7 +4654,8 @@ civicrm_relationship.is_permission_a_b = 0
    */
   function getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds) {
     $this->_includeContactIds = $includeContactIds;
-    list($select, $from, $where) = $this->query();
+    $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
+    list($select, $from, $where) = $this->query(FALSE, FALSE, FALSE, $onlyDeleted);
     $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
     $order = " ORDER BY pnc.id";
     $groupBy = " GROUP BY contact_a.id";
