@@ -4031,7 +4031,7 @@ WHERE  id IN ( $groupIDs )
        return;
     }
     // also get values array for relation_target_name
-    // for relatinship search we always do wildcard
+    // for relationship search we always do wildcard
     $relationType = $this->getWhereValues('relation_type_id', $grouping);
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
