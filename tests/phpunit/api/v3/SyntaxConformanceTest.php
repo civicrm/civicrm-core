@@ -152,6 +152,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return static::entities(static::toBeSkipped_getlimit());
   }
 
+  public static function entities_getSqlOperators() {
+    return static::entities(static::toBeSkipped_getSqlOperators());
+  }
   /**
    * @return array
    */
@@ -383,6 +386,22 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Extension', // can't handle creating 25
       'MailingGroup', // no get call on MailingGroup
       'Note', // fails on 5 limit - probably a set up problem
+      'Setting', //a bit of a pseudoapi - keys by domain
+    );
+    return $entitiesWithout;
+  }
+
+  /**
+   * At this stage exclude the ones that don't pass & add them as we can troubleshoot them
+   */
+  public static function toBeSkipped_getSqlOperators() {
+    $entitiesWithout = array(
+      'Case',//case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
+      'Contact', // on the todo list!
+      'EntityTag', // non-standard api - has inappropriate mandatory fields & doesn't implement limit
+      'Extension', // can't handle creating 25
+      'Note', // note has a default get that isn't implemented in createTestObject -meaning you don't 'get' them
+      'MailingGroup', // no get call on MailingGroup
       'Setting', //a bit of a pseudoapi - keys by domain
     );
     return $entitiesWithout;
@@ -727,12 +746,46 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Ensure that the "get" operation accepts limiting the #result records.
+   *
+   * @dataProvider entities_getSqlOperators
+   *
+   * @param $entityName
+   *
+   * @internal param string $entity
+   */
+  function testSqlOperators($entityName) {
+    $baoString = _civicrm_api3_get_BAO($entityName);
+    if (empty($baoString)) {
+      $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
+      return;
+    }
+    $entities = $this->callAPISuccess($entityName, 'get', array('options' => array('limit' => 0), 'return' => 'id'));
+    $entities = array_keys($entities['values']);
+    $totalEntities = count($entities);
+    if ($totalEntities < 3) {
+      $ids = array();
+      for ($i = 0; $i < 3 - $totalEntities; $i++) {
+        $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
+        $ids[] = $baoObj->id;
+      }
+      $totalEntities = 3;
+    }
+    $entities = $this->callAPISuccess($entityName, 'get', array('options' => array('limit' => 0)));
+    $entities = array_keys($entities['values']);
+    $this->assertGreaterThan(2, $totalEntities);
+    $this->callAPISuccess($entityName, 'getsingle', array('id' => array('IN' => array($entities[0]))));
+    $this->callAPISuccessGetCount($entityName, array('id' => array('NOT IN' => array($entities[0]))), $totalEntities - 1);
+    $this->callAPISuccessGetCount($entityName, array('id' => array('>' => $entities[0])), $totalEntities - 1);
+  }
+
+  /**
    * Check that get fetches an appropriate number of results
    *
    * @param string $entityName Name of entity to test
-   * @param unknown $params
-   * @param unknown $limit
-   * @param unknown $message
+   * @param array $params
+   * @param integer $limit
+   * @param string $message
    */
   function checkLimitAgainstExpected($entityName, $params, $limit, $message) {
     $result = $this->callAPISuccess($entityName, 'get', $params);
