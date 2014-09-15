@@ -148,6 +148,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
   }
+
   /**
    * Test submit with a membership block in place
    */
