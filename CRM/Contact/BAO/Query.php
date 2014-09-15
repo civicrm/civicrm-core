@@ -5201,7 +5201,14 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         if (empty($dataType)) {
           $dataType = 'String';
         }
-
+        if (is_array($value)) {
+          //this could have come from the api - as in the restWhere section we potentially use the api operator syntax which is becoming more
+          // widely used and consistent across the codebase
+          // adding this here won't accept the search functions which don't submit an array
+          if (($queryString = CRM_Core_DAO::createSqlFilter($field, $value, $dataType)) != FALSE) {
+            return $queryString;
+          }
+        }
         $value = CRM_Utils_Type::escape($value, $dataType);
         // if we don't have a dataType we should assume
         if ($dataType == 'String' || $dataType == 'Text') {
