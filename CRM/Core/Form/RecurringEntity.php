@@ -261,23 +261,10 @@ class CRM_Core_Form_RecurringEntity {
     //Delete relations if any from recurring entity tables before inserting new relations for this entity id
     if($params['parent_event_id']){
       $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($params['parent_event_id'], 'civicrm_event', FALSE);
-      $implodeRelatedEntities = implode(',', array_map(function($entity){
-                                  return $entity['id'];
-                                }, $getRelatedEntities));
+      $participantDetails = CRM_Core_BAO_RecurringEntity::getParticipantCountforEvent($getRelatedEntities);
       //Check if participants exists for events
-      if($implodeRelatedEntities){
-        $query = "SELECT event_id, COUNT(*) as count
-                  FROM civicrm_participant 
-                  WHERE event_id IN ({$implodeRelatedEntities})
-                  GROUP BY event_id";
-        $dao = CRM_Core_DAO::executeQuery($query);
-        $participantDetails = array();
-        while($dao->fetch()) {
-          $participantDetails[$dao->event_id] = $dao->count;
-        }
-      }
       foreach ($getRelatedEntities as $key => $value) {
-        if(!CRM_Utils_Array::value($value['id'], $participantDetails)){
+        if(!CRM_Utils_Array::value($value['id'], $participantDetails['countByID'])){
           CRM_Event_BAO_Event::del($value['id']);
         }
       }
