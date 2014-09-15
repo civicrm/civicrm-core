@@ -129,10 +129,12 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     
     //Set Schedule Reminder Id
     $this->_scheduleReminderId = $this->_scheduleReminderDetails->id;
-    list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($this->_parentEventStartDate, 'activityDateTime');
+    //Always pass current event's start date by default
+    $currentEventStartDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'start_date', 'id');
+    list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($currentEventStartDate, 'activityDateTime');
+    
     // Check if there is id for this event in Reminder table
     if($this->_scheduleReminderId){
-      list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($this->_scheduleReminderDetails->start_action_date, 'activityDateTime');
       $defaults['repetition_frequency_unit'] = $this->_scheduleReminderDetails->repetition_frequency_unit;
       $defaults['repetition_frequency_interval'] = $this->_scheduleReminderDetails->repetition_frequency_interval;
       $defaults['start_action_condition'] = array_flip(explode(",",$this->_scheduleReminderDetails->start_action_condition));
@@ -160,13 +162,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       if($this->_scheduleReminderDetails->entity_status){
         $defaults['repeats_by'] = 2;
       }
-      //echo "<pre>"; print_r($this->_excludeDateInfo);
       $defaults['exclude_date_list'] = array('a', 'b');
-         /* array
-        (
-            0 => '08/25/2014',
-            1 => '08/28/2014'
-        );*/
     } 
     return $defaults;
   }
@@ -178,7 +174,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
   public function postProcess() {
     if($this->_id){
       $params = $this->controller->exportValues($this->_name); 
-      $params['current_event_id'] = $this->_id;
+      $params['event_id'] = $this->_id;
       $params['parent_event_id']  = $this->_parentEventId;
       $params['parent_event_start_date'] = $this->_parentEventStartDate;
       $params['parent_event_end_date'] = $this->_parentEventEndDate;
@@ -192,7 +188,6 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       
       CRM_Core_Form_RecurringEntity::postProcess($params, 'event');
       CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
-      //CRM_Core_Error::debug_var('Event Recursion');
     }else{
         CRM_Core_Error::fatal("Could not find Event ID");
     }  

@@ -204,12 +204,14 @@ class CRM_Core_Form_RecurringEntity {
       $params['used_for'] = $type;
     }
     
+    //Save post params to the schedule reminder table
+    $dbParams = CRM_Core_BAO_RecurringEntity::mapFormValuesToDB($params);
+
+    //Delete repeat configuration and rebuild
     if(CRM_Utils_Array::value('id', $params)){
       CRM_Core_BAO_ActionSchedule::del($params['id']);
       unset($params['id']);
     }
-    //Save post params to the schedule reminder table
-    $dbParams = CRM_Core_BAO_RecurringEntity::mapFormValuesToDB($params);
     $actionScheduleObj = CRM_Core_BAO_ActionSchedule::add($dbParams);
     
     //exclude dates 
@@ -296,7 +298,7 @@ class CRM_Core_Form_RecurringEntity {
       $recursion->intervalDateColumns = array('end_date' => $interval);
     }
 
-    $recursion->entity_id = $params['current_event_id'];
+    $recursion->entity_id = $params['event_id'];
     $recursion->entity_table = 'civicrm_event';
     $recursion->linkedEntities = array(
       array(
