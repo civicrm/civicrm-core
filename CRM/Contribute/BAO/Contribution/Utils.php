@@ -65,28 +65,34 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $isTest = ($form->_mode == 'test') ? 1 : 0;
     $lineItems = $form->_lineItem;
 
-    $contributionType = new CRM_Financial_DAO_FinancialType();
+    //do overrides that should have been done in the calling function -
+    // @todo the calling function should pass the correct
+    // variable for $contributionTypeId as it's impossible to debug what is happening in each flow here
+    // but we need to ensure it is doing so before we remove this cruft
+
     if (isset($paymentParams['financial_type'])) {
-      $contributionType->id = $paymentParams['financial_type'];
+      $contributionTypeId = $paymentParams['financial_type'];
     }
     elseif (!empty($form->_values['pledge_id'])) {
-      $contributionType->id = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
+      $contributionTypeId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
         $form->_values['pledge_id'],
         'financial_type_id'
       );
     }
-    else {
-      $contributionType->id = $contributionTypeId;
-    }
+
+    $contributionType = new CRM_Financial_DAO_FinancialType();
+    $contributionType->id = $contributionTypeId;
     if (!$contributionType->find(TRUE)) {
+      //@todo - surely this check was part of the 4.3 upgrade & can go now?
       CRM_Core_Error::fatal('Could not find a system table');
     }
 
     // add some financial type details to the params list
     // if folks need to use it
-    $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $contributionType->name;
+    //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
+    $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $contributionType->name;
     //CRM-11456
-    $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionType->id);
+    $paymentParams['financialType_accounting_code'] =  $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionTypeId);
     $paymentParams['contributionPageID'] = $form->_params['contributionPageID'] = $form->_values['id'];
 
 
@@ -122,7 +128,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->_params['contributionID'] = $contribution->id;
       }
 
-      $form->_params['contributionTypeID'] = $contributionType->id;
+      $form->_params['contributionTypeID'] = $contributionTypeId;
       $form->_params['item_name'] = $form->_params['description'];
       $form->_params['receive_date'] = $now;
 
@@ -145,7 +151,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         else {
           if (!$form->_params['is_pay_later']) {
             if (is_object($payment)) {
-              // call postprocess hook before leaving
+              // call postProcess hook before leaving
               $form->postProcessHook();
               // this does not return
               $result = &$payment->doTransferCheckout($form->_params, 'contribute');
@@ -246,7 +252,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
 
         $paymentParams['contributionID'] = $contribution->id;
-        $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
+        //CRM-15297 deprecate contributionTypeID
+        $paymentParams['financialTypeID'] = $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
         $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
 
         if ($form->_values['is_recur'] && $contribution->contribution_recur_id) {
@@ -267,6 +274,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
     if (is_a($result, 'CRM_Core_Error')) {
       //make sure to cleanup db for recurring case.
+      //@todo this clean up has always been controversial as many orgs prefer to see failed transactions.
+      // most recent discussion has been that they should be retained and this could be altered
       if (!empty($paymentParams['contributionID'])) {
         CRM_Contribute_BAO_Contribution::deleteContribution($paymentParams['contributionID']);
       }
@@ -295,6 +304,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       // result has all the stuff we need
       // lets archive it to a financial transaction
+      //@todo - this is done in 2 places - can't we just do it once straight after retrieving contribution type -
+      // when would this be a bad thing?
       if ($contributionType->is_deductible) {
         $form->assign('is_deductible', TRUE);
         $form->set('is_deductible', TRUE);
