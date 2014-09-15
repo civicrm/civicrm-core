@@ -138,7 +138,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->select("name=option51_length", "value=100");
 
     $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
-    $this->click("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
+    $this->clickLink("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
 
     $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", '_qf_Merge_cancel-bottom');
@@ -180,8 +180,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Verify activity merged
     $this->click("css=li#tab_activity a");
-    $this->waitForElementPresent("xpath=//table[@id='contact-activity-selector-activity']/tbody/tr");
-    $this->verifyText("xpath=//table[@id='contact-activity-selector-activity']/tbody/tr/td[5]/a",
+    $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody/tr");
+    $this->verifyText("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody/tr/td[5]/a",
       preg_quote("$lastName, $firstName")
     );
 
