@@ -379,7 +379,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         ),
         array(
           'name' => ts('Subject'),
-          'sort' => 'subject',
+          'sort' => 'activity_subject',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
