@@ -2200,5 +2200,49 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
+  
+  /**
+   * Update mode column in civicrm_recurring_entity table for event related tabs
+   * 
+   * @params int $entityId event id
+   * @params string $linkedEntityTable Linked entity table name for this event
+   * @return array
+   */
+  public static function updateModeRecurringEntityForEvent($entityId, $linkedEntityTable){
+    $result = array();
+    if( $entityId && $linkedEntityTable ){
+      switch ($linkedEntityTable) {
+          case 'civicrm_tell_friend':
+            $params = array(
+                        'entity_id' => $entityId,
+                        'entity_table' => 'civicrm_event'
+                      );
+            $defaults = array();
+            CRM_Core_DAO::commonRetrieve('CRM_Friend_DAO_Friend', $params, $defaults);
+            if(CRM_Utils_Array::value('id', $defaults)){
+              $result['entityId'] = $defaults['id'];
+              $result['entityTable'] = 'civicrm_tell_friend';
+            }
+            break;
+
+          case 'civicrm_pcp_block':
+            $params = array(
+                        'entity_id' => $entityId,
+                        'entity_table' => 'civicrm_event'
+                      );
+            $defaults = array();
+            CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $defaults);
+            if(CRM_Utils_Array::value('id', $defaults)){
+              $result['entityId'] = $defaults['id'];
+              $result['entityTable'] = 'civicrm_pcp_block';
+            }
+            break;
+
+          default:
+            break;
+        }
+      } 
+      return $result;
+    }
 }
 

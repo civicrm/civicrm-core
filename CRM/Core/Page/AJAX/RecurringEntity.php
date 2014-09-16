@@ -15,20 +15,29 @@
 class CRM_Core_Page_AJAX_RecurringEntity {
   
   public static function updateMode() {
-    if(CRM_Utils_Array::value('mode', $_REQUEST) && CRM_Utils_Array::value('entityId', $_REQUEST)){
+    if(CRM_Utils_Array::value('mode', $_REQUEST) && CRM_Utils_Array::value('entityId', $_REQUEST) && CRM_Utils_Array::value('entityTable', $_REQUEST)){
+      
       $finalResult = array();
       $mode = CRM_Utils_Type::escape($_REQUEST['mode'], 'Integer');
       $entityId = CRM_Utils_Type::escape($_REQUEST['entityId'], 'Integer');
+      $entityTable = CRM_Utils_Type::escape($_REQUEST['entityTable'], 'String');
 
-      $sql = "UPDATE
-        civicrm_recurring_entity
-        SET mode = %1
-        WHERE entity_id = %2 AND entity_table = 'civicrm_event'";
-      $params = array(
-        1 => array($mode, 'Integer'),          
-        2 => array($entityId, 'Integer')
-      );
-      CRM_Core_DAO::executeQuery($sql, $params);
+      if(CRM_Utils_Array::value('linkedEntityTable', $_REQUEST)){
+        $result = array();
+        $result = CRM_Event_BAO_Event::updateModeRecurringEntityForEvent($entityId, $_REQUEST['linkedEntityTable']);
+      }
+
+      $dao = new CRM_Core_DAO_RecurringEntity();
+      if(!empty($result)){
+        $dao->entity_id = $result['entityId'];
+        $dao->entityTable = $result['entityTable'];
+      }else{
+        $dao->entity_id = $entityId;
+        $dao->entityTable = $entityTable;
+      }
+      $dao->find(TRUE);
+      $dao->mode = $mode;
+      $dao->save();
       $finalResult['status'] = 'Done';
     }
     echo json_encode($finalResult);
