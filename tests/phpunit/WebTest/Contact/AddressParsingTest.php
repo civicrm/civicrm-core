@@ -121,7 +121,9 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
       $this->waitForElementPresent("address_{$i}_street_address");
       $address[$i] = $location[$this->getSelectedLabel("address_{$i}_location_type_id")];
       // Open "Edit Address Elements"
-      $this->click("//table[@id='address_{$i}']//a[text()='Edit Address Elements']");
+      $this->waitForElementPresent('addressBlockId');
+      $this->click('addressBlockId');
+      $this->click("//table[@id='address_table_{$i}']//a[text()='Edit Address Elements']");
     }
 
     //verify all the address fields were parsed correctly
