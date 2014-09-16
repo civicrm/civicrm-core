@@ -96,9 +96,9 @@
 
   {else}
         {if $action eq 16}
-        <div class="messages status no-popup">
+        <div class="messages status no-popup crm-empty-table">
             <div class="icon inform-icon"></div>
-            {ts 1=$groupTitle 2=$crmURL}There are no fields for price set '%1'.{/ts}
+            {ts}None found.{/ts}
         </div>
         <div class="action-link">
           <a href="{crmURL q="reset=1&action=add&sid=$sid"}" id="newPriceField" class="button"><span><div class="icon add-icon"></div>{ts}Add Price Field{/ts}</span></a>
