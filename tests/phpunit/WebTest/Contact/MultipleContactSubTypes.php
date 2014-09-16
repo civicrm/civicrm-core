@@ -240,9 +240,11 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added.");
     $gid = $this->urlArg('gid');
 
+    // Add field
+    $this->openCiviPage('admin/custom/group/field/add', "reset=1&action=add&gid=$gid");
     $fieldLabel = "custom_field_for_{$contactSubType}" . substr(sha1(rand()), 0, 4);
     $this->type('label', $fieldLabel);
-    $this->click('_qf_Field_next-bottom');
+    $this->click('_qf_Field_done-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
     return array($customGroupTitle, $gid);

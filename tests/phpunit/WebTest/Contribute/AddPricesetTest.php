@@ -103,8 +103,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
    */
   function _testAddPriceFields(&$fields, &$validateString, $financialType, $dateSpecificFields = FALSE) {
     $validateStrings[] = $financialType;
-    $this->click('newPriceField');
-    $this->waitForElementPresent('label');
+    $sid = $this->urlArg('sid');
+    $this->openCiviPage('admin/price/field', "reset=1&action=add&sid=$sid", 'label');
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
 

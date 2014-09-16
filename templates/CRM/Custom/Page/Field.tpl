@@ -70,9 +70,9 @@
 
     {else}
         {if $action eq 16}
-        <div class="messages status no-popup">
+        <div class="messages status no-popup crm-empty-table">
           <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
-          {ts 1=$groupTitle}There are no fields for custom group '%1'</a>.{/ts}
+          {ts}None found.{/ts}
         </div>
         {/if}
     {/if}
