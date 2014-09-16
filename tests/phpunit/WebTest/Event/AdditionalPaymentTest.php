@@ -158,7 +158,6 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
 
     $this->open($location);
     $this->waitForElementPresent("xpath=id('AdditionalPayment')");
-    $this->assertElementContainsText("xpath=id('AdditionalPayment')/h3", 'New Event Payment');
 
     // verify balance
     $text = $this->getText("xpath=id('AdditionalPayment')/div[2]//table/tbody/tr[3]/td[2]");
