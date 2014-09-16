@@ -334,6 +334,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       }
       $noSelection = TRUE;
     }
+    elseif (!is_array($this->_params['id_value'])) {
+      $this->_params['id_value'] = explode(',', $this->_params['id_value']);
+    }
 
     $this->_rowsFound = count($this->_params['id_value']);
 
