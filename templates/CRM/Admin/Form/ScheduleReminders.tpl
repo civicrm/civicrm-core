@@ -120,7 +120,6 @@
          </tr>
        </table>
        {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
-    </div>
     </fieldset>
     {if $sms}
       <fieldset id="sms" class="crm-collapsible"><legend class="collapsible-title">{ts}SMS Screen{/ts}</legend>
@@ -139,6 +138,7 @@
     <div>
   </fieldset>
   {/if}
+  </div>
 
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    = "is_repeat"
