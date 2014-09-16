@@ -58,12 +58,15 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->click("extends[0]");
     $this->select("extends[0]", "label=Contacts");
     $this->click("//option[@value='Contact']");
-    $this->click("//form[@id='Group']/div[2]/div[3]/span[1]/input");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("//form[@id='Group']/div[2]/div[3]/span[1]/input");
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '$customGroupTitle' has been added. You can add custom fields now."));
+    $this->waitForText('crm-notification-container', "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
+    
+    $gid = $this->urlArg('gid');
+    
     //add custom field - alphanumeric text
+    $this->openCiviPage('admin/custom/group/field/add', "reset=1&action=add&gid=$gid");
     $textFieldLabel = 'test_text_field';
     $this->click("header");
     $this->type("label", $textFieldLabel);
@@ -106,20 +109,18 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next_new-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Field_next_new-bottom");
 
     //Is custom field created?
-    $this->assertTrue($this->isTextPresent("Your custom field '$checkboxFieldLabel' has been saved."));
+    $this->waitForText('crm-notification-container', "Custom field '$checkboxFieldLabel' has been saved.");
 
     //add custom field - alphanumeric text
     $textFieldLabel = 'test_text_field';
     $this->click("header");
     $this->type("label", $textFieldLabel);
-    $this->click("_qf_Field_next_new-bottom");
+    $this->clickLink("_qf_Field_next_new-bottom");
 
     // Same group will not contain same custome fields so will show error for this field :
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("data_type[0]");
     $this->select("data_type[0]", "value=0");
     $this->click("//option[@value='0']");
@@ -127,7 +128,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->select("data_type[1]", "label=CheckBox");
     $this->click("//option[@value='CheckBox']");
     //Is custom field created
-    $this->assertTrue($this->isTextPresent("Custom field '$textFieldLabel' already exists in Database."));
+    $this->waitForText('crm-notification-container', "Custom field '$textFieldLabel' already exists in Database.");
 
     //create another custom field - Number Radio
     $this->click("data_type[0]");
@@ -159,11 +160,10 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Field_done-bottom");
 
     //Is custom field created
-    $this->assertTrue($this->isTextPresent("Your custom field '$radioFieldLabel' has been saved."));
+    $this->waitForText('crm-notification-container', "Custom field '$radioFieldLabel' has been saved.");
 
   }
 }
