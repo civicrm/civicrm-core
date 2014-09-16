@@ -31,7 +31,10 @@
 <dt>{ts}From{/ts}</dt><dd>{if $fromName}{$fromName}{else}{ts}(display name not available){/ts}{/if}</dd>
 <dt>{ts}To{/ts}</dt><dd>{$toName}</dd>
 <dt>{ts}Message{/ts}</dt><dd>{$message}</dd>
-<dt>&nbsp;</dt><dd><input type="button" name="Done" value="Done" onClick="location.href='{crmURL p='civicrm/contact/view/activity' q="history=1&show=1"}';"></dd>
+<dt>&nbsp;</dt>
+  <dd class="crm-submit-buttons">
+    <a class="button cancel" href="{crmURL p='civicrm/contact/view/activity' q="history=1&show=1"}">{ts}Done{/ts}</a>
+  </dd>
 </dl>
 </fieldset>
 </div>
