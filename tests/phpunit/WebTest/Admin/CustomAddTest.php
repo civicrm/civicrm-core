@@ -57,7 +57,6 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
 
     //add custom field - alphanumeric text
-    $this->click('newCustomField');
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
     $textFieldLabel = 'test_text_field' . substr(sha1(rand()), 0, 3);
     $this->click("header");

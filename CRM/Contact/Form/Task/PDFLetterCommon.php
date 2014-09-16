@@ -175,54 +175,19 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     CRM_Mailing_BAO_Mailing::commonLetterCompose($form);
 
-    if ($form->_single) {
-      $cancelURL = CRM_Utils_System::url(
-        'civicrm/contact/view',
-        "reset=1&cid={$form->_cid}&selectedChild=activity",
-        FALSE,
-        NULL,
-        FALSE
+    $buttons = array();
+    if ($form->get('action') != CRM_Core_Action::VIEW) {
+      $buttons[] = array(
+        'type' => 'submit',
+        'name' => $form->_single ? ts('Make PDF') : ts('Make PDFs'),
+        'isDefault' => TRUE,
       );
-
-      if ($form->get('action') == CRM_Core_Action::VIEW) {
-        $form->addButtons(array(
-            array(
-              'type' => 'cancel',
-              'name' => ts('Done'),
-              'js' => array('onclick' => "location.href='{$cancelURL}'; return false;"),
-            ),
-          )
-        );
-      }
-      else {
-        $form->addButtons(array(
-            array(
-              'type' => 'submit',
-              'name' => ts('Make PDF Letter'),
-              'isDefault' => TRUE,
-            ),
-            array(
-              'type' => 'cancel',
-              'name' => ts('Done'),
-              'js' => array('onclick' => "location.href='{$cancelURL}'; return false;"),
-            ),
-          )
-        );
-      }
     }
-    else {
-      $form->addButtons(array(
-        array(
-          'type' => 'submit',
-          'name' => ts('Make PDF Letters'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Done'),
-        ),
-      ));
-    }
+    $buttons[] = array(
+      'type' => 'cancel',
+      'name' => $form->get('action') == CRM_Core_Action::VIEW ? ts('Done') : ts('Cancel'),
+    );
+    $form->addButtons($buttons);
 
     $form->addFormRule(array('CRM_Contact_Form_Task_PDFLetterCommon', 'formRule'), $form);
   }

@@ -72,14 +72,12 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type('sort_name', "Smiths_x");
     $this->click('_qf_Basic_refresh');
-    $this->waitForElementPresent('Go');
 
     // Batch Update Via Profile
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
     $this->select('task', "label=Batch Update via Profile");
-    $this->click('Go');
     $this->waitForElementPresent('_qf_PickProfile_next');
     $this->waitForElementPresent('uf_group_id');
     $this->select('uf_group_id', "label={$profileTitle}");
@@ -158,14 +156,12 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type('sort_name', $lastName);
     $this->click('_qf_Basic_refresh');
-    $this->waitForElementPresent('Go');
 
     // Batch Update Via Profile
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
     $this->select('task', "label=Batch Update via Profile");
-    $this->click('Go');
     $this->waitForElementPresent('_qf_PickProfile_next');
 
     $this->select('uf_group_id', "label={$profileTitle}");
@@ -339,14 +335,12 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type('sort_name', $lastName);
     $this->click('_qf_Basic_refresh');
-    $this->waitForElementPresent('Go');
 
     // Batch Update Via Profile
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
     $this->select('task', "label=Batch Update via Profile");
-    $this->click('Go');
     $this->waitForElementPresent('_qf_PickProfile_next');
 
     $this->select('uf_group_id', "label={$profileTitle}");
@@ -403,47 +397,46 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     //Reserve and interview respondents
     $this->openCiviPage('campaign', 'reset=1&subPage=survey');
-    $this->waitForElementPresent("xpath=//table[@id='surveys']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class=' crm-campaign-voterLinks']/span/ul/li/a");
-    $this->click("xpath=//table[@id='surveys']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class=' crm-campaign-voterLinks']/span/ul/li/a");
+    $this->waitForElementPresent("xpath=//table[@class='surveys dataTable no-footer']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class=' crm-campaign-voterLinks']/span/ul/li/a");
+    $this->click("xpath=//table[@class='surveys dataTable no-footer']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class=' crm-campaign-voterLinks']/span/ul/li/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("xpath=//div[@id='search_form_reserve']/div");
     $this->waitForElementPresent('sort_name');
     $this->type('sort_name', $lastName);
     $this->waitForElementPresent('_qf_Search_refresh');
-    $this->clickLink('_qf_Search_refresh', 'Go');
+    $this->clickLink('_qf_Search_refresh', 'toggleSelect');
     $this->click('toggleSelect');
     $this->select('task', "value=2");
-    $this->click('Go');
     $this->waitForElementPresent('_qf_Reserve_next_reserveToInterview-top');
     $this->clickLink('_qf_Reserve_next_reserveToInterview-top', '_qf_Interview_cancel_interview');
 
-    $this->isElementPresent("xpath=//table[@id='voterRecords']/tbody//tr/td[text()='{$Name2}']");
-    $this->isElementPresent("xpath=//table[@id='voterRecords']/tbody//tr/td[text()='{$Name1}']");
+    $this->isElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='{$Name2}']");
+    $this->isElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='{$Name1}']");
 
     //edition to be done here
     // selecting first check of profile
-    $this->click("xpath=//table[@id='voterRecords']/tbody/tr/td[3]/input[2]");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[3]/input[2]");
     // selecting second check of profile
-    $this->click("xpath=//table[@id='voterRecords']/tbody/tr/td[4]/input[2]");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[4]/input[2]");
     // clicking copy values to rows of first check and verifying
     // if other check Profile Field check box are affected
 
-    $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[3]/div/img");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/thead/tr/th[3]/div/img");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(5);
-    if ($this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[4]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[4]/input[4]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[4]/input[6]") &&
+    if ($this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[4]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[4]/input[4]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[4]/input[6]") &&
       //verification for second field first row
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[4]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[4]/input[4]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[4]/input[6]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[4]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[4]/input[4]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[4]/input[6]") &&
       //verification for first field second row
-      $this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[3]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[3]/input[4]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[3]/input[6]")
+      $this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[3]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[3]/input[4]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[3]/input[6]")
     ) {
       $assertCheck = TRUE;
     }
@@ -453,22 +446,22 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($assertCheck, 'copy rows for field one failed for inteview (campaign)');
 
-    $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[4]/div/img");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/thead/tr/th[4]/div/img");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(5);
-    if ($this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[4]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[4]/input[4]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[4]/input[6]") &&
+    if ($this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[4]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[4]/input[4]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[4]/input[6]") &&
       //verification for second field first row
-      $this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[4]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[4]/input[4]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[4]/input[6]") &&
+      $this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[4]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[4]/input[4]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[4]/input[6]") &&
       //verification for first field second row
-      $this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[3]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[3]/input[4]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[3]/input[6]")
+      $this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[3]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[3]/input[4]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[3]/input[6]")
     ) {
       $assertCheck = TRUE;
     }
@@ -478,11 +471,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($assertCheck, 'copy rows for field two failed for inteview (campaign)');
 
-    $dateElementIdFirstRow = $this->getAttribute("xpath=//table[@id='voterRecords']/tbody/tr/td[5]/input/@id");
-    $dateElementIdSecondRow = $this->getAttribute("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[5]/input/@id");
+    $dateElementIdFirstRow = $this->getAttribute("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[5]/input/@id");
+    $dateElementIdSecondRow = $this->getAttribute("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[5]/input/@id");
 
     $this->webtestFillDateTime($dateElementIdFirstRow, "+1 week");
-    $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[5]/div/img");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/thead/tr/th[5]/div/img");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
@@ -497,14 +490,14 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($assertCheck, 'date / time coping failed for inteview (campaign)');
 
-    $this->type("xpath=//table[@id='voterRecords']/tbody/tr/td[@class='note']/input", 'This is Test Introductory Message');
-    $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[8]/div/img");
+    $this->type("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[@class='note']/input", 'This is Test Introductory Message');
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/thead/tr/th[8]/div/img");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(5);
 
-    if ($this->getValue("xpath=//table[@id='voterRecords']/tbody/tr/td[@class='note']/input") == $this->getValue("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[@class='note']/input")) {
+    if ($this->getValue("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[@class='note']/input") == $this->getValue("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[@class='note']/input")) {
       $assertCheck = TRUE;
     }
     else {
@@ -513,28 +506,28 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($assertCheck, 'Note Custom field coping failed');
 
-    $this->click("xpath=//table[@id='voterRecords']/tbody/tr/td[6]/input");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[6]/input");
     // selecting second check of profile
-    $this->click("xpath=//table[@id='voterRecords']/tbody/tr/td[7]/input");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[7]/input");
     // clicking copy values to rows of first check and verifying
     // if other radio Profile Field radio buttons are affected
 
-    $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[6]/div/img");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/thead/tr/th[6]/div/img");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(5);
-    if ($this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[7]/input") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[7]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[7]/input[3]") &&
+    if ($this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[7]/input") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[7]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[7]/input[3]") &&
       //verification for second field first row
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[7]/input") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[7]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[7]/input[3]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[7]/input") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[7]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[7]/input[3]") &&
       //verification for first field second row
-      $this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[6]/input") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[6]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[6]/input[3]")
+      $this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[6]/input") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[6]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[6]/input[3]")
     ) {
       $assertCheck = TRUE;
     }
@@ -544,22 +537,22 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($assertCheck, 'copy rows for field one failed for inteview (campaign)[radio button]');
 
-    $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[7]/div/img");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/thead/tr/th[7]/div/img");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(5);
-    if ($this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[7]/input") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[7]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[7]/input[3]") &&
+    if ($this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[7]/input") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[7]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[7]/input[3]") &&
       //verification for second field first row
-      $this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[7]/input") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[7]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[7]/input[3]") &&
+      $this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[7]/input") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[7]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[7]/input[3]") &&
       //verification for first field second row
-      $this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[6]/input") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[6]/input[2]") &&
-      !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[6]/input[3]")
+      $this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[6]/input") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[6]/input[2]") &&
+      !$this->isChecked("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[2]/td[6]/input[3]")
     ) {
       $assertCheck = TRUE;
     }
@@ -568,6 +561,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     }
 
     $this->assertTrue($assertCheck, 'copy rows for field two failed for inteview (campaign)[radio button]');
+    $this->clickLink("_qf_Interview_cancel_interview");
 
     //change the editor back to ckeditor
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1', '_qf_Display_next-bottom');
@@ -585,17 +579,20 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage('admin/uf/group', 'reset=1');
 
-    $this->click('link=Add Profile');
+    $this->clickLink('link=Add Profile', '_qf_Group_cancel-bottom');
 
     // Add membership custom data field to profile
-    $this->waitForElementPresent('_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
-    $this->click('_qf_Group_next-bottom');
 
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    // Standalone form or directory
+    $this->click('uf_group_type_Profile');
+
+    $this->clickLink('_qf_Group_next-bottom');
+
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
-    foreach ($customDataArr as $key => $customDataParams) {
+    $this->waitForElementPresent("field_name[0]");
+    foreach ($customDataArr as $customDataParams) {
       $this->select('field_name[0]', "label={$profileFor}");
       $this->select('field_name[1]', "label={$customDataParams[1]} :: {$customDataParams[0]}");
       $this->click('field_name[1]');
@@ -603,8 +600,8 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
       // Clicking save and new
       $this->click('_qf_Field_next_new-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field '{$customDataParams[1]}' has been saved to '{$profileTitle}'.");
+      $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
     }
   }
 
@@ -620,8 +617,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/custom/group', 'reset=1');
 
     //add new custom data
-    $this->click("//a[@id='newCustomDataGroup']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("//a[@id='newCustomDataGroup']/span");
 
     //fill custom group title
     $this->click("title");
@@ -634,13 +630,13 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
       $this->click("//option[@value='']");
     }
 
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    $this->clickLink('_qf_Group_next-bottom');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     //for checkbox 1
+    $this->waitForElementPresent("label");
     $checkLabel1 = 'Custom Check One Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $checkLabel1);
     $this->click('data_type[0]');
@@ -663,17 +659,13 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type("options_per_line", 2);
 
     //clicking save
-    $this->click('_qf_Field_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click('_qf_Field_next_new-top');
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$checkLabel1' has been saved.");
     $returnArray[1] = array($customGroupTitle, $checkLabel1);
 
-    $this->waitForElementPresent("xpath=//*[@id='newCustomField']/span");
     // create another custom field - Integer Radio
-    $this->clickLink("xpath=//*[@id='newCustomField']/span", "_qf_Field_cancel-bottom", FALSE);
-
     //for checkbox 2
     $checkLabel2 = 'Custom Check Two Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $checkLabel2);
@@ -694,14 +686,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('option_value_3', 3);
 
     //clicking save
-    $this->clickLink('_qf_Field_next', "xpath=//*[@id='newCustomField']", FALSE);
+    $this->click('_qf_Field_next_new-top');
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$checkLabel2' has been saved.");
     $returnArray[2] = array($customGroupTitle, $checkLabel2);
-
-    // create another custom field - Integer Radio
-    $this->clickLink("xpath=//*[@id='newCustomField']/span", "_qf_Field_cancel-bottom", FALSE);
 
     // create another custom field - Date
     $dateFieldLabel = 'Custom Date Field' . substr(sha1(rand()), 0, 4);
@@ -721,14 +710,10 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->select('time_format', "value=2");
 
     //clicking save
-    $this->clickLink('_qf_Field_next', "xpath=//*[@id='newCustomField']", FALSE);
-
+    $this->click('_qf_Field_next_new-top');
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$dateFieldLabel' has been saved.");
     $returnArray[3] = array($customGroupTitle, $dateFieldLabel);
-
-    // create another custom field - Integer Radio
-    $this->clickLink("xpath=//*[@id='newCustomField']/span", "_qf_Field_cancel-bottom", FALSE);
 
     //create rich text editor field
     $richTextField = 'Custom Rich TextField_' . substr(sha1(rand()), 0, 4);
@@ -738,14 +723,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->select('data_type[1]', "label=RichTextEditor");
 
     //clicking save
-    $this->clickLink('_qf_Field_next', "xpath=//*[@id='newCustomField']", FALSE);
+    $this->click('_qf_Field_next_new-top');
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$richTextField' has been saved.");
     $returnArray[4] = array($customGroupTitle, $richTextField);
-
-    // create another custom field - Integer Radio
-    $this->clickLink("xpath=//*[@id='newCustomField']/span", "_qf_Field_cancel-bottom", FALSE);
 
     //create radio button field
     //for radio 1
@@ -768,15 +750,13 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('option_value_3', 3);
 
     //clicking save
-    $this->clickLink('_qf_Field_next', "xpath=//*[@id='newCustomField']", FALSE);
+    $this->click('_qf_Field_next_new-top');
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$radioLabel1' has been saved.");
     $returnArray[5] = array($customGroupTitle, $radioLabel1);
 
-    // create another custom field - Integer Radio
-    $this->clickLink("xpath=//*[@id='newCustomField']/span", "_qf_Field_cancel-bottom", FALSE);
-
+    // create another custom field - Alpha Radio
     //for radio 2
     $radioLabel2 = 'Custom Radio Two Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $radioLabel2);
@@ -797,7 +777,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('option_value_3', 3);
 
     //clicking save
-    $this->clickLink('_qf_Field_next', "xpath=//*[@id='newCustomField']", FALSE);
+    $this->clickLink('_qf_Field_done', 'newCustomField', FALSE);
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$radioLabel2' has been saved.");

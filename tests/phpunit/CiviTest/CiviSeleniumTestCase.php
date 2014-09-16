@@ -1874,8 +1874,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     else {
       $text = "The financial type \"{$financialType['name']}\" has been updated.";
     }
-    $this->waitForElementPresent("xpath=//div[@class='notify-content']");
-    $this->assertElementContainsText('crm-notification-container', $text);
+    $this->assertSuccessMsg($text);
   }
 
   /**
@@ -1901,22 +1900,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   function addProfile($profileTitle, $profileFields) {
     $this->openCiviPage('admin/uf/group', "reset=1");
 
-    $this->click('link=Add Profile');
-
-    // Add membership custom data field to profile
-    $this->waitForElementPresent('_qf_Group_cancel-bottom');
+    $this->clickLink('link=Add Profile', '_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Group_next-bottom', "xpath=//a/span[text()='Add Field']");
 
-    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
-    $this->click("xpath=//a/span[text()='Add Field']");
-    $this->waitForElementPresent("field_name[0]");
-    //$this->assertTrue($this->isTextPresent("Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now."));
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     foreach ($profileFields as $field) {
       $this->waitForElementPresent('field_name_0');
-      // $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->click("id=field_name_0");
       $this->select("id=field_name_0", "label=" . $field['type']);
       $this->waitForElementPresent('field_name_1');
@@ -2140,6 +2131,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    */
   function waitForStatusMsg() {
     $this->waitForElementPresent("css=.crm-status-box-outer.status-success");
+  }
+  
+  /**
+   * Wait for unobtrusive status message as set by CRM.status
+   */
+  function assertSuccessMsg($text) {
+    $this->waitForElementPresent("css=div.success");
+    $this->assertElementContainsText("css=div.success", $text);
   }
   
   /**

@@ -135,6 +135,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->waitForElementPresent("xpath=//a[@id='newfinancialTypeAccount']");
    $this->clickLink("xpath=//a[@id='newfinancialTypeAccount']", "_qf_FinancialTypeAccount_cancel-botttom", FALSE);
    $this->select("account_relationship", "label=Premiums Inventory Account is");
+   $this->waitForElementPresent("xpath=//select[@id='financial_account_id']/option[3][text()='Deposit Bank Account']");
    $this->select("financial_account_id", "label=$to");
    $this->clickLink("_qf_FinancialTypeAccount_next-botttom", "xpath=//a[@id='newfinancialTypeAccount']", FALSE);
 
@@ -172,7 +173,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->clickLink("_qf_Contribution_upload");
    // Is status message correct?
    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
-   // verify if Membership is created
+   // verify if Contribution is created
    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
    //click through to the Contribution edit screen
    $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
@@ -182,7 +183,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->waitForElementPresent("product_name_0");
    $this->select('product_name_0', "label=$premiumName2 ( $sku2 )");
    // Clicking save.
-   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']", FALSE);
+   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[7][text()='$premiumName2']", FALSE);
+   $this->assertSuccessMsg("The contribution record has been saved.");
 
    //Assertions
    $actualAmount = $this->_getPremiumActualCost($contId, $to, $from, $cost2, "'civicrm_contribution'");
@@ -211,6 +213,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->clickLink("xpath=//a[@id='newfinancialTypeAccount']", "_qf_FinancialTypeAccount_cancel-botttom", FALSE);
 
    $this->select("account_relationship", "label=Premiums Inventory Account is");
+   $this->waitForElementPresent("xpath=//select[@id='financial_account_id']/option[3][text()='Deposit Bank Account']");
    $this->select("financial_account_id", "label=$to");
    $this->clickLink("_qf_FinancialTypeAccount_next-botttom", "xpath=//a[@id='newfinancialTypeAccount']", FALSE);
    $premiumName = 'Premium' . substr(sha1(rand()), 0, 7);
@@ -239,7 +242,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->clickLink("_qf_Contribution_upload");
    // Is status message correct?
    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
-   // verify if Membership is created
+   // verify if Contribution is created
    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
    //click through to the Contribution edit screen
    $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
@@ -249,7 +252,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->waitForElementPresent("product_name_0");
    $this->select('product_name_0', "value=0");
    // Clicking save.
-   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']", FALSE);
+   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[7][not(text())]", FALSE);
 
    //Assertions
    $actualAmount = $this->_getPremiumActualCost($contId, $from, $to, NULL, "'civicrm_contribution'");
@@ -277,7 +280,9 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->select("payment_instrument_id", "label=$label");
    $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
    //Assertions
-   $totalAmount = $this->_getPremiumActualCost($contId, 'Payment Processor Account', 'Accounts Receivable');
+   $subtractedTotal = $this->_getPremiumActualCost($contId, NULL, 'Payment Processor Account');
+   $this->assertEquals($subtractedTotal, -$amount, "Verify amount deleted from old account");
+   $totalAmount = $this->_getPremiumActualCost($contId, NULL, 'Accounts Receivable');
    $this->assertEquals($totalAmount, $amount, "Verify amount for newly inserted values");
  }
 
@@ -296,7 +301,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
    $contId = explode('&', $contId[1]);
    $contId = $contId[0];
-   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
+   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[6][text()='Refunded']", FALSE);
 
    //Assertions
    $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
@@ -420,6 +425,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    if (!empty($cost)) {
      $query .= " AND eft.amount = {$cost}";
    }
+   $query .= " ORDER BY ft.id DESC LIMIT 1";
    $result = CRM_Core_DAO::singleValueQuery($query);
    return $result;
  }
