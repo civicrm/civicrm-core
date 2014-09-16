@@ -501,7 +501,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     else {
       // Jump directly to adding a field if popups are disabled
       $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
-      $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&gid=' . $group->id . '&action=' . ($action ? 'add' : 'browse'));
+      $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&new=1&gid=' . $group->id . '&action=' . ($action ? 'add' : 'browse'));
       CRM_Core_Session::setStatus(ts("Your custom field set '%1' has been added. You can add custom fields now.",
           array(1 => $group->title)
         ), ts('Saved'), 'success');
