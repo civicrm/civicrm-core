@@ -76,7 +76,8 @@ var isMailing    = false;
 {literal}
 
 var editor = {/literal}"{$editor}"{literal};
-function showSaveUpdateChkBox(prefix = '') {
+function showSaveUpdateChkBox(prefix) {
+  prefix = prefix || '';
   if (document.getElementById(prefix + "template") == null) {
     if (document.getElementsByName(prefix + "saveTemplate")[0].checked){
       document.getElementById(prefix + "saveDetails").style.display = "block";
@@ -228,7 +229,8 @@ function selectValue( val, prefix) {
 if ( isMailing ) {
   document.getElementById(prefix + "editMessageDetails").style.display = "block";
 
-  function verify(select, prefix = '') {
+  function verify(select, prefix) {
+    prefix = prefix || '';
     if (document.getElementsByName(prefix + "saveTemplate")[0].checked  == false) {
       document.getElementById(prefix + "saveDetails").style.display = "none";
     }
@@ -249,7 +251,8 @@ if ( isMailing ) {
     document.getElementById(prefix + "saveTemplateName").disabled = false;
   }
 
-  function showSaveDetails(chkbox, prefix = '') {
+  function showSaveDetails(chkbox, prefix) {
+    prefix = prefix || '';
     if (chkbox.checked) {
       document.getElementById(prefix + "saveDetails").style.display = "block";
       document.getElementById(prefix + "saveTemplateName").disabled = false;
