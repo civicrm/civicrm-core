@@ -579,19 +579,20 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage('admin/uf/group', 'reset=1');
 
-    $this->click('link=Add Profile');
+    $this->clickLink('link=Add Profile', '_qf_Group_cancel-bottom');
 
     // Add membership custom data field to profile
-    $this->waitForElementPresent('_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
-    $this->click('_qf_Group_next-bottom');
 
-    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
+    // Standalone form or directory
+    $this->click('uf_group_type_Profile');
+
+    $this->clickLink('_qf_Group_next-bottom');
+
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
-    $this->click("xpath=//a/span[text()='Add Field']");
     $this->waitForElementPresent("field_name[0]");
-    foreach ($customDataArr as $key => $customDataParams) {
+    foreach ($customDataArr as $customDataParams) {
       $this->select('field_name[0]', "label={$profileFor}");
       $this->select('field_name[1]', "label={$customDataParams[1]} :: {$customDataParams[0]}");
       $this->click('field_name[1]');
@@ -600,6 +601,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
       // Clicking save and new
       $this->click('_qf_Field_next_new-bottom');
       $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field '{$customDataParams[1]}' has been saved to '{$profileTitle}'.");
+      $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
     }
   }
 
@@ -615,8 +617,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/custom/group', 'reset=1');
 
     //add new custom data
-    $this->click("//a[@id='newCustomDataGroup']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("//a[@id='newCustomDataGroup']/span");
 
     //fill custom group title
     $this->click("title");
@@ -629,14 +630,12 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
       $this->click("//option[@value='']");
     }
 
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent("newCustomField");
+    $this->clickLink('_qf_Group_next-bottom');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     //for checkbox 1
-    $this->click("newCustomField");
     $this->waitForElementPresent("label");
     $checkLabel1 = 'Custom Check One Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $checkLabel1);
@@ -660,17 +659,13 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type("options_per_line", 2);
 
     //clicking save
-    $this->click('_qf_Field_done');
-    $this->waitForElementPresent("newCustomField");
+    $this->click('_qf_Field_next_new-top');
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$checkLabel1' has been saved.");
     $returnArray[1] = array($customGroupTitle, $checkLabel1);
 
-    $this->waitForElementPresent('newCustomField');
     // create another custom field - Integer Radio
-    $this->clickLink('newCustomField', "_qf_Field_cancel-bottom", FALSE);
-
     //for checkbox 2
     $checkLabel2 = 'Custom Check Two Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $checkLabel2);
@@ -691,14 +686,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('option_value_3', 3);
 
     //clicking save
-    $this->clickLink('_qf_Field_done', 'newCustomField', FALSE);
+    $this->click('_qf_Field_next_new-top');
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$checkLabel2' has been saved.");
     $returnArray[2] = array($customGroupTitle, $checkLabel2);
-
-    // create another custom field - Integer Radio
-    $this->clickLink('newCustomField', "_qf_Field_cancel-bottom", FALSE);
 
     // create another custom field - Date
     $dateFieldLabel = 'Custom Date Field' . substr(sha1(rand()), 0, 4);
@@ -718,14 +710,10 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->select('time_format', "value=2");
 
     //clicking save
-    $this->clickLink('_qf_Field_done', 'newCustomField', FALSE);
-
+    $this->click('_qf_Field_next_new-top');
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$dateFieldLabel' has been saved.");
     $returnArray[3] = array($customGroupTitle, $dateFieldLabel);
-
-    // create another custom field - Integer Radio
-    $this->clickLink('newCustomField', "_qf_Field_cancel-bottom", FALSE);
 
     //create rich text editor field
     $richTextField = 'Custom Rich TextField_' . substr(sha1(rand()), 0, 4);
@@ -735,14 +723,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->select('data_type[1]', "label=RichTextEditor");
 
     //clicking save
-    $this->clickLink('_qf_Field_done', 'newCustomField', FALSE);
+    $this->click('_qf_Field_next_new-top');
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$richTextField' has been saved.");
     $returnArray[4] = array($customGroupTitle, $richTextField);
-
-    // create another custom field - Integer Radio
-    $this->clickLink('newCustomField', "_qf_Field_cancel-bottom", FALSE);
 
     //create radio button field
     //for radio 1
@@ -765,15 +750,13 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('option_value_3', 3);
 
     //clicking save
-    $this->clickLink('_qf_Field_done', 'newCustomField', FALSE);
+    $this->click('_qf_Field_next_new-top');
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$radioLabel1' has been saved.");
     $returnArray[5] = array($customGroupTitle, $radioLabel1);
 
-    // create another custom field - Integer Radio
-    $this->clickLink('newCustomField', "_qf_Field_cancel-bottom", FALSE);
-
+    // create another custom field - Alpha Radio
     //for radio 2
     $radioLabel2 = 'Custom Radio Two Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $radioLabel2);
