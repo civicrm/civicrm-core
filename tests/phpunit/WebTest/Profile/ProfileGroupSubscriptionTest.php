@@ -76,7 +76,6 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     //Add email field to profile
-    $this->click("xpath=//a/span[text()='Add Field']");
     $this->waitForElementPresent("field_name[0]");
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');

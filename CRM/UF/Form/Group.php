@@ -370,7 +370,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       else {
         // Jump directly to adding a field if popups are disabled
         $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
-        $url = CRM_Utils_System::url("civicrm/admin/uf/group/field$action", 'reset=1&gid=' . $ufGroup->id . '&action=' . ($action ? 'add' : 'browse'));
+        $url = CRM_Utils_System::url("civicrm/admin/uf/group/field$action", 'reset=1&new=1&gid=' . $ufGroup->id . '&action=' . ($action ? 'add' : 'browse'));
         CRM_Core_Session::setStatus(ts('Your CiviCRM Profile \'%1\' has been added. You can add fields to this profile now.',
             array(1 => $ufGroup->title)
           ), ts('Profile Added'), 'success');
