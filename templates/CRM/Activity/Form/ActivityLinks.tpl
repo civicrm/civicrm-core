@@ -57,7 +57,7 @@
 <ul>
   <li class="crm-activity-tab"><a href="#" data-tab="activity">{ts}Record Activity:{/ts}</a></li>
 {foreach from=$activityTypes key=k item=link}
-<li class="crm-activity-type_{$k}"><a class="no-popup" href="{$urls.$k}" data-tab="activity">{$link}</a></li>
+<li class="crm-activity-type_{$k}"><a href="{$urls.$k}" data-tab="activity">{$link}</a></li>
 {/foreach}
 
 {* add hook links if any *}
