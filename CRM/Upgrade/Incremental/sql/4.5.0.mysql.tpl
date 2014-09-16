@@ -6,4 +6,4 @@ ALTER TABLE `civicrm_action_schedule`
   ADD CONSTRAINT `FK_civicrm_action_schedule_sms_template_id` FOREIGN KEY (`sms_template_id`) REFERENCES  civicrm_msg_template(`id`) ON DELETE SET NULL;
 
 ALTER TABLE `civicrm_msg_template`
-  `is_active` tinyint(4) DEFAULT '0' COMMENT 'Is this message template used for sms?';
+  ADD COLUMN `is_sms` tinyint(4) DEFAULT '0' COMMENT 'Is this message template used for sms?';
