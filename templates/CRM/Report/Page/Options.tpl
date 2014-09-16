@@ -56,7 +56,7 @@
     </tr>
         </thead>
     {foreach from=$rows item=row}
-        <tr id="report-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{$row.class}{if NOT $row.is_active} crm-report-optionList crm-report-optionList-status_disable disabled{else} crm-report-optionList crm-report-optionList-status_enable{/if}">
+        <tr id="option_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{$row.class}{if NOT $row.is_active} crm-report-optionList crm-report-optionList-status_disable disabled{else} crm-report-optionList crm-report-optionList-status_enable{/if}">
              <td class="crm-report-optionList-label crm-editable" data-field="label">{$row.label}</td>
             <td class="crm-report-optionList-value">{$row.value}</td>
             <td class="crm-report-optionList-description">{$row.description}</td>
