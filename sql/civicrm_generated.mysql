@@ -1215,7 +1215,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `civicrm_product` WRITE;
 /*!40000 ALTER TABLE `civicrm_product` DISABLE KEYS */;
-INSERT INTO `civicrm_product` (`id`, `name`, `description`, `sku`, `options`, `image`, `thumbnail`, `price`, `currency`, `financial_type_id`, `min_contribution`, `cost`, `is_active`, `period_type`, `fixed_period_start_day`, `duration_unit`, `duration_interval`, `frequency_unit`, `frequency_interval`) VALUES (1,'Coffee Mug','This heavy-duty mug is great for home or office, coffee or tea or hot chocolate. Show your support to family, friends and colleagues. Choose from three great colors.','MUG-101','White, Black, Green',NULL,NULL,'12.50','USD',NULL,'5.00','2.25',1,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `civicrm_product` (`id`, `name`, `description`, `sku`, `options`, `image`, `thumbnail`, `price`, `currency`, `financial_type_id`, `min_contribution`, `cost`, `is_active`, `period_type`, `fixed_period_start_day`, `duration_unit`, `duration_interval`, `frequency_unit`, `frequency_interval`) VALUES (1,'Coffee Mug','This heavy-duty mug is great for home or office, coffee or tea or hot chocolate. Show your support to family, friends and colleagues. Choose from three great colors.','MUG-101','White, Black, Green',NULL,NULL,'12.50','USD',NULL,'5.00',NULL,1,NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `civicrm_product` ENABLE KEYS */;
 UNLOCK TABLES;
 
