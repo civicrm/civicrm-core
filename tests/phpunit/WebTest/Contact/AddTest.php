@@ -476,7 +476,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Edit_next");
 
     // Is new contact created?
-    $this->waitForText('crm-notification-container', "$sharedHousehold Created");
+    $this->waitForText("css=div.crm-status-box-msg", "$sharedHousehold Created");
 
     //make sure shared address is selected
     $this->waitForElementPresent('selected_shared_address-2');
@@ -498,8 +498,8 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     // make sure relationships are created
     $this->click("xpath=id('tab_rel')/a");
     $this->waitForElementPresent('permission-legend');
-    $this->assertElementContainsText('option11', 'Employee of');
-    $this->assertElementContainsText('option11', 'Household Member of');
+    $this->assertElementContainsText('DataTables_Table_0', 'Employee of');
+    $this->assertElementContainsText('DataTables_Table_0', 'Household Member of');
   }
 }
 
