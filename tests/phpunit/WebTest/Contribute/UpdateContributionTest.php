@@ -257,6 +257,12 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    // Clicking save.
    $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']", FALSE);
 
+   // Opening View page and cancelling to give the DB time to get updated prior to Assert statements below. dgg
+   $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
+   $this->clickLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
+   $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+   $this->clickLink("_qf_ContributionView_cancel-bottom", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']", FALSE);
+
    //Assertions
    $actualAmount = $this->_getPremiumActualCost($contId, $from, $to, NULL, "'civicrm_contribution'");
    $this->assertEquals($actualAmount, $cost, "Verify actual cost for deleted premium");
