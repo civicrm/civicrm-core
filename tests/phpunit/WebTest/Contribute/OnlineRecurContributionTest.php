@@ -59,7 +59,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     $pcp = FALSE;
 
     // open browser, login
-    $this->webtestLogin();
+    $this->webtestLogin('admin');
 
     // create a new online contribution page with recurring enabled (using a newly created AuthNet processor)
     // create contribution page with randomized title and default params
