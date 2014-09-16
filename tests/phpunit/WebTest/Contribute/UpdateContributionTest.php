@@ -172,7 +172,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->clickLink("_qf_Contribution_upload");
    // Is status message correct?
    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
-   // verify if Membership is created
+   // verify if Contribution is created
    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
    //click through to the Contribution edit screen
    $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
@@ -183,6 +183,12 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->select('product_name_0', "label=$premiumName2 ( $sku2 )");
    // Clicking save.
    $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']", FALSE);
+   $this->assertSuccessMsg("The contribution record has been saved.");
+   // Opening View page and cancelling to give the DB time to get updated prior to Assert statements below. dgg
+   $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
+   $this->clickLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
+   $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+   $this->clickLink("_qf_ContributionView_cancel-bottom", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']", FALSE);
 
    //Assertions
    $actualAmount = $this->_getPremiumActualCost($contId, $to, $from, $cost2, "'civicrm_contribution'");
@@ -239,7 +245,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->clickLink("_qf_Contribution_upload");
    // Is status message correct?
    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
-   // verify if Membership is created
+   // verify if Contribution is created
    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
    //click through to the Contribution edit screen
    $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));

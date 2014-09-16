@@ -1874,8 +1874,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     else {
       $text = "The financial type \"{$financialType['name']}\" has been updated.";
     }
-    $this->waitForElementPresent("xpath=//div[@class='notify-content']");
-    $this->assertElementContainsText('crm-notification-container', $text);
+    $this->assertSuccessMsg($text);
   }
 
   /**
@@ -2140,6 +2139,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    */
   function waitForStatusMsg() {
     $this->waitForElementPresent("css=.crm-status-box-outer.status-success");
+  }
+  
+  /**
+   * Wait for unobtrusive status message as set by CRM.status
+   */
+  function assertSuccessMsg($text) {
+    $this->waitForElementPresent("css=div.success");
+    $this->assertElementContainsText("css=div.success", $text);
   }
   
   /**
