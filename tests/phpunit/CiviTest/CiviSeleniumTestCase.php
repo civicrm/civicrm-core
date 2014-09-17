@@ -1917,7 +1917,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     $this->clickLink('link=Add Profile', '_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
-    $this->clickLink('_qf_Group_next-bottom', "xpath=//a/span[text()='Add Field']");
+    $this->clickLink('_qf_Group_next-bottom');
 
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 

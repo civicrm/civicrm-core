@@ -354,9 +354,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->click("extends[0]");
     $this->select("extends[0]", "value=Activity");
     $this->click("//option[@value='Activity']");
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent('newCustomField');
-    $this->click('newCustomField');
+    $this->clickLink('_qf_Group_next-bottom');
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
