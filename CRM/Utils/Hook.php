@@ -178,12 +178,13 @@ abstract class CRM_Utils_Hook {
     // must be reentrant. PHP is finicky about running
     // multiple loops over the same variable. The circumstances
     // to reproduce the issue are pretty intricate.
-    $result = $fResult = array();
+    $result = array();
 
     if ($civiModules !== NULL) {
       foreach ($civiModules as $module) {
         $fnName = "{$module}_{$fnSuffix}";
         if (function_exists($fnName)) {
+          $fResult = array();
           switch ($numParams) {
             case 0:
               $fResult = $fnName();
@@ -217,11 +218,11 @@ abstract class CRM_Utils_Hook {
               CRM_Core_Error::fatal(ts('Invalid hook invocation'));
               break;
           }
-        }
 
-        if (!empty($fResult) &&
-          is_array($fResult)) {
-          $result = array_merge($result, $fResult);
+          if (!empty($fResult) &&
+            is_array($fResult)) {
+            $result = array_merge($result, $fResult);
+          }
         }
       }
     }
