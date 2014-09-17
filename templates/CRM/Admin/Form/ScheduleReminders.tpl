@@ -52,6 +52,9 @@
         <td class="right"></td>
         <td colspan="3">{$form.start_action_offset.html}&nbsp;&nbsp;&nbsp;{$form.start_action_unit.html}&nbsp;&nbsp;&nbsp;{$form.start_action_condition.html}&nbsp;&nbsp;&nbsp;{$form.start_action_date.html}</td>
     </tr>
+    <tr id="recordActivity" class="crm-scheduleReminder-form-block-record_activity"><td class="label" width="20%">{$form.record_activity.label}</td>
+        <td>{$form.record_activity.html}</td>
+    </tr>
     <tr id="relativeDateRepeat" class="crm-scheduleReminder-form-block-is_repeat"><td class="label" width="20%">{$form.is_repeat.label}</td>
         <td>{$form.is_repeat.html}&nbsp;&nbsp;<span class="description">{ts}Enable repetition.{/ts}</span></td>
     </tr>
@@ -95,34 +98,44 @@
       <td class="label">{$form.mode.label}</td>
       <td>{$form.mode.html}</td>
     </tr>
-    <tr id="smsProvider" class="crm-scheduleReminder-form-block-sms_provider_id">
-      <td class="label">{$form.sms_provider_id.label}</td>
-      <td>{$form.sms_provider_id.html}</td>
+    <tr class="crm-scheduleReminder-form-block-active">
+      <td class="label"></td>
+      <td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
     </tr>
   </table>
-  <fieldset id="compose_id"><legend>{$title}</legend>
-     <table id="email-field-table" class="form-layout-compressed">
-        <tr class="crm-scheduleReminder-form-block-active">
-           <td class="label"></td>
-           <td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
-        </tr>
-        <tr id="recordActivity" class="crm-scheduleReminder-form-block-record_activity">
-            <td class="label"></td>
-           <td>{$form.record_activity.html}&nbsp;{$form.record_activity.label}</td>
-        </tr>
-        <tr class="crm-scheduleReminder-form-block-template">
+  <fieldset id="email" class="crm-collapsible" style="display: block;">
+    <legend class="collapsible-title">{ts}Email Screen{/ts}</legend>
+      <div>
+       <table id="email-field-table" class="form-layout-compressed">
+         <tr class="crm-scheduleReminder-form-block-template">
             <td class="label">{$form.template.label}</td>
             <td>{$form.template.html}</td>
-        </tr>
-        <tr class="crm-scheduleReminder-form-block-subject">
+         </tr>
+         <tr class="crm-scheduleReminder-form-block-subject">
             <td class="label">{$form.subject.label}</td>
             <td>{$form.subject.html}</td>
-        </tr>
-
-  </table>
-    <div id="email">{include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}</div>
-    {if $sms}<div id="sms">{include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}</div>{/if}
+         </tr>
+       </table>
+       {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
+    </div>
+    </fieldset>
+    {if $sms}
+      <fieldset id="sms" class="crm-collapsible"><legend class="collapsible-title">{ts}SMS Screen{/ts}</legend>
+        <div>
+        <table id="sms-field-table" class="form-layout-compressed">
+          <tr id="smsProvider" class="crm-scheduleReminder-form-block-sms_provider_id">
+            <td class="label">{$form.sms_provider_id.label}</td>
+            <td>{$form.sms_provider_id.html}</td>
+          </tr>
+          <tr class="crm-scheduleReminder-form-block-sms-template">
+            <td class="label">{$form.SMStemplate.label}</td>
+            <td>{$form.SMStemplate.html}</td>
+          </tr>
+        </table>
+        {include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}
+    <div>
   </fieldset>
+  {/if}
 
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    = "is_repeat"
@@ -169,7 +182,7 @@
         $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
       }
 
-      $('#entity_0', $form).change(buildSelects).change(showHideLimitTo);
+      $('#entity_0', $form).change(buildSelects);
 
       loadMsgBox();
       $('#mode', $form).change(loadMsgBox);
@@ -212,28 +225,32 @@
           $('#is_recipient_listing', $form).val('');
         }
       }
-      // CRM-14070 Hide limit-to when entity is activity
-      function showHideLimitTo() {
-        $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
-      }
     });
 
   function loadMsgBox() {
     if (cj('#mode').val() == 'Email' || cj('#mode').val() == 0){
       cj('#sms').hide();
-      cj('#smsProvider').hide();
       cj('#email').show();
     }
     else if (cj('#mode').val() == 'SMS'){
       cj('#email').hide();
       cj('#sms').show();
-      cj('#smsProvider').show();
+      showSaveUpdateChkBox('SMS');
     }
     else if (cj('#mode').val() == 'User_Preference'){
         cj('#email').show();
         cj('#sms').show();
-        cj('#smsProvider').show();
+      showSaveUpdateChkBox('SMS');
       }
+  }
+
+  function showHideLimitTo() {
+    if (cj('#entity_0').val() == 1) {
+      cj('#limit_to').hide();
+    }
+    else {
+      cj('#limit_to').show();
+    }
   }
 
  </script>
