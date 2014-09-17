@@ -155,16 +155,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     //Add Price Set now
     $this->openCiviPage("event/manage/fee", "reset=1&action=update&id=$id", "_qf_Fee_upload-bottom");
     $this->click("xpath=//a[@id='quickconfig']");
-    $this->waitForElementPresent('popupContainer');
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(3);
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(3);
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[2]");
+    $this->waitForElementPresent("xpath=//a[@id='quickconfig']");
 
     //Assert quick config change and discount deletion
     $this->openCiviPage("admin/price", "reset=1");
