@@ -433,14 +433,7 @@ CRM.$(function($) {
       }, 'json');
     }
   }
-  if (!$().find('div.crm-error').text()) {
-    $(window).load(function () {
-      setSignature();
-    });
-  }
-  $("#fromEmailAddress").change( function( ) {
-    setSignature( );
-  });
+  $("#fromEmailAddress", form).change(setSignature);
 });
 
 </script>
