@@ -216,8 +216,8 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         $this->verifyText("xpath=id('MembershipView')/div[2]/div/table[1]/tbody/tr[$label]/td[2]", preg_quote($value));
       }
       //View Contribution
-      $this->waitForElementPresent("xpath=//div[@class='crm-block crm-content-block crm-membership-view-form-block']/table[2]/tbody/tr[1]/td[8]/span/a[text()='View']");
-      $this->click("xpath=//div[@class='crm-block crm-content-block crm-membership-view-form-block']/table[2]/tbody/tr[1]/td[8]/span/a[text()='View']");
+      $this->waitForElementPresent("xpath=//div[@class='crm-block crm-content-block crm-membership-view-form-block']/div[@class='crm-accordion-wrapper']/div[@class='crm-accordion-body']/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
+      $this->click("xpath=//div[@class='crm-block crm-content-block crm-membership-view-form-block']/div[@class='crm-accordion-wrapper']/div[@class='crm-accordion-body']/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
       $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
       $expected = array(
         'From' => "{$data['first_name']} {$data['last_name']}",
