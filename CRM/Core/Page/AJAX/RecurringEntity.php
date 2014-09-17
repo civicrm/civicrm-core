@@ -35,10 +35,14 @@ class CRM_Core_Page_AJAX_RecurringEntity {
         $dao->entity_id = $entityId;
         $dao->entityTable = $entityTable;
       }
-      $dao->find(TRUE);
-      $dao->mode = $mode;
-      $dao->save();
-      $finalResult['status'] = 'Done';
+      
+      if($dao->find(TRUE)){
+        $dao->mode = $mode;
+        $dao->save();
+        $finalResult['status'] = 'Done';
+      }else{
+        $finalResult['status'] = 'Error';
+      }
     }
     echo json_encode($finalResult);
     CRM_Utils_System::civiExit();
