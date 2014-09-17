@@ -591,6 +591,8 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->open($registerUrl);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
+    $this->waitForElementPresent('additional_participants');
+
     $this->select("additional_participants", "value=" . $numberRegistrations);
 
     if ($infoPassed) {
@@ -788,7 +790,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       );
       $this->assertFalse($this->isElementPresent('record_contribution'),
         'Record Payment checkbox showed up wrongly for additional participant edit screen');
-      $this->clickLink("_qf_Participant_cancel-top");
+      $this->click("_qf_Participant_cancel-top");
     }
 
     //unselect the payment processor configured
@@ -804,10 +806,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/search?reset=1", "reset=1");
     $this->select2("event_id", $eventTitle, FALSE);
     $this->click("xpath=//td[@class='crm-event-form-block-participant_status']/div[@class='listing-box']//div/label[text()='Pending from pay later']");
-    $this->click('_qf_Search_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Search_refresh');
+
     $uRL = $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='Edit']@href");
-    $participantName = $this->getText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a");
     $this->click("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='Edit']");
     $this->waitForElementPresent("status_id");
     $this->select('status_id', 'label=Registered');
@@ -820,7 +821,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->click('_qf_Participant_upload-top');
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='Edit']");
     $this->click("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_ParticipantView_cancel-top");
+    $this->waitForElementPresent("css=.ui-dialog");
     $this->verifyFinancialRecords($contributionID);
 
     // add participant and 3 additional participant and change status of participant from edit contribution

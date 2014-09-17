@@ -2085,7 +2085,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
       //Is custom group created?
       $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added.");
-      $this->click('css=a#newCustomField');
 
       $gid = $this->urlArg('gid');
       $this->waitForTextPresent("{$customGroupTitle} - New Field");
