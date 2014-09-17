@@ -117,9 +117,13 @@
           data: data,
           url:  ajaxurl,
           success: function (result) {
-            $("#repeat-mode-dailog").dialog('close');
+            if(result.status != "" && result.status == 'Done'){
+              $("#repeat-mode-dailog").dialog('close');
               $('#mainTabContainer div:visible Form').submit();
+            }else if(result.status != "" && result.status == 'Error'){
+              $("#repeat-mode-dailog").html('').append("<span id='error-text'>Some error ocurred, please try after some time</span>").css('color', 'red');
             }
+          }
         });
       }
     }
