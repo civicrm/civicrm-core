@@ -66,6 +66,7 @@
 
 </table>
 {include file="CRM/Contact/Form/Task/SMSCommon.tpl"}
+{include file="CRM/Mailing/Form/InsertTokens.tpl"}
 
 <div class="spacer"> </div>
 

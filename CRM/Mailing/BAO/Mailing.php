@@ -2480,32 +2480,10 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     //sorted in ascending order tokens by ignoring word case
     $form->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
-    $form->_templates = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
-    if (!empty($form->_templates)) {
-      $form->assign('templates', TRUE);
-      $form->add('select', 'template', ts('Use Template'),
-        array(
-          '' => ts('- select -')) + $form->_templates, FALSE,
-        array('onChange' => "selectValue( this.value );")
-      );
-      $form->add('checkbox', 'updateTemplate', ts('Update Template'), NULL);
-    }
+    $templates = array();
 
-    $form->add('checkbox', 'saveTemplate', ts('Save As New Template'), NULL, FALSE,
-      array('onclick' => "showSaveDetails(this);")
-    );
-    $form->add('text', 'saveTemplateName', ts('Template Title'));
-
-
-    //insert message Text by selecting "Select Template option"
-    $form->add('textarea',
-      'text_message',
-      ts('Plain-text format'),
-      array(
-        'cols' => '80', 'rows' => '8',
-        'onkeyup' => "return verify(this)",
-      )
-    );
+    $textFields = array('text_message' => ts('HTML format'), 'sms_text_message' => ts('SMS Message'));
+    $modePrefixes = array('Mail' => NULL, 'SMS' => 'SMS');
 
     if ($className != 'CRM_SMS_Form_Upload' && $className != 'CRM_Contact_Form_Task_SMS' &&
       $className != 'CRM_Contact_Form_Task_SMS'
@@ -2517,6 +2495,53 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
           'onkeyup' => "return verify(this)",
         )
       );
+
+      if ($className != 'CRM_Admin_Form_ScheduleReminders') {
+        unset($modePrefixes['SMS']);
+      }
+    }
+    else {
+      unset($textFields['text_message']);
+      unset($modePrefixes['Mail']);
+    }
+
+    //insert message Text by selecting "Select Template option"
+    foreach ($textFields as $id => $label) {
+      $prefix = NULL;
+      if ($id == 'sms_text_message') {
+        $prefix = "SMS";
+        $form->assign('max_sms_length', CRM_SMS_Provider::MAX_SMS_CHAR);
+      }
+      $form->add('textarea', $id, $label,
+        array(
+          'cols' => '80', 'rows' => '8',
+          'onkeyup' => "return verify(this, '{$prefix}')",
+        )
+      );
+    }
+
+    foreach ($modePrefixes as $prefix) {
+      if ($prefix == 'SMS') {
+        $templates[$prefix] = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE, TRUE);
+      }
+      else {
+        $templates[$prefix] = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
+      }
+
+      if (!empty($templates[$prefix])) {
+        $form->assign('templates', TRUE);
+
+        $form->add('select', "{$prefix}template", ts('Use Template'),
+          array('' => ts('- select -')) + $templates[$prefix], FALSE,
+          array('onChange' => "selectValue( this.value, '{$prefix}');")
+        );
+      }
+      $form->add('checkbox', "{$prefix}updateTemplate", ts('Update Template'), NULL);
+
+      $form->add('checkbox', "{$prefix}saveTemplate", ts('Save As New Template'), NULL, FALSE,
+        array('onclick' => "showSaveDetails(this, '{$prefix}');")
+      );
+      $form->add('text', "{$prefix}saveTemplateName", ts('Template Title'));
     }
   }
 
