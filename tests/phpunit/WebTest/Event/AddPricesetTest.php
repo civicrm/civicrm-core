@@ -88,7 +88,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', 'newPriceField');
+    $this->clickLink('_qf_Set_next-bottom');
   }
 
   /**
@@ -97,7 +97,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
    * @param bool $dateSpecificFields
    */
   function _testAddPriceFields(&$fields, &$validateStrings, $dateSpecificFields = FALSE) {
-    $this->clickLink('newPriceField', '_qf_Field_cancel-bottom', FALSE);
+    $this->waitForElementPresent('_qf_Field_cancel-bottom');
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
 
@@ -618,7 +618,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText("css=#crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
+    $this->waitForText("crm-notification-container", "Event registration for $displayName has been added");
 
     $this->waitForElementPresent("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen

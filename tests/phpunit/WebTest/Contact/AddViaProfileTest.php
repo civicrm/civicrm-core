@@ -38,7 +38,7 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
   function testAddViaCreateProfile() {
     $this->webtestLogin();
 
-    $this->openCiviPage('profile/create', 'reset=1&gid=1', '_qf_Edit_cancel');
+    $this->openCiviPage('profile/create', 'reset=1&gid=1', '_qf_Edit_next');
 
     $firstName = 'Jo' . substr(sha1(rand()), 0, 4);
     $lastName = 'Ad' . substr(sha1(rand()), 0, 7);
