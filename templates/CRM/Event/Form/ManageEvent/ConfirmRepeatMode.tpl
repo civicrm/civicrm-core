@@ -71,8 +71,8 @@
     //Tab and table mapper
     var mapper = {'CRM_Event_Form_ManageEvent_EventInfo': '',
                 'CRM_Event_Form_ManageEvent_Location': '',
-                'CRM_Event_Form_ManageEvent_Fee': 'civicrm_price_set_entity',
-                'CRM_Event_Form_ManageEvent_Registration': 'civicrm_uf_join',
+                'CRM_Event_Form_ManageEvent_Fee': '',
+                'CRM_Event_Form_ManageEvent_Registration': '',
                 'CRM_Friend_Form_Event': 'civicrm_tell_friend',
                 'CRM_PCP_Form_Event': 'civicrm_pcp_block'
                 };
