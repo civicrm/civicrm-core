@@ -120,8 +120,6 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // add a custom field to the custom group
-    $this->waitForElementPresent('newCustomField');
-    $this->click('newCustomField');
     $this->waitForElementPresent('label');
     $this->type("label", "Field $title");
 
@@ -357,12 +355,10 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $customGroup = "Custom Group $title";
     $this->type('title', "$customGroup");
     $this->select('extends[0]', "value=Contact");
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent('newCustomField');
+    $this->clickLink('_qf_Group_next-bottom');
     $this->waitForText('crm-notification-container', $customGroup);
 
     // Add custom fields
-    $this->click('newCustomField');
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
     $field1 = "Checkbox $title";
     $this->type('label', $field1);
@@ -400,12 +396,10 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $surveyProfile = "Survey Profile $title";
     $this->type('title', $surveyProfile);
     $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent("xpath=//div[@id='crm-main-content-wrapper']/div/div[2]/a/span");
-    $this->waitForText('crm-notification-container', $surveyProfile);
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '$surveyProfile' has been added. You can add fields to this profile now.");
 
     // Add fields to the profile
     // Phone ( Primary )
-    $this->click("xpath=//div[@id='crm-main-content-wrapper']/div/div[2]/a/span");
     $this->waitForElementPresent('field_name[0]');
     $this->select('field_name[0]', "value=Contact");
     $this->waitForElementPresent('field_name[1]');
@@ -419,6 +413,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     // Custom Data Fields
     $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
+    $this->waitForElementPresent('field_name[0]');
     $this->select('field_name[0]', "value=Contact");
     $this->waitForElementPresent('field_name[1]');
     $this->select('field_name[1]', "label=$field1 :: $customGroup");
@@ -554,11 +549,11 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[6]/input[@type='text']");    
 
     $this->type("field_{$id1}_phone-Primary-1", 9876543210);
-    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[7]/input[2]/../label[text()='$label1']");
-    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[7]/input[2]/../label[text()='$label1']");
 
-    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[7]/input[4]/../label[text()='$label2']");
-    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[7]/input[6]/../label[text()='$label2']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[7]/input[2]");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[7]/input[2]");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[7]/input[4]");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[7]/input[4]");
 
     $this->select("field_{$id1}_result", $optionLabel1);
     $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[10]/a");
