@@ -237,6 +237,20 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * Click on a link and have it open full-page
+   * @param $element
+   * @param string $waitFor
+   */
+  function clickLinkSuppressPopup($element, $waitFor = 'civicrm-footer') {
+    $link = $this->getAttribute($element . '@href');
+    $this->open($link);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    if ($waitFor) {
+      $this->waitForElementPresent($waitFor);
+    }
+  }
+
+  /**
    * Call the API on the local server
    * (kind of defeats the point of a webtest - see CRM-11889)
    */
