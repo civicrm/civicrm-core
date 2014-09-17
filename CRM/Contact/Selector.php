@@ -832,12 +832,34 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   function buildPrevNextCache($sort) {
     $cacheKey = 'civicrm search ' . $this->_key;
 
-    // Get current page requested
+    // We should clear the cache in following conditions:
+    // 1. when starting from scratch, i.e new search
+    // 2. if records are sorted
+
+    // get current page requested
     $pageNum = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
-    // When starting from scratch, clear any old cache
-    if (!$pageNum) {
+
+    // get the current sort order
+    $currentSortID = CRM_Utils_Request::retrieve('crmSID', 'String', CRM_Core_DAO::$_nullObject);
+
+    $session = CRM_Core_Session::singleton();
+
+    // get previous sort id
+    $previousSortID = $session->get('previousSortID');
+
+    // check for current != previous to ensure cache is not reset if paging is done without changing
+    // sort criteria
+    if (!$pageNum || (!empty($currentSortID) && $currentSortID != $previousSortID) ) {
       CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKey, 'civicrm_contact');
-      $pageNum = 1;
+      // this means it's fresh search, so set pageNum=1
+      if (!$pageNum) {
+        $pageNum = 1;
+      }
+    }
+
+    // set the current sort as previous sort
+    if (!empty($currentSortID)) {
+      $session->set('previousSortID', $currentSortID);
     }
 
     $pageSize = CRM_Utils_Request::retrieve('crmRowCount', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, 50);
