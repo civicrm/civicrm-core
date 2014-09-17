@@ -92,7 +92,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', 'newPriceField');
+    $this->clickLink('_qf_Set_next-bottom');
   }
 
   /**

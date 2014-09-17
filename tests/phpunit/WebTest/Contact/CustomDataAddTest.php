@@ -49,12 +49,10 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("extends[0]");
     $this->select("extends[0]", "value=Contact");
     $this->click("//option[@value='Contact']");
-    $this->click("_qf_Group_next-bottom");
-    $this->waitForElementPresent('newCustomField');
+    $this->clickLink("_qf_Group_next-bottom");
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
-    $this->click('newCustomField');
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //add custom field - alphanumeric checkbox
@@ -173,12 +171,10 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("extends[0]");
     $this->select("extends[0]", "value=Contact");
     $this->click("//option[@value='Contact']");
-    $this->click("_qf_Group_next-bottom");
-    $this->waitForElementPresent('newCustomField');
+    $this->clickLink("_qf_Group_next-bottom");
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
-    $this->click('newCustomField');
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //add custom field - money text
@@ -259,10 +255,8 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->type("id=title", $customFieldSet);
     $this->select("id=extends_0", "label=Individual");
     $this->click("id=collapse_display");
-    $this->click("id=_qf_Group_next-bottom");
-    $this->waitForElementPresent('newCustomField');
+    $this->clickLink("id=_qf_Group_next-bottom");
     $this->waitForText('crm-notification-container', "Your custom field set '$customFieldSet' has been added.");
-    $this->click('newCustomField');
     $this->waitForElementPresent('_qf_Field_done-bottom');
 
     // Add field to fieldset
@@ -308,7 +302,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=1228");
 
-    if ($this->assertElementContainsText("address_1", "Latitude")) {
+    if ($this->assertElementContainsText("address_table_1", "Latitude")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }

@@ -172,12 +172,10 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     $this->click("extends[0]");
     $this->select("extends[0]", "value=Contact");
     $this->click("//option[@value='Contact']");
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent('newCustomField');
+    $this->clickLink('_qf_Group_next-bottom');
 
     //Is custom group created?
     $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now."));
-    $this->click('newCustomField');
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
     $url = explode('gid=', $this->getLocation());
     $gid = $url[1];

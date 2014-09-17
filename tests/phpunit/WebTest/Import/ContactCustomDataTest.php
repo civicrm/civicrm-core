@@ -161,12 +161,10 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->click('extends[0]');
     $this->select('extends[0]', "value=Contact");
     $this->click("//option[@value='Contact']");
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent('newCustomField');
+    $this->clickLink('_qf_Group_next-bottom');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', $customGroupTitle);
-    $this->click('newCustomField');
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
     $gid = $this->urlArg('gid');
 

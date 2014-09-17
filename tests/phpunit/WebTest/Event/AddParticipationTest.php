@@ -161,8 +161,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->select('extends[1][]', 'value=2');
 
     $this->click("//option[@value='Contact']");
-    $this->click('_qf_Group_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Group_next', 'label');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
@@ -198,14 +197,13 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
 
     //clicking save
-    $this->click('_qf_Field_done-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Field_done-bottom', 'newCustomField', FALSE);
 
     //Is custom field created?
     $this->waitForText('crm-notification-container', "Custom field '$checkboxFieldLabel' has been saved.");
 
     //create another custom field - Integer Radio
-    $this->clickLink("//a[@id='newCustomField']/span", '_qf_Field_cancel', FALSE);
+    $this->clickLink('newCustomField', '_qf_Field_cancel', FALSE);
     $this->click('data_type[0]');
     $this->select('data_type[0]', 'value=1');
     $this->click("//option[@value='1']");
