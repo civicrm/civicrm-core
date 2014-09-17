@@ -2213,33 +2213,35 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     if( $entityId && $linkedEntityTable ){
       switch ($linkedEntityTable) {
           case 'civicrm_tell_friend':
-            $params = array(
-                        'entity_id' => $entityId,
-                        'entity_table' => 'civicrm_event'
-                      );
-            $defaults = array();
-            CRM_Core_DAO::commonRetrieve('CRM_Friend_DAO_Friend', $params, $defaults);
-            if(CRM_Utils_Array::value('id', $defaults)){
-              $result['entityId'] = $defaults['id'];
-              $result['entityTable'] = 'civicrm_tell_friend';
-            }
+            $dao = 'CRM_Friend_DAO_Friend';
+            $entityTable = 'civicrm_tell_friend';
             break;
 
           case 'civicrm_pcp_block':
-            $params = array(
+            $dao = 'CRM_PCP_DAO_PCPBlock';
+            $entityTable = 'civicrm_pcp_block';
+            break;
+            
+          case 'civicrm_price_set_entity':
+            $dao = 'CRM_Price_DAO_PriceSetEntity';
+            $entityTable = 'civicrm_price_set_entity';
+            break;
+            
+          case 'civicrm_uf_join':
+            $dao = 'CRM_Core_DAO_UFJoin';
+            $entityTable = 'civicrm_uf_join';
+            break;
+          
+        }
+        $params = array(
                         'entity_id' => $entityId,
                         'entity_table' => 'civicrm_event'
                       );
-            $defaults = array();
-            CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $defaults);
-            if(CRM_Utils_Array::value('id', $defaults)){
-              $result['entityId'] = $defaults['id'];
-              $result['entityTable'] = 'civicrm_pcp_block';
-            }
-            break;
-
-          default:
-            break;
+        $defaults = array();
+        CRM_Core_DAO::commonRetrieve($dao, $params, $defaults);
+        if(CRM_Utils_Array::value('id', $defaults)){
+          $result['entityId'] = $defaults['id'];
+          $result['entityTable'] = $entityTable;
         }
       } 
       return $result;
