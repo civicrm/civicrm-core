@@ -69,26 +69,18 @@
 <script>
   CRM.$(function($) {
     //Tab and table mapper
-    var mapper = {'CRM_Event_Form_ManageEvent_EventInfo': 'civicrm_event',
-                'CRM_Event_Form_ManageEvent_Location': 'civicrm_location',
-                'CRM_Event_Form_ManageEvent_Fee': 'civicrm_fee',
-                'CRM_Event_Form_ManageEvent_Registration': 'civicrm_registration',
+    var mapper = {'CRM_Event_Form_ManageEvent_EventInfo': '',
+                'CRM_Event_Form_ManageEvent_Location': '',
+                'CRM_Event_Form_ManageEvent_Fee': 'civicrm_price_set_entity',
+                'CRM_Event_Form_ManageEvent_Registration': 'civicrm_uf_join',
                 'CRM_Friend_Form_Event': 'civicrm_tell_friend',
                 'CRM_PCP_Form_Event': 'civicrm_pcp_block'
                 };
-    //var findTellAFriend = false;
+    
     var form = '';
     $('#crm-main-content-wrapper').on('click', 'div.crm-submit-buttons span.crm-button input[value="Save"], div.crm-submit-buttons span.crm-button input[value="Save and Done"]', function() {
         form = $(this).parents('form:first').attr('class');
-        if( form != "" && mapper.hasOwnProperty(form)){
-/*            var re = new RegExp("^CRM_Friend_", "i");
-            var match = re.test(form);
-            if (match == true){
-                findTellAFriend = true;
-            }else{
-                findTellAFriend = false;
-            }
-*/
+        if( form != "" && mapper.hasOwnProperty(form) ){
           $("#repeat-mode-dailog").dialog({
             title: 'How does this change affect other repeating events in the set?',
             modal: true,
