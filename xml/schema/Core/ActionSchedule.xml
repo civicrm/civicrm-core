@@ -192,6 +192,13 @@
     <add>3.4</add>
   </field>
   <field>
+    <name>sms_body_text</name>
+    <title>SMS Reminder Text</title>
+    <type>longtext</type>
+    <comment>Content of the SMS text.</comment>
+    <add>4.5</add>
+  </field>
+  <field>
     <name>subject</name>
     <title>Reminder Subject</title>
     <type>varchar</type>
@@ -244,6 +251,18 @@
   <field>
     <name>msg_template_id</name>
     <title>Reminder Template</title>
+    <type>int unsigned</type>
+    <comment>FK to the message template.</comment>
+  </field>
+  <foreignKey>
+    <name>msg_template_id</name>
+    <table>civicrm_msg_template</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>sms_template_id</name>
+    <title>SMS Reminder Template</title>
     <type>int unsigned</type>
     <comment>FK to the message template.</comment>
   </field>
