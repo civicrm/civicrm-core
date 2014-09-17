@@ -105,7 +105,6 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
 
     //Add field to profile
-    $this->click("xpath=//a/span[text()='Add Field']");
     $this->waitForElementPresent("field_name[0]");
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
@@ -276,12 +275,9 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', 'Profile Added');
 
-    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
-    $this->click("xpath=//a/span[text()='Add Field']");
     $this->waitForElementPresent("field_name_0");
 
     // select field(s) to be added in profile
-
     $this->select("field_name_0", "value=Contact");
     $this->select("field_name_1", "value=email");
     $this->select("field_name_2", "value=2");
@@ -291,7 +287,6 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', "Profile Field Saved");
-
 
     $this->waitForElementPresent("xpath=//div[@id='field_page']/table/tbody/tr[1]/td[9]/span/a[text()='Edit']");
     // extract profile Id
