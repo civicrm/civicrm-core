@@ -90,8 +90,8 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a", FALSE);
 
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    sleep(1);
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span[2]/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
   }
 }
