@@ -95,7 +95,6 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("newCustomField");
 
     //Is custom group created?
-    $this->click("newCustomField");
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     $customGroupId = $this->urlArg('gid');

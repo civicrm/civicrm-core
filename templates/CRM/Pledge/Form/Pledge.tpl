@@ -201,10 +201,8 @@ function loadPanes( id ) {
       if ( !emailAddress ) {
       var emailAddress = cj('#email-address').html();
       }
-      var message = '{/literal}{ts escape="js" 1="'+emailAddress+'"}Click OK to save this Pledge record AND send an acknowledgment to %1 now{/ts}{literal}.';
-            if (!confirm( message) ) {
-                return false;
-            }
+      var message = '{/literal}{ts escape="js" 1="%1"}Click OK to save this Pledge record AND send an acknowledgment to %1 now.{/ts}{literal}';
+         return confirm(ts(message, {1: emailAddress}));
         }
      }
 

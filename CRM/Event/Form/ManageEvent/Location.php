@@ -110,9 +110,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     if (!empty($defaults['loc_block_id'])) {
       $defaults['loc_event_id'] = $defaults['loc_block_id'];
       $countLocUsed = CRM_Event_BAO_Event::countEventsUsingLocBlockId($defaults['loc_block_id']);
-      if ($countLocUsed > 1) {
-        $this->assign('locUsed', TRUE);
-      }
+      $this->assign('locUsed', $countLocUsed);
     }
 
     $config = CRM_Core_Config::singleton();
@@ -207,10 +205,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
         '2' => ts('Use existing location'),
       );
 
-      $this->addRadio('location_option', ts("Choose Location"), $optionTypes,
-        array(
-          'onclick' => "showLocFields();"), '<br/>', FALSE
-      );
+      $this->addRadio('location_option', ts("Choose Location"), $optionTypes);
 
       if (!isset($locationEvents[$this->_oldLocBlockId]) || (!$this->_oldLocBlockId)) {
         $locationEvents = array(
