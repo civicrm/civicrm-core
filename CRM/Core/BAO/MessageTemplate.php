@@ -139,11 +139,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *
    * @return object
    */
-  static function getMessageTemplates($all = TRUE) {
+  static function getMessageTemplates($all = TRUE, $isSMS = FALSE) {
     $msgTpls = array();
 
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->is_active = 1;
+    $messageTemplates->is_sms = $isSMS;
 
     if (!$all) {
       $messageTemplates->workflow_id = 'NULL';
