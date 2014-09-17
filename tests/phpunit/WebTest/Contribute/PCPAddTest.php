@@ -181,11 +181,12 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
 
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
-
+    $this->waitForElementPresent('contribution_pcp_made_through_id');
     $this->select('contribution_pcp_made_through_id', "label={$pcpTitle}");
 
-    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->clickLink("_qf_Search_refresh", "xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[1][text()='View']");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
 
     // View Contribution Record and test for expected values
     $expected = array(
