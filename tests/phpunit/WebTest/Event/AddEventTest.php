@@ -310,7 +310,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->assertChecked('is_pay_later');
     $this->click("CIVICRM_QFID_0_is_monetary");
 
-    $this->clickLink("_qf_Fee_upload-bottom", "_qf_Fee_upload-bottom");
+    $this->click("_qf_Fee_upload-bottom");
+    $this->waitForText('crm-notification-container', "'Fees' information has been saved.");
+    $this->waitForAjaxContent();
 
     //check if pay later option is disabled
     $this->click('CIVICRM_QFID_1_is_monetary');
@@ -357,8 +359,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->type("max_participants", "50");
     $this->click("is_map");
     $this->click("is_public");
-    $this->click("_qf_EventInfo_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_EventInfo_upload-bottom");
   }
 
   /**
@@ -373,8 +374,8 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     // Select event template. Use option value, not label - since labels can be translated and test would fail
     $this->select("template_id", "value={$templateID}");
 
-    // Wait for event type to be filled in (since page reloads)
-    $this->waitForElementPresent("event_type_id");
+    // Wait for event type to be filled in (since page refreshes)
+    $this->waitForAjaxContent();
     $this->verifySelectedValue("event_type_id", $eventTypeID);
 
     // Attendee role s/b selected now.
@@ -395,8 +396,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->type("max_participants", "50");
     $this->click("is_map");
-    $this->click("_qf_EventInfo_upload-bottom");
-
+    $this->clickLink("_qf_EventInfo_upload-bottom");
   }
 
   /**
@@ -404,7 +404,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
    */
   function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForAjaxContent();
     $this->waitForElementPresent("_qf_Location_upload-bottom");
 
     // Fill in address fields
@@ -766,7 +766,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       $this->_testOnlineRegistration($registerUrl, 2, $anonymous, FALSE, $participantEmails, "Test Processor");
     $primaryDisplayName = "{$primaryParticipantInfo['first_name']} {$primaryParticipantInfo['last_name']}";
     $this->webtestLogin();
-    $this->openCiviPage("event/search?reset=1", "reset=1");
+    $this->openCiviPage("event/search", "reset=1");
     $this->select2("event_id", $eventTitle, FALSE);
     $this->clickLink('_qf_Search_refresh');
     $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
@@ -776,9 +776,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     //CRM-12618 check edit screen of additional participant and ensuring record_contribution not present
     foreach ($addtlPart as $value) {
-      $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
+      $this->clickPopupLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
        '{$value['last_name']}, {$value['first_name']}')]/../../td[11]/span/a[2][contains(text(), 'Edit')]",
-        '_qf_Participant_upload-bottom', FALSE);
+        '_qf_Participant_upload-bottom');
       $this->assertTrue(
         $this->isElementPresent("xpath=//tr[@class='crm-participant-form-block-registered-by']/td[2]/a[contains(text(),
          '$primaryDisplayName')]"), 'Registered By info is wrong on additional participant edit form');
