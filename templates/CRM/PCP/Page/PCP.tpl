@@ -36,35 +36,31 @@
 <div id="ltype">
 <p></p>
 {include file="CRM/common/pager.tpl" location="top"}
-{include file="CRM/common/pagerAToZ.tpl}
-{include file="CRM/common/jsortable.tpl}
+{include file="CRM/common/pagerAToZ.tpl"}
+{include file="CRM/common/jsortable.tpl"}
 {strip}
 <table id="options" class="display">
   <thead>
     <tr>
     <th>{ts}Page Title{/ts}</th>
     <th>{ts}Supporter{/ts}</th>
-    <th id="sortable">{ts}Contribution Page / Event{/ts}</th>
-    <th id="start_date">{ts}Starts{/ts}</th>
-    <th id="end_date">{ts}Ends{/ts}</th>
+    <th>{ts}Contribution Page / Event{/ts}</th>
+    <th>{ts}Starts{/ts}</th>
+    <th>{ts}Ends{/ts}</th>
     <th>{ts}Status{/ts}</th>
     <th></th>
-    <th class="hiddenElement"></th>
-    <th class="hiddenElement"></th>
     </tr>
   </thead>
   <tbody>
   {foreach from=$rows item=row}
   <tr id="row_{$row.id}" class="{$row.class}">
-          <td><a href="{crmURL p='civicrm/pcp/info' q="reset=1&id=`$row.id` " fe='true'}" title="{ts}View Personal Campaign Page{/ts}" target="_blank">{$row.title}</a></td>
+    <td><a href="{crmURL p='civicrm/pcp/info' q="reset=1&id=`$row.id`" fe='true'}" title="{ts}View Personal Campaign Page{/ts}" target="_blank">{$row.title}</a></td>
     <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.supporter_id`"}" title="{ts}View contact record{/ts}">{$row.supporter}</a></td>
     <td><a href="{$row.page_url}" title="{ts}View page{/ts}" target="_blank">{$row.page_title}</td>
     <td>{$row.start_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
     <td>{if $row.end_date}{$row.end_date|crmDate:"%b %d, %Y %l:%M %P"}{else}({ts}ongoing{/ts}){/if}</td>
     <td>{$row.status_id}</td>
     <td id={$row.id}>{$row.action|replace:'xx':$row.id}</td>
-    <td class="start_date hiddenElement">{$row.start_date|truncate:10:''|crmDate}</td>
-    <td class="end_date hiddenElement">{if $row.end_date}{$row.end_date|truncate:10:''|crmDate}{else}({ts}ongoing{/ts}){/if}</td>
   </tr>
   {/foreach}
   </tbody>

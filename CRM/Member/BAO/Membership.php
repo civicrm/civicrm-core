@@ -2820,6 +2820,7 @@ WHERE      civicrm_membership.is_test = 0";
     $contributionParams['receipt_date'] = (CRM_Utils_Array::value('receipt_date', $params)) ? $params['receipt_date'] : 'null';
     $contributionParams['source'] = CRM_Utils_Array::value('contribution_source', $params);
     $contributionParams['non_deductible_amount'] = 'null';
+    $contributionParams['payment_processor'] = CRM_Utils_Array::value('payment_processor_id', $params);
     $contributionSoftParams = CRM_Utils_Array::value('soft_credit', $params);
     $recordContribution = array(
       'contact_id', 'total_amount', 'receive_date', 'financial_type_id',
@@ -2851,10 +2852,12 @@ WHERE      civicrm_membership.is_test = 0";
 
     //CRM-13981, create new soft-credit record as to record payment from different person for this membership
     if (!empty($contributionSoftParams)) {
-      $contributionSoftParams['contribution_id'] = $contribution->id;
-      $contributionSoftParams['currency'] = $contribution->currency;
-      $contributionSoftParams['amount'] = $contribution->total_amount;
-      CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
+      foreach ($contributionSoftParams as $contributionSoft){
+        $contributionSoft['contribution_id'] = $contribution->id;
+        $contributionSoft['currency'] = $contribution->currency;
+        $contributionSoft['amount'] = $contribution->total_amount;
+        CRM_Contribute_BAO_ContributionSoft::add($contributionSoft);
+      }
     }
 
     // store contribution id

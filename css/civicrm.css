@@ -4244,11 +4244,13 @@ span.crm-status-icon {
 
 #crm-container.crm-public input[type="text"],
 #crm-container.crm-public input[type="password"],
+#crm-container.crm-public input[type="email"],
 #crm-container.crm-public select {
   font-size: 15px;
   padding: 5px;
   border-radius: 3px;
   vertical-align: middle;
+  max-width: 100%;
 }
 
 #crm-container.crm-public .label {

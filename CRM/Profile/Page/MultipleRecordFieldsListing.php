@@ -172,6 +172,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    */
   function browse() {
     $dateFields = NULL;
+    $cgcount = 0;
     $dateFieldsVals = NULL;
     if ($this->_pageViewType == 'profileDataView' && $this->_profileId) {
       $fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, NULL,

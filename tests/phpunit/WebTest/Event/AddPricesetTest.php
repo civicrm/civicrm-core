@@ -50,7 +50,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
-    $validStrings = array();
+    $validateStrings = array();
 
     $fields = array(
       'Full Conference' => 'Text',
@@ -59,7 +59,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
       'Evening Sessions' => 'CheckBox',
     );
     $this->_testAddPriceFields($fields, $validateStrings);
-    // var_dump($validateStrings);
 
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
@@ -88,7 +87,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', 'newPriceField');
+    $this->clickLink('_qf_Set_next-bottom');
   }
 
   /**
@@ -97,7 +96,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
    * @param bool $dateSpecificFields
    */
   function _testAddPriceFields(&$fields, &$validateStrings, $dateSpecificFields = FALSE) {
-    $this->clickLink('newPriceField', '_qf_Field_cancel-bottom', FALSE);
+    $this->clickLinkSuppressPopup('newPriceField');
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
 
@@ -176,7 +175,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         default:
           break;
       }
-      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom', FALSE);
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
       $this->waitForText('crm-notification-container', "Price Field '".$label."' has been saved.");
     }
   }
@@ -618,7 +617,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText("css=#crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
+    $this->waitForText("crm-notification-container", "Event registration for $displayName has been added");
 
     $this->waitForElementPresent("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen

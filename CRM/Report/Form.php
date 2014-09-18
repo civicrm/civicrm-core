@@ -2253,6 +2253,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * Post Processing function for Form (postProcessCommon should be used to set other variables from input as the api accesses that function)
+   */
   function beginPostProcess() {
     $this->setParams($this->controller->exportValues($this->_name));
 

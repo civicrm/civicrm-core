@@ -182,7 +182,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertTrue($this->isTextPresent("Your custom field '$checkboxFieldLabel' has been saved."));
+    $this->assertTrue($this->isTextPresent("Custom field '$checkboxFieldLabel' has been saved."));
 
     //create another custom field - Integer Radio
     $this->click("//a[@id='newCustomField']/span");
@@ -224,7 +224,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertTrue($this->isTextPresent("Your custom field '$radioFieldLabel' has been saved."));
+    $this->assertTrue($this->isTextPresent("Custom field '$radioFieldLabel' has been saved."));
 
     //add the above custom data to the On Behalf of Profile
     $this->openCiviPage("admin/uf/group", "reset=1");
@@ -374,11 +374,13 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     // Add membership custom data field to profile
     $this->waitForElementPresent('_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
-    $this->click('_qf_Group_next-bottom');
+    $this->clickLink('_qf_Group_next-bottom');
 
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
     $this->assertTrue($this->isTextPresent("Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now."));
 
+    $gid = $this->urlArg('gid');
+
+    $this->openCiviPage('admin/uf/group/field/add', array('action' => 'add', 'reset' => 1, 'gid' => $gid), 'field_name[0]');
     $this->select('field_name[0]', "value=Membership");
     $this->select('field_name[1]', "label={$checkboxFieldLabel} :: {$customGroupTitle}");
     $this->click('field_name[1]');
@@ -813,7 +815,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next-bottom');
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Your custom field '$fieldTitle' has been saved."));
+    $this->assertTrue($this->isTextPresent("Custom field '$fieldTitle' has been saved."));
     $fieldId = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='field_page']/div[2]/table/tbody//tr/td[1][text()='$fieldTitle']/../td[8]/span/a@href"));
 
     // Enable CiviCampaign module if necessary
@@ -1063,7 +1065,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next-bottom');
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Your custom field '$fieldTitle' has been saved."));
+    $this->assertTrue($this->isTextPresent("Custom field '$fieldTitle' has been saved."));
     $fieldId = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='field_page']/div[2]/table/tbody//tr/td[1]/span[text()='$fieldTitle']/../td[8]/span/a@href"));
 
     // Enable CiviCampaign module if necessary
