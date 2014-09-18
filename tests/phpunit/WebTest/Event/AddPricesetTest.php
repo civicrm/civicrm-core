@@ -50,7 +50,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
-    $validStrings = array();
+    $validateStrings = array();
 
     $fields = array(
       'Full Conference' => 'Text',
@@ -59,7 +59,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
       'Evening Sessions' => 'CheckBox',
     );
     $this->_testAddPriceFields($fields, $validateStrings);
-    // var_dump($validateStrings);
 
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
@@ -97,7 +96,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
    * @param bool $dateSpecificFields
    */
   function _testAddPriceFields(&$fields, &$validateStrings, $dateSpecificFields = FALSE) {
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    $this->clickLinkSuppressPopup('newPriceField');
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
 
@@ -176,7 +175,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         default:
           break;
       }
-      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom', FALSE);
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
       $this->waitForText('crm-notification-container', "Price Field '".$label."' has been saved.");
     }
   }
