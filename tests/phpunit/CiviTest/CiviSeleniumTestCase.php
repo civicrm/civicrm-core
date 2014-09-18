@@ -237,17 +237,16 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Click a popup link and wait for the ajax content to load
+   * Click a link or button and wait for the ajax content to load
    * @param string $element
    * @param string $waitFor
    */
-  function clickPopupLink($element, $waitFor) {
+  function clickAjaxLink($element, $waitFor = 'css=.ui-dialog') {
     $this->click($element);
-    $this->waitForElementPresent('css=.ui-dialog');
-    $this->waitForAjaxContent();
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
     }
+    $this->waitForAjaxContent();
   }
 
   /**
@@ -269,6 +268,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    */
   function waitForAjaxContent() {
     // Add sleep to prevent condition where we click an ajax button and call this function before the content has even started loading
+    // TODO: When test suite is more stable, try removing sleep() and see if it breaks anything
     sleep(1);
     $this->waitForElementNotPresent('css=.blockOverlay');
   }
@@ -718,7 +718,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @param string $financialAccount
    * @throws PHPUnit_Framework_AssertionFailedError
-   * @return void
+   * @return int
    */
 
   function webtestAddPaymentProcessor($processorName, $processorType = 'Dummy', $processorSettings = NULL, $financialAccount = 'Deposit Bank Account') {
@@ -766,8 +766,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if (empty($pid)) {
       $this->fail("$processorType processortype not found.");
     }
-    $this->open($this->sboxPath . 'civicrm/admin/paymentProcessor?action=add&reset=1&pp=' . $pid);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/paymentProcessor', 'action=add&reset=1&pp=' . $pid, 'name');
     $this->type('name', $processorName);
     $this->select('financial_account_id', "label={$financialAccount}");
 
@@ -775,14 +774,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->type($f, $v);
     }
 
-    // Is new processor created?
-    $this->click('_qf_PaymentProcessor_next-bottom');
-    $this->waitForTextPresent($processorName);
-    $this->assertTrue($this->isTextPresent($processorName), 'Processor name not found in selector after adding payment processor (webTestAddPaymentProcessor).');
+    // Save
+    $this->clickLink('_qf_PaymentProcessor_next-bottom');
 
-    $paymentProcessorId = explode('&id=', $this->getAttribute("xpath=//table[@class='selector row-highlight']//tbody//tr/td[text()='{$processorName}']/../td[7]/span/a[1]@href"));
-    $paymentProcessorId = explode('&', $paymentProcessorId[1]);
-    return $paymentProcessorId[0];
+    $this->waitForTextPresent($processorName);
+
+    // Get payment processor id
+    $paymentProcessorLink = $this->getAttribute("xpath=//table[@class='selector row-highlight']//tbody//tr/td[text()='{$processorName}']/../td[7]/span/a[1]@href");
+    return $this->urlArg('id', $paymentProcessorLink);
   }
  
   function webtestAddCreditCardDetails() {
@@ -2085,6 +2084,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @return array
    */
   function addCustomGroupField($customSets) {
+    $return = array();
     foreach ($customSets as $customSet) {
       $this->openCiviPage("admin/custom/group", "action=add&reset=1");
 
@@ -2120,6 +2120,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $return[] = array(
         "{$customSet['entity']}_{$customSet['subEntity']}" => array('cgtitle' => $customGroupTitle, 'gid' => $gid, 'triggerElement' => $customSet['triggerElement']));
     }
+    // Avoid weird qf_key bug when going straight from here to the next form
+    $this->openCiviPage('');
     return $return;
   }
 
@@ -2127,6 +2129,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * function to type and select first occurance of autocomplete
    */
   function select2($fieldName,$label, $multiple = FALSE, $xpath=FALSE) {
+    // In the case of chainSelect, wait for options to load
+    $this->waitForElementNotPresent('css=select.loading');
     if ($multiple) {
       $this->clickAt("//*[@id='$fieldName']/../div/ul/li");
       $this->keyDown("//*[@id='$fieldName']/../div/ul/li//input", " ");
