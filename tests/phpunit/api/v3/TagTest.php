@@ -186,7 +186,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
   }
 
   function testTagGetfields() {
-    $description = "demonstrate use of getfields to interogate api";
+    $description = "demonstrate use of getfields to interrogate api";
     $params      = array('action' => 'create');
     $result      = $this->callAPIAndDocument('tag', 'getfields', $params, __FUNCTION__, __FILE__, $description, NULL, 'getfields');
     $this->assertEquals('civicrm_contact', $result['values']['used_for']['api.default']);
