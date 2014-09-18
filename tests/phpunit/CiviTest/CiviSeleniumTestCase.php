@@ -237,8 +237,22 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Click on a link and have it open full-page
-   * @param $element
+   * Click a popup link and wait for the ajax content to load
+   * @param string $element
+   * @param string $waitFor
+   */
+  function clickPopupLink($element, $waitFor) {
+    $this->click($element);
+    $this->waitForElementPresent('css=.ui-dialog');
+    $this->waitForAjaxContent();
+    if ($waitFor) {
+      $this->waitForElementPresent($waitFor);
+    }
+  }
+
+  /**
+   * Force a link to open full-page, even if it would normally open in a popup
+   * @param string $element
    * @param string $waitFor
    */
   function clickLinkSuppressPopup($element, $waitFor = 'civicrm-footer') {
@@ -248,6 +262,15 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
     }
+  }
+
+  /**
+   * Wait for ajax snippets to finish loading
+   */
+  function waitForAjaxContent() {
+    // Add sleep to prevent condition where we click an ajax button and call this function before the content has even started loading
+    sleep(1);
+    $this->waitForElementNotPresent('css=.blockOverlay');
   }
 
   /**
@@ -2091,7 +2114,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
       $fieldLabel = "custom_field_for_{$customSet['entity']}_{$customSet['subEntity']}" . substr(sha1(rand()), 0, 4);
       $this->type('label', $fieldLabel);
-      $this->click('_qf_Field_next_new-bottom');
+      $this->click('_qf_Field_done-bottom');
       $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
 
       $return[] = array(
@@ -2132,6 +2155,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * function to select multiple options
    */
   function multiselect2($fieldid, $params) {
+    // In the case of chainSelect, wait for options to load
+    $this->waitForElementNotPresent('css=select.loading');
     foreach($params as $value) {
       $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
       $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
