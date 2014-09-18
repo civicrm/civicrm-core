@@ -776,7 +776,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     //CRM-12618 check edit screen of additional participant and ensuring record_contribution not present
     foreach ($addtlPart as $value) {
-      $this->clickPopupLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
+      $this->clickAjaxLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
        '{$value['last_name']}, {$value['first_name']}')]/../../td[11]/span/a[2][contains(text(), 'Edit')]",
         '_qf_Participant_upload-bottom');
       $this->assertTrue(
