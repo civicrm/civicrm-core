@@ -169,16 +169,15 @@ function showOnBehalf(onBehalfRequired) {
 }
 
 function resetValues() {
-  cj('input[type=text], select, textarea', "#select_org div").not('#onbehalfof_id').val('');
-  cj('input[type=radio], input[type=checkbox]', "#select_org tr td").prop('checked', false);
+  cj('input[type=text], select, textarea', "#select_org div").not('#onbehalfof_id').val('').change();
+  cj('input[type=radio], input[type=checkbox]', "#select_org tr td").prop('checked', false).change();
 }
 
 function createNew( ) {
   if (cj("#mode").prop('checked')) {
     var textMessage = ' {/literal}{ts escape="js"}Use existing organization{/ts}{literal} ';
-    cj("#onbehalf_organization_name").removeAttr('readonly');
+    cj("#onbehalf_organization_name").prop('readonly', false);
     cj("#mode").prop('checked', false);
-    cj("#mode").removeAttr('checked');
     resetValues();
   }
   else {
