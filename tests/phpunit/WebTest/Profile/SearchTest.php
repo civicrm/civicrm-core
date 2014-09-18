@@ -67,7 +67,6 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $profileId = $this->urlArg('gid');
 
     // Add Last Name field.
-    $this->click("xpath=//a/span[text()='Add Field']");
     $this->waitForElementPresent("field_name[0]");
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Individual');
@@ -154,8 +153,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Field_next-bottom', "xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']", FALSE);
 
     $uselink = explode('?', $this->getAttribute("xpath=//*[@id='field_page']/div[1]/a[4]@href"));
-    $this->openCiviPage('profile/create', "$uselink[1]", '_qf_Edit_cancel');
-    $this->waitForElementPresent('_qf_Edit_next');
+    $this->openCiviPage('profile/create', "$uselink[1]", '_qf_Edit_next');
     $lastName = substr(sha1(rand()), 0, 7);
 
     // Fill Last Name
@@ -167,16 +165,16 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
     // fill country, state, county
     $this->select('country-Primary', "United States");
-    // adding sleep gives time for state data
-    // to get populated in state combo box
-    sleep(1);
+
+    // wait for state data to be populated
+    $this->waitForElementPresent("xpath=//select[@id='state_province-Primary']/option[text()='California']");
     $this->select('state_province-Primary', "California");
-    // adding sleep gives time for county data
-    // to get populated in county combo box
-    sleep(1);
+
+    // wait for county data to be populated
+    $this->waitForElementPresent("xpath=//select[@id='county-Primary']/option[text()='Alameda']");
     $this->select('county-Primary', "Alameda");
-    $this->click('_qf_Edit_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->clickLink('_qf_Edit_next', NULL);
 
     $this->assertElementContainsText("css=span.msg-text", 'Your information has been saved.');
 
@@ -192,19 +190,18 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
     // Fill state, county, country
     $this->select('country-Primary', "United States");
-    // adding sleep gives time for state data
-    // to get populated in state combo box
-    sleep(1);
+
+    // wait for state data to be populated
+    $this->waitForElementPresent("xpath=//select[@id='state_province-Primary']/option[text()='California']");
     $this->select('state_province-Primary', "California");
-    // adding sleep gives time for county data
-    // to get populated in county combo box
-    sleep(1);
+
+    // wait for county data to be populated
+    $this->waitForElementPresent("xpath=//select[@id='county-Primary']/option[text()='Alameda']");
     $this->select('county-Primary', "Alameda");
 
     // Select Custom option
     $this->select('custom_1', 'Education');
-    $this->click('_qf_Search_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Search_refresh', NULL);
 
     // Verify Data.
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[2][text()='$lastName']"));
@@ -216,18 +213,12 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[8][text()='Alameda']"));
 
     // Go back to Profile fields admin
-    $this->openCiviPage('admin/uf/group/field', "reset=1&action=browse&gid=$profileId");
+    $this->openCiviPage('admin/uf/group/field', "reset=1&action=browse&gid=$profileId", "xpath=//table/tbody/tr[1]/td[9]");
 
     // Edit first profile field
-    $this->waitForElementPresent("xpath=//table/tbody/tr[1]/td[9]");
     $this->clickLink("xpath=//table/tbody/tr[1]/td[9]/span[1]/a[1]", '_qf_Field_next-bottom', FALSE);
 
-    // sleep 5 to make sure jQuery is not hiding field after page load
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(5);
-    $this->assertTrue($this->isElementPresent("visibility"), 'Visibility field not present when editing existing profile field.');
+    $this->waitForElementPresent("visibility");
     $this->click("xpath=//tr[@id='profile_visibility']/td[1]/a");
     $this->waitForElementPresent("xpath=//div[@id='crm-notification-container']/div/div[2]/p[2]");
     $this->waitForText('crm-notification-container', 'Is this field hidden from other users');

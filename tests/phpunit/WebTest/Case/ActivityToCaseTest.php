@@ -343,8 +343,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/custom/group', 'reset=1');
 
     //add new custom data
-    $this->click("//a[@id='newCustomDataGroup']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("//a[@id='newCustomDataGroup']/span");
 
     //fill custom group title
     $this->click("title");
@@ -354,15 +353,13 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->click("extends[0]");
     $this->select("extends[0]", "value=Activity");
     $this->click("//option[@value='Activity']");
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent('newCustomField');
-    $this->click('newCustomField');
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    $this->clickLink('_qf_Group_next-bottom');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     // create a custom field - Integer Radio
+    $this->clickLinkSuppressPopup('newCustomField', "data_type[0]");
     $this->click("data_type[0]");
     $this->select("data_type[0]", "value=1");
     $this->click("//option[@value='1']");
@@ -392,16 +389,12 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
+    $this->clickLink("_qf_Field_next_new-bottom", "_qf_Field_next_new-bottom");
 
     //Is custom field created
-    $this->waitForElementPresent("newCustomField");
     $this->waitForText('crm-notification-container', "Custom field '$radioFieldLabel' has been saved.");
 
     // create another custom field - text field
-    $this->click("newCustomField");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
-
     $textFieldLabel = 'Custom Field Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $textFieldLabel);
 
@@ -415,8 +408,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
 
     //clicking save
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
-    $this->waitForElementPresent("//a[@id='newCustomField']/span");
+    $this->clickLink("_qf_Field_done-bottom", "//a[@id='newCustomField']/span");
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$textFieldLabel' has been saved.");

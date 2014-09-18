@@ -99,15 +99,12 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->click('is_uf_link');
 
     //click on save
-    $this->click('_qf_Group_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Group_next');
 
-    //check for  profile create
-    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+    $gid = $this->urlArg('gid');
+
 
     //Add field to profile
-    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
-    $this->click("xpath=//a/span[text()='Add Field']");
     $this->waitForElementPresent("field_name[0]");
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
@@ -117,7 +114,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     //click on save
     $this->click('_qf_Field_next');
-    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
+    sleep(1);
 
     // delete the profile
     $this->openCiviPage('admin/uf/group', 'reset=1');
@@ -163,8 +160,6 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
       'last_name'  => 'Individual',
       'email'      => 'Contact'
     );
-    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
-    $this->click("xpath=//a/span[text()='Add Field']");
     $this->waitForElementPresent("field_name_0");
     foreach ($fields as $field => $type) {
       $this->click('field_name_0');
@@ -280,12 +275,9 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', 'Profile Added');
 
-    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
-    $this->click("xpath=//a/span[text()='Add Field']");
     $this->waitForElementPresent("field_name_0");
 
     // select field(s) to be added in profile
-
     $this->select("field_name_0", "value=Contact");
     $this->select("field_name_1", "value=email");
     $this->select("field_name_2", "value=2");
@@ -295,7 +287,6 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', "Profile Field Saved");
-
 
     $this->waitForElementPresent("xpath=//div[@id='field_page']/table/tbody/tr[1]/td[9]/span/a[text()='Edit']");
     // extract profile Id
@@ -316,7 +307,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', 'Profile Saved');
 
-    $this->clickLink("xpath=//div[@id='breadcrumb']/div//a[text()='Profiles']");
+    $this->openCiviPage("admin/uf/group", "reset=1");
     $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']/a[@id='newCiviCRMProfile-bottom']");
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[2]/a");
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[3]");

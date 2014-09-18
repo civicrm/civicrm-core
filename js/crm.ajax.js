@@ -257,7 +257,9 @@
           return;
         }
         data.url = url;
-        that.element.trigger('crmBeforeLoad', data).html(data.content);
+        that.element.trigger('crmBeforeLoad', data);
+        that._beforeRemovingContent();
+        that.element.html(data.content);
         that._handleOrderLinks();
         that.element.trigger('crmLoad', data);
         that.options.crmForm && that.element.trigger('crmFormLoad', data);
@@ -265,9 +267,21 @@
         that._onFailure();
       });
     },
+    // Perform any cleanup needed before removing/replacing content
+    _beforeRemovingContent: function() {
+      var that = this;
+      if (window.tinyMCE && tinyMCE.editors) {
+        $.each(tinyMCE.editors, function(k) {
+          if ($.contains(that.element[0], this.getElement())) {
+            this.remove();
+          }
+        });
+      }
+      this.options.crmForm && $('form', this.element).ajaxFormUnbind();
+    },
     _destroy: function() {
       this.element.removeClass('crm-ajax-container');
-      this.options.crmForm && $('form', this.element).ajaxFormUnbind();
+      this._beforeRemovingContent();
       if (this._originalContent !== null) {
         this.element.empty().append(this._originalContent);
       }
@@ -432,6 +446,11 @@
           if (window.CKEDITOR && window.CKEDITOR.instances) {
             $.each(CKEDITOR.instances, function() {
               this.updateElement && this.updateElement();
+            });
+          }
+          if (window.tinyMCE && tinyMCE.editors) {
+            $.each(tinyMCE.editors, function() {
+              this.save();
             });
           }
         },

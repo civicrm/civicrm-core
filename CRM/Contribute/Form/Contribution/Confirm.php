@@ -1775,9 +1775,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $priceField->price_set_id = $priceSetID;
     $priceField->orderBy('weight');
     $priceField->find();
+    $paramWeDoNotUnderstand = NULL;
 
     while ($priceField->fetch()) {
-      $paramWeDoNotUnderstand = NULL;
       if ($priceField->name == "contribution_amount") {
         $paramWeDoNotUnderstand = $priceField->id;
       }

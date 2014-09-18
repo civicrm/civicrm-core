@@ -92,7 +92,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', 'newPriceField');
+    $this->clickLink('_qf_Set_next-bottom');
   }
 
   /**
@@ -103,8 +103,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
    */
   function _testAddPriceFields(&$fields, &$validateString, $financialType, $dateSpecificFields = FALSE) {
     $validateStrings[] = $financialType;
-    $this->click('newPriceField');
-    $this->waitForElementPresent('label');
+    $sid = $this->urlArg('sid');
+    $this->openCiviPage('admin/price/field', "reset=1&action=add&sid=$sid", 'label');
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
 

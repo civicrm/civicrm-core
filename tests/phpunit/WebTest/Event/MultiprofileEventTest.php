@@ -502,6 +502,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     //$streetAddress = "100 Main Street";
     $this->type("address_1_street_address", $streetAddress);
     $this->type("address_1_city", "San Francisco");
+    $this->waitForElementPresent('address_1_country_id');
+    $this->select("address_1_country_id", "value=1228");
     $this->type("address_1_postal_code", "94117");
     $this->select("address_1_state_province_id", "value=1004");
     $this->type("email_1_email", "info@civicrm.org");
@@ -510,7 +512,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForElementPresent("_qf_Location_upload-bottom");
-    $this->waitForTextPresent("'Event Location' information has been saved.");
+    $this->waitForText('crm-notification-container', "'Event Location' information has been saved.");
   }
 
   /**
@@ -666,6 +668,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     $this->type("current_employer", "ABCD");
     $this->type("job_title", "Painter");
+    $this->waitForElementPresent('nick_name');
     $this->type("nick_name", "Nick");
     $this->type("url-1", "http://www.test.com");
 

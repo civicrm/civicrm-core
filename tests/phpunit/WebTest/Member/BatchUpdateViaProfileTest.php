@@ -203,10 +203,12 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
     $this->click('uf_group_type_Profile');
-    $this->click('_qf_Group_next-bottom');
+    $this->clickLink('_qf_Group_next-bottom');
 
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+    $gid = $this->urlArg('gid');
+
+    $this->openCiviPage('admin/uf/group/field/add', array('action' => 'add', 'reset' => 1, 'gid' => $gid), 'field_name[0]');
 
     $this->select('field_name[0]', "value=Membership");
     $this->select('field_name[1]', "label={$customDataParams[0]} :: {$customDataParams[1]}");

@@ -48,6 +48,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
      * @var bool
      */
     $this->is_drupal = FALSE;
+    $this->is_wordpress = TRUE;
   }
 
   /**

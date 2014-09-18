@@ -110,6 +110,11 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * @static
    */
   function browse() {
+    $resourceManager = CRM_Core_Resources::singleton();
+    if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
+      $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999);
+    }
+
     $ufField = array();
     $ufFieldBAO = new CRM_Core_BAO_UFField();
 

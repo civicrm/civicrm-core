@@ -266,6 +266,11 @@ SELECT DISTINCT case_id
 
 /**
  * Deprecated. Use activity API instead
+ *
+ * @param array $params
+ *
+ * @throws API_Exception
+ * @return array
  */
 function civicrm_api3_case_activity_create($params) {
   return civicrm_api3_activity_create($params);
@@ -415,6 +420,8 @@ function _civicrm_api3_case_read($caseId, $options) {
 
 /**
  * Internal function to format create params for processing
+ *
+ * @param array $params
  */
 function _civicrm_api3_case_format_params(&$params) {
   // figure out case type id from case type and vice-versa

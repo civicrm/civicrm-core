@@ -213,8 +213,8 @@ class CRM_Core_Page_AJAX_Location {
   static function getLocBlock() {
     // i wish i could retrieve loc block info based on loc_block_id,
     // Anyway, lets retrieve an event which has loc_block_id set to 'lbid'.
-    if ($_POST['lbid']) {
-      $params = array('1' => array($_POST['lbid'], 'Integer'));
+    if ($_REQUEST['lbid']) {
+      $params = array('1' => array($_REQUEST['lbid'], 'Integer'));
       $eventId = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_event WHERE loc_block_id=%1 LIMIT 1', $params);
     }
     // now lets use the event-id obtained above, to retrieve loc block information.
@@ -260,7 +260,7 @@ class CRM_Core_Page_AJAX_Location {
     }
 
     // set the message if loc block is being used by more than one event.
-    $result['count_loc_used'] = CRM_Event_BAO_Event::countEventsUsingLocBlockId($_POST['lbid']);
+    $result['count_loc_used'] = CRM_Event_BAO_Event::countEventsUsingLocBlockId($_REQUEST['lbid']);
 
     CRM_Utils_JSON::output($result);
   }

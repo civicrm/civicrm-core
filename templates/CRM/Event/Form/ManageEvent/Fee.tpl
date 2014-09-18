@@ -344,7 +344,7 @@
     $("#quickconfig").click(function(e) {
       e.preventDefault();
       CRM.confirm({
-        width: 400.
+        width: 400,
         message: {/literal}"{ts escape='js'}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}"{literal}
       }).on('crmConfirm:yes', function() {
           {/literal}

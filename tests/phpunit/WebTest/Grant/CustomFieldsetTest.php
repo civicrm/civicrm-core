@@ -70,10 +70,8 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $this->select('id=extends_0', 'label=Grants');
     $this->addSelection('id=extends_1', "label=$grantType");
     $this->click('id=collapse_display');
-    $this->click('id=_qf_Group_next-bottom');
-    $this->waitForElementPresent('newCustomField');
+    $this->clickLink('id=_qf_Group_next-bottom');
     $this->waitForText('crm-notification-container', "Your custom field set '$grantFieldSet' has been added.");
-    $this->click('newCustomField');
     $this->waitForElementPresent('_qf_Field_done-bottom');
 
     // Add field to fieldset

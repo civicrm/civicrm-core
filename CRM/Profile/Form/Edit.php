@@ -213,18 +213,13 @@ SELECT module,is_reserved
 
     parent::buildQuickForm();
 
+    $this->assign('cancelURL', $this->_cancelURL);
+
     if (($this->_multiRecord & CRM_Core_Action::DELETE) && $this->_recordExists) {
       $this->_deleteButtonName = $this->getButtonName('upload', 'delete');
 
       $this->addElement('submit', $this->_deleteButtonName, ts('Delete'));
 
-      $buttons[] = array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-        'isDefault' => TRUE,
-        'js' => array('onclick' => "location.href='{$this->_cancelURL}'; return false;"),
-      );
-      $this->addButtons($buttons);
       return;
     }
 
@@ -243,13 +238,6 @@ SELECT module,is_reserved
       'type' => $buttonName,
       'name' => ts('Save'),
       'isDefault' => TRUE,
-    );
-
-    $buttons[] = array(
-      'type' => 'cancel',
-      'name' => ts('Cancel'),
-      'isDefault' => TRUE,
-      'js' => array('onclick' => "location.href='{$this->_cancelURL}'; return false;"),
     );
 
     $this->addButtons($buttons);

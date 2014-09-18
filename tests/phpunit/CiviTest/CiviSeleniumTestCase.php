@@ -237,6 +237,43 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * Click a popup link and wait for the ajax content to load
+   * @param string $element
+   * @param string $waitFor
+   */
+  function clickPopupLink($element, $waitFor) {
+    $this->click($element);
+    $this->waitForElementPresent('css=.ui-dialog');
+    $this->waitForAjaxContent();
+    if ($waitFor) {
+      $this->waitForElementPresent($waitFor);
+    }
+  }
+
+  /**
+   * Force a link to open full-page, even if it would normally open in a popup
+   * @param string $element
+   * @param string $waitFor
+   */
+  function clickLinkSuppressPopup($element, $waitFor = 'civicrm-footer') {
+    $link = $this->getAttribute($element . '@href');
+    $this->open($link);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    if ($waitFor) {
+      $this->waitForElementPresent($waitFor);
+    }
+  }
+
+  /**
+   * Wait for ajax snippets to finish loading
+   */
+  function waitForAjaxContent() {
+    // Add sleep to prevent condition where we click an ajax button and call this function before the content has even started loading
+    sleep(1);
+    $this->waitForElementNotPresent('css=.blockOverlay');
+  }
+
+  /**
    * Call the API on the local server
    * (kind of defeats the point of a webtest - see CRM-11889)
    */
@@ -737,16 +774,17 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     foreach ($processorSettings AS $f => $v) {
       $this->type($f, $v);
     }
-    $this->click('_qf_PaymentProcessor_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+
     // Is new processor created?
+    $this->click('_qf_PaymentProcessor_next-bottom');
+    $this->waitForTextPresent($processorName);
     $this->assertTrue($this->isTextPresent($processorName), 'Processor name not found in selector after adding payment processor (webTestAddPaymentProcessor).');
 
     $paymentProcessorId = explode('&id=', $this->getAttribute("xpath=//table[@class='selector row-highlight']//tbody//tr/td[text()='{$processorName}']/../td[7]/span/a[1]@href"));
     $paymentProcessorId = explode('&', $paymentProcessorId[1]);
     return $paymentProcessorId[0];
   }
-
+ 
   function webtestAddCreditCardDetails() {
     $this->waitForElementPresent('credit_card_type');
     $this->select('credit_card_type', 'label=Visa');
@@ -1874,8 +1912,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     else {
       $text = "The financial type \"{$financialType['name']}\" has been updated.";
     }
-    $this->waitForElementPresent("xpath=//div[@class='notify-content']");
-    $this->assertElementContainsText('crm-notification-container', $text);
+    $this->assertSuccessMsg($text);
   }
 
   /**
@@ -1901,22 +1938,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   function addProfile($profileTitle, $profileFields) {
     $this->openCiviPage('admin/uf/group', "reset=1");
 
-    $this->click('link=Add Profile');
-
-    // Add membership custom data field to profile
-    $this->waitForElementPresent('_qf_Group_cancel-bottom');
+    $this->clickLink('link=Add Profile', '_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Group_next-bottom');
 
-    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
-    $this->click("xpath=//a/span[text()='Add Field']");
-    $this->waitForElementPresent("field_name[0]");
-    //$this->assertTrue($this->isTextPresent("Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now."));
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     foreach ($profileFields as $field) {
       $this->waitForElementPresent('field_name_0');
-      // $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->click("id=field_name_0");
       $this->select("id=field_name_0", "label=" . $field['type']);
       $this->waitForElementPresent('field_name_1');
@@ -2079,14 +2108,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
       //Is custom group created?
       $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added.");
-      $this->click('css=a#newCustomField');
 
       $gid = $this->urlArg('gid');
       $this->waitForTextPresent("{$customGroupTitle} - New Field");
 
       $fieldLabel = "custom_field_for_{$customSet['entity']}_{$customSet['subEntity']}" . substr(sha1(rand()), 0, 4);
       $this->type('label', $fieldLabel);
-      $this->click('_qf_Field_next_new-bottom');
+      $this->click('_qf_Field_done-bottom');
       $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
 
       $return[] = array(
@@ -2127,6 +2155,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * function to select multiple options
    */
   function multiselect2($fieldid, $params) {
+    // In the case of chainSelect, wait for options to load
+    $this->waitForElementNotPresent('css=select.loading');
     foreach($params as $value) {
       $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
       $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
@@ -2140,6 +2170,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    */
   function waitForStatusMsg() {
     $this->waitForElementPresent("css=.crm-status-box-outer.status-success");
+  }
+  
+  /**
+   * Wait for unobtrusive status message as set by CRM.status
+   */
+  function assertSuccessMsg($text) {
+    $this->waitForElementPresent("css=div.success");
+    $this->assertElementContainsText("css=div.success", $text);
   }
   
   /**

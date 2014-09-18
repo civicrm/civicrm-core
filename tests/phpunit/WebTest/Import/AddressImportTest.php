@@ -127,13 +127,11 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click('extends[0]');
     $this->select('extends[0]', "value=Address");
     $this->click("//option[@value='Address']");
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent('newCustomField');
+    $this->clickLink('_qf_Group_next-bottom');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
     $gid = $this->urlArg('gid');
-    $this->click('newCustomField');
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     // create custom field "alphanumeric text"
