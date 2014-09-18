@@ -295,7 +295,7 @@ class CRM_Core_Form_RecurringEntity {
           'entity_table' => 'civicrm_event'
         ),
         'linkedColumns' => array('entity_id'),
-        'isRecurringEntityRecord' => TRUE,
+        'isRecurringEntityRecord' => FALSE,
       ),
       array(
         'table'         => 'civicrm_uf_join',
@@ -304,7 +304,7 @@ class CRM_Core_Form_RecurringEntity {
           'entity_table' => 'civicrm_event'
         ),
         'linkedColumns' => array('entity_id'),
-        'isRecurringEntityRecord' => TRUE,
+        'isRecurringEntityRecord' => FALSE,
       ),
       array(
         'table'         => 'civicrm_tell_friend',
