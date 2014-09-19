@@ -197,8 +197,12 @@
       var first = val.charAt(0),
         last = val.slice(-1);
       // Simple types
-      if (val === 'true' || val === 'false' || val === 'null' || !isNaN(val)) {
+      if (val === 'true' || val === 'false' || val === 'null') {
         return eval(val);
+      }
+      // Integers - quote any number that starts with 0 to avoid oddities
+      if (!isNaN(val) && val.search(/[^\d]/) < 0 && (val.length === 1 || first !== '0')) {
+        return parseInt(val, 10);
       }
       // Quoted strings
       if ((first === '"' || first === "'") && last === first) {
