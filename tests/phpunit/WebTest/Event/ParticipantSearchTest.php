@@ -178,7 +178,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     // visit event search page
     $this->openCiviPage("event/search", "reset=1");
 
-    $this->select("xpath=//div[@id='Food_Preference']/div[2]/table/tbody/tr/td[2]//select", 'Chicken Combo');
+    $this->select("css=select[data-crm-custom='Food_Preference:Soup_Selection']", 'Chicken Combo');
 
     $this->clickLink("_qf_Search_refresh");
 
@@ -189,7 +189,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
 
     $this->_checkStrings($stringsToCheck);
 
-    $this->select("xpath=//div[@id='Food_Preference']/div[2]/table/tbody/tr/td[2]//select", 'Salmon Stew');
+    $this->select("css=select[data-crm-custom='Food_Preference:Soup_Selection']", 'Salmon Stew');
     $this->clickLink("_qf_Search_refresh");
 
     $stringsToCheck = array("Soup Selection = Salmon Stew");
