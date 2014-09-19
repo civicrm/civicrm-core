@@ -401,7 +401,16 @@
     //Exclude list function
     function addToExcludeList(val) {
       if(val !== ""){
-        cj('#exclude_date_list').append('<option>'+val+'</option>');
+        var exists = false;
+        for(var i = 0, opts = document.getElementById('exclude_date_list').options; i < opts.length; ++i){
+          if(opts[i].text == val){
+            exists = true;
+            break;
+          }
+        }
+        if (exists == false){
+          cj('#exclude_date_list').append('<option>'+val+'</option>');
+        }
       }
     }
     
