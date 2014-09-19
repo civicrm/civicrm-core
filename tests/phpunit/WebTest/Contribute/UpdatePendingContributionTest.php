@@ -191,8 +191,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
    */
   function _testOnlineContribution($firstName, $lastName, $email) {
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $processorType = 'Dummy';
     $pageTitle = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);

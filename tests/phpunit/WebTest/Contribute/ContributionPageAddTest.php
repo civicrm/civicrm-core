@@ -39,7 +39,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $rand = 2 * rand(2, 50);
     $pageTitle = 'Donate Online ' . $hash;
     // create contribution page with randomized title and default params
-    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array("Webtest Dummy" . substr(sha1(rand()), 0, 7) => 'Dummy'), TRUE, TRUE, 'required');
+    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array('Test Processor' => 'Dummy'), TRUE, TRUE, 'required');
 
     $this->openCiviPage("admin/contribute", "reset=1");
 
@@ -94,7 +94,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $rand = 2 * rand(2, 50);
     $pageTitle = 'Donate Online ' . $hash;
     // create contribution page with randomized title and default params
-    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array("Webtest Dummy" . substr(sha1(rand()), 0, 7) => 'Dummy'), TRUE, TRUE, 'required');
+    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array('Test Processor' => 'Dummy'), TRUE, TRUE, 'required');
 
     $this->openCiviPage("admin/contribute", "reset=1");
 
@@ -152,7 +152,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $pageTitle = 'Donate Online ' . $hash;
 
     // create contribution page with randomized title, default params and separate payment for Membership and Contribution
-    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array("Webtest Dummy" . substr(sha1(rand()), 0, 7) => 'Dummy'),
+    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array('Test Processor' => 'Dummy'),
       TRUE, TRUE, 'required', TRUE, FALSE, TRUE, NULL, TRUE,
       1, 7, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE
     );
@@ -292,7 +292,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $hash = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
     $pageTitle = 'Donate Online ' . $hash;
-    $processor = array("Webtest Dummy" . substr(sha1(rand()), 0, 7) => 'Dummy');
+    $processor = array('Test Processor' => 'Dummy');
 
     // Create a new payment processor
     while (list($processorName, $processorType) = each($processor)) {

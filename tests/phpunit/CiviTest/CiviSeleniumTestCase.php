@@ -721,17 +721,16 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @return int
    */
 
-  function webtestAddPaymentProcessor($processorName, $processorType = 'Dummy', $processorSettings = NULL, $financialAccount = 'Deposit Bank Account') {
+  function webtestAddPaymentProcessor($processorName = 'Test Processor', $processorType = 'Dummy', $processorSettings = NULL, $financialAccount = 'Deposit Bank Account') {
     if (!$processorName) {
       $this->fail("webTestAddPaymentProcessor requires $processorName.");
     }
-    if ($processorType == 'Dummy') {
-      $processorSettings = array(
-        'user_name' => 'dummy',
-        'url_site' => 'http://dummy.com',
-        'test_user_name' => 'dummytest',
-        'test_url_site' => 'http://dummytest.com',
-      );
+    if ($processorName === 'Test Processor') {
+      // Use the default test processor, no need to create a new one
+      $this->openCiviPage('admin/paymentProcessor', 'action=update&id=1&reset=1');
+      $this->check('is_default');
+      $this->clickLink('_qf_PaymentProcessor_next-bottom');
+      return 1;
     }
     elseif ($processorType == 'AuthNet') {
       // FIXME: we 'll need to make a new separate account for testing
@@ -970,7 +969,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   function webtestAddContributionPage($hash = NULL,
                                       $rand = NULL,
                                       $pageTitle = NULL,
-                                      $processor = array('Dummy Processor' => 'Dummy'),
+                                      $processor = array('Test Processor' => 'Dummy'),
                                       $amountSection = TRUE,
                                       $payLater = TRUE,
                                       $onBehalf = TRUE,
@@ -2113,15 +2112,17 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->waitForTextPresent("{$customGroupTitle} - New Field");
 
       $fieldLabel = "custom_field_for_{$customSet['entity']}_{$customSet['subEntity']}" . substr(sha1(rand()), 0, 4);
+      $this->waitForElementPresent('label');
       $this->type('label', $fieldLabel);
       $this->click('_qf_Field_done-bottom');
-      $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
 
+      $this->waitForText('crm-notification-container', $fieldLabel);
+      $this->waitForAjaxContent();
+
+      $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
       $return[] = array(
         "{$customSet['entity']}_{$customSet['subEntity']}" => array('cgtitle' => $customGroupTitle, 'gid' => $gid, 'triggerElement' => $customSet['triggerElement']));
     }
-    // Avoid weird qf_key bug when going straight from here to the next form
-    $this->openCiviPage('');
     return $return;
   }
 

@@ -77,8 +77,8 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $conPcp = FALSE;
     $conIsAprovalNeeded = TRUE;
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
 
     //create contribution page for event pcp with campaign type as contribution
     $contributionPageId = $this->webtestAddContributionPage($conHash,
@@ -490,8 +490,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
     $this->select2("event_id", $eventName);
 
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Search_refresh");
 
     $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody/tr[1]/td[@class='crm-participant-sort_name']/a[text()='{$sortName}']/../../td[11]/span/a[text()='View']", "xpath=//table[@class='selector row-highlight']/tbody/tr/td[8]/span/a[text()='View']", FALSE);
     $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr/td[8]/span/a[text()='View']");
