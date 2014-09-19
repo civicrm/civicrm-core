@@ -133,11 +133,11 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
    $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
    $this->waitForElementPresent("xpath=//a[@id='newfinancialTypeAccount']");
-   $this->clickLink("xpath=//a[@id='newfinancialTypeAccount']", "_qf_FinancialTypeAccount_cancel-botttom", FALSE);
+   $this->clickAjaxLink("xpath=//a[@id='newfinancialTypeAccount']", "_qf_FinancialTypeAccount_cancel-botttom");
    $this->select("account_relationship", "label=Premiums Inventory Account is");
    $this->waitForElementPresent("xpath=//select[@id='financial_account_id']/option[3][text()='Deposit Bank Account']");
    $this->select("financial_account_id", "label=$to");
-   $this->clickLink("_qf_FinancialTypeAccount_next-botttom", "xpath=//a[@id='newfinancialTypeAccount']", FALSE);
+   $this->clickAjaxLink("_qf_FinancialTypeAccount_next-botttom", "xpath=//a[@id='newfinancialTypeAccount']");
 
    $premiumName = 'Premium'.substr(sha1(rand()), 0, 7);
    $amount = 500;
@@ -167,23 +167,22 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    // total amount
    $this->type("total_amount", "100");
    // fill Premium information
-   $this->clickLink("xpath=//div[@id='Premium']", "product_name_0", FALSE);
+   $this->clickAjaxLink("xpath=//div[@id='Premium']", "product_name_0");
    $this->select('product_name_0', "label=$premiumName ( $sku )");
    // Clicking save.
-   $this->clickLink("_qf_Contribution_upload");
+   $this->clickAjaxLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
    // Is status message correct?
-   $this->waitForText('crm-notification-container', "The contribution record has been saved.");
+   $this->checkCRMAlert("The contribution record has been saved.");
    // verify if Contribution is created
-   $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
    //click through to the Contribution edit screen
    $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
    $contId = explode('&', $contId[1]);
    $contId = $contId[0];
-   $this->clickLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", "_qf_Contribution_upload-bottom", FALSE);
+   $this->clickAjaxLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", "_qf_Contribution_upload-bottom");
    $this->waitForElementPresent("product_name_0");
    $this->select('product_name_0', "label=$premiumName2 ( $sku2 )");
    // Clicking save.
-   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[7][text()='$premiumName2']", FALSE);
+   $this->clickAjaxLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[7][text()='$premiumName2']");
    $this->checkCRMAlert("The contribution record has been saved.");
 
    //Assertions
@@ -296,13 +295,13 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $amount = 100.00;
    $this->_testOfflineContribution($firstName, $lastName, $email, $amount);
    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']");
-   $this->clickLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom', FALSE);
+   $this->clickAjaxLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom');
    //Contribution status
    $this->select("contribution_status_id", "label=Refunded");
    $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
    $contId = explode('&', $contId[1]);
    $contId = $contId[0];
-   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[6][text()='Refunded']", FALSE);
+   $this->clickAjaxLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[6][text()='Refunded']");
 
    //Assertions
    $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
