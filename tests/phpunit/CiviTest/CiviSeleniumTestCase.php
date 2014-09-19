@@ -251,6 +251,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Force a link to open full-page, even if it would normally open in a popup
+   * @note: works with links only, not buttons
    * @param string $element
    * @param string $waitFor
    */
@@ -264,13 +265,16 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Wait for ajax snippets to finish loading
+   * Wait for all ajax snippets to finish loading
    */
   function waitForAjaxContent() {
-    // Add sleep to prevent condition where we click an ajax button and call this function before the content has even started loading
-    // TODO: When test suite is more stable, try removing sleep() and see if it breaks anything
-    sleep(1);
     $this->waitForElementNotPresent('css=.blockOverlay');
+    // Some ajax calls happen in pairs (e.g. submit a popup form then refresh the underlying content)
+    // So we'll wait a sec and recheck to see if any more stuff is loading
+    sleep(1);
+    if ($this->isElementPresent('css=.blockOverlay')) {
+      $this->waitForAjaxContent();
+    }
   }
 
   /**
@@ -2015,8 +2019,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->select('protocol', "IMAP");
       $this->type('server', 'localhost');
       $this->type('domain', 'example.com');
-      $this->click('_qf_MailSettings_next-top');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->clickLink('_qf_MailSettings_next-top');
     }
   }
 
@@ -2134,6 +2137,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
       $return[] = array(
         "{$customSet['entity']}_{$customSet['subEntity']}" => array('cgtitle' => $customGroupTitle, 'gid' => $gid, 'triggerElement' => $customSet['triggerElement']));
+
+      // Go home for a sec to give time for caches to clear
+      $this->openCiviPage('');
     }
     return $return;
   }
@@ -2166,6 +2172,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->waitForElementPresent("//*[@class='select2-result-label']");
       $this->clickAt("//*[contains(@class,'select2-result-selectable')]/div[contains(@class, 'select2-result-label')]");
     }
+    // Wait a sec for select2 to update the original element
+    sleep(1);
   }
 
   /**
@@ -2180,6 +2188,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->clickAt("xpath=//ul[@class='select2-results']//li/div[text()='$value']");
       $this->assertElementContainsText("xpath=//*[@id='$fieldid']/preceding-sibling::div[1]/", $value);
     }
+    // Wait a sec for select2 to update the original element
+    sleep(1);
   }
 
   /**
