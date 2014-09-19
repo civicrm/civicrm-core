@@ -407,12 +407,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @return mixed either a string with the (either generated or provided) email or null (if no email)
    */
   function webtestAddContact($fname = 'Anthony', $lname = 'Anderson', $email = NULL, $contactSubtype = NULL) {
-    $url = $this->sboxPath . 'civicrm/contact/add?reset=1&ct=Individual';
+    $args = 'reset=1&ct=Individual';
     if ($contactSubtype) {
-      $url = $url . "&cst={$contactSubtype}";
+      $args .= "&cst={$contactSubtype}";
     }
-    $this->open($url);
-    $this->waitForElementPresent('_qf_Contact_upload_view-bottom');
+    $this->openCiviPage('contact/add', $args, '_qf_Contact_upload_view-bottom');
     $this->type('first_name', $fname);
     $this->type('last_name', $lname);
     if ($email === TRUE) {
@@ -421,9 +420,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if ($email) {
       $this->type('email_1_email', $email);
     }
-    $this->waitForElementPresent('_qf_Contact_upload_view-bottom');
-    $this->click('_qf_Contact_upload_view-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Contact_upload_view-bottom');
     return $email;
   }
 
@@ -434,7 +431,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @return null|string
    */
   function webtestAddHousehold($householdName = "Smith's Home", $email = NULL) {
-
     $this->openCiviPage("contact/add", "reset=1&ct=Household");
     $this->click('household_name');
     $this->type('household_name', $householdName);
@@ -446,8 +442,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->type('email_1_email', $email);
     }
 
-    $this->click('_qf_Contact_upload_view');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Contact_upload_view');
     return $email;
   }
 
@@ -459,12 +454,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @return null|string
    */
   function webtestAddOrganization($organizationName = "Organization XYZ", $email = NULL, $contactSubtype = NULL) {
-
-    $url = $this->sboxPath . 'civicrm/contact/add?reset=1&ct=Organization';
+    $args = 'reset=1&ct=Organization';
     if ($contactSubtype) {
-      $url = $url . "&cst={$contactSubtype}";
+      $args .= "&cst={$contactSubtype}";
     }
-    $this->open($url);
+    $this->openCiviPage('contact/add', $args, '_qf_Contact_upload_view-bottom');
     $this->click('organization_name');
     $this->type('organization_name', $organizationName);
 
@@ -474,8 +468,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if ($email) {
       $this->type('email_1_email', $email);
     }
-    $this->click('_qf_Contact_upload_view');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Contact_upload_view');
     return $email;
   }
 
@@ -798,7 +791,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $paymentProcessorLink = $this->getAttribute("xpath=//table[@class='selector row-highlight']//tbody//tr/td[text()='{$processorName}']/../td[7]/span/a[1]@href");
     return $this->urlArg('id', $paymentProcessorLink);
   }
- 
+
   function webtestAddCreditCardDetails() {
     $this->waitForElementPresent('credit_card_type');
     $this->select('credit_card_type', 'label=Visa');
@@ -1926,7 +1919,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     else {
       $text = "The financial type \"{$financialType['name']}\" has been updated.";
     }
-    $this->assertSuccessMsg($text);
+    $this->checkCRMAlert($text);
   }
 
   /**
@@ -2193,20 +2186,23 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Wait for unobtrusive status message as set by CRM.status
+   * Check for unobtrusive status message as set by CRM.status
    */
-  function waitForStatusMsg() {
+  function checkCRMStatus($text=NULL) {
     $this->waitForElementPresent("css=.crm-status-box-outer.status-success");
+    if ($text) {
+      $this->assertElementContainsText("css=.crm-status-box-outer.status-success", $text);
+    }
   }
-  
+
   /**
-   * Wait for unobtrusive status message as set by CRM.status
+   * Check for obtrusive status message as set by CRM.alert
    */
-  function assertSuccessMsg($text) {
-    $this->waitForElementPresent("css=div.success");
-    $this->assertElementContainsText("css=div.success", $text);
+  function checkCRMAlert($text, $type='success') {
+    $this->waitForElementPresent("css=div.ui-notify-message.$type");
+    $this->waitForText("css=div.ui-notify-message.$type", $text);
   }
-  
+
   /**
    * function to enable or disable Pop-ups via Display Preferences
    */
@@ -2217,7 +2213,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         $this->click('ajaxPopupsEnabled');
     }
     if ($enabled) {
-      $this->assertChecked('ajaxPopupsEnabled');      
+      $this->assertChecked('ajaxPopupsEnabled');
     }
     else {
       $this->assertNotChecked('ajaxPopupsEnabled');

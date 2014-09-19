@@ -184,7 +184,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->select('product_name_0', "label=$premiumName2 ( $sku2 )");
    // Clicking save.
    $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[7][text()='$premiumName2']", FALSE);
-   $this->assertSuccessMsg("The contribution record has been saved.");
+   $this->checkCRMAlert("The contribution record has been saved.");
 
    //Assertions
    $actualAmount = $this->_getPremiumActualCost($contId, $to, $from, $cost2, "'civicrm_contribution'");
