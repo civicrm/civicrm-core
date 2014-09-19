@@ -82,7 +82,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
 
     //search groups using created by
     $this->type('created_by', $createdBy);
-    $this->clickLink('_qf_Search_refresh');
+    $this->click('_qf_Search_refresh');
 
     //show maximum no. of groups on first result set page
     //as many groups can be created by same creator

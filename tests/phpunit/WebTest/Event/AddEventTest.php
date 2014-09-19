@@ -448,7 +448,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     }
 
     if ($processorName) {
-      $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
+      $this->check("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']/../input");
     }
     $this->select("financial_type_id", "value=4");
     if ($priceSet) {
