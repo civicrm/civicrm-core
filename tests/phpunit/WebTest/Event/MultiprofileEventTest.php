@@ -47,8 +47,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $email1 = $firstName . "@test.com";
     $email2 = $participantfname . "@test.com";
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     //add email to name and address profile
@@ -147,8 +147,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $email3 = $participantfname2 . "@test.com";
     $email4 = $firstName2 . "@test.com";
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     //add email field to name and address profile

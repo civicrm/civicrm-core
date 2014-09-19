@@ -46,8 +46,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=2", "_qf_Amount_next");
@@ -220,8 +220,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=2", '_qf_Amount_next');
@@ -414,8 +414,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     preg_match('/id=([0-9]+)/', $url, $matches);
     $membershipTypeId = $matches[1];
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
 
     // create contribution page with randomized title and default params
     $hash = substr(sha1(rand()), 0, 7);
