@@ -297,8 +297,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select("campaign_survey_id", "label=Survey $title");
 
     $this->waitForElementPresent('_qf_Search_refresh');
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Search_refresh");
     $this->waitForText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]",'1 Result');
   }
 
