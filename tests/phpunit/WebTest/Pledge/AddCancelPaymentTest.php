@@ -76,7 +76,8 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     );
     //Edit and add the first payment for 300.00
     $this->click('_qf_PledgeView_next-bottom');
-    sleep(1);
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
     $this->click("xpath=//div[@class='view-content']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a");
@@ -106,7 +107,7 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     $this->click("_qf_ContributionView_cancel-bottom");
 
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    sleep(1);
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]");
 

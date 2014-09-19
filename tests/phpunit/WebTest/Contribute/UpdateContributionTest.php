@@ -279,6 +279,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    //change payment processor to newly created value
    $this->select("payment_instrument_id", "label=$label");
    $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
+   $this->waitForAjaxContent();
    //Assertions
    $subtractedTotal = $this->_getPremiumActualCost($contId, NULL, 'Payment Processor Account');
    $this->assertEquals($subtractedTotal, -$amount, "Verify amount deleted from old account");
