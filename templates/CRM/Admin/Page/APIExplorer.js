@@ -126,6 +126,7 @@
    */
   function getActions() {
     if (entity) {
+      $('#api-action').addClass('loading');
       CRM.api3(entity, 'getactions').done(function(data) {
         actions = data.values || ['get'];
         populateActions();
@@ -142,7 +143,7 @@
    */
   function populateActions(el) {
     var val = $('#api-action').val();
-    $('#api-action').select2({
+    $('#api-action').removeClass('loading').select2({
       data: _.transform(actions, function(ret, item) {ret.push({text: item, id: item})})
     });
     // If previously selected action is not available, set it to 'get' if possible
