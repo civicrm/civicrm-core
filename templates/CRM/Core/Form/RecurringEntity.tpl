@@ -108,236 +108,230 @@
     #start_action_offset{
         width: 40px;
     }
-    /*input[disabled="disabled"], select[disabled="disabled"]{
-        background-color: #EBEBE4 !important;
-    }*/
 </style>
 <script type="text/javascript">
   cj(document).ready(function() {
-      cj('#repetition_start_date_display').closest("tr").hide();
+    cj('#repetition_start_date_display').closest("tr").hide();
     /****** On load "Repeats By" and "Repeats On" blocks should be hidden if dropdown value is not week or month****** (Edit Mode)***/
     if(cj('#repetition_frequency_unit').val() == "week"){
-        cj('.crm-core-form-recurringentity-block-start_action_condition').show();
-        cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
+      cj('.crm-core-form-recurringentity-block-start_action_condition').show();
+      cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
     }else if(cj('#repetition_frequency_unit').val() == "month"){
-        cj('.crm-core-form-recurringentity-block-repeats_by td').show();
-        cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
+      cj('.crm-core-form-recurringentity-block-repeats_by td').show();
+      cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
     }else{
-        cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
-        cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
+      cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
+      cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
     }
     cj("#repeats-every-text").html(cj('#repetition_frequency_unit').val()+'(s)');
     
     /***********On Load Set Ends Value (Edit Mode) **********/
     if(cj('input:radio[name=ends]:checked').val() == 1){
-        cj('#start_action_offset').removeAttr('disabled').attr('enabled','enabled');
-        cj('#repeat_absolute_date_display').removeAttr("enabled").attr('disabled','disabled');
-        cj('#repeat_absolute_date_display').val('');
+      cj('#start_action_offset').removeAttr('disabled').attr('enabled','enabled');
+      cj('#repeat_absolute_date_display').removeAttr("enabled").attr('disabled','disabled');
+      cj('#repeat_absolute_date_display').val('');
     }else if(cj('input:radio[name=ends]:checked').val() == 2){
-        cj('#repeat_absolute_date_display').removeAttr("disabled").attr('enabled','enabled');
-        cj('#start_action_offset').removeAttr('enabled').attr('disabled','disabled');
-        cj('#start_action_offset').val('');
+      cj('#repeat_absolute_date_display').removeAttr("disabled").attr('enabled','enabled');
+      cj('#start_action_offset').removeAttr('enabled').attr('disabled','disabled');
+      cj('#start_action_offset').val('');
     }else{
-        cj('#start_action_offset').removeAttr('enabled').attr('disabled','disabled');
-        cj('#repeat_absolute_date_display').removeAttr('enabled').attr('disabled','disabled');
+      cj('#start_action_offset').removeAttr('enabled').attr('disabled','disabled');
+      cj('#repeat_absolute_date_display').removeAttr('enabled').attr('disabled','disabled');
     }
 
     /******On Load set Repeats by section******************/
     if(cj('input:radio[name=repeats_by]:checked').val() == 1){
-        cj('#limit_to').removeAttr('disabled').attr('enabled','enabled');
-        cj('#entity_status_1, #entity_status_2').removeAttr("enabled").attr('disabled','disabled');
+      cj('#limit_to').removeAttr('disabled').attr('enabled','enabled');
+      cj('#entity_status_1, #entity_status_2').removeAttr("enabled").attr('disabled','disabled');
     }else if(cj('input:radio[name=repeats_by]:checked').val() == 2){
-        cj('#entity_status_1, #entity_status_2').removeAttr("disabled").attr('enabled','enabled');
-        cj('#limit_to').removeAttr('enabled').attr('disabled','disabled');
+      cj('#entity_status_1, #entity_status_2').removeAttr("disabled").attr('enabled','enabled');
+      cj('#limit_to').removeAttr('enabled').attr('disabled','disabled');
     }else{
-        //Just in-case block shows up, disable it
-        cj('#limit_to, #entity_status_1, #entity_status_2').removeAttr('enabled').attr('disabled','disabled');
+      //Just in-case block shows up, disable it
+      cj('#limit_to, #entity_status_1, #entity_status_2').removeAttr('enabled').attr('disabled','disabled');
     }
     
     cj('#repetition_frequency_unit').change(function () {
-        if(cj(this).val()==='hour'){
-            cj('#repeats-every-text').html(cj(this).val()+'(s)');
-            cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
-            cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
-        }else if(cj(this).val()==='day'){
-            cj('#repeats-every-text').html(cj(this).val()+'(s)');
-            cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
-            cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
-        }else if(cj(this).val()==='week'){
-            cj('#repeats-every-text').html(cj(this).val()+'(s)');
-            //Show "Repeats On" block when week is selected 
-            cj('.crm-core-form-recurringentity-block-start_action_condition').show();
-            cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
-        }else if(cj(this).val()==='month'){
-            cj('#repeats-every-text').html(cj(this).val()+'(s)');
-            cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
-            //Show "Repeats By" block when month is selected 
-            cj('.crm-core-form-recurringentity-block-repeats_by td').show();
-        }else if(cj(this).val()==='year'){
-            cj('#repeats-every-text').html(cj(this).val()+'(s)');
-            cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
-            cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
-        }
+      if(cj(this).val()==='hour'){
+        cj('#repeats-every-text').html(cj(this).val()+'(s)');
+        cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
+        cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
+      }else if(cj(this).val()==='day'){
+        cj('#repeats-every-text').html(cj(this).val()+'(s)');
+        cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
+        cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
+      }else if(cj(this).val()==='week'){
+        cj('#repeats-every-text').html(cj(this).val()+'(s)');
+        //Show "Repeats On" block when week is selected 
+        cj('.crm-core-form-recurringentity-block-start_action_condition').show();
+        cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
+      }else if(cj(this).val()==='month'){
+        cj('#repeats-every-text').html(cj(this).val()+'(s)');
+        cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
+        //Show "Repeats By" block when month is selected 
+        cj('.crm-core-form-recurringentity-block-repeats_by td').show();
+      }else if(cj(this).val()==='year'){
+        cj('#repeats-every-text').html(cj(this).val()+'(s)');
+        cj('.crm-core-form-recurringentity-block-start_action_condition').hide();
+        cj('.crm-core-form-recurringentity-block-repeats_by td').hide();
+      }
     });
     
     // For "Ends" block
     cj('input:radio[name=ends]').click(function() {
-        if(cj(this).val() == 1){
-            cj('#start_action_offset').removeAttr('disabled').attr('enabled','enabled');
-            cj('#repeat_absolute_date_display').val('');
-        }else if(cj(this).val() == 2){
-            cj('#repeat_absolute_date_display').removeAttr('disabled').attr('enabled','enabled');
-            cj('#start_action_offset').val('');
-        }else{
-            cj('#repeat_absolute_date_display').removeAttr('enabled').attr('disabled','disabled');
-        }
+      if(cj(this).val() == 1){
+        cj('#start_action_offset').removeAttr('disabled').attr('enabled','enabled');
+        cj('#repeat_absolute_date_display').val('');
+      }else if(cj(this).val() == 2){
+        cj('#repeat_absolute_date_display').removeAttr('disabled').attr('enabled','enabled');
+        cj('#start_action_offset').val('');
+      }else{
+        cj('#repeat_absolute_date_display').removeAttr('enabled').attr('disabled','disabled');
+      }
     });
-    //cj('#start_action_offset').attr('disabled','disabled');
-    //cj('#repeat_absolute_date_display').attr('disabled','disabled');
     
     //For "Repeats By" block
     cj('input:radio[name=repeats_by]').click(function() {
-        if(cj(this).val() == 1){
-            cj('#limit_to').removeAttr('disabled').attr('enabled','enabled');
-        }else{
-            cj('#limit_to').removeAttr('enabled').attr('disabled','disabled');
-        }
-        if(cj(this).val() == 2){
-            cj('#entity_status_1').removeAttr('disabled').attr('enabled','enabled');
-            cj('#entity_status_2').removeAttr('disabled').attr('enabled','enabled');
-        }else{
-            cj('#entity_status_1').removeAttr('enabled').attr('disabled','disabled');
-            cj('#entity_status_2').removeAttr('enabled').attr('disabled','disabled');
-        }
+      if(cj(this).val() == 1){
+        cj('#limit_to').removeAttr('disabled').attr('enabled','enabled');
+      }else{
+        cj('#limit_to').removeAttr('enabled').attr('disabled','disabled');
+      }
+      if(cj(this).val() == 2){
+        cj('#entity_status_1').removeAttr('disabled').attr('enabled','enabled');
+        cj('#entity_status_2').removeAttr('disabled').attr('enabled','enabled');
+      }else{
+        cj('#entity_status_1').removeAttr('enabled').attr('disabled','disabled');
+        cj('#entity_status_2').removeAttr('enabled').attr('disabled','disabled');
+      }
     });
     
     //Select all options in selectbox before submitting
     cj(this).submit(function() {
-        cj('#exclude_date_list option').attr('selected',true);
-        
-        //Check form for values submitted
-        if(cj('input[name=ends]:checked').val() == 1){
-            if(cj('#start_action_offset').val() == ""){
-                if(!cj('span#start_action_offset-error').length){
-                    cj('#start_action_offset').after('<span id ="start_action_offset-error" class="crm-error"> This is a required field.</span>');
-                    //Check if other message already present, hide it
-                    cj('span#repeat_absolute_date_display-error').toggle();
-                }
-                return false;
-            }
-        }else if (cj('input[name=ends]:checked').val() == 2){
-            if(cj('#repeat_absolute_date_display').val() == ""){
-                if(!cj('span#repeat_absolute_date_display-error').length){
-                    cj('#repeat_absolute_date_display').after('<span id="repeat_absolute_date_display-error" class="crm-error"> This is a required field.</span>');
-                    //Check if other message already present, hide it
-                    cj('span#start_action_offset-error').toggle();
-                }
-                return false;
-            }
+      cj('#exclude_date_list option').attr('selected',true);
+
+      //Check form for values submitted
+      if(cj('input[name=ends]:checked').val() == 1){
+        if(cj('#start_action_offset').val() == ""){
+          if(!cj('span#start_action_offset-error').length){
+              cj('#start_action_offset').after('<span id ="start_action_offset-error" class="crm-error"> This is a required field.</span>');
+              //Check if other message already present, hide it
+              cj('span#repeat_absolute_date_display-error').toggle();
+          }
+          return false;
         }
+      }else if (cj('input[name=ends]:checked').val() == 2){
+        if(cj('#repeat_absolute_date_display').val() == ""){
+          if(!cj('span#repeat_absolute_date_display-error').length){
+            cj('#repeat_absolute_date_display').after('<span id="repeat_absolute_date_display-error" class="crm-error"> This is a required field.</span>');
+            //Check if other message already present, hide it
+            cj('span#start_action_offset-error').toggle();
+          }
+          return false;
+        }
+      }
         
     });
         
     //Dialog for preview repeat Configuration dates
     cj('#preview-dialog').dialog({ autoOpen: false });
     cj('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom').click( function (){
-        cj('#exclude_date_list option').attr('selected',true);
-        //Copy exclude dates
-        var dateTxt=[];
-        cj('#exclude_date_list option:selected').each(function(){
-            dateTxt.push(cj(this).text());
-        });
-        var completeDateText = dateTxt.join(',');
-        cj('#copyExcludeDates').val(completeDateText);
-        
-        cj('#generated_dates').html('').html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Just a moment, generating dates{/ts}{literal}...</span></div>');
-        cj('#preview-dialog').dialog('open');
-        cj('#preview-dialog').dialog({
-            title: 'Confirm event dates',
-            width: '650',
-            position: 'center',
-            //draggable: false,
-            buttons: {
-                Ok: function() {
-                    cj(this).dialog( "close" );
-                    cj('form#Repeat').submit();
-                },
-                Cancel: function() { //cancel
-                    cj(this).dialog( "close" );
-                }
-            }
-        });
-        var ajaxurl = CRM.url("civicrm/ajax/recurringentity/generate-preview");
-        var eventID = {/literal}{$currentEntityId}{literal};
-        if(eventID != ""){
-            ajaxurl += "?event_id="+eventID;
-        }
-        var formData = cj('form').serializeArray();
-        cj.ajax({
-          dataType: "json",
-          type: "POST",
-          data: formData,
-          url:  ajaxurl,
-          success: function (result) {
-             var errors = [];
-             var participantData = [];
-             var html = 'Based on your repeat configuration here is the list of event dates, Do you wish to proceed creating events for these dates?<br/><table id="options" class="display"><thead><tr><th>Sr No</th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
-             var count = 1;
-             for(var i in result) {
-                if(i != 'errors'){
-                    if(i == 'participantData'){
-                        participantData = result.participantData;
-                        break;
-                    }
-                    var start_date = result[i].start_date;
-                    var end_date = result[i].end_date;
+      cj('#exclude_date_list option').attr('selected',true);
+      //Copy exclude dates
+      var dateTxt=[];
+      cj('#exclude_date_list option:selected').each(function(){
+          dateTxt.push(cj(this).text());
+      });
+      var completeDateText = dateTxt.join(',');
+      cj('#copyExcludeDates').val(completeDateText);
 
-                    var end_date_text = '';
-                    if(end_date !== undefined){
-                       end_date_text = '<td>'+end_date+'</td>';
-                    }
-                    html += '<tr><td>'+count+'</td><td>'+start_date+'</td>'+end_date_text+'</tr>';
-                    count = count + 1;
-                }else{
-                    errors = result.errors;
-                }
-            }
-            html += '</table>';
-            var warningHtml = '';
-            if(Object.keys(participantData).length > 0){               
-                warningHtml += '<div class="messages status no-popup"><div class="icon inform-icon"></div>&nbsp;There are registrations for the repeating events already present in the set, continuing with the process would unlink them and repeating events without registration would be trashed. </div><table id="options" class="display"><thead><tr><th>Event ID</th><th>Event</th><th>Participant Count</th></tr><thead>';
-                for (var id in participantData) {
-                    for(var data in participantData[id]){
-                    warningHtml += '<tr><td>'+id+'</td><td> <a href="{/literal}{crmURL p="civicrm/event/manage/settings" q="reset=1&action=update&id="}{literal}'+id+'{/literal}{literal}">'+data+'</a></td><td><a href="{/literal}{crmURL p='civicrm/event/search' q="reset=1&force=1&status=true&event="}{literal}'+id+'{/literal}{literal}">'+participantData[id][data]+'</a></td></tr>';
-                    }
-                }
-                warningHtml += '</table><br/>';
-            }
-            if(errors.length > 0){
-                html = '';
-                for (var j = 0; j < errors.length; j++) {
-                    html += '<span style="color: #8A1F11;">*&nbsp;' + errors[j] + '</span><br/>';
-                }
-            }
-            if(warningHtml != ""){
-                cj('#generated_dates').append(warningHtml).append(html);
-            }else{
-                cj('#generated_dates').html(html);
-            }
-            if(end_date_text == ""){
-                cj('#th-end-date').hide();
-            }
-            if(cj("#preview-dialog").height() >= 300){
-                cj('#preview-dialog').css('height', '300');
-                cj('#preview-dialog').css('overflow-y', 'auto');
-            }
-                
+      cj('#generated_dates').html('').html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Just a moment, generating dates{/ts}{literal}...</span></div>');
+      cj('#preview-dialog').dialog('open');
+      cj('#preview-dialog').dialog({
+        title: 'Confirm event dates',
+        width: '650',
+        position: 'center',
+        //draggable: false,
+        buttons: {
+          Ok: function() {
+              cj(this).dialog( "close" );
+              cj('form#Repeat').submit();
           },
-          complete: function(){
-            cj('div.crm-loading-element').hide();
+          Cancel: function() { //cancel
+              cj(this).dialog( "close" );
           }
-        });
-        return false;
+        }
+      });
+      var ajaxurl = CRM.url("civicrm/ajax/recurringentity/generate-preview");
+      var eventID = {/literal}{$currentEntityId}{literal};
+      if(eventID != ""){
+          ajaxurl += "?event_id="+eventID;
+      }
+      var formData = cj('form').serializeArray();
+      cj.ajax({
+        dataType: "json",
+        type: "POST",
+        data: formData,
+        url:  ajaxurl,
+        success: function (result) {
+          var errors = [];
+          var participantData = [];
+          var html = 'Based on your repeat configuration here is the list of event dates, Do you wish to proceed creating events for these dates?<br/><table id="options" class="display"><thead><tr><th>Sr No</th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
+          var count = 1;
+          for(var i in result) {
+            if(i != 'errors'){
+              if(i == 'participantData'){
+                participantData = result.participantData;
+                break;
+              }
+              var start_date = result[i].start_date;
+              var end_date = result[i].end_date;
+
+              var end_date_text = '';
+              if(end_date !== undefined){
+                end_date_text = '<td>'+end_date+'</td>';
+              }
+              html += '<tr><td>'+count+'</td><td>'+start_date+'</td>'+end_date_text+'</tr>';
+              count = count + 1;
+            }else{
+              errors = result.errors;
+            }
+          }
+          html += '</table>';
+          var warningHtml = '';
+          if(Object.keys(participantData).length > 0){               
+            warningHtml += '<div class="messages status no-popup"><div class="icon inform-icon"></div>&nbsp;There are registrations for the repeating events already present in the set, continuing with the process would unlink them and repeating events without registration would be trashed. </div><table id="options" class="display"><thead><tr><th>Event ID</th><th>Event</th><th>Participant Count</th></tr><thead>';
+            for (var id in participantData) {
+              for(var data in participantData[id]){
+              warningHtml += '<tr><td>'+id+'</td><td> <a href="{/literal}{crmURL p="civicrm/event/manage/settings" q="reset=1&action=update&id="}{literal}'+id+'{/literal}{literal}">'+data+'</a></td><td><a href="{/literal}{crmURL p='civicrm/event/search' q="reset=1&force=1&status=true&event="}{literal}'+id+'{/literal}{literal}">'+participantData[id][data]+'</a></td></tr>';
+              }
+            }
+            warningHtml += '</table><br/>';
+          }
+          if(errors.length > 0){
+            html = '';
+            for (var j = 0; j < errors.length; j++) {
+              html += '<span style="color: #8A1F11;">*&nbsp;' + errors[j] + '</span><br/>';
+            }
+          }
+          if(warningHtml != ""){
+            cj('#generated_dates').append(warningHtml).append(html);
+          }else{
+            cj('#generated_dates').html(html);
+          }
+          if(end_date_text == ""){
+            cj('#th-end-date').hide();
+          }
+          if(cj("#preview-dialog").height() >= 300){
+            cj('#preview-dialog').css('height', '300');
+            cj('#preview-dialog').css('overflow-y', 'auto');
+          }
+        },
+        complete: function(){
+          cj('div.crm-loading-element').hide();
+        }
+      });
+      return false;
     });
     
     //Build Summary
@@ -345,58 +339,58 @@
     var numberText = '';
     var interval = cj('#repetition_frequency_interval').val() + ' ';
     if(cj('#repetition_frequency_interval').val() == 1){
-        interval = '';
+      interval = '';
     }else{
-        numberText = 's';
+      numberText = 's';
     }
     finalSummary = "Every " + interval + cj('#repetition_frequency_unit option:selected').val() + numberText;
     
     //Case Week
     var dayOfWeek = new Array();
     if(cj('#repetition_frequency_unit option:selected').val() == "week"){
-        cj("input[name^='start_action_condition']:checked").each(function() {
-            var tempArray = new Array();
-            var thisID = cj(this).attr('id');
-            tempArray = thisID.split('_');
-            dayOfWeek.push(tempArray[3].substr(0, 1).toUpperCase() + tempArray[3].substr(1).toLowerCase());
-        });
-        finalSummary += ' on ' + dayOfWeek.join();
+      cj("input[name^='start_action_condition']:checked").each(function() {
+        var tempArray = new Array();
+        var thisID = cj(this).attr('id');
+        tempArray = thisID.split('_');
+        dayOfWeek.push(tempArray[3].substr(0, 1).toUpperCase() + tempArray[3].substr(1).toLowerCase());
+      });
+      finalSummary += ' on ' + dayOfWeek.join();
     }
     
     //Case Monthly
     if(cj('#repetition_frequency_unit option:selected').val() == "month"){
-        if(cj('input:radio[name=repeats_by]:checked').val() == 1){
-            finalSummary += ' on day ' + cj('#limit_to').val();
-        }
-        if(cj('input:radio[name=repeats_by]:checked').val() == 2){
-            finalSummary += ' on ' + cj('#entity_status_1').val().substr(0, 1).toUpperCase() + cj('#entity_status_1').val().substr(1).toLowerCase() + ' ' + cj('#entity_status_2').val().substr(0, 1).toUpperCase() + cj('#entity_status_2').val().substr(1).toLowerCase();
-        }
+      if(cj('input:radio[name=repeats_by]:checked').val() == 1){
+        finalSummary += ' on day ' + cj('#limit_to').val();
+      }
+      if(cj('input:radio[name=repeats_by]:checked').val() == 2){
+        finalSummary += ' on ' + cj('#entity_status_1').val().substr(0, 1).toUpperCase() + cj('#entity_status_1').val().substr(1).toLowerCase() + ' ' + cj('#entity_status_2').val().substr(0, 1).toUpperCase() + cj('#entity_status_2').val().substr(1).toLowerCase();
+      }
     }
     
     //Case Ends
     if(cj('input:radio[name=ends]:checked').val() == 1){
-        var timeText = ''
-        if(cj('#start_action_offset').val() != 1){
-            timeText = cj('#start_action_offset').val() + ' times';
-        }else{
-            timeText = ' once';
-        }
-        finalSummary += ', ' + timeText;
+      var timeText = ''
+      if(cj('#start_action_offset').val() != 1){
+        timeText = cj('#start_action_offset').val() + ' times';
+      }else{
+        timeText = ' once';
+      }
+      finalSummary += ', ' + timeText;
     }
     if(cj('input:radio[name=ends]:checked').val() == 2){
-        var monthNames = new Array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
-        var date = new Date(cj('#repeat_absolute_date_display').val());
-        function addOrdinal(d) {
-            if(d>3 && d<21) return 'th'; 
-            switch (d % 10) {
-                  case 1:  return "st";
-                  case 2:  return "nd";
-                  case 3:  return "rd";
-                  default: return "th";
-              }
-          } 
-        var newDate = monthNames[(date.getMonth())] + ' ' + date.getDate()+ addOrdinal() + ' ' +  date.getFullYear();
-        finalSummary += ', untill '+ newDate;
+      var monthNames = new Array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
+      var date = new Date(cj('#repeat_absolute_date_display').val());
+      function addOrdinal(d) {
+        if(d>3 && d<21) return 'th'; 
+        switch (d % 10) {
+          case 1:  return "st";
+          case 2:  return "nd";
+          case 3:  return "rd";
+          default: return "th";
+        }
+      } 
+      var newDate = monthNames[(date.getMonth())] + ' ' + date.getDate()+ addOrdinal() + ' ' +  date.getFullYear();
+      finalSummary += ', untill '+ newDate;
     }
     
     //Build/Attach final Summary
@@ -406,22 +400,22 @@
     
     //Exclude list function
     function addToExcludeList(val) {
-        if(val !== ""){
-            cj('#exclude_date_list').append('<option>'+val+'</option>');
-        }
+      if(val !== ""){
+        cj('#exclude_date_list').append('<option>'+val+'</option>');
+      }
     }
     
     function removeFromExcludeList(sourceID) {
-        var src = document.getElementById(sourceID);
-        for(var count= src.options.length-1; count >= 0; count--) {
-            if(src.options[count].selected == true) {
-                    try{
-                        src.remove(count, null);
-                    }catch(error){
-                        src.remove(count);
-                    }
-            }
+      var src = document.getElementById(sourceID);
+      for(var count= src.options.length-1; count >= 0; count--) {
+        if(src.options[count].selected == true) {
+          try{
+            src.remove(count, null);
+          }catch(error){
+            src.remove(count);
+          }
         }
+      }
     }
 </script>
 {/literal}  
