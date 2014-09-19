@@ -76,42 +76,43 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     );
     $this->click('_qf_PledgeView_next-bottom');
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
     $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->click("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->type('total_amount', '300.00');
     $this->click('_qf_Contribution_upload-bottom');
 
-    $this->waitForPageToLoad("30000");
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='Record Payment']");
     $this->click("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->click("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->type('total_amount', '250.00');
     $this->click('_qf_Contribution_upload-bottom');
-    $this->waitForPageToLoad("30000");
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a[text()='Record Payment']");
     $this->click("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->click("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
 
     $this->type('total_amount', '170.00');
     $this->click('_qf_Contribution_upload-bottom');
-    $this->waitForPageToLoad("30000");
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     // delete the contribution associated with the 2nd payment
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[2]/td[2]/table[@class='nestedSelector']/tbody/tr[3]/td[8]/a[text()='View Payment']");
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[2]/td[2]/table[@class='nestedSelector']/tbody/tr[3]/td[8]/a");
@@ -122,6 +123,7 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//li[@id='tab_pledge']/a");
     $this->click("xpath=//li[@id='tab_pledge']/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]");
 
