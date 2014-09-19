@@ -64,7 +64,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // go to tag tab and add to new tag
     $this->clickAjaxLink("css=li#tab_tag a", "css=div#tagtree");
     $this->click("xpath=//ul/li/span/label[text()=\"$tagName\"]");
-    $this->waitForStatusMsg();
+    $this->checkCRMStatus();
 
     // register for event ( auto add activity and contribution )
     $this->clickAjaxLink("link=Register for Event");
