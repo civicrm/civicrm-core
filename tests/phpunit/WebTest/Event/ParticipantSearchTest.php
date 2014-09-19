@@ -88,8 +88,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $crypticName = "foobardoogoo_" . md5(time());
     $this->type("sort_name", $crypticName);
 
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Search_refresh");
 
     $stringsToCheck = array(
       'No matches found for',
@@ -109,8 +108,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $eventName = "Fall Fundraiser Dinner";
     $this->select2("event_id", $eventName);
 
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Search_refresh");
 
     $stringsToCheck = array(
       "Event = $eventName",
@@ -132,8 +130,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('event_start_date_low', '-2 year');
     $this->webtestFillDate('event_end_date_high', '+1 year');
 
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Search_refresh");
 
     $stringsToCheck = array(
       "Start Date - greater than or equal to",
@@ -160,8 +157,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $eventTypeName = 'Fundraiser';
     $this->select2("event_type_id", $eventTypeName);
 
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Search_refresh");
 
     $stringsToCheck = array(
       "Start Date - greater than or equal to",
@@ -184,8 +180,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
 
     $this->select("xpath=//div[@id='Food_Preference']/div[2]/table/tbody/tr/td[2]//select", 'Chicken Combo');
 
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Search_refresh");
 
     // note since this is generated data
     // we are not sure if someone has this selection, so
@@ -195,8 +190,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->_checkStrings($stringsToCheck);
 
     $this->select("xpath=//div[@id='Food_Preference']/div[2]/table/tbody/tr/td[2]//select", 'Salmon Stew');
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Search_refresh");
 
     $stringsToCheck = array("Soup Selection = Salmon Stew");
 

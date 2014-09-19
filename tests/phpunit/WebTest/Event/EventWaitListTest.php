@@ -37,8 +37,8 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage("event/add", "reset=1&action=add");

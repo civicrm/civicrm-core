@@ -38,8 +38,8 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
   function testOnlineContributionAdd() {
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $processorType = 'Dummy';
     $pageTitle = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(10, 50);
@@ -181,8 +181,8 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
   function testOnlineContributionWithZeroAmount () {
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $processorType = 'Dummy';
     $pageTitle = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(10, 50);
