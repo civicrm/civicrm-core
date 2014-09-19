@@ -725,12 +725,24 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if (!$processorName) {
       $this->fail("webTestAddPaymentProcessor requires $processorName.");
     }
+    // Ensure we are logged in as admin before we proceed
+    $this->webtestLogin('admin');
+
     if ($processorName === 'Test Processor') {
       // Use the default test processor, no need to create a new one
       $this->openCiviPage('admin/paymentProcessor', 'action=update&id=1&reset=1');
       $this->check('is_default');
       $this->clickLink('_qf_PaymentProcessor_next-bottom');
       return 1;
+    }
+
+    if ($processorType == 'Dummy') {
+      $processorSettings = array(
+        'user_name' => 'dummy',
+        'url_site' => 'http://dummy.com',
+        'test_user_name' => 'dummytest',
+        'test_url_site' => 'http://dummytest.com',
+      );
     }
     elseif ($processorType == 'AuthNet') {
       // FIXME: we 'll need to make a new separate account for testing
