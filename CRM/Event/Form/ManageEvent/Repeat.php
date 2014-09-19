@@ -162,7 +162,6 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       if($this->_scheduleReminderDetails->entity_status){
         $defaults['repeats_by'] = 2;
       }
-      $defaults['exclude_date_list'] = array('a', 'b');
     } 
     return $defaults;
   }
