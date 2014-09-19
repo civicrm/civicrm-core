@@ -629,7 +629,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // 6 - Household profile
     $profile = array('4' => 'New Individual', '5' => 'New Organization', '6' => 'New Household');
     $this->clickAt("xpath=//div[@id='$selectId']/a");
-    $this->click("xpath=//li[@class='select2-no-results']//a[contains(text(),' $profile[$type]')]");
+    $this->clickAjaxLink("xpath=//li[@class='select2-no-results']//a[contains(text(),' $profile[$type]')]");
 
     $this->waitForElementPresent('_qf_Edit_next');
 
@@ -649,7 +649,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
 
     $this->type('email-Primary', $email);
-    $this->click('_qf_Edit_next');
+    $this->clickAjaxLink('_qf_Edit_next');
 
     // Is new contact created?
     if ($lname) {
@@ -2201,6 +2201,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   function checkCRMAlert($text, $type='success') {
     $this->waitForElementPresent("css=div.ui-notify-message.$type");
     $this->waitForText("css=div.ui-notify-message.$type", $text);
+    // We got the message, now let's close it so the webtest doesn't get confused by lots of open alerts
+    $this->click('css=.ui-notify-cross');
   }
 
   /**
