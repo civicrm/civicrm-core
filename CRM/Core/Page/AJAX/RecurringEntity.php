@@ -84,7 +84,7 @@ class CRM_Core_Page_AJAX_RecurringEntity {
       //Show the list of participants registered for the events if any
       $getConnectedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($parentEventId, 'civicrm_event', TRUE);
       if($getConnectedEntities){
-        $participantDetails = CRM_Core_BAO_RecurringEntity::getParticipantCountforEvent($getConnectedEntities);
+        $participantDetails = CRM_Event_Form_ManageEvent_Repeat::getParticipantCountforEvent($getConnectedEntities);
         if(!empty($participantDetails['countByName'])){
           $result['participantData'] = $participantDetails['countByName'];
         }
