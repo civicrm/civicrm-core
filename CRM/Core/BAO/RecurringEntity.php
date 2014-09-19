@@ -71,7 +71,17 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       'civicrm_pcp_block'   => array('entity_id'),
       'civicrm_activity'    => array('activity_date_time'),
     );
-
+  
+  /**
+   * Function to save records in civicrm_recujrring_entity table
+   *
+   * @param array $params reference array contains the values submitted by the form
+   *
+   * @access public
+   * @static
+   *
+   * @return object
+   */
   static function add(&$params) {
     if (CRM_Utils_Array::value('id', $params)) {
       CRM_Utils_Hook::pre('edit', 'RecurringEntity', $params['id'], $params);
@@ -93,6 +103,18 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $result;
   }
 
+  /**
+   * Wrapper for the function add() to add entry in recurring entity
+   *
+   * @param int $parentId Parent entity id
+   * @param int $entityId Child entity id
+   * @param String $entityTable Name of the entity table
+   *
+   * @access public
+   * @static
+   *
+   * @return object
+   */
   static function quickAdd($parentId, $entityId, $entityTable) {
     $params = 
       array(
@@ -103,6 +125,15 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return self::add($params);
   }
 
+  /**
+   * This function updates the mode column in the civicrm_recurring_entity table
+   *
+   * @param int $mode Mode of the entity to cascade changes across parent/child relations eg 1 - only this entity, 2 - this and the following entity, 3 - All the entity
+   *
+   * @access public
+   *
+   * @return void
+   */
   function mode($mode) {
     if ($this->entity_id && $this->entity_table) {
       if ($this->find(TRUE)) {
@@ -115,13 +146,24 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
   }
 
-  // generate all new entities based on object vars
+  /**
+   * This function generates all new entities based on object vars
+   * 
+   * @return array
+   */
   function generate() {
     $this->generateRecursiveDates();
 
     return $this->generateEntities();
   }
 
+  /**
+   * This function gives call to When library, converts formparams to dbparams,
+   * or if there is repeat configuration saved in civicrm_action_achedule table, takes params from there.
+   * DBparams are finally mapped to When params/criterias
+   * 
+   * @return object When object
+   */
   function generateRecursion() {
     // return if already generated
     if (is_a($this->recursion, 'When')) { 
@@ -141,7 +183,11 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $this->recursion;
   }
 
-  // generate new DAOs and along with entries in recurring_entity table
+  /**
+   * Generate new DAOs and along with entries in civicrm_recurring_entity table
+   * 
+   * @return array
+   */
   function generateEntities() {
     $newEntities  = array();
     $findCriteria = array();
@@ -197,6 +243,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $newEntities;
   }
 
+  /**
+   * This function iterates through when object criterias and 
+   * generates recursive dates based on that
+   * 
+   * @return array array of dates
+   */
   function generateRecursiveDates() {
     $this->generateRecursion();
 
@@ -262,7 +314,20 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $recursionDates;
   }
 
-  // MODE = 3 (ALL)
+  /**
+   * This function gets all the children for that particular parent
+   * 
+   * @param int $parentId Parent entity id
+   * @param string $entityTable Name of the entity table
+   * @param boolean $includeParent If true parent id is included in result set and vice versa
+   * @param int $mode ??
+   * @param int $initiatorId ??
+   * 
+   * @access public
+   * @static
+   * 
+   * @return array an array of child ids
+   */
   static public function getEntitiesForParent($parentId, $entityTable, $includeParent = TRUE, $mode = 3, $initiatorId = NULL) {
     $entities = array();
 
@@ -309,6 +374,20 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $entities;
   }
 
+  /**
+   * This function when passed an entity id checks if it has parent and 
+   * returns all other entities that are connected to same parent.
+   * 
+   * @param int $entityId entity id
+   * @param string $entityTable Entity table name
+   * @param boolean $includeParent Include parent in result set
+   * @param int $mode ??
+   * 
+   * @access public
+   * @static
+   * 
+   * @return array array of connected ids
+   */
   static public function getEntitiesFor($entityId, $entityTable, $includeParent = TRUE, $mode = 3) {
     $parentId = self::getParentFor($entityId, $entityTable);
     if ($parentId) {
@@ -317,6 +396,18 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return array();
   }
 
+  /**
+   * This function gets the parent for the entity id passed to it
+   * 
+   * @param int $entityId entity ID
+   * @param string $entityTable Entity table name
+   * @param boolean $includeParent Include parent in result set
+   * 
+   * @access public
+   * @static
+   * 
+   * @return int unsigned $parentId Parent ID 
+   */
   static public function getParentFor($entityId, $entityTable, $includeParent = TRUE) {
     $query = "
       SELECT parent_id 
@@ -335,6 +426,19 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $parentId;
   }
 
+  /**
+   * This function copies the information from parent entity and creates other entities with same information
+   * 
+   * @param string $entityTable Entity table name
+   * @param array $fromCriteria array of all the fields & values on which basis to copy
+   * @param array $newParams  array of all the fields & values to be copied besides the other fields
+   * @param type $createRecurringEntity ??
+   * 
+   * @access public
+   * @static
+   * 
+   * @return object
+   */
   static public function copyCreateEntity($entityTable, $fromCriteria, $newParams, $createRecurringEntity = TRUE) {
     $daoName = self::$_tableDAOMapper[$entityTable];
     if (!$daoName) {
@@ -354,6 +458,17 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $newObject;
   }
 
+  /**
+   * This function acts as a listener to dao->update whenever there is an update,
+   * and the it matched entries in recurring entity, it cascaded the changes across
+   * the related entities
+   * 
+   * @param object $obj An object containing data that needs to be updated                                                                                                                                                        *   
+   * @access public
+   * @static
+   *                          
+   * @return void
+   */
   static public function triggerUpdate($obj) {
     // if DB version is earlier than 4.6 skip any processing
     static $currentVer = NULL;
@@ -369,7 +484,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       return FALSE;
     }
     $key = "{$obj->__table}_{$obj->id}";
-
+    
     if (array_key_exists($key, $processedEntities)) {
       // already processed
       return NULL;
@@ -414,6 +529,13 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     unset($processedEntities);
   }
 
+  /**
+   * This function maps values posted from form to civicrm_action_schedule columns
+   * 
+   * @param array $formParams and array of form values posted
+   * 
+   * @return array 
+   */
   function mapFormValuesToDB($formParams = array()){   
     $dbParams = array();
     if(CRM_Utils_Array::value('used_for', $formParams)){
@@ -485,6 +607,16 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $dbParams;
   }
 
+  /**
+   * This function gets all the columns of civicrm_action_schedule table based on id(primary key)
+   * 
+   * @param int $scheduleReminderId primary key of civicrm_action_schedule table
+   * 
+   * @access public
+   * @static
+   * 
+   * @return object
+   */
   static public function getScheduleReminderDetailsById($scheduleReminderId){
     $query = "SELECT *
       FROM civicrm_action_schedule WHERE 1";
@@ -501,6 +633,13 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $dao;
   }
 
+  /**
+   * This function is a wrapper of getScheduleReminderDetailsById function
+   * 
+   * @param int $scheduleReminderId primary key of civicrm_action_schedule table
+   * 
+   * @return array
+   */
   function getScheduleParams($scheduleReminderId) {
     $scheduleReminderDetails = array();
     if ($scheduleReminderId){
@@ -511,6 +650,14 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $scheduleReminderDetails;
   }
 
+  /**
+   * This function takes criterias saved in civicrm_action_schedule table
+   * and creates recursion rule
+   * 
+   * @param array $scheduleReminderDetails array of repeat criterias saved in civicrm_action_schedule table
+   * 
+   * @return object When object
+   */
   function getRecursionFromSchedule($scheduleReminderDetails = array()){
     $r = new When();
     //If there is some data for this id
@@ -599,29 +746,18 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
     return $r;
   }
-
-  /*
-   * Get Reminder id based on event id
+  
+  /**
+   * This function gets time difference between the two datetime object
+   * 
+   * @param DateTime $startDate Start Date
+   * @param DateTime $endDate End Date
+   * 
+   * @access public
+   * @static
+   * 
+   * @return object DateTime object which contain time difference
    */
-  static public function getReminderDetailsByEventId($eventId, $used_for){
-    if($eventId){
-      $query = "
-        SELECT *
-        FROM   civicrm_action_schedule 
-        WHERE  entity_value = %1";
-      if($used_for){
-        $query .= " AND used_for = %2";
-      }
-      $params = array(
-        1 => array($eventId, 'Integer'),
-        2 => array($used_for, 'String')
-      );
-      $dao = CRM_Core_DAO::executeQuery($query, $params);
-      $dao->fetch();
-    }
-    return $dao;
-  }  
-
   static public function getInterval($startDate, $endDate) { 
     if ($startDate && $endDate) {
       $startDate = new DateTime($startDate);
@@ -631,6 +767,17 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
   }
 
+  /**
+   * This function deletes all the other entities that are related to it
+   * 
+   * @param int $entityId Entity id
+   * @param string $entityTable Name of the entity table
+   * 
+   * @access public
+   * @static
+   * 
+   * @return boolean|object Returns either boolean value or CRM_Core_DAO_RecurringEntity object
+   */
   static public function delEntityRelations($entityId, $entityTable){
     if(!$entityId && !$entityTable){
       return FALSE;
@@ -643,26 +790,4 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
   }
 
-  static public function getParticipantCountforEvent($listOfRelatedEntities = array()){
-    if(!empty($listOfRelatedEntities)){
-      $implodeRelatedEntities = implode(',', array_map(function($entity){
-        return $entity['id'];
-      }, $listOfRelatedEntities));
-      if($implodeRelatedEntities){
-        $query = "SELECT p.event_id as event_id, 
-          concat_ws(' ', e.title, concat_ws(' - ', DATE_FORMAT(e.start_date, '%b %d %Y %h:%i %p'), DATE_FORMAT(e.end_date, '%b %d %Y %h:%i %p'))) as event_data, 
-          count(p.id) as participant_count
-          FROM civicrm_participant p, civicrm_event e 
-          WHERE p.event_id = e.id AND p.event_id IN ({$implodeRelatedEntities})
-          GROUP BY p.event_id";
-        $dao = CRM_Core_DAO::executeQuery($query);
-        $participantDetails = array();
-        while($dao->fetch()) {
-          $participantDetails['countByID'][$dao->event_id] = $dao->participant_count;
-          $participantDetails['countByName'][$dao->event_id][$dao->event_data] = $dao->participant_count;
-        }
-      }
-    }
-    return $participantDetails;
-  }
 }

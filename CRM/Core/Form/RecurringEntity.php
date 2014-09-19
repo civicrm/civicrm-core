@@ -261,7 +261,7 @@ class CRM_Core_Form_RecurringEntity {
     //Delete relations if any from recurring entity tables before inserting new relations for this entity id
     if($params['event_id']){
       $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['event_id'], 'civicrm_event', TRUE);
-      $participantDetails = CRM_Core_BAO_RecurringEntity::getParticipantCountforEvent($getRelatedEntities);
+      $participantDetails = CRM_Event_Form_ManageEvent_Repeat::getParticipantCountforEvent($getRelatedEntities);
       //Check if participants exists for events
       foreach ($getRelatedEntities as $key => $value) {
         if(!CRM_Utils_Array::value($value['id'], $participantDetails['countByID']) && $value['id'] != $params['event_id']){

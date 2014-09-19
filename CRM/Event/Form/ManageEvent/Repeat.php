@@ -55,7 +55,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     $checkParentExistsForThisId;
     //If this ID has parent, send parent id
     if($checkParentExistsForThisId){
-      $this->_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEventId($checkParentExistsForThisId, 'event');
+      $this->_scheduleReminderDetails = self::getReminderDetailsByEventId($checkParentExistsForThisId, 'event');
       $this->_parentEventId = $checkParentExistsForThisId;
       
       /**
@@ -91,7 +91,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       }
     }else{
       //ELse send this id as parent
-      $this->_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEventId($this->_id, 'event');
+      $this->_scheduleReminderDetails = self::getReminderDetailsByEventId($this->_id, 'event');
       $this->_parentEventId = $this->_id;
     }
     //Assign this to hide summary
@@ -192,5 +192,68 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         CRM_Core_Error::fatal("Could not find Event ID");
     }  
   }
+  
+   /**
+   * This function gets the number of participant count for the list of related event ids
+   * 
+   * @param array $listOfRelatedEntities list of related event ids
+   * 
+   * @access public
+   * @static
+   * 
+   * @return array
+   */
+  static public function getParticipantCountforEvent($listOfRelatedEntities = array()){
+    if(!empty($listOfRelatedEntities)){
+      $implodeRelatedEntities = implode(',', array_map(function($entity){
+        return $entity['id'];
+      }, $listOfRelatedEntities));
+      if($implodeRelatedEntities){
+        $query = "SELECT p.event_id as event_id, 
+          concat_ws(' ', e.title, concat_ws(' - ', DATE_FORMAT(e.start_date, '%b %d %Y %h:%i %p'), DATE_FORMAT(e.end_date, '%b %d %Y %h:%i %p'))) as event_data, 
+          count(p.id) as participant_count
+          FROM civicrm_participant p, civicrm_event e 
+          WHERE p.event_id = e.id AND p.event_id IN ({$implodeRelatedEntities})
+          GROUP BY p.event_id";
+        $dao = CRM_Core_DAO::executeQuery($query);
+        $participantDetails = array();
+        while($dao->fetch()) {
+          $participantDetails['countByID'][$dao->event_id] = $dao->participant_count;
+          $participantDetails['countByName'][$dao->event_id][$dao->event_data] = $dao->participant_count;
+        }
+      }
+    }
+    return $participantDetails;
+  }
+  
+  /**
+   * This function gets all columns from civicrm_action_schedule on the basis of event id
+   * 
+   * @param int $eventId Event ID
+   * @param string $used_for Specifies for which entity type it's used for
+   * 
+   * @access public
+   * @static
+   * 
+   * @return object
+   */
+  static public function getReminderDetailsByEventId($eventId, $used_for){
+    if($eventId){
+      $query = "
+        SELECT *
+        FROM   civicrm_action_schedule 
+        WHERE  entity_value = %1";
+      if($used_for){
+        $query .= " AND used_for = %2";
+      }
+      $params = array(
+        1 => array($eventId, 'Integer'),
+        2 => array($used_for, 'String')
+      );
+      $dao = CRM_Core_DAO::executeQuery($query, $params);
+      $dao->fetch();
+    }
+    return $dao;
+  }  
   
 }
