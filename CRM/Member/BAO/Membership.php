@@ -2855,7 +2855,6 @@ WHERE      civicrm_membership.is_test = 0";
       foreach ($contributionSoftParams as $contributionSoft){
         $contributionSoft['contribution_id'] = $contribution->id;
         $contributionSoft['currency'] = $contribution->currency;
-        $contributionSoft['amount'] = $contribution->total_amount;
         CRM_Contribute_BAO_ContributionSoft::add($contributionSoft);
       }
     }
