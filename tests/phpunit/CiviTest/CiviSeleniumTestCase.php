@@ -730,7 +730,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     if ($processorName === 'Test Processor') {
       // Use the default test processor, no need to create a new one
-      $this->openCiviPage('admin/paymentProcessor', 'action=update&id=1&reset=1');
+      $this->openCiviPage('admin/paymentProcessor', 'action=update&id=1&reset=1', '_qf_PaymentProcessor_cancel-bottom');
       $this->check('is_default');
       $this->clickLink('_qf_PaymentProcessor_next-bottom');
       return 1;
