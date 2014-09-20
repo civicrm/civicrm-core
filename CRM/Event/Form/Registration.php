@@ -727,7 +727,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Function to handle  process after the confirmation of payment by User
+   * Function to handle process after the confirmation of payment by User
    *
    * @param null $contactID
    * @param null $contribution
@@ -871,6 +871,7 @@ WHERE  v.option_group_id = g.id
       $registerDate = CRM_Utils_Date::format($params['participant_register_date']);
     }
 
+    $participantFields = CRM_Event_DAO_Participant::fields();
     $participantParams = array('id' => CRM_Utils_Array::value('participant_id', $params),
       'contact_id' => $contactID,
       'event_id' => $this->_eventId ? $this->_eventId : $params['event_id'],
@@ -881,8 +882,11 @@ WHERE  v.option_group_id = g.id
         $params, $roleID
       ),
       'register_date' => ($registerDate) ? $registerDate : date('YmdHis'),
-      'source' => isset($params['participant_source']) ?
-        CRM_Utils_Array::value('participant_source', $params) : CRM_Utils_Array::value('description', $params),
+      'source' => CRM_Utils_String::ellipsify(
+        isset($params['participant_source']) ?
+          CRM_Utils_Array::value('participant_source', $params) : CRM_Utils_Array::value('description', $params),
+        $participantFields['participant_source']['maxlength']
+      ),
       'fee_level' => CRM_Utils_Array::value('amount_level', $params),
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
       'fee_amount' => CRM_Utils_Array::value('fee_amount', $params),
