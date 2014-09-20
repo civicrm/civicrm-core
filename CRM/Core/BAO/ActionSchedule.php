@@ -470,7 +470,7 @@ WHERE   cas.entity_value = $id AND
           $dummy_mail->body_text = $$bodyType;
         }
         else {
-          $dummy_mail->$$bodyType = $$bodyType;
+          $dummy_mail->$bodyType = $$bodyType;
         }
         $tokens = $dummy_mail->getTokens();
 
