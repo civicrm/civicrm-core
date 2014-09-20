@@ -621,6 +621,41 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * Use a contact EntityRef field to add a new contact
+   * @param string $field selector
+   * @param string $contactType
+   * @return array of contact attributes (id, names, email)
+   */
+  function createDialogContact($field = 'contact_id', $contactType = 'Individual') {
+    $selectId = 's2id_' . $this->getAttribute($field . '@id');
+    $this->clickAt("xpath=//div[@id='$selectId']/a");
+    $this->clickAjaxLink("xpath=//li[@class='select2-no-results']//a[contains(text(), 'New $contactType')]", '_qf_Edit_next');
+
+    $name = substr(sha1(rand()), 0, rand(6, 8));
+    $params = array();
+    if ($contactType == 'Individual') {
+      $params['first_name'] = "$name $contactType";
+      $params['last_name'] = substr(sha1(rand()), 0, rand(5, 9));
+    }
+    else {
+      $params[strtolower($contactType) . '_name'] = "$name $contactType";
+    }
+    foreach($params as $param => $val) {
+      $this->type($param, $val);
+    }
+    $this->type('email-Primary', $params['email'] = "{$name}@example.com");
+    $this->clickAjaxLink('_qf_Edit_next');
+
+    $this->waitForText("xpath=//div[@id='$selectId']","$name");
+
+    $params['sort_name'] = $contactType == 'Individual' ? $params['last_name'] . ', ' . $params['first_name'] : "$name $contactType";
+    $params['display_name'] = $contactType == 'Individual' ? $params['first_name'] . ' ' . $params['last_name'] : $params['sort_name'];
+    $params['id'] = $this->getValue($field);
+    return $params;
+  }
+
+  /**
+   * @deprecated in favor of createDialogContact
    */
   function webtestNewDialogContact($fname = 'Anthony', $lname = 'Anderson', $email = 'anthony@anderson.biz',
                                    $type = 4, $selectId = 's2id_contact_id', $row = 1, $prefix = '') {

@@ -242,8 +242,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone", '_qf_Contribution_upload');
 
     // create new contact using dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, 'Contributor', $firstName . '@example.com');
+    $this->createDialogContact();
 
     // select financial type
     $this->select('financial_type_id', "label={$financialType}");
@@ -588,8 +587,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone", '_qf_Contribution_upload');
 
     // create new contact using dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, 'Contributor', $firstName . '@example.com');
+    $contact = $this->createDialogContact();
 
     // select contribution type
     $this->select('financial_type_id', "label={$financialType}");
@@ -633,7 +631,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // View Contribution Record and test for expected values
     $expected = array(
-      'From' => "{$firstName} Contributor",
+      'From' => $contact['display_name'],
       'Financial Type' => $financialType,
       'Contribution Amount' => 'Contribution Total: $ 590.00',
       'Paid By' => 'Check',
@@ -690,7 +688,6 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     );
 
     // Retrieve contribution from the DB via api and verify DB values against view contribution page
-    require_once 'api/api.php';
     $fields = $this->webtest_civicrm_api('contribution', 'get', $params);
 
     $params['id'] = $params['contact_id'] = $fields['values'][$fields['id']]['soft_credit_to'];

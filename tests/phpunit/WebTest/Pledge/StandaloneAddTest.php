@@ -41,9 +41,7 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('pledge/add', 'reset=1&context=standalone', '_qf_Pledge_upload');
 
     // create new contact using dialog
-    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
-    $lastName = 'An' . substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, $lastName, $firstName . '@example.com');
+    $contact = $this->createDialogContact();
 
     $this->type('amount', '100');
     $this->type('installments', '10');
@@ -75,7 +73,7 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     $pledgeDate = date('F jS, Y', strtotime('now'));
 
     $this->webtestVerifyTabularData(array(
-        'Pledge By' => $firstName . ' ' . $lastName,
+        'Pledge By' => $contact['display_name'],
         'Total Pledge Amount' => '$ 100.00',
         'To be paid in' => '10 installments of $ 10.00 every 1 week(s)',
         'Payments are due on the' => '2 day of the period',
