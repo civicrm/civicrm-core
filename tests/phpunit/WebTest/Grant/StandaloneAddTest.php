@@ -52,8 +52,7 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('grant/add', 'reset=1&context=standalone', '_qf_Grant_upload');
 
     // create new contact using dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, "Grantor", $firstName . "@example.com");
+    $contact = $this->createDialogContact();
 
     // select grant Status
     $this->select("status_id", "value=1");

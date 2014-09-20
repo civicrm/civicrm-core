@@ -130,8 +130,6 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
   }
 
   function testEventParticipationAddWithMultipleRoles() {
-
-    // Log in using webtestLogin() method
     $this->webtestLogin();
 
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
@@ -327,47 +325,38 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
   }
 
   function testEventAddMultipleParticipants() {
-
-    // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $processorId = $this->webtestAddPaymentProcessor('dummy' . substr(sha1(rand()), 0, 7));
-    $rand = substr(sha1(rand()), 0, 7);
-    $firstName = 'First' . $rand;
-    $lastName = 'Last' . $rand;
-    $rand = substr(sha1(rand()), 0, 7);
-    $lastName2 = 'Last' . $rand;
+    $processorId = $this->webtestAddPaymentProcessor();
 
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone&mode=test&eid=3");
 
-    $this->assertTrue($this->isTextPresent("New Event Registration"), "Page title 'New Event Registration' missing");
-    $this->assertTrue($this->isTextPresent("A TEST transaction will be submitted"), "test mode status 'A TEST transaction will be submitted' missing");
-    $this->_fillParticipantDetails($firstName, $lastName, $processorId);
-    $this->click('_qf_Participant_upload_new-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $contacts = array();
 
     $this->assertTrue($this->isTextPresent("New Event Registration"), "Page title 'New Event Registration' missing");
     $this->assertTrue($this->isTextPresent("A TEST transaction will be submitted"), "test mode status 'A TEST transaction will be submitted' missing");
-    $this->_fillParticipantDetails($firstName, $lastName2, $processorId);
-    $this->click('_qf_Participant_upload_new-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $contacts[] = $this->_fillParticipantDetails($processorId);
+    $this->clickLink('_qf_Participant_upload_new-bottom');
+
+    $this->assertTrue($this->isTextPresent("New Event Registration"), "Page title 'New Event Registration' missing");
+    $this->assertTrue($this->isTextPresent("A TEST transaction will be submitted"), "test mode status 'A TEST transaction will be submitted' missing");
+    $contacts[] = $this->_fillParticipantDetails($processorId);
+    $this->clickLink('_qf_Participant_upload_new-bottom');
 
     //searching the paricipants
     $this->openCiviPage("event/search", "reset=1");
-    $this->type('sort_name', $firstName);
+    $this->type('sort_name', 'Individual');
     $eventName = "Rain-forest Cup Youth Soccer Tournament";
     $this->select2("event_id", $eventName, FALSE, FALSE);
     $this->check('participant_test');
-    $this->click("_qf_Search_refresh");
-    $this->waitForElementPresent("participantSearch");
+    $this->clickLink("_qf_Search_refresh", "participantSearch");
 
     //verifying the registered participants
-    $names = array( "{$lastName}, {$firstName}", "{$lastName2}, {$firstName}" );
     $status = "Registered (test)";
 
-    foreach($names as $name) {
-      $this->verifyText("xpath=//div[@id='participantSearch']//table//tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$name}']/../../td[9]", preg_quote($status));
-      $this->verifyText("xpath=//div[@id='participantSearch']//table//tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$name}']/../../td[4]/a", preg_quote($eventName));
+    foreach($contacts as $contact) {
+      $this->verifyText("xpath=//div[@id='participantSearch']//table//tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$contact['sort_name']}']/../../td[9]", preg_quote($status));
+      $this->verifyText("xpath=//div[@id='participantSearch']//table//tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$contact['sort_name']}']/../../td[4]/a", preg_quote($eventName));
 }
   }
 
@@ -411,7 +400,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // Select role.
     $this->multiselect2('role_id', array('Volunteer'));
 
-    foreach($return as $values) {
+    foreach ($return as $values) {
       foreach ($values as $entityType => $customData) {
         //checking for duplicate custom data present or not
         $this->assertElementPresent("xpath=//*[@class='crm-customData-block']/div[@class='custom-group custom-group-{$customData['cgtitle']} crm-accordion-wrapper ']");
@@ -425,8 +414,8 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
    * @param $lastName
    * @param $processorId
    */
-  function _fillParticipantDetails($firstName, $lastName, $processorId) {
-    $this->webtestNewDialogContact($firstName, $lastName);
+  function _fillParticipantDetails($processorId) {
+    $contact = $this->createDialogContact();
 
     $this->select('payment_processor_id', "value={$processorId}");
     $event_id = $this->getAttribute("xpath=//*[@id='event_id']@value");
@@ -435,5 +424,6 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->select("role_id", "value=1");
     $this->webtestAddCreditCardDetails();
     $this->webtestAddBillingDetails();
+    return $contact;
   }
 }

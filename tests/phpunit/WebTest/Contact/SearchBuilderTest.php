@@ -376,11 +376,6 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
    *
    */
   function testSearchBuilderfinancialType() {
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // add financial type
@@ -404,8 +399,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
         $financialType = $financialTypeName2;
       }
       // create new contact using dialog
-      $firstName = substr(sha1(rand()), 0, 7);
-      $this->webtestNewDialogContact($firstName, 'Contributor', $firstName . '@example.com');
+      $this->createDialogContact();
       $this->select('financial_type_id', $financialType);
       $this->type('total_amount', 100 * $i);
       $this->clickLink('_qf_Contribution_upload_new', '_qf_Contribution_upload_new');
@@ -413,15 +407,14 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/search/builder", "reset=1", "_qf_Builder_refresh");
 
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, '=', array($financialTypeName1));
-    $this->click('_qf_Builder_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Builder_refresh');
 
     $this->assertTrue($this->isTextPresent('3 Contacts'), 'Missing text: ' . '3 Contacts');
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, '=', array($financialTypeName2));
-    $this->click('_qf_Builder_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Builder_refresh');
+
     $this->assertTrue($this->isTextPresent('3 Contacts'), 'Missing text: ' . '3 Contacts');
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
@@ -429,8 +422,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
       $financialTypeName1,
       $financialTypeName2
     ));
-    $this->click('_qf_Builder_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Builder_refresh');
+
     $this->assertTrue($this->isTextPresent('6 Contacts'), 'Missing text: ' . '6 Contacts');
   }
 

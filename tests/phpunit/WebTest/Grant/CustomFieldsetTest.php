@@ -83,9 +83,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
 
     // Create new Grant
     $this->openCiviPage('grant/add', 'reset=1&action=add&context=standalone', '_qf_Grant_upload-bottom');
-    $firstName = 'First' . $rand;
-    $lastName = 'Last' . $rand;
-    $this->webtestNewDialogContact($firstName, $lastName);
+    $contact = $this->createDialogContact();
     $this->select('id=status_id', 'label=Approved for Payment');
     $this->select('id=grant_type_id', "label=$grantType");
     $this->waitForTextPresent($grantField);
@@ -100,7 +98,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
 
     // verify tabular data for grant view
     $this->webtestVerifyTabularData(array(
-      'Name' => "$firstName $lastName",
+      'Name' => $contact['display_name'],
       'Grant Status' => 'Approved',
       'Grant Type' => $grantType,
       $grantField => '$ 99.99',
