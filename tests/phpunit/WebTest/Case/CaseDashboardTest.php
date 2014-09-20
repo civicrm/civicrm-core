@@ -37,7 +37,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
 
   function testAllOrMyCases() {
     // Log in as admin first to verify permissions for CiviCase
-    $this->webtestLogin('true');
+    $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
@@ -71,14 +71,8 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     //Add case to get drilldown cell on Case dashboard
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
-    // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = "Fraser";
-    $contactName = "{$lastName}, {$firstName}";
-    $displayName = "{$firstName} {$lastName}";
-    $email = "{$lastName}.{$firstName}@example.org";
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
+    $this->createDialogContact('client_id');
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
