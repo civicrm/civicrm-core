@@ -2074,12 +2074,19 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
                                      which uses the entity info as its selection value
    * @param array  $pageUrl          the url which on which the ajax custom group load takes place
-   * @param $beforeTriggering        code to execute before actual element triggering
+   * @param callable|boolean $beforeTriggering fn to execute before actual element triggering
    * @return void
    */
   function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering = NULL) {
     //add the custom set
     $return = $this->addCustomGroupField($customSets);
+
+    // Hack to ensure caches are properly cleared
+    // FIXME: This shouldn't be necessary, try to find root of the problem with WebTest_Event_AddParticipationTest::testAjaxCustomGroupLoad
+    if ($beforeTriggering === TRUE) {
+      $this->webtestLogout();
+      $this->webtestLogin();
+    }
 
     $this->openCiviPage($pageUrl['url'], $pageUrl['args']);
     foreach($return as $values) {
@@ -2088,7 +2095,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         list($entity, $entityData) = explode('_', $entityType);
         $elementType = CRM_Utils_Array::value('type', $customData['triggerElement'], 'select');
         $elementName = CRM_Utils_Array::value('name', $customData['triggerElement']);
-        if ($beforeTriggering) {
+        if (is_callable($beforeTriggering)) {
           call_user_func($beforeTriggering);
         }
         if ($elementType == 'select') {
@@ -2112,8 +2119,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
           }
         }
         //checking for proper custom data which is loading through ajax
-        $this->waitForElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]",
-          "The on the fly custom group has not been rendered for entity : {$entity} => {$entityData}");
+        $this->waitForElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]");
         $this->assertElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]/div[contains(@class, 'crm-accordion-body')]/table/tbody/tr/td[2]/input",
           "The on the fly custom group field is not present for entity : {$entity} => {$entityData}");
       }
