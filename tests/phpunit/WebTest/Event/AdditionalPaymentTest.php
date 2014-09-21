@@ -46,7 +46,6 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
-    // Type contact last name in contact auto-complete, wait for dropdown and click first result
     $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
@@ -59,7 +58,6 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     // Using helper webtestFillDate function.
     $this->webtestFillDate('register_date', 'now');
     $today = date('F jS, Y', strtotime('now'));
-    // May 5th, 2010
 
     // Select participant status
     $this->select('status_id', 'value=1');
@@ -89,7 +87,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->type('check_number', '1044');
 
     // give some time for js to process
-    sleep(1);
+    $this->waitForAjaxContent();
     $this->verifySelectedLabel("status_id", 'Partially paid');
 
     // later on change the status
@@ -105,8 +103,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->select('status_id', 'label=Partially paid');
 
     // Clicking save.
-    $this->click('_qf_Participant_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Participant_upload-bottom');
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', "Event registration for $displayName has been added");
@@ -142,22 +139,19 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
       )
     );
 
-    $this->click('_qf_ContributionView_cancel-top');
+    $this->clickAjaxLink('_qf_ContributionView_cancel-top');
     $this->waitForElementPresent("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     // make additional payment
     // 1 - check for links presence on participant view and edit page
     $this->assertElementPresent("xpath=id('Search')/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span[2]/ul/li[2]/a[text()='Record Payment']");
     $this->click("xpath=id('Search')/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("xpath=id('ParticipantView')");
-    $this->assertElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]");
+    $this->waitForElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]");
 
     $this->click("xpath=id('ParticipantView')//div[@class='action-link']/div/a/span[contains(text(), 'Edit')]");
     $this->waitForElementPresent("xpath=id('Participant')");
-    $this->assertElementPresent("xpath=id('Participant')//td[@id='payment-info']//a/span[contains(text(), 'Record Payment')]");
-    $location = $this->getAttribute("xpath=id('Participant')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]/../@href");
-
-    $this->open($location);
-    $this->waitForElementPresent("xpath=id('AdditionalPayment')");
+    $this->waitForElementPresent("xpath=id('Participant')//td[@id='payment-info']//a/span[contains(text(), 'Record Payment')]");
+    $this->clickLinkSuppressPopup("xpath=id('Participant')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]/../", 'AdditionalPayment');
 
     // verify balance
     $text = $this->getText("xpath=id('AdditionalPayment')/div[2]//table/tbody/tr[3]/td[2]");
@@ -171,7 +165,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->waitForText("xpath=//span[@id='totalAmount']/span", 'Payment amount cannot be greater than owed amount');
     $this->type('total_amount', $balance);
     $this->click('_qf_AdditionalPayment_upload-bottom');
-    $this->waitForText('crm-notification-container', 'The payment record has been processed.');
+    $this->checkCRMAlert('The payment record has been processed.');
 
     $this->waitForElementPresent("xpath=id('Search')/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->click("xpath=id('Search')/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
@@ -188,11 +182,10 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     // check the fee amount and contribution amount
     $this->_checkPaymentInfoTable(800.00, 800.00);
 
-    // check for not apprence of record payment button
+    // check for absence of record payment button
     $this->assertFalse($this->isElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']//a/span[contains(text(), 'Record Payment')]"));
 
-    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+    $this->clickAjaxLink("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
 
     $this->webtestVerifyTabularData(
       array(
@@ -208,7 +201,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
 
     // view transaction popup info check
     $this->waitForElementPresent("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]/a");
-    $this->click("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]/a");
+    $this->clickAjaxLink("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]/a");
     $this->waitForElementPresent("xpath=//table[@id='info']/tbody/tr/th[contains(text(), 'Amount')]/../../tr[2]/td[contains(text(), '$ 400.00')]/../../tr[3]/td[contains(text(), '$ 400.00')]");
     $this->waitForElementPresent("xpath=//table[@id='info']/tbody/tr/th[3][contains(text(), 'Paid By')]/../../tr[2]/td[3][contains(text(), 'Check')]/../../tr[3]/td[3][contains(text(), 'Cash')]");
     $this->waitForElementPresent("xpath=//table[@id='info']/tbody/tr/th[6][contains(text(), 'Status')]/../../tr[2]/td[6][contains(text(), 'Completed')]/../../tr[3]/td[6][contains(text(), 'Completed')]");
