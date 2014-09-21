@@ -2082,10 +2082,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $return = $this->addCustomGroupField($customSets);
 
     // Hack to ensure caches are properly cleared
-    // FIXME: This shouldn't be necessary, try to find root of the problem with WebTest_Event_AddParticipationTest::testAjaxCustomGroupLoad
-    if ($beforeTriggering === TRUE) {
+    // FIXME: This shouldn't be necessary, try to find root of the problem with *::testAjaxCustomGroupLoad
+    if (TRUE) {
+      $userName = $this->loggedInAs;
       $this->webtestLogout();
-      $this->webtestLogin();
+      $this->webtestLogin($userName);
     }
 
     $this->openCiviPage($pageUrl['url'], $pageUrl['args']);
