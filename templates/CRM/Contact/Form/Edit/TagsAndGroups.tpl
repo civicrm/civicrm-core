@@ -54,14 +54,6 @@
       highlightSelected();
 
       $("#tagtree input").change(function(){
-		if($(this).prop("checked")) {
-			$(this).parents("li[id^=tag]").children("input").each(function() {
-				if(!this.disabled)
-					$(this).prop("checked", true);
-			});
-		} else {
-			$(this).closest("li").find("input").prop("checked", false);
-		}		
         highlightSelected();
       });
 
