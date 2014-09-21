@@ -120,8 +120,8 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
    * @param $id
    */
   function onlineContributionAddTest($campaignTitle, $id) {
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $paymentProcessorId = $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage("admin/contribute/add", "reset=1&action=add");

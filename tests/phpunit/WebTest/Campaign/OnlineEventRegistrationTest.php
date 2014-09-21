@@ -117,8 +117,8 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
    * @param $id
    */
   function onlineParticipantAddTest($campaignTitle, $id) {
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $paymentProcessorId = $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage("event/add", "reset=1&action=add");
@@ -192,7 +192,9 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
 
     // Fill in address fields
     $streetAddress = "100 Main Street";
+    $this->waitForElementPresent('address_1_street_address');
     $this->type("address_1_street_address", $streetAddress);
+    $this->waitForElementPresent('address_1_city');
     $this->type("address_1_city", "San Francisco");
     $this->type("address_1_postal_code", "94117");
     $this->select('address_1_country_id', 'United States');

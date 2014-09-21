@@ -50,7 +50,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
-    $validStrings = array();
+    $validateStrings = array();
 
     $fields = array(
       'Full Conference' => 'Text',
@@ -59,7 +59,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
       'Evening Sessions' => 'CheckBox',
     );
     $this->_testAddPriceFields($fields, $validateStrings);
-    // var_dump($validateStrings);
 
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
@@ -88,7 +87,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', 'newPriceField');
+    $this->clickLink('_qf_Set_next-bottom');
   }
 
   /**
@@ -97,7 +96,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
    * @param bool $dateSpecificFields
    */
   function _testAddPriceFields(&$fields, &$validateStrings, $dateSpecificFields = FALSE) {
-    $this->clickLink('newPriceField', '_qf_Field_cancel-bottom', FALSE);
+    $this->clickLinkSuppressPopup('newPriceField');
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
 
@@ -176,7 +175,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         default:
           break;
       }
-      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom', FALSE);
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
       $this->waitForText('crm-notification-container', "Price Field '".$label."' has been saved.");
     }
   }
@@ -223,8 +222,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
@@ -384,8 +383,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
@@ -458,9 +457,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestAddContact($firstName, 'Anderson', TRUE);
-    $contactName = "Anderson, $firstName";
-    $displayName = "$firstName Anderson";
+    $lastName = 'Anderson'. substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, $lastName, TRUE);
+    $contactName = "$lastName, $firstName";
+    $displayName = "$firstName $lastName";
 
     $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone', '_qf_Participant_upload-bottom');
 
@@ -472,6 +472,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Select role
     $this->multiselect2('role_id', array('Volunteer'));
 
+    $this->waitForElementPresent("xpath=//input[@class='crm-form-radio']");
     $this->click("xpath=//input[@class='crm-form-radio']");
     $this->click("xpath=//input[@class='crm-form-checkbox']");
 
@@ -512,9 +513,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestAddContact($firstName, 'Anderson', TRUE);
-    $contactName = "Anderson, $firstName";
-    $displayName = "$firstName Anderson";
+    $lastName = 'Anderson'. substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, $lastName, TRUE);
+    $contactName = "$lastName, $firstName";
+    $displayName = "$firstName $lastName";
 
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
     $usedFor = 'Event';
@@ -615,7 +617,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText("css=#crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
+    $this->waitForText("crm-notification-container", "Event registration for $displayName has been added");
 
     $this->waitForElementPresent("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen

@@ -45,7 +45,8 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
   protected $_add2groupSupported = FALSE;
 
   protected $_customGroupExtends = array(
-    'Event');
+    'Event'
+  );
 
   public $_drilldownReport = array('event/participantlist' => 'Link to Detail Report');
 
@@ -58,31 +59,36 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
   function __construct() {
 
     $this->_columns = array(
-      'civicrm_event' =>
-      array(
+      'civicrm_event' => array(
         'dao' => 'CRM_Event_DAO_Event',
-        'fields' =>
-        array(
-          'title' => array('title' => ts('Event'),
+        'fields' => array(
+          'title' => array(
+            'title' => ts('Event'),
             'required' => TRUE,
           ),
           'id' => array(
+            'title' => 'Event ID',
             'no_display' => TRUE,
             'required' => TRUE,
           ),
-          'event_type_id' => array('title' => ts('Event Type'),
+          'event_type_id' => array(
+            'title' => ts('Event Type'),
           ),
-          'fee_label' => array('title' => ts('Fee Label')),
-          'event_start_date' => array('title' => ts('Event Start Date'),
+          'fee_label' => array(
+            'title' => ts('Fee Label')
           ),
-          'event_end_date' => array('title' => ts('Event End Date'),
+          'event_start_date' => array(
+            'title' => ts('Event Start Date'),
           ),
-          'max_participants' => array('title' => ts('Capacity'),
+          'event_end_date' => array(
+            'title' => ts('Event End Date'),
+          ),
+          'max_participants' => array(
+            'title' => ts('Capacity'),
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
-        'filters' =>
-        array(
+        'filters' => array(
           'id' => array(
             'title' => ts('Event'),
             'operatorType' => CRM_Report_Form::OP_ENTITYREF,
@@ -95,43 +101,44 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('event_type'),
           ),
-          'event_start_date' => array('title' => ts('Event Start Date'),
+          'event_start_date' => array(
+            'title' => ts('Event Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
-          'event_end_date' => array('title' => ts('Event End Date'),
+          'event_end_date' => array(
+            'title' => ts('Event End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
         ),
       ),
-      'civicrm_line_item' =>
-      array(
+      'civicrm_line_item' => array(
         'dao' => 'CRM_Price_DAO_LineItem',
-        'fields' =>
-        array(
+        'fields' => array(
           'participant_count' => array(
             'title' => ts('Participants'),
             'default' => TRUE,
             'statistics' =>
-            array('count' => ts('Participants'),
-            ),
+              array(
+                'count' => ts('Participants'),
+              ),
           ),
           'line_total' => array(
             'title' => ts('Income Statistics'),
             'type' => CRM_Utils_Type::T_MONEY,
             'default' => TRUE,
             'statistics' =>
-            array('sum' => ts('Income'),
-              'avg' => ts('Average'),
-            ),
+              array(
+                'sum' => ts('Income'),
+                'avg' => ts('Average'),
+              ),
           ),
         ),
       ),
-      'civicrm_participant' =>
-      array(
+      'civicrm_participant' => array(
         'dao' => 'CRM_Event_DAO_Participant',
-        'filters' =>
-        array(
-          'sid' => array('name' => 'status_id',
+        'filters' => array(
+          'sid' => array(
+            'name' => 'status_id',
             'title' => ts('Participant Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Event_PseudoConstant::participantStatus(),
@@ -142,7 +149,8 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Event_PseudoConstant::participantRole(),
           ),
-          'participant_register_date' => array('title' => ts('Registration Date'),
+          'participant_register_date' => array(
+            'title' => ts('Registration Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
         ),
@@ -220,8 +228,8 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
           $clause = NULL;
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
             $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
+            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
 
             if ($relative || $from || $to) {
               $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
@@ -268,6 +276,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     if ($dao->fetch()) {
+      $avg = 0;
       if ($dao->count && $dao->amount) {
         $avg = $dao->amount / $dao->count;
       }
@@ -281,7 +290,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
         'title' => 'Total Income',
         'type' => CRM_Utils_Type::T_MONEY,
       );
-      $statistics['counts']['avg   '] = array(
+      $statistics['counts']['avg'] = array(
         'value' => $avg,
         'title' => 'Average',
         'type' => CRM_Utils_Type::T_MONEY,
@@ -356,7 +365,8 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
       foreach ($rows as $key => $value) {
         if ($value['civicrm_event_id']) {
           $graphRows['totalParticipants'][] = ($rows[$key]['civicrm_line_item_participant_count_count']);
-          $graphRows[$this->_interval][] = substr($rows[$key]['civicrm_event_title'], 0, 12) . "..(" . $rows[$key]['civicrm_event_id'] . ") ";
+          $graphRows[$this->_interval][] =
+            substr($rows[$key]['civicrm_event_title'], 0, 12) . "..(" . $rows[$key]['civicrm_event_id'] . ") ";
           $graphRows['value'][] = ($rows[$key]['civicrm_line_item_participant_count_count']);
         }
       }

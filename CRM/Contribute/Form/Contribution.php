@@ -1241,7 +1241,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // if non_deductible_amount exists i.e. Additional Details field set was opened [and staff typed something] -
       // if non_deductible_amount does NOT exist - then calculate it depending on:
       // $ContributionType->is_deductible and whether there is a product (premium).
-      if (!isset($params['non_deductible_amount']) || (!empty($params['non_deductible_amount']))) {
+      if (empty($params['non_deductible_amount'])) {
         $contributionType = new CRM_Financial_DAO_FinancialType();
         $contributionType->id = $params['financial_type_id'];
         if (!$contributionType->find(TRUE)) {

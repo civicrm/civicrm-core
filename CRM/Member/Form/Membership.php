@@ -1244,7 +1244,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     $membershipType = implode(', ', $membershipTypes);
-    
+
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
     list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($ids['userId']);
 
@@ -1297,7 +1297,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $formValues['financial_type_id']
       );
     }
-    
+
     // process line items, until no previous line items.
     if (!empty($lineItem)) {
       $params['lineItems'] = $lineItem;
@@ -1463,7 +1463,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       if ($params['total_amount'] > 0.0) {
         $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
-        $result = & $payment->doDirectPayment($paymentParams);
+        $result = $payment->doDirectPayment($paymentParams);
       }
 
       if (is_a($result, 'CRM_Core_Error')) {
@@ -1624,7 +1624,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           if (!empty($softParams)) {
             $membershipParams['soft_credit'] = $softParams;
           }
-          
+
           $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
           $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
           unset($params['lineItems']);

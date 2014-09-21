@@ -84,6 +84,7 @@ class CRM_Contact_BAO_Query {
 
   public $_paramLookup;
 
+  public $_sort;
   /**
    * the set of output params
    *
@@ -4029,7 +4030,7 @@ WHERE  id IN ( $groupIDs )
     }
     // also get values array for relation_target_name
     // for relatinship search we always do wildcard
-    $relationType = $this->getWhereValues('relation_type_id', $grouping);    
+    $relationType = $this->getWhereValues('relation_type_id', $grouping);
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
     $relPermission = $this->getWhereValues('relation_permission', $grouping);
@@ -4058,7 +4059,7 @@ WHERE  id IN ( $groupIDs )
       $params = array('id' => $rel[0]);
       $rType = CRM_Contact_BAO_RelationshipType::retrieve($params, $rTypeValues);
     }
-    if ( empty($rTypeValues) ) {    
+    if (empty($rTypeValues)) {
       // if we don't know which end of the relationship we are dealing with we'll create a temp table
       //@todo unless we are dealing with a target group
       self::$_relType = 'reciprocal';
@@ -4596,8 +4597,8 @@ civicrm_relationship.is_permission_a_b = 0
       }
     }
 
-    // note : this modifies _fromClause and _simpleFromClause
-    $this->includePseudoFieldsJoin($sort);
+    // CRM-15231
+    $this->_sort = $sort;
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
 
@@ -4653,7 +4654,8 @@ civicrm_relationship.is_permission_a_b = 0
    */
   function getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds) {
     $this->_includeContactIds = $includeContactIds;
-    list($select, $from, $where) = $this->query();
+    $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
+    list($select, $from, $where) = $this->query(FALSE, FALSE, FALSE, $onlyDeleted);
     $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
     $order = " ORDER BY pnc.id";
     $groupBy = " GROUP BY contact_a.id";
@@ -4694,14 +4696,11 @@ civicrm_relationship.is_permission_a_b = 0
         if (!$count) {
           $this->_useDistinct = TRUE;
         }
-
-        if (empty($this->_fromClause)) {
-          $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-        }
-
-        if (empty($this->_simpleFromClause)) {
-          $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-        }
+        //CRM-15231
+        $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+        $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+        // note : this modifies _fromClause and _simpleFromClause
+        $this->includePseudoFieldsJoin($this->_sort);
       }
     }
     else {
@@ -5203,7 +5202,14 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         if (empty($dataType)) {
           $dataType = 'String';
         }
-
+        if (is_array($value)) {
+          //this could have come from the api - as in the restWhere section we potentially use the api operator syntax which is becoming more
+          // widely used and consistent across the codebase
+          // adding this here won't accept the search functions which don't submit an array
+          if (($queryString = CRM_Core_DAO::createSqlFilter($field, $value, $dataType)) != FALSE) {
+            return $queryString;
+          }
+        }
         $value = CRM_Utils_Type::escape($value, $dataType);
         // if we don't have a dataType we should assume
         if ($dataType == 'String' || $dataType == 'Text') {

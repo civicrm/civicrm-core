@@ -71,15 +71,10 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
       $this->select2("xpath=//tr[@class='addRow']/td[contains(text(),'Add activity:')]/span/div/a", $tActivityType, FALSE, TRUE);
     }
 
-    $this->click("xpath=//div[@class='crm-submit-buttons']/span/input[@value='Save']");
+    $this->clickAjaxLink("xpath=//div[@class='crm-submit-buttons']/span/input[@value='Save']", NULL);
 
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = "Fraser";
-    $contactName = "{$lastName}, {$firstName}";
-    $displayName = "{$firstName} {$lastName}";
-    $email = "{$lastName}.{$firstName}@example.org";
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
+    $client = $this->createDialogContact("client_id");
 
     $caseStatusLabel = "Ongoing";
     $subject = "Safe daytime setting - senior female";
@@ -90,8 +85,9 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->fireEvent('activity_details', 'focus');
     $this->fillRichTextField("activity_details", $details, 'CKEditor');
     $this->type("activity_subject", $subject);
-
+    $this->waitForElementPresent('case_type_id');
     $this->select("case_type_id", "label={$caseTypeLabel}");
+    $this->waitForElementPresent('status_id');
     $this->select("status_id", "label={$caseStatusLabel}");
 
     $this->webtestFillDate('start_date', 'now');

@@ -37,7 +37,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
   function testAddActivityToCase() {
     // Log in as admin first to verify permissions for CiviCase
-    $this->webtestLogin('true');
+    $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
@@ -53,12 +53,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = "Fraser";
-    $contactName = "{$lastName}, {$firstName}";
-    $displayName = "{$firstName} {$lastName}";
-    $email = "{$lastName}.{$firstName}@example.org";
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
+    $contact = $this->createDialogContact("client_id");
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
@@ -80,26 +75,24 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom', FALSE);
 
     // Is status message correct?
-    $this->waitForText('crm-notification-container', "Case opened successfully.");
+    $this->checkCRMAlert("Case opened successfully.");
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 7);
 
-    $this->_testAddNewActivity($firstName, $subject, $customGroupTitle, $contactName);
+    $this->_testAddNewActivity($contact['first_name'], $subject, $customGroupTitle, $contact['sort_name']);
   }
 
   function testLinkCases() {
     $this->webtestLogin();
+
+    // Enable CiviCase module if necessary
+    $this->enableComponents("CiviCase");
 
     //Add Case 1
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = "Fraser";
-    $contactName = "{$lastName}, {$firstName}";
-    $displayName = "{$firstName} {$lastName}";
-    $email = "{$lastName}.{$firstName}@example.org";
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
+    $contact1 = $this->createDialogContact('client_id');
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
@@ -118,22 +111,17 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $today = date('F jS, Y', strtotime('now'));
 
     $this->type('duration', "20");
-    $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom', FALSE);
+    $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom');
 
     // Is status message correct?
-    $this->waitForText('crm-notification-container', "Case opened successfully.");
+    $this->checkCRMAlert("Case opened successfully.");
 
     //Add Case 2
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
-    $firstName2 = substr(sha1(rand()), 0, 7);
-    $lastName2 = "Fraser";
-    $contactName2 = "{$lastName}, {$firstName}";
-    $displayName2 = "{$firstName} {$lastName}";
-    $email2 = "{$lastName2}.{$firstName2}@example.org";
-    $this->webtestNewDialogContact($firstName2, $lastName2, $email2, $type = 4, "s2id_client_id");
+    $contact2 = $this->createDialogContact('client_id');
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel2 = "Adult Day Care Referral";
@@ -152,34 +140,35 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $today = date('F jS, Y', strtotime('now'));
 
     $this->type('duration', "20");
-    $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom', FALSE);
+    $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom');
 
     // Is status message correct?
-    $this->waitForText('crm-notification-container', "Case opened successfully.");
+    $this->checkCRMAlert("Case opened successfully.");
 
-    //Add Link Case Activity
+    // We should now be on the "manage case" screen for case 2
+    //Add Link Case Activity to case 1
     $this->select('add_activity_type_id', 'Link Cases');
     $this->waitForElementPresent("_qf_Activity_cancel-bottom");
-    $this->select2('link_to_case_id', $firstName);
+    $this->select2('link_to_case_id', $contact1['sort_name']);
     $activitydetails = 'Details of Link Case Activity';
     $this->fillRichTextField("details", $activitydetails, 'CKEditor');
-    $this->click('activity-details');
-    $this->waitForElementPresent('subject');
+    $this->click('css=#activity-details .crm-accordion-header');
+    $this->waitForVisible('subject');
     $activitySubject = 'Link Case Activity between case 1 and case 2';
     $activitylocation = 'Main Office Building';
-    $this->select2('source_contact_id', $firstName2);
+    $this->select2('source_contact_id', $contact2['sort_name']);
     $this->type('subject', $activitySubject);
     $this->type('location', $activitylocation);
-    $this->click('_qf_Activity_upload-bottom');
+    $this->clickAjaxLink('_qf_Activity_upload-bottom');
     $id = $this->urlArg('id');
     $this->waitForText("case_id_$id", $activitySubject);
     $this->click("xpath=//a[contains(text(),'$activitySubject')]");
 
     $LinkCaseActivityData = array(
-      "Client" => $firstName2,
+      "Client" => $contact2['first_name'],
       "Activity Type" => "Link Cases",
       "Subject" => $activitySubject,
-      "Reported By" => "{$firstName2} {$lastName2}",
+      "Reported By" => $contact2['display_name'],
       "Medium" => "Phone",
       "Location" => $activitylocation,
       "Date and Time" => $today,
@@ -283,15 +272,18 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', $subject);
 
     // click through to the Activity view screen
-    $this->waitForElementPresent("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[1]/td[8]");
-    $this->click("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[2]/td[8]/span[2]/ul/li/a[text()='File On Case']");
-    $this->waitForElementPresent('file_on_case_activity_subject');
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[5]/a[text()='Summerson, $firstName1']/../../td[8]/span/a[1][text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[5]/a[text()='Summerson, $firstName1']/../../td[8]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[5]/a[text()='Summerson, $firstName1']/../../td[8]/span[2][text()='more']/ul[1]/li[1]/a");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[5]/a[text()='Summerson, $firstName1']/../../td[8]/span[2][text()='more']/ul[1]/li[1]/a");
 
     // file activity on case
+    $this->waitForElementPresent('file_on_case_unclosed_case_id');
     $this->select2('file_on_case_unclosed_case_id', $firstName);
     $this->assertElementContainsText("xpath=//div[@id='s2id_file_on_case_unclosed_case_id']", "$firstName", 'Contact not found in line ' . __LINE__);
+    $this->type('file_on_case_activity_subject', $subject);
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
-    $this->waitForElementPresent("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[5]/a[text()='Summerson, $firstName1']/../../td[8]/span/a[1][text()='View']");
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
@@ -305,7 +297,6 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent('ActivityView');
     $this->waitForElementPresent("css=table#crm-activity-view-table tr.crm-case-activityview-form-block-groupTitle");
-    $this->assertElementContainsText('crm-activity-view-table', "$customDataParams[0]");
     $this->assertElementContainsText('crm-activity-view-table', "$textField");
     $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
     $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody/tr[1]/td[2]");
@@ -338,8 +329,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/custom/group', 'reset=1');
 
     //add new custom data
-    $this->click("//a[@id='newCustomDataGroup']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("//a[@id='newCustomDataGroup']/span");
 
     //fill custom group title
     $this->click("title");
@@ -349,13 +339,13 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->click("extends[0]");
     $this->select("extends[0]", "value=Activity");
     $this->click("//option[@value='Activity']");
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    $this->clickLink('_qf_Group_next-bottom');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     // create a custom field - Integer Radio
+    $this->clickLinkSuppressPopup('newCustomField', "data_type[0]");
     $this->click("data_type[0]");
     $this->select("data_type[0]", "value=1");
     $this->click("//option[@value='1']");
@@ -385,16 +375,12 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Field_next_new-bottom", "_qf_Field_next_new-bottom");
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$radioFieldLabel' has been saved.");
 
     // create another custom field - text field
-    $this->click("//a[@id='newCustomField']/span");
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
-
     $textFieldLabel = 'Custom Field Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $textFieldLabel);
 
@@ -408,13 +394,11 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
 
     //clicking save
-    $this->click('_qf_Field_next');
-    $this->waitForElementPresent("//a[@id='newCustomField']/span");
+    $this->clickLink("_qf_Field_done-bottom", "//a[@id='newCustomField']/span");
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$textFieldLabel' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//div//table/tbody//tr/td/span[text()='$textFieldLabel']");
-    $textFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//div//table/tbody//tr/td/span[text()='$textFieldLabel']/../../td[8]/span/a[text()='Edit Field']/@href"));
+    $textFieldId = explode('&id=', $this->getAttribute("xpath=//table[@id='options']/tbody//tr/td[1]/span[text()='$textFieldLabel']/../../td[8]/span/a[1][text()='Edit Field']/@href"));
     $textFieldId = $textFieldId[1];
 
     return array($radioOptionLabel1, "custom_{$textFieldId}_-1");

@@ -463,7 +463,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @access public
    * @static
    */
-  static function &getValues(&$entityBlock, $microformat = FALSE, $fieldName = 'contact_id') {
+  static function &getValues($entityBlock, $microformat = FALSE, $fieldName = 'contact_id') {
     if (empty($entityBlock)) {
       return NULL;
     }

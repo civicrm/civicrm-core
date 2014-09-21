@@ -1315,7 +1315,7 @@ AND civicrm_membership.is_test = %2";
       $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
     }
     //@todo it should no longer be possible for it to get to this point & membership to not be an array
-    if (is_array($membershipTypeIDs)) {
+    if (is_array($membershipTypeIDs) && !empty($membershipContributionID)) {
       $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
       foreach ($membershipTypeIDs as $memType) {
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
@@ -1359,9 +1359,14 @@ AND civicrm_membership.is_test = %2";
     }
     if(count($createdMemberships) == 1) {
       //presumably this is only relevant for exactly 1 membership
-      $form->_params['membershipID'] = $form->_values['membership_id'] = $createdMembership->id;
+      $form->_params['membershipID'] = $createdMembership->id;
     }
 
+    //CRM-15232: Check if membership is created and on the basis of it use
+    //membership reciept template to send payment reciept
+    if (count($createdMemberships)) {
+      $form->_values['isMembership'] = TRUE;
+    }
     if ($form->_contributeMode == 'notify') {
       if ($form->_values['is_monetary'] && $form->_amount > 0.0 && !$form->_params['is_pay_later']) {
         // call postProcess hook before leaving
@@ -2815,6 +2820,7 @@ WHERE      civicrm_membership.is_test = 0";
     $contributionParams['receipt_date'] = (CRM_Utils_Array::value('receipt_date', $params)) ? $params['receipt_date'] : 'null';
     $contributionParams['source'] = CRM_Utils_Array::value('contribution_source', $params);
     $contributionParams['non_deductible_amount'] = 'null';
+    $contributionParams['payment_processor'] = CRM_Utils_Array::value('payment_processor_id', $params);
     $contributionSoftParams = CRM_Utils_Array::value('soft_credit', $params);
     $recordContribution = array(
       'contact_id', 'total_amount', 'receive_date', 'financial_type_id',
@@ -2846,10 +2852,11 @@ WHERE      civicrm_membership.is_test = 0";
 
     //CRM-13981, create new soft-credit record as to record payment from different person for this membership
     if (!empty($contributionSoftParams)) {
-      $contributionSoftParams['contribution_id'] = $contribution->id;
-      $contributionSoftParams['currency'] = $contribution->currency;
-      $contributionSoftParams['amount'] = $contribution->total_amount;
-      CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
+      foreach ($contributionSoftParams as $contributionSoft){
+        $contributionSoft['contribution_id'] = $contribution->id;
+        $contributionSoft['currency'] = $contribution->currency;
+        CRM_Contribute_BAO_ContributionSoft::add($contributionSoft);
+      }
     }
 
     // store contribution id

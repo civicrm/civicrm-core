@@ -2157,7 +2157,7 @@ WHERE  contribution_id = %1 ";
       if (!empty($this->_relatedObjects['membership'])) {
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
-            $values['membership_id'] = $membership->id;
+            $values['isMembership'] = TRUE;
 
             // need to set the membership values here
             $template->assign('membership_assign', 1);
@@ -2607,7 +2607,7 @@ WHERE  contribution_id = %1 ";
     if (CRM_Utils_Array::value('contribution_mode', $params) == 'membership') {
       $isRelatedId = TRUE;
     }
-    
+
     $entityID[] = $entityId;
     if (!empty($additionalParticipantId)) {
       $entityID += $additionalParticipantId;
@@ -2730,7 +2730,7 @@ WHERE  contribution_id = %1 ";
           $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
           $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
         }
-                
+
         //if financial type is changed
         if (!empty($params['financial_type_id']) &&
           $params['contribution']->financial_type_id != $params['prevContribution']->financial_type_id) {

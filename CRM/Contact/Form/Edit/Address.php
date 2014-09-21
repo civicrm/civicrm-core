@@ -339,10 +339,14 @@ class CRM_Contact_Form_Edit_Address {
 
       foreach ($defaults['address'] as $key => $addressValue) {
         if (!empty($addressValue['master_id']) && !$shareAddressContactNames[$addressValue['master_id']]['is_deleted']) {
+          $master_cid = $shareAddressContactNames[$addressValue['master_id']]['contact_id'];
           $sharedAddresses[$key]['shared_address_display'] = array(
             'address' => $addressValue['display'],
             'name' => $shareAddressContactNames[$addressValue['master_id']]['name'],
+            'options' => CRM_Core_BAO_Address::getValues(array('entity_id' => $master_cid, 'contact_id' => $master_cid)),
+            'master_id' => $addressValue['master_id'],
           );
+          $defaults['address'][$key]['master_contact_id'] = $master_cid;
         }
         else {
           $defaults['address'][$key]['use_shared_address'] = 0;
