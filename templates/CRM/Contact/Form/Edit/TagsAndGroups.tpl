@@ -75,6 +75,14 @@
           "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
         }
       });
+	  
+	  {/literal}
+      {if $permission neq 'edit'}
+        {literal}
+          $("#tagtree input").prop('disabled', true);
+        {/literal}
+      {/if}
+      {literal}
     });
   })(CRM.$, CRM._);
   {/literal}
