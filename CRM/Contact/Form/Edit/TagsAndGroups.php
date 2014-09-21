@@ -164,9 +164,12 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       $form->assign('tagCount', count($elements));
       $form->assign('tree', $tree);
       $form->assign('tag', $tree);
-
       $form->assign('entityID', $contactId);
       $form->assign('entityTable', 'civicrm_contact');
+
+      if ($isRequired) {
+        $form->addRule($fName, ts('%1 is a required field.', array(1 => $tagName)), 'required');
+      }
 
       // build tag widget
       $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
