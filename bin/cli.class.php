@@ -331,8 +331,8 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
   }
 
   function run() {
-  	if($this->_semicolon)
-  		$this->separator = ';';
+    if($this->_semicolon)
+  	  $this->separator = ';';
   	
     $out = fopen("php://output", 'w');
     fputcsv($out, $this->columns, $this->separator, '"');
