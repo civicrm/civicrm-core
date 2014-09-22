@@ -2078,14 +2078,15 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     //add the custom set
     $return = $this->addCustomGroupField($customSets);
 
-    // Hack to ensure caches are properly cleared
-    // FIXME: This shouldn't be necessary, try to find root of the problem with *::testAjaxCustomGroupLoad
+    // FIXME: Hack to ensure caches are properly cleared
     if (TRUE) {
       $userName = $this->loggedInAs;
       $this->webtestLogout();
       $this->webtestLogin($userName);
     }
 
+    $this->openCiviPage($pageUrl['url'], $pageUrl['args']);
+    // Open the page again just to make sure caches are cleared
     $this->openCiviPage($pageUrl['url'], $pageUrl['args']);
     foreach($return as $values) {
       foreach ($values as $entityType => $customData) {
