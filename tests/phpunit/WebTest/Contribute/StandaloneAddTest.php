@@ -163,22 +163,21 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     }
 
     // go to first soft creditor contact view page
-    $this->click("css=table.crm-soft-credit-listing tbody tr td a");
+    $this->clickLink("css=table.crm-soft-credit-listing tbody tr td a");
 
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
     $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
-
+    $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[1]/a", preg_quote($contact['display_name']));
     // verify soft credit details
     $expected = array(
-      1 => $contact['display_name'],
-      2 => 'Donation',
-      1 => '100.00',
+      4 => 'Donation',
+      2 => '100.00',
       6 => 'Completed',
     );
     foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[1]/td[$value]", preg_quote($label));
+      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", preg_quote($label));
     }
   }
 
