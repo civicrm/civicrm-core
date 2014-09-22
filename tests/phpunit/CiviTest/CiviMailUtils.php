@@ -164,15 +164,12 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       $this->_ut->waitForElementPresent('css=td.crm-mailing-name');
 
       // This should select the first "Report" link in the table, which is sorted by Completion Date descending, so in theory is the most recent email. Not sure of a more robust way at the moment.
-      $this->_ut->click('xpath=//tr[contains(@id, "crm-mailing_")]//a[text()="Report"]');
+      $this->_ut->clickLink('xpath=//tr[contains(@id, "crm-mailing_")]//a[text()="Report"]');
 
       // Also not sure how robust this is, but there isn't a good
       // identifier for this link either.
       $this->_ut->waitForElementPresent('xpath=//a[contains(text(), "View complete message")]');
-      $this->_ut->click('xpath=//a[contains(text(), "View complete message")]');
-
-      $this->_ut->waitForPopUp(NULL, 30000);
-      $this->_ut->selectPopUp(NULL);
+      $this->_ut->clickLinkSuppressPopup('xpath=//a[contains(text(), "View complete message")]', NULL);
       /*
        * FIXME:
        *
@@ -184,8 +181,6 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
        */
       //$msg = $this->_ut->getHtmlSource();
       $msg = $this->_ut->getBodyText();
-      $this->_ut->close();
-      $this->_ut->selectWindow(NULL);
 
     }
     else {
@@ -328,7 +323,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    * @return ezcMail
    */
   private function convertToEzc($msg) {
-    $set = new ezcMailVariableSet($msg);
+    $set = new ezcMailVariableSet($msg);print_r($msg);
     $parser = new ezcMailParser();
     $mail = $parser->parseMail($set);
     $this->_ut->assertNotEmpty($mail, 'Cannot parse mail');
