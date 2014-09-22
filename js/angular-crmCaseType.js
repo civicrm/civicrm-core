@@ -231,7 +231,7 @@
         case 'sequence':
           return 0 == _.where($scope.caseType.definition.activitySets, {sequence: '1'}).length;
         default:
-          if (console && console.log) console.log('Denied access to unrecognized workflow: (' + workflow + ')');
+          CRM.console('warn', 'Denied access to unrecognized workflow: (' + workflow + ')');
           return false;
       }
     };

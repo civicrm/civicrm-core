@@ -937,6 +937,9 @@ CRM.strings = CRM.strings || {};
             CRM.alert(msg.text, msg.title, msg.type, msg.options);
           })
         }
+        if (response.backtrace) {
+          CRM.console('log', response.backtrace);
+        }
       }
     }
     // Suppress errors
@@ -1055,4 +1058,15 @@ CRM.strings = CRM.strings || {};
     result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
     return format.replace(/1.*234.*56/, result);
   };
+
+  CRM.console = function(method, title, msg) {
+    if (window.console) {
+      method = $.isFunction(console[method]) ? method : 'log';
+      if (msg === undefined) {
+        return console[method](title);
+      } else {
+        return console[method](title, msg);
+      }
+    }
+  }
 })(jQuery, _);
