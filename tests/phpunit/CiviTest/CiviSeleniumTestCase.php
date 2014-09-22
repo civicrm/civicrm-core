@@ -862,10 +862,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     $this->type('billing_street_address-5', '234 Lincoln Ave');
     $this->type('billing_city-5', 'San Bernadino');
-    $this->select('billing_country_id-5', 'value=1228');
-    $this->click('billing_state_province_id-5');
-    $this->waitForVisible('billing_state_province_id-5');
-    $this->select('billing_state_province_id-5', 'label=California');
+    $this->select2('billing_country_id-5', 'United States');
+    $this->select2('billing_state_province_id-5', 'California');
     $this->type('billing_postal_code-5', '93245');
 
     return array($firstName, $middleName, $lastName);
@@ -1558,8 +1556,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
-    $this->waitForElementPresent('_qf_Activity_cancel-bottom');
+    $this->clickLinkSuppressPopup("xpath=//div[@class='dataTables_wrapper no-footer']//table/tbody/tr[2]/td[8]/span/a[text()='View']", '_qf_Activity_cancel-bottom');
 
     // parse URL to grab the activity id
     // pass id back to any other tests that call this class
