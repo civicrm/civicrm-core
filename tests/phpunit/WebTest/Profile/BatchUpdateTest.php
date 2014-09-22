@@ -44,7 +44,6 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $lastName1 = "Smiths_x" . substr(sha1(rand()), 0, 7);
     $Name1 = $lastName1 . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName1, "$firstName1.$lastName1@example.com");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Add new individual using Quick Add block on the main page
     $firstName2 = "James_" . substr(sha1(rand()), 0, 7);
@@ -56,9 +55,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $Name3 = $lastName3 . ', ' . $firstName3;
 
     $this->webtestAddContact($firstName2, $lastName2, "$firstName2.$lastName2@example.com", "Student");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->webtestAddContact($firstName3, $lastName3, "$firstName3.$lastName3@example.com", "Staff");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $profileTitle = 'Batch Profile test_' . substr(sha1(rand()), 0, 7);
     $profileFields = array(
@@ -134,13 +131,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $lastName = "Smith_" . substr(sha1(rand()), 0, 7);
     $Name1 = $lastName . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName, "$firstName1.$lastName@example.com");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Add new individual using Quick Add block on the main page
     $firstName1 = "James_" . substr(sha1(rand()), 0, 7);
     $Name2 = $lastName . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName, "$firstName1.$lastName@example.com");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $profileTitle = 'Batch Profile test for contacts ' . substr(sha1(rand()), 0, 7);
     $profileFor = 'Contacts';
     $customDataArr = $this->_addCustomData($profileFor);
