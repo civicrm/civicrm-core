@@ -75,8 +75,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
     // create new contact using dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, "Contributor", $firstName . "@example.com");
+    $contact = $this->createDialogContact();
 
     // select financial type
     $this->select("financial_type_id", "value=1");
@@ -164,22 +163,21 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     }
 
     // go to first soft creditor contact view page
-    $this->click("css=table.crm-soft-credit-listing tbody tr td a");
+    $this->clickLink("css=table.crm-soft-credit-listing tbody tr td a");
 
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
     $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
-
+    $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[1]/a", preg_quote($contact['display_name']));
     // verify soft credit details
     $expected = array(
-      1 => "{$firstName} Contributor",
-      2 => 'Donation',
-      1 => '100.00',
+      4 => 'Donation',
+      2 => '100.00',
       6 => 'Completed',
     );
     foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[1]/td[$value]", preg_quote($label));
+      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", preg_quote($label));
     }
   }
 
@@ -204,8 +202,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[2]", "Financial Type IN {$financialType['name']}");
 
     $this->openCiviPage("contact/search/advanced", "reset=1", "_qf_Advanced_refresh-top");
-    $this->click('CiviContribute');
-    $this->waitForElementPresent("financial_type_id");
+    $this->clickAjaxLink('CiviContribute', "financial_type_id");
 
     // select group
     $this->select("financial_type_id", "label={$financialType['name']}");
@@ -222,8 +219,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
     // create new contact using dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, "Contributor", $firstName . "@example.com");
+    $this->createDialogContact();
 
     // select financial type
     $this->select("financial_type_id", "label={$financialType['name']}");
@@ -256,11 +252,10 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('thankyou_date');
 
     // Clicking save.
-    $this->click("_qf_Contribution_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Contribution_upload");
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The contribution record has been saved."), "Status message didn't show up after saving!");
+    $this->checkCRMAlert("The contribution record has been saved.");
 
     // verify if Membership is created
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");

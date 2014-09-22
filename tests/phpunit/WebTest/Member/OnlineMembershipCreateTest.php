@@ -47,8 +47,8 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $hash = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
 
     // create contribution page with randomized title and default params
     $amountSection = TRUE;
@@ -258,8 +258,8 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
 
     $hash = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $amountSection = TRUE;
     $payLater = TRUE;
     $allowOtherAmmount = TRUE;

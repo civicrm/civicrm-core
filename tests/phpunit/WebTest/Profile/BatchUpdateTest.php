@@ -44,7 +44,6 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $lastName1 = "Smiths_x" . substr(sha1(rand()), 0, 7);
     $Name1 = $lastName1 . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName1, "$firstName1.$lastName1@example.com");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Add new individual using Quick Add block on the main page
     $firstName2 = "James_" . substr(sha1(rand()), 0, 7);
@@ -56,9 +55,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $Name3 = $lastName3 . ', ' . $firstName3;
 
     $this->webtestAddContact($firstName2, $lastName2, "$firstName2.$lastName2@example.com", "Student");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->webtestAddContact($firstName3, $lastName3, "$firstName3.$lastName3@example.com", "Staff");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $profileTitle = 'Batch Profile test_' . substr(sha1(rand()), 0, 7);
     $profileFields = array(
@@ -134,13 +131,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $lastName = "Smith_" . substr(sha1(rand()), 0, 7);
     $Name1 = $lastName . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName, "$firstName1.$lastName@example.com");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Add new individual using Quick Add block on the main page
     $firstName1 = "James_" . substr(sha1(rand()), 0, 7);
     $Name2 = $lastName . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName, "$firstName1.$lastName@example.com");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $profileTitle = 'Batch Profile test for contacts ' . substr(sha1(rand()), 0, 7);
     $profileFor = 'Contacts';
     $customDataArr = $this->_addCustomData($profileFor);
@@ -659,10 +654,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type("options_per_line", 2);
 
     //clicking save
-    $this->click('_qf_Field_next_new-top');
+    $this->clickLink('_qf_Field_next_new-top', '_qf_Field_done-bottom', FALSE);
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$checkLabel1' has been saved.");
+    $this->waitForElementPresent("label");
     $returnArray[1] = array($customGroupTitle, $checkLabel1);
 
     // create another custom field - Integer Radio
@@ -686,13 +682,14 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('option_value_3', 3);
 
     //clicking save
-    $this->click('_qf_Field_next_new-top');
+    $this->clickLink('_qf_Field_next_new-top', '_qf_Field_done-bottom', FALSE);
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$checkLabel2' has been saved.");
     $returnArray[2] = array($customGroupTitle, $checkLabel2);
 
     // create another custom field - Date
+    $this->waitForElementPresent("label");
     $dateFieldLabel = 'Custom Date Field' . substr(sha1(rand()), 0, 4);
     $this->type('label', $dateFieldLabel);
     $this->click('data_type[0]');
@@ -710,12 +707,13 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->select('time_format', "value=2");
 
     //clicking save
-    $this->click('_qf_Field_next_new-top');
+    $this->clickLink('_qf_Field_next_new-top', '_qf_Field_done-bottom', FALSE);
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$dateFieldLabel' has been saved.");
     $returnArray[3] = array($customGroupTitle, $dateFieldLabel);
 
     //create rich text editor field
+    $this->waitForElementPresent("label");
     $richTextField = 'Custom Rich TextField_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $richTextField);
     $this->click('data_type[0]');
@@ -723,7 +721,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->select('data_type[1]', "label=RichTextEditor");
 
     //clicking save
-    $this->click('_qf_Field_next_new-top');
+    $this->clickLink('_qf_Field_next_new-top', '_qf_Field_done-bottom', FALSE);
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$richTextField' has been saved.");
@@ -731,6 +729,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     //create radio button field
     //for radio 1
+    $this->waitForElementPresent("label");
     $radioLabel1 = 'Custom Radio One Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $radioLabel1);
     $this->click('data_type[0]');
@@ -750,7 +749,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('option_value_3', 3);
 
     //clicking save
-    $this->click('_qf_Field_next_new-top');
+    $this->clickLink('_qf_Field_next_new-top', '_qf_Field_done-bottom', FALSE);
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$radioLabel1' has been saved.");
@@ -758,6 +757,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     // create another custom field - Alpha Radio
     //for radio 2
+    $this->waitForElementPresent("label");
     $radioLabel2 = 'Custom Radio Two Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $radioLabel2);
     $this->click('data_type[0]');

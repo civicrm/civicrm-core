@@ -37,7 +37,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
   function testAddActivityToCase() {
     // Log in as admin first to verify permissions for CiviCase
-    $this->webtestLogin('true');
+    $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
@@ -53,12 +53,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = "Fraser";
-    $contactName = "{$lastName}, {$firstName}";
-    $displayName = "{$firstName} {$lastName}";
-    $email = "{$lastName}.{$firstName}@example.org";
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
+    $contact = $this->createDialogContact("client_id");
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
@@ -80,10 +75,10 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom', FALSE);
 
     // Is status message correct?
-    $this->waitForText('crm-notification-container', "Case opened successfully.");
+    $this->checkCRMAlert("Case opened successfully.");
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 7);
 
-    $this->_testAddNewActivity($firstName, $subject, $customGroupTitle, $contactName);
+    $this->_testAddNewActivity($contact['first_name'], $subject, $customGroupTitle, $contact['sort_name']);
   }
 
   function testLinkCases() {
@@ -97,12 +92,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = "Fraser";
-    $contactName = "{$lastName}, {$firstName}";
-    $displayName = "{$firstName} {$lastName}";
-    $email = "{$lastName}.{$firstName}@example.org";
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
+    $contact1 = $this->createDialogContact('client_id');
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
@@ -121,22 +111,17 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $today = date('F jS, Y', strtotime('now'));
 
     $this->type('duration', "20");
-    $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom', FALSE);
+    $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom');
 
     // Is status message correct?
-    $this->waitForText('crm-notification-container', "Case opened successfully.");
+    $this->checkCRMAlert("Case opened successfully.");
 
     //Add Case 2
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
-    $firstName2 = substr(sha1(rand()), 0, 7);
-    $lastName2 = "Fraser";
-    $contactName2 = "{$lastName}, {$firstName}";
-    $displayName2 = "{$firstName} {$lastName}";
-    $email2 = "{$lastName2}.{$firstName2}@example.org";
-    $this->webtestNewDialogContact($firstName2, $lastName2, $email2, $type = 4, "s2id_client_id");
+    $contact2 = $this->createDialogContact('client_id');
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel2 = "Adult Day Care Referral";
@@ -155,34 +140,35 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $today = date('F jS, Y', strtotime('now'));
 
     $this->type('duration', "20");
-    $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom', FALSE);
+    $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom');
 
     // Is status message correct?
-    $this->waitForText('crm-notification-container', "Case opened successfully.");
+    $this->checkCRMAlert("Case opened successfully.");
 
-    //Add Link Case Activity
+    // We should now be on the "manage case" screen for case 2
+    //Add Link Case Activity to case 1
     $this->select('add_activity_type_id', 'Link Cases');
     $this->waitForElementPresent("_qf_Activity_cancel-bottom");
-    $this->select2('link_to_case_id', $firstName);
+    $this->select2('link_to_case_id', $contact1['sort_name']);
     $activitydetails = 'Details of Link Case Activity';
     $this->fillRichTextField("details", $activitydetails, 'CKEditor');
-    $this->click('activity-details');
-    $this->waitForElementPresent('subject');
+    $this->click('css=#activity-details .crm-accordion-header');
+    $this->waitForVisible('subject');
     $activitySubject = 'Link Case Activity between case 1 and case 2';
     $activitylocation = 'Main Office Building';
-    $this->select2('source_contact_id', $firstName2);
+    $this->select2('source_contact_id', $contact2['sort_name']);
     $this->type('subject', $activitySubject);
     $this->type('location', $activitylocation);
-    $this->click('_qf_Activity_upload-bottom');
+    $this->clickAjaxLink('_qf_Activity_upload-bottom');
     $id = $this->urlArg('id');
     $this->waitForText("case_id_$id", $activitySubject);
     $this->click("xpath=//a[contains(text(),'$activitySubject')]");
 
     $LinkCaseActivityData = array(
-      "Client" => $firstName2,
+      "Client" => $contact2['first_name'],
       "Activity Type" => "Link Cases",
       "Subject" => $activitySubject,
-      "Reported By" => "{$firstName2} {$lastName2}",
+      "Reported By" => $contact2['display_name'],
       "Medium" => "Phone",
       "Location" => $activitylocation,
       "Date and Time" => $today,

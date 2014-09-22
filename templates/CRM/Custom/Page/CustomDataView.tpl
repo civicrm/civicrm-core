@@ -50,7 +50,7 @@
           <div class="crm-accordion-wrapper {if $cd_edit.collapse_display eq 0 or $skipTitle} {else}collapsed{/if}">
             {if !$skipTitle}
               <div class="crm-accordion-header">
-                {$cd_edit.title} {$rowCount}
+                {$cd_edit.title}
               </div>
             {/if}
             <div class="crm-accordion-body">
