@@ -142,21 +142,30 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     }
 
     if ($type & self::TAG) {
+      // CODE FROM CRM/Tag/Form/Tag.php //
+      CRM_Core_Resources::singleton()
+        ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
+        ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
+
       $fName = 'tag';
       if ($fieldName) {
         $fName = $fieldName;
       }
       $form->_tagGroup[$fName] = 1;
-      $elements = array();
-      $tag = CRM_Core_BAO_Tag::getTags();
 
-      foreach ($tag as $id => $name) {
-        $elements[] = $form->createElement('checkbox', $id, NULL, $name);
-      }
-      if (!empty($elements)) {
-        $form->addGroup($elements, $fName, $tagName, '<br />');
-        $form->assign('tagCount', count($elements));
-      }
+      // get the list of all the categories
+      $tags = new CRM_Core_BAO_Tag();
+      $tree = $tags->getTree('civicrm_contact', TRUE);
+
+      $elements = array();
+      self::climbtree($form, $tree, $elements);
+
+      $form->addGroup($elements, $fName, $tagName, '<br />');
+      $form->assign('tagCount', count($elements));
+      $form->assign('tree', $tree);
+      $form->assign('tag', $tree);
+      $form->assign('entityID', $contactId);
+      $form->assign('entityTable', 'civicrm_contact');
 
       if ($isRequired) {
         $form->addRule($fName, ts('%1 is a required field.', array(1 => $tagName)), 'required');
@@ -164,10 +173,25 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
 
       // build tag widget
       $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
-
       CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, FALSE, TRUE);
     }
     $form->assign('tagGroup', $form->_tagGroup);
+  }
+  
+  static function climbtree($form, $tree, &$elements) {
+    foreach ($tree as $tagID => $varValue) {
+      $tagAttribute = array(
+      'onclick' => "return changeRowColor(\"rowidtag_$tagID\")",
+      'id' => "tag_{$tagID}",
+      );
+
+      $elements[$tagID] = $form->createElement('checkbox', $tagID, '', '', $tagAttribute);
+
+      if (array_key_exists('children', $varValue)) {
+        self::climbtree($form, $varValue['children'], $elements);
+      }
+    }
+   return $elements;
   }
 
   /**
