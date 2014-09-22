@@ -65,9 +65,10 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    * @param $startImmediately bool Start writing to db now or wait until start() is called
    */
   function __construct(&$unit_test, $startImmediately = TRUE) {
+    $this->_ut = $unit_test;
+
     // Check if running under webtests or not
     if (is_subclass_of($unit_test, 'CiviSeleniumTestCase')) {
-      $this->_ut = $unit_test;
       $this->_webtest = TRUE;
     }
 
