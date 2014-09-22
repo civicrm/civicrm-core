@@ -91,8 +91,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'description')
       );
 
-      //@lobo haven't a clue why the checkbox isn't displayed (it should be checked by default
-      $this->add('checkbox', 'is_selectable');
+      $this->add('checkbox', 'is_selectable', ts('Selectable?'));
 
       $isReserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
@@ -148,6 +147,10 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
 
     if (!isset($params['is_reserved'])) {
       $params['is_reserved'] = 0;
+    }
+
+    if (!isset($params['is_selectable'])) {
+      $params['is_selectable'] = 0;
     }
 
     if ($this->_action == CRM_Core_Action::DELETE) {
