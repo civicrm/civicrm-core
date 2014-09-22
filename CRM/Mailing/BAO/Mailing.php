@@ -1108,7 +1108,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @param null $replyToEmail
    *
-   * @return object               The mail object
+   * @return Mail_mime               The mail object
    * @access public
    */
   public function &compose($job_id, $event_queue_id, $hash, $contactId,
