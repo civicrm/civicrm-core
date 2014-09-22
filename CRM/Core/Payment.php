@@ -91,7 +91,7 @@ abstract class CRM_Core_Payment {
    * @param object  $paymentForm      reference to the form object if available
    * @param boolean $force            should we force a reload of this payment object
    *
-   * @return object
+   * @return CRM_Core_Payment
    * @static
    *
    */

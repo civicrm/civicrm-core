@@ -73,7 +73,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
 
     // check tag we have created
     $this->click("xpath=//ul/li/span/label[text()=\"$tagName\"]");
-    $this->waitForStatusMsg();
+    $this->checkCRMStatus();
   }
 
   function testTagSetContact() {

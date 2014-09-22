@@ -63,7 +63,6 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     // Add Contact
     $firstName2 = 'An_' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "Summerson");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Edit and expand all tabs
     $this->click('link=Edit');
@@ -183,7 +182,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
 
     // clicking save
     $this->click('_qf_Field_done-bottom');
-    $this->waitForElementPresent('newCustomField');
+    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td");
 
     $this->waitForText('crm-notification-container', "Custom field '{$customField}' has been saved.");
     $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField']/../../td[8]/span/a@href"));

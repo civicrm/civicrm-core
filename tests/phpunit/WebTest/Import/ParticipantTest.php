@@ -255,8 +255,8 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
 
     if (empty($params)) {
 
-      // We need a payment processor
-      $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+      // Use default payment processor
+      $processorName = 'Test Processor';
       $this->webtestAddPaymentProcessor($processorName);
 
       // create an event

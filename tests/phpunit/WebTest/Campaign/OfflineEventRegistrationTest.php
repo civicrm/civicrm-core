@@ -135,8 +135,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->click("campaign_id");
     $this->select("campaign_id", "value=$id");
     $this->waitForElementPresent('_qf_EventInfo_upload_done-bottom');
-    $this->click("_qf_EventInfo_upload_done-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_EventInfo_upload_done-bottom");
 
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
@@ -148,7 +147,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
-    $this->webtestFillAutocomplete($firstName, 'contact_id');
+    $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
     $this->select2("event_id", $eventName);
