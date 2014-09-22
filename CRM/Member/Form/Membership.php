@@ -1431,10 +1431,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         );
 
         //create new soft-credit record, CRM-13981
-        $softParams['contribution_id'] = $contribution->id;
-        $softParams['currency'] = $contribution->currency;
-        $softParams['amount'] = $contribution->total_amount;
-        CRM_Contribute_BAO_ContributionSoft::add($softParams);
+        if ($softParams) {
+          $softParams['contribution_id'] = $contribution->id;
+          $softParams['currency'] = $contribution->currency;
+          $softParams['amount'] = $contribution->total_amount;
+          CRM_Contribute_BAO_ContributionSoft::add($softParams);
+        }
 
         $paymentParams['contactID'] = $this->_contactID;
         $paymentParams['contributionID'] = $contribution->id;
@@ -1560,13 +1562,14 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           CRM_Price_BAO_LineItem::processPriceSet($params['contribution_id'], $lineItem, $contributionBAO, 'civicrm_membership');
 
           //create new soft-credit record, CRM-13981
-          $softParams['contribution_id'] = $params['contribution_id'];
-
-          while ($contributionBAO->fetch()) {
-            $softParams['currency'] = $contributionBAO->currency;
-            $softParams['amount'] = $contributionBAO->total_amount;
+          if ($softParams) {
+            $softParams['contribution_id'] = $params['contribution_id'];
+            while ($contributionBAO->fetch()) {
+              $softParams['currency'] = $contributionBAO->currency;
+              $softParams['amount'] = $contributionBAO->total_amount;
+            }
+            CRM_Contribute_BAO_ContributionSoft::add($softParams);
           }
-          CRM_Contribute_BAO_ContributionSoft::add($softParams);
         }
 
         //carry updated membership object.
