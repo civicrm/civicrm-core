@@ -525,8 +525,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->type("css=.crm-basic-criteria-form-block input#sort_name", $pcpCreatorFirstName);
 
     // click to search
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     $this->click("xpath=//div[@class='crm-search-results']//table/tbody//tr/td[3]/a[text()='{$sortName}']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
