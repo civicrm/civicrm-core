@@ -43,7 +43,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
 
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
-    $this->type("sort_name", "Contributor");
+    $this->type("sort_name", "Individual");
     $this->click('contribution_status_id_2');
     $this->clickLink("_qf_Search_refresh");
 
@@ -58,7 +58,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
 
     $this->waitForElementPresent("contribution_date_low");
 
-    $this->type("sort_name", "Contributor");
+    $this->type("sort_name", "Individual");
     $this->click('contribution_status_id_1');
     $this->click("_qf_Search_refresh");
 

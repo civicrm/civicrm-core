@@ -15,7 +15,7 @@
       return tplURL = path;
     }
     if (!tplURL) {
-      console && console.log && console.log('Warning: CRM.url called before initialization');
+      CRM.console('error', 'Error: CRM.url called before initialization');
     }
     if (!mode) {
       mode = CRM.config && CRM.config.isFrontend ? 'front' : 'back';
@@ -36,10 +36,10 @@
     return url;
   };
 
-  // Backwards compatible with jQuery fn
+  // @deprecated
   $.extend ({'crmURL':
     function (p, params) {
-      console && console.log && console.log('Calling crmURL from jQuery is deprecated. Please use CRM.url() instead.');
+      CRM.console('warn', 'Calling crmURL from jQuery is deprecated. Please use CRM.url() instead.');
       return CRM.url(p, params);
     }
   });
@@ -156,7 +156,7 @@
    * @deprecated
    */
   $.fn.crmAPI = function(entity, action, params, options) {
-    console && console.log && console.log('Calling crmAPI from jQuery is deprecated. Please use CRM.api() instead.');
+    CRM.console('warn', 'Calling crmAPI from jQuery is deprecated. Please use CRM.api3() instead.');
     return CRM.api.call(this, entity, action, params, options);
   };
 
