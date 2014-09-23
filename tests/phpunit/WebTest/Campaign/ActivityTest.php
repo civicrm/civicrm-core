@@ -106,8 +106,8 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
 
     $this->waitForText('crm-notification-container', "Campaign $title");
 
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("xpath=//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[3][text()='{$campaignTitle}']/../td[1]");
+    $id = (int) $this->getText("xpath=//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[3][text()='{$campaignTitle}']/../td[1]");
     $this->activityAddTest($campaignTitle, $id);
   }
 
@@ -156,6 +156,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->type("subject", $subject);
 
     // select campaign
+    $this->waitForElementPresent("campaign_id");
     $this->click("campaign_id");
     $this->select("campaign_id", "value=$id");
 
@@ -197,7 +198,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody/tr[1]/td[8]/span/a[text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr[2]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
     $this->waitForElementPresent("xpath=id('Activity')/div[2]/table[1]/tbody/tr[5]/td[2]/span");
 

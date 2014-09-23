@@ -764,6 +764,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       // Use the default test processor, no need to create a new one
       $this->openCiviPage('admin/paymentProcessor', 'action=update&id=1&reset=1', '_qf_PaymentProcessor_cancel-bottom');
       $this->check('is_default');
+      $this->select('financial_account_id', "label={$financialAccount}");
       $this->clickLink('_qf_PaymentProcessor_next-bottom');
       return 1;
     }
@@ -812,7 +813,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->openCiviPage('admin/paymentProcessor', 'action=add&reset=1&pp=' . $pid, 'name');
     $this->type('name', $processorName);
     $this->select('financial_account_id', "label={$financialAccount}");
-
     foreach ($processorSettings AS $f => $v) {
       $this->type($f, $v);
     }
