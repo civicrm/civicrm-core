@@ -420,11 +420,11 @@ CRM.strings = CRM.strings || {};
       $el.crmSelect2($.extend(settings, $el.data('select-params'), selectParams))
         .on('select2-selecting.crmEntity', function(e) {
           if (e.val === "0") {
+            // Create a new term
             e.object.label = e.object.term;
             CRM.api3(entity, 'create', $.extend({name: e.object.term}, $el.data('api-params').params || {}))
               .done(function(created) {
                 var
-                  multiple = !!$el.data('select-params').multiple,
                   val = $el.select2('val'),
                   data = $el.select2('data'),
                   item = {id: created.id, label: e.object.term};
@@ -553,11 +553,15 @@ CRM.strings = CRM.strings || {};
           e.preventDefault();
         });
       }
+      // FIXME: D7 hack to get the toolbar out of the way (CRM-15341)
+      if (CRM.config.userFramework === 'Drupal') $('#toolbar').css('z-index', '100');
     })
     .on('dialogclose', function(e) {
       // Restore scrollbars when closing modal
       if ($('.ui-dialog .modal-dialog:visible').not(e.target).length < 1) {
         $('body').css({overflow: ''});
+        // FIXME: D7 hack, restore toolbar (CRM-15341)
+        if (CRM.config.userFramework === 'Drupal') $('#toolbar').css('z-index', '');
       }
     })
     .on('submit', function(e) {
@@ -628,9 +632,7 @@ CRM.strings = CRM.strings || {};
   }
 
   advmultiselectResize();
-  $(window).resize(function () {
-    advmultiselectResize();
-  });
+  $(window).resize(advmultiselectResize);
 
   $.fn.crmtooltip = function () {
     $(document)
@@ -937,6 +939,9 @@ CRM.strings = CRM.strings || {};
             CRM.alert(msg.text, msg.title, msg.type, msg.options);
           })
         }
+        if (response.backtrace) {
+          CRM.console('log', response.backtrace);
+        }
       }
     }
     // Suppress errors
@@ -1055,4 +1060,15 @@ CRM.strings = CRM.strings || {};
     result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
     return format.replace(/1.*234.*56/, result);
   };
+
+  CRM.console = function(method, title, msg) {
+    if (window.console) {
+      method = $.isFunction(console[method]) ? method : 'log';
+      if (msg === undefined) {
+        return console[method](title);
+      } else {
+        return console[method](title, msg);
+      }
+    }
+  }
 })(jQuery, _);

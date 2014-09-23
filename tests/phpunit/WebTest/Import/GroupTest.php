@@ -64,8 +64,7 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     // Select GroupName
     $this->select("group", "label={$groupName}");
 
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     // To Check Number Of Imported Contacts
     $this->assertTrue($this->isTextPresent("{$count} Contacts"), "Contacts Not Found");
@@ -86,8 +85,7 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     // Select GroupName
     $this->select("group", "label={$groupName}");
 
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     // To Check Imported Contacts
     $this->assertTrue($this->isTextPresent("{$count} Contacts"), "Contacts Not Found");
