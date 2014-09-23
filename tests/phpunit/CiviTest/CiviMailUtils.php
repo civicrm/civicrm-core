@@ -118,14 +118,15 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
 
   function stop() {
     if ($this->_webtest) {
-      // Change outbound mail setting
-      $this->_ut->openCiviPage('admin/setting/smtp', "reset=1", "_qf_Smtp_next");
-      $this->_ut->click('xpath=//input[@name="outBound_option" and @value="' . $this->_outBound_option . '"]');
-      $this->_ut->clickLink("_qf_Smtp_next");
-
-      // Is there supposed to be a status message displayed when outbound email settings are changed?
-      // assert something?
-
+      if ($this->_outBound_option != CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB) {
+        // Change outbound mail setting
+        $this->_ut->openCiviPage('admin/setting/smtp', "reset=1", "_qf_Smtp_next");
+        $this->_ut->click('xpath=//input[@name="outBound_option" and @value="' . $this->_outBound_option . '"]');
+        if ($this->_outBound_option != CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
+          $this->_ut->chooseOkOnNextConfirmation();
+        }
+        $this->_ut->clickLink("_qf_Smtp_next");
+      }
     }
     else {
 
