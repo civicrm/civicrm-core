@@ -1449,6 +1449,7 @@ INSERT INTO civicrm_uf_field
        ( 11,     'check_number',                0, 0, 11, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Check Number{/ts}', 'Membership', NULL, NULL ),
        ( 11,     'contribution_status_id',      1, 1, 12, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Payment Status{/ts}', 'Membership', NULL, NULL ),
        ( 11,     'soft_credit',                 0, 0, 13, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Soft Credit{/ts}', 'Membership', NULL, NULL ),
+       ( 11,     'soft_credit_type',            0, 0, 14, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Soft Credit Type{/ts}', 'Membership', NULL, NULL ),
        ( 12,     'first_name',                  1, 0,  1, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}First Name{/ts}',  'Individual', NULL, NULL),
        ( 12,     'last_name',                   1, 0,  2, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Last Name{/ts}',   'Individual',  NULL,  NULL),
        ( 12,     'email',                       1, 0,  3, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Email Address{/ts}', 'Contact', NULL, NULL),
