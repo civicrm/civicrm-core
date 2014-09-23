@@ -420,11 +420,11 @@ CRM.strings = CRM.strings || {};
       $el.crmSelect2($.extend(settings, $el.data('select-params'), selectParams))
         .on('select2-selecting.crmEntity', function(e) {
           if (e.val === "0") {
+            // Create a new term
             e.object.label = e.object.term;
             CRM.api3(entity, 'create', $.extend({name: e.object.term}, $el.data('api-params').params || {}))
               .done(function(created) {
                 var
-                  multiple = !!$el.data('select-params').multiple,
                   val = $el.select2('val'),
                   data = $el.select2('data'),
                   item = {id: created.id, label: e.object.term};
@@ -632,9 +632,7 @@ CRM.strings = CRM.strings || {};
   }
 
   advmultiselectResize();
-  $(window).resize(function () {
-    advmultiselectResize();
-  });
+  $(window).resize(advmultiselectResize);
 
   $.fn.crmtooltip = function () {
     $(document)
