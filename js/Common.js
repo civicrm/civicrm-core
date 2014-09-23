@@ -553,11 +553,15 @@ CRM.strings = CRM.strings || {};
           e.preventDefault();
         });
       }
+      // FIXME: D7 hack to get the toolbar out of the way (CRM-15341)
+      if (CRM.config.userFramework === 'Drupal') $('#toolbar').css('z-index', '100');
     })
     .on('dialogclose', function(e) {
       // Restore scrollbars when closing modal
       if ($('.ui-dialog .modal-dialog:visible').not(e.target).length < 1) {
         $('body').css({overflow: ''});
+        // FIXME: D7 hack, restore toolbar (CRM-15341)
+        if (CRM.config.userFramework === 'Drupal') $('#toolbar').css('z-index', '');
       }
     })
     .on('submit', function(e) {
