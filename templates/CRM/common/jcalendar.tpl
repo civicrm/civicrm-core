@@ -23,7 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{strip}
 {if $batchUpdate}
     {assign var='elementId'   value=$form.field.$elementIndex.$elementName.id}
     {assign var="tElement" value=$elementName|cat:"_time"}
@@ -73,21 +72,21 @@
     {literal}
     CRM.$(function($) {
       {/literal}
-      var element_date   = "#{$displayDate}";
-      var element_time  = "#{$elementId}_time";
+      // Workaround for possible duplicate ids in the dom - select by name instead of id and exclude already initialized widgets
+      var $dateElement = $('input[name={$displayDate}].dateplugin:not(.hasDatepicker)');
       {if $timeElement}
-          element_time  = "#{$timeElement}";
-          var time_format   = $( element_time ).attr('timeFormat');
+        var $timeElement = $dateElement.siblings("#{$timeElement}");
+        var time_format = $timeElement.attr('timeFormat');
           {literal}
-              $(element_time).timeEntry({ show24Hours : time_format, spinnerImage: '' });
+            $timeElement.timeEntry({ show24Hours : time_format, spinnerImage: '' });
           {/literal}
+      {else}
+        var $timeElement = $();
       {/if}
-      var currentYear = new Date().getFullYear();
-      var alt_field   = '#{$elementId}';
-      $( alt_field ).hide();
-      var date_format = $( alt_field ).attr('format');
-
-      var altDateFormat = 'mm/dd/yy';
+      var currentYear = new Date().getFullYear(),
+        $originalElement = $dateElement.siblings('#{$elementId}').hide(),
+        date_format = $originalElement.attr('format'),
+        altDateFormat = 'mm/dd/yy';
       {literal}
       switch ( date_format ) {
         case 'dd-mm':
@@ -97,30 +96,27 @@
       }
 
       if ( !( ( date_format == 'M yy' ) || ( date_format == 'yy' ) || ( date_format == 'yy-mm' ) ) ) {
-          $( element_date ).addClass( 'dpDate' );
+          $dateElement.addClass( 'dpDate' );
       }
 
       {/literal}
-      var yearRange   = currentYear - parseInt( $( alt_field ).attr('startOffset') );
+      var yearRange   = currentYear - parseInt($originalElement.attr('startOffset'));
           yearRange  += ':';
-          yearRange  += currentYear + parseInt( $( alt_field ).attr('endOffset'  ) );
+          yearRange  += currentYear + parseInt($originalElement.attr('endOffset'));
       {literal}
 
-      var startRangeYr = currentYear - parseInt( $( alt_field ).attr('startOffset') );
-      var endRangeYr = currentYear + parseInt( $( alt_field ).attr('endOffset'  ) );
+      var startRangeYr = currentYear - parseInt($originalElement.attr('startOffset')),
+        endRangeYr = currentYear + parseInt($originalElement.attr('endOffset'));
 
-      var lcMessage = {/literal}"{$config->lcMessages}"{literal};
-      var localisation = lcMessage.split('_');
-      var dateValue = $(alt_field).val( );
-      $(element_date).datepicker({
+      $dateElement.datepicker({
                                     closeAtTop        : true,
                                     dateFormat        : date_format,
                                     changeMonth       : true,
                                     changeYear        : true,
-                                    altField          : alt_field,
+                                    altField          : $originalElement,
                                     altFormat         : altDateFormat,
                                     yearRange         : yearRange,
-                                    regional          : localisation[0],
+                                    regional          : CRM.config.lcMessages.split('_')[0],
                                     minDate           : new Date(startRangeYr, 1 - 1, 1),
                                     maxDate           : new Date(endRangeYr, 12 - 1, 31)
                                 });
@@ -128,15 +124,15 @@
       // set default value to display field, setDefault param for datepicker
       // is not working hence using below logic
       // parse the date
-      var displayDateValue = $.datepicker.parseDate( altDateFormat, dateValue );
+      var displayDateValue = $.datepicker.parseDate(altDateFormat, $originalElement.val());
 
       // format date according to display field
       displayDateValue = $.datepicker.formatDate( date_format, displayDateValue );
-      $( element_date).val( displayDateValue );
+      $dateElement.val( displayDateValue );
       //support unsaved-changes warning: CRM-14353
-      $( element_date).data('crm-initial-value', displayDateValue);
+      $dateElement.data('crm-initial-value', displayDateValue);
 
-      $(element_date).click( function( ) {
+      $dateElement.click( function( ) {
           hideYear( this );
       });
       $('.ui-datepicker-trigger').click( function( ) {
@@ -148,13 +144,14 @@
           $(".ui-datepicker-year").css('display', 'none');
         }
       }
-      $(alt_field + ',' + element_date + ',' + element_time).on('blur change', function() {
-        var vis = $(alt_field).val() || $(element_time).val() ? '' : 'hidden';
-        $(this).siblings('.crm-clear-link').css('visibility', vis);
+      // Add clear button
+      $($timeElement).add($originalElement).add($dateElement).on('blur change', function() {
+        var vis = $dateElement.val() || $timeElement.val() ? '' : 'hidden';
+        $dateElement.siblings('.crm-clear-link').css('visibility', vis);
       });
-      $(alt_field).change();
+      $originalElement.change();
     });
 
     {/literal}
 </script>
-{/strip}
+
