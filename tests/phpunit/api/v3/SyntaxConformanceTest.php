@@ -248,6 +248,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailSettings',
       'Setting',
       'MailingContact',
+      //temporary for 4.4 - do not merge to 4.5
+      'FinancialType',
+      'FinancialAccount',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -284,6 +287,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ActionSchedule' => array(
         'cant_update' => array(
           'group_id',
+        ),
+      ),
+      'ActivityContact' => array(
+        'cant_update' => array(
+          'activity_id', //we have an FK on activity_id + contact_id + record id so if we don't leave this one distinct we get an FK constraint error
         ),
       ),
       'Address' => array(
