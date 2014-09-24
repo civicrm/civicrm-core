@@ -95,7 +95,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @static
    * @return object
    */
-  static function add(&$params, &$ids) {
+  static function add(&$params, &$ids = array()) {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, false);
     $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, false);
     $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, false);
