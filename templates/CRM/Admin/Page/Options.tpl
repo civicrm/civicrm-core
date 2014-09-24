@@ -157,10 +157,11 @@
       {ts}None found.{/ts}
     </div>
 {/if}
-  {if $isLocked ne 1}
     <div class="action-link">
-      <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
+      {if $isLocked ne 1}
+        <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
+      {/if}
+      <a href="{crmURL p="civicrm/admin" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
     </div>
-  {/if}
 </div>
 {/if}
