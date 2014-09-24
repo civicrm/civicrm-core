@@ -410,7 +410,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         if (!empty($params['soft_credit_contact_id'][$key]) && !empty($params['soft_credit_amount'][$key])) {
           $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_id'][$key];
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
-          $value['soft_credit'][$key]['soft_credit_type_id'] = $params['field'][$key]['soft_credit_type'];
+
+          //CRM-15350: if soft-credit-type profile field is disabled or removed then
+          //we choose configured SCT default value
+          if (!empty($params['soft_credit_type'][$key])) {
+            $value['soft_credit'][$key]['soft_credit_type_id'] = $params['soft_credit_type'][$key];
+          }
+          else {
+            $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_OptionGroup::getDefaultValue("soft_credit_type");
+          }
         }
 
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
@@ -615,9 +623,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         // handle soft credit
-        if (is_array(CRM_Utils_Array::value('soft_credit_contact_id', $params)) && !empty($params['soft_credit_contact_id'][$key]) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+        if (!empty($params['soft_credit_contact_id'][$key]) && !empty($params['soft_credit_amount'][$key])) {
           $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_id'][$key];
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
+
+          //CRM-15350: if soft-credit-type profile field is disabled or removed then
+          //we choose Gift as default value as per Gift Membership rule
+          if (!empty($params['soft_credit_type'][$key])) {
+            $value['soft_credit'][$key]['soft_credit_type_id'] = $params['soft_credit_type'][$key];
+          }
+          else {
+            $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'Gift', 'name');
+          }
         }
 
         if (!empty($value['receive_date'])) {
