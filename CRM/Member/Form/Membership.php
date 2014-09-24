@@ -1525,6 +1525,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         }
 
         $membershipParams = array_merge($membershipTypeValues[$memType], $params);
+        //CRM-15320
+        if (!empty($softParams) && empty($paymentParams['is_recur'])) {
+          $membershipParams['soft_credit'] = $softParams;
+        }
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
         unset($params['lineItems']);
