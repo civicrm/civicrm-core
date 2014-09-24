@@ -44,6 +44,15 @@
         <td class="label">{$form.dedupe_email.label}</td>
         <td>{$form.dedupe_email.html} {help id="dedupe-email"}</td>
     </tr>
+    <tr class="crm-mailing-group-form-block-locationTypeId">
+        <td class="label">{$form.location_type_id.label}</td>
+        <td>{$form.location_type_id.html} {help id="email-selection"}</td>
+    </tr>
+    <tr class="crm-mailing-group-form-block-locationSelectionMethod">
+        <td class="label">{$form.email_selection_method.label}</td>
+        <td>{$form.email_selection_method.html} {help id="email-selection"}</td>
+    </tr>
+
   </table>
 
 {if ($groupCount > 0|| $mailingCount > 0)}
