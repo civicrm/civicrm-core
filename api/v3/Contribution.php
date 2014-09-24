@@ -295,7 +295,7 @@ function civicrm_api3_contribution_transact($params) {
       return CRM_Core_Error::createApiError($last_error['message']);
     }
   }
-
+  $params['payment_instrument_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', $paymentProcessor['payment_processor_type_id'], 'payment_type') == 1 ? 'Credit Card' : 'Debit Card';
   return civicrm_api('contribution', 'create', $params);
 }
 /**
