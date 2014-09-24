@@ -2852,10 +2852,18 @@ WHERE      civicrm_membership.is_test = 0";
 
     //CRM-13981, create new soft-credit record as to record payment from different person for this membership
     if (!empty($contributionSoftParams)) {
-      foreach ($contributionSoftParams as $contributionSoft){
-        $contributionSoft['contribution_id'] = $contribution->id;
-        $contributionSoft['currency'] = $contribution->currency;
-        CRM_Contribute_BAO_ContributionSoft::add($contributionSoft);
+      if (!empty($params['batch_id'])) {
+        foreach ($contributionSoftParams as $contributionSoft) {
+          $contributionSoft['contribution_id'] = $contribution->id;
+          $contributionSoft['currency'] = $contribution->currency;
+          CRM_Contribute_BAO_ContributionSoft::add($contributionSoft);
+        }
+      }
+      else {
+       $contributionSoftParams['contribution_id'] = $contribution->id;
+       $contributionSoftParams['currency'] = $contribution->currency;
+       $contributionSoftParams['amount'] = $contribution->total_amount;
+       CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
       }
     }
 
