@@ -349,9 +349,9 @@ ALTER TABLE civicrm_case
 -- CRM-15343 set the auto increment civicrm_case_type.id start point to max id to avoid conflict in future insertion
 SELECT @max_case_type_id := max(id) from civicrm_case_type;
 SET @query  = CONCAT("ALTER TABLE civicrm_case_type AUTO_INCREMENT = ", @max_case_type_id);
-PREPARE stmt FROM @query;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
+PREPARE alter_case_type_auto_inc FROM @query;
+EXECUTE alter_case_type_auto_inc;
+DEALLOCATE PREPARE alter_case_type_auto_inc;
 
 DELETE FROM civicrm_option_value WHERE option_group_id = @option_group_id_case_type;
 
