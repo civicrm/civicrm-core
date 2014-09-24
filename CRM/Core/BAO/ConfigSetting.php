@@ -383,25 +383,11 @@ class CRM_Core_BAO_ConfigSetting {
       // lets use imageUploadDir since we dont mess around with its values
       // in the config object, lets kep it a bit generic since folks
       // might have different values etc
-     
-	  //Fix preg_replace to handle backslash for Windows File Paths
-	  if(DIRECTORY_SEPARATOR == '\\')
-	  {
-		$dir = preg_replace(
-			'|civicrm\\\\templates_c\\\\.*$|',
-			'',
-			$config->templateCompileDir
-        );
-	  }
-	  else
-	  {
-		$dir = preg_replace(
-			'|civicrm/templates_c/.*$|',
-			'',
-			$config->templateCompileDir
-        );
-	  }
-	  
+      $dir = preg_replace(
+        '|civicrm/templates_c/.*$|',
+        '',
+        $config->templateCompileDir
+      );
       $siteRoot = preg_replace(
         '|/media/civicrm/.*$|',
         '',
@@ -418,25 +404,11 @@ class CRM_Core_BAO_ConfigSetting {
       // lets use imageUploadDir since we dont mess around with its values
       // in the config object, lets kep it a bit generic since folks
       // might have different values etc
-      
-	  //Fix preg_replace to handle backslash for Windows File Paths
-	  if(DIRECTORY_SEPARATOR == '\\')
-	  {
-		$dir = preg_replace(
-			'|civicrm\\\\templates_c\\\\.*$|',
-			'',
-			$config->templateCompileDir
-        );
-	  }
-	  else
-	  {
-		$dir = preg_replace(
-			'|civicrm/templates_c/.*$|',
-			'',
-			$config->templateCompileDir
-        );
-	  }
-	  
+      $dir = preg_replace(
+        '|civicrm/templates_c/.*$|',
+        '',
+        $config->templateCompileDir
+      );
       $siteRoot = preg_replace(
         '|/wp-content/plugins/files/civicrm/.*$|',
         '',
@@ -453,25 +425,12 @@ class CRM_Core_BAO_ConfigSetting {
       // lets use imageUploadDir since we dont mess around with its values
       // in the config object, lets kep it a bit generic since folks
       // might have different values etc
-      
-	  //Fix preg_replace to handle backslash for Windows File Paths
-	  if(DIRECTORY_SEPARATOR == '\\')
-	  {
-		$dir = preg_replace(
-			'|\\\\files\\\\civicrm\\\\.*$|',
-			'\\\\files\\\\',
-			$config->imageUploadDir
-        );
-	  }
-	  else
-	  {
-		$dir = preg_replace(
-			'|/files/civicrm/.*$|',
-			'/files/',
-			$config->imageUploadDir
-        );
-	  }
-	 
+      $dir = preg_replace(
+        '|/files/civicrm/.*$|',
+        '/files/',
+        $config->imageUploadDir
+      );
+
       $matches = array();
       if (preg_match(
           '|/sites/([\w\.\-\_]+)/|',
@@ -489,6 +448,7 @@ class CRM_Core_BAO_ConfigSetting {
       }
     }
 
+
     return array($url, $dir, $siteName, $siteRoot);
   }
 
@@ -502,15 +462,8 @@ class CRM_Core_BAO_ConfigSetting {
  */
   static function getBestGuessSettings() {
     $config = CRM_Core_Config::singleton();
-    
-	//Fix preg_replace to handle backslash for Windows File Paths
-	if(DIRECTORY_SEPARATOR == '\\')
-		$needle = 'civicrm\\\\templates_c\\\\.*$';
-	else
-		$needle = 'civicrm/templates_c/.*$';
-	
-	$dir = preg_replace(
-      "|$needle|",
+    $dir = preg_replace(
+      '|civicrm/templates_c/.*$|',
       '',
       $config->templateCompileDir
     );
