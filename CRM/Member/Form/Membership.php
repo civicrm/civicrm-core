@@ -1525,7 +1525,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         }
 
         $membershipParams = array_merge($membershipTypeValues[$memType], $params);
-        //CRM-15320
+        //CRM-15366
         if (!empty($softParams) && empty($paymentParams['is_recur'])) {
           $membershipParams['soft_credit'] = $softParams;
         }
