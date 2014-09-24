@@ -140,8 +140,8 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
       }
     }
 	
-	//CRM-15365 - Fix BaseURL to avoid wrong trailing slash on Windows installs
-	foreach ($params as $name => & $val) {
+    //CRM-15365 - Fix BaseURL to avoid wrong trailing slash on Windows installs
+    foreach ($params as $name => & $val) {
       if ($val && in_array($name, array(
         'newBaseURL'))) {
         $val = CRM_Utils_File::addTrailingSlash($val,"/");
