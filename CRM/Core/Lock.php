@@ -89,9 +89,6 @@ class CRM_Core_Lock {
   }
 
   function acquire() {
-    if (defined('CIVICRM_LOCK_DEBUG')) {
-      CRM_Core_Error::debug_log_message('acquire lock for ' . $this->_name);
-    }
     if (!$this->_hasLock) {
       $query = "SELECT GET_LOCK( %1, %2 )";
       $params = array(
