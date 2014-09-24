@@ -110,8 +110,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->WebtestAddGroup($newGroupName);
 
     $this->openCiviPage('contact/search', 'reset=1');
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     $this->type("xpath=//*[@id='CRM_Contact_Form_Search_Basic-rows-per-page-select']", '25');
     $this->waitForElementPresent("toggleSelect");

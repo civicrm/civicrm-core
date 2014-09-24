@@ -39,8 +39,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create priceset
@@ -117,7 +117,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $pricesetLoc = $this->getLocation();
 
     // get text field Id.
-    $textFieldId = explode('&id=', $this->getAttribute("xpath=//div[@class='crm-main-content-wrapper']//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]@href"));
+    $textFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']/table/tbody/tr[1]/td[9]/span[1]/a[2]@href"));
     $textFieldId = explode('&', $textFieldId[0]);
     $textFieldId = explode('=', $textFieldId[3]);
     $textFieldId = $textFieldId[1];
@@ -237,8 +237,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create priceset
@@ -443,8 +443,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create priceset
@@ -735,8 +735,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create priceset
@@ -1060,6 +1060,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $count = 1;
     $this->waitForElementPresent('label');
     foreach ($fields as $label => $field) {
+      $this->waitForElementPresent('label');
       $this->type('label', $label);
       $this->select('html_type', "value={$field['type']}");
 

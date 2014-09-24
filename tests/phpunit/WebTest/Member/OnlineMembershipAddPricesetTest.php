@@ -67,8 +67,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->_testVerifyPriceSet($validateStrings, $sid);
 
     $contributionPageTitle = "Contribution Page $title";
-    $paymentProcessor = "Webtest Dummy $title";
-    $pageId = $this->webtestAddContributionPage(NULL, NULL, $contributionPageTitle, array($paymentProcessor => 'Dummy'),
+    $pageId = $this->webtestAddContributionPage(NULL, NULL, $contributionPageTitle, array('Test Processor' => 'Dummy'),
       TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, $sid, FALSE, 1, NULL
     );
 
@@ -141,32 +140,27 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $i = 2;
     foreach($options as $index => $values){
       $this->select("membership_type_id_{$index}", "value={$values['membership_type_id']}");
-      // Because it tends to cause problems, all uses of sleep() must be justified in comments
-      // Sleep should never be used for wait for anything to load from the server
-      // Justification for this instance: FIXME
-      sleep(1);
+
+      $this->waitForElementPresent("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input");
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input",$values['membership_num_terms']);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[5]/input",$values['label']);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[6]/input",$values['amount']);
       if($i > 3){
         $this->click('link=another choice');
-
       }
       $i++;
     }
     $this->waitForElementPresent( 'financial_type_id' );
     $this->select("financial_type_id", "label={$contributionType}");
     $this->waitForElementPresent('_qf_Field_next-bottom');
-    $this->click('_qf_Field_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Field_next-bottom');
     $this->waitForText('crm-notification-container', "Price Field '{$fields[0]}' has been saved.");
 
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
 
     $contributionPageTitle = "Contribution Page $title";
-    $paymentProcessor = "Webtest Dummy $title";
-    $pageId = $this->webtestAddContributionPage(NULL, NULL, $contributionPageTitle, array($paymentProcessor => 'Dummy'),
+    $pageId = $this->webtestAddContributionPage(NULL, NULL, $contributionPageTitle, array('Test Processor' => 'Dummy'),
       TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, $sid, FALSE, 1, NULL
     );
 
@@ -518,8 +512,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       );
     }
     //check if the membership amount is correct
-    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[2]/tbody/tr/td/span[text()='{$amount}']");
-    $this->assertTrue($this->isElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[2]/tbody/tr/td/span[text()='{$amount}']"));
+    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[2]/div[2]/table/tbody/tr/td[1]/span[text()='{$amount}']");
+    $this->assertTrue($this->isElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[2]/div[2]/table/tbody/tr/td[1]/span[text()='{$amount}']"));
   }
 
 }

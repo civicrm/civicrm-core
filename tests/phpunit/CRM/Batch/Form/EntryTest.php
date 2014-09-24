@@ -219,7 +219,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         ),
       'field' => array(
         1 => array(
-          'membership_type' => Array (0 => 1, 1 => 1),// (I was unable to determine what these both mean but both are refered to in code
+          'membership_type' => Array (0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
           'join_date' => '07/22/2013',
           'membership_start_date' => NULL,
           'membership_end_date' => NULL,
@@ -233,7 +233,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'contribution_status_id' => 1,
         ),
       2 => array(
-        'membership_type' => Array (0 => 1, 1 => 1 ),
+        'membership_type' => Array (0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
         'join_date' => '07/03/2013',
         'membership_start_date' => '02/03/2013',
         'membership_end_date' => NULL,
@@ -248,7 +248,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
        ),
         // no join date, coded end date
        3 => array(
-         'membership_type' => Array (0 => 1, 1 => 1 ),
+         'membership_type' => Array (0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
          'join_date' => NULL,
          'membership_start_date' => NULL,
          'membership_end_date' => '2013-12-01',

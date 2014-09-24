@@ -126,7 +126,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
 
     // select tag
     $this->click("xpath=//ul/li/span/label[text()=\"$tagName\"]");
-    $this->waitForStatusMsg();
+    $this->checkCRMStatus();
 
     // visit contact search page
     $this->openCiviPage("contact/search", "reset=1");
@@ -236,8 +236,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->select("group", "label=$parentGroupName");
 
     // click to search
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=.crm-search-results > table.row-highlight', $sortName);

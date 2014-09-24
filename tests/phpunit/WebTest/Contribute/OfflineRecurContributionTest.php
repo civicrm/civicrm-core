@@ -62,8 +62,8 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->waitForElementPresent('payment_processor_id');
     $this->select('payment_processor_id', "label={$processorName}");
 
-      $this->click('financial_type_id');
-      $this->select('financial_type_id', 'label=Donation');
+    $this->click('financial_type_id');
+    $this->select('financial_type_id', 'label=Donation');
     $this->type('total_amount', '10');
 
     // recurring contribution fields
@@ -73,7 +73,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->type('installments', '12');
 
     $this->click('is_email_receipt');
-      $this->waitForElementPresent('credit_card_type');
+    $this->waitForElementPresent('credit_card_type');
 
     // enter credit card info on form
     $this->webtestAddCreditCardDetails();
