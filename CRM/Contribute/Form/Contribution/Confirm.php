@@ -1182,7 +1182,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // a better fix would be to set the values in the respective forms rather than require
     // a function being shared by two forms to deal with their respective values
     // moving it to the BAO & not taking the $form as a param would make sense here.
-    if(!isset($params['is_email_receipt'])){
+    if(!isset($params['is_email_receipt']) && !empty($form->_values['is_email_receipt'])){
       $params['is_email_receipt'] = CRM_Utils_Array::value( 'is_email_receipt', $form->_values );
     }
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType, $online);
@@ -1271,8 +1271,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     if (isset($params['amount'])) {
+      $isMonetary = NULL;
+      if (!empty($form->_values['is_monetary'])) {
+        $isMonetary = $form->_values['is_monetary'];
+      }
       $contribParams = self::getContributionParams(
-        $params, $contactID, $financialType->id, $online, $contributionPageId, $nonDeductibleAmount, $campaignId, $form->_values['is_monetary'], $pending, $result, $receiptDate,
+        $params, $contactID, $financialType->id, $online, $contributionPageId, $nonDeductibleAmount, $campaignId,  $isMonetary, $pending, $result, $receiptDate,
         $recurringContributionID, $isTest, $addressID, $contribSoftContactId, $lineItems
       );
       $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
@@ -1458,7 +1462,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // CRM-14354: For an auto-renewing membership with an additional contribution,
     // if separate payments is not enabled, make sure only the membership fee recurs
-    if ($form->_membershipBlock['is_separate_payment'] === '0'
+    if (!empty($form->_membershipBlock)
+      && $form->_membershipBlock['is_separate_payment'] === '0'
       && isset($params['selectMembership'])
       && $form->_values['is_allow_other_amount'] == '1'
     ) {
