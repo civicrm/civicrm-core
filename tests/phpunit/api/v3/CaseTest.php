@@ -270,7 +270,7 @@ class api_v3_CaseTest extends CiviUnitTestCase {
     // Test using label instead of value
     unset($params['case_type_id']);
     $params['case_type'] = 'Housing Support';
-    $result = $this->callAPISuccess('case', 'create', $params);
+    $result = $this->callAPIAndDocument('case', 'create', $params, __FUNCTION__, __FILE__);
     $id = $result['id'];
 
     // Check result
