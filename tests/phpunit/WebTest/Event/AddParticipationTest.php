@@ -193,7 +193,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForAjaxContent();
 
     //create another custom field - Integer Radio
-    $this->clickAjaxLink('newCustomField', '_qf_Field_cancel');
+    $this->clickPopupLink('newCustomField', '_qf_Field_cancel');
     $this->click('data_type[0]');
     $this->select('data_type[0]', 'value=1');
     $this->click("//option[@value='1']");
@@ -227,7 +227,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
 
     //clicking save
-    $this->clickAjaxLink('_qf_Field_done-bottom', NULL);
+    $this->clickAjaxLink('_qf_Field_done-bottom');
 
     // Visit home page for a sec to give caches time to be cleared
     $this->openCiviPage('');
