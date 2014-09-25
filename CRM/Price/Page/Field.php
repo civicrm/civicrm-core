@@ -289,7 +289,10 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       }
     }
 
-    if ($this->_sid) {
+    if ($action & CRM_Core_Action::DELETE) {
+      CRM_Utils_System::setTitle(ts('Delete Price Field'));
+    }
+    elseif ($this->_sid) {
       $groupTitle = CRM_Price_BAO_PriceSet::getTitle($this->_sid);
       $this->assign('sid', $this->_sid);
       $this->assign('groupTitle', $groupTitle);
