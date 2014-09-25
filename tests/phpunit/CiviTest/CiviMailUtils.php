@@ -123,7 +123,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
         $this->_ut->openCiviPage('admin/setting/smtp', "reset=1", "_qf_Smtp_next");
         $this->_ut->click('xpath=//input[@name="outBound_option" and @value="' . $this->_outBound_option . '"]');
         if ($this->_outBound_option != CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
-          $this->_ut->chooseOkOnNextConfirmation();
+          $this->_ut->getAlert();
         }
         $this->_ut->clickLink("_qf_Smtp_next");
       }
