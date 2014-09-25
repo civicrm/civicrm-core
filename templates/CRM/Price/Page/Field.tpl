@@ -29,19 +29,18 @@
     {include file="CRM/Price/Form/DeleteField.tpl"}
 {elseif $action eq 1024 }
     {include file="CRM/Price/Form/Preview.tpl"}
-{else}
-  {if ($usedBy and $action eq 8) or $usedBy.civicrm_event or $usedBy.civicrm_contribution_page}
-    <div id="price_set_used_by" class="messages status no-popup">
-      <div class="icon inform-icon"></div>
-        {if $action eq 8}
-            {ts 1=$usedPriceSetTitle}Unable to delete the '%1' Price Field - it is currently in use by one or more active events or contribution pages or contributions  or event templates.{/ts}
-         {/if}
+{elseif ($usedBy and $action eq 8) or $usedBy.civicrm_event or $usedBy.civicrm_contribution_page}
+  <div id="price_set_used_by" class="messages status no-popup">
+    <div class="icon inform-icon"></div>
+    {if $action eq 8}
+      {ts 1=$usedPriceSetTitle}Unable to delete the '%1' Price Field - it is currently in use by one or more active events or contribution pages or contributions  or event templates.{/ts}
+    {/if}
 
-        {if $usedBy.civicrm_event or $usedBy.civicrm_contribution_page or $usedBy.civicrm_event_template}
-            {include file="CRM/Price/Page/table.tpl"}
-        {/if}
-    </div>
-  {/if}
+    {if $usedBy.civicrm_event or $usedBy.civicrm_contribution_page or $usedBy.civicrm_event_template}
+      {include file="CRM/Price/Page/table.tpl"}
+    {/if}
+  </div>
+{else}
 
 
 
@@ -80,7 +79,7 @@
             <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{if $row.active_on}{$row.active_on|date_format:"%Y-%m-%d %T"}{/if}</td>
             <td>{if $row.expire_on}{$row.expire_on|date_format:"%Y-%m-%d %T"}{/if}</td>
-            <td>{if $row.html_type eq "Text"}{$row.price|crmMoney}{else}<a href="{crmURL p="civicrm/admin/price/field/option" q="action=browse&reset=1&sid=$sid&fid=$fid"}">{if $isReserved}{ts}View Price Options{/ts}{else}{ts}Edit Price Options{/ts}{/if}</a>{/if}</td>
+            <td>{if $row.html_type eq "Text"}{$row.price|crmMoney}{else}<a class="action-item" href="{crmURL p="civicrm/admin/price/field/option" q="action=browse&reset=1&sid=$sid&fid=$fid"}">{if $isReserved}{ts}View Price Options{/ts}{else}{ts}Edit Price Options{/ts}{/if}</a>{/if}</td>
             <td class="field-action">{$row.action|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
