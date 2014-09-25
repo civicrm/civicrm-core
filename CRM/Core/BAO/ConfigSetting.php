@@ -323,14 +323,8 @@ class CRM_Core_BAO_ConfigSetting {
         }
       }
 
-      if ($lcMessages) {
-        // update config lcMessages - CRM-5027 fixed.
-        $defaults['lcMessages'] = $lcMessages;
-      }
-      else {
-        // if a single-lang site or the above didn't yield a result, use default
-        $lcMessages = CRM_Utils_Array::value( 'lcMessages', $defaults );
-      }
+      // if a single-lang site or the above didn't yield a result, use default
+      $lcMessages = CRM_Utils_Array::value( 'lcMessages', $defaults );
 
       // set suffix for table names - use views if more than one language
       $dbLocale = $multiLang ? "_{$lcMessages}" : '';
