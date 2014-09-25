@@ -122,6 +122,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
         // Change outbound mail setting
         $this->_ut->openCiviPage('admin/setting/smtp', "reset=1", "_qf_Smtp_next");
         $this->_ut->click('xpath=//input[@name="outBound_option" and @value="' . $this->_outBound_option . '"]');
+        // There will be a warning when switching from test to live mode
         if ($this->_outBound_option != CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
           $this->_ut->getAlert();
         }
