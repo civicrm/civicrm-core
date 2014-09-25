@@ -71,7 +71,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
       $this->select2("xpath=//tr[@class='addRow']/td[contains(text(),'Add activity:')]/span/div/a", $tActivityType, FALSE, TRUE);
     }
 
-    $this->clickAjaxLink("xpath=//div[@class='crm-submit-buttons']/span/input[@value='Save']", NULL);
+    $this->clickAjaxLink("xpath=//div[@class='crm-submit-buttons']/span/input[@value='Save']");
 
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
     $client = $this->createDialogContact("client_id");
