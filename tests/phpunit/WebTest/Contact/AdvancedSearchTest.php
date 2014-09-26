@@ -58,7 +58,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // go to group tab and add to new group
     $this->clickAjaxLink("css=li#tab_group a", "_qf_GroupContact_next");
     $this->select("group_id", "$groupName");
-    $this->clickAjaxLink("_qf_GroupContact_next", NULL);
+    $this->clickAjaxLink("_qf_GroupContact_next");
     $this->waitForText('crm-notification-container', "Contact has been added to '$groupName'");
 
     // go to tag tab and add to new tag
@@ -67,7 +67,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->checkCRMStatus();
 
     // register for event ( auto add activity and contribution )
-    $this->clickAjaxLink("link=Register for Event");
+    $this->clickPopupLink("link=Register for Event");
     $this->waitForText('s2id_event_id', "- select event -");
     $this->select2("event_id", "Fall Fundraiser Dinner");
     $this->waitForElementPresent("receipt_text");
@@ -83,7 +83,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Event registration for $firstName adv$firstName has been added");
 
     // Add pledge
-    $this->clickAjaxLink("link=Add Pledge");
+    $this->clickPopupLink("link=Add Pledge");
     $this->waitForElementPresent("contribution_page_id");
     $this->type("amount", "200");
     $this->type("installments", "5");
@@ -93,7 +93,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     // Add membership
-    $this->clickAjaxLink("link=Add Membership", "_qf_Membership_cancel-bottom");
+    $this->clickPopupLink("link=Add Membership", "_qf_Membership_cancel-bottom");
     //let the organisation be default (Default Organization)
     $this->select("membership_type_id[0]", "value=1");
     $this->click("membership_type_id[1]");
@@ -103,7 +103,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Student membership for $firstName adv$firstName has been added");
 
     // Add relationship
-    $this->clickAjaxLink("link=Add Relationship", "_qf_Relationship_cancel");
+    $this->clickPopupLink("link=Add Relationship", "_qf_Relationship_cancel");
     $this->select2("relationship_type_id", "Employee of");
     $this->waitForElementPresent("xpath=//input[@id='related_contact_id'][@placeholder='- select organization -']");
     $this->select2("related_contact_id", "Default", TRUE);

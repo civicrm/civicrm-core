@@ -277,7 +277,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Search_refresh-bottom');
     $this->waitForElementPresent("xpath=//table[@class='caseSelector']/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']");
 
-    $this->clickAjaxLink("xpath=//table[@class='caseSelector']/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']/../../td[11]/span[2]/ul/li/a[contains(text(),'Assign to Another Client')]");
+    $this->clickPopupLink("xpath=//table[@class='caseSelector']/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']/../../td[11]/span[2]/ul/li/a[contains(text(),'Assign to Another Client')]");
     $client = $this->createDialogContact("reassign_contact_id");
     $this->clickLink('_qf_EditClient_done-bottom');
     $this->assertElementContainsText('page-title', "{$client['display_name']} - $caseTypeLabel");
