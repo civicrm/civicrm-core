@@ -363,16 +363,16 @@ class CRM_Contact_Form_Task_LabelCommon {
 
       // fill uniqueAddress array with last/first name tree
       if (isset($uniqueAddress[$address])) {
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix] = $rows[$rowID]['addressee_display'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
         // drop unnecessary rows
         unset($rows[$rowID]);
         // this is the first listing at this address
       }
       else {
         $uniqueAddress[$address]['ID'] = $rowID;
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix] = $rows[$rowID]['addressee_display'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
       }
     }
     foreach ($uniqueAddress as $address => $data) {
@@ -384,8 +384,13 @@ class CRM_Contact_Form_Task_LabelCommon {
         if ($count > 2) {
           break;
         }
-        // collapse the tree to summarize
-        $family = trim(implode(" & ", $first_names) . " " . $last_name);
+        if(count($first_names) == 1) {
+          $family = $first_names[current(array_keys($first_names))]['addressee_display'];
+        }
+        else {
+          // collapse the tree to summarize
+          $family = trim(implode(" & ", $first_names) . " " . $last_name);
+        }
         if ($count) {
           $processedNames .= "\n" . $family;
         }
