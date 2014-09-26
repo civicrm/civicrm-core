@@ -657,6 +657,10 @@ class CRM_Core_Resources {
         }
       }
     }
+
+    // CMS-specific resources
+    $config->userSystem->appendCoreResources($items);
+
     return $items;
   }
 }
