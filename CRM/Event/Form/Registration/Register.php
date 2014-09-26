@@ -756,7 +756,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         //but we don't want to allow participant to increase
         //seats at the time of re-walking registration.
         if ($count &&
-          $form->_allowConfirmation &&
+          !empty($form->_allowConfirmation) &&
           !empty($formattedPriceSetDefaults)
         ) {
           if (empty($formattedPriceSetDefaults["price_{$field}"]) || empty($formattedPriceSetDefaults["price_{$fieldId}"][$optId])) {
