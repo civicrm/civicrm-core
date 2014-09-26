@@ -361,5 +361,10 @@ abstract class CRM_Utils_System_Base {
   function logger($message) {
 
   }
+
+  /**
+   * Append to coreResourcesList
+   */
+  function appendCoreResources(&$list) {}
 }
 
