@@ -66,7 +66,11 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
 
     $languages = CRM_Core_I18n::languages(TRUE);
     foreach ($this->_locales as $locale) {
-      $this->addElement($type, "{$field}_{$locale}", $languages[$locale], array('class' => 'huge huge12' . ($locale == $tsLocale ? ' default-lang' : '')));
+      if ($type == 'textarea') {
+        $this->addWysiwyg("{$field}_{$locale}", $languages[$locale], array('class' => 'huge huge12' . ($locale == $tsLocale ? ' default-lang' : '')));
+      } else {
+        $this->addElement($type, "{$field}_{$locale}", $languages[$locale], array('class' => 'huge huge12' . ($locale == $tsLocale ? ' default-lang' : '')));
+      }
       $this->_defaults["{$field}_{$locale}"] = $dao->$locale;
     }
 
