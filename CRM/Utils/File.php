@@ -258,7 +258,7 @@ class CRM_Utils_File {
       $separator = DIRECTORY_SEPARATOR;
     }
 
-    if (substr($name, -1, 1) != $separator) {
+    if (!in_array(substr($name, -1, 1), array('/', '\\'))) {
       $name .= $separator;
     }
     return $name;
