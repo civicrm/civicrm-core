@@ -37,6 +37,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
 
   protected $_summary = NULL;
   protected $_relField = FALSE;
+  protected $_exposeContactID = FALSE;
 
   /**
    *
@@ -46,7 +47,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
    */
   function __construct() {
     $this->case_types    = CRM_Case_PseudoConstant::caseType();
-    $this->case_statuses = CRM_Case_PseudoConstant::caseStatus();
+    $this->case_statuses = CRM_Core_OptionGroup::values('case_status');
     $rels                = CRM_Core_PseudoConstant::relationshipType();
     foreach ($rels as $relid => $v) {
       $this->rel_types[$relid] = $v['label_b_a'];
