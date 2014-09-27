@@ -533,7 +533,6 @@ CRM.strings = CRM.strings || {};
         $el.addClass('modal-dialog');
         $('body').css({overflow: 'hidden'});
       }
-      $el.parent().find('.ui-dialog-titlebar-close').attr('title', ts('Close'));
       // Add resize button
       if ($el.parent().hasClass('crm-container') && $el.dialog('option', 'resizable')) {
         $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Toggle fullscreen')+'" style="right:2em;"/>').button({icons: {primary: 'ui-icon-newwin'}, text: false}));
