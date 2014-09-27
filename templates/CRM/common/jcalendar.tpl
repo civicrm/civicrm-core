@@ -88,62 +88,33 @@
         date_format = $originalElement.attr('format'),
         altDateFormat = 'mm/dd/yy';
       {literal}
-      switch ( date_format ) {
-        case 'dd-mm':
-        case 'mm/dd':
-            altDateFormat = 'mm/dd';
-            break;
-      }
 
       if ( !( ( date_format == 'M yy' ) || ( date_format == 'yy' ) || ( date_format == 'yy-mm' ) ) ) {
           $dateElement.addClass( 'dpDate' );
       }
 
-      {/literal}
-      var yearRange   = currentYear - parseInt($originalElement.attr('startOffset'));
-          yearRange  += ':';
-          yearRange  += currentYear + parseInt($originalElement.attr('endOffset'));
-      {literal}
-
-      var startRangeYr = currentYear - parseInt($originalElement.attr('startOffset')),
+      var yearRange = (currentYear - parseInt($originalElement.attr('startOffset'))) +
+        ':' + currentYear + parseInt($originalElement.attr('endOffset')),
+        startRangeYr = currentYear - parseInt($originalElement.attr('startOffset')),
         endRangeYr = currentYear + parseInt($originalElement.attr('endOffset'));
 
       $dateElement.datepicker({
-                                    closeAtTop        : true,
-                                    dateFormat        : date_format,
-                                    changeMonth       : true,
-                                    changeYear        : true,
-                                    altField          : $originalElement,
-                                    altFormat         : altDateFormat,
-                                    yearRange         : yearRange,
-                                    regional          : CRM.config.lcMessages.split('_')[0],
-                                    minDate           : new Date(startRangeYr, 1 - 1, 1),
-                                    maxDate           : new Date(endRangeYr, 12 - 1, 31)
-                                });
+        closeAtTop: true,
+        dateFormat: date_format,
+        changeMonth: (date_format.indexOf('m') > -1),
+        changeYear: (date_format.indexOf('y') > -1),
+        altField: $originalElement,
+        altFormat: altDateFormat,
+        yearRange: yearRange,
+        minDate: new Date(startRangeYr, 1 - 1, 1),
+        maxDate: new Date(endRangeYr, 12 - 1, 31)
+      });
 
-      // set default value to display field, setDefault param for datepicker
-      // is not working hence using below logic
-      // parse the date
-      var displayDateValue = $.datepicker.parseDate(altDateFormat, $originalElement.val());
-
-      // format date according to display field
-      displayDateValue = $.datepicker.formatDate( date_format, displayDateValue );
-      $dateElement.val( displayDateValue );
+      // format display date
+      var displayDateValue = $.datepicker.formatDate(date_format, $.datepicker.parseDate(altDateFormat, $originalElement.val()));
       //support unsaved-changes warning: CRM-14353
-      $dateElement.data('crm-initial-value', displayDateValue);
+      $dateElement.val(displayDateValue).data('crm-initial-value', displayDateValue);
 
-      $dateElement.click( function( ) {
-          hideYear( this );
-      });
-      $('.ui-datepicker-trigger').click( function( ) {
-          hideYear( $(this).prev() );
-      });
-      function hideYear( element ) {
-        var format = $( element ).attr('format');
-        if ( format == 'dd-mm' || format == 'mm/dd' ) {
-          $(".ui-datepicker-year").css('display', 'none');
-        }
-      }
       // Add clear button
       $($timeElement).add($originalElement).add($dateElement).on('blur change', function() {
         var vis = $dateElement.val() || $timeElement.val() ? '' : 'hidden';
