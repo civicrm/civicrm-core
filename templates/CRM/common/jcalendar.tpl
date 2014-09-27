@@ -88,12 +88,6 @@
         date_format = $originalElement.attr('format'),
         altDateFormat = 'mm/dd/yy';
       {literal}
-      switch ( date_format ) {
-        case 'dd-mm':
-        case 'mm/dd':
-            altDateFormat = 'mm/dd';
-            break;
-      }
 
       if ( !( ( date_format == 'M yy' ) || ( date_format == 'yy' ) || ( date_format == 'yy-mm' ) ) ) {
           $dateElement.addClass( 'dpDate' );
