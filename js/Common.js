@@ -773,7 +773,7 @@ CRM.strings = CRM.strings || {};
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
   CRM.confirm = function (options) {
-    var dialog, url, msg, settings = {
+    var dialog, url, msg, buttons = [], settings = {
       title: ts('Confirm'),
       message: ts('Are you sure you want to continue?'),
       url: null,
@@ -791,13 +791,13 @@ CRM.strings = CRM.strings || {};
     };
     $.extend(settings, ($.isFunction(options) ? arguments[1] : options) || {});
     if (!settings.buttons && $.isPlainObject(settings.options)) {
-      settings.buttons = [];
-      $.each(settings.options, function(key, label) {
-        settings.buttons.push({
+      $.each(settings.options, function(op, label) {
+        buttons.push({
           text: label,
-          icons: {primary: key === 'no' ? 'ui-icon-close' : 'ui-icon-check'},
+          'data-op': op,
+          icons: {primary: op === 'no' ? 'ui-icon-close' : 'ui-icon-check'},
           click: function() {
-            var event = $.Event('crmConfirm:' + key);
+            var event = $.Event('crmConfirm:' + op);
             $(this).trigger(event);
             if (!event.isDefaultPrevented()) {
               dialog.dialog('close');
@@ -805,6 +805,8 @@ CRM.strings = CRM.strings || {};
           }
         });
       });
+      // Order buttons so that "no" goes on the right-hand side
+      settings.buttons = _.sortBy(buttons, 'data-op').reverse();
     }
     url = settings.url;
     msg = settings.message;
