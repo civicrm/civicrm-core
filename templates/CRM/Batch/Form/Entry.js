@@ -12,13 +12,13 @@ CRM.$(function($) {
     checkColumns($(this));
   });
 
-  $('input[name^="soft_credit_contact["]').change(function(){
-    var rowNum = $(this).attr('id').replace('soft_credit_contact_','');
+  $('input[name^="soft_credit_contact_"]').on('change', function(){
+    var rowNum = $(this).attr('id').replace('soft_credit_contact_id_','');
     var totalAmount = $('#field_'+rowNum+'_total_amount').val();
     //assign total amount as default soft credit amount
     $('#soft_credit_amount_'+ rowNum).val(totalAmount);
     //assign soft credit type default value if any
-    $('#field_'+rowNum+'_soft_credit_type').val($('#sct_default_id').val());
+    $('#soft_credit_type_'+ rowNum).val($('#sct_default_id').val());
   });
 
   // validate rows

@@ -118,7 +118,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->checkCRMAlert("Case opened successfully.");
     $this->clickLink("_qf_CaseView_cancel-bottom");
     $this->openCiviPage('case', 'reset=1', "xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[8]/a[text()='Open Case']");
-    $this->clickAjaxLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[8]/a[text()='Open Case']");
+    $this->clickPopupLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[8]/a[text()='Open Case']");
 
     $openCaseData = array(
       "Client" => $client['display_name'],

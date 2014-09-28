@@ -183,6 +183,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
       if (!CRM_Utils_System::isNull($eventTemplates)) {
         $this->add('select', 'template_id', ts('From Template'), array('' => ts('- select -')) + $eventTemplates, FALSE, array('class' => 'crm-select2 huge'));
       }
+      // Make sure this form redirects properly
+      $this->preventAjaxSubmit();
     }
 
     // add event title, make required if this is not a template

@@ -1787,7 +1787,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     else {
       $name = $fieldName;
     }
-    
+
     $selectAttributes = array('class' => 'crm-select2', 'placeholder' => TRUE);
 
     // CRM-15172 - keep track of all the fields we've processed
@@ -2121,14 +2121,18 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     elseif ($fieldName == 'soft_credit_type') {
+      $name = "soft_credit_type[$rowNumber]";
       $form->add('select', $name, $title,
         array(
           '' => ts('- select -')) + CRM_Core_OptionGroup::values("soft_credit_type")
       );
-      $form->addElement('hidden', 'sct_default_id',
-        CRM_Core_OptionGroup::getDefaultValue("soft_credit_type"),
-        array('id' => 'sct_default_id')
-      );
+      //CRM-15350: choose SCT field default value as 'Gift' for membership use
+      //else (for contribution), use configured SCT default value
+      $SCTDefaultValue = CRM_Core_OptionGroup::getDefaultValue("soft_credit_type");
+      if ($field['field_type'] == 'Membership') {
+        $SCTDefaultValue = CRM_Core_OptionGroup::getValue('soft_credit_type', 'Gift', 'name');
+      }
+      $form->addElement('hidden', 'sct_default_id', $SCTDefaultValue, array('id' => 'sct_default_id'));
     }
     elseif ($fieldName == 'currency') {
       $form->addCurrency($name, $title, $required);

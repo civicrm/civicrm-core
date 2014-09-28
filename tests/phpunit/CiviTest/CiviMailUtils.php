@@ -122,8 +122,9 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
         // Change outbound mail setting
         $this->_ut->openCiviPage('admin/setting/smtp', "reset=1", "_qf_Smtp_next");
         $this->_ut->click('xpath=//input[@name="outBound_option" and @value="' . $this->_outBound_option . '"]');
+        // There will be a warning when switching from test to live mode
         if ($this->_outBound_option != CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
-          $this->_ut->chooseOkOnNextConfirmation();
+          $this->_ut->getAlert();
         }
         $this->_ut->clickLink("_qf_Smtp_next");
       }
@@ -164,7 +165,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       // Also not sure how robust this is, but there isn't a good
       // identifier for this link either.
       $this->_ut->waitForElementPresent('xpath=//a[contains(text(), "View complete message")]');
-      $this->_ut->clickAjaxLink('xpath=//a[contains(text(), "View complete message")]', NULL);
+      $this->_ut->clickAjaxLink('xpath=//a[contains(text(), "View complete message")]');
       $msg = $this->_ut->getText('css=.ui-dialog-content.crm-ajax-container');
     }
     else {

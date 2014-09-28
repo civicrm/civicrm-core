@@ -1866,8 +1866,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
         unset($insertLines[$previousLineItem['price_field_value_id']]);
         // for updating the line items i.e. use-case - once deselect-option selecting again
         if ($previousLineItem['line_total'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total']) {
-          $updateLines[$previousLineItem['price_field_value_id']]['qty'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'];
-          $updateLines[$previousLineItem['price_field_value_id']]['line_total'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total'];
+          $updateLines[$previousLineItem['price_field_value_id']] =  $submittedLineItems[$previousLineItem['price_field_value_id']];;
         }
       }
     }
@@ -1923,7 +1922,9 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
         $updateLineItem = "
 UPDATE civicrm_line_item li
 SET li.qty = {$vals['qty']},
-    li.line_total = {$vals['line_total']}
+    li.line_total = {$vals['line_total']},
+    li.unit_price = {$vals['unit_price']},
+    li.label = '{$vals['label']}'
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}) AND
       (price_field_value_id = {$valueId})
 ";

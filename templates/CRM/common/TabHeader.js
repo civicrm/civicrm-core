@@ -32,7 +32,7 @@ CRM.$(function($) {
           ui.panel
             .off('click.crmLivePage')
             .on('click.crmLivePage', 'a.button, a.action-item', CRM.popup)
-            .on('crmPopupFormSuccess.crmLivePage', 'a.button, a.action-item', CRM.refreshParent);
+            .on('crmPopupFormSuccess.crmLivePage', 'a.button, a.action-item:not(.crm-enable-disable)', CRM.refreshParent);
         }
         ui.panel
           .off('.tabInfo')

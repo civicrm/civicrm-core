@@ -244,24 +244,25 @@ class CRM_Utils_File {
   }
 
   /**
-   * Appends trailing slashed to paths
+   * Appends a slash to the end of a string if it doesn't already end with one
    *
-   * @param $name
-   * @param null $separator
+   * @param string $path
+   * @param string $slash
    *
    * @return string
    * @access public
    * @static
    */
-  static function addTrailingSlash($name, $separator = NULL) {
-    if (!$separator) {
-      $separator = DIRECTORY_SEPARATOR;
+  static function addTrailingSlash($path, $slash = NULL) {
+    if (!$slash) {
+      // FIXME: Defaulting to backslash on windows systems can produce unexpected results, esp for URL strings which should always use forward-slashes.
+      // I think this fn should default to forward-slash instead.
+      $slash = DIRECTORY_SEPARATOR;
     }
-
-    if (substr($name, -1, 1) != $separator) {
-      $name .= $separator;
+    if (!in_array(substr($path, -1, 1), array('/', '\\'))) {
+      $path .= $slash;
     }
-    return $name;
+    return $path;
   }
 
   /**

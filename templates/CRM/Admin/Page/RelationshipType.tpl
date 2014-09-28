@@ -84,5 +84,6 @@
 {/if}
   <div class="action-link">
     <a href="{crmURL q="action=add&reset=1"}" class="button newRelationshipType"><span><div class="icon add-icon"></div>{ts}Add Relationship Type{/ts}</span></a>
+    <a href="{crmURL p="civicrm/admin" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
   </div>
 {/if}

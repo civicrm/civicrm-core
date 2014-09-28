@@ -214,9 +214,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $controller->process();
     $controller->run();
 
-
-    $this->browse();
-
     if ($action & CRM_Core_Action::DELETE) {
       // add breadcrumb
       $url = CRM_Utils_System::url('civicrm/admin/price/field/option', 'reset=1');

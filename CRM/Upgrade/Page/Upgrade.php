@@ -89,6 +89,9 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       CRM_Core_Error::fatal($error);
     }
 
+    // All cached content needs to be cleared because the civi codebase was just replaced
+    CRM_Core_Resources::singleton()->flushStrings()->rebuildDynamicResources();
+
     // This could be removed in later rev
     if ($currentVer == '2.1.6') {
       $config = CRM_Core_Config::singleton();

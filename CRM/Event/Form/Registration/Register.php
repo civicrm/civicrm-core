@@ -693,6 +693,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public static function formatFieldsForOptionFull(&$form) {
     $priceSet = $form->get('priceSet');
     $priceSetId = $form->get('priceSetId');
+    $defaultPricefieldIds = array();
+    if (!empty($form->_values['line_items'])) {
+      foreach ($form->_values['line_items'] as $lineItem) {
+        $defaultPricefieldIds[] = $lineItem['price_field_value_id'];
+      }
+    }
     if (!$priceSetId ||
       !is_array($priceSet) ||
       empty($priceSet) || empty($priceSet['optionsMaxValueTotal'])) {
@@ -721,6 +727,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //get the current price event price set options count.
     $currentOptionsCount = self::getPriceSetOptionCount($form);
     $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_eventId, $skipParticipants);
+    $optionFullTotalAmount = 0;
 
     foreach ($form->_feeBlock as & $field) {
       $optionFullIds = array();
@@ -750,13 +757,22 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         ) {
           $isFull = TRUE;
           $optionFullIds[$optId] = $optId;
+          if ($field['html_type'] != 'Select') {
+            if (in_array($optId, $defaultPricefieldIds)) {
+              $optionFullTotalAmount += CRM_Utils_Array::value('amount', $option);
+            }
+          }
+          else {
+            if (!empty($defaultPricefieldIds) && in_array($optId, $defaultPricefieldIds)) {
+              unset($optionFullIds[$optId]);
+            }
+          }
         }
-
         //here option is not full,
         //but we don't want to allow participant to increase
         //seats at the time of re-walking registration.
         if ($count &&
-          $form->_allowConfirmation &&
+          !empty($form->_allowConfirmation) &&
           !empty($formattedPriceSetDefaults)
         ) {
           if (empty($formattedPriceSetDefaults["price_{$field}"]) || empty($formattedPriceSetDefaults["price_{$fieldId}"][$optId])) {
@@ -777,6 +793,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       //finally get option ids in.
       $field['option_full_ids'] = $optionFullIds;
     }
+    $form->assign('optionFullTotalAmount', $optionFullTotalAmount);
   }
 
   /**

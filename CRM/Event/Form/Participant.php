@@ -1244,7 +1244,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
 
-      $result = &$payment->doDirectPayment($paymentParams);
+      $result = $payment->doDirectPayment($paymentParams);
 
       if (is_a($result, 'CRM_Core_Error')) {
         CRM_Core_Error::displaySessionError($result);
@@ -1287,7 +1287,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           $this->_params['role_id']
         );
       }
-      $participants[] = CRM_Event_Form_Registration::addParticipant($this->_params, $contactID);
+      $participants[] = CRM_Event_Form_Registration::addParticipant($this, $contactID);
 
       //add custom data for participant
       CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
