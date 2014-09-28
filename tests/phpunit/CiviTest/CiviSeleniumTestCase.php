@@ -2131,6 +2131,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
             $this->select2($elementName, $entityData);
           }
         }
+        // FIXME: Try to find out what the heck is going on with these tests
+        $this->waitForAjaxContent();
+        $this->checkForErrorsOnPage();
+        
         //checking for proper custom data which is loading through ajax
         $this->waitForElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]");
         $this->assertElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]/div[contains(@class, 'crm-accordion-body')]/table/tbody/tr/td[2]/input",
