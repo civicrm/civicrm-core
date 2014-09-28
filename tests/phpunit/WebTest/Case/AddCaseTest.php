@@ -140,10 +140,18 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
   }
 
   function testAjaxCustomGroupLoad() {
-    $this->webtestLogin();
+    // Log in as admin first to verify permissions for CiviCase
+    $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
+
+    // let's give full CiviCase permissions to demo user (registered user).
+    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $this->changePermissions($permission);
+
+    // Log in as normal user
+    $this->webtestLogin();
 
     $triggerElement = array('name' => 'case_type_id', 'type' => 'select');
     $customSets = array(
@@ -259,8 +267,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
       $this->webtestFillDate("case_to_end_date_low", "-1 month");
       $this->webtestFillDate("case_to_end_date_high", "+1 month");
     }
-    $this->click("_qf_Advanced_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Advanced_refresh");
     $this->assertElementContainsText('Advanced', "$lastName, $firstName");
   }
   

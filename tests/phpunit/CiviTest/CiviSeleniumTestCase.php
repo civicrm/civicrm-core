@@ -2086,6 +2086,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @return void
    */
   function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering = NULL) {
+    // FIXME: Testing a theory that these failures have something to do with permissions
+    $this->webtestLogin('admin');
+
     //add the custom set
     $return = $this->addCustomGroupField($customSets);
 
@@ -2134,9 +2137,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         // FIXME: Try to find out what the heck is going on with these tests
         $this->waitForAjaxContent();
         $this->checkForErrorsOnPage();
-        
+
         //checking for proper custom data which is loading through ajax
-        $this->waitForElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]");
+        $this->waitForElementPresent("css=.custom-group-{$customData['cgtitle']}");
         $this->assertElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]/div[contains(@class, 'crm-accordion-body')]/table/tbody/tr/td[2]/input",
           "The on the fly custom group field is not present for entity : {$entity} => {$entityData}");
       }
