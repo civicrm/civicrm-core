@@ -426,18 +426,24 @@ class CRM_Core_Resources {
 
   /**
    * @param $value
+   * @return CRM_Core_Resources
    */
   public function setCacheCode($value) {
     $this->cacheCode = $value;
     if ($this->cacheCodeKey) {
       CRM_Core_BAO_Setting::setItem($value, CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, $this->cacheCodeKey);
     }
+    return $this;
   }
 
+  /**
+   * @return CRM_Core_Resources
+   */
   public function resetCacheCode() {
     $this->setCacheCode(CRM_Utils_String::createRandom(5, CRM_Utils_String::ALPHANUMERIC));
     // Also flush cms resource cache if needed
     CRM_Core_Config::singleton()->userSystem->clearResourceCache();
+    return $this;
   }
 
   /**
@@ -518,9 +524,21 @@ class CRM_Core_Resources {
 
   /**
    * Flushes cached translated strings
+   * @return CRM_Core_Resources
    */
   public function flushStrings() {
     $this->cache->flush();
+    return $this;
+  }
+
+  /**
+   * Deletes and rebuilds dynamic resource files
+   * @return CRM_Core_Resources
+   */
+  public function rebuildDynamicResources() {
+    CRM_Utils_File::flushDynamicResources();
+    $this->addLocalizationJs();
+    return $this;
   }
 
   /**
