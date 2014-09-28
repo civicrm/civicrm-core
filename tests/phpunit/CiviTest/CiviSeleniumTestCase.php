@@ -400,9 +400,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       }
     }
     if ($added) {
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForText('crm-notification-container', "Saved");
+      $this->clickLink("_qf_Component_next-bottom");
+      $this->checkCRMAlert("Saved");
     }
   }
 
