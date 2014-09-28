@@ -215,6 +215,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
     $this->open("{$this->sboxPath}civicrm/$url");
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->checkForErrorsOnPage();
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
     }
@@ -230,6 +231,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // conditional wait for page load e.g for ajax form save
     if ($waitForPageLoad) {
       $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->checkForErrorsOnPage();
     }
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
@@ -2095,8 +2097,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
 
     $this->openCiviPage($pageUrl['url'], $pageUrl['args']);
-    // Open the page again just to make sure caches are cleared
-    $this->openCiviPage($pageUrl['url'], $pageUrl['args']);
+
+    // FIXME: Try to find out what the heck is going on with these tests
+    $this->waitForAjaxContent();
+    $this->checkForErrorsOnPage();
+
     foreach($return as $values) {
       foreach ($values as $entityType => $customData) {
         //initiate necessary variables
@@ -2270,5 +2275,23 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->assertNotChecked('ajaxPopupsEnabled');
     }
     $this->clickLink("_qf_Display_next-bottom");
+  }
+
+  /**
+   * Attempt to get information about what went wrong if we encounter an error when loading a page
+   */
+  function checkForErrorsOnPage() {
+    foreach (array('Access denied', 'Page not found') as $err) {
+      if ($this->isElementPresent("xpath=//h1[text()='$err']")) {
+        $this->fail("\"$err\" encountered at " . $this->getLocation());
+      }
+    }
+    if ($this->isElementPresent("xpath=//span[text()='Sorry but we are not able to provide this at the moment.']")) {
+      $msg = '"Fatal Error" encountered at ' . $this->getLocation();
+      if ($this->isElementPresent('css=div.crm-section.crm-error-message')) {
+        $msg .= "\nError Message: " . $this->getText('css=div.crm-section.crm-error-message');
+      }
+      $this->fail($msg);
+    }
   }
 }
