@@ -6,7 +6,7 @@
 function survey_create_example(){
 $params = array(
   'title' => 'survey title',
-  'activity_type_id' => '35',
+  'activity_type_id' => '30',
   'max_number_of_contacts' => 12,
   'instructions' => 'Call people, ask for money',
 );
@@ -40,7 +40,7 @@ function survey_create_expectedresult(){
           'id' => '1',
           'title' => 'survey title',
           'campaign_id' => '',
-          'activity_type_id' => '35',
+          'activity_type_id' => '30',
           'recontact_interval' => '',
           'instructions' => 'Call people, ask for money',
           'release_frequency' => '',

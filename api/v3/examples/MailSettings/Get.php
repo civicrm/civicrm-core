@@ -12,6 +12,7 @@ $params = array(
   'server' => 'localhost',
   'username' => 'sue',
   'password' => 'pass',
+  'is_default' => 1,
 );
 
 try{
@@ -37,13 +38,13 @@ function mail_settings_get_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 2,
+  'id' => 4,
   'values' => array(
-      '2' => array(
-          'id' => '2',
+      '4' => array(
+          'id' => '4',
           'domain_id' => '1',
           'name' => 'my mail setting',
-          'is_default' => 0,
+          'is_default' => '1',
           'domain' => 'setting.com',
           'server' => 'localhost',
           'username' => 'sue',

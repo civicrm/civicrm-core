@@ -36,7 +36,7 @@ function activity_get_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'activity_type_id' => '46',
+          'activity_type_id' => '49',
           'subject' => 'test activity type id',
           'activity_date_time' => '2011-06-02 14:36:13',
           'duration' => '120',
@@ -51,10 +51,10 @@ function activity_get_expectedresult(){
           'source_contact_id' => '1',
           'custom_1' => 'defaultValue',
           'custom_1_1' => 'defaultValue',
-          'custom_2_id' => '1',
-          'custom_2_1_id' => '1',
           'custom_2' => 'Anderson, Anthony',
           'custom_2_1' => 'Anderson, Anthony',
+          'custom_2_1_id' => '1',
+          'custom_2_id' => '1',
         ),
     ),
 );

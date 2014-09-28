@@ -7,7 +7,7 @@ function case_create_example(){
 $params = array(
   'subject' => 'Test case',
   'contact_id' => 17,
-  'case_type' => 'Housing Support',
+  'case_type' => 'housing_support',
 );
 
 try{
@@ -33,11 +33,11 @@ function case_create_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 1,
+  'id' => 2,
   'values' => array(
-      '1' => array(
-          'id' => '1',
-          'case_type_id' => '4',
+      '2' => array(
+          'id' => '2',
+          'case_type_id' => '1',
           'subject' => 'Test case',
           'start_date' => '2013-07-29 00:00:00',
           'end_date' => '',

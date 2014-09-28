@@ -33,7 +33,7 @@ function contact_getfields_expectedresult(){
   $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 53,
+  'count' => 55,
   'values' => array(
       'id' => array(
           'name' => 'id',
@@ -56,6 +56,9 @@ function contact_getfields_expectedresult(){
           'size' => 30,
           'export' => true,
           'where' => 'civicrm_contact.contact_type',
+          'html' => array(
+              'type' => 'Select',
+            ),
           'pseudoconstant' => array(
               'table' => 'civicrm_contact_type',
               'keyColumn' => 'name',
@@ -74,6 +77,9 @@ function contact_getfields_expectedresult(){
           'where' => 'civicrm_contact.contact_sub_type',
           'headerPattern' => '/C(ontact )?(subtype|sub-type|sub type)/i',
           'export' => true,
+          'html' => array(
+              'type' => 'Multi-Select',
+            ),
           'pseudoconstant' => array(
               'table' => 'civicrm_contact_type',
               'keyColumn' => 'name',
@@ -90,6 +96,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/d(o )?(not )?(email)/i',
           'dataPattern' => '/^\\d{1,}$/',
           'export' => true,
+          'html' => array(
+              'type' => 'CheckBox',
+            ),
         ),
       'do_not_phone' => array(
           'name' => 'do_not_phone',
@@ -100,6 +109,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/d(o )?(not )?(call|phone)/i',
           'dataPattern' => '/^\\d{1,}$/',
           'export' => true,
+          'html' => array(
+              'type' => 'CheckBox',
+            ),
         ),
       'do_not_mail' => array(
           'name' => 'do_not_mail',
@@ -110,6 +122,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/^(d(o\\s)?n(ot\\s)?mail)|(\\w*)?bulk\\s?(\\w*)$/i',
           'dataPattern' => '/^\\d{1,}$/',
           'export' => true,
+          'html' => array(
+              'type' => 'CheckBox',
+            ),
         ),
       'do_not_sms' => array(
           'name' => 'do_not_sms',
@@ -120,6 +135,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/d(o )?(not )?(sms)/i',
           'dataPattern' => '/^\\d{1,}$/',
           'export' => true,
+          'html' => array(
+              'type' => 'CheckBox',
+            ),
         ),
       'do_not_trade' => array(
           'name' => 'do_not_trade',
@@ -130,6 +148,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/d(o )?(not )?(trade)/i',
           'dataPattern' => '/^\\d{1,}$/',
           'export' => true,
+          'html' => array(
+              'type' => 'CheckBox',
+            ),
         ),
       'is_opt_out' => array(
           'name' => 'is_opt_out',
@@ -139,6 +160,9 @@ function contact_getfields_expectedresult(){
           'import' => true,
           'where' => 'civicrm_contact.is_opt_out',
           'export' => true,
+          'html' => array(
+              'type' => 'CheckBox',
+            ),
         ),
       'legal_identifier' => array(
           'name' => 'legal_identifier',
@@ -151,6 +175,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/legal\\s?id/i',
           'dataPattern' => '/\\w+?\\d{5,}/',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'external_identifier' => array(
           'name' => 'external_identifier',
@@ -163,6 +190,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/external\\s?id/i',
           'dataPattern' => '/^\\d{11,}$/',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'sort_name' => array(
           'name' => 'sort_name',
@@ -172,6 +202,9 @@ function contact_getfields_expectedresult(){
           'size' => 30,
           'export' => true,
           'where' => 'civicrm_contact.sort_name',
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'display_name' => array(
           'name' => 'display_name',
@@ -181,6 +214,9 @@ function contact_getfields_expectedresult(){
           'size' => 30,
           'export' => true,
           'where' => 'civicrm_contact.display_name',
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'nick_name' => array(
           'name' => 'nick_name',
@@ -193,6 +229,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/n(ick\\s)name|nick$/i',
           'dataPattern' => '/^\\w+$/',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'legal_name' => array(
           'name' => 'legal_name',
@@ -204,6 +243,9 @@ function contact_getfields_expectedresult(){
           'where' => 'civicrm_contact.legal_name',
           'headerPattern' => '/^legal|(l(egal\\s)?name)$/i',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'image_URL' => array(
           'name' => 'image_URL',
@@ -214,6 +256,9 @@ function contact_getfields_expectedresult(){
           'import' => true,
           'where' => 'civicrm_contact.image_URL',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'preferred_communication_method' => array(
           'name' => 'preferred_communication_method',
@@ -226,6 +271,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/^p(ref\\w*\\s)?c(omm\\w*)|( meth\\w*)$/i',
           'dataPattern' => '/^\\w+$/',
           'export' => true,
+          'html' => array(
+              'type' => 'Select',
+            ),
           'pseudoconstant' => array(
               'optionGroupName' => 'preferred_communication_method',
             ),
@@ -240,6 +288,9 @@ function contact_getfields_expectedresult(){
           'where' => 'civicrm_contact.preferred_language',
           'headerPattern' => '/^lang/i',
           'export' => true,
+          'html' => array(
+              'type' => 'Select',
+            ),
           'pseudoconstant' => array(
               'optionGroupName' => 'languages',
               'keyColumn' => 'name',
@@ -249,12 +300,19 @@ function contact_getfields_expectedresult(){
           'name' => 'preferred_mail_format',
           'type' => 2,
           'title' => 'Preferred Mail Format',
+          'maxlength' => 8,
+          'size' => 8,
           'import' => true,
           'where' => 'civicrm_contact.preferred_mail_format',
           'headerPattern' => '/^p(ref\\w*\\s)?m(ail\\s)?f(orm\\w*)$/i',
           'export' => true,
           'default' => 'Both',
-          'enumValues' => 'Text, HTML, Both',
+          'html' => array(
+              'type' => 'Select',
+            ),
+          'pseudoconstant' => array(
+              'callback' => 'CRM_Core_SelectValues::pmf',
+            ),
         ),
       'hash' => array(
           'name' => 'hash',
@@ -283,6 +341,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/^first|(f(irst\\s)?name)$/i',
           'dataPattern' => '/^\\w+$/',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'middle_name' => array(
           'name' => 'middle_name',
@@ -295,6 +356,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/^middle|(m(iddle\\s)?name)$/i',
           'dataPattern' => '/^\\w+$/',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'last_name' => array(
           'name' => 'last_name',
@@ -307,6 +371,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/^last|(l(ast\\s)?name)$/i',
           'dataPattern' => '/^\\w+(\\s\\w+)?+$/',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'prefix_id' => array(
           'name' => 'prefix_id',
@@ -317,6 +384,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/^(prefix|title)/i',
           'dataPattern' => '/^(mr|ms|mrs|sir|dr)\\.?$/i',
           'export' => true,
+          'html' => array(
+              'type' => 'Select',
+            ),
           'pseudoconstant' => array(
               'optionGroupName' => 'individual_prefix',
             ),
@@ -334,12 +404,36 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/^suffix$/i',
           'dataPattern' => '/^(sr|jr)\\.?|i{2,}$/',
           'export' => true,
+          'html' => array(
+              'type' => 'Select',
+            ),
           'pseudoconstant' => array(
               'optionGroupName' => 'individual_suffix',
             ),
           'api.aliases' => array(
               '0' => 'individual_suffix',
               '1' => 'individual_suffix_id',
+            ),
+        ),
+      'formal_title' => array(
+          'name' => 'formal_title',
+          'type' => 2,
+          'title' => 'Formal Title',
+          'maxlength' => 64,
+          'size' => 30,
+          'import' => true,
+          'where' => 'civicrm_contact.formal_title',
+          'headerPattern' => '/^title/i',
+          'export' => true,
+        ),
+      'communication_style_id' => array(
+          'name' => 'communication_style_id',
+          'type' => 1,
+          'title' => 'Communication Style',
+          'export' => true,
+          'where' => 'civicrm_contact.communication_style_id',
+          'pseudoconstant' => array(
+              'optionGroupName' => 'communication_style',
             ),
         ),
       'email_greeting_id' => array(
@@ -355,6 +449,9 @@ function contact_getfields_expectedresult(){
           'size' => 45,
           'import' => true,
           'where' => 'civicrm_contact.email_greeting_custom',
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'email_greeting_display' => array(
           'name' => 'email_greeting_display',
@@ -362,11 +459,17 @@ function contact_getfields_expectedresult(){
           'title' => 'Email Greeting',
           'maxlength' => 255,
           'size' => 45,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'postal_greeting_id' => array(
           'name' => 'postal_greeting_id',
           'type' => 1,
           'title' => 'Postal Greeting ID',
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'postal_greeting_custom' => array(
           'name' => 'postal_greeting_custom',
@@ -376,6 +479,9 @@ function contact_getfields_expectedresult(){
           'size' => 45,
           'import' => true,
           'where' => 'civicrm_contact.postal_greeting_custom',
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'postal_greeting_display' => array(
           'name' => 'postal_greeting_display',
@@ -383,6 +489,9 @@ function contact_getfields_expectedresult(){
           'title' => 'Postal Greeting',
           'maxlength' => 255,
           'size' => 45,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'addressee_id' => array(
           'name' => 'addressee_id',
@@ -397,6 +506,9 @@ function contact_getfields_expectedresult(){
           'size' => 45,
           'import' => true,
           'where' => 'civicrm_contact.addressee_custom',
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'addressee_display' => array(
           'name' => 'addressee_display',
@@ -404,6 +516,9 @@ function contact_getfields_expectedresult(){
           'title' => 'Addressee',
           'maxlength' => 255,
           'size' => 45,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'job_title' => array(
           'name' => 'job_title',
@@ -416,6 +531,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/^job|(j(ob\\s)?title)$/i',
           'dataPattern' => '//',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'gender_id' => array(
           'name' => 'gender_id',
@@ -425,6 +543,9 @@ function contact_getfields_expectedresult(){
           'where' => 'civicrm_contact.gender_id',
           'headerPattern' => '/^gender$/i',
           'export' => true,
+          'html' => array(
+              'type' => 'Select',
+            ),
           'pseudoconstant' => array(
               'optionGroupName' => 'gender',
             ),
@@ -438,6 +559,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/^birth|(b(irth\\s)?date)|D(\\W*)O(\\W*)B(\\W*)$/i',
           'dataPattern' => '/\\d{4}-?\\d{2}-?\\d{2}/',
           'export' => true,
+          'html' => array(
+              'type' => 'Select Date',
+            ),
         ),
       'is_deceased' => array(
           'name' => 'is_deceased',
@@ -447,6 +571,9 @@ function contact_getfields_expectedresult(){
           'where' => 'civicrm_contact.is_deceased',
           'headerPattern' => '/i(s\\s)?d(eceased)$/i',
           'export' => true,
+          'html' => array(
+              'type' => 'CheckBox',
+            ),
         ),
       'deceased_date' => array(
           'name' => 'deceased_date',
@@ -456,6 +583,9 @@ function contact_getfields_expectedresult(){
           'where' => 'civicrm_contact.deceased_date',
           'headerPattern' => '/^deceased|(d(eceased\\s)?date)$/i',
           'export' => true,
+          'html' => array(
+              'type' => 'Select Date',
+            ),
         ),
       'household_name' => array(
           'name' => 'household_name',
@@ -468,12 +598,18 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/^household|(h(ousehold\\s)?name)$/i',
           'dataPattern' => '/^\\w+$/',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'primary_contact_id' => array(
           'name' => 'primary_contact_id',
           'type' => 1,
           'title' => 'Household Primary Contact ID',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'html' => array(
+              'type' => 'Select',
+            ),
         ),
       'organization_name' => array(
           'name' => 'organization_name',
@@ -486,6 +622,9 @@ function contact_getfields_expectedresult(){
           'headerPattern' => '/^organization|(o(rganization\\s)?name)$/i',
           'dataPattern' => '/^\\w+$/',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'sic_code' => array(
           'name' => 'sic_code',
@@ -497,6 +636,9 @@ function contact_getfields_expectedresult(){
           'where' => 'civicrm_contact.sic_code',
           'headerPattern' => '/^sic|(s(ic\\s)?code)$/i',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'user_unique_id' => array(
           'name' => 'user_unique_id',
@@ -510,12 +652,17 @@ function contact_getfields_expectedresult(){
           'dataPattern' => '/^[\\w\\/\\:\\.]+$/',
           'export' => true,
           'rule' => 'url',
+          'html' => array(
+              'type' => 'Text',
+            ),
         ),
       'created_date' => array(
           'name' => 'created_date',
           'type' => 256,
           'title' => 'Created Date',
           'required' => '',
+          'export' => true,
+          'where' => 'civicrm_contact.created_date',
           'default' => 'NULL',
         ),
       'modified_date' => array(
@@ -523,6 +670,8 @@ function contact_getfields_expectedresult(){
           'type' => 256,
           'title' => 'Modified Date',
           'required' => '',
+          'export' => true,
+          'where' => 'civicrm_contact.modified_date',
           'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
         ),
       'source' => array(
@@ -535,6 +684,9 @@ function contact_getfields_expectedresult(){
           'where' => 'civicrm_contact.source',
           'headerPattern' => '/(S(ource\\s)?o(f\\s)?C(ontact\\s)?Data)$/i',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
           'uniqueName' => 'contact_source',
         ),
       'employer_id' => array(
@@ -544,6 +696,9 @@ function contact_getfields_expectedresult(){
           'export' => true,
           'where' => 'civicrm_contact.employer_id',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'html' => array(
+              'type' => 'Autocomplete-Select',
+            ),
           'uniqueName' => 'current_employer_id',
         ),
       'is_deleted' => array(
@@ -553,6 +708,9 @@ function contact_getfields_expectedresult(){
           'required' => true,
           'export' => true,
           'where' => 'civicrm_contact.is_deleted',
+          'html' => array(
+              'type' => 'CheckBox',
+            ),
           'uniqueName' => 'contact_is_deleted',
         ),
       'custom_1' => array(
@@ -570,10 +728,12 @@ function contact_getfields_expectedresult(){
           'extends_entity_column_id' => '',
           'is_view' => 0,
           'is_multiple' => 0,
-          'option_group_id' => '99',
+          'option_group_id' => '102',
           'date_format' => '',
           'time_format' => '',
+          'is_required' => '1',
           'name' => 'custom_1',
+          'title' => 'Our special field',
           'type' => 2,
           'options' => array(
               '1' => 'Label1',
