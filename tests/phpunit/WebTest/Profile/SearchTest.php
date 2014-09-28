@@ -149,12 +149,23 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
     $this->click('in_selector');
 
+    // click on save and new
+    $this->clickLink('_qf_Field_next_new-bottom', 'field_name[0]', FALSE);
+    $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
+
+    $this->select('field_name[0]', 'value=Individual');
+    $this->select('field_name[1]', 'value=current_employer');
+    $this->select('visibility', 'value=Public Pages and Listings');
+    $this->click('is_searchable');
+    $this->click('in_selector');
+
     // click on save
     $this->clickLink('_qf_Field_next-bottom', "xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']", FALSE);
 
     $uselink = explode('?', $this->getAttribute("xpath=//*[@id='field_page']/div[1]/a[4]@href"));
     $this->openCiviPage('profile/create', "$uselink[1]", '_qf_Edit_next');
     $lastName = substr(sha1(rand()), 0, 7);
+    $orgName = 'Organisation'.substr(sha1(rand()), 0, 7);
 
     // Fill Last Name
     $this->type('last_name', $lastName);
@@ -173,6 +184,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     // wait for county data to be populated
     $this->waitForElementPresent("xpath=//select[@id='county-Primary']/option[text()='Alameda']");
     $this->select('county-Primary', "Alameda");
+
+    $this->type('current_employer', $orgName);
 
     $this->clickLink('_qf_Edit_next', NULL);
 
@@ -211,6 +224,16 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[6][text()='United States']"));
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[7][text()='CA']"));
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[8][text()='Alameda']"));
+
+    // verify if the organization has been created -- CRM-15368
+    $this->click("css=input#sort_name_navigation");
+    $this->type("css=input#sort_name_navigation", "$orgName");
+    $this->typeKeys("css=input#sort_name_navigation", "$orgName");
+    $this->waitForElementPresent("css=ul.ui-autocomplete li");
+
+    // visit contact summary page
+    $this->click("css=ul.ui-autocomplete li");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go back to Profile fields admin
     $this->openCiviPage('admin/uf/group/field', "reset=1&action=browse&gid=$profileId", "xpath=//table/tbody/tr[1]/td[9]");

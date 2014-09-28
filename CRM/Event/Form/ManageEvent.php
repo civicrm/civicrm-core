@@ -380,5 +380,13 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       return 'CRM/Event/Form/ManageEvent/Tab.tpl';
     }
   }
+
+  /**
+   * Pre-load libraries required by Online Registration Profile fields
+   */
+  static function addProfileEditScripts() {
+    CRM_UF_Page_ProfileEditor::registerProfileScripts();
+    CRM_UF_Page_ProfileEditor::registerSchemas(array('IndividualModel', 'ParticipantModel'));
+  }
 }
 

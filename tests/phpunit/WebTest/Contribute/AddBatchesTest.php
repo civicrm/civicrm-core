@@ -145,7 +145,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         'soft_credit'
       );
       $this->type("soft_credit_amount_{$row}", $data['soft_credit_amount']);
-      $this->select("field_{$row}_soft_credit_type", $data['soft_credit_type']);
+      $this->select("soft_credit_type_{$row}", $data['soft_credit_type']);
 
     }
     elseif ($type == "Membership") {
@@ -170,6 +170,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         $row, 'soft_credit'
       );
       $this->type("soft_credit_amount_{$row}", $data['soft_credit_amount']);
+      $this->select("soft_credit_type_{$row}", $data['soft_credit_type']);
     }
   }
 
@@ -230,6 +231,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $expectedSoft = array(
         'Soft Credit To' => "{$data['soft_credit_first_name']} {$data['soft_credit_last_name']}",
         'Amount (Soft Credit Type)' => $data['soft_credit_amount'],
+        'Soft Credit Type' => $data['soft_credit_type'],
       );
       foreach ($expectedSoft as $value) {
         $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));

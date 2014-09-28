@@ -926,7 +926,7 @@ class CRM_Report_Form extends CRM_Core_Form {
                 $element->freeze();
               }
               if ($fieldName == 'state_province_id' || $fieldName == 'county_id') {
-                $this->addChainSelect($fieldName . '_value', array('multiple' => TRUE, 'label' => NULL));
+                $this->addChainSelect($fieldName . '_value', array('multiple' => TRUE, 'label' => NULL, 'class' => 'huge'));
               }
               else {
                 $this->addElement('select', "{$fieldName}_value", NULL, $field['options'], array(

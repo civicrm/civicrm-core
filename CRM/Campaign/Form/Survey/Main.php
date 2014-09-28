@@ -157,7 +157,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     $surveyActivityTypes = CRM_Campaign_BAO_Survey::getSurveyActivityType();
     // Activity Type id
-    $this->addSelect('activity_type_id', array(), TRUE);
+    $this->addSelect('activity_type_id', array('option_url' => 'civicrm/admin/campaign/surveyType'), TRUE);
 
     // Campaign id
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('campaign_id', $this->_values));

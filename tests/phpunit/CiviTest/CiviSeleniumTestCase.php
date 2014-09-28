@@ -237,11 +237,23 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Click a link or button and wait for the ajax content to load
+   * Click a link or button and wait for an ajax dialog to load
    * @param string $element
    * @param string $waitFor
    */
-  function clickAjaxLink($element, $waitFor = 'css=.ui-dialog') {
+  function clickPopupLink($element, $waitFor=NULL) {
+    $this->clickAjaxLink($element, 'css=.ui-dialog');
+    if ($waitFor) {
+      $this->waitForElementPresent($waitFor);
+    }
+  }
+
+  /**
+   * Click a link or button and wait for ajax content to load or refresh
+   * @param string $element
+   * @param string $waitFor
+   */
+  function clickAjaxLink($element, $waitFor=NULL) {
     $this->click($element);
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
@@ -664,9 +676,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // 6 - Household profile
     $profile = array('4' => 'New Individual', '5' => 'New Organization', '6' => 'New Household');
     $this->clickAt("xpath=//div[@id='$selectId']/a");
-    $this->clickAjaxLink("xpath=//li[@class='select2-no-results']//a[contains(text(),' $profile[$type]')]");
-
-    $this->waitForElementPresent('_qf_Edit_next');
+    $this->clickPopupLink("xpath=//li[@class='select2-no-results']//a[contains(text(),' $profile[$type]')]", '_qf_Edit_next');
 
     switch ($type) {
       case 4:

@@ -533,7 +533,6 @@ CRM.strings = CRM.strings || {};
         $el.addClass('modal-dialog');
         $('body').css({overflow: 'hidden'});
       }
-      $el.parent().find('.ui-dialog-titlebar-close').attr('title', ts('Close'));
       // Add resize button
       if ($el.parent().hasClass('crm-container') && $el.dialog('option', 'resizable')) {
         $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Toggle fullscreen')+'" style="right:2em;"/>').button({icons: {primary: 'ui-icon-newwin'}, text: false}));
@@ -553,15 +552,11 @@ CRM.strings = CRM.strings || {};
           e.preventDefault();
         });
       }
-      // FIXME: D7 hack to get the toolbar out of the way (CRM-15341)
-      if (CRM.config.userFramework === 'Drupal') $('#toolbar').css('z-index', '100');
     })
     .on('dialogclose', function(e) {
       // Restore scrollbars when closing modal
       if ($('.ui-dialog .modal-dialog:visible').not(e.target).length < 1) {
         $('body').css({overflow: ''});
-        // FIXME: D7 hack, restore toolbar (CRM-15341)
-        if (CRM.config.userFramework === 'Drupal') $('#toolbar').css('z-index', '');
       }
     })
     .on('submit', function(e) {
@@ -777,7 +772,7 @@ CRM.strings = CRM.strings || {};
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
   CRM.confirm = function (options) {
-    var dialog, url, msg, settings = {
+    var dialog, url, msg, buttons = [], settings = {
       title: ts('Confirm'),
       message: ts('Are you sure you want to continue?'),
       url: null,
@@ -795,13 +790,13 @@ CRM.strings = CRM.strings || {};
     };
     $.extend(settings, ($.isFunction(options) ? arguments[1] : options) || {});
     if (!settings.buttons && $.isPlainObject(settings.options)) {
-      settings.buttons = [];
-      $.each(settings.options, function(key, label) {
-        settings.buttons.push({
+      $.each(settings.options, function(op, label) {
+        buttons.push({
           text: label,
-          icons: {primary: key === 'no' ? 'ui-icon-close' : 'ui-icon-check'},
+          'data-op': op,
+          icons: {primary: op === 'no' ? 'ui-icon-close' : 'ui-icon-check'},
           click: function() {
-            var event = $.Event('crmConfirm:' + key);
+            var event = $.Event('crmConfirm:' + op);
             $(this).trigger(event);
             if (!event.isDefaultPrevented()) {
               dialog.dialog('close');
@@ -809,6 +804,8 @@ CRM.strings = CRM.strings || {};
           }
         });
       });
+      // Order buttons so that "no" goes on the right-hand side
+      settings.buttons = _.sortBy(buttons, 'data-op').reverse();
     }
     url = settings.url;
     msg = settings.message;

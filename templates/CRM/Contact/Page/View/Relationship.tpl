@@ -29,7 +29,7 @@
 {elseif $action neq 16} {* add, update or view *}
   {include file="CRM/Contact/Form/Relationship.tpl"}
 {else}
-  <div class="view-content">
+  <div id="contact-summary-relationship-tab" class="view-content">
     {if $permission EQ 'edit'}
       <div class="action-link">
         <a accesskey="N" href="{crmURL p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1"}"
@@ -54,5 +54,16 @@
   </div>
 
   {include file="CRM/common/enableDisableApi.tpl"}
+  {literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
+      // Changing relationships may affect related members and contributions. Ensure they are refreshed.
+      $('#contact-summary-relationship-tab').on('crmPopupFormSuccess', function() {
+        CRM.tabHeader.resetTab('tab_contribute');
+        CRM.tabHeader.resetTab('tab_member');
+      });
+    });
+  </script>
+  {/literal}
 {/if} {* close of custom data else*}
 
