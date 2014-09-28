@@ -426,6 +426,7 @@ class CRM_Core_Resources {
 
   /**
    * @param $value
+   * @return CRM_Core_Resources
    */
   public function setCacheCode($value) {
     $this->cacheCode = $value;
@@ -435,6 +436,9 @@ class CRM_Core_Resources {
     return $this;
   }
 
+  /**
+   * @return CRM_Core_Resources
+   */
   public function resetCacheCode() {
     $this->setCacheCode(CRM_Utils_String::createRandom(5, CRM_Utils_String::ALPHANUMERIC));
     // Also flush cms resource cache if needed
@@ -520,6 +524,7 @@ class CRM_Core_Resources {
 
   /**
    * Flushes cached translated strings
+   * @return CRM_Core_Resources
    */
   public function flushStrings() {
     $this->cache->flush();
@@ -528,6 +533,7 @@ class CRM_Core_Resources {
 
   /**
    * Deletes and rebuilds dynamic resource files
+   * @return CRM_Core_Resources
    */
   public function rebuildDynamicResources() {
     CRM_Utils_File::flushDynamicResources();
