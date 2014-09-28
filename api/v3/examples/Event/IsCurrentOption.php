@@ -65,6 +65,7 @@ function event_get_expectedresult(){
           'is_template' => 0,
           'created_date' => '2013-07-28 08:49:19',
           'is_share' => '1',
+          'is_confirm_enabled' => '1',
         ),
     ),
 );

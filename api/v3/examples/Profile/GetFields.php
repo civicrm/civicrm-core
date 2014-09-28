@@ -51,10 +51,11 @@ function profile_getfields_expectedresult(){
           'option_group_id' => '',
           'date_format' => '',
           'time_format' => '',
+          'is_required' => 0,
           'name' => 'custom_1',
+          'title' => 'first_name',
           'type' => 2,
           'api.required' => '1',
-          'title' => 'first_name',
           'help_pre' => '',
           'help_post' => '',
           'entity' => 'contact',
@@ -84,6 +85,9 @@ function profile_getfields_expectedresult(){
           'type' => 1,
           'title' => 'State Province',
           'FKClassName' => 'CRM_Core_DAO_StateProvince',
+          'html' => array(
+              'type' => 'Select',
+            ),
           'pseudoconstant' => array(
               'table' => 'civicrm_state_province',
               'keyColumn' => 'id',
@@ -101,6 +105,9 @@ function profile_getfields_expectedresult(){
           'type' => 1,
           'title' => 'Country',
           'FKClassName' => 'CRM_Core_DAO_Country',
+          'html' => array(
+              'type' => 'Select',
+            ),
           'pseudoconstant' => array(
               'table' => 'civicrm_country',
               'keyColumn' => 'id',
@@ -144,6 +151,9 @@ function profile_getfields_expectedresult(){
           'dataPattern' => '/^[a-zA-Z][\\w\\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\\w\\.-]*[a-zA-Z0-9]\\.[a-zA-Z][a-zA-Z\\.]*[a-zA-Z]$/',
           'export' => true,
           'rule' => 'email',
+          'html' => array(
+              'type' => 'Text',
+            ),
           'api.required' => '1',
           'help_pre' => '',
           'help_post' => '',
@@ -164,6 +174,9 @@ function profile_getfields_expectedresult(){
           'headerPattern' => '/^last|(l(ast\\s)?name)$/i',
           'dataPattern' => '/^\\w+(\\s\\w+)?+$/',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
           'api.required' => '1',
           'help_pre' => '',
           'help_post' => '',
@@ -182,6 +195,9 @@ function profile_getfields_expectedresult(){
           'headerPattern' => '/^first|(f(irst\\s)?name)$/i',
           'dataPattern' => '/^\\w+$/',
           'export' => true,
+          'html' => array(
+              'type' => 'Text',
+            ),
           'api.required' => '1',
           'help_pre' => '',
           'help_post' => '',
@@ -191,6 +207,7 @@ function profile_getfields_expectedresult(){
         ),
       'profile_id' => array(
           'api.required' => true,
+          'title' => 'Profile ID',
         ),
     ),
 );
