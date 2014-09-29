@@ -315,8 +315,7 @@ abstract class CRM_Core_Payment {
       $url = 'civicrm/contribute/unsubscribe';
     }
     elseif ($action == 'billing') {
-      //in notify mode don't return the update billing url
-      if ($this->_paymentProcessor['billing_mode'] == self::BILLING_MODE_NOTIFY) {
+      if (!$this->isSupported('updateSubscriptionBillingInfo')) {
         return NULL;
       }
       $url = 'civicrm/contribute/updatebilling';
