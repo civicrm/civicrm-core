@@ -2076,7 +2076,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $action - optional action - otherwise taken from function name
    */
   function documentMe($params, $result, $function, $filename, $description = "", $subfile = NULL, $action = NULL) {
-    if (defined('DONT_DOCUMENT_TEST_CONFIG')) {
+    if (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG) {
       return;
     }
     $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);

@@ -43,7 +43,7 @@ function membership_type_get_expectedresult(){
           'duration_unit' => 'year',
           'duration_interval' => '1',
           'period_type' => 'rolling',
-          'visibility' => '1',
+          'visibility' => 'Public',
           'auto_renew' => 0,
           'is_active' => '1',
         ),

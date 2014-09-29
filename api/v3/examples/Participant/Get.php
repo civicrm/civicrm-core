@@ -50,6 +50,7 @@ function participant_get_expectedresult(){
           'event_type' => 'Conference',
           'participant_status_id' => '2',
           'participant_status' => 'Attended',
+          'participant_role' => 'Attendee',
           'participant_role_id' => '1',
           'participant_register_date' => '2007-02-19 00:00:00',
           'participant_source' => 'Wimbeldon',

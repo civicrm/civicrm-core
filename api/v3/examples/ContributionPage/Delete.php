@@ -5,7 +5,7 @@
  */
 function contribution_page_delete_example(){
 $params = array(
-  'id' => 4,
+  'id' => 1,
 );
 
 try{
