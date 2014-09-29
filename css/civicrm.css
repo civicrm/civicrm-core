@@ -3262,6 +3262,10 @@ div.crm-container form {
 .crm-container table.display td.center {
   text-align: center;
 }
+/* Fix weird color added to some datatables' sort column */
+.crm-container table.dataTable.display tbody tr > td.sorting_1 {
+  background-color: transparent;
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Datatables misc
