@@ -24,7 +24,7 @@ class CRM_Core_Page_AJAX_RecurringEntity {
 
       if(CRM_Utils_Array::value('linkedEntityTable', $_REQUEST)){
         $result = array();
-        $result = CRM_Event_BAO_Event::updateModeRecurringEntityForEvent($entityId, $_REQUEST['linkedEntityTable']);
+        $result = CRM_Event_Form_ManageEvent_Repeat::updateModeRecurringEntityForEvent($entityId, $_REQUEST['linkedEntityTable']);
       }
 
       $dao = new CRM_Core_DAO_RecurringEntity();
