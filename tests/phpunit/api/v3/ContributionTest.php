@@ -642,6 +642,24 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', array('id' => $contact2['id']));
   }
 
+  function testCreateContributionWithSoftCreditDefaults() {
+    $description = "Demonstrates creating contribution with Soft Credit defaults for amount and type";
+    $subfile     = "ContributionCreateWithSoftCredit";
+    $contact2    = $this->callAPISuccess('Contact', 'create', array('display_name' => 'superman', 'contact_type' => 'Individual'));
+    $params = $this->_params + array(
+      'soft_credit_to' => $contact2['id'],
+    );
+    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('contribution','get', array('return'=> 'soft_credit', 'sequential' => 1));
+
+    $this->assertEquals($contact2['id'], $result['values'][0]['soft_credit'][1]['contact_id']);
+    $this->assertEquals(100, $result['values'][0]['soft_credit'][1]['amount']);
+    $this->assertEquals(CRM_Core_OptionGroup::getDefaultValue("soft_credit_type"), $result['values'][0]['soft_credit'][1]['soft_credit_type'],'In line ' . __LINE__);
+
+    $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
+    $this->callAPISuccess('contact', 'delete', array('id' => $contact2['id']));
+  }
+
   /**
    *  Test  using example code
    */
