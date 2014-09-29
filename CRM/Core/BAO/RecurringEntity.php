@@ -529,6 +529,40 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     unset($processedEntities);
   }
 
+  static public function triggerDelete($obj){
+    // if DB version is earlier than 4.6 skip any processing
+    static $currentVer = NULL;
+    if (!$currentVer) {
+      $currentVer = CRM_Core_BAO_Domain::version();
+    }
+    if (version_compare($currentVer, '4.6.alpha1') < 0) {
+      return;
+    }
+
+    static $processedEntities = array();
+    if (empty($obj->id) || empty($obj->__table)) {
+      return FALSE;
+    }
+    $key = "{$obj->__table}_{$obj->id}";
+    CRM_Core_Error::debug_var('$key', $key);
+
+    if (array_key_exists($key, $processedEntities)) {
+      // already processed
+      return NULL;
+    }
+
+    // mark being processed
+    $processedEntities[$key] = 1;
+
+    $parentID = self::getParentFor($obj->id, $obj->__table, FALSE);
+    if ($parentID) {
+      $dao = new CRM_Core_DAO_RecurringEntity();
+      $dao->entity_id = $obj->id;
+      $dao->entity_table = $obj->__table;
+      $dao->delete();
+    }
+  }
+
   /**
    * This function maps values posted from form to civicrm_action_schedule columns
    * 
