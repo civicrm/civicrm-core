@@ -316,7 +316,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     // change activity status
     $this->select('activity_change_status', 'value=2');
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[2]/span[text()='Continue']");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
     $this->openCiviPage('case', 'reset=1');
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']");
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
