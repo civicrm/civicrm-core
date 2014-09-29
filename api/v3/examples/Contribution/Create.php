@@ -69,6 +69,8 @@ function contribution_create_expectedresult(){
           'check_number' => '',
           'campaign_id' => '',
           'contribution_type_id' => '1',
+          'creditnote_id' => '',
+          'tax_amount' => '',
         ),
     ),
 );
