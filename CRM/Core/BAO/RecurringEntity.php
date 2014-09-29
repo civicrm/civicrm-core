@@ -128,7 +128,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function updates the mode column in the civicrm_recurring_entity table
    *
-   * @param int $mode Mode of the entity to cascade changes across parent/child relations eg 1 - only this entity, 2 - this and the following entity, 3 - All the entity
+   * @param int $mode Mode of the entity to cascade changes across parent/child relations eg 1 - only this entity, 2 - this and the following entities, 3 - All the entity
    *
    * @access public
    *
@@ -158,9 +158,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function gives call to When library, converts formparams to dbparams,
-   * or if there is repeat configuration saved in civicrm_action_achedule table, takes params from there.
-   * DBparams are finally mapped to When params/criterias
+   * This function builds a "When" object based on schedule/reminder params
    * 
    * @return object When object
    */
@@ -315,13 +313,13 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function gets all the children for that particular parent
+   * This function gets all the children for a particular parent entity
    * 
    * @param int $parentId Parent entity id
    * @param string $entityTable Name of the entity table
    * @param boolean $includeParent If true parent id is included in result set and vice versa
-   * @param int $mode ??
-   * @param int $initiatorId ??
+   * @param int $mode 1. retrieve only one entity. 2. retrieve all future entities in the repeating set. 3. all entities in the repeating set.
+   * @param int $initiatorId the instance where this function is invoked from
    * 
    * @access public
    * @static
@@ -381,7 +379,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param int $entityId entity id
    * @param string $entityTable Entity table name
    * @param boolean $includeParent Include parent in result set
-   * @param int $mode ??
+   * @param int $mode 1. retrieve only one entity. 2. retrieve all future entities in the repeating set. 3. all entities in the repeating set.
    * 
    * @access public
    * @static
@@ -432,7 +430,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param string $entityTable Entity table name
    * @param array $fromCriteria array of all the fields & values on which basis to copy
    * @param array $newParams  array of all the fields & values to be copied besides the other fields
-   * @param type $createRecurringEntity ??
+   * @param boolean $createRecurringEntity if to create a record in recurring_entity table
    * 
    * @access public
    * @static
@@ -460,10 +458,10 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
   /**
    * This function acts as a listener to dao->update whenever there is an update,
-   * and the it matched entries in recurring entity, it cascaded the changes across
-   * the related entities
+   * and propagates any changes to all related entities present in recurring entity table
    * 
-   * @param object $obj An object containing data that needs to be updated                                                                                                                                                        *   
+   * @param object $obj An object containing data that needs to be updated
+   *   
    * @access public
    * @static
    *                          
@@ -529,6 +527,16 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     unset($processedEntities);
   }
 
+  /**
+   * This function acts as a listener to dao->delete, and deletes an entry from recurring_entity table
+   * 
+   * @param object $obj An object containing data that needs to be updated
+   *
+   * @access public
+   * @static
+   *                          
+   * @return void
+   */
   static public function triggerDelete($obj){
     // if DB version is earlier than 4.6 skip any processing
     static $currentVer = NULL;
@@ -544,7 +552,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       return FALSE;
     }
     $key = "{$obj->__table}_{$obj->id}";
-    CRM_Core_Error::debug_var('$key', $key);
 
     if (array_key_exists($key, $processedEntities)) {
       // already processed
@@ -687,7 +694,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * 
    * @return object When object
    */
-  function getRecursionFromSchedule($scheduleReminderDetails = array()){
+  function getRecursionFromSchedule($scheduleReminderDetails = array()) {
     $r = new When();
     //If there is some data for this id
     if($scheduleReminderDetails['repetition_frequency_unit']){
