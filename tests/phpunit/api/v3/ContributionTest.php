@@ -644,7 +644,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   function testCreateContributionWithSoftCreditDefaults() {
     $description = "Demonstrates creating contribution with Soft Credit defaults for amount and type";
-    $subfile     = "ContributionCreateWithSoftCredit";
+    $subfile     = "ContributionCreateWithSoftCreditDefaults";
     $contact2    = $this->callAPISuccess('Contact', 'create', array('display_name' => 'superman', 'contact_type' => 'Individual'));
     $params = $this->_params + array(
       'soft_credit_to' => $contact2['id'],
@@ -663,7 +663,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   function testCreateContributionWithHonoreeContact() {
     $description = "Demonstrates creating contribution with Soft Credit by passing in honor_contact_id";
-    $subfile     = "ContributionCreateWithSoftCredit";
+    $subfile     = "ContributionCreateWithHonoreeContact";
     $contact2    = $this->callAPISuccess('Contact', 'create', array('display_name' => 'superman', 'contact_type' => 'Individual'));
     $params = $this->_params + array(
       'honor_contact_id' => $contact2['id'],
