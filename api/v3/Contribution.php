@@ -54,14 +54,6 @@ function civicrm_api3_contribution_create(&$params) {
   _civicrm_api3_custom_format_params($params, $values, 'Contribution');
   $params = array_merge($params, $values);
 
-  //legacy soft credit handling - recommended approach is chaining
-  if(!empty($params['soft_credit_to'])){
-    $params['soft_credit'] = array(array(
-      'contact_id'          => $params['soft_credit_to'],
-      'amount'              => $params['total_amount'],
-      'soft_credit_type_id' => CRM_Core_OptionGroup::getDefaultValue("soft_credit_type")));
-  }
-
   if (!empty($params['id']) && !empty($params['contribution_status_id'])) {
     $error = array();
     //throw error for invalid status change such as setting completed back to pending
@@ -72,6 +64,9 @@ function civicrm_api3_contribution_create(&$params) {
       throw new API_Exception($error['contribution_status_id']);
     }
   }
+
+  _civicrm_api3_contribution_create_legacy_support_45($params);
+
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
 }
 
@@ -110,6 +105,13 @@ function _civicrm_api3_contribution_create_spec(&$params) {
     'description' => 'ID of Contact to be Soft credited to',
     'FKClassName' => 'CRM_Contact_DAO_Contact',
   );
+  $params['honor_contact_id'] = array(
+    'name' => 'honor_contact_id',
+    'title' => 'Honoree contact ID',
+    'type' => 1,
+    'description' => 'ID of honoree contact',
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+  );
   // note this is a recommended option but not adding as a default to avoid
   // creating unnecessary changes for the dev
   $params['skipRecentView'] = array(
@@ -130,6 +132,28 @@ function _civicrm_api3_contribution_create_spec(&$params) {
     'type' => 1,
     'description' => 'Batch which relevant transactions should be added to',
   );
+}
+
+/**
+* Support for schema changes made in 4.5
+* The main purpose of the API is to provide integrators a level of stability not provided by
+* the core code or schema - this means we have to provide support for api calls (where possible)
+* across schema changes.
+*/
+function _civicrm_api3_contribution_create_legacy_support_45(&$params){
+  //legacy soft credit handling - recommended approach is chaining
+  if(!empty($params['soft_credit_to'])){
+    $params['soft_credit'] = array(array(
+      'contact_id'          => $params['soft_credit_to'],
+      'amount'              => $params['total_amount'],
+      'soft_credit_type_id' => CRM_Core_OptionGroup::getDefaultValue("soft_credit_type")));
+  }
+  if(!empty($params['honor_contact_id'])){
+    $params['soft_credit'] = array(array(
+      'contact_id'          => $params['honor_contact_id'],
+      'amount'              => $params['total_amount'],
+      'soft_credit_type_id' => CRM_Core_OptionGroup::getValue('soft_credit_type', 'in_honor_of', 'name')));
+  }
 }
 
 /**
