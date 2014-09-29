@@ -146,11 +146,10 @@ class CRM_Core_Form_RecurringEntity {
       }
       if($values['ends'] == 2){
         if ($values['repeat_absolute_date'] != "") {
-          $today = date("Y-m-d H:i:s"); 
-          $today = CRM_Utils_Date::processDate($today);
+          $eventStartDate = CRM_Utils_Date::processDate($values['repetition_start_date']);
           $end = CRM_Utils_Date::processDate($values['repeat_absolute_date']);
-          if (($end <= $today) && ($end != 0)) {
-            $errors['repeat_absolute_date'] = ts('End date should be after today\'s date');
+          if (($end < $eventStartDate) && ($end != 0)) {
+            $errors['repeat_absolute_date'] = ts('End date should be after event\'s start date');
           }
         }else{
           $errors['repeat_absolute_date'] = ts('This is a required field');
