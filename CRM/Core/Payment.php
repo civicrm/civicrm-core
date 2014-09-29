@@ -355,15 +355,13 @@ abstract class CRM_Core_Payment {
       case 'cancel' :
         $url = 'civicrm/contribute/unsubscribe';
         break;
-
       case 'billing' :
         //in notify mode don't return the update billing url
-        if ($this->_paymentProcessor['billing_mode'] == self::BILLING_MODE_NOTIFY) {
+        if (!$this->isSupported('updateSubscriptionBillingInfo')) {
           return NULL;
         }
-      	$url = 'civicrm/contribute/updatebilling';
+        $url = 'civicrm/contribute/updatebilling';
         break;
-
       case 'update' :
         $url = 'civicrm/contribute/updaterecur';
         break;
