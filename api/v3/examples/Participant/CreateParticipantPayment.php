@@ -1,7 +1,7 @@
 <?php
 /**
  * Test Generated example of using participant create API
- * single function to create contact w participation & contribution. Note that in the
+ * single function to create contact w partipation & contribution. Note that in the
       case of 'contribution' the 'create' is implied (api.contribution.create) *
  */
 function participant_create_example(){
@@ -9,7 +9,7 @@ $params = array(
   'contact_type' => 'Individual',
   'display_name' => 'dlobo',
   'api.participant' => array(
-      'event_id' => 39,
+      'event_id' => 40,
       'status_id' => 1,
       'role_id' => 1,
       'format.only_id' => 1,
@@ -77,6 +77,8 @@ function participant_create_expectedresult(){
           'last_name' => '',
           'prefix_id' => '',
           'suffix_id' => '',
+          'formal_title' => '',
+          'communication_style_id' => '',
           'email_greeting_id' => '1',
           'email_greeting_custom' => '',
           'email_greeting_display' => '',

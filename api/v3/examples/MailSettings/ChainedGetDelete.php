@@ -37,7 +37,7 @@ function mail_settings_get_expectedresult(){
           'id' => '1',
           'domain_id' => '1',
           'name' => 'default',
-          'is_default' => '1',
+          'is_default' => 0,
           'domain' => 'EXAMPLE.ORG',
           'api.MailSettings.delete' => array(
               'is_error' => 0,
@@ -46,11 +46,11 @@ function mail_settings_get_expectedresult(){
               'values' => 1,
             ),
         ),
-      '3' => array(
-          'id' => '3',
+      '6' => array(
+          'id' => '6',
           'domain_id' => '1',
           'name' => 'my mail setting',
-          'is_default' => 0,
+          'is_default' => '1',
           'domain' => 'setting.com',
           'server' => 'localhost',
           'username' => 'sue',

@@ -35,7 +35,7 @@ function membership_get_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'contact_id' => '15',
+          'contact_id' => '35',
           'membership_type_id' => '21',
           'join_date' => '2009-01-21',
           'start_date' => '2013-07-29 00:00:00',

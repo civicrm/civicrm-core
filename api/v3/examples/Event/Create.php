@@ -109,8 +109,10 @@ function event_create_expectedresult(){
           'currency' => '',
           'campaign_id' => '',
           'is_share' => '',
+          'is_confirm_enabled' => '',
           'parent_event_id' => '',
           'slot_label_id' => '',
+          'dedupe_rule_group_id' => '',
         ),
     ),
 );

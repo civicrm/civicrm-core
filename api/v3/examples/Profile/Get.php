@@ -6,11 +6,11 @@
 function profile_get_example(){
 $params = array(
   'profile_id' => array(
-      '0' => 14,
+      '0' => 15,
       '1' => 1,
       '2' => 'Billing',
     ),
-  'contact_id' => 2,
+  'contact_id' => 3,
 );
 
 try{
@@ -37,7 +37,7 @@ function profile_get_expectedresult(){
   'version' => 3,
   'count' => 3,
   'values' => array(
-      '14' => array(
+      '15' => array(
           'postal_code-1' => '90210',
           'state_province-1' => '1021',
           'country-1' => '1228',
