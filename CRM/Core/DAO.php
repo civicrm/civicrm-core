@@ -462,6 +462,14 @@ class CRM_Core_DAO extends DB_DataObject {
     return $this;
   }
 
+  function delete($useWhere = FALSE) {
+    $result = parent::delete($useWhere);
+    if ($result) {
+      CRM_Core_BAO_RecurringEntity::triggerDelete($this);
+    }
+    return $result;
+  }
+
   /**
    * @param bool $created
    */
