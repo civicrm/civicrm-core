@@ -5,8 +5,8 @@
  */
 function group_contact_delete_example(){
 $params = array(
-  'contact_id' => 1,
-  'group_id' => 1,
+  'id' => 4,
+  'skip_undelete' => true,
 );
 
 try{
@@ -34,7 +34,7 @@ function group_contact_delete_expectedresult(){
   'count' => 1,
   'values' => 1,
   'total_count' => 1,
-  'removed' => 1,
+  'removed' => 0,
   'not_removed' => 0,
 );
 
@@ -45,7 +45,7 @@ function group_contact_delete_expectedresult(){
 /*
 * This example has been generated from the API test suite. The test that created it is called
 *
-* testDelete and can be found in
+* testDeletePermanent and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/GroupContactTest.php
 *
 * You can see the outcome of the API tests at

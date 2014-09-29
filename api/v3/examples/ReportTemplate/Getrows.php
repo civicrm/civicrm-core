@@ -41,16 +41,10 @@ function report_template_getrows_expectedresult(){
       '0' => array(
           'civicrm_contact_sort_name' => 'Default Organization',
           'civicrm_contact_id' => '1',
-          'civicrm_address_street_address' => '',
-          'civicrm_address_city' => '',
-          'civicrm_country_name' => '',
         ),
       '1' => array(
           'civicrm_contact_sort_name' => 'Second Domain',
           'civicrm_contact_id' => '2',
-          'civicrm_address_street_address' => '15 Main St',
-          'civicrm_address_city' => 'Collinsville',
-          'civicrm_country_name' => 'United States',
         ),
     ),
   'metadata' => array(
@@ -58,9 +52,6 @@ function report_template_getrows_expectedresult(){
       'labels' => array(
           'civicrm_contact_sort_name' => 'Contact Name',
           'civicrm_contact_id' => 'Internal Contact ID',
-          'civicrm_address_street_address' => 'Street Address',
-          'civicrm_address_city' => 'City',
-          'civicrm_country_name' => 'Country',
         ),
     ),
 );
