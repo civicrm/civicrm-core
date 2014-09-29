@@ -121,7 +121,14 @@
               $("#repeat-mode-dailog").dialog('close');
               $('#mainTabContainer div:visible Form').submit();
             }else if(result.status != "" && result.status == 'Error'){
-              $("#repeat-mode-dailog").html('').append("<span id='error-text'>Some error ocurred, please try after some time</span>").css('color', 'red');
+              var errorBox = confirm("Mode could not be updated, save only this event?");
+              if (errorBox == true) {
+                $("#repeat-mode-dailog").dialog('close');
+                $('#mainTabContainer div:visible Form').submit();
+              } else {
+                $("#repeat-mode-dailog").dialog('close');
+                return false;
+              }
             }
           }
         });
