@@ -57,8 +57,9 @@ function civicrm_api3_contribution_create(&$params) {
   //legacy soft credit handling - recommended approach is chaining
   if(!empty($params['soft_credit_to'])){
     $params['soft_credit'] = array(array(
-      'contact_id' => $params['soft_credit_to'],
-      'amount' => $params['total_amount']));
+      'contact_id'          => $params['soft_credit_to'],
+      'amount'              => $params['total_amount'],
+      'soft_credit_type_id' => CRM_Core_OptionGroup::getDefaultValue("soft_credit_type")));
   }
 
   if (!empty($params['id']) && !empty($params['contribution_status_id'])) {
