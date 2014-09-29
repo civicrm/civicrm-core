@@ -253,6 +253,50 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       $dao->fetch();
     }
     return $dao;
-  }  
+  }
   
+   /**
+   * Update mode column in civicrm_recurring_entity table for event related tabs
+   * 
+   * @params int $entityId event id
+   * @params string $linkedEntityTable Linked entity table name for this event
+   * @return array
+   */
+  public static function updateModeRecurringEntityForEvent($entityId, $linkedEntityTable){
+    $result = array();
+    if( $entityId && $linkedEntityTable ){
+      switch ($linkedEntityTable) {
+        case 'civicrm_tell_friend':
+          $dao = 'CRM_Friend_DAO_Friend';
+          $entityTable = 'civicrm_tell_friend';
+          break;
+
+        case 'civicrm_pcp_block':
+          $dao = 'CRM_PCP_DAO_PCPBlock';
+          $entityTable = 'civicrm_pcp_block';
+          break;
+
+        case 'civicrm_price_set_entity':
+          $dao = 'CRM_Price_DAO_PriceSetEntity';
+          $entityTable = 'civicrm_price_set_entity';
+          break;
+
+        case 'civicrm_uf_join':
+          $dao = 'CRM_Core_DAO_UFJoin';
+          $entityTable = 'civicrm_uf_join';
+          break;
+        }
+        $params = array(
+                        'entity_id' => $entityId,
+                        'entity_table' => 'civicrm_event'
+                      );
+        $defaults = array();
+        CRM_Core_DAO::commonRetrieve($dao, $params, $defaults);
+        if(CRM_Utils_Array::value('id', $defaults)){
+          $result['entityId'] = $defaults['id'];
+          $result['entityTable'] = $entityTable;
+        }
+    } 
+    return $result;
+  }  
 }
