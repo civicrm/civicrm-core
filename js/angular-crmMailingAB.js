@@ -58,6 +58,12 @@
 //-----------------------------------------
   // Add a new record by name.
   // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
+  /**
+   * This controler lists the existing ABtests
+   * used on /partials/abtesting/list.html
+   * @returns mailingABList - object that contains the existing AB mailings
+   * @returns testing_criteria - array that has the name of the different test types
+   */
   crmMailingAB.controller('ABListingCtrl', function ($scope, crmApi, mailingABList) {
     $scope.mailingABList = mailingABList.values;
     $scope.testing_criteria = {
