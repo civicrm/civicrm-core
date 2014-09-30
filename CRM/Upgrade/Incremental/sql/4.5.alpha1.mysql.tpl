@@ -339,7 +339,7 @@ INSERT IGNORE INTO civicrm_case_type
   WHERE
     option_group_id = @option_group_id_case_type;
 
---- Remove the special character, earlier used as a separator and reference to civicrm_case_type.id
+-- Remove the special character, earlier used as a separator and reference to civicrm_case_type.id
 UPDATE civicrm_case SET case_type_id = replace(case_type_id, 0x01, '');
 
 ALTER TABLE civicrm_case
