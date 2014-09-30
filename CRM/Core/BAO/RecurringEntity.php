@@ -252,7 +252,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
     $recursionDates = array();
     if (is_a($this->recursion, 'When')) { 
-      $initialCount = CRM_Utils_Array::value('start_action_offset', $this->scheduleFormValues);
+      $initialCount = CRM_Utils_Array::value('start_action_offset', $this->schedule);
 
       $exRangeStart = $exRangeEnd = NULL;
       if (!empty($this->excludeDateRangeColumns)) {
