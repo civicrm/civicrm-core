@@ -296,7 +296,6 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Find Member
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
@@ -334,7 +333,6 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->select("credit_card_exp_date[Y]", "value=2020");
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Find Member
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
