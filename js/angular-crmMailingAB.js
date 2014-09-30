@@ -21,7 +21,7 @@
         controller: 'ABListingCtrl',
         resolve: {
           mailingABList: function ($route, crmApi) {
-            return crmApi('MailingAB', 'get', {});
+            return crmApi('MailingAB', 'get', {rowCount: 0});
           }
         }
       });
