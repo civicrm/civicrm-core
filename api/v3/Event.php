@@ -79,6 +79,7 @@ function _civicrm_api3_event_create_spec(&$params) {
   $params['title']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
+  $params['is_template']['api.default'] = 0;
 }
 
 /**
@@ -126,13 +127,6 @@ function civicrm_api3_event_get($params) {
 
   $eventDAO = new CRM_Event_BAO_Event();
   _civicrm_api3_dao_set_filter($eventDAO, $params, TRUE, 'Event');
-
-  if (!empty($params['is_template'])) {
-    $eventDAO->whereAdd( '( is_template = 1 )' );
-  }
-  elseif(empty($eventDAO->id)){
-    $eventDAO->whereAdd('( is_template IS NULL ) OR ( is_template = 0 )');
-  }
 
   if (!empty($params['isCurrent'])) {
     $eventDAO->whereAdd('(start_date >= CURDATE() || end_date >= CURDATE())');
