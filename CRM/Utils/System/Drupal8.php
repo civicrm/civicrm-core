@@ -628,4 +628,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       return $id;
     }
   }
+
+  /**
+   * Get the default location for CiviCRM blocks
+   *
+   * @return string
+   *
+   */
+  function getDefaultBlockLocation() {
+    return 'sidebar_first';
+  }
 }
