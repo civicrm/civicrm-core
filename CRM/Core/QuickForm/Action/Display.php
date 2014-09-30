@@ -119,8 +119,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
     // Deprecated - use snippet=6 instead of json=1
     $json = CRM_Utils_Request::retrieve('json', 'Boolean', CRM_Core_DAO::$_nullObject);
     if ($json) {
-      echo json_encode($form);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($form);
     }
 
     $template->assign('form', $form);

@@ -51,7 +51,7 @@ To create a new test-suite:
    (my-stuff.js) as well as any special dependencies (jQuery plugins,
    Backbone, etc).
 
-4. Edit the "civcrm/tests/qunit/my-stuff/test.js"
+4. Edit the "civicrm/tests/qunit/my-stuff/test.js"
 
 5. To run the test-suite, login to CiviCRM as administrator and visit:
 

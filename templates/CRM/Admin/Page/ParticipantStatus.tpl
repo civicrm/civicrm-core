@@ -63,7 +63,8 @@
 
   {if $action ne 1 and $action ne 2}
     <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" class="button"><span><div class="icon add-icon"></div>{ts}Add Participant Status{/ts}</span></a>
+      <a href="{crmURL q="action=add&reset=1"}" class="button"><span><div class="icon add-icon"></div> {ts}Add Participant Status{/ts}</span></a>
+      <a href="{crmURL p="civicrm/admin" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
     </div>
   {/if}
 </div>

@@ -83,9 +83,11 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
         ),
         'filters' =>
         array(
-          'id' => array('title' => ts('Event Title'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->getEventFilterOptions(),
+          'id' => array(
+            'title' => ts('Event'),
+            'operatorType' => CRM_Report_Form::OP_ENTITYREF,
+            'type' => CRM_Utils_Type::T_INT,
+            'attributes' => array('select' => array('minimumInputLength' => 0)),
           ),
           'event_type_id' => array(
             'name' => 'event_type_id',
@@ -159,8 +161,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
             }
           }
           if (!empty($this->_params['id_value'])) {
-            $participant = implode(', ', $this->_params['id_value']);
-            $this->_participantWhere = " AND civicrm_participant.event_id IN ( {$participant} ) ";
+            $this->_participantWhere = " AND civicrm_participant.event_id IN ( {$this->_params['id_value']} ) ";
           }
 
           if (!empty($clause)) {

@@ -194,7 +194,7 @@
   {literal}
   <script type="text/javascript">
   function verify( ) {
-    if (cj('#is_email_receipt').attr( 'checked' )) {
+    if (cj('#is_email_receipt').prop('checked')) {
       var ok = confirm( '{/literal}{ts escape='js'}Click OK to save this payment record AND send a receipt to the contributor now{/ts}{literal}.' );
       if (!ok) {
         return false;

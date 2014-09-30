@@ -190,7 +190,7 @@ function custom_option_html_type( ) {
               {$form.filter.html}
               &nbsp;&nbsp;<span><a href="#" onclick="toggleContactRefFilter('Group'); return false;">{ts}Filter by Group{/ts}</a></span>
         <br />
-        <span class="description">{ts}Filter contact search results for this field using Contact Lookup API parameters. EXAMPLE: To list Students in group 3:{/ts} "action=lookup&group=3&contact_sub_type=Student" {docURL page="developer/techniques/api"}</span>
+        <span class="description">{ts}Filter contact search results for this field using Contact Lookup API parameters. EXAMPLE: To list Students in group 3:{/ts} "action=lookup&group=3&contact_sub_type=Student" {docURL page="Using the API" resource="wiki"}</span>
             </td>
         </tr>
         <tr  class="crm-custom-field-form-block-options_per_line" id="optionsPerLine" {if $action neq 2 && ($form.data_type.value.0.0 >= 4 && $form.data_type.value.1.0 neq 'CheckBox' || $form.data_type.value.1.0 neq 'Radio' )}class="hide-block"{/if}>

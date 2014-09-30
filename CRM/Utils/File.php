@@ -244,24 +244,25 @@ class CRM_Utils_File {
   }
 
   /**
-   * Appends trailing slashed to paths
+   * Appends a slash to the end of a string if it doesn't already end with one
    *
-   * @param $name
-   * @param null $separator
+   * @param string $path
+   * @param string $slash
    *
    * @return string
    * @access public
    * @static
    */
-  static function addTrailingSlash($name, $separator = NULL) {
-    if (!$separator) {
-      $separator = DIRECTORY_SEPARATOR;
+  static function addTrailingSlash($path, $slash = NULL) {
+    if (!$slash) {
+      // FIXME: Defaulting to backslash on windows systems can produce unexpected results, esp for URL strings which should always use forward-slashes.
+      // I think this fn should default to forward-slash instead.
+      $slash = DIRECTORY_SEPARATOR;
     }
-
-    if (substr($name, -1, 1) != $separator) {
-      $name .= $separator;
+    if (!in_array(substr($path, -1, 1), array('/', '\\'))) {
+      $path .= $slash;
     }
-    return $name;
+    return $path;
   }
 
   /**
@@ -716,7 +717,7 @@ HTACCESS;
     // FIXME: Use self::baseFilePath once url issue has been resolved
     // Windows PHP accepts any mix of "/" or "\"; simpler if we only deal with one of those
     $imageUploadDir = str_replace('\\', '/', $config->imageUploadDir);
-    $path = self::addTrailingSlash(str_replace('/persist/contribute', '', $imageUploadDir)) . 'dynamic';
+    $path = self::addTrailingSlash(str_replace('/persist/contribute', '', $imageUploadDir), '/') . 'dynamic';
     if ($fileName !== NULL) {
       $path .= "/$fileName";
     }
@@ -728,14 +729,19 @@ HTACCESS;
    * @param string $fileName
    * @return string
    */
-  static function dynamicResourceUrl($fileName) {
+  static function dynamicResourceUrl($fileName, $addCacheCode = TRUE) {
     $config = CRM_Core_Config::singleton();
     // FIXME: Need a better way of getting the url of the baseFilePath
-    return self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadURL), '/') . 'dynamic/' . $fileName;
+    $url = self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadURL), '/') . 'dynamic/' . $fileName;
+    if ($addCacheCode) {
+      return $url . '?r=' . CRM_Core_Resources::singleton()->getCacheCode();
+    }
+    return $url;
   }
 
   /**
    * Delete all files from the dynamic resource directory
+   * Change the cache code to force browsers to reload new resources
    */
   static function flushDynamicResources() {
     $files = glob(self::dynamicResourcePath('*'));
@@ -744,6 +750,7 @@ HTACCESS;
         unlink($file);
       }
     }
+    CRM_Core_Resources::singleton()->resetCacheCode();
   }
 }
 

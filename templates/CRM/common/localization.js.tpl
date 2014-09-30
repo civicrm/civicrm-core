@@ -32,12 +32,10 @@
   CRM.config.lcMessages = {$config->lcMessages|@json_encode};
 
   // Contact create links
-  if (CRM.profileCreate !== false) {ldelim}
-    CRM.profileCreate = {$contactCreate|@json_encode};
-  {rdelim}
-  
+  if (CRM.profileCreate !== false) CRM.profileCreate = {$contactCreate|@json_encode};
+
   // Initialize CRM.url and CRM.formatMoney
-  CRM.url('init', '{crmURL p="civicrm/example" q="placeholder" h=0}');
+  CRM.url({ldelim}back: '{crmURL p="*path*" q="*query*" h=0 fb=1}', front: '{crmURL p="*path*" q="*query*" h=0 fe=1}'{rdelim});
   CRM.formatMoney('init', {$moneyFormat});
 
   // Localize select2
@@ -47,6 +45,9 @@
   $.fn.select2.defaults.formatInputTooShort = function() {ldelim}
     return $(this).data('api-entity') == 'contact' ? {$contactSearch} : {$otherSearch};
   {rdelim};
+
+  // Localize jQuery UI
+  $.ui.dialog.prototype.options.closeText = "{ts escape='js'}Close{/ts}";
 
   // Localize strings for jQuery.validate
   var messages = {ldelim}
@@ -73,7 +74,9 @@
 
   var params = {
     errorClass: 'crm-inline-error',
-    messages: {}
+    messages: {},
+    // TODO: remove after resolution of https://github.com/jzaefferer/jquery-validation/pull/1261
+    ignore: ":hidden, [readonly]"
   };
 
   // use civicrm notifications when there are errors

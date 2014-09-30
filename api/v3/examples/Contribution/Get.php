@@ -61,7 +61,7 @@ function contribution_get_expectedresult(){
           'contribution_campaign_id' => '',
           'financial_type_id' => '1',
           'financial_type' => 'Donation',
-          'instrument_id' => '84',
+          'instrument_id' => '87',
           'payment_instrument' => 'Check',
           'product_id' => '',
           'product_name' => '',

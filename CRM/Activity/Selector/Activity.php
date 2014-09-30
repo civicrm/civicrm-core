@@ -246,7 +246,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     ) {
       $actionLinks += array(CRM_Core_Action::ADD => array('name' => ts('File On Case'),
         'url' => '#',
-        'extra' => 'onclick="javascript:fileOnCase( \'file\', \'%%id%%\' ); return false;"',
+        'extra' => 'onclick="javascript:fileOnCase( \'file\', \'%%id%%\', null, this ); return false;"',
         'title' => ts('File On Case'),
       ));
     }

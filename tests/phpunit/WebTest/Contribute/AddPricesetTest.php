@@ -92,7 +92,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom');
   }
 
   /**
@@ -103,6 +103,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
    */
   function _testAddPriceFields(&$fields, &$validateString, $financialType, $dateSpecificFields = FALSE) {
     $validateStrings[] = $financialType;
+    $sid = $this->urlArg('sid');
+    $this->openCiviPage('admin/price/field', "reset=1&action=add&sid=$sid", 'label');
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
 
@@ -177,7 +179,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
           break;
       }
       $this->select('financial_type_id', "label={$financialType}");
-      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom', FALSE);
+      $this->waitForText('crm-notification-container', "Price Field '$label' has been saved.");
     }
   }
 
@@ -239,8 +242,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone", '_qf_Contribution_upload');
 
     // create new contact using dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, 'Contributor', $firstName . '@example.com');
+    $this->createDialogContact();
 
     // select financial type
     $this->select('financial_type_id', "label={$financialType}");
@@ -339,8 +341,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage("admin/contribute/add", "reset=1&action=add");
@@ -460,8 +462,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage("admin/contribute/add", "reset=1&action=add");
@@ -585,8 +587,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone", '_qf_Contribution_upload');
 
     // create new contact using dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, 'Contributor', $firstName . '@example.com');
+    $contact = $this->createDialogContact();
 
     // select contribution type
     $this->select('financial_type_id', "label={$financialType}");
@@ -630,7 +631,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // View Contribution Record and test for expected values
     $expected = array(
-      'From' => "{$firstName} Contributor",
+      'From' => $contact['display_name'],
       'Financial Type' => $financialType,
       'Contribution Amount' => 'Contribution Total: $ 590.00',
       'Paid By' => 'Check',
@@ -687,7 +688,6 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     );
 
     // Retrieve contribution from the DB via api and verify DB values against view contribution page
-    require_once 'api/api.php';
     $fields = $this->webtest_civicrm_api('contribution', 'get', $params);
 
     $params['id'] = $params['contact_id'] = $fields['values'][$fields['id']]['soft_credit_to'];

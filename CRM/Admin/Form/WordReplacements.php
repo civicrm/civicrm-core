@@ -44,7 +44,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     // but that's no longer the canonical store. Re-sync from canonical store to ensure
     // that we display that latest data. This is inefficient - at some point, we
     // should rewrite this UI.
-    CRM_Core_BAO_WordReplacement::rebuild();
+    CRM_Core_BAO_WordReplacement::rebuild(FALSE);
 
     $this->_soInstance = CRM_Utils_Array::value('instance', $_GET);
     $this->assign('soInstance', $this->_soInstance);

@@ -1720,7 +1720,12 @@ class CRM_Utils_Token {
       // Group by entity
       else {
         $split = explode('.', trim($k, '{}'));
-        $entity = isset($split[1]) ? ucfirst($split[0]) : 'Contact';
+        if (isset($split[1])) {
+          $entity = array_key_exists($split[1], CRM_Core_DAO_Address::export()) ? 'Address' : ucfirst($split[0]);
+        }
+        else {
+          $entity = 'Contact';
+        }
         $sorted[ts($entity)][] = array('id' => $k, 'text' => $v);
       }
     }

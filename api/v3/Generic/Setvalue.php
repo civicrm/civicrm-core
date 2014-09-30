@@ -1,6 +1,11 @@
 <?php
 /**
  * params must contain at least id=xx & {one of the fields from getfields}=value
+ *
+ * @param $apiRequest
+ *
+ * @throws API_Exception
+ * @return array
  */
 function civicrm_api3_generic_setValue($apiRequest) {
   $entity = $apiRequest['entity'];

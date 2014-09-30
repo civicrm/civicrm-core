@@ -84,18 +84,9 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
 
     $this->webtestAddCreditCardDetails();
 
-    // since country is not pre-selected for offline mode
-    $this->select("billing_country_id-5", "label=United States");
-    //wait for states to populate the select box
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(2);
-    $this->click('billing_state_province_id-5');
     $this->webtestAddBillingDetails($firstName, NULL, $lastName);
 
-    $this->click("_qf_Membership_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Membership_upload-bottom");
 
     // Use Find Members to make sure membership exists
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
@@ -103,8 +94,7 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     $this->type("sort_name", "$firstName $lastName");
     $this->click("member_test");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+    $this->clickAjaxLink("xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_MembershipView_cancel-bottom");
 
     // View Membership Record
     $verifyData = array(
@@ -119,7 +109,6 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
         preg_quote($value)
       );
     }
-    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
   }
 }
 

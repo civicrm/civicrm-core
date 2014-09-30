@@ -56,7 +56,7 @@
                    href="{crmURL p='civicrm/event/manage/registration' q="reset=1&action=update&id=`$event.id`"}">{ts}Online Registration{/ts}</a>
             </li>
             {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
-              <li><a title="{ts}11Schedule Reminders{/ts}"
+              <li><a title="{ts}Schedule Reminders{/ts}"
                      href="{crmURL p='civicrm/event/manage/reminder' q="reset=1&action=update&id=`$event.id`"}">{ts}Schedule Reminders{/ts}</a>
               </li>
             {/if}

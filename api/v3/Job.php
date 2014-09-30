@@ -83,9 +83,7 @@ function civicrm_api3_job_get($params) {
 /**
  * Delete a job
  *
- * @param $params
- *
- * @internal param int $id
+ * @param array $params
  *
  * @return array API Result Array
  * {@getfields Job_delete}
@@ -100,7 +98,7 @@ function civicrm_api3_job_delete($params) {
  * Dumb wrapper to execute scheduled jobs. Always creates success - errors
  * and results are handled in the job log.
  *
- * @param  array       $params (reference ) input parameters
+ * @param  array $params (reference ) input parameters
  *
  * @return array API Result Array
  *
@@ -150,8 +148,11 @@ function civicrm_api3_job_geocode($params) {
     return civicrm_api3_create_error($result['messages']);
   }
 }
+
 /**
  * First check on Code documentation
+ *
+ * @param array $params
  */
 function _civicrm_api3_job_geocode_spec(&$params) {
   $params['start'] = array('title' => 'Start Date');
@@ -241,7 +242,7 @@ function civicrm_api3_job_mail_report($params) {
  *
  *                        id - Integer - greetings option group
  *
- * @param $params
+ * @param array $params
  *
  * @return boolean        true if success, else false
  * @static
@@ -356,6 +357,10 @@ function civicrm_api3_job_process_sms($params) {
 
 /**
  * Job to get mail responses from civimailing
+ *
+ * @param array $params
+ *
+ * @return array
  */
 function civicrm_api3_job_fetch_bounces($params) {
   $lock = new CRM_Core_Lock('civimail.job.EmailProcessor');
@@ -375,6 +380,10 @@ function civicrm_api3_job_fetch_bounces($params) {
 
 /**
  * Job to get mail and create activities
+ *
+ * @param array $params
+ *
+ * @return array
  */
 function civicrm_api3_job_fetch_activities($params) {
   $lock = new CRM_Core_Lock('civimail.job.EmailProcessor');
@@ -569,6 +578,9 @@ function civicrm_api3_job_cleanup( $params ) {
 /**
  * Set expired relationships to disabled.
  *
+ * @param array $params
+ *
+ * @return array
  */
 function civicrm_api3_job_disable_expired_relationships($params) {
   $result = CRM_Contact_BAO_Relationship::disableExpiredRelationships();
@@ -585,8 +597,12 @@ function civicrm_api3_job_disable_expired_relationships($params) {
  * it is recommended that they use the limit clause to limit the number of smart groups
  * evaluated on a per job basis. Might also help to increase the smartGroupCacheTimeout
  * and use the cache
+ *
+ * @param array $params
+ *
+ * @return array
  */
-function civicrm_api3_job_group_rebuild( $params ) {
+function civicrm_api3_job_group_rebuild($params) {
   $lock = new CRM_Core_Lock('civimail.job.groupRebuild');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');

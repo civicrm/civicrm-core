@@ -188,6 +188,7 @@ function civicrm_api3_participant_get($params) {
  */
 function _civicrm_api3_participant_get_spec(&$params) {
   $params['participant_test']['api.default'] = 0;
+  $params['participant_test']['title'] = 'Get Test Participants';
 }
 
 /**

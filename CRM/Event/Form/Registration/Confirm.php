@@ -379,9 +379,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
-
     $this->setDefaults($defaults);
     $this->freeze();
 
@@ -884,7 +881,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $now         = date('YmdHis');
     $receiptDate = NULL;
 
-    if ($form->_values['event']['is_email_confirm']) {
+    if (!empty($form->_values['event']['is_email_confirm'])) {
       $receiptDate = $now;
     }
     //CRM-4196
@@ -894,7 +891,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     $contribParams = array(
       'contact_id' => $contactID,
-      'financial_type_id'     => $form->_values['event']['financial_type_id'] ?
+      'financial_type_id'     => !empty($form->_values['event']['financial_type_id']) ?
       $form->_values['event']['financial_type_id'] : $params['financial_type_id'],
       'receive_date' => $now,
       'total_amount' => $params['amount'],

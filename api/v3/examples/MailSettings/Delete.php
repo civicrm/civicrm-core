@@ -5,7 +5,7 @@
  */
 function mail_settings_delete_example(){
 $params = array(
-  'id' => 2,
+  'id' => 5,
 );
 
 try{

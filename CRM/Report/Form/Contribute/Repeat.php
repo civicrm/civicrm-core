@@ -464,7 +464,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
    *
    * @return array
    */
-  function formRule($fields, $files, $self) {
+  static function formRule($fields, $files, $self) {
 
     $errors = $checkDate = $errorCount = array();
 
@@ -492,6 +492,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
 
     $idMapping = array(
       'id' => ts('Contact'),
+      'exposed_id' => ts('Contact'),
       'country_id' => ts('Country'),
       'state_province_id' => ts('State/Province'),
       'contribution_source' => ts('Contribution Source'),

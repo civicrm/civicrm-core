@@ -63,7 +63,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
-
+    $this->setPageTitle(ts('Price Option'));
     $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive',
       $this
     );
@@ -271,7 +271,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   /**
    * global validation rules for the form
    *
-   * @param array $fields (referance) posted values of the form
+   * @param array $fields posted values of the form
    *
    * @param $files
    * @param $form

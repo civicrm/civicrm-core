@@ -110,7 +110,7 @@
                     {foreach from=$eventSummary.tab key=k item=v}
                       {assign var="fld" value=$v.field}
                       {if NOT $values.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
-                      <li><a title="{$v.title}" class="action-item crm-hover-button {$status}"
+                      <li><a title="{$v.title}" class="action-item crm-hover-button no-popup {$status}"
                              href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$id`"}">{$v.title}</a></li>
                     {/foreach}
                   </ul>

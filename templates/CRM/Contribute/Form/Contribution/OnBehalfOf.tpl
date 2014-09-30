@@ -201,12 +201,15 @@ function setOrgName( ) {
 function setLocationDetails(contactID , reset) {
   var submittedCID = {/literal}"{$submittedOnBehalf}"{literal};
   var submittedOnBehalfInfo = {/literal}'{$submittedOnBehalfInfo}'{literal};
-  submittedOnBehalfInfo = cj.parseJSON(submittedOnBehalfInfo);
-  if (submittedCID == contactID) {
-    cj.each(submittedOnBehalfInfo, function(key, value) {
-      cj('#onbehalf_' + key ).val(value);
-    });
-    return;
+  if (submittedOnBehalfInfo) {
+    submittedOnBehalfInfo = cj.parseJSON(submittedOnBehalfInfo);
+
+    if (submittedCID == contactID) {
+      cj.each(submittedOnBehalfInfo, function(key, value) {
+        cj('#onbehalf_' + key ).val(value);
+      });
+      return;
+    }
   }
 
   resetValues();
@@ -232,6 +235,16 @@ function setLocationDetails(contactID , reset) {
             cj('#' + ele + " option[value='" + selectedOption + "']").prop('selected', true);
           }
         }
+        else if (data[ele].type == 'Select2') {
+          if (data[ele].fld == 'country') {
+            cj('#' + ele ).select2('val', data[ele].value).change(function() {
+              var stateField = 'onbehalf_state_province-' + data[ele].locTypeId;
+              if (stateField.length > 0 ) {
+                cj('#' + stateField).select2('val', data[stateField].value);
+              }
+            }).change();
+          }
+        }
         else if (data[ele].type == 'Autocomplete-Select') {
           cj('#' + ele ).val( data[ele].value );
           cj('#' + ele + '_id').val(data[ele].id);
@@ -246,6 +259,7 @@ function setLocationDetails(contactID , reset) {
             // remove selected values from left and selected values to right
             cj('#onbehalf\\['+ customFld +'\\]-f option[value="' + selectedOption + '"]').remove()
               .appendTo('#onbehalf\\['+ customFld +'\\]-t');
+            cj('#onbehalf_'+ customFld).val(selectedOption);
           }
         }
         else {

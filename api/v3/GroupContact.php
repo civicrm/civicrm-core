@@ -41,7 +41,7 @@
 
 /**
  * This API will give list of the groups for particular contact
- * Particualr status can be sent in params array
+ * Particular status can be sent in params array
  * If no status mentioned in params, by default 'added' will be used
  * to fetch the records
  *

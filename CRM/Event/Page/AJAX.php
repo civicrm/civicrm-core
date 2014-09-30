@@ -64,8 +64,7 @@ GROUP BY cv.label";
     while ($dao->fetch()) {
       $results[] = array('id' => $dao->id, 'text' => $dao->label);
     }
-    echo json_encode($results);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($results);
   }
 
 }
