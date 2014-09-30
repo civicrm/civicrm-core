@@ -1843,7 +1843,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
   static function changeFeeSelections($params, $participantId, $contributionId, $feeBlock, $lineItems, $paidAmount, $priceSetId) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
-    $pendngRefundStatusId = array_search('Pending refund', $contributionStatuses);
+    $pendingRefundStatusId = array_search('Pending refund', $contributionStatuses);
     $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($participantId, 'participant');
     CRM_Price_BAO_PriceSet::processAmount($feeBlock,
       $params, $lineItems
@@ -1937,6 +1937,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     foreach ($insertLines as $valueId => $lineParams) {
       $lineParams['entity_table'] = 'civicrm_participant';
       $lineParams['entity_id'] = $participantId;
+      $lineParams['contribution_id'] = $contributionId;
       $lineObj = CRM_Price_BAO_LineItem::create($lineParams);
     }
 
@@ -1984,28 +1985,30 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     $balanceAmt = $updatedAmount - $paidAmount;
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
-    $pendngRefundStatusId = array_search('Pending refund', $contributionStatuses);
+    $pendingRefundStatusId = array_search('Pending refund', $contributionStatuses);
     $completedStatusId = array_search('Completed', $contributionStatuses);
 
     $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
-
+    $skip = FALSE;
     if ($balanceAmt) {
       if ($balanceAmt > 0 && $paidAmount != 0) {
         $contributionStatusVal = $partiallyPaidStatusId;
       }
       elseif ($balanceAmt < 0 && $paidAmount != 0) {
-        $contributionStatusVal = $pendngRefundStatusId;
+        $contributionStatusVal = $pendingRefundStatusId;
       }
       elseif ($paidAmount == 0) {
-        $contributionStatusVal = $completedStatusId;
+        //skip updating the contribution status if no payment is made
+        $skip = TRUE;
         $updatedContributionDAO->cancel_date = 'null';
         $updatedContributionDAO->cancel_reason = NULL;
       }
-
       // update contribution status and total amount without trigger financial code
       // as this is handled in current BAO function used for change selection
       $updatedContributionDAO->id = $contributionId;
-      $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
+      if (!$skip) {
+        $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
+      }
       $updatedContributionDAO->total_amount = $updatedAmount;
       $updatedContributionDAO->save();
 
