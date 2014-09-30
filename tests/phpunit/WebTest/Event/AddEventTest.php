@@ -156,12 +156,13 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/manage/fee", "reset=1&action=update&id=$id", "_qf_Fee_upload-bottom");
     $this->click("xpath=//a[@id='quickconfig']");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']");
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[2]");
-    $this->waitForElementPresent("xpath=//a[@id='quickconfig']");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button/span[text()='Continue']");
 
     //Assert quick config change and discount deletion
     $this->openCiviPage("admin/price", "reset=1");
-    $this->assertStringsPresent($discount);
+    foreach ($discount as $key => $val) {
+      $this->waitForTextPresent($val);
+    }
   }
 
   function testAddDeleteEventDiscount() {
