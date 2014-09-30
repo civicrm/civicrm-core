@@ -76,7 +76,7 @@ class CRM_Upgrade_Incremental_php_FourFive {
       $postUpgradeMessage .= '<br /><br />' . ts('If you use CiviMail for newsletters or other communications, check out the new sample CiviMail templates which use responsive design to optimize display on mobile devices (Administer > Communications > Message Templates ).');
     }
     if ($rev == '4.5.1') {
-      $postUpgradeMessage .= '<br /><br />' . ts('WARNING: If you use CiviCase, it is possible that previous upgrades corrupted some CiviCase metadata. If you have not already done so, please identify any custom field sets, smart groups, or reports which refer to CiviCase and ensure that they are properly configured.');
+      $postUpgradeMessage .= '<br /><br />' . ts('WARNING: If you use CiviCase with v4.5.alpha*, v4.5.beta*, or v4.5.0, it is possible that previous upgrades corrupted some CiviCase metadata. If you have not already done so, please identify any custom field sets, smart groups, or reports which refer to CiviCase and ensure that they are properly configured.');
     }
   }
 
