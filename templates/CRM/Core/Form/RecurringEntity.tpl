@@ -62,10 +62,6 @@
             <td>{$form.repeats_by.2.html}&nbsp;&nbsp;{$form.entity_status_1.html}&nbsp;&nbsp;{$form.entity_status_2.html} {help id="id-repeats-by-week"}
             </td>
           </tr>
-          {*<tr class="crm-core-form-recurringentity-block-event_start_date">
-            <td class="label">{$form.repeat_event_start_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=repeat_event_start_date}</td>
-          </tr>*}
           <tr class="crm-core-form-recurringentity-block-ends">
             <td class="label">{$form.ends.label}</td>
             <td>{$form.ends.1.html}&nbsp;{$form.start_action_offset.html}&nbsp;occurrences&nbsp;{help id="id-ends-after"}</td>
@@ -92,9 +88,6 @@
       </div>
     </div>
 </div>
-<!--<div id="dialog" style="display:none">
-    Changing Repeat configuration may affect all other connected repeating events, Are you sure?
-</div>-->
 <div id="preview-dialog" style="display:none;height:auto;">
     <div style="display:block;" id="generated_dates"></div>
     
@@ -328,6 +321,7 @@
               cj('#preview-dialog').css('overflow-y', 'auto');
             }
           }else{
+            cj('div.ui-dialog-buttonset button span:contains(Ok)').hide();
             cj('#generated_dates').append("<span style='color:red;'>Sorry, no dates could be generated for the given criteria!</span>");
           }
         },
@@ -402,33 +396,33 @@
     
 });
     
-    //Exclude list function
-    function addToExcludeList(val) {
-      if(val !== ""){
-        var exists = false;
-        for(var i = 0, opts = document.getElementById('exclude_date_list').options; i < opts.length; ++i){
-          if(opts[i].text == val){
-            exists = true;
-            break;
-          }
+  //Exclude list function
+  function addToExcludeList(val) {
+    if(val !== ""){
+      var exists = false;
+      for(var i = 0, opts = document.getElementById('exclude_date_list').options; i < opts.length; ++i){
+        if(opts[i].text == val){
+          exists = true;
+          break;
         }
-        if (exists == false){
-          cj('#exclude_date_list').append('<option>'+val+'</option>');
+      }
+      if (exists == false){
+        cj('#exclude_date_list').append('<option>'+val+'</option>');
+      }
+    }
+  }
+
+  function removeFromExcludeList(sourceID) {
+    var src = document.getElementById(sourceID);
+    for(var count= src.options.length-1; count >= 0; count--) {
+      if(src.options[count].selected == true) {
+        try{
+          src.remove(count, null);
+        }catch(error){
+          src.remove(count);
         }
       }
     }
-    
-    function removeFromExcludeList(sourceID) {
-      var src = document.getElementById(sourceID);
-      for(var count= src.options.length-1; count >= 0; count--) {
-        if(src.options[count].selected == true) {
-          try{
-            src.remove(count, null);
-          }catch(error){
-            src.remove(count);
-          }
-        }
-      }
-    }
+  }
 </script>
 {/literal}  
