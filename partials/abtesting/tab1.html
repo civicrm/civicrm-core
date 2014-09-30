@@ -6,16 +6,21 @@
     <br><br>
 
     <h3> What would you like to test?</h3><br><br>
-    &nbsp <input type="radio" ng-model="sparestuff.template" ng-value="templates[0]" ng-click="init(2)"
+    <label for="radio-option-subject-lines">
+      &nbsp <input id="radio-option-subject-lines" type="radio" ng-model="sparestuff.template" ng-value="templates[0]" ng-click="init(2)"
                  ng-checked="currentABTest.testing_criteria_id==1" >
-    Subject Lines <br/><br>
-    &nbsp <input type="radio" ng-model="sparestuff.template" ng-value="templates[1]" ng-click="init(3)"
+      Subject lines <br/><br>
+    </label>
+    <label>
+      &nbsp <input type="radio" ng-model="sparestuff.template" ng-value="templates[1]" ng-click="init(3)"
                  ng-checked="currentABTest.testing_criteria_id==2" >
-    From Names <br/><br>
-    &nbsp <input type="radio" ng-model="sparestuff.template" ng-value="templates[2]" ng-click="init(1)"
+      From names <br/><br>
+    </label>
+    <label>
+      &nbsp <input type="radio" ng-model="sparestuff.template" ng-value="templates[2]" ng-click="init(1)"
                  ng-checked="currentABTest.testing_criteria_id==3" >
-    Two different Emails <br/><br>
-    &nbsp
+      Two different emails <br/><br>
+    </label>
 
     <div class="crm-submit-buttons">
     <span class="crm-button">
