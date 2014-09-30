@@ -63,13 +63,33 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       'civicrm_activity_contact'  => 'CRM_Activity_DAO_ActivityContact',
     );
 
-
   static $_updateSkipFields = 
     array(
       'civicrm_event'       => array('start_date', 'end_date'),
       'civicrm_tell_friend' => array('entity_id'),
       'civicrm_pcp_block'   => array('entity_id'),
       'civicrm_activity'    => array('activity_date_time'),
+    );
+
+  static $_linkedEntitiesInfo = 
+    array(
+      'civicrm_tell_friend' => array(
+        'entity_id_col'    => 'entity_id', 
+        'entity_table_col' => 'entity_table'
+      ),
+      'civicrm_price_set_entity' => array(
+        'entity_id_col'    => 'entity_id', 
+        'entity_table_col' => 'entity_table',
+        'is_multirecord'   => TRUE,
+      ),
+      'civicrm_uf_join' => array(
+        'entity_id_col'    => 'entity_id', 
+        'entity_table_col' => 'entity_table'
+      ),
+      'civicrm_pcp_block' => array(
+        'entity_id_col'    => 'entity_id', 
+        'entity_table_col' => 'entity_table'
+      ),
     );
   
   /**
@@ -92,6 +112,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
     $daoRecurringEntity = new CRM_Core_DAO_RecurringEntity();
     $daoRecurringEntity->copyValues($params);
+    $daoRecurringEntity->find(TRUE);
     $result = $daoRecurringEntity->save();
 
     if (CRM_Utils_Array::value('id', $params)) {
@@ -209,6 +230,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         foreach ($this->overwriteColumns as $col => $val) {
           $newCriteria[$col] = $val;
         }
+        // create main entities
         $obj = CRM_Core_BAO_RecurringEntity::copyCreateEntity($this->entity_table, 
           $findCriteria,
           $newCriteria,
@@ -223,6 +245,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
             foreach ($linkedInfo['linkedColumns'] as $col) {
               $newCriteria[$col] = $obj->id;
             }
+            // create linked entities
             $linkedObj = CRM_Core_BAO_RecurringEntity::copyCreateEntity($linkedInfo['table'], 
               $linkedInfo['findCriteria'],
               $newCriteria,
@@ -523,6 +546,96 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         CRM_Core_Error::fatal("DAO Mapper missing for $entityTable.");
       }
     }
+    // done with processing. lets unset static var.
+    unset($processedEntities);
+  }
+
+  /**
+   * This function acts as a listener to dao->save,
+   * and creates entries for linked entities in recurring entity table
+   * 
+   * @param object $obj An object containing data that needs to be updated
+   *   
+   * @access public
+   * @static
+   *                          
+   * @return void
+   */
+  static public function triggerSave($obj) {
+    if (!array_key_exists($obj->__table, self::$_linkedEntitiesInfo)) {
+      return FALSE;
+    }
+
+    // if DB version is earlier than 4.6 skip any processing
+    static $currentVer = NULL;
+    if (!$currentVer) {
+      $currentVer = CRM_Core_BAO_Domain::version();
+    }
+    if (version_compare($currentVer, '4.6.alpha1') < 0) {
+      return;
+    }
+
+    static $processedEntities = array();
+    if (empty($obj->id) || empty($obj->__table)) {
+      return FALSE;
+    }
+    $key = "{$obj->__table}_{$obj->id}";
+    
+    if (array_key_exists($key, $processedEntities)) {
+      // already being processed. Exit recursive calls.
+      return NULL;
+    }
+
+    // mark being processed
+    $processedEntities[$key] = 1;
+
+    // get related entities for table being saved
+    $repeatingEntities = self::getEntitiesFor($obj->id, $obj->__table, FALSE, NULL);
+    if (empty($repeatingEntities)) {
+      // check if its a linked entity
+      if (array_key_exists($obj->__table, self::$_linkedEntitiesInfo)) {
+        $linkedDAO = new self::$_tableDAOMapper[$obj->__table]();
+        $linkedDAO->id = $obj->id;
+        if ($linkedDAO->find(TRUE)) {
+          $idCol = self::$_linkedEntitiesInfo[$obj->__table]['entity_id_col'];
+          $tableCol = self::$_linkedEntitiesInfo[$obj->__table]['entity_table_col'];
+
+          $pEntityID    = $linkedDAO->$idCol;
+          $pEntityTable = $linkedDAO->$tableCol;
+          
+          // find all parent recurring entity set
+          $pRepeatingEntities = self::getEntitiesFor($pEntityID, $pEntityTable, FALSE, NULL);
+
+          if (!empty($pRepeatingEntities)) {
+            // for each parent entity in the set, find out a similar linked entity,
+            // if doesn't exist create one, and also create entries in recurring_entity table
+            foreach($pRepeatingEntities as $key => $val) {
+              $rlinkedDAO = new self::$_tableDAOMapper[$obj->__table]();
+              $rlinkedDAO->$idCol = $val['id'];
+              $rlinkedDAO->$tableCol = $val['table'];
+              if ($rlinkedDAO->find(TRUE)) {
+                CRM_Core_BAO_RecurringEntity::quickAdd($obj->id, $rlinkedDAO->id, $obj->__table);
+              } else {
+                // linked entity doesn't exist. lets create them
+                $newCriteria = array(
+                  $idCol    => $val['id'],
+                  $tableCol => $val['table']
+                );
+                $linkedObj = CRM_Core_BAO_RecurringEntity::copyCreateEntity($obj->__table, 
+                  array('id' => $obj->id),
+                  $newCriteria,
+                  TRUE
+                );
+                if ($linkedObj->id) {
+                  CRM_Core_BAO_RecurringEntity::quickAdd($obj->id, $linkedObj->id, $obj->__table);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     // done with processing. lets unset static var.
     unset($processedEntities);
   }
