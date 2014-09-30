@@ -769,7 +769,7 @@
         $(element).on("click", function () {
           scope.savea({
             id: scope.mailA.id,
-            name: "mailing a",
+            name: scope.currentABTest.name + ' (AB test A)',
             visibility: scope.mailA.visibility,
             created_id: 1,
             subject: scope.mailA.subject,
@@ -841,7 +841,7 @@
           }
           scope.saveb({
             id: scope.mailB.id,
-            name: "mailing b",
+            name: scope.currentABTest.name + ' (AB test B)',
             visibility: scope.mailB.visibility,
             created_id: 1,
             subject: scope.mailB.subject,
@@ -866,7 +866,7 @@
 
           scope.savec({
             id: scope.mailC.id,
-            name: "mailing c",
+            name: scope.currentABTest.name + ' (AB test winner)',
             visibility: scope.mailB.visibility,
             created_id: 1,
             subject: scope.mailB.subject,
