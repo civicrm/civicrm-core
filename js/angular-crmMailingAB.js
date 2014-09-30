@@ -61,6 +61,11 @@
   // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
   crmMailingAB.controller('ABListingCtrl', function ($scope, crmApi,mailingABList) {
     $scope.mailingABList = mailingABList.values;
+    $scope.testing_criteria = {
+      '1': "Subject lines",
+      '2': "From names",
+      '3': "Two different emails"
+    };
   });
 
   crmMailingAB.controller('ReportCtrl', function ($scope, crmApi, selectedABTest,$location) {
