@@ -454,6 +454,7 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     else {
       $this->insert();
+      CRM_Core_BAO_RecurringEntity::triggerSave($this);
     }
     $this->free();
 
