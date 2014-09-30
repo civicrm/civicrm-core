@@ -500,7 +500,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   function testgetfields() {
-    $description = "demonstrate use of getfields to interogate api";
+    $description = "demonstrate use of getfields to interrogate api";
     $params = array('action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['title']['api.required'], 'in line ' . __LINE__);
@@ -509,19 +509,19 @@ class api_v3_EventTest extends CiviUnitTestCase {
      * test api_action param also works
      */
   function testgetfieldsRest() {
-    $description = "demonstrate use of getfields to interogate api";
+    $description = "demonstrate use of getfields to interrogate api";
     $params = array('api_action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['title']['api.required'], 'in line ' . __LINE__);
   }
   function testgetfieldsGet() {
-    $description = "demonstrate use of getfields to interogate api";
+    $description = "demonstrate use of getfields to interrogate api";
     $params = array('action' => 'get');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals('title', $result['values']['event_title']['name'], 'in line ' . __LINE__);
   }
   function testgetfieldsDelete() {
-    $description = "demonstrate use of getfields to interogate api";
+    $description = "demonstrate use of getfields to interrogate api";
     $params = array('action' => 'delete');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['id']['api.required']);

@@ -145,7 +145,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         'soft_credit'
       );
       $this->type("soft_credit_amount_{$row}", $data['soft_credit_amount']);
-      $this->select("field_{$row}_soft_credit_type", $data['soft_credit_type']);
+      $this->select("soft_credit_type_{$row}", $data['soft_credit_type']);
 
     }
     elseif ($type == "Membership") {
@@ -170,6 +170,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         $row, 'soft_credit'
       );
       $this->type("soft_credit_amount_{$row}", $data['soft_credit_amount']);
+      $this->select("soft_credit_type_{$row}", $data['soft_credit_type']);
     }
   }
 
@@ -216,8 +217,8 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         $this->verifyText("xpath=id('MembershipView')/div[2]/div/table[1]/tbody/tr[$label]/td[2]", preg_quote($value));
       }
       //View Contribution
-      $this->waitForElementPresent("xpath=//div[@class='crm-block crm-content-block crm-membership-view-form-block']/table[2]/tbody/tr[1]/td[8]/span/a[text()='View']");
-      $this->click("xpath=//div[@class='crm-block crm-content-block crm-membership-view-form-block']/table[2]/tbody/tr[1]/td[8]/span/a[text()='View']");
+      $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[2]/div[2]/table/tbody/tr[1]/td[8]/span/a[1][text()='View']");
+      $this->click("xpath=//form[@id='MembershipView']/div[2]/div/div[2]/div[2]/table/tbody/tr[1]/td[8]/span/a[1][text()='View']");
       $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
       $expected = array(
         'From' => "{$data['first_name']} {$data['last_name']}",
@@ -230,6 +231,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $expectedSoft = array(
         'Soft Credit To' => "{$data['soft_credit_first_name']} {$data['soft_credit_last_name']}",
         'Amount (Soft Credit Type)' => $data['soft_credit_amount'],
+        'Soft Credit Type' => $data['soft_credit_type'],
       );
       foreach ($expectedSoft as $value) {
         $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
@@ -242,8 +244,9 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
    * @param $type
    */
   function _verifyData($data, $type) {
-    $this->waitForElementPresent("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']");
-    $this->clickLink("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']", "_qf_Entry_upload");
+    $this->waitForElementPresent("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[7]/span/a[1][text()='Enter records']");
+    $this->click("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[7]/span/a[1][text()='Enter records']");
+    $this->waitForElementPresent('_qf_Entry_upload');
     $this->click("_qf_Entry_upload");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     foreach ($data as $value) {

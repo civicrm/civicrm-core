@@ -69,7 +69,8 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->click('link=Add Grant');
 
     // wait for grant form to load completely
-    $this->waitForText('css=span.ui-dialog-title', "$firstName $lastName");
+    $this->waitForText('css=span.ui-dialog-title', "New Grant");
+    $this->waitForElementPresent('status_id');
 
     // check contact name on Grant form
 

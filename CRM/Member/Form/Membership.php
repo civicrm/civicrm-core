@@ -271,6 +271,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $this->setPageTitle(ts('Membership'));
 
+
     parent::preProcess();
   }
 
@@ -402,9 +403,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
       $defaults = array_merge($defaults, $billingDefaults);
-
-      // now fix all state country selectors, set correct state based on country
-      CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
 
       //             // hack to simplify credit card entry for testing
       //             $defaults['credit_card_type']     = 'Visa';
@@ -1184,7 +1182,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $$dateVariable = CRM_Utils_Date::processDate($formValues[$dateField]);
     }
 
-    $memTypeNumTerms = CRM_Utils_Array::value('num_terms', $formValues);
+    $memTypeNumTerms =  empty($termsByType) ? CRM_Utils_Array::value('num_terms', $formValues) : NULL;
 
     $calcDates = array();
     foreach ($this->_memTypeSelected as $memType) {
@@ -1440,10 +1438,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         );
 
         //create new soft-credit record, CRM-13981
-        $softParams['contribution_id'] = $contribution->id;
-        $softParams['currency'] = $contribution->currency;
-        $softParams['amount'] = $contribution->total_amount;
-        CRM_Contribute_BAO_ContributionSoft::add($softParams);
+        if ($softParams) {
+          $softParams['contribution_id'] = $contribution->id;
+          $softParams['currency'] = $contribution->currency;
+          $softParams['amount'] = $contribution->total_amount;
+          CRM_Contribute_BAO_ContributionSoft::add($softParams);
+        }
 
         $paymentParams['contactID'] = $this->_contactID;
         $paymentParams['contributionID'] = $contribution->id;
@@ -1472,7 +1472,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       if ($params['total_amount'] > 0.0) {
         $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
-        $result = & $payment->doDirectPayment($paymentParams);
+        $result = $payment->doDirectPayment($paymentParams);
       }
 
       if (is_a($result, 'CRM_Core_Error')) {
@@ -1533,7 +1533,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
         $membershipParams = array_merge($membershipTypeValues[$memType], $params);
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
-
+        $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
+        unset($params['lineItems']);
         $this->_membershipIDs[] = $membership->id;
         $createdMemberships[$memType] = $membership;
         $count++;
@@ -1568,13 +1569,14 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           CRM_Price_BAO_LineItem::processPriceSet($params['contribution_id'], $lineItem, $contributionBAO, 'civicrm_membership');
 
           //create new soft-credit record, CRM-13981
-          $softParams['contribution_id'] = $params['contribution_id'];
-
-          while ($contributionBAO->fetch()) {
-            $softParams['currency'] = $contributionBAO->currency;
-            $softParams['amount'] = $contributionBAO->total_amount;
+          if ($softParams) {
+            $softParams['contribution_id'] = $params['contribution_id'];
+            while ($contributionBAO->fetch()) {
+              $softParams['currency'] = $contributionBAO->currency;
+              $softParams['amount'] = $contributionBAO->total_amount;
+            }
+            CRM_Contribute_BAO_ContributionSoft::add($softParams);
           }
-          CRM_Contribute_BAO_ContributionSoft::add($softParams);
         }
 
         //carry updated membership object.
@@ -1634,6 +1636,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           }
 
           $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
+          $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
+          unset($params['lineItems']);
 
           $this->_membershipIDs[] = $membership->id;
           $createdMemberships[$memType] = $membership;
@@ -1649,9 +1653,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $totalTaxAmount = 0;
       foreach ($lineItem[$priceSetId] as & $priceFieldOp) {
         if (!empty($priceFieldOp['membership_type_id'])) {
-          $priceFieldOp['start_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'], '%d%f %b, %Y') : '-';
-
-          $priceFieldOp['end_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date'], '%d%f %b, %Y') : '-';
+          $priceFieldOp['start_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'], '%B %E%f, %Y') : '-';
+          $priceFieldOp['end_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date'], '%B %E%f, %Y') : '-';
         }
         else {
           $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';

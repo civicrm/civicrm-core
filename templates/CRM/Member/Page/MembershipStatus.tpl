@@ -28,7 +28,7 @@
    {include file="CRM/Member/Form/MembershipStatus.tpl"}
 {else}
   <div id="help">
-    <p>{ts}CiviMember automatically calculates the current status of each contact's membership based on the status names and rules configured here. The status 'rule' tells CiviMember what status to assign based on the start and end dates of a given membership. For example, the default <strong>Grace</strong> status rule says: 'assign Grace status if the membership period ended sometime within the past month.'{/ts} {docURL page="user/membership/setup"}
+    <p>{ts}CiviMember automatically calculates the current status of each contact's membership based on the status names and rules configured here. The status 'rule' tells CiviMember what status to assign based on the start and end dates of a given membership. For example, the default <strong>Grace</strong> status rule says: 'assign Grace status if the membership period ended sometime within the past month.'{/ts} {docURL page="user/membership/defining-memberships/"}
     <p>{ts 1=$crmURL}The status rules provided by default may be sufficient for your organization. However, you can easily change the status names and/or adjust the rules by clicking the Edit links below. Or you can <a href='%1'>add a new status and rule</a>.{/ts}
   </div>
 
@@ -67,8 +67,9 @@
         {/strip}
 
         {if $action ne 1 and $action ne 2}
-      <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" id="newMembershipStatus" class="button"><span><div class="icon add-icon"></div>{ts}Add Membership Status{/ts}</span></a>
+        <div class="action-link">
+          <a href="{crmURL q="action=add&reset=1"}" id="newMembershipStatus" class="button"><span><div class="icon add-icon"></div>{ts}Add Membership Status{/ts}</span></a>
+          <a href="{crmURL p="civicrm/admin" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
         </div>
         {/if}
     </div>

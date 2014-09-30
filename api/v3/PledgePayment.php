@@ -43,7 +43,7 @@
  * the oldest pledge with no associated contribution is updated
  *
  * @todo possibly add ability to add payment if there are less payments than pledge installments
- * @todo possibily add ability to recalc dates if the schedule is changed
+ * @todo possibly add ability to recalculate dates if the schedule is changed
  *
  * @param  array   $params    input parameters
  * {@getfields PledgePayment_create}

@@ -1866,11 +1866,8 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
         unset($insertLines[$previousLineItem['price_field_value_id']]);
         // for updating the line items i.e. use-case - once deselect-option selecting again
         if ($previousLineItem['line_total'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total']) {
+          $updateLines[$previousLineItem['price_field_value_id']] = $submittedLineItems[$previousLineItem['price_field_value_id']];
           $updateLines[$previousLineItem['price_field_value_id']]['id'] = $id;
-          $updateLines[$previousLineItem['price_field_value_id']]['qty'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'];
-          $updateLines[$previousLineItem['price_field_value_id']]['line_total'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total'];
-          $updateLines[$previousLineItem['price_field_value_id']]['tax_amount'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['tax_amount'];
-          $updateLines[$previousLineItem['price_field_value_id']]['financial_type_id'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['financial_type_id'];
         }
       }
     }
@@ -1956,7 +1953,9 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
 UPDATE civicrm_line_item li
 SET li.qty = {$vals['qty']},
     li.line_total = {$vals['line_total']},
-    li.tax_amount = {$taxAmount}
+    li.tax_amount = {$taxAmount},
+    li.unit_price = {$vals['unit_price']},
+    li.label = '{$vals['label']}'
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}) AND
       (price_field_value_id = {$valueId})
 ";
@@ -2026,6 +2025,9 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
     $pendngRefundStatusId = array_search('Pending refund', $contributionStatuses);
+    $completedStatusId = array_search('Completed', $contributionStatuses);
+
+    $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
 
     if ($balanceAmt) {
       if ($balanceAmt > 0 && $paidAmount != 0) {
@@ -2034,10 +2036,14 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       elseif ($balanceAmt < 0 && $paidAmount != 0) {
         $contributionStatusVal = $pendngRefundStatusId;
       }
+      elseif ($paidAmount == 0) {
+        $contributionStatusVal = $completedStatusId;
+        $updatedContributionDAO->cancel_date = 'null';
+        $updatedContributionDAO->cancel_reason = NULL;
+      }
 
       // update contribution status and total amount without trigger financial code
       // as this is handled in current BAO function used for change selection
-      $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
       $updatedContributionDAO->id = $contributionId;
       $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
       $updatedContributionDAO->total_amount = $updatedAmount;

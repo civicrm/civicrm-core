@@ -81,7 +81,11 @@ class CRM_Case_XMLRepository {
     $definition = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseType, 'definition', 'name');
 
     if (!empty($definition)) {
-      return simplexml_load_string($definition);
+      list ($xml, $error) = CRM_Utils_XML::parseString($definition);
+      if (!$xml) {
+        throw new CRM_Core_Exception("Failed to parse CaseType XML: $error");
+      }
+      return $xml;
     }
 
     // TODO In 4.6 or 5.0, remove support for weird machine-names

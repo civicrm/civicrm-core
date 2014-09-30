@@ -5,45 +5,41 @@
  */
 (function($, CRM, undefined) {
   /**
-   * Almost like {crmURL} but on the client side
-   * eg: var url = CRM.url('civicrm/contact/view', {reset:1,cid:42});
-   * or: $('a.my-link').crmURL();
+   * @param string path
+   * @param string|object query
+   * @param string mode - optionally specify "front" or "back"
    */
-  var tplURL = '/civicrm/example?placeholder';
-  var urlInitted = false;
-  CRM.url = function (p, params) {
-    if (p == "init") {
-      tplURL = params;
-      urlInitted = true;
-      return;
+  var tplURL;
+  CRM.url = function (path, query, mode) {
+    if (typeof path === 'object') {
+      return tplURL = path;
     }
-    if (!urlInitted) {
-      console && console.log && console.log('Warning: CRM.url called before initialization');
+    if (!tplURL) {
+      CRM.console('error', 'Error: CRM.url called before initialization');
     }
-    params = params || '';
-    var frag = p.split ('?');
-    var url = tplURL.replace("civicrm/example", frag[0]);
+    if (!mode) {
+      mode = CRM.config && CRM.config.isFrontend ? 'front' : 'back';
+    }
+    query = query || '';
+    var frag = path.split('?');
+    var url = tplURL[mode].replace("*path*", frag[0]);
 
-    if (typeof(params) == 'string') {
-      url = url.replace("placeholder", params);
+    if (!query) {
+      url = url.replace(/[?&]\*query\*/, '');
     }
     else {
-      url = url.replace("placeholder", $.param(params));
+      url = url.replace("*query*", typeof query === 'string' ? query : $.param(query));
     }
     if (frag[1]) {
-      url += (url.indexOf('?') === (url.length - 1) ? '' : '&') + frag[1];
-    }
-    // remove trailing "?"
-    if (url.indexOf('?') === (url.length - 1)) {
-      url = url.slice(0, (url.length - 1));
+      url += (url.indexOf('?') < 0 ? '?' : '&') + frag[1];
     }
     return url;
   };
 
-  // Backwards compatible with jQuery fn
+  // @deprecated
   $.extend ({'crmURL':
     function (p, params) {
-      console && console.log && console.log('Calling crmURL from jQuery is deprecated. Please use CRM.url() instead.');
+      CRM.console('warn', 'Calling crmURL from jQuery is deprecated. Please use CRM.url() instead.');
       return CRM.url(p, params);
     }
   });
@@ -160,7 +156,7 @@
    * @deprecated
    */
   $.fn.crmAPI = function(entity, action, params, options) {
-    console && console.log && console.log('Calling crmAPI from jQuery is deprecated. Please use CRM.api() instead.');
+    CRM.console('warn', 'Calling crmAPI from jQuery is deprecated. Please use CRM.api3() instead.');
     return CRM.api.call(this, entity, action, params, options);
   };
 
@@ -249,8 +245,9 @@
       if (this._originalContent === null) {
         this._originalContent = this.element.contents().detach();
       }
-      this.options.block && $('.blockOverlay', this.element).length < 1 && this.element.block();
+      this.options.block && this.element.block();
       $.getJSON(url, function(data) {
+        that.options.block && that.element.unblock();
         if (!$.isPlainObject(data)) {
           that._onFailure(data);
           return;
@@ -260,7 +257,9 @@
           return;
         }
         data.url = url;
-        that.element.trigger('crmBeforeLoad', data).html(data.content);
+        that.element.trigger('crmBeforeLoad', data);
+        that._beforeRemovingContent();
+        that.element.html(data.content);
         that._handleOrderLinks();
         that.element.trigger('crmLoad', data);
         that.options.crmForm && that.element.trigger('crmFormLoad', data);
@@ -268,9 +267,21 @@
         that._onFailure();
       });
     },
+    // Perform any cleanup needed before removing/replacing content
+    _beforeRemovingContent: function() {
+      var that = this;
+      if (window.tinyMCE && tinyMCE.editors) {
+        $.each(tinyMCE.editors, function(k) {
+          if ($.contains(that.element[0], this.getElement())) {
+            this.remove();
+          }
+        });
+      }
+      this.options.crmForm && $('form', this.element).ajaxFormUnbind();
+    },
     _destroy: function() {
       this.element.removeClass('crm-ajax-container');
-      this.options.crmForm && $('form', this.element).ajaxFormUnbind();
+      this._beforeRemovingContent();
       if (this._originalContent !== null) {
         this.element.empty().append(this._originalContent);
       }
@@ -314,10 +325,10 @@
           }
           // Adjust height to fit content (small delay to allow elements to render)
           window.setTimeout(function() {
-            var currentHeight = $(settings.target).parent().height(),
+            var currentHeight = $(settings.target).parent().outerHeight(),
               padding = currentHeight - $(settings.target).height(),
               newHeight = $(settings.target).prop('scrollHeight') + padding,
-              menuHeight = $('#civicrm-menu').height(),
+              menuHeight = $('#civicrm-menu').outerHeight(),
               maxHeight = $(window).height() - menuHeight;
             newHeight = newHeight > maxHeight ? maxHeight : newHeight;
             if (newHeight > (currentHeight + 15)) {
@@ -379,9 +390,8 @@
     });
 
     widget.on('crmFormLoad.crmForm', function(event, data) {
-      var $el = $(this)
-        .attr('data-unsaved-changes', 'false');
-      var settings = $el.crmSnippet('option', 'crmForm');
+      var $el = $(this).attr('data-unsaved-changes', 'false'),
+        settings = $el.crmSnippet('option', 'crmForm');
       settings.cancelButton && $(settings.cancelButton, this).click(function(e) {
         e.preventDefault();
         var returnVal = settings.onCancel.call($el, e);
@@ -404,7 +414,6 @@
         dataType: 'json',
         success: function(response) {
           if (response.content === undefined) {
-            $el.crmSnippet('option', 'block') && $el.unblock();
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
             if (response.userContext && (response.status === 'redirect' || (settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0))) {
@@ -412,7 +421,8 @@
               $el.data('civiCrmSnippet')._originalUrl = response.userContext;
               $el.crmSnippet('resetUrl').crmSnippet('refresh');
             }
-            else if ($el.data('uiDialog') && settings.autoClose) {
+            // Close if we are on the original url or the action was "delete" (in which case returning to view may be inappropriate)
+            else if ($el.data('uiDialog') && (settings.autoClose || response.action === 8)) {
               $el.dialog('close');
             }
             else if (settings.autoClose === false) {
@@ -420,6 +430,7 @@
             }
           }
           else {
+            $el.crmSnippet('option', 'block') && $el.unblock();
             response.url = data.url;
             $el.html(response.content).trigger('crmLoad', response).trigger('crmFormLoad', response);
             if (response.status === 'form_error') {
@@ -437,6 +448,11 @@
               this.updateElement && this.updateElement();
             });
           }
+          if (window.tinyMCE && tinyMCE.editors) {
+            $.each(tinyMCE.editors, function() {
+              this.save();
+            });
+          }
         },
         beforeSubmit: function(submission) {
           $.each(formErrors, function() {
@@ -452,6 +468,34 @@
           $el.crmSnippet('option', 'url', $(this).attr('href')).crmSnippet('refresh');
           return false;
         });
+      }
+      // Show form buttons as part of the dialog
+      if ($el.data('uiDialog')) {
+        var buttonContainers = '.crm-submit-buttons, .action-link',
+          buttons = [],
+          added = [];
+        $(buttonContainers, $el).find('input.crm-form-submit, a.button').each(function() {
+          var $el = $(this),
+            label = $el.is('input') ? $el.attr('value') : $el.text(),
+            identifier = $el.attr('name') || $el.attr('href');
+          if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
+            var $icon = $el.find('.icon'),
+              button = {'data-identifier': identifier, text: label, click: function() {
+                $el.click();
+              }};
+            if ($icon.length) {
+              button.icons = {primary: $icon.attr('class')};
+            } else {
+              var action = $el.hasClass('cancel') ? 'close' : (identifier.substr(identifier.length-4) === '_new' ? 'plus' : 'check');
+              button.icons = {primary: 'ui-icon-' + action};
+            }
+            buttons.push(button);
+            added.push(identifier);
+          }
+          // display:none causes the form to not submit when pressing "enter"
+          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'});
+        });
+        $el.dialog('option', 'buttons', buttons);
       }
       // Allow a button to prevent ajax submit
       $('input[data-no-ajax-submit=true]').click(function() {
@@ -482,9 +526,6 @@
     }
     else if ($el.hasClass('medium-popup')) {
       settings.dialog.width = settings.dialog.height = '50%';
-    }
-    else if ($el.hasClass('huge-popup')) {
-      settings.dialog.height = '90%';
     }
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element

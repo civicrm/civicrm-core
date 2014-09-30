@@ -111,8 +111,14 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         $this->assign('count', CRM_Contact_BAO_Group::memberCount($this->_id));
         CRM_Utils_System::setTitle(ts('Confirm Group Delete'));
       }
+      if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
+        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to delete this reserved group."));
+      }
     }
     else {
+      if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
+        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to change settings for this reserved group."));
+      }
       if (isset($this->_id)) {
         $groupValues = array(
           'id' => $this->_id,

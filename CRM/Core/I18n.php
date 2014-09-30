@@ -225,7 +225,7 @@ class CRM_Core_I18n {
     // in such cases we return early, only doing SQL/JS escaping
     if (isset($params['skip']) and $params['skip']) {
       if (isset($escape) and ($escape == 'sql')) {
-        $text = mysql_escape_string($text);
+        $text = mysql_real_escape_string($text);
       }
       if (isset($escape) and ($escape == 'js')) {
         $text = addcslashes($text, "'");
@@ -322,7 +322,7 @@ class CRM_Core_I18n {
 
     // escape SQL if we were asked for it
     if (isset($escape) and ($escape == 'sql')) {
-      $text = mysql_escape_string($text);
+      $text = mysql_real_escape_string($text);
     }
 
     // escape for JavaScript (if requested)

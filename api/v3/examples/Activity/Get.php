@@ -6,7 +6,7 @@
 function activity_get_example(){
 $params = array(
   'contact_id' => 1,
-  'activity_type_id' => '46',
+  'activity_type_id' => '49',
   'sequential' => 1,
   'return.custom_1' => 1,
 );
@@ -39,7 +39,7 @@ function activity_get_expectedresult(){
       '0' => array(
           'source_contact_id' => '1',
           'id' => '1',
-          'activity_type_id' => '46',
+          'activity_type_id' => '49',
           'subject' => 'test activity type id',
           'location' => 'Pensulvania',
           'activity_date_time' => '2011-06-02 14:36:13',

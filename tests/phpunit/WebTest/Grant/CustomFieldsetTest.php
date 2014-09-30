@@ -70,23 +70,20 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $this->select('id=extends_0', 'label=Grants');
     $this->addSelection('id=extends_1', "label=$grantType");
     $this->click('id=collapse_display');
-    $this->click('id=_qf_Group_next-bottom');
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('id=_qf_Group_next-bottom');
     $this->waitForText('crm-notification-container', "Your custom field set '$grantFieldSet' has been added.");
+    $this->waitForElementPresent('_qf_Field_done-bottom');
 
     // Add field to fieldset
     $grantField = 'GrantField' . $rand;
     $this->type('id=label', $grantField);
     $this->select('id=data_type_0', 'label=Money');
-    $this->click('id=_qf_Field_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click('id=_qf_Field_done-bottom');
     $this->waitForText('crm-notification-container', "Custom field '$grantField' has been saved.");
 
     // Create new Grant
     $this->openCiviPage('grant/add', 'reset=1&action=add&context=standalone', '_qf_Grant_upload-bottom');
-    $firstName = 'First' . $rand;
-    $lastName = 'Last' . $rand;
-    $this->webtestNewDialogContact($firstName, $lastName);
+    $contact = $this->createDialogContact();
     $this->select('id=status_id', 'label=Approved for Payment');
     $this->select('id=grant_type_id', "label=$grantType");
     $this->waitForTextPresent($grantField);
@@ -101,7 +98,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
 
     // verify tabular data for grant view
     $this->webtestVerifyTabularData(array(
-      'Name' => "$firstName $lastName",
+      'Name' => $contact['display_name'],
       'Grant Status' => 'Approved',
       'Grant Type' => $grantType,
       $grantField => '$ 99.99',

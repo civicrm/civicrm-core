@@ -118,10 +118,10 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', $subject);
 
     $this->waitForElementPresent(
-      "xpath=//table[@id='contact-activity-selector-activity']//tbody//tr[2]/td[8]/span/a[text()='View']");
+      "xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']//tbody//tr[2]/td[8]/span/a[text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//table[@id='contact-activity-selector-activity']//tbody//tr[2]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']//tbody//tr[2]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
 
     // verify Activity created

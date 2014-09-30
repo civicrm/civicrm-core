@@ -40,7 +40,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Create new  group
     $parentGroupName = 'TestSuffixPrefixGender_' . substr(sha1(rand()), 0, 7);
-    $this->addContactGroup($parentGroupName);
+    $this->WebtestAddGroup($parentGroupName);
 
     // Adding Parent group contact
     // We're using Quick Add block on the main page for this.
@@ -59,7 +59,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$parentGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForElementPresent("//*[@id='GroupContact']");
+    $this->waitForAjaxContent();
 
     $secondContactName = 'TestExport2' . substr(sha1(rand()), 0, 7);
     list($emailContactSecond,$prefixLabelContactScnd,$suffixLabelContactScnd,$genderLabelContactScnd) = WebTest_Export_ContactTest::webtestAddContactWithGenderPrefixSuffix($secondContactName, "John", "$secondContactName.john@example.org", Null);
@@ -75,7 +75,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$parentGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForElementPresent("//*[@id='GroupContact']");
+    $this->waitForAjaxContent();
 
     $this->openCiviPage("contact/search", "reset=1");
 
@@ -86,8 +86,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->select("group", "label=$parentGroupName");
 
     // Click to search.
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $sortFirstName, "Contact did not found in search result!");
@@ -101,7 +100,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Select the task action to export.
     $this->click("task");
     $this->select("task", "label=Export Contacts");
-    $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $csvFile = $this->downloadCSV("_qf_Select_next-bottom");
@@ -155,11 +153,11 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Create new  group
     $parentGroupName = 'Parentgroup_' . substr(sha1(rand()), 0, 7);
-    $this->addContactGroup($parentGroupName);
+    $this->WebtestAddGroup($parentGroupName);
 
     // Create new group and select the previously selected group as parent group for this new group.
     $childGroupName = 'Childgroup_' . substr(sha1(rand()), 0, 7);
-    $this->addContactGroup($childGroupName, $parentGroupName);
+    $this->WebtestAddGroup($childGroupName, $parentGroupName);
 
     // Adding Parent group contact
     // We're using Quick Add block on the main page for this.
@@ -177,7 +175,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$parentGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForElementPresent("//*[@id='GroupContact']");
+    $this->waitForAjaxContent();
 
     // Adding child group contact
     // We're using Quick Add block on the main page for this.
@@ -195,7 +193,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to child group.
     $this->select("group_id", "label=regexp:$childGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForElementPresent("//*[@id='GroupContact']");
+    $this->waitForAjaxContent();
 
     // Visit contact search page.
     $this->openCiviPage("contact/search", "reset=1");
@@ -207,8 +205,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->select("group", "label=$parentGroupName");
 
     // Click to search.
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $sortName, "Contact did not found in search result!");
@@ -222,7 +219,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Select the task action to export.
     $this->click("task");
     $this->select("task", "label=Export Contacts");
-    $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $csvFile = $this->downloadCSV("_qf_Select_next-bottom");
@@ -267,7 +263,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Create new  group
     $groupName = 'TestGroup_' . substr(sha1(rand()), 0, 7);
-    $this->addContactGroup($groupName);
+    $this->WebtestAddGroup($groupName);
 
     // Adding Parent group contact
     // We're using Quick Add block on the main page for this.
@@ -286,7 +282,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->type("address_1_street_address", "121A Sherman St. Apt. 12");
     $this->type("address_1_city", "Dumfries");
     $this->type("address_1_postal_code", "1234");
-    $this->assertElementContainsText('address_1', "- select - United States");
+    $this->assertElementContainsText('address_table_1', "- select - United States");
     $this->select("address_1_state_province_id", "value=1019");
 
     $this->click('_qf_Contact_upload_view');
@@ -300,7 +296,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForElementPresent("//*[@id='GroupContact']");
+    $this->waitForAjaxContent();
 
     $firstName1 = 'aa' . substr(sha1(rand()), 0, 5);
     $this->webtestAddContact($firstName1, "Smith", "{$firstName1}.smith@example.org");
@@ -316,7 +312,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForElementPresent("//*[@id='GroupContact']");
+    $this->waitForAjaxContent();
 
     $firstName2 = 'bb' . substr(sha1(rand()), 0, 5);
 
@@ -350,7 +346,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForElementPresent("//*[@id='GroupContact']");
+    $this->waitForAjaxContent();
 
     $this->openCiviPage("contact/search", "reset=1", NULL);
 
@@ -358,8 +354,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->select("group", "label=$groupName");
 
     // Click to search.
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $sortName1, "Contact did not found in search result!");
@@ -376,7 +371,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Select the task action to export.
     $this->click("task");
     $this->select("task", "label=Export Contacts");
-    $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click("CIVICRM_QFID_2_10");
@@ -413,39 +407,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Read CSV and fire assertions.
     $this->reviewCSV($csvFile, $checkHeaders, $checkRows, 2);
-  }
-
-  /**
-   * @param string $groupName
-   * @param string $parentGroupName
-   */
-  function addContactGroup($groupName = 'New Group', $parentGroupName = "- select group -") {
-    $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
-
-    // Fill group name.
-    $this->type("title", $groupName);
-
-    // Fill description.
-    $this->type("description", "Adding new group.");
-
-    // Check Access Control.
-    $this->click("group_type[1]");
-
-    // Check Mailing List.
-    $this->click("group_type[2]");
-
-    // Select Visibility as Public Pages.
-    $this->select("visibility", "value=Public Pages");
-
-    // Select parent group.
-    $this->select("parents", "label=$parentGroupName");
-
-    // Clicking save.
-    $this->click("_qf_Edit_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Is status message correct?
-    $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
   }
 
   /**

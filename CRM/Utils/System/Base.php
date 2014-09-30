@@ -184,6 +184,13 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Flush css/js caches
+   */
+  function clearResourceCache() {
+    // nullop by default
+  }
+
+  /**
    * Return default Site Settings
    *
    * @param $dir
@@ -354,5 +361,10 @@ abstract class CRM_Utils_System_Base {
   function logger($message) {
 
   }
+
+  /**
+   * Append to coreResourcesList
+   */
+  function appendCoreResources(&$list) {}
 }
 

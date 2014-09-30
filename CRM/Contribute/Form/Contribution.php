@@ -323,7 +323,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_compId);
       }
       else {
-        $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution', 1);
+        $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution', 1, TRUE, TRUE);
       }
       empty($lineItem) ? NULL : $this->_lineItems[] = $lineItem;
     }
@@ -378,9 +378,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
       $defaults = array_merge($defaults, $billingDefaults);
-
-      // now fix all state country selectors, set correct state based on country
-      CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
     }
 
     if ($this->_id) {
@@ -1021,7 +1018,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public function postProcess() {
     $session = CRM_Core_Session::singleton();
-    $sendReceipt = $pId = $contribution  = FALSE;
+    $sendReceipt = $pId = $contribution = $isRelatedId = FALSE;
     $softParams = $softIDs =array();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -1069,8 +1066,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $submittedValues['total_amount'] = CRM_Utils_Array::value('amount', $submittedValues);
     }
     if ($this->_id) {
-      //CRM-10964
-      $pId = ($this->_compId && $this->_context == 'participant') ? $this->_compId : CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'participant_id', 'contribution_id');
+      if ($this->_compId) {
+        if ($this->_context == 'participant') {
+          $pId = $this->_compId;
+        }
+        elseif ($this->_context == 'membership') {
+          $isRelatedId = TRUE;
+        }
+      }
+      else {
+        $contributionDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
+        if (array_key_exists('membership', $contributionDetails)) {
+          $isRelatedId = TRUE;
+        }
+        elseif (array_key_exists('participant', $contributionDetails)) {
+          $pId = current($contributionDetails['participant']);
+        }        
+      }
     }
     if (!$priceSetId && !empty($submittedValues['total_amount']) && $this->_id) {
       // 10117 update th line items for participants
@@ -1091,7 +1103,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $entityID = $this->_id;
       }
 
-      $lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, $entityTable);
+      $lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, NULL, TRUE, $isRelatedId);
       foreach (array_keys($lineItems) as $id) {
         $lineItems[$id]['id'] = $id;
       }
@@ -1266,6 +1278,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['participant_id'] = $pId;
         $params['skipLineItem'] = 1;
       }
+      elseif ($isRelatedId) {
+        $params['contribution_mode'] = 'membership';
+      }
       $params['line_item'] = $lineItem;
       $params['payment_processor_id'] = $params['payment_processor'] = CRM_Utils_Array::value('id', $this->_paymentProcessor);
       if (isset($submittedValues['tax_amount'])) {
@@ -1280,7 +1295,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // if non_deductible_amount exists i.e. Additional Details field set was opened [and staff typed something] -
       // if non_deductible_amount does NOT exist - then calculate it depending on:
       // $ContributionType->is_deductible and whether there is a product (premium).
-      if (!isset($params['non_deductible_amount']) || (!empty($params['non_deductible_amount']))) {
+      if (empty($params['non_deductible_amount'])) {
         $contributionType = new CRM_Financial_DAO_FinancialType();
         $contributionType->id = $params['financial_type_id'];
         if (!$contributionType->find(TRUE)) {

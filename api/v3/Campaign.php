@@ -41,7 +41,7 @@
  * In case of updating existing campaign, id of that particular campaign must
  * be in $params array.
  *
- * @param array $params  (referance) Associative array of property
+ * @param array $params  (reference) Associative array of property
  *                       name/value pairs to insert in new 'campaign'
  *
  * @return array   campaign array
@@ -65,11 +65,11 @@ function _civicrm_api3_campaign_create_spec(&$params) {
 /**
  * Returns array of campaigns  matching a set of one or more group properties
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params Array of one or more valid
  *                       property_name=>value pairs. If $params is set
  *                       as null, all campaigns will be returned
  *
- * @return array  (referance) Array of matching campaigns
+ * @return array  Array of matching campaigns
  * @access public
  * {@getfields campaign_get}
  */
@@ -86,7 +86,7 @@ function civicrm_api3_campaign_get($params) {
  * @param array $params  (reference) array containing id of the group
  *                       to be deleted
  *
- * @return array  (referance) returns flag true if successfull, error
+ * @return array  (reference) returns flag true if successful, error
  *                message otherwise
  * {@getfields campaign_delete}
  * @access public

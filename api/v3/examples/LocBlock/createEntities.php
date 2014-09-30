@@ -1,9 +1,9 @@
 <?php
 /**
- * Test Generated example of using loc_block createEntities API
- * Create entities and location block in 1 api call *
+ * Test Generated example of using loc_block create API
+ * Create entities and locBlock in 1 api call *
  */
-function loc_block_createentities_example(){
+function loc_block_create_example(){
 $params = array(
   'email' => array(
       'location_type_id' => 1,
@@ -24,7 +24,7 @@ $params = array(
 );
 
 try{
-  $result = civicrm_api3('loc_block', 'createEntities', $params);
+  $result = civicrm_api3('loc_block', 'create', $params);
 }
 catch (CiviCRM_API3_Exception $e) {
   // handle error here
@@ -40,7 +40,7 @@ return $result;
 /**
  * Function returns array of result expected from previous function
  */
-function loc_block_createentities_expectedresult(){
+function loc_block_create_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
@@ -58,7 +58,7 @@ function loc_block_createentities_expectedresult(){
               'manual_geo_code' => 0,
             ),
           'email' => array(
-              'id' => '4',
+              'id' => '33',
               'contact_id' => '',
               'location_type_id' => '1',
               'email' => 'test2@loc.block',
@@ -97,7 +97,7 @@ function loc_block_createentities_expectedresult(){
             ),
           'id' => '3',
           'address_id' => '3',
-          'email_id' => '4',
+          'email_id' => '33',
           'phone_id' => '3',
           'im_id' => '',
           'address_2_id' => '',

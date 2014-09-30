@@ -37,7 +37,7 @@ function survey_get_expectedresult(){
       '1' => array(
           'id' => '1',
           'title' => 'survey title',
-          'activity_type_id' => '35',
+          'activity_type_id' => '30',
           'instructions' => 'Call people, ask for money',
           'max_number_of_contacts' => '12',
           'is_active' => '1',

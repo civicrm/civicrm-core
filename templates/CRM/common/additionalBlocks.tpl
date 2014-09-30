@@ -80,7 +80,7 @@ function buildAdditionalBlocks( blockName, className ) {
         async   : false,
         success : function(html){
             cj(fname).after(html);
-            cj(fname).next().trigger('crmLoad');
+            cj(fname).nextAll().trigger('crmLoad');
         }
     });
 

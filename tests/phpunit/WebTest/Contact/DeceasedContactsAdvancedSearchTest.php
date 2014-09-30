@@ -65,13 +65,13 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->click('demographics');
     $this->waitForElementPresent('CIVICRM_QFID_1_is_deceased');
     $this->click('CIVICRM_QFID_1_is_deceased');
-    $this->clickLink('_qf_Advanced_refresh', 'Go');
+    $this->clickLink('_qf_Advanced_refresh');
     $this->assertElementContainsText('search-status', '2 Contacts');
     $this->click("toggleSelect");
     $this->waitForTextPresent('2 Selected records only');
 
     $this->select('task', 'label=Remove Contacts from Group');
-    $this->click("Go");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('_qf_RemoveFromGroup_back-bottom');
     $this->assertElementContainsText('crm-container', 'Number of selected contacts: 2');
     $this->select('group_id', "label={$groupName}");
@@ -85,7 +85,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->click('_qf_Advanced_refresh');
 
     // Check if non-deceased contacts are still present
-    $this->waitForElementPresent('Go');
+    $this->waitForElementPresent('search-status');
     $this->assertElementContainsText('search-status', '3 Contacts');
   }
 

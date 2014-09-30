@@ -111,7 +111,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
     'FKClassName' => 'CRM_Contact_DAO_Contact',
   );
   // note this is a recommended option but not adding as a default to avoid
-  // creating unecessary changes for the dev
+  // creating unnecessary changes for the dev
   $params['skipRecentView'] = array(
     'name' => 'skipRecentView',
     'title' => 'Skip adding to recent view',
@@ -217,6 +217,7 @@ function _civicrm_api3_format_soft_credit(&$contribution) {
  */
 function _civicrm_api3_contribution_get_spec(&$params) {
   $params['contribution_test']['api.default'] = 0;
+  $params['contribution_test']['title'] = 'Get Test Contributions?';
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
   $params['contact_id'] = $params['contribution_contact_id'];
   $params['contact_id']['api.aliases'] = array('contribution_contact_id');
@@ -250,8 +251,8 @@ function _civicrm_api3_contribute_format_params($params, &$values, $create = FAL
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_contribution_transact_spec(&$params) {
-  // This function calls create, so should inherit create spec
-  _civicrm_api3_contribution_create_spec($params);
+  $fields = civicrm_api3('contribution', 'getfields', array('action' => 'create'));
+  $params = array_merge($params, $fields['values']);
   $params['receive_date']['api.default'] = 'now';
 }
 
@@ -300,7 +301,7 @@ function civicrm_api3_contribution_transact($params) {
       return CRM_Core_Error::createApiError($last_error['message']);
     }
   }
-
+  $params['payment_instrument_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', $paymentProcessor['payment_processor_type_id'], 'payment_type') == 1 ? 'Credit Card' : 'Debit Card';
   return civicrm_api('contribution', 'create', $params);
 }
 

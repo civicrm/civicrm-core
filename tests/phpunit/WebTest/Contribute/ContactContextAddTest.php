@@ -137,11 +137,14 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('fulfilled_date');
 
     // Clicking save.
-    $this->clickLink("_qf_Contribution_upload-bottom", 'civicrm-footer');
+    $this->clickLink("_qf_Contribution_upload-bottom", 'civicrm-footer', FALSE);
     // Is status message correct?
     $this->waitForText('crm-notification-container', "The contribution record has been saved");
 
     $this->waitForElementPresent("xpath=//div[@class='view-content']/table[2]/tbody/tr/td[8]/span/a[text()='View']");
+    $viewUrl = $this->parseURL($this->getAttribute("xpath=//div[@class='view-content']/table[2]/tbody/tr/td[8]/span/a[text()='View']@href"));
+    $id = $viewUrl['queryString']['id'];
+    $this->assertType('numeric', $id);
 
     // click through to the Contribution view screen
     $this->click("xpath=//div[@class='view-content']/table[2]/tbody/tr/td[8]/span/a[text()='View']");
@@ -164,9 +167,6 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     }
 
     // check values of contribution record in the DB
-    $viewUrl = $this->parseURL();
-    $id = $viewUrl['queryString']['id'];
-    $this->assertType('numeric', $id);
 
     $searchParams = array('id' => $id);
     $compareParams = array(
@@ -176,7 +176,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $searchParams, $compareParams);
 
     // go to soft creditor contact view page
-    $this->click("css=table.crm-soft-credit-listing tbody tr td a");
+    $this->clickLink("css=table.crm-soft-credit-listing tbody tr td a");
 
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");
@@ -191,7 +191,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
       1 => "{$firstName} Anderson",
     );
     foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", preg_quote($label));
+      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody//tr/td[$value]", preg_quote($label));
     }
   }
 }

@@ -39,15 +39,14 @@
  * create/update group
  *
  * This API is used to create new group or update any of the existing
- * In case of updating existing group, id of that particular grop must
+ * In case of updating existing group, id of that particular group must
  * be in $params array. Either id or name is required field in the
  * $params array
  *
- * @param array $params  (referance) Associative array of property
+ * @param array $params Associative array of property
  *                       name/value pairs to insert in new 'group'
  *
- * @return array   returns id of the group created if success,
- *                 error message otherwise
+ * @return array  API result array
  *@example GroupCreate.php
  *{@getfields group_create}
  * @access public
@@ -70,7 +69,7 @@ function _civicrm_api3_group_create_spec(&$params) {
 /**
  * Returns array of groups  matching a set of one or more group properties
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params Array of one or more valid
  *                       property_name=>value pairs. If $params is set
  *                       as null, all groups will be returned
  *

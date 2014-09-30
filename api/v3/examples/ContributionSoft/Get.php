@@ -40,6 +40,7 @@ function contribution_soft_get_expectedresult(){
           'amount' => '10.00',
           'currency' => 'USD',
           'pcp_display_in_roll' => 0,
+          'soft_credit_type_id' => '4',
         ),
     ),
 );

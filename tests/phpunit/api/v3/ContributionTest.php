@@ -1310,9 +1310,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   function cleanUpAfterPriceSets() {
     $this->quickCleanUpFinancialEntities();
     $this->contactDelete($this->_ids['contact']);
-    $this->callAPISuccess('price_field_value', 'delete', array('id' => $this->_ids['price_field_value'][0]));
-    $this->callAPISuccess('price_field_value', 'delete', array('id' => $this->_ids['price_field_value'][1]));
-    $this->callAPISuccess('price_field', 'delete', array('id' => $this->_ids['price_field'][0]));
     $this->callAPISuccess('price_set', 'delete', array('id' => $this->_ids['price_set']));
   }
 

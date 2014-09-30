@@ -35,7 +35,7 @@
  * To do this, perform a 'get' action to load the existing values, then merge in the updates
  * and call 'create' to save the revised entity.
  *
- * @param $apiRequest an array with keys:
+ * @param array $apiRequest array with keys:
  *  - entity: string
  *  - action: string
  *  - version: string
@@ -72,4 +72,3 @@ function civicrm_api3_generic_update($apiRequest) {
   $p = array_merge($existing, $apiRequest['params']);
   return civicrm_api($apiRequest['entity'], 'create', $p);
 }
-

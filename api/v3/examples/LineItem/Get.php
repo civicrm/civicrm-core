@@ -37,6 +37,7 @@ function line_item_get_expectedresult(){
           'id' => '1',
           'entity_table' => 'civicrm_contribution',
           'entity_id' => '1',
+          'contribution_id' => '1',
           'price_field_id' => '1',
           'label' => 'Contribution Amount',
           'qty' => '1',

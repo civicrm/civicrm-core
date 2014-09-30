@@ -129,7 +129,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
    */
   function testGetFields() {
     $result = $this->callAPISuccess('Contact', 'getfields', array());
-    $this->assertArrayHasKey("custom_{$this->IndividualField['id']}", $result['values'], 'If This fails there is probably a cachine issue - failure in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
+    $this->assertArrayHasKey("custom_{$this->IndividualField['id']}", $result['values'], 'If This fails there is probably a caching issue - failure in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
     $result = $this->callAPISuccess('Contact', 'getfields', array('action' => 'create', 'contact_type' => 'Individual'), 'in line' . __LINE__);
     $this->assertArrayHasKey("custom_{$this->IndividualField['id']}", $result['values']);
     $result = $this->callAPISuccess('Contact', 'getfields', array('action' => 'create', 'contact_type' => 'Organization'));

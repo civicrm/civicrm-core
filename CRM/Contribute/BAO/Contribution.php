@@ -2157,7 +2157,7 @@ WHERE  contribution_id = %1 ";
       if (!empty($this->_relatedObjects['membership'])) {
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
-            $values['membership_id'] = $membership->id;
+            $values['isMembership'] = TRUE;
 
             // need to set the membership values here
             $template->assign('membership_assign', 1);
@@ -2583,7 +2583,7 @@ WHERE  contribution_id = %1 ";
    * @static
    */
   static function recordFinancialAccounts(&$params, $financialTrxnValues = NULL) {
-    $skipRecords = $update = $return = FALSE;
+    $skipRecords = $update = $return = $isRelatedId = FALSE;
 
     $additionalParticipantId = array();
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -2602,6 +2602,10 @@ WHERE  contribution_id = %1 ";
     else {
       $entityId = $params['contribution']->id;
       $entityTable = 'civicrm_contribution';
+    }
+
+    if (CRM_Utils_Array::value('contribution_mode', $params) == 'membership') {
+      $isRelatedId = TRUE;
     }
 
     $entityID[] = $entityId;
@@ -2654,7 +2658,7 @@ WHERE  contribution_id = %1 ";
 
     // build line item array if its not set in $params
     if (empty($params['line_item']) || $additionalParticipantId) {
-      CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));
+      CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable), $isRelatedId);
     }
 
     if (CRM_Utils_Array::value('contribution_status_id', $params) != array_search('Failed', $contributionStatuses) &&
@@ -2718,8 +2722,14 @@ WHERE  contribution_id = %1 ";
         $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;
         $params['trxnParams']['trxn_id'] = $params['prevContribution']->trxn_id;
         $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
-        $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
-        $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
+
+
+        if (!(($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)
+          || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatuses))
+          && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatuses))) {
+          $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
+          $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
+        }
 
         //if financial type is changed
         if (!empty($params['financial_type_id']) &&
@@ -3150,7 +3160,17 @@ WHERE  contribution_id = %1 ";
       $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($contributionDAO->financial_type_id, $relationTypeId);
 
       $trxnId = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId, $contributionDAO->financial_type_id);
-      $trxnId = $trxnId['trxn_id'];
+      if (!empty($trxnId)) {
+        $trxnId = $trxnId['trxn_id'];
+      }
+      elseif (!empty($contributionDAO->payment_instrument_id)) {
+        $trxnId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($contributionDAO->payment_instrument_id);
+      }
+      else {
+        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
+        $queryParams = array(1 => array($relationTypeId, 'Integer'));
+        $trxnId = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = %1", $queryParams);
+      }
 
       // update statuses
       // criteria for updates contribution total_amount == financial_trxns of partial_payments
@@ -3167,15 +3187,21 @@ WHERE eft.entity_table = 'civicrm_contribution'
 
       // update statuses
       if ($contributionDAO->total_amount == $sumOfPayments) {
-        // update contribution status
-        $contributionUpdate['id'] = $contributionId;
-        $contributionUpdate['contribution_status_id'] = $statusId;
-        $contributionUpdate['skipLineItem'] = TRUE;
+        // update contribution status and
+        // clean cancel info (if any) if prev. contribution was updated in case of 'Refunded' => 'Completed'
+        $contributionDAO->contribution_status_id = $statusId;
+        $contributionDAO->cancel_date = 'null';
+        $contributionDAO->cancel_reason = NULL;
+        $contributionDAO->save();
+
+        //Change status of financial record too
+        $financialTrxn->status_id = $statusId;
+        $financialTrxn->save();
+
         // note : not using the self::add method,
         // the reason because it performs 'status change' related code execution for financial records
         // which in 'Partial Paid' => 'Completed' is not useful, instead specific financial record updates
         // are coded below i.e. just updating financial_item status to 'Paid'
-        $contributionDetails = CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'contribution_status_id', $statusId);
 
         if ($participantId) {
           // update participant status

@@ -399,14 +399,12 @@ class CRM_Core_Invoke {
     // also cleanup module permissions
     $config->cleanupPermissions();
 
-    // also rebuild word replacement cache
-    CRM_Core_BAO_WordReplacement::rebuild();
-
-    // Clear dynamic js files
-    CRM_Utils_File::flushDynamicResources();
+    // rebuild word replacement cache - pass false to prevent operations redundant with this fn
+    CRM_Core_BAO_WordReplacement::rebuild(FALSE);
 
     CRM_Core_BAO_Setting::updateSettingsFromMetaData();
-    CRM_Core_Resources::singleton()->resetCacheCode();
+    // Clear js caches
+    CRM_Core_Resources::singleton()->flushStrings()->rebuildDynamicResources();
     CRM_Case_XMLRepository::singleton(TRUE);
 
     // also rebuild triggers if requested explicitly
