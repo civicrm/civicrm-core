@@ -165,27 +165,15 @@
     $scope.tab_val = 0;
     $scope.max_tab = ($scope.sparestuff.isnew == true) ? 0 : 4;
 
-    $scope.campaign_clicked = function () {
-      if ($scope.max_tab >= 0) {
-        $scope.tab_val = 0;
+    /**
+     * Example: gotoTab('campaign')
+     */
+    $scope.gotoTab = function(name) {
+      var TABS = {campaign: 0, compose: 1, rec: 2, preview: 3}; // FIXME
+      if ($scope.max_tab >= TABS[name]) {
+        $scope.tab_val = TABS[name];
       }
-    };
-
-    $scope.compose_clicked = function () {
-      if ($scope.max_tab >= 1) {
-        $scope.tab_val = 1;
-      }
-    };
-    $scope.rec_clicked = function () {
-      if ($scope.max_tab >= 2) {
-        $scope.tab_val = 2;
-      }
-    };
-    $scope.preview_clicked = function () {
-      if ($scope.max_tab >= 3) {
-        $scope.tab_val = 3;
-      }
-    };
+    }
 
     $scope.preview = false;
     $scope.slide_value = 0;
