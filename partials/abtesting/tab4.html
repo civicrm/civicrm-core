@@ -27,7 +27,10 @@
         <td>{{currentABTest.date}} Date &nbsp {{currentABTest.time}} Time</td>
       </tr>
     </table>
-    <h3 ng-click="pre()">Preview Mail</h3>
+    <span class="crm-button">
+      <input type="button" value="Preview Mail" ng-click="pre()">
+    </span>
+    <br><br>
     <div ng-show="preview" id="prevmail">
       <div ui-jq="tabs" id="settings">
         <ul>
@@ -42,7 +45,10 @@
         <div id="frag2" ng-bind-html="deliberatelyTrustDangerousSnippetb();"></div>
       </div>
     </div>
-    <h3 ng-click="sendTestMailing();">Send Test Emails</h3>
+    <span class="crm-button">
+      <input type="button" value="Send Test Emails" ng-click="sendTestMailing();">
+    </span>
+    <br><br>
 
     <div ng-show="sendtest" id="sendtest">
       Email-id : &nbsp<input placeholder = "abcd@civicrm.org" type="text" ng-model="sparestuff.emailadd">
