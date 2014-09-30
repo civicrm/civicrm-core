@@ -297,4 +297,194 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   function appendCoreResources(&$list) {
     $list[] = 'js/crm.drupal.js';
   }
+
+  /**
+   * Reset any system caches that may be required for proper CiviCRM
+   * integration.
+   */
+  function flush() {
+    drupal_flush_all_caches();
+  }
+
+  /**
+   * Get a list of all installed modules, including enabled and disabled ones
+   *
+   * @return array CRM_Core_Module
+   *
+   */
+  function getModules() {
+    $result = array();
+    $q = db_query('SELECT name, status FROM {system} WHERE type = \'module\' AND schema_version <> -1');
+    foreach ($q as $row) {
+      $result[] = new CRM_Core_Module('drupal.' . $row->name, ($row->status == 1) ? TRUE : FALSE);
+    }
+    return $result;
+  }
+
+  /**
+   * Find any users/roles/security-principals with the given permission
+   * and replace it with one or more permissions.
+   *
+   * @param $oldPerm string
+   * @param $newPerms array, strings
+   *
+   * @return void
+   */
+  function replacePermission($oldPerm, $newPerms) {
+    $roles = user_roles(FALSE, $oldPerm);
+    if (!empty($roles)) {
+      foreach (array_keys($roles) as $rid) {
+        user_role_revoke_permissions($rid, array($oldPerm));
+        user_role_grant_permissions($rid, $newPerms);
+      }
+    }
+  }
+  /**
+   * Format the url as per language Negotiation.
+   *
+   * @param string $url
+   *
+   * @return string $url, formatted url.
+   * @static
+   */
+  function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
+    if (empty($url)) {
+      return $url;
+    }
+
+    //CRM-7803 -from d7 onward.
+    $config = CRM_Core_Config::singleton();
+    if (function_exists('variable_get') &&
+      module_exists('locale') &&
+      function_exists('language_negotiation_get')
+    ) {
+      global $language;
+
+      //does user configuration allow language
+      //support from the URL (Path prefix or domain)
+      if (language_negotiation_get('language') == 'locale-url') {
+        $urlType = variable_get('locale_language_negotiation_url_part');
+
+        //url prefix
+        if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_PREFIX) {
+          if (isset($language->prefix) && $language->prefix) {
+            if ($addLanguagePart) {
+              $url .= $language->prefix . '/';
+            }
+            if ($removeLanguagePart) {
+              $url = str_replace("/{$language->prefix}/", '/', $url);
+            }
+          }
+        }
+        //domain
+        if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_DOMAIN) {
+          if (isset($language->domain) && $language->domain) {
+            if ($addLanguagePart) {
+              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $language->domain . base_path();
+            }
+            if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
+              $url = str_replace('\\', '/', $url);
+              $parseUrl = parse_url($url);
+
+              //kinda hackish but not sure how to do it right
+              //hope http_build_url() will help at some point.
+              if (is_array($parseUrl) && !empty($parseUrl)) {
+                $urlParts           = explode('/', $url);
+                $hostKey            = array_search($parseUrl['host'], $urlParts);
+                $ufUrlParts         = parse_url(CIVICRM_UF_BASEURL);
+                $urlParts[$hostKey] = $ufUrlParts['host'];
+                $url                = implode('/', $urlParts);
+              }
+            }
+          }
+        }
+      }
+    }
+    return $url;
+  }
+
+  /**
+   * GET CMS Version
+   * @return string
+   */
+  function getVersion() {
+    return defined('VERSION') ? VERSION : 'Unknown';
+  }
+
+  /**
+   */
+  function updateCategories() {
+    // copied this from profile.module. Seems a bit inefficient, but i dont know a better way
+    // CRM-3600
+    cache_clear_all();
+    menu_rebuild();
+  }
+
+  /**
+   * Get the default location for CiviCRM blocks
+   *
+   * @return string
+   *
+   */
+  function getDefaultBlockLocation() {
+    return 'sidebar_first';
+  }
+  /**
+   * Get the locale set in the hosting CMS
+   *
+   * @return string  with the locale or null for none
+   *
+   */
+  function getUFLocale() {
+    // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
+    // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
+    // sometimes for CLI based on order called, this might not be set and/or empty
+    global $language;
+
+    if (empty($language)) {
+      return NULL;
+    }
+
+    if ($language->language == 'zh-hans') {
+      return 'zh_CN';
+    }
+
+    if ($language->language == 'zh-hant') {
+      return 'zh_TW';
+    }
+
+    if (preg_match('/^.._..$/', $language->language)) {
+      return $language->language;
+    }
+
+    return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
+  }
+  /**
+   * Perform any post login activities required by the UF -
+   * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
+   * calls hook_user op 'login' and generates a new session.
+   *
+   * @param array params
+   *
+   * FIXME: Document values accepted/required by $params
+   *
+   */
+  function userLoginFinalize($params = array()){
+    user_login_finalize($params);
+  }
+
+  /**
+   * figure out the post url for the form
+   *
+   * @param mix $action the default action if one is pre-specified
+   *
+   * @return string the url to post the form
+   * @access public
+   */
+  function postURL($action) {
+    if (!empty($action)) {
+      return $action;
+    }
+    return $this->url($_GET['q']);
+  }
 }
