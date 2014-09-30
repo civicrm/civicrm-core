@@ -90,9 +90,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     $this->type("description", "This is a test campaign");
 
     // include groups for the campaign
-    $this->addSelection("includeGroups-f", "label=$groupName");
-    $this->click("//option[@value=4]");
-    $this->click("add");
+    $this->multiselect2("includeGroups", array("$groupName", "Advisory Board"));
 
     // fill the end date for campaign
     $this->webtestFillDate("end_date", "+1 year");
@@ -106,8 +104,8 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
 
     $this->waitForText('crm-notification-container', "Campaign $title");
 
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
     $this->memberAddTest($campaignTitle, $id);
   }
 

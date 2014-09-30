@@ -65,11 +65,11 @@ function _civicrm_api3_grant_create_spec(&$params) {
 /**
  * Returns array of grants  matching a set of one or more group properties
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params Array of one or more valid
  *                       property_name=>value pairs. If $params is set
  *                       as null, all grants will be returned
  *
- * @return array  (referance) Array of matching grants
+ * @return array Array of matching grants
  * {@getfields grant_get}
  * @access public
  */

@@ -107,8 +107,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    */
   public function cancelAction() {
     $response = array('status' => 'cancel');
-    echo json_encode($response);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($response);
   }
 
   /**

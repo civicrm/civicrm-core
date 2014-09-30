@@ -53,6 +53,9 @@ class CRM_Mailing_MailStore {
     }
 
     $protocols = CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol');
+    if (empty($protocols[$dao->protocol])) {
+      throw new Exception("Empty mail protocol");
+    }
 
     switch ($protocols[$dao->protocol]) {
       case 'IMAP':

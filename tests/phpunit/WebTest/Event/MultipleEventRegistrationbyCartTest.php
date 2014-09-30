@@ -47,8 +47,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->click("_qf_Event_next-top");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     //event 1
@@ -137,8 +137,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     //event 1

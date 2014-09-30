@@ -697,40 +697,42 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $fnName = CRM_Utils_Array::value('function', $trace);
       $className = isset($trace['class']) ? ($trace['class'] . $trace['type']) : '';
 
-      // do now show args for a few password related functions
+      // Do not show args for a few password related functions
       $skipArgs = ($className == 'DB::' && $fnName == 'connect') ? TRUE : FALSE;
 
-      foreach ($trace['args'] as $arg) {
-        if (! $showArgs || $skipArgs) {
-          $args[] = '(' . gettype($arg) . ')';
-          continue;
-        }
-        switch ($type = gettype($arg)) {
-          case 'boolean':
-            $args[] = $arg ? 'TRUE' : 'FALSE';
-            break;
-          case 'integer':
-          case 'double':
-            $args[] = $arg;
-            break;
-          case 'string':
-            $args[] = '"' . CRM_Utils_String::ellipsify(addcslashes((string) $arg, "\r\n\t\""), $maxArgLen). '"';
-            break;
-          case 'array':
-            $args[] = '(Array:'.count($arg).')';
-            break;
-          case 'object':
-            $args[] = 'Object(' . get_class($arg) . ')';
-            break;
-          case 'resource':
-            $args[] = 'Resource';
-            break;
-          case 'NULL':
-            $args[] = 'NULL';
-            break;
-          default:
-            $args[] = "($type)";
-            break;
+      if (!empty($trace['args'])) {
+        foreach ($trace['args'] as $arg) {
+          if (! $showArgs || $skipArgs) {
+            $args[] = '(' . gettype($arg) . ')';
+            continue;
+          }
+          switch ($type = gettype($arg)) {
+            case 'boolean':
+              $args[] = $arg ? 'TRUE' : 'FALSE';
+              break;
+            case 'integer':
+            case 'double':
+              $args[] = $arg;
+              break;
+            case 'string':
+              $args[] = '"' . CRM_Utils_String::ellipsify(addcslashes((string) $arg, "\r\n\t\""), $maxArgLen). '"';
+              break;
+            case 'array':
+              $args[] = '(Array:'.count($arg).')';
+              break;
+            case 'object':
+              $args[] = 'Object(' . get_class($arg) . ')';
+              break;
+            case 'resource':
+              $args[] = 'Resource';
+              break;
+            case 'NULL':
+              $args[] = 'NULL';
+              break;
+            default:
+              $args[] = "($type)";
+              break;
+          }
         }
       }
 

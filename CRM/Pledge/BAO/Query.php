@@ -390,7 +390,11 @@ class CRM_Pledge_BAO_Query {
         return;
 
       case 'pledge_id':
-        $query->_where[$grouping][] = "civicrm_pledge.id $op $value";
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_pledge.id",
+          $op,
+          $value,
+          "Integer"
+        );
         $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
         return;
 

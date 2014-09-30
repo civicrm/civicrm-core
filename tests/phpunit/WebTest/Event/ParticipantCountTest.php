@@ -39,8 +39,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create an event
@@ -113,8 +113,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create priceset
@@ -188,7 +188,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
       else {
         $this->_testAddMultipleChoiceOptions($field['options']);
       }
-      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom', FALSE);
+      $this->waitForText("crm-notification-container", "Price Field '$label' has been saved.");
     }
 
     // create event.
@@ -447,7 +448,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click('_qf_Custom_refresh-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $tableHeaders = array('Contact Id', 'Participant Id', 'Name');
+    $tableHeaders = array('Contact ID', 'Participant Id', 'Name');
     $tableHeaders = array_merge($tableHeaders, array_keys(current($priceFieldOptionCounts)));
 
     $tdnum = 2;

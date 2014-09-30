@@ -127,6 +127,11 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @access public
    */
   function browse() {
+    $resourceManager = CRM_Core_Resources::singleton();
+    if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
+      $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999);
+    }
+
     $customField = array();
     $customFieldBAO = new CRM_Core_BAO_CustomField();
 

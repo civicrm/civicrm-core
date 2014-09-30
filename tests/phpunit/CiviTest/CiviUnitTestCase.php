@@ -304,6 +304,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // Rebuild triggers
     civicrm_api('system', 'flush', array('version' => 3, 'triggers' => 1));
 
+    CRM_Core_BAO_ConfigSetting::setEnabledComponents(array(
+      'CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'
+    ));
+
     return TRUE;
   }
 
@@ -2072,7 +2076,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $action - optional action - otherwise taken from function name
    */
   function documentMe($params, $result, $function, $filename, $description = "", $subfile = NULL, $action = NULL) {
-    if (defined('DONT_DOCUMENT_TEST_CONFIG')) {
+    if (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG) {
       return;
     }
     $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
@@ -2374,9 +2378,17 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'civicrm_participant_payment',
       'civicrm_pledge',
       'civicrm_price_set_entity',
+      'civicrm_price_field_value',
+      'civicrm_price_field',
     );
     $this->quickCleanup($tablesToTruncate);
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_membership_status WHERE name NOT IN('New', 'Current', 'Grace', 'Expired', 'Pending', 'Cancelled', 'Deceased')");
+    $this->restoreDefaultPriceSetConfig();
+  }
+
+  function restoreDefaultPriceSetConfig() {
+    CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field` (`id`, `price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `help_pre`, `help_post`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `active_on`, `expire_on`, `javascript`, `visibility_id`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', 'Text', 0, NULL, NULL, 1, 1, 1, 1, 1, NULL, NULL, NULL, 1)");
+    CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`id`, `price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `deductible_amount`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, 1, 0.00)");
   }
   /*
    * Function does a 'Get' on the entity & compares the fields in the Params with those returned
@@ -2794,9 +2806,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Set up an acl allowing contact to see 2 specified groups
-   *  - $this->_permissionedGroup & $this->_permissionedDisbaledGroup
+   *  - $this->_permissionedGroup & $this->_permissionedDisabledGroup
    *
-   *  You need to have precreated these groups & created the user e.g
+   *  You need to have pre-created these groups & created the user e.g
    *  $this->createLoggedInUser();
    *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
    *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
@@ -2805,7 +2817,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   function setupACL() {
     global $_REQUEST;
     $_REQUEST = $this->_params;
-    
+
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
     $optionGroupID = $this->callAPISuccessGetValue('option_group', array('return' => 'id', 'name' => 'acl_role'));
     $optionValue = $this->callAPISuccess('option_value', 'create', array('option_group_id' => $optionGroupID,

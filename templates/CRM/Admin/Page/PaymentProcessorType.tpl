@@ -61,17 +61,17 @@
         {/strip}
 
         {if $action ne 1 and $action ne 2}
-      <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" id="newPaymentProcessor">&raquo; {ts}New Payment Processor{/ts}</a>
+        <div class="action-link">
+          <a href="{crmURL q="action=add&reset=1"}" id="newPaymentProcessor">&raquo; {ts}New Payment Processor{/ts}</a>
+          <a href="{crmURL p="civicrm/admin" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
         </div>
         {/if}
     </div>
 </div>
 {elseif $action ne 1}
     <div class="messages status no-popup">
-        <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
-        {capture assign=crmURL}{crmURL p='civicrm/admin/paymentProcessorType' q="action=add&reset=1"}{/capture}
-        {ts 1=$crmURL}There are no Payment Processors entered. You can <a href='%1'>add one</a>.{/ts}
+      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+      {ts}None found.{/ts}
     </div>
 {/if}
 {/if}

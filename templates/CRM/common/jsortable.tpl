@@ -128,7 +128,7 @@
         }
       }
 
-      var noRecordFoundMsg  = {/literal}'{ts escape="js"}There are no records.{/ts}'{literal};
+      var noRecordFoundMsg  = {/literal}'{ts escape="js"}None found.{/ts}'{literal};
 
       var oTable;
       if ( useAjax ) {

@@ -72,6 +72,7 @@ function custom_field_create_expectedresult(){
           'column_name' => 'name1_1',
           'option_group_id' => '',
           'filter' => '',
+          'in_selector' => 0,
         ),
     ),
 );

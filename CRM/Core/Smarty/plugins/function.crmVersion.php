@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -28,58 +28,33 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright TTTP
  * $Id$
  *
  */
 
 /**
- * This class generates form components generic to all the contact types.
+ * Display the CiviCRM version
  *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
+ * @code
+ * The version is {crmVersion}.
  *
+ * {crmVersion redact=auto assign=ver}The version is {$ver}.
+ * @endcode
  */
-class CRM_Contact_Form_Test extends CRM_Core_Form {
-  function preProcess() {}
+function smarty_function_crmVersion($params, &$smarty) {
+  $version = CRM_Utils_System::version();
 
-  /**
-   * This function sets the default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return void
-   */
-  function setDefaultValues() {
-    $defaults = array();
-    $params = array();
+  $redact = !CRM_Core_Permission::check('access CiviCRM');
+  if ($redact) {
+    $parts = explode('.', $version);
+    $version = $parts[0] . '.' . $parts[1] . '.x';
   }
 
-  /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
-   */
-  public function buildQuickForm() {
-
-    $this->addElement('text', "state", ts('State / Province'), 'onkeyup="getState(this,event, false);"  onblur="getState(this,event, false);" autocomplete="off"');
-
-    $this->addElement('text', "state_id", ts('State / Province Id'));
-    //$this->addElement('text', "country", ts('Country'));
-    // $this->addElement('text', "country_id", ts('Country  Id'));
-    $this->addElement('select', "country", ts('Country'), array('' => ts('- select -')), 'onblur="getState(this,event, true);"');
+  if (isset($params['assign'])) {
+    $smarty->assign($params['assign'], $version);
   }
-
-  /**
-   * Form submission of new/edit contact is processed.
-   *
-   * @access public
-   *
-   * @return void
-   */
-  public function postProcess() {}
+  else {
+    return $version;
+  }
 }
-

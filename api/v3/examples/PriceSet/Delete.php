@@ -5,7 +5,7 @@
  */
 function price_set_delete_example(){
 $params = array(
-  'id' => 17,
+  'id' => 18,
 );
 
 try{

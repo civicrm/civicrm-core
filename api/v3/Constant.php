@@ -41,7 +41,7 @@
  * It's recommended to use the api getoptions action instead
  *
  *  @param  string  Name of a public static method of
- *                  CRM_Core_PseudoContant: one of
+ *                  CRM_Core_PseudoConstant: one of
  *  <ul>
  *    <li>activityStatus</li>
  *    <li>activityType</li>
@@ -135,6 +135,7 @@ function _civicrm_api3_constant_get_spec(&$params) {
 
   $params = (array
     ('name' => array(
+      'title' => 'Constant Name',
       'api.required' => 1,
         'options' =>
           'activityStatus',

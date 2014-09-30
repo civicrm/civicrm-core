@@ -696,39 +696,9 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     }
 
 
-    if ($this->_single) {
-      $urlPath = 'civicrm/contact/view/participant';
-      $urlParams = "reset=1&cid={$this->_contactId}&context=participant";
-      if ($this->_context == 'standalone') {
-        $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE), TRUE);
-        $urlParams = 'reset=1&context=standalone';
-        $urlPath = 'civicrm/participant/add';
-      }
-
-      if ($this->_id) {
-        $urlParams .= "&action=update&id={$this->_id}";
-      }
-      else {
-        $urlParams .= "&action=add";
-      }
-
-      if ($this->_mode) {
-        $urlParams .= "&mode={$this->_mode}";
-      }
-
-      $url = CRM_Utils_System::url($urlPath, $urlParams,
-        FALSE, NULL, FALSE
-      );
+    if ($this->_single && $this->_context == 'standalone') {
+      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE, 'api' => array('extra' => array('email'))), TRUE);
     }
-    else {
-      $currentPath = CRM_Utils_System::currentPath();
-
-      $url = CRM_Utils_System::url($currentPath, '_qf_Participant_display=true',
-        FALSE, NULL, FALSE
-      );
-    }
-
-    $this->assign('refreshURL', $url);
 
     $eventFieldParams = array(
       'entity' => 'event',
@@ -1274,7 +1244,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
 
-      $result = &$payment->doDirectPayment($paymentParams);
+      $result = $payment->doDirectPayment($paymentParams);
 
       if (is_a($result, 'CRM_Core_Error')) {
         CRM_Core_Error::displaySessionError($result);
@@ -1317,7 +1287,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           $this->_params['role_id']
         );
       }
-      $participants[] = CRM_Event_Form_Registration::addParticipant($this->_params, $contactID);
+      $participants[] = CRM_Event_Form_Registration::addParticipant($this, $contactID);
 
       //add custom data for participant
       CRM_Core_BAO_CustomValueTable::postProcess($this->_params,

@@ -276,7 +276,7 @@ UNION
    * Create Current employer relationship for a individual
    *
    * @param int $contactID contact id of the individual
-   * @param $organizationId
+   * @param $organization (id or name)
    * @param null $previousEmployerID
    *
    * @internal param string $organization it can be name or id of organization
@@ -284,8 +284,34 @@ UNION
    * @access public
    * @static
    */
-  static function createCurrentEmployerRelationship($contactID, $organizationId, $previousEmployerID = NULL, $newContact = FALSE) {
-    if ($organizationId && is_numeric($organizationId)) {
+  static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
+    //if organization name is passed. CRM-15368
+    if ($newContact && is_string($organization)) {
+      $organizationParams['organization_name'] = $organization;
+      $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
+
+      $dedupeParams['check_permission'] = FALSE;
+      $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
+
+      if (is_array($dupeIDs) && !empty($dupeIDs)) {
+        // we should create relationship only w/ first org CRM-4193
+        foreach ($dupeIDs as $orgId) {
+          $organization = $orgId;
+          break;
+        }
+      }
+      else {
+        //create new organization
+        $newOrg = array(
+          'contact_type' => 'Organization',
+          'organization_name' => $organization,
+        );
+        $org = CRM_Contact_BAO_Contact::create($newOrg);
+        $organization = $org->id;
+      }
+    }
+
+    if ($organization && is_numeric($organization)) {
       $cid = array('contact' => $contactID);
 
       // get the relationship type id of "Employee of"
@@ -298,7 +324,7 @@ UNION
       $relationshipParams = array(
         'is_active' => TRUE,
         'relationship_type_id' => $relTypeId . '_a_b',
-        'contact_check' => array($organizationId => TRUE),
+        'contact_check' => array($organization => TRUE),
       );
       list($valid, $invalid, $duplicate,
         $saved, $relationshipIds
@@ -310,17 +336,17 @@ UNION
         $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
       }
       if ($previousEmployerID &&
-        $previousEmployerID != $organizationId
+        $previousEmployerID != $organization
       ) {
         self::clearCurrentEmployer($contactID, $previousEmployerID);
       }
 
       // set current employer
-      self::setCurrentEmployer(array($contactID => $organizationId));
+      self::setCurrentEmployer(array($contactID => $organization));
 
       $relationshipParams['relationship_ids'] = $relationshipIds;
       // handle related meberships. CRM-3792
-      self::currentEmployerRelatedMembership($contactID, $organizationId, $relationshipParams, $duplicate, $previousEmployerID);
+      self::currentEmployerRelatedMembership($contactID, $organization, $relationshipParams, $duplicate, $previousEmployerID);
     }
   }
 
@@ -517,15 +543,6 @@ WHERE id={$contactId}; ";
     );
     //build the address block
     CRM_Contact_Form_Edit_Address::buildQuickForm($form);
-
-    // also fix the state country selector
-    CRM_Contact_Form_Edit_Address::fixStateSelect($form,
-      'address[1][country_id]',
-      'address[1][state_province_id]',
-      "address[1][county_id]",
-      $countryID,
-      $stateID
-    );
   }
 
   /**
@@ -859,6 +876,7 @@ Group By  componentId";
         $contactNames[$dao->id] = array(
           'name' => "<a href='{$contactViewUrl}'>{$dao->display_name}</a>",
           'is_deleted' => $dao->is_deleted,
+          'contact_id' => $dao->cid,
         );
       }
     }
@@ -942,6 +960,8 @@ Group By  componentId";
     }
 
     if ($idFldName) {
+      $queryParams = array(1 => array($contactType, 'String'));
+
       // if $force == 1 then update all contacts else only
       // those with NULL greeting or addressee value CRM-9476
       if ($processAll) {
@@ -957,10 +977,11 @@ Group By  componentId";
       }
 
       if ($limit) {
-        $sql .= " LIMIT $limit";
+        $sql .= " LIMIT 0, %2";
+        $queryParams += array(2 => array($limit, 'Integer'));
       }
 
-      $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contactType, 'String')));
+      $dao = CRM_Core_DAO::executeQuery($sql, $queryParams);
       while ($dao->fetch()) {
         $filterContactFldIds[$dao->id] = $dao->$idFldName;
 

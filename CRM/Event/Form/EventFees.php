@@ -147,9 +147,6 @@ class CRM_Event_Form_EventFees {
       $billingDefaults = $form->getProfileDefaults('Billing', $form->_contactId);
       $defaults[$form->_pId] = array_merge($defaults[$form->_pId], $billingDefaults);
 
-      // now fix all state country selectors, set correct state based on country
-      CRM_Core_BAO_Address::fixAllStateSelects($form, $defaults[$form->_pId]);
-
       //             // hack to simplify credit card entry for testing
       //             $defaults[$form->_pId]['credit_card_type']     = 'Visa';
       //             $defaults[$form->_pId]['credit_card_number']   = '4807731747657838';

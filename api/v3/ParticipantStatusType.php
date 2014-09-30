@@ -41,7 +41,7 @@
  * In case of updating existing participant_status, id of that particular participant_status must
  * be in $params array.
  *
- * @param array $params  (referance) Associative array of property
+ * @param array $params Associative array of property
  *                       name/value pairs to insert in new 'participant_status'
  *
  * @return array   participant_status array
@@ -54,13 +54,13 @@ function civicrm_api3_participant_status_type_create($params) {
 }
 
 /**
- * Returns array of participant_statuss  matching a set of one or more group properties
+ * Returns array of participant_statuses  matching a set of one or more group properties
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params Array of one or more valid
  *                       property_name=>value pairs. If $params is set
- *                       as null, all participant_statuss will be returned
+ *                       as null, all participant_statuses will be returned
  *
- * @return array  (referance) Array of matching participant_statuses
+ * @return array Array of matching participant_statuses
  * {@getfields ParticipantStatusType_get}
  * @example ParticipantStatusTypeGet.php
  * @access public

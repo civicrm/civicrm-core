@@ -47,6 +47,9 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
     $profileTitle = 'Country state province web test temp';
     $this->type('title', $profileTitle);
 
+    // Standalone form or directory
+    $this->click('uf_group_type_Profile');
+
     //click on save
     $this->click('_qf_Group_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -55,7 +58,9 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
     //check for  profile create
     $this->waitForText('crm-notification-container', "Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
     $gid = $this->urlArg('gid');
+
     //Add Country field to profile
+    $this->openCiviPage('admin/uf/group/field/add', array('action' => 'add', 'reset' => 1, 'gid' => $gid), 'field_name[0]');
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
     $this->click("//option[@value='Contact']");
@@ -112,18 +117,14 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
       $states = CRM_Core_PseudoConstant::stateProvinceForCountry($countryID, 'id');
       $stateID = array_rand($states);
       $this->select("xpath=//form[@id='Edit']/div[2]/div/div/div[2]/select", "value=$countryID");
-      sleep(2);
-      $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/div[2]/div[2]/select");
+      $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/div[2]/div[2]/select/option[@value=$stateID]");
       $this->click("xpath=//form[@id='Edit']/div[2]/div/div[2]/div[2]/select");
       $this->select("xpath=//form[@id='Edit']/div[2]/div/div[2]/div[2]/select", "value=$stateID");
       $this->clickLink('_qf_Edit_next', NULL);
-      $this->openCiviPage('admin/uf/group', 'reset=1');
-      $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
-      $this->click("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
 
-      $this->waitForElementPresent('_qf_Group_next-bottom');
-      $this->click('_qf_Group_next-bottom');
-      $this->waitForElementPresent('newCiviCRMProfile-bottom');
+      // Delete profile
+      $this->openCiviPage('admin/uf/group', 'action=delete&id=' . $gid, '_qf_Group_next-bottom');
+      $this->clickLink('_qf_Group_next-bottom', 'newCiviCRMProfile-bottom');
       $this->waitForText('crm-notification-container', "Profile '{$profileTitle}' has been deleted.");
 
       $this->openCiviPage("admin/setting/localization", "reset=1", "_qf_Localization_next-bottom");

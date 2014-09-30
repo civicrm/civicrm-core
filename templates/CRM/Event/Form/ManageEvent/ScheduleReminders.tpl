@@ -149,48 +149,47 @@
   {literal}
     <script type='text/javascript'>
       CRM.$(function($) {
+        var $form = $('form.{/literal}{$form.formClass}{literal}'),
+          recipientMapping = eval({/literal}{$recipientMapping}{literal});
+
         populateRecipient();
-        $('#recipient').click( function( ) {
-          populateRecipient();
+        $('#recipient', $form).change(populateRecipient);
+
+        function populateRecipient() {
+          var recipient = $("#recipient", $form).val();
+
+          if (recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') {
+            CRM.api3('participant', 'getoptions', {field: recipientMapping[recipient] == 'participant_role' ? 'role_id' : 'status_id', sequential: 1})
+              .done(function(result) {
+                CRM.utils.setOptions($('#recipient_listing', $form), result.values);
+              });
+            $("#recipientList", $form).show();
+            $('#is_recipient_listing', $form).val(1);
+          } else {
+            $("#recipientList", $form).hide();
+            $('#is_recipient_listing', $form).val('');
+          }
+        }
+
+        $('#absolute_date_display', $form).change(function() {
+          if($(this).val()) {
+            $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
+          } else {
+            $('#relativeDate, #relativeDateRepeat', $form).show();
+          }
         });
-      });
 
-      function populateRecipient( ) {
-        var recipientMapping = eval({/literal}{$recipientMapping}{literal});
-        var recipient = cj("#recipient option:selected").val();
-        var postUrl = "{/literal}{crmURL p='civicrm/ajax/populateRecipient' h=0}{literal}";
-        if(recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role'){
-          var elementID = '#recipient_listing';
-          cj( elementID ).html('');
-          cj.post(postUrl, {recipient: recipientMapping[recipient]},
-            function ( response ) {
-              response = eval( response );
-              for (iota = 0; iota < response.length; iota++) {
-                cj( elementID ).get(0).add(new Option(response[iota].name, response[iota].value), document.all ? iota : null);
-              }
-            }
-          );
-          cj("#recipientList").show();
-        } else {
-          cj("#recipientList").hide();
+        if ($('#absolute_date_display', $form).val()) {
+          $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
         }
-      }
 
-      cj('#absolute_date_display').click( function( ) {
-        if(cj('#absolute_date_display').val()) {
-          cj('#relativeDate').hide();
-          cj('#relativeDateRepeat').hide();
-          cj('#repeatFields').hide();
-        } else {
-          cj('#relativeDate').show();
-          cj('#relativeDateRepeat').show();
-        }
       });
 
     </script>
   {/literal}
   {/if}
   <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+    {include file="CRM/common/formButtons.tpl" location="bottom"}
+  </div>
 </div>
 {/if}

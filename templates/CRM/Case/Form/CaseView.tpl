@@ -340,7 +340,7 @@
       </a>
     </div>
     <div id="addMembersToGroupDialog" class="hiddenElement">
-      <input name="add_member_to_group_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" />
+      <input name="add_member_to_group_contact_id" placeholder="{ts}- select contacts -{/ts}" class="huge" />
     </div>
     <table id="globalRelationships-selector-{$caseId}"  class="report-layout">
       <thead><tr>

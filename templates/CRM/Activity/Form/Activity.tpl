@@ -281,6 +281,9 @@
       <a href="{crmURL p='civicrm/contact/view/activity' q=$urlParams}" class="delete button" title="{ts}Delete{/ts}"><span><div class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
     {/if}
   {/if}
+  {if $action eq 4 and call_user_func(array('CRM_Case_BAO_Case','checkPermission'), $activityId, 'File On Case', $atype)}
+    <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts}File On Case{/ts}"><span><div class="icon ui-icon-clipboard"></div>{ts}File On Case{/ts}</span></a>
+  {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
 

@@ -87,8 +87,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->type("name", "Mailing $mailingName Webtest");
 
     // Add the test mailing group
-    $this->select("includeGroups-f", "$groupName");
-    $this->click("add");
+    $this->select("includeGroups", "$groupName");
 
     // click next
     $this->clickLink("_qf_Group_next", "_qf_Settings_cancel", FALSE);
@@ -344,8 +343,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->type("name", "Mailing $mailingName Webtest");
 
     // Add the test mailing group
-    $this->select("includeGroups-f", "$groupName");
-    $this->click("add");
+    $this->select("includeGroups", "$groupName");
 
     // click next
     $this->click("_qf_Group_next");
