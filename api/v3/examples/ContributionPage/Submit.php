@@ -11,6 +11,7 @@ $params = array(
   'billing_first_name' => 'Billy',
   'billing_middle_name' => 'Goat',
   'billing_last_name' => 'Gruff',
+  'email' => 'billy@goat.gruff',
   'selectMembership' => array(
       '0' => 1,
     ),
@@ -22,6 +23,9 @@ $params = array(
       'Y' => 2040,
     ),
   'cvv2' => 123,
+  'is_recur' => 1,
+  'frequency_interval' => 1,
+  'frequency_unit' => 'month',
 );
 
 try{
@@ -57,7 +61,7 @@ function contribution_page_submit_expectedresult(){
 /*
 * This example has been generated from the API test suite. The test that created it is called
 *
-* testSubmitMembershipBlockIsSeparatePaymentPaymentProcessor and can be found in
+* testSubmitMembershipPriceSetPaymentPaymentProcessorRecurDelayed and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionPageTest.php
 *
 * You can see the outcome of the API tests at
