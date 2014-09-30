@@ -2364,7 +2364,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
             $format
           ),
           'membership_type_id' => $membershipTypeID,
-          'max_related' => $membershipTypeDetails['max_related'],
+          'max_related' => !empty($membershipTypeDetails['max_related']) ? $membershipTypeDetails['max_related'] : NULL,
         );
         $session = CRM_Core_Session::singleton();
         // If we have an authenticated session, set modified_id to that user's contact_id, else set to membership.contact_id
