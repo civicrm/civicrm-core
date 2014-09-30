@@ -12,17 +12,19 @@ Required vars: mailingABList
     <tr>
       <th>Title</th>
       <th>Id</th>
+      <th>Test Type</th>
       <th></th>
 
       <th></th>
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="ab in mailingABList">
-      <td>{{ab.name}}</td>
-      <td>{{ab.id}}</td>
-      <td><a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/{{ab.id}}">Edit</a>&nbsp
-      <a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/report/{{ab.id}}">Results</a></td>
+    <tr ng-repeat="mailingAB in mailingABList">
+      <td>{{mailingAB.name}}</td>
+      <td>{{mailingAB.id}}</td>
+      <td>{{testing_criteria[mailingAB.testing_criteria_id]}}</td>
+      <td><a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/{{mailingAB.id}}">Edit</a>&nbsp
+      <a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/report/{{mailingAB.id}}">Results</a></td>
 
     </tr>
     </tbody>
