@@ -27,7 +27,6 @@
  * This file provides the HTML for the on-behalf-of form. 
  * Also used for related contact edit form.
  * FIXME: This is way more complex than it needs to be
- * FIXME: About 1% of this javascript is needed for contribution forms
  * FIXME: Why are we not just using the dynamic form tpl to display this profile?
  *}
 
@@ -169,8 +168,10 @@ function showOnBehalf(onBehalfRequired) {
 }
 
 function resetValues() {
-  cj('input[type=text], select, textarea', "#select_org div").not('#onbehalfof_id').val('').change();
-  cj('input[type=radio], input[type=checkbox]', "#select_org tr td").prop('checked', false).change();
+  // Don't trip chain-select when clearing values
+  cj('.crm-chain-select-control', "#select_org div").select2('val', '');
+  cj('input[type=text], select, textarea', "#select_org div").not('.crm-chain-select-control, #onbehalfof_id').val('').change();
+  cj('input[type=radio], input[type=checkbox]', "#select_org div").prop('checked', false).change();
 }
 
 function createNew( ) {
@@ -219,6 +220,11 @@ function setLocationDetails(contactID , reset) {
     timeout     : 5000, //Time in milliseconds
     success     : function(data, status) {
       for (var ele in data) {
+        if (cj("#"+ ele).hasClass('crm-chain-select-target')) {
+          cj("#"+ ele).data('newVal', data[ele].value).off('.autofill').on('crmOptionsUpdated.autofill', function() {console.log(this.id, cj(this).data('newVal'));
+            cj(this).off('.autofill').val(cj(this).data('newVal')).change();
+          });
+        }
         if (data[ele].type == 'Radio') {
           if (data[ele].value) {
             cj("input[name='"+ ele +"']").filter("[value=" + data[ele].value + "]").prop('checked', true);
@@ -232,16 +238,6 @@ function setLocationDetails(contactID , reset) {
         else if (data[ele].type == 'Multi-Select') {
           for (var selectedOption in data[ele].value) {
             cj('#' + ele + " option[value='" + selectedOption + "']").prop('selected', true);
-          }
-        }
-        else if (data[ele].type == 'Select2') {
-          if (data[ele].fld == 'country') {
-            cj('#' + ele ).select2('val', data[ele].value).change(function() {
-              var stateField = 'onbehalf_state_province-' + data[ele].locTypeId;
-              if (stateField.length > 0 ) {
-                cj('#' + stateField).select2('val', data[stateField].value);
-              }
-            }).change();
           }
         }
         else if (data[ele].type == 'Autocomplete-Select') {
@@ -262,7 +258,7 @@ function setLocationDetails(contactID , reset) {
           }
         }
         else {
-          cj('#' + ele ).val(data[ele].value);
+          cj('#' + ele ).val(data[ele].value).change();
         }
       }
     },
