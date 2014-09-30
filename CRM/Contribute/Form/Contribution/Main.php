@@ -244,7 +244,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //         $this->_defaults['amount']               = 168;
     //         $this->_defaults['credit_card_number']   = '4111111111111111';
     //         $this->_defaults['cvv2']                 = '000';
-    //         $this->_defaults['credit_card_exp_date'] = array('Y' => '2014', 'M' => '05');
+    //         $this->_defaults['credit_card_exp_date'] = array('Y' => date('Y')+1, 'M' => '05');
 
     //         // hack to simplify direct debit entry for testing
     //         $this->_defaults['account_holder'] = 'Max Müller';
@@ -318,9 +318,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (empty($this->_defaults["billing_state_province_id-{$this->_bltID}"])) {
       $this->_defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
     }
-
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
 
     if ($this->_priceSetId) {
       if (($this->_useForMember && !empty($this->_currentMemberships)) || $this->_defaultMemTypeId) {
@@ -896,7 +893,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
             if (!empty($value['options'])) {
               foreach ($value['options'] as $val) {
-                if (!empty($val['membership_type_id'])) {
+                if (!empty($val['membership_type_id']) && (
+                    ($fields['price_' . $priceId] == $val['id']) ||
+                    (isset($fields['price_' . $priceId]) && !empty($fields['price_' . $priceId][$val['id']]))
+                  )
+                ) {
                   $priceFieldMemTypes[] = $val['membership_type_id'];
                 }
               }

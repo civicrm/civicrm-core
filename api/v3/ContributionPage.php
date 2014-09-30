@@ -84,11 +84,10 @@ function civicrm_api3_contribution_page_get($params) {
  * This method is used to delete any existing contribution_page. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params  (reference) array containing id of the group
+ * @param array $params array containing id of the group
  *                       to be deleted
  *
- * @return array  (referance) returns flag true if successfull, error
- *                message otherwise
+ * @return array API result Array
  * {@getfields contribution_page_delete}
  * @access public
  */
@@ -105,8 +104,7 @@ function civicrm_api3_contribution_page_delete($params) {
  * @param array $params  (reference) array containing id of the group
  *                       to be deleted
  *
- * @return array  (referance) returns flag true if successfull, error
- *                message otherwise
+ * @return array API result array
  * {@getfields contribution_page_delete}
  * @access public
  */

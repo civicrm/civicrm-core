@@ -49,7 +49,7 @@
 {include file="CRM/Event/Form/SearchEvent.tpl"}
 
 <div class="action-link">
-  <a accesskey="N" href="{$newEventURL}" id="newManageEvent" class="button">
+  <a accesskey="N" href="{$newEventURL}" id="newManageEvent" class="button crm-popup">
     <span><div class="icon add-icon"></div>{ts}Add Event{/ts}</span>
   </a>
   <div class="clear"></div>

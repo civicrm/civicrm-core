@@ -106,9 +106,9 @@
       $('.crm-container-snippet', o).replaceWith(response.content);
       $('form', o).validate(CRM.validate.params);
       $('form', o).ajaxForm(ajaxFormParams);
-      o.trigger('crmFormError', [response]).trigger('crmFormLoad');
+      o.trigger('crmFormError', [response]).trigger('crmFormLoad').trigger('crmLoad');
     }
-  };
+  }
 
   /**
    * Configure optimistic locking mechanism for inplace editing

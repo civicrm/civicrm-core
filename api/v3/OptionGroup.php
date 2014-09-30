@@ -43,10 +43,10 @@ function _civicrm_api3_option_group_create_spec(&$params) {
  * This method is used to delete any existing Option Group. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params  (reference) array containing id of the group
+ * @param array $params array containing id of the group
  *                       to be deleted
  *
- * @return array  (reference) returns flag true if successfull, error
+ * @return array API Result Array
  *                message otherwise
  * {@getfields OptionGroup_delete}
  * @access public

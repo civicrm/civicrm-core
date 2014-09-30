@@ -91,7 +91,7 @@ abstract class CRM_Core_Payment {
    * @param object  $paymentForm      reference to the form object if available
    * @param boolean $force            should we force a reload of this payment object
    *
-   * @return object
+   * @return CRM_Core_Payment
    * @static
    *
    */
@@ -355,15 +355,13 @@ abstract class CRM_Core_Payment {
       case 'cancel' :
         $url = 'civicrm/contribute/unsubscribe';
         break;
-
       case 'billing' :
         //in notify mode don't return the update billing url
-        if ($this->_paymentProcessor['billing_mode'] == self::BILLING_MODE_NOTIFY) {
+        if (!$this->isSupported('updateSubscriptionBillingInfo')) {
           return NULL;
         }
-      	$url = 'civicrm/contribute/updatebilling';
+        $url = 'civicrm/contribute/updatebilling';
         break;
-
       case 'update' :
         $url = 'civicrm/contribute/updaterecur';
         break;

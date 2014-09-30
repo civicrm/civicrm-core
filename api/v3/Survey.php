@@ -63,11 +63,11 @@ function _civicrm_api3_survey_create_spec(&$params) {
 /**
  * Returns array of surveys  matching a set of one or more group properties
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params Array of one or more valid
  *                       property_name=>value pairs. If $params is set
  *                       as null, all surveys will be returned
  *
- * @return array  (referance) Array of matching surveys
+ * @return array  API result Array of matching surveys
  * {@getfields survey_get}
  * @access public
  */

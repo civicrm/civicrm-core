@@ -1216,9 +1216,9 @@ class Installer extends InstallRequirements {
     if (!$this->errors) {
       global $installType, $installURLPath;
 
-      $registerSiteURL = "http://civicrm.org/civicrm/profile/create?reset=1&gid=15";
+      $registerSiteURL = "https://civicrm.org/register-site";
       $commonOutputMessage = "
-                      <li> Have you registered this site at CiviCRM.org? If not, please help strengthen the CiviCRM ecosystem by taking a few minutes to <a href='$registerSiteURL' target='_blank'>fill out the site registration form</a>. The information collected will help us prioritize improvements, target our communications and build the community. If you have a technical role for this site, be sure to check Keep in Touch to receive technical updates (a low volume  mailing list).</li>
+                      <li>Have you registered this site at CiviCRM.org? If not, please help strengthen the CiviCRM ecosystem by taking a few minutes to <a href='$registerSiteURL' target='_blank'>fill out the site registration form</a>. The information collected will help us prioritize improvements, target our communications and build the community. If you have a technical role for this site, be sure to check Keep in Touch to receive technical updates (a low volume  mailing list).</li>
                       <li>We have integrated KCFinder with CKEditor and TinyMCE. This allows a user to upload images. All uploaded images are public.</li>
 ";
 

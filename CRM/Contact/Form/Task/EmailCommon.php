@@ -46,7 +46,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   public $_toContactEmails = array();
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function preProcessFromAddress(&$form) {
     $form->_single = FALSE;
@@ -116,6 +116,17 @@ class CRM_Contact_Form_Task_EmailCommon {
     }
 
     $form->_fromEmails = CRM_Utils_Array::crmArrayMerge($emails, $domainEmails);
+
+    // Add signature
+    $defaultEmail = civicrm_api3('email', 'getsingle', array('id' => key($form->_fromEmails)));
+    $defaults = array();
+    if (!empty($defaultEmail['signature_html'])) {
+      $defaults['html_message'] = '<br/><br/>--' . $defaultEmail['signature_html'];
+    }
+    if (!empty($defaultEmail['signature_text'])) {
+      $defaults['text_message'] = "\n\n--\n" . $defaultEmail['signature_text'];
+    }
+    $form->setDefaults($defaults);
   }
 
   /**

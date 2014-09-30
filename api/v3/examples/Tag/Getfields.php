@@ -1,7 +1,7 @@
 <?php
 /**
  * Test Generated example of using tag getfields API
- * demonstrate use of getfields to interogate api *
+ * demonstrate use of getfields to interrogate api *
  */
 function tag_getfields_example(){
 $params = array(
@@ -35,6 +35,7 @@ function tag_getfields_expectedresult(){
       'id' => array(
           'name' => 'id',
           'type' => 1,
+          'title' => 'Tag ID',
           'required' => true,
           'api.aliases' => array(
               '0' => 'tag',
@@ -43,7 +44,7 @@ function tag_getfields_expectedresult(){
       'name' => array(
           'name' => 'name',
           'type' => 2,
-          'title' => 'Name',
+          'title' => 'Tag Name',
           'required' => true,
           'maxlength' => 64,
           'size' => 30,
@@ -59,21 +60,25 @@ function tag_getfields_expectedresult(){
       'parent_id' => array(
           'name' => 'parent_id',
           'type' => 1,
+          'title' => 'Parent Tag',
           'default' => 'NULL',
           'FKClassName' => 'CRM_Core_DAO_Tag',
         ),
       'is_selectable' => array(
           'name' => 'is_selectable',
           'type' => 16,
+          'title' => 'Display Tag?',
           'default' => '1',
         ),
       'is_reserved' => array(
           'name' => 'is_reserved',
           'type' => 16,
+          'title' => 'Reserved',
         ),
       'is_tagset' => array(
           'name' => 'is_tagset',
           'type' => 16,
+          'title' => 'Tagset',
         ),
       'used_for' => array(
           'name' => 'used_for',
@@ -82,11 +87,18 @@ function tag_getfields_expectedresult(){
           'maxlength' => 64,
           'size' => 30,
           'default' => 'NULL',
+          'html' => array(
+              'type' => 'Select',
+            ),
+          'pseudoconstant' => array(
+              'optionGroupName' => 'tag_used_for',
+            ),
           'api.default' => 'civicrm_contact',
         ),
       'created_id' => array(
           'name' => 'created_id',
           'type' => 1,
+          'title' => 'Tag Created By',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ),
       'created_date' => array(

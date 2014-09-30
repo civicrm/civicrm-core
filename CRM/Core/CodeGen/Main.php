@@ -47,7 +47,7 @@ class CRM_Core_CodeGen_Main {
     // default cms is 'drupal', if not specified
     $this->cms = isset($argCms) ? strtolower($argCms) : 'drupal';
 
-    CRM_Core_CodeGen_Util_Template::$smartyPluginDirs = $smartyPluginDirs;
+    CRM_Core_CodeGen_Util_Smarty::singleton()->setPluginDirs($smartyPluginDirs);
 
     $versionFile        = "version.xml";
     $versionXML         = CRM_Core_CodeGen_Util_Xml::parse($versionFile);

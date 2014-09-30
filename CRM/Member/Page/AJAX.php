@@ -47,8 +47,7 @@ class CRM_Member_Page_AJAX {
       $details['auto_renew'] = '';
       $details['total_amount'] = '';
 
-      echo json_encode($details);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($details);
     }
     $memType = CRM_Utils_Type::escape($_POST['mtype'], 'Integer');
 
@@ -68,8 +67,7 @@ WHERE   id = %1";
     $details['total_amount'] = CRM_Utils_Money::format($details['total_amount'], NULL, '%a');
     $options = array(ts('No auto-renew option'), ts('Give option, but not required'), ts('Auto-renew required '));
     $details['auto_renew'] = CRM_Utils_Array::value('auto_renew', $options[$details]);
-    echo json_encode($details);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($details);
   }
 }
 

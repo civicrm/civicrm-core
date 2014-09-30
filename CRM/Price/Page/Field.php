@@ -121,6 +121,11 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @access public
    */
   function browse() {
+    $resourceManager = CRM_Core_Resources::singleton();
+    if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
+      $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999);
+    }
+
     $priceField    = array();
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
@@ -182,7 +187,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
       // need to translate html types from the db
       $htmlTypes = CRM_Price_BAO_PriceField::htmlTypes();
-      $priceField[$priceFieldBAO->id]['html_type'] = $htmlTypes[$priceField[$priceFieldBAO->id]['html_type']];
+      $priceField[$priceFieldBAO->id]['html_type_display'] = $htmlTypes[$priceField[$priceFieldBAO->id]['html_type']];
       $priceField[$priceFieldBAO->id]['order'] = $priceField[$priceFieldBAO->id]['weight'];
       $priceField[$priceFieldBAO->id]['action'] = CRM_Core_Action::formLink(
         self::actionLinks(),
@@ -301,7 +306,10 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       }
     }
 
-    if ($this->_sid) {
+    if ($action & CRM_Core_Action::DELETE) {
+      CRM_Utils_System::setTitle(ts('Delete Price Field'));
+    }
+    elseif ($this->_sid) {
       $groupTitle = CRM_Price_BAO_PriceSet::getTitle($this->_sid);
       $this->assign('sid', $this->_sid);
       $this->assign('groupTitle', $groupTitle);

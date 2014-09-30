@@ -142,7 +142,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     $this->_defaults = array();
 
     if ($this->_subscriptionDetails->contact_id) {
-      $options = array();
       $fields  = array();
       $names   = array(
         'first_name', 'middle_name', 'last_name', "street_address-{$this->_bltID}", "city-{$this->_bltID}",
@@ -172,15 +171,11 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       }
     }
 
-
     $config = CRM_Core_Config::singleton();
     // set default country from config if no country set
     if (empty($this->_defaults["billing_country_id-{$this->_bltID}"])) {
       $this->_defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
     }
-
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
 
     return $this->_defaults;
   }

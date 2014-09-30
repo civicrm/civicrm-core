@@ -139,6 +139,10 @@ class CRM_Admin_Page_AJAX {
           $ret['content'] = ts('Are you sure you want to disable this premium? This action will remove the premium from any contribution pages that currently offer it. However it will not delete the premium record - so you can re-enable it and add it back to your contribution page(s) at a later time.');
           break;
 
+        case 'CRM_Contact_BAO_Relationship':
+          $ret['content'] = ts('Are you sure you want to disable this relationship?');
+          break;
+
         case 'CRM_Contact_BAO_RelationshipType':
           $ret['content'] = ts('Are you sure you want to disable this relationship type?') . '<br/><br/>' . ts('Users will no longer be able to select this value when adding or editing relationships between contacts.');
           break;
@@ -292,61 +296,31 @@ LIMIT $limit";
       }
       $result[] = $row;
     }
-    print json_encode($result);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($result);
   }
 
   function mappingList() {
-    $params = array('mappingID');
-    foreach ($params as $param) {
-      $$param = CRM_Utils_Array::value($param, $_POST);
+    if (empty($_GET['mappingID'])) {
+      CRM_Utils_JSON::output(array('status' => 'error', 'error_msg' => 'required params missing.'));
     }
 
-    if (!$mappingID) {
-      echo json_encode(array('error_msg' => 'required params missing.'));
-      CRM_Utils_System::civiExit();
+    $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection1($_GET['mappingID']);
+
+    $output = array(
+      'sel4' => array(),
+      'sel5' => array(),
+      'recipientMapping' => $selectionOptions['recipientMapping'],
+    );
+    foreach (array(4, 5) as $sel) {
+      foreach ($selectionOptions["sel$sel"] as $id => $name) {
+        $output["sel$sel"][] = array(
+          'value' => $name,
+          'key' => $id,
+        );
+      }
     }
 
-    $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection1($mappingID);
-    extract($selectionOptions);
-
-    $elements = array();
-    foreach ($sel4 as $id => $name) {
-      $elements[] = array(
-        'name' => $name,
-        'value' => $id,
-      );
-    }
-
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
-  }
-
-  function mappingList1() {
-    $params = array('mappingID');
-    foreach ($params as $param) {
-      $$param = CRM_Utils_Array::value($param, $_POST);
-    }
-
-    if (!$mappingID) {
-      echo json_encode(array('error_msg' => 'required params missing.'));
-      CRM_Utils_System::civiExit();
-    }
-
-    $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection1($mappingID);
-    extract($selectionOptions);
-
-    $elements = array();
-    foreach ($sel5 as $id => $name) {
-      $elements['sel5'][] = array(
-        'name' => $name,
-        'value' => $id,
-      );
-    }
-    $elements['recipientMapping'] = $recipientMapping;
-
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($output);
   }
 
   static function mergeTags() {
@@ -367,44 +341,8 @@ LIMIT $limit";
       array(1 => $result['tagA'], 2 => $result['tagB'])
     );
 
-    echo json_encode($result);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($result);
   }
 
-  function recipient() {
-    $params = array('recipient');
-    foreach ($params as $param) {
-      $$param = CRM_Utils_Array::value($param, $_POST);
-    }
-
-    if (!$recipient) {
-      echo json_encode(array('error_msg' => 'required params missing.'));
-      CRM_Utils_System::civiExit();
-    }
-
-    switch ($recipient) {
-      case 'Participant Status':
-        $values = CRM_Event_PseudoConstant::participantStatus();
-        break;
-
-      case 'participant_role':
-        $values = CRM_Event_PseudoConstant::participantRole();
-        break;
-
-      default:
-        exit;
-    }
-
-    $elements = array();
-    foreach ($values as $id => $name) {
-      $elements[] = array(
-        'name' => $name,
-        'value' => $id,
-      );
-    }
-
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
-  }
 }
 

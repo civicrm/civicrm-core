@@ -383,11 +383,25 @@ class CRM_Core_BAO_ConfigSetting {
       // lets use imageUploadDir since we dont mess around with its values
       // in the config object, lets kep it a bit generic since folks
       // might have different values etc
-      $dir = preg_replace(
-        '|civicrm/templates_c/.*$|',
-        '',
-        $config->templateCompileDir
-      );
+     
+	  //CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
+	  if(DIRECTORY_SEPARATOR == '\\')
+	  {
+		$dir = preg_replace(
+		  '|civicrm[/\\\\]templates_c[/\\\\].*$|',
+		  '',
+		  $config->templateCompileDir
+        );
+	  }
+	  else
+	  {
+		$dir = preg_replace(
+		  '|civicrm/templates_c/.*$|',
+		  '',
+		  $config->templateCompileDir
+        );
+	  }
+	  
       $siteRoot = preg_replace(
         '|/media/civicrm/.*$|',
         '',
@@ -404,11 +418,25 @@ class CRM_Core_BAO_ConfigSetting {
       // lets use imageUploadDir since we dont mess around with its values
       // in the config object, lets kep it a bit generic since folks
       // might have different values etc
-      $dir = preg_replace(
-        '|civicrm/templates_c/.*$|',
-        '',
-        $config->templateCompileDir
-      );
+      
+	  //CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
+	  if(DIRECTORY_SEPARATOR == '\\')
+	  {
+		$dir = preg_replace(
+		  '|civicrm[/\\\\]templates_c[/\\\\].*$|',
+		  '',
+		  $config->templateCompileDir
+        );
+	  }
+	  else
+	  {
+		$dir = preg_replace(
+		  '|civicrm/templates_c/.*$|',
+		  '',
+		  $config->templateCompileDir
+        );
+	  }
+	  
       $siteRoot = preg_replace(
         '|/wp-content/plugins/files/civicrm/.*$|',
         '',
@@ -425,12 +453,25 @@ class CRM_Core_BAO_ConfigSetting {
       // lets use imageUploadDir since we dont mess around with its values
       // in the config object, lets kep it a bit generic since folks
       // might have different values etc
-      $dir = preg_replace(
-        '|/files/civicrm/.*$|',
-        '/files/',
-        $config->imageUploadDir
-      );
-
+      
+	  //CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
+	  if(DIRECTORY_SEPARATOR == '\\')
+	  {
+		$dir = preg_replace(
+		  '|[/\\\\]files[/\\\\]civicrm[/\\\\].*$|',
+		  '\\\\files\\\\',
+		  $config->imageUploadDir
+        );
+	  }
+	  else
+	  {
+		$dir = preg_replace(
+		  '|/files/civicrm/.*$|',
+		  '/files/',
+		  $config->imageUploadDir
+        );
+	  }
+	 
       $matches = array();
       if (preg_match(
           '|/sites/([\w\.\-\_]+)/|',
@@ -448,7 +489,6 @@ class CRM_Core_BAO_ConfigSetting {
       }
     }
 
-
     return array($url, $dir, $siteName, $siteRoot);
   }
 
@@ -462,8 +502,15 @@ class CRM_Core_BAO_ConfigSetting {
  */
   static function getBestGuessSettings() {
     $config = CRM_Core_Config::singleton();
-    $dir = preg_replace(
-      '|civicrm/templates_c/.*$|',
+    
+	//CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
+	if(DIRECTORY_SEPARATOR == '\\')
+	  $needle = 'civicrm[/\\\\]templates_c[/\\\\].*$';
+	else
+	  $needle = 'civicrm/templates_c/.*$';
+	
+	$dir = preg_replace(
+      "|$needle|",
       '',
       $config->templateCompileDir
     );
@@ -626,10 +673,9 @@ WHERE  option_group_id = (
       // component is already enabled
       return TRUE;
     }
-    $components = CRM_Core_Component::getComponents();
 
     // return if component does not exist
-    if (!array_key_exists($componentName, $components)) {
+    if (!array_key_exists($componentName, CRM_Core_Component::getComponents())) {
       return FALSE;
     }
 
@@ -637,6 +683,32 @@ WHERE  option_group_id = (
     $enabledComponents =
       CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
     $enabledComponents[] = $componentName;
+
+    self::setEnabledComponents($enabledComponents);
+
+    return TRUE;
+  }
+
+  static function disableComponent($componentName) {
+    $config = CRM_Core_Config::singleton();
+    if (!in_array($componentName, $config->enableComponents) || !array_key_exists($componentName, CRM_Core_Component::getComponents())) {
+      // post-condition satisified
+      return TRUE;
+    }
+
+    // get enabled-components from DB and add to the list
+    $enabledComponents =
+      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $enabledComponents = array_diff($enabledComponents, array($componentName));
+
+    self::setEnabledComponents($enabledComponents);
+
+    return TRUE;
+  }
+
+  public static function setEnabledComponents($enabledComponents) {
+    $config = CRM_Core_Config::singleton();
+    $components = CRM_Core_Component::getComponents();
 
     $enabledComponentIDs = array();
     foreach ($enabledComponents as $name) {
@@ -652,9 +724,7 @@ WHERE  option_group_id = (
 
     // update DB
     CRM_Core_BAO_Setting::setItem($enabledComponents,
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,'enable_components');
-
-    return TRUE;
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components');
   }
 
   /**

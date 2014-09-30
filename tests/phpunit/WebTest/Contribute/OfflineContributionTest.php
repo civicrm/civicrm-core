@@ -46,7 +46,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
 
     //financial account for check
     $this->openCiviPage("admin/options/payment_instrument", "reset=1");
-    $financialAccount = $this->getText("xpath=//div[@id='payment_instrument']/div/table/tbody//tr/td[1][text()='Check']/../td[3]");
+    $financialAccount = $this->getText("xpath=//div[@id='payment_instrument']/table/tbody//tr/td[1][text()='Check']/../td[3]");
 
     // Add new Financial Account
     $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
@@ -322,7 +322,6 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
     $this->waitForElementPresent("link=Submit Credit Card Contribution");
-    $this->clickLink("link=Submit Credit Card Contribution", "_qf_Contribution_cancel-bottom", FALSE);
 
     // since we don't have live credentials we will switch to test mode
     $url = $this->getAttribute("xpath=//*[@id='Search']/div[2]/div[2]/a[2]@href");

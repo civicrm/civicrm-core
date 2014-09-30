@@ -89,17 +89,12 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       CRM_Core_Error::fatal($error);
     }
 
-    // This could be removed in later rev
-    if ($currentVer == '2.1.6') {
-      $config = CRM_Core_Config::singleton();
-      // also cleanup the templates_c directory
-      $config->cleanupCaches();
-    } else {
-      $config = CRM_Core_Config::singleton();
-      // cleanup only the templates_c directory
-      $config->cleanup(1, FALSE);
-    }
-    // end of hack
+    $config = CRM_Core_Config::singleton();
+
+    // All cached content needs to be cleared because the civi codebase was just replaced
+    CRM_Core_Resources::singleton()->flushStrings()->rebuildDynamicResources();
+    // cleanup only the templates_c directory
+    $config->cleanup(1, FALSE);
 
     $preUpgradeMessage = NULL;
     $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
@@ -117,7 +112,6 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     }
 
     $template->assign('preUpgradeMessage', $preUpgradeMessage);
-    // $template->assign( 'message', $postUpgradeMessage );
 
     $content = $template->fetch('CRM/common/success.tpl');
     echo CRM_Utils_System::theme($content, $this->_print, TRUE);
@@ -135,14 +129,8 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     }
 
     $config = CRM_Core_Config::singleton();
-    // This could be removed in later rev
-    if ($currentVer == '2.1.6') {
-      // also cleanup the templates_c directory
-      $config->cleanupCaches();
-    }
-    // end of hack
 
-    $postUpgradeMessage = ts('Congratulations! Your upgrade was successful! (... wasn\'t that easy!)');
+    $postUpgradeMessage = '<span class="bold">' . ts('Congratulations! Your upgrade was successful! (... wasn\'t that easy!)') . '</span>';
 
     // lets drop all the triggers here
     CRM_Core_DAO::dropTriggers();

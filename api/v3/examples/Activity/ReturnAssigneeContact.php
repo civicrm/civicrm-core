@@ -40,7 +40,7 @@ function activity_get_expectedresult(){
   'values' => array(
       '0' => array(
           'id' => '1',
-          'activity_type_id' => '46',
+          'activity_type_id' => '49',
           'subject' => 'test activity type id',
           'activity_date_time' => '2011-06-02 14:36:13',
           'duration' => '120',
@@ -87,6 +87,8 @@ function activity_get_expectedresult(){
                       'last_name' => 'Anderson',
                       'prefix_id' => '3',
                       'suffix_id' => '3',
+                      'formal_title' => '',
+                      'communication_style_id' => '',
                       'job_title' => '',
                       'gender_id' => '',
                       'birth_date' => '',
@@ -121,6 +123,7 @@ function activity_get_expectedresult(){
                       'world_region' => '',
                       'individual_prefix' => 'Mr.',
                       'individual_suffix' => 'II',
+                      'communication_style' => '',
                       'gender' => '',
                       'state_province_name' => '',
                       'state_province' => '',

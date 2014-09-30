@@ -381,11 +381,6 @@ SELECT {$this->_logTables[$entity]['bracket_info']['entity_column']}
         $entityID = $id;
       }
 
-      // since case_type_id is a varchar field with separator
-      if ($entity == 'log_civicrm_case') {
-        $entityID = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, $entityID);
-        $entityID = CRM_Utils_Array::value(1, $entityID);
-      }
 
       if ($entityID && $logDate && array_key_exists('table', $this->_logTables[$entity]['bracket_info'])) {
         $sql = "

@@ -128,7 +128,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
       CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
     }
-    $stateCountryMap = array();
     //set custom field defaults
     foreach ($this->_fields as $name => $field) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
@@ -138,21 +137,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
           );
         }
       }
-      if ((substr($name, 0, 14) === 'state_province') || (substr($name, 0, 7) === 'country') || (substr($name, 0, 6) === 'county')) {
-        list($fieldName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if (!array_key_exists($index, $stateCountryMap)) {
-          $stateCountryMap[$index] = array();
-        }
-        $stateCountryMap[$index][$fieldName] = $name;
-      }
-
-      // also take care of state country widget
-      if (!empty($stateCountryMap)) {
-        CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap, $this->_defaults);
-      }
     }
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
     return $this->_defaults;
   }
 

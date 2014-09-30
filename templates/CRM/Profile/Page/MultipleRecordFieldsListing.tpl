@@ -58,9 +58,7 @@
                 {/foreach}
                 <td>{$rows.action}</td>
                 {foreach from=$dateFieldsVals key=fid item=rec}
-                  {if $rec.$recId}
                     <td class='crm-field-{$fid}_date hiddenElement'>{$rec.$recId}</td>
-                  {/if}
                 {/foreach}
               </tr>
             {/foreach}

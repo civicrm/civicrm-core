@@ -278,7 +278,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $this->add('select', 'add_activity_type_id', '', $activityLinks, FALSE, array('class' => 'crm-select2 crm-action-menu action-icon-plus twenty'));
     if ($this->_hasAccessToAllCases) {
       $this->add('select', 'report_id', '',
-        array('' => ts('Run QA Audit / Redact')) + $reports,
+        array('' => ts('Activity Audit')) + $reports,
         FALSE,
         array('class' => 'crm-select2 crm-action-menu action-icon-clipboard')
       );

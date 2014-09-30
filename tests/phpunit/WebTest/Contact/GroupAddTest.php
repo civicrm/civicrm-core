@@ -74,14 +74,10 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '{$params['name']}')]");
-    $createdBy = $this->getText("xpath=//table[@id='crm-group-selector']/tbody/tr/td[3]/a");
-    $this->click("xpath=//table[@id='crm-group-selector']/tbody/tr/td[7]/span/a[2]");
-    $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table[2]/tbody/tr/td[2]/select");
-
-    //assert created by in the edit page
-    $this->assertTrue($this->isElementPresent(
-      "xpath=//form[@id='Edit']/div[2]/div/table/tbody/tr[2]/td[contains(text(), '{$createdBy}')]"));
+    $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]");
+    $createdBy = $this->getText("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td[3]/a");
+    $this->click("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td[7]/span/a[2]");
+    $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table/tbody/tr[2]/td[contains(text(), '{$createdBy}')]");
     $this->openCiviPage('group', 'reset=1');
 
     //search groups using created by
@@ -91,16 +87,16 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     //show maximum no. of groups on first result set page
     //as many groups can be created by same creator
     //and checking is done on first result set page
-    $this->waitForVisible('crm-group-selector_processing');
-    $this->select("xpath=//select[@name='crm-group-selector_length']", '100');
-    $this->waitForVisible('crm-group-selector_processing');
+    $this->waitForVisible("xpath=//table[@class='crm-group-selector no-footer dataTable']");
+    $this->select("xpath=//div[@class='dataTables_length']/label/select", '100');
+    $this->waitForVisible("xpath=//table[@class='crm-group-selector no-footer dataTable']");
 
-    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '{$params['name']}')]");
-    $this->assertTrue($this->isElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '{$params['name']}')]/following-sibling::td[2]/a[text()='{$createdBy}']"));
+    $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]");
+    $this->click("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]/../following-sibling::td[2]/a[text()='{$createdBy}']");
+    $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]/../following-sibling::td[2]/a[text()='{$createdBy}']");
 
     //check link of the contact who created the group
-    $this->click("xpath=//table[@id='crm-group-selector']/tbody//tr/td[1][contains(.,'{$params['name']}')]/following-sibling::td[2]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody//tr/td[1]/span[contains(text(),'{$params['name']}')]/../following-sibling::td[2]/a", "css=div.crm-summary-display_name");
     $name = explode(',', $createdBy);
     $name1 = isset($name[1]) ? trim($name[1]) : NULL;
     $name0 = trim($name[0]);
@@ -143,11 +139,10 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->click("is_reserved");
 
     // Clicking save.
-    $this->click("_qf_Edit_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Edit_upload");
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The Group '{$params['name']}' has been saved."));
+    $this->waitForText('crm-notification-container', "The Group '{$params['name']}' has been saved.");
 
     // Create a new role w/o reserved group permissions
     $role = 'role' . substr(sha1(rand()), 0, 7);
@@ -155,8 +150,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("edit-add");
     $this->type("edit-name", $role);
-    $this->click("edit-add");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("edit-add", NULL);
 
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role}']");

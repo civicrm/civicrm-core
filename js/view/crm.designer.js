@@ -198,11 +198,11 @@
       'click .crm-designer-preview': 'doPreview'
     },
     onRender: function() {
-      this.$('.crm-designer-save').button().attr({
+      this.$('.crm-designer-save').button({icons: {primary: 'ui-icon-check'}}).attr({
         disabled: 'disabled',
-        style: 'opacity:.5; box-shadow:none; cursor:default;'
+        style: 'opacity:.5; cursor:default;'
       });
-      this.$('.crm-designer-preview').button();
+      this.$('.crm-designer-preview').button({icons: {primary: 'ui-icon-search'}});
     },
     initialize: function(options) {
       CRM.designerApp.vent.on('ufUnsaved', this.onUfChanged, this);
@@ -254,7 +254,7 @@
       if (!this.previewMode) {
         $('.crm-designer-preview-canvas').html('');
         $('.crm-designer-canvas > *, .crm-designer-palette-region').show();
-        $('.crm-designer-preview span').html(ts('Preview'));
+        $('.crm-designer-preview').button('option', {icons: {primary: 'ui-icon-search'}}).find('span').text(ts('Preview'));;
         return;
       }
       if (this.model.getRel('ufFieldCollection').hasDuplicates()) {
@@ -277,7 +277,7 @@
         $dialog.unblock();
         $('.crm-designer-canvas > *, .crm-designer-palette-region').hide();
         $('.crm-designer-preview-canvas').html(data).show().trigger('crmLoad').find(':input').prop('readOnly', true);
-        $('.crm-designer-preview span').html(ts('Edit'));
+        $('.crm-designer-preview').button('option', {icons: {primary: 'ui-icon-pencil'}}).find('span').text(ts('Edit'));
       });
     }
   });

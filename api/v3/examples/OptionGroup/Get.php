@@ -39,6 +39,7 @@ function option_group_get_expectedresult(){
           'title' => 'Preferred Communication Method',
           'is_reserved' => '1',
           'is_active' => '1',
+          'is_locked' => 0,
         ),
     ),
 );
