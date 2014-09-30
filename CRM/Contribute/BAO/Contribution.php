@@ -3181,6 +3181,8 @@ WHERE eft.entity_table = 'civicrm_contribution'
         $contributionDAO->contribution_status_id = $statusId;
         $contributionDAO->cancel_date = 'null';
         $contributionDAO->cancel_reason = NULL;
+        $netAmount = !empty($trxnsData['net_amount']) ? $trxnsData['net_amount'] : $trxnsData['total_amount'];
+        $contributionDAO->net_amount = $contributionDAO->net_amount + $netAmount;
         $contributionDAO->save();
 
         //Change status of financial record too
