@@ -85,6 +85,16 @@ WHERE  mailing_id = %1
     return CRM_Core_DAO::executeQuery($sql, $params);
   }
 
+  /**
+   * Moves a number of randomly-chosen recipients of one Mailing to another Mailing.
+   *
+   * @param int $mailingIdC
+   *   Source mailing ID
+   * @param int $newMailingID
+   *   Destination mailing ID
+   * @param int $totalLimit
+   *   Number of recipients to move
+   */
   static function updateRandomRecipients($mailingIdC, $newMailingID, $totalLimit = NULL) {
     $limitString = NULL;
     if ($totalLimit) {
