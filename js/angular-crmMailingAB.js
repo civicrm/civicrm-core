@@ -8,7 +8,6 @@
   };
   var mltokens = [];
   var crmMailingAB = angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'ngSanitize']);
-  var mltokens = [];
 
   crmMailingAB.run(function ($rootScope, $templateCache) {
     $rootScope.$on('$viewContentLoaded', function () {
@@ -114,7 +113,7 @@
         crmApi('Mailing', 'create', mail);
       });
       $location.path('mailing/abtesting');
-    }
+    };
     var result = crmApi('Mailing', 'stats', {mailing_id: selectedABTest.mailing_id_a});
     $scope.r = [];
     result.success(function (data) {
@@ -140,11 +139,11 @@
     $scope.aastop = false;
     $scope.asure = function () {
       $scope.aastop = true;
-    }
+    };
     $scope.bbstop = false;
     $scope.bsure = function () {
       $scope.bbstop = true;
-    }
+    };
 
     var numdiv = 5;
     var keep_cnt = 0;
@@ -232,7 +231,8 @@
         $scope.graph_data[temp - 1] = {
           time: tp,
           x: data.values.A[temp].count,
-          y: data.values.B[temp].count}
+          y: data.values.B[temp].count
+        };
 
         if (keep_cnt == numdiv) {
           $scope.graphload = true;
@@ -328,13 +328,12 @@
             .text("Time");
 
           svg.append("text")      // text label for the x axis
-
             .style("text-anchor", "middle")
             .text($scope.winnercriteria).attr("transform",function (d) {
               return "rotate(-90)"
             }).attr("x", -height / 2)
             .attr("y", -30);
-          ;
+
           // create a variable called series and bind the date
           // for each series append a g element and class it as series for css styling
           var series = svg.selectAll(".series")
@@ -426,8 +425,6 @@
 
         }
       });
-
-
     }
     else {
       $scope.sparestuff.isnew = true;
@@ -471,12 +468,7 @@
     };
 
     $scope.tab_val = 0;
-    if ($scope.sparestuff.isnew == true) {
-      $scope.max_tab = 0;
-    }
-    else {
-      $scope.max_tab = 4;
-    }
+    $scope.max_tab = ($scope.sparestuff.isnew == true) ? 0 : 4;
 
     $scope.campaign_clicked = function () {
       if ($scope.max_tab >= 0) {
@@ -504,12 +496,7 @@
     $scope.slide_value = 0;
 
     $scope.setifyes = function (val) {
-      if (val == 1) {
-        $scope.ifyes = true;
-      }
-      else {
-        $scope.ifyes = false;
-      }
+      $scope.ifyes = val == 1;
     };
 
     /*    $scope.reply = function () {
@@ -528,17 +515,12 @@
     };
 
     $scope.trackr = function (trackreplies) {
-      if (trackreplies == "1") {
-        return true;
-      }
-      else {
-        return false;
-      }
-    }
+      return trackreplies == "1";
+    };
 
     $scope.sendTestMailing = function () {
       $scope.sendtest = true;
-    }
+    };
 
     $scope.isHeader = function (hf) {
       return hf.component_type == "Header";
@@ -563,12 +545,16 @@
     };
 
     $scope.append_mails = function () {
-      crmApi('MailingAB', 'create', {id: $scope.abId, mailing_id_a: $scope.mailA.id, mailing_id_b: $scope.mailB.id, mailing_id_c: $scope.mailC.id});
+      crmApi('MailingAB', 'create', {
+        id: $scope.abId,
+        mailing_id_a: $scope.mailA.id,
+        mailing_id_b: $scope.mailB.id,
+        mailing_id_c: $scope.mailC.id
+      });
       $scope.currentABTest.id = $scope.abId;
     };
 
     $scope.saveb = function (dat) {
-      var flag = 0;
       var result = crmApi('Mailing', 'create', dat, true);
       result.success(function (data) {
         if (data.is_error == 0) {
@@ -580,7 +566,6 @@
     };
 
     $scope.savec = function (dat) {
-      var flag = 0;
       var result = crmApi('Mailing', 'create', dat, true);
 
       result.success(function (data) {
@@ -595,7 +580,7 @@
     $scope.sparestuff.previewa = "";
     $scope.pre = function () {
       $scope.preview = true;
-    }
+    };
 
     $scope.init = function (par) {
       if (par == "3") {
@@ -609,17 +594,17 @@
           $scope.sparestuff.template.url = partialUrl('two_emails.html');
         }
       }
-      $scope.whatnext = par.toString()
+      $scope.whatnext = par.toString();
     };
 
     $scope.tab_upd = function () {
       $scope.tab_val = $scope.tab_val + 1;
       $scope.max_tab = Math.max($scope.tab_val, $scope.max_tab);
-    }
+    };
 
     $scope.tab_upd_dec = function () {
       $scope.tab_val = $scope.tab_val - 1;
-    }
+    };
 
     $scope.setdate = function (par) {
       $scope.send_date = par;
@@ -673,7 +658,7 @@
       $scope.tp1.include = $scope.incGroupids;
       $scope.tp1.exclude = $scope.excGroupids;
       console.log($scope.tp1);
-      var result = crmApi('MailingAB', 'recipients_update', {
+      crmApi('MailingAB', 'recipients_update', {
         id: $scope.currentABTest.id,
         groups: $scope.tp1
       });
@@ -698,10 +683,9 @@
         if (typeof $scope.sparestuff.date == 'undefined') {
           $scope.sparestuff.date = 'now';
         }
-        var result = crmApi('MailingAB', 'send_mail', {id: $scope.abId,
+        crmApi('MailingAB', 'send_mail', {id: $scope.abId,
           scheduled_date: $scope.sparestuff.date, scheduled_date_time: $scope.currentABTest.latertime});
-
-      }
+      };
 
       angular.forEach($scope.incGroup, function (value) {
         $scope.sparestuff.ingrps += value.toString() + ", ";
@@ -715,13 +699,11 @@
       if ($scope.sparestuff.excgrps.length != 0) {
         $scope.sparestuff.excgrps = $scope.sparestuff.excgrps.substr(0, $scope.sparestuff.excgrps.length - 2);
       }
-
-    }
-
+    };
 
     $scope.update_abtest = function () {
       $scope.currentABTest.declare_winning_time = $scope.currentABTest.date + " " + $scope.currentABTest.time;
-      result = crmApi('MailingAB', 'create', {
+      crmApi('MailingAB', 'create', {
         id: $scope.abId,
         testing_criteria_id: $scope.sparestuff.template.val,
         mailing_id_a: $scope.currentABTest.mailing_id_a,
@@ -807,7 +789,7 @@
           }
         }
       }
-    }
+    };
 
     /*$scope.tmp = function (tst){
      $scope.currentMailing.msg_template_id=tst;
@@ -858,16 +840,16 @@
 
     $scope.call = function () {
       $scope.$apply();
-      var result = crmApi('Mailing', 'send_test', {
+      crmApi('Mailing', 'send_test', {
         mailing_id: $scope.currentABTest.mailing_id_a,
         test_email: $scope.sparestuff.emailadd
       });
 
-      var result = crmApi('Mailing', 'send_test', {
+      crmApi('Mailing', 'send_test', {
         mailing_id: $scope.currentABTest.mailing_id_b,
         test_email: $scope.sparestuff.emailadd
       })
-    }
+    };
 
     $scope.$watch('sendtest', function () {
       if ($scope.sendtest == true) {
@@ -906,11 +888,10 @@
 
         var tabselector = $(".crmABTestingAllTabs");
         tabselector.tabs(scope.$eval(attrs.nexttab));
-        var myarr = new Array(1, 2, 3)
 
         // disable remaining tabs
         if (scope.sparestuff.isnew == true) {
-          tabselector.tabs({disabled: myarr});
+          tabselector.tabs({disabled: [1, 2, 3]});
         }
 
         $(element).on("click", function () {
@@ -945,7 +926,7 @@
 
           scope.tab_upd();
 
-          var myArray1 = new Array();
+          var myArray1 = [];
           for (var i = scope.max_tab + 1; i < 4; i++) {
             myArray1.push(i);
           }
@@ -1045,15 +1026,15 @@
         });
         $(element).on("select2-removed", function (e) {
           if (e.val.split(" ")[2] == "exclude") {
-            var index = scope.excGroup.indexOf(e.val.split(" ")[3]);
-            scope.excGroup.splice(index, 1);
-            scope.excGroupids.splice(index, 1);
+            var excIndex = scope.excGroup.indexOf(e.val.split(" ")[3]);
+            scope.excGroup.splice(excIndex, 1);
+            scope.excGroupids.splice(excIndex, 1);
             scope.$apply();
           }
           else {
-            var index = scope.incGroup.indexOf(e.val.split(" ")[3]);
-            scope.incGroup.splice(index, 1);
-            scope.incGroupids.splice(index, 1);
+            var incIndex = scope.incGroup.indexOf(e.val.split(" ")[3]);
+            scope.incGroup.splice(incIndex, 1);
+            scope.incGroupids.splice(incIndex, 1);
             scope.$apply();
           }
 
@@ -1061,7 +1042,6 @@
         });
       }
     };
-
   });
 
   crmMailingAB.directive('sliderbar', function () {
