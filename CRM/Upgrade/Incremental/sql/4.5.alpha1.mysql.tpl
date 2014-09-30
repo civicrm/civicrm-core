@@ -326,8 +326,9 @@ CREATE TABLE IF NOT EXISTS `civicrm_case_type` (
 SELECT @option_group_id_case_type := max(id) from civicrm_option_group where name = 'case_type';
 
 INSERT IGNORE INTO civicrm_case_type
-  (name, {localize field='title'}title{/localize}, {localize field='description'}description{/localize}, is_active, is_reserved, weight)
+  (id, name, {localize field='title'}title{/localize}, {localize field='description'}description{/localize}, is_active, is_reserved, weight)
   SELECT
+    value,
     name,
     {localize field='label'}label{/localize},
     {localize field='description'}description{/localize},
@@ -338,20 +339,19 @@ INSERT IGNORE INTO civicrm_case_type
   WHERE
     option_group_id = @option_group_id_case_type;
 
--- Replace the pseudo-fk to ov.value with a reference to civicrm_case_type.id
-UPDATE civicrm_case
-  SET case_type_id = (
-    SELECT civicrm_case_type.id FROM civicrm_case_type
-    JOIN civicrm_option_value
-      ON civicrm_option_value.name = civicrm_case_type.name
-    WHERE
-      civicrm_option_value.option_group_id = @option_group_id_case_type
-      AND civicrm_option_value.value = replace(civicrm_case.case_type_id, 0x01, '')
-  );
+--- Remove the special character, earlier used as a separator and reference to civicrm_case_type.id
+UPDATE civicrm_case SET case_type_id = replace(case_type_id, 0x01, '');
 
 ALTER TABLE civicrm_case
   MODIFY case_type_id int(10) unsigned COLLATE utf8_unicode_ci NULL COMMENT 'FK to civicrm_case_type.id',
   ADD CONSTRAINT FK_civicrm_case_case_type_id FOREIGN KEY (case_type_id) REFERENCES civicrm_case_type (id) ON DELETE SET NULL;
+
+-- CRM-15343 set the auto increment civicrm_case_type.id start point to max id to avoid conflict in future insertion
+SELECT @max_case_type_id := max(id) from civicrm_case_type;
+SET @query  = CONCAT("ALTER TABLE civicrm_case_type AUTO_INCREMENT = ", @max_case_type_id);
+PREPARE alter_case_type_auto_inc FROM @query;
+EXECUTE alter_case_type_auto_inc;
+DEALLOCATE PREPARE alter_case_type_auto_inc;
 
 DELETE FROM civicrm_option_value WHERE option_group_id = @option_group_id_case_type;
 
