@@ -2931,6 +2931,13 @@ WHERE  contribution_id = %1 ";
           'entity_table' => 'civicrm_financial_item',
           'financial_trxn_id' => $trxn->id,
         );
+        if (empty($params['line_item'])) {
+          //CRM-15296
+          //@todo - check with Joe regarding this situation - payment processors create pending transactions with no line items
+          // when creating recurring membership payment - there are 2 lines to comment out in contributonPageTest if fixed
+          // & this can be removed
+          return;
+        }
         foreach ($params['line_item'] as $fieldId => $fields) {
           foreach ($fields as $fieldValueId => $fieldValues) {
             $fparams = array(
