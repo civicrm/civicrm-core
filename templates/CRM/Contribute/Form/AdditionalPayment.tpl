@@ -73,16 +73,18 @@
     <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
   </div>
   {/if}
+  {if $newCredit AND $contributionMode EQ null}
+    {if $contactId}
+      {capture assign=ccModeLink}{crmURL p='civicrm/payment/add' q="reset=1&action=add&cid=`$contactId`&id=`$id`&component=`$component`&mode=live"}{/capture}
+    {/if}
+    {if $paymentType eq 'owed'}
+      <div class="action-link css_right crm-link-credit-card-mode">
+        <a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a>
+      </div>
+    {/if}
+  {/if}
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl"}
-    {if $newCredit AND $contributionMode EQ null}
-      {if $contactId}
-        {capture assign=ccModeLink}{crmURL p='civicrm/payment/add' q="reset=1&action=add&cid=`$contactId`&id=`$id`&component=`$component`&mode=live"}{/capture}
-       {/if}
-      {if $paymentType eq 'owed'}
-        <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a></span>
-      {/if}
-    {/if}
   </div>
   <table class="form-layout-compressed">    
     <tr>
