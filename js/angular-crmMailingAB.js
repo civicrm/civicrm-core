@@ -6,7 +6,6 @@
   var partialUrl = function (relPath) {
     return CRM.resourceUrls['civicrm'] + '/partials/abtesting/' + relPath;
   };
-  var mltokens = [];
   var crmMailingAB = angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'ngSanitize']);
 
   crmMailingAB.run(function ($rootScope, $templateCache) {
@@ -55,7 +54,7 @@
     }
   ]);
 
-//-----------------------------------------
+  //-----------------------------------------
   // Add a new record by name.
   // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
   /**
@@ -92,8 +91,6 @@
     $scope.mailid = [];
     $scope.preventsubmit = false;
 
-
-    mltokens = CRM.crmMailing.mailTokens;
     if ($scope.currentABTest.declare_winning_time != null) {
       $scope.ans = $scope.currentABTest.declare_winning_time.split(" ");
       $scope.currentABTest.date = $scope.ans[0];
@@ -121,8 +118,6 @@
       abmailC.success(function (data) {
         if (data.is_error == 0) {
           $scope.mailC = data;
-
-
         }
       });
     }
@@ -941,7 +936,7 @@
     return {
       restrict: 'AE',
       link: function (scope, element, attrs) {
-        $(element).select2({width: "200px", data: mltokens, placeholder: "Insert Token"});
+        $(element).select2({width: "200px", data: CRM.crmMailing.mailTokens, placeholder: "Insert Token"});
         $(element).on('select2-selecting', function (e) {
 
           scope.$evalAsync('_resetSelection()');
