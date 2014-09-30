@@ -1150,7 +1150,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $lineItems
    *
    * @throws Exception
-   * @internal param bool $deductibleMode
    * @return CRM_Contribute_DAO_Contribution
    * @access public
    */
