@@ -59,7 +59,7 @@
 //-----------------------------------------
   // Add a new record by name.
   // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
-  crmMailingAB.controller('ABListingCtrl', function ($scope, crmApi,mailingABList) {
+  crmMailingAB.controller('ABListingCtrl', function ($scope, crmApi, mailingABList) {
     $scope.mailingABList = mailingABList.values;
     $scope.testing_criteria = {
       '1': "Subject lines",
@@ -68,8 +68,14 @@
     };
   });
 
-  crmMailingAB.controller('ReportCtrl', function ($scope, crmApi, selectedABTest,$location) {
-    $scope.graph_data = [{},{},{},{},{}];
+  crmMailingAB.controller('ReportCtrl', function ($scope, crmApi, selectedABTest, $location) {
+    $scope.graph_data = [
+      {},
+      {},
+      {},
+      {},
+      {}
+    ];
 
     $scope.graphload = false;
     if (selectedABTest.winner_criteria_id == 1) {
@@ -86,43 +92,43 @@
       }
     }
 
-    $scope.copyatoc = function(){
-      var res = crmApi('Mailing','get',{id:selectedABTest.mailing_id_a});
-      res.success(function(data){
-        for( var key in data.values){
+    $scope.copyatoc = function () {
+      var res = crmApi('Mailing', 'get', {id: selectedABTest.mailing_id_a});
+      res.success(function (data) {
+        for (var key in data.values) {
           var mail = data.values[key];
         }
         mail.id = selectedABTest.mailing_id_c;
-        crmApi('Mailing','create',mail);
+        crmApi('Mailing', 'create', mail);
       });
       $location.path('mailing/abtesting');
     };
 
-    $scope.sendc = function(){
-      var res = crmApi('Mailing','get',{id:selectedABTest.mailing_id_b});
-      res.success(function(data){
-        for( var key in data.values){
+    $scope.sendc = function () {
+      var res = crmApi('Mailing', 'get', {id: selectedABTest.mailing_id_b});
+      res.success(function (data) {
+        for (var key in data.values) {
           var mail = data.values[key];
         }
         mail.id = selectedABTest.mailing_id_c;
-        crmApi('Mailing','create',mail);
+        crmApi('Mailing', 'create', mail);
       });
       $location.path('mailing/abtesting');
     }
-    var result = crmApi('Mailing','stats',{mailing_id : selectedABTest.mailing_id_a});
-    $scope.r=[];
+    var result = crmApi('Mailing', 'stats', {mailing_id: selectedABTest.mailing_id_a});
+    $scope.r = [];
     result.success(function (data) {
-      $scope.rtt= data;
+      $scope.rtt = data;
       $scope.r.push(data.values[selectedABTest.mailing_id_a]["Delivered"].toString());
       $scope.r.push(data.values[selectedABTest.mailing_id_a]["Bounces"].toString());
       $scope.r.push(data.values[selectedABTest.mailing_id_a]["Unsubscribers"].toString());
       $scope.r.push(data.values[selectedABTest.mailing_id_a]["Opened"].toString());
       $scope.r.push(data.values[selectedABTest.mailing_id_a]["Unique Clicks"].toString());
-     $scope.$apply();
+      $scope.$apply();
     });
 
-    $scope.d=[];
-    result = crmApi('Mailing','stats',{mailing_id : selectedABTest.mailing_id_b});
+    $scope.d = [];
+    result = crmApi('Mailing', 'stats', {mailing_id: selectedABTest.mailing_id_b});
     result.success(function (data) {
       $scope.d.push(data.values[selectedABTest.mailing_id_b]["Delivered"].toString());
       $scope.d.push(data.values[selectedABTest.mailing_id_b]["Bounces"].toString());
@@ -132,213 +138,240 @@
       $scope.$apply();
     });
     $scope.aastop = false;
-    $scope.asure = function(){
+    $scope.asure = function () {
       $scope.aastop = true;
     }
     $scope.bbstop = false;
-    $scope.bsure = function(){
+    $scope.bsure = function () {
       $scope.bbstop = true;
     }
 
-      var numdiv = 5;
-      var keep_cnt =0;
-      for (i = 1; i <= numdiv; i++) {
-        var result = crmApi('MailingAB', 'graph_stats',{id : selectedABTest.id, split_count : numdiv, split_count_select : i});
-        result.success(function (data) {
-          var temp=0;
-          keep_cnt ++;
-          for( var key in data.values.A){
-            temp = key;
+    var numdiv = 5;
+    var keep_cnt = 0;
+    for (i = 1; i <= numdiv; i++) {
+      var result = crmApi('MailingAB', 'graph_stats', {id: selectedABTest.id, split_count: numdiv, split_count_select: i});
+      result.success(function (data) {
+        var temp = 0;
+        keep_cnt++;
+        for (var key in data.values.A) {
+          temp = key;
+        }
+        var t = data.values.A[temp].time.split(" ");
+        var m = t[0];
+        var year = t[2];
+        var day = t[1].substr(0, t[1].length - 3);
+        if (t[3] == "") {
+          var t1 = t[4].split(":");
+          var hur = t1[0];
+          if (t[5] == "AM") {
+            hour = hur;
+            if (hour == 12) {
+              hour = 0;
+            }
           }
-          var t = data.values.A[temp].time.split(" ");
-          var m = t[0];
-          var year = t[2];
-          var day = t[1].substr(0,t[1].length-3);
-          if(t[3]==""){
-            var t1= t[4].split(":");
-            var hur = t1[0];
-            if(t[5] == "AM"){hour = hur; if(hour == 12)hour = 0;}
-            if(t[5] == "PM")hour = parseInt(hur)+12;
-            var min = t1[1];
+          if (t[5] == "PM") {
+            hour = parseInt(hur) + 12;
           }
-          else{
-            var t1= t[3].split(":");
-            var hur = t1[0];
-            if(t[4] == "AM"){hour = hur; if(hour == 12)hour = 0;}
-            if(t[4] == "PM")hour = parseInt(hur)+12;
-            var min = t1[1];
+          var min = t1[1];
+        }
+        else {
+          var t1 = t[3].split(":");
+          var hur = t1[0];
+          if (t[4] == "AM") {
+            hour = hur;
+            if (hour == 12) {
+              hour = 0;
+            }
           }
-          var month = 0;
-         switch (m) {
-           case "January":
-             month = 0;break;
-           case "February":
-             month = 1;break;
-           case "March":
-             month = 2;break;
-           case "April":
-             month = 3;break;
-           case "May":
-             month = 4;break;
-           case "June":
-             month = 5;break;
-           case "July":
-             month = 6;break;
-           case "August":
-             month = 7;break;
-           case "September":
-             month = 8;break;
-           case "October":
-             month = 9;break;
-           case "November":
-             month = 10;break;
-           case "December":
-             month = 11;break;
+          if (t[4] == "PM") {
+            hour = parseInt(hur) + 12;
+          }
+          var min = t1[1];
+        }
+        var month = 0;
+        switch (m) {
+          case "January":
+            month = 0;
+            break;
+          case "February":
+            month = 1;
+            break;
+          case "March":
+            month = 2;
+            break;
+          case "April":
+            month = 3;
+            break;
+          case "May":
+            month = 4;
+            break;
+          case "June":
+            month = 5;
+            break;
+          case "July":
+            month = 6;
+            break;
+          case "August":
+            month = 7;
+            break;
+          case "September":
+            month = 8;
+            break;
+          case "October":
+            month = 9;
+            break;
+          case "November":
+            month = 10;
+            break;
+          case "December":
+            month = 11;
+            break;
 
-         }
-          var tp = new Date(year, month, day, hour, min, 0, 0);
-          $scope.graph_data[temp-1] = {
-            time:tp,
-            x:data.values.A[temp].count,
-            y:data.values.B[temp].count}
+        }
+        var tp = new Date(year, month, day, hour, min, 0, 0);
+        $scope.graph_data[temp - 1] = {
+          time: tp,
+          x: data.values.A[temp].count,
+          y: data.values.B[temp].count}
 
-          if(keep_cnt == numdiv){
-            $scope.graphload = true;
-            $scope.$apply();
-            var data = $scope.graph_data;
+        if (keep_cnt == numdiv) {
+          $scope.graphload = true;
+          $scope.$apply();
+          var data = $scope.graph_data;
 
-              // set up a colour variable
-              var color = d3.scale.category10();
+          // set up a colour variable
+          var color = d3.scale.category10();
 
-              // map one colour each to x, y and z
-              // keys grabs the key value or heading of each key value pair in the json
-              // but not time
-              color.domain(d3.keys(data[0]).filter(function (key) {
-                return key !== "time";
-              }));
+          // map one colour each to x, y and z
+          // keys grabs the key value or heading of each key value pair in the json
+          // but not time
+          color.domain(d3.keys(data[0]).filter(function (key) {
+            return key !== "time";
+          }));
 
-              // create a nested series for passing to the line generator
-              // it's best understood by console logging the data
-              var series = color.domain().map(function (name) {
+          // create a nested series for passing to the line generator
+          // it's best understood by console logging the data
+          var series = color.domain().map(function (name) {
+            return {
+              name: name,
+              values: data.map(function (d) {
                 return {
-                  name: name,
-                  values: data.map(function (d) {
-                    return {
-                      time: d.time,
-                      score: +d[name]
-                    };
-                  })
+                  time: d.time,
+                  score: +d[name]
                 };
+              })
+            };
+          });
+
+          // Set the dimensions of the canvas / graph
+          var margin = {
+              top: 30,
+              right: 20,
+              bottom: 40,
+              left: 75
+            },
+            width = 550 - margin.left - margin.right,
+            height = 350 - margin.top - margin.bottom;
+
+          // Set the ranges
+          //var x = d3.time.scale().range([0, width]).domain([0,10]);
+          var x = d3.time.scale().range([0, width]);
+          var y = d3.scale.linear().range([height, 0]);
+
+          // Define the axes
+          var xAxis = d3.svg.axis().scale(x)
+            .orient("bottom").ticks(10);
+
+          var yAxis = d3.svg.axis().scale(y)
+            .orient("left").ticks(5);
+
+          // Define the line
+          // Note you plot the time / score pair from each key you created ealier
+          var valueline = d3.svg.line()
+            .x(function (d) {
+              return x(d.time);
+            })
+            .y(function (d) {
+              return y(d.score);
+            });
+
+          // Adds the svg canvas
+          var svg = d3.select("#linegraph")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+          // Scale the range of the data
+          x.domain(d3.extent(data, function (d) {
+            return d.time;
+          }));
+
+          // note the nested nature of this you need to dig an additional level
+          y.domain([
+            d3.min(series, function (c) {
+              return d3.min(c.values, function (v) {
+                return v.score;
               });
+            }),
+            d3.max(series, function (c) {
+              return d3.max(c.values, function (v) {
+                return v.score;
+              });
+            })
+          ]);
+          svg.append("text")      // text label for the x axis
+            .attr("x", width / 2)
+            .attr("y", height + margin.bottom)
+            .style("text-anchor", "middle")
+            .text("Time");
 
-              // Set the dimensions of the canvas / graph
-              var margin = {
-                  top: 30,
-                  right: 20,
-                  bottom: 40,
-                  left: 75
-                },
-                width = 550 - margin.left - margin.right,
-                height = 350 - margin.top - margin.bottom;
+          svg.append("text")      // text label for the x axis
 
-              // Set the ranges
-              //var x = d3.time.scale().range([0, width]).domain([0,10]);
-              var x = d3.time.scale().range([0, width]);
-              var y = d3.scale.linear().range([height, 0]);
+            .style("text-anchor", "middle")
+            .text($scope.winnercriteria).attr("transform",function (d) {
+              return "rotate(-90)"
+            }).attr("x", -height / 2)
+            .attr("y", -30);
+          ;
+          // create a variable called series and bind the date
+          // for each series append a g element and class it as series for css styling
+          var series = svg.selectAll(".series")
+            .data(series)
+            .enter().append("g")
+            .attr("class", "series");
 
-              // Define the axes
-              var xAxis = d3.svg.axis().scale(x)
-                .orient("bottom").ticks(10);
+          // create the path for each series in the variable series i.e. x, y and z
+          // pass each object called x, y nad z to the lne generator
+          series.append("path")
+            .attr("class", "line")
+            .attr("d", function (d) {
+              // console.log(d); // to see how d3 iterates through series
+              return valueline(d.values);
+            })
+            .style("stroke", function (d) {
+              return color(d.name);
+            });
 
-              var yAxis = d3.svg.axis().scale(y)
-                .orient("left").ticks(5);
+          // Add the X Axis
+          svg.append("g") // Add the X Axis
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+            .selectAll("text")
+            .attr("transform", function (d) {
+              return "rotate(-30)";
+            });
 
-              // Define the line
-              // Note you plot the time / score pair from each key you created ealier
-              var valueline = d3.svg.line()
-                .x(function (d) {
-                  return x(d.time);
-                })
-                .y(function (d) {
-                  return y(d.score);
-                });
-
-              // Adds the svg canvas
-              var svg = d3.select("#linegraph")
-                .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-                .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-              // Scale the range of the data
-              x.domain(d3.extent(data, function (d) {
-                return d.time;
-              }));
-
-              // note the nested nature of this you need to dig an additional level
-              y.domain([
-                d3.min(series, function (c) {
-                  return d3.min(c.values, function (v) {
-                    return v.score;
-                  });
-                }),
-                d3.max(series, function (c) {
-                  return d3.max(c.values, function (v) {
-                    return v.score;
-                  });
-                })
-              ]);
-              svg.append("text")      // text label for the x axis
-                .attr("x", width / 2)
-                .attr("y", height + margin.bottom)
-                .style("text-anchor", "middle")
-                .text("Time");
-
-              svg.append("text")      // text label for the x axis
-
-                .style("text-anchor", "middle")
-                .text($scope.winnercriteria).attr("transform",function (d) {
-                  return "rotate(-90)"
-                }).attr("x", -height / 2)
-                .attr("y", -30);
-              ;
-              // create a variable called series and bind the date
-              // for each series append a g element and class it as series for css styling
-              var series = svg.selectAll(".series")
-                .data(series)
-                .enter().append("g")
-                .attr("class", "series");
-
-              // create the path for each series in the variable series i.e. x, y and z
-              // pass each object called x, y nad z to the lne generator
-              series.append("path")
-                .attr("class", "line")
-                .attr("d", function (d) {
-                  // console.log(d); // to see how d3 iterates through series
-                  return valueline(d.values);
-                })
-                .style("stroke", function (d) {
-                  return color(d.name);
-                });
-
-              // Add the X Axis
-              svg.append("g") // Add the X Axis
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + height + ")")
-                .call(xAxis)
-                .selectAll("text")
-                .attr("transform", function(d) {
-                  return "rotate(-30)";});
-
-            // Add the Y Axis
-              svg.append("g") // Add the Y Axis
-                .attr("class", "y axis")
-                .call(yAxis);
-          }
-        });
-      }
-      console.log($scope.graph_data);
+          // Add the Y Axis
+          svg.append("g") // Add the Y Axis
+            .attr("class", "y axis")
+            .call(yAxis);
+        }
+      });
+    }
+    console.log($scope.graph_data);
   });
 
   crmMailingAB.controller('crmABTestingTabsCtrl', function ($scope, crmApi, selectedABTest, $sce) {
@@ -352,7 +385,7 @@
     $scope.tmpList = CRM.crmMailing.mesTemplate;
     $scope.mailingGrp = CRM.crmMailing.mailGrp;
     $scope.headerfooter = CRM.crmMailing.headerfooterList;
-    $scope.sparestuff ={};
+    $scope.sparestuff = {};
     $scope.sparestuff.emailadd = "";
     $scope.sparestuff.winnercriteria = "";
     $scope.sparestuff.isnew = false;
@@ -438,9 +471,12 @@
     };
 
     $scope.tab_val = 0;
-    if($scope.sparestuff.isnew==true)
-    $scope.max_tab = 0;
-    else $scope.max_tab = 4;
+    if ($scope.sparestuff.isnew == true) {
+      $scope.max_tab = 0;
+    }
+    else {
+      $scope.max_tab = 4;
+    }
 
     $scope.campaign_clicked = function () {
       if ($scope.max_tab >= 0) {
@@ -476,17 +512,17 @@
       }
     };
 
-/*    $scope.reply = function () {
-      if ($scope.trackreplies == 0) {
-        $scope.trackreplies = 1;
-      }
-      else {
-        $scope.trackreplies = 0;
-        $scope.mailA.forward_replies = 0;
-        $scope.mailA.auto_responder = 0;
-      }
-    }
-*/
+    /*    $scope.reply = function () {
+     if ($scope.trackreplies == 0) {
+     $scope.trackreplies = 1;
+     }
+     else {
+     $scope.trackreplies = 0;
+     $scope.mailA.forward_replies = 0;
+     $scope.mailA.auto_responder = 0;
+     }
+     }
+     */
     $scope.isAuto = function (au) {
       return au.component_type == "Reply";
     };
@@ -606,10 +642,10 @@
       }
       else {
         if (typeof $scope.currentABTest.mailing_id_a == 'undefined') {
-          result = crmApi('MailingAB', 'create', {name: $scope.currentABTest.name,id: $scope.abId, testing_criteria_id: $scope.sparestuff.template.val});
+          result = crmApi('MailingAB', 'create', {name: $scope.currentABTest.name, id: $scope.abId, testing_criteria_id: $scope.sparestuff.template.val});
         }
         else {
-          result = crmApi('MailingAB', 'create', {name: $scope.currentABTest.name,id: $scope.abId, testing_criteria_id: $scope.sparestuff.template.val, mailing_id_a: $scope.currentABTest.mailing_id_a, mailing_id_b: $scope.currentABTest.mailing_id_b});
+          result = crmApi('MailingAB', 'create', {name: $scope.currentABTest.name, id: $scope.abId, testing_criteria_id: $scope.sparestuff.template.val, mailing_id_a: $scope.currentABTest.mailing_id_a, mailing_id_b: $scope.currentABTest.mailing_id_b});
         }
       }
 
@@ -619,15 +655,15 @@
         }
       });
     };
-    $scope.tokenfunc = function(elem,e,chng){
+    $scope.tokenfunc = function (elem, e, chng) {
       var msg = document.getElementById(elem).value;
       var cursorlen = document.getElementById(elem).selectionStart;
-      var textlen   = msg.length;
+      var textlen = msg.length;
       document.getElementById(elem).value = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
       chng = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
       var cursorPos = (cursorlen + e.val.length);
       document.getElementById(elem).selectionStart = cursorPos;
-      document.getElementById(elem).selectionEnd   = cursorPos;
+      document.getElementById(elem).selectionEnd = cursorPos;
       document.getElementById(elem).focus();
     };
 
@@ -658,26 +694,26 @@
         }
       });
 
-      $scope.startabtest = function(){
+      $scope.startabtest = function () {
         if (typeof $scope.sparestuff.date == 'undefined') {
           $scope.sparestuff.date = 'now';
         }
         var result = crmApi('MailingAB', 'send_mail', {id: $scope.abId,
-          scheduled_date : $scope.sparestuff.date , scheduled_date_time: $scope.currentABTest.latertime});
+          scheduled_date: $scope.sparestuff.date, scheduled_date_time: $scope.currentABTest.latertime});
 
       }
 
-      angular.forEach($scope.incGroup, function(value) {
-        $scope.sparestuff.ingrps += value.toString()+", ";
+      angular.forEach($scope.incGroup, function (value) {
+        $scope.sparestuff.ingrps += value.toString() + ", ";
       });
-      angular.forEach($scope.excGroup, function(value) {
-        $scope.sparestuff.excgrps += value.toString()+", ";
+      angular.forEach($scope.excGroup, function (value) {
+        $scope.sparestuff.excgrps += value.toString() + ", ";
       });
-      if($scope.sparestuff.ingrps.length != 0){
-        $scope.sparestuff.ingrps = $scope.sparestuff.ingrps.substr(0,$scope.sparestuff.ingrps.length-2);
+      if ($scope.sparestuff.ingrps.length != 0) {
+        $scope.sparestuff.ingrps = $scope.sparestuff.ingrps.substr(0, $scope.sparestuff.ingrps.length - 2);
       }
-      if($scope.sparestuff.excgrps.length != 0){
-        $scope.sparestuff.excgrps = $scope.sparestuff.excgrps.substr(0,$scope.sparestuff.excgrps.length-2);
+      if ($scope.sparestuff.excgrps.length != 0) {
+        $scope.sparestuff.excgrps = $scope.sparestuff.excgrps.substr(0, $scope.sparestuff.excgrps.length - 2);
       }
 
     }
@@ -691,7 +727,7 @@
         mailing_id_a: $scope.currentABTest.mailing_id_a,
         mailing_id_b: $scope.currentABTest.mailing_id_b,
         mailing_id_c: $scope.currentABTest.mailing_id_c,
-        specific_url :$scope.currentABTest.acturl,
+        specific_url: $scope.currentABTest.acturl,
         winner_criteria_id: $scope.currentABTest.winner_criteria_id,
         group_percentage: $scope.currentABTest.group_percentage,
         declare_winning_time: $scope.currentABTest.declare_winning_time
@@ -703,14 +739,15 @@
         $scope.mailA.msg_template_id = tst;
         if ($scope.mailA.msg_template_id == null) {
           $scope.mailA.body_html = "";
-          $scope.mailA.subject="";
+          $scope.mailA.subject = "";
         }
         else {
           for (var a in $scope.tmpList) {
             if ($scope.tmpList[a].id == $scope.mailA.msg_template_id) {
               $scope.mailA.body_html = $scope.tmpList[a].msg_html;
-              if(typeof $scope.mailA.subject == 'undefined' || $scope.mailA.subject.length == 0)
-              {$scope.mailA.subject=$scope.tmpList[a].msg_subject;}
+              if (typeof $scope.mailA.subject == 'undefined' || $scope.mailA.subject.length == 0) {
+                $scope.mailA.subject = $scope.tmpList[a].msg_subject;
+              }
             }
           }
         }
@@ -720,14 +757,15 @@
           $scope.mailB.msg_template_id = tst;
           if ($scope.mailB.msg_template_id == null) {
             $scope.mailB.body_html = "";
-            $scope.mailB.subject="";
+            $scope.mailB.subject = "";
           }
           else {
             for (var a in $scope.tmpList) {
               if ($scope.tmpList[a].id == $scope.mailB.msg_template_id) {
                 $scope.mailB.body_html = $scope.tmpList[a].msg_html;
-                if(typeof $scope.mailB.subject == 'undefined' || $scope.mailB.subject.length ==0)
-                { $scope.mailB.subject=$scope.tmpList[a].msg_subject;}
+                if (typeof $scope.mailB.subject == 'undefined' || $scope.mailB.subject.length == 0) {
+                  $scope.mailB.subject = $scope.tmpList[a].msg_subject;
+                }
 
               }
             }
@@ -737,14 +775,15 @@
           $scope.mailA.msg_template_id = tst;
           if ($scope.mailA.msg_template_id == null) {
             $scope.mailA.body_html = "";
-            $scope.mailA.subject="";
+            $scope.mailA.subject = "";
           }
           else {
             for (var a in $scope.tmpList) {
               if ($scope.tmpList[a].id == $scope.mailA.msg_template_id) {
                 $scope.mailA.body_html = $scope.tmpList[a].msg_html;
-                if(typeof $scope.mailA.subject == 'undefined' || $scope.mailA.subject.length == 0)
-                {$scope.mailA.subject=$scope.tmpList[a].msg_subject;}
+                if (typeof $scope.mailA.subject == 'undefined' || $scope.mailA.subject.length == 0) {
+                  $scope.mailA.subject = $scope.tmpList[a].msg_subject;
+                }
               }
             }
           }
@@ -752,15 +791,16 @@
           $scope.mailB.msg_template_id = tst;
           if ($scope.mailB.msg_template_id == null) {
             $scope.mailB.body_html = "";
-            $scope.mailB.subject="";
+            $scope.mailB.subject = "";
 
           }
           else {
             for (var a in $scope.tmpList) {
               if ($scope.tmpList[a].id == $scope.mailB.msg_template_id) {
                 $scope.mailB.body_html = $scope.tmpList[a].msg_html;
-                if(typeof $scope.mailB.subject == 'undefined' || $scope.mailB.subject.length == 0)
-                { $scope.mailB.subject=$scope.tmpList[a].msg_subject;}
+                if (typeof $scope.mailB.subject == 'undefined' || $scope.mailB.subject.length == 0) {
+                  $scope.mailB.subject = $scope.tmpList[a].msg_subject;
+                }
 
               }
             }
@@ -770,24 +810,24 @@
     }
 
     /*$scope.tmp = function (tst){
-      $scope.currentMailing.msg_template_id=tst;
-      console.log($scope.currentMailing.msg_template_id+ "sasas");
-      if($scope.currentMailing.msg_template_id == null){
-        $scope.currentMailing.body_html="";
-        $scope.currentMailing.subject="";
-      }
-      else{
-        for(var a in $scope.tmpList){
+     $scope.currentMailing.msg_template_id=tst;
+     console.log($scope.currentMailing.msg_template_id+ "sasas");
+     if($scope.currentMailing.msg_template_id == null){
+     $scope.currentMailing.body_html="";
+     $scope.currentMailing.subject="";
+     }
+     else{
+     for(var a in $scope.tmpList){
 
-          if($scope.tmpList[a].id==$scope.currentMailing.msg_template_id){
-            $scope.currentMailing.body_html=$scope.tmpList[a].msg_html;
-            console.log($scope.tmpList[a].msg_subject);
-            $scope.currentMailing.subject=$scope.tmpList[a].msg_subject;
-            console.log($scope.currentMailing.subject);
-          }
-        }
-      }
-    };*/
+     if($scope.tmpList[a].id==$scope.currentMailing.msg_template_id){
+     $scope.currentMailing.body_html=$scope.tmpList[a].msg_html;
+     console.log($scope.tmpList[a].msg_subject);
+     $scope.currentMailing.subject=$scope.tmpList[a].msg_subject;
+     console.log($scope.currentMailing.subject);
+     }
+     }
+     }
+     };*/
 
 
     $scope.$watch('preview', function () {
@@ -799,7 +839,7 @@
           closed: false,
           cache: false,
           modal: true,
-          position : {
+          position: {
             my: 'left',
             at: 'top',
             of: $(".crmABTestingAllTabs")
@@ -816,16 +856,16 @@
 
     }, true);
 
-    $scope.call = function(){
+    $scope.call = function () {
       $scope.$apply();
-      var result = crmApi('Mailing','send_test',{
-        mailing_id : $scope.currentABTest.mailing_id_a,
-        test_email : $scope.sparestuff.emailadd
+      var result = crmApi('Mailing', 'send_test', {
+        mailing_id: $scope.currentABTest.mailing_id_a,
+        test_email: $scope.sparestuff.emailadd
       });
 
-      var result = crmApi('Mailing','send_test',{
-        mailing_id : $scope.currentABTest.mailing_id_b,
-        test_email : $scope.sparestuff.emailadd
+      var result = crmApi('Mailing', 'send_test', {
+        mailing_id: $scope.currentABTest.mailing_id_b,
+        test_email: $scope.sparestuff.emailadd
       })
     }
 
@@ -869,8 +909,9 @@
         var myarr = new Array(1, 2, 3)
 
         // disable remaining tabs
-        if(scope.sparestuff.isnew == true)
-        tabselector.tabs({disabled: myarr});
+        if (scope.sparestuff.isnew == true) {
+          tabselector.tabs({disabled: myarr});
+        }
 
         $(element).on("click", function () {
           if (scope.tab_val == 0) {
@@ -1216,26 +1257,68 @@
     };
   });
 
-  crmMailingAB.directive('groupselect',function(){
+  crmMailingAB.directive('groupselect', function () {
     return {
-      restrict : 'AE',
-      link: function(scope,element, attrs){
-        $(element).select2({width:"200px", data: mltokens, placeholder:"Insert Token"});
-        $(element).on('select2-selecting', function(e) {
+      restrict: 'AE',
+      link: function (scope, element, attrs) {
+        $(element).select2({width: "200px", data: mltokens, placeholder: "Insert Token"});
+        $(element).on('select2-selecting', function (e) {
 
           scope.$evalAsync('_resetSelection()');
           var a = $(element).attr('id');
-          if(a=="htgroupcompose"){scope.tokenfunc("body_html",e,scope.mailA.body_html);}
-          else if(a=="htgroupcomposetwob"){scope.tokenfunc("twomailbbody_html",e,scope.mailB.body_html);}
-          else if(a=="htgroupcomposetwoa"){scope.tokenfunc("twomailabody_html",e,scope.mailA.body_html);}
-          else if(a=="textgroupcompose"){scope.tokenfunc("body_text",e,scope.mailA.body_text);}
-          else if(a=="textgroupcomposetwoa"){scope.tokenfunc("twomailabody_text",e,scope.mailA.body_text);}
-          else if(a=="textgroupcomposetwob"){scope.tokenfunc("twomailbbody_text",e,scope.mailB.body_text);}
-          else if(a=="subgroupsuba"){scope.tokenfunc("suba",e,scope.mailA.subject);}
-          else if(a=="subgroupsubb"){scope.tokenfunc("subb",e,scope.mailB.subject);}
-          else if(a=="subgroupfrom"){scope.tokenfunc("subfrom",e,scope.mailA.subject);}
-          else if(a=="subgrouptwoa"){scope.tokenfunc("twomaila",e,scope.mailA.subject);}
-          else if(a=="subgrouptwob"){scope.tokenfunc("twomailb",e,scope.mailB.subject);}
+          if (a == "htgroupcompose") {
+            scope.tokenfunc("body_html", e, scope.mailA.body_html);
+          }
+          else {
+            if (a == "htgroupcomposetwob") {
+              scope.tokenfunc("twomailbbody_html", e, scope.mailB.body_html);
+            }
+            else {
+              if (a == "htgroupcomposetwoa") {
+                scope.tokenfunc("twomailabody_html", e, scope.mailA.body_html);
+              }
+              else {
+                if (a == "textgroupcompose") {
+                  scope.tokenfunc("body_text", e, scope.mailA.body_text);
+                }
+                else {
+                  if (a == "textgroupcomposetwoa") {
+                    scope.tokenfunc("twomailabody_text", e, scope.mailA.body_text);
+                  }
+                  else {
+                    if (a == "textgroupcomposetwob") {
+                      scope.tokenfunc("twomailbbody_text", e, scope.mailB.body_text);
+                    }
+                    else {
+                      if (a == "subgroupsuba") {
+                        scope.tokenfunc("suba", e, scope.mailA.subject);
+                      }
+                      else {
+                        if (a == "subgroupsubb") {
+                          scope.tokenfunc("subb", e, scope.mailB.subject);
+                        }
+                        else {
+                          if (a == "subgroupfrom") {
+                            scope.tokenfunc("subfrom", e, scope.mailA.subject);
+                          }
+                          else {
+                            if (a == "subgrouptwoa") {
+                              scope.tokenfunc("twomaila", e, scope.mailA.subject);
+                            }
+                            else {
+                              if (a == "subgrouptwob") {
+                                scope.tokenfunc("twomailb", e, scope.mailB.subject);
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
 
 
           scope.$apply();
@@ -1245,12 +1328,12 @@
     };
   });
 
-  crmMailingAB.directive('stopa',function(){
+  crmMailingAB.directive('stopa', function () {
     return {
-      restrict :'AE',
-      link: function(scope,element,attrs){
+      restrict: 'AE',
+      link: function (scope, element, attrs) {
         scope.$watch('aastop', function () {
-          if(scope.aastop == true ){
+          if (scope.aastop == true) {
             $(element).dialog({
               title: 'Confirmation',
               width: 300,
@@ -1264,13 +1347,13 @@
                   scope.copyatoc();
                   $(element).dialog("close");
                 },
-                'No':function(){
-                    scope.aastop = false;
+                'No': function () {
+                  scope.aastop = false;
                   $(element).dialog("close");
                 }
               },
               close: function () {
-                  scope.aastop = false;
+                scope.aastop = false;
 
                 scope.$apply();
               }
@@ -1281,49 +1364,49 @@
     }
   });
 
-  crmMailingAB.directive('stopb',function(){
+  crmMailingAB.directive('stopb', function () {
     return {
-      restrict :'AE',
-      link: function(scope,element,attrs){
+      restrict: 'AE',
+      link: function (scope, element, attrs) {
 
-              scope.$watch('bbstop', function () {
-                if(scope.bbstop == true ){
-                  $(element).dialog({
-                    title: 'Confirmation',
-                    width: 300,
-                    height: 150,
-                    closed: false,
-                    cache: false,
-                    modal: true,
-                    buttons: {
-                      'Yes': function () {
-                        scope.bbstop = false;
-                        scope.sendc();
-                        $(element).dialog("close");
-                      },
-                      'No':function(){
-                        scope.bbstop = false;
-                        $(element).dialog("close");
-                      }
-                    },
-                    close: function () {
-                      scope.bbstop = false;
-
-                      scope.$apply();
-                    }
-                  });
+        scope.$watch('bbstop', function () {
+          if (scope.bbstop == true) {
+            $(element).dialog({
+              title: 'Confirmation',
+              width: 300,
+              height: 150,
+              closed: false,
+              cache: false,
+              modal: true,
+              buttons: {
+                'Yes': function () {
+                  scope.bbstop = false;
+                  scope.sendc();
+                  $(element).dialog("close");
+                },
+                'No': function () {
+                  scope.bbstop = false;
+                  $(element).dialog("close");
                 }
-              });
+              },
+              close: function () {
+                scope.bbstop = false;
+
+                scope.$apply();
+              }
+            });
+          }
+        });
       }
     }
   });
 
 
-  crmMailingAB.directive('checktimeentry',function(){
+  crmMailingAB.directive('checktimeentry', function () {
     return {
-      restrict :'AE',
+      restrict: 'AE',
       link: function (scope, element, attrs) {
-      $(element).timeEntry({show24Hours:true});
+        $(element).timeEntry({show24Hours: true});
       }
     }
   });
