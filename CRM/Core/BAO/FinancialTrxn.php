@@ -385,7 +385,12 @@ WHERE ceft.entity_id = %1";
     $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));
     $domainId = CRM_Core_Config::domainID();
     $amount = 0;
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     if (!empty($params['prevContribution'])) {
+      if ($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses) ||
+        $params['contribution']->contribution_status_id == array_search('Refund', $contributionStatuses)) {
+        return FALSE;
+      }
       $amount = $params['prevContribution']->fee_amount;
     }
     $amount = $params['fee_amount'] - $amount;
