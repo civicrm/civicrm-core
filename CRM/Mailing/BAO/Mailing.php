@@ -2576,7 +2576,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $form->add('select', 'template', ts('Select Template'),
         array(
           '' => ts('- select -')) + $form->_templates, FALSE,
-        array('onChange' => "selectValue( this.value );")
+        array('onChange' => "selectValue( this.value,'' );")
       );
       $form->add('checkbox', 'updateTemplate', ts('Update Template'), NULL);
     }
