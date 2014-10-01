@@ -392,8 +392,8 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
     }
     elseif ($entity == 'contribution') {
       $sql .= "
-      FROM civicrm_contribution       con
-LEFT JOIN civicrm_contribution_recur rec
+      FROM civicrm_contribution con
+LEFT JOIN civicrm_contribution_recur rec ON ( con.contribution_recur_id = rec.id )
 LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
      WHERE con.id = %1";
     }
