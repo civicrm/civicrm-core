@@ -600,7 +600,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('source', 'Event StandaloneAddTest Webtest');
 
     // Select an event fee
-    $this->waitForElementPresent('priceset');
+    $this->waitForElementPresent("xpath=//div[@id='priceset']/div[2]/div[2]");
     $this->type("//div[@id='priceset']/div[2]/div[2]/input", '5');
     $this->fireEvent("//div[@id='priceset']/div[2]/div[2]/input", 'blur');
     $this->click("xpath=//div[@id='priceset']/div[3]/div[2]/div[1]/span/input");
