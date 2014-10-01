@@ -1,11 +1,11 @@
 <form name="tab1Form" unsaved-warning-form>
   <div class="crm-block crm-form-block crmABTesting">
-    <h3> What would you like to name the Test?</h3><br>
-    <input type="text" ng-model="currentABTest.name" name="abname" class="big crm-form-text" required>
+    <br><h3> What would you like to name the Test?</h3><p>
+    &nbsp&nbsp<input type="text" ng-model="currentABTest.name" name="abname" class="big crm-form-text" required>
     <span ng-show="(!currentABTest.name.length && !tab1Form.abname.$pristine)">  *This field is required</span>
-    <br><br>
+    <br>
 
-    <h3> What would you like to test?</h3><br><br>
+    <h3> What would you like to test?</h3>
     <label for="radio-option-subject-lines">
       &nbsp <input id="radio-option-subject-lines" type="radio" ng-model="sparestuff.template" ng-value="templates[0]" ng-click="init(2)"
                  ng-checked="currentABTest.testing_criteria_id==1" >
