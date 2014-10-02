@@ -85,12 +85,12 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
     $this->addEntityRef('reassign_contact_id', ts('Select Contact'), array('create' => TRUE), TRUE);
     $this->addButtons(array(
       array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
-      array(
         'type' => 'done',
         'name' => ts('Reassign Case'),
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
       ),
     ));
 
