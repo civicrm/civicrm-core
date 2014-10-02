@@ -720,8 +720,8 @@ function civicrm_api3_contact_getquick($params) {
   //CRM-10687
   if (!empty($params['field_name']) && !empty($params['table_name'])) {
     $table_name = CRM_Utils_String::munge($params['table_name']);
-    $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch')";
-    $exactWhereClause = " WHERE ( $table_name.$field_name = '$name')";
+    $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch') {$where}";
+    $exactWhereClause = " WHERE ( $table_name.$field_name = '$name') {$where}";
     // Search by id should be exact
     if ($field_name == 'id' || $field_name == 'external_identifier') {
       $whereClause = $exactWhereClause;
