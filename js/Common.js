@@ -808,19 +808,19 @@ CRM.strings = CRM.strings || {};
       settings.buttons = _.sortBy(buttons, 'data-op').reverse();
     }
     url = settings.url;
-    msg = settings.message;
+    msg = url ? '' : settings.message;
     delete settings.options;
     delete settings.message;
     delete settings.url;
-    dialog = $('<div class="crm-confirm-dialog"></div>').dialog(settings);
+    dialog = $('<div class="crm-confirm-dialog"></div>').html(msg || '').dialog(settings);
     if ($.isFunction(options)) {
       dialog.on('crmConfirm:yes', options);
     }
     if (url) {
       CRM.loadPage(url, {target: dialog});
     }
-    else if (msg && msg.length) {
-      dialog.html(msg).trigger('crmLoad');
+    else {
+      dialog.trigger('crmLoad');
     }
     return dialog;
   };
