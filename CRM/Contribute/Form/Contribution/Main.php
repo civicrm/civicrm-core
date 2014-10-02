@@ -390,7 +390,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     // Build payment processor form
-    if ($this->_ppType && empty($_GET['onbehalf'])) {
+    if (($this->_ppType || $this->_isBillingAddressRequiredForPayLater) && empty($_GET['onbehalf'])) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
       // Return if we are in an ajax callback
       if ($this->_snippet) {
@@ -1054,7 +1054,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     // also return if paylater mode
-    if (CRM_Utils_Array::value('payment_processor', $fields) == 0) {
+    if (CRM_Utils_Array::value('payment_processor', $fields) == 0 && $self->_isBillingAddressRequiredForPayLater == 0) {
       return empty($errors) ? TRUE : $errors;
     }
 
@@ -1278,10 +1278,16 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $component = 'membership';
       }
       CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetId], $component);
+      if ($params['tax_amount']) {
+        $this->set('tax_amount', $params['tax_amount']);
+      }
 
       if ($proceFieldAmount) {
-        $lineItem[$params['priceSetId']][$fieldOption]['line_total'] = $proceFieldAmount;
         $lineItem[$params['priceSetId']][$fieldOption]['unit_price'] = $proceFieldAmount;
+        $lineItem[$params['priceSetId']][$fieldOption]['line_total'] = $proceFieldAmount;
+        if (isset($lineItem[$params['priceSetId']][$fieldOption]['tax_amount'])) {
+          $proceFieldAmount += $lineItem[$params['priceSetId']][$fieldOption]['tax_amount'];
+        }
         if (!$this->_membershipBlock['is_separate_payment']) {
           $params['amount'] = $proceFieldAmount; //require when separate membership not used
         }

@@ -94,6 +94,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'receive_date' => (CRM_Utils_Array::value('receive_date', $params)) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
       'non_deductible_amount' => $nonDeductibleAmount,
       'total_amount' => $params['amount'],
+      'tax_amount' => CRM_Utils_Array::value('tax_amount', $params),
       'amount_level' => CRM_Utils_Array::value('amount_level', $params),
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
@@ -251,6 +252,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
       $this->_params['amount'] = $this->get('amount');
+      $this->_params['tax_amount'] = $this->get('tax_amount');
 
       $this->_useForMember = $this->get('useForMember');
 
@@ -467,6 +469,24 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $amount_block_is_active = $this->get('amount_block_is_active');
     $this->assign('amount_block_is_active', $amount_block_is_active);
 
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    if ($invoicing) {
+      $getTaxDetails = FALSE;
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      foreach ($this->_lineItem as $key => $value) {
+        foreach ($value as $v) {
+          if (isset($v['tax_rate'])) {
+            if ($v['tax_rate'] != '') {
+              $getTaxDetails = TRUE;
+            }
+          }
+        }
+      }
+      $this->assign('getTaxDetails', $getTaxDetails);
+      $this->assign('taxTerm', $taxTerm);
+      $this->assign('totalTaxAmount', $params['tax_amount']);
+    }
     if (!empty($params['selectProduct']) && $params['selectProduct'] != 'no_thanks') {
       $option = CRM_Utils_Array::value('options_' . $params['selectProduct'], $params);
       $productID = $params['selectProduct'];
@@ -695,7 +715,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     //unset the billing parameters if it is pay later mode
     //to avoid creation of billing location
-    if ($params['is_pay_later']) {
+    if ($params['is_pay_later'] && !$this->_isBillingAddressRequiredForPayLater) {
       $billingFields = array(
         'billing_first_name',
         'billing_middle_name',
@@ -1275,6 +1295,28 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $recurringContributionID, $isTest, $addressID, $contribSoftContactId, $lineItems
       );
       $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
+
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+      if ($invoicing) {
+        $totalTaxAmount = 0;
+        $dataArray = array();
+        foreach ($form->_lineItem as $lineItemKey => $lineItemValue) {
+          foreach ($lineItemValue as $key => $value) {
+            if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
+              if (isset($dataArray[$value['tax_rate']])) {
+                $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
+              }
+              else {
+                $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
+              }
+            }
+          }
+        }
+        $smarty = CRM_Core_Smarty::singleton();
+        $smarty->assign('dataArray', $dataArray);
+        $smarty->assign('totalTaxAmount', $params['tax_amount']);
+      }
       if (is_a($contribution, 'CRM_Core_Error')) {
         $message = CRM_Core_Error::getMessages($contribution);
         CRM_Core_Error::fatal($message);

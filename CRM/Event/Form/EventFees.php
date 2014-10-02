@@ -377,8 +377,17 @@ SELECT  id, html_type
       CRM_Event_Form_Registration::initEventFee($form, $event['id']);
       CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->_discountId);
       $lineItem = array();
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+      $totalTaxAmount = 0;
       if (!CRM_Utils_System::isNull(CRM_Utils_Array::value('line_items', $form->_values))) {
         $lineItem[] = $form->_values['line_items'];
+        foreach ($form->_values['line_items'] as $key => $value) {
+          $totalTaxAmount = $value['tax_amount'] + $totalTaxAmount;
+        }
+      }
+      if ($invoicing) {
+        $form->assign('totalTaxAmount', $totalTaxAmount);
       }
       $form->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
       $discounts = array();

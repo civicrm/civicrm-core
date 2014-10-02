@@ -441,6 +441,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       return CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
 
+    $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
     // build price set form.
     $buildPriceSet = FALSE;
     if ($this->_priceSetId || !empty($_POST['price_set_id'])) {
@@ -1126,6 +1127,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     if ($priceSetId) {
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $this->_params, $lineItem[$priceSetId]);
+      if (CRM_Utils_Array::value('tax_amount', $this->_params)) {
+        $params['tax_amount'] = $this->_params['tax_amount'];
+      }
       $params['total_amount'] = CRM_Utils_Array::value('amount', $this->_params);
       $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues);
       if (!empty($lineItem[$priceSetId])) {
@@ -1273,10 +1277,13 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
 
       if (!$this->_onlinePendingContributionId) {
-        $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)',
-          array(1 => $membershipType, 2 => $userName)
-        );
-      }
+        if (empty($formValues['source'])) {
+          $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', array(1 => $membershipType, 2 => $userName));
+        }
+        else {
+          $params['contribution_source'] = $formValues['source'];	
+        }
+      }	
 
       if (empty($params['is_override']) &&
         CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
@@ -1640,6 +1647,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     if (!empty($lineItem[$priceSetId])) {
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+      $taxAmount = FALSE;
+      $totalTaxAmount = 0;
       foreach ($lineItem[$priceSetId] as & $priceFieldOp) {
         if (!empty($priceFieldOp['membership_type_id'])) {
           $priceFieldOp['start_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'], '%B %E%f, %Y') : '-';
@@ -1648,6 +1659,27 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         else {
           $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
         }
+        if ($invoicing && isset($priceFieldOp['tax_amount'])) {
+          $taxAmount = TRUE;
+          $totalTaxAmount += $priceFieldOp['tax_amount'];
+        }
+      }
+      if ($invoicing) {
+        $dataArray = array();
+        foreach ($lineItem[$priceSetId] as $key => $value) {
+          if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
+            if (isset($dataArray[$value['tax_rate']])) {
+              $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
+            } else {
+              $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
+            }
+          } 
+        }
+        if ($taxAmount) {
+          $this->assign('totalTaxAmount', $totalTaxAmount);
+          $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
+        }
+        $this->assign('dataArray', $dataArray);
       }
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
@@ -1871,6 +1903,17 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $form->_receiptContactId = $formValues['contact_id'];
       }
     }
+    $template = CRM_Core_Smarty::singleton( );
+    $taxAmt = $template->get_template_vars('dataArray');
+    $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
+    $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+    if ((!empty($taxAmt) || isset($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+      $isEmailPdf = True;
+    }
+    else {
+      $isEmailPdf = False;
+    }
 
     list($mailSend, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       array(
@@ -1880,6 +1923,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         'from' => $receiptFrom,
         'toName' => $form->_contributorDisplayName,
         'toEmail' => $form->_contributorEmail,
+        'PDFFilename' => ts('receipt').'.pdf',
+        'isEmailPdf' => $isEmailPdf,
+        'contributionId' => $formValues['contribution_id'],
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW)
       )
     );
