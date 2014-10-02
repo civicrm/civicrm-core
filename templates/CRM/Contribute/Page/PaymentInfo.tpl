@@ -37,7 +37,13 @@ CRM.$(function($) {
       }
     });
 
-    $('.total_amount-section').remove();
+    var taxAmount = "{$totalTaxAmount}";
+    if (taxAmount) {
+      $('.total_amount-section').show();
+    }
+    else {
+      $('.total_amount-section').remove();
+    }
   }
 });
 </script>

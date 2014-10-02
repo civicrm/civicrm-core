@@ -179,10 +179,17 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
     $participantCount = array();
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $totalTaxAmount = 0;
     foreach ($lineItem as $k => $v) {
       if (CRM_Utils_Array::value('participant_count', $lineItem[$k]) > 0) {
         $participantCount[] = $lineItem[$k]['participant_count'];
       }
+      $totalTaxAmount = $v['tax_amount'] + $totalTaxAmount;
+    }
+    if ($invoicing) {
+      $this->assign('totalTaxAmount', $totalTaxAmount);
     }
     if ($participantCount) {
       $this->assign('pricesetFieldsCount', $participantCount);

@@ -455,4 +455,12 @@
     <comment>Can people share the contribution page through social media?</comment>
     <add>4.1</add>
   </field>
+  <field>
+    <name>is_billing_required</name>
+    <title>Is billing block required</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - billing block is required for online contribution page</comment>
+    <add>4.6</add>
+  </field>
 </table>

@@ -1276,6 +1276,10 @@ AND civicrm_membership.is_test = %2";
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = array();
 
+    if (CRM_Utils_Array::value('membership_source', $form->_params)) {
+      $membershipParams['contribution_source'] = $form->_params['membership_source'];
+    }
+
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $premiumParams, $contactID,
@@ -2826,7 +2830,7 @@ WHERE      civicrm_membership.is_test = 0";
       'contact_id', 'total_amount', 'receive_date', 'financial_type_id',
       'payment_instrument_id', 'trxn_id', 'invoice_id', 'is_test',
       'contribution_status_id', 'check_number', 'campaign_id', 'is_pay_later',
-      'membership_id', 'skipLineItem'
+      'membership_id', 'tax_amount', 'skipLineItem'
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);

@@ -717,7 +717,7 @@ WHERE  id = %1";
    */
   static function processAmount(&$fields, &$params, &$lineItem, $component = '') {
     // using price set
-    $totalPrice = 0;
+    $totalPrice = $totalTax = 0;
     $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
     if ($component) {
       $autoRenew = array();
@@ -736,7 +736,21 @@ WHERE  id = %1";
           $firstOption = reset($field['options']);
           $params["price_{$id}"] = array($firstOption['id'] => $params["price_{$id}"]);
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
-          $totalPrice += $lineItem[$firstOption['id']]['line_total'];
+          if (CRM_Utils_Array::value('tax_rate', $field['options'][key($field['options'])])) {
+            $lineItem = self::setLineItem($field, $lineItem, key($field['options']));
+            $totalTax += $field['options'][key($field['options'])]['tax_amount'] * $lineItem[key($field['options'])]['qty'];
+          }
+          if (CRM_Utils_Array::value('name', $field['options'][key($field['options'])]) == 'contribution_amount') {
+            $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+            if (array_key_exists($params['financial_type_id'], $taxRates)) {
+              $field['options'][key($field['options'])]['tax_rate'] = $taxRates[$params['financial_type_id']];
+              $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($field['options'][key($field['options'])]['amount'], $field['options'][key($field['options'])]['tax_rate']);
+              $field['options'][key($field['options'])]['tax_amount'] = round($taxAmount['tax_amount'], 2);
+              $lineItem = self::setLineItem($field, $lineItem, key($field['options']));
+              $totalTax += $field['options'][key($field['options'])]['tax_amount'] * $lineItem[key($field['options'])]['qty'];
+            }
+          }
+          $totalPrice += $lineItem[$firstOption['id']]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[key($field['options'])]);
           break;
 
         case 'Radio':
@@ -758,7 +772,14 @@ WHERE  id = %1";
             $radioLevel = array_keys($params['amount_priceset_level_radio']);
           }
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
-          $totalPrice += $lineItem[$optionValueId]['line_total'];
+          if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
+            $lineItem = self::setLineItem($field, $lineItem, $optionValueId);
+            $totalTax += $field['options'][$optionValueId]['tax_amount'];
+            if (CRM_Utils_Array::value('field_title', $lineItem[$optionValueId]) == 'Membership Amount') {
+              $lineItem[$optionValueId]['line_total'] = $lineItem[$optionValueId]['unit_price'] = CRM_Utils_Rule::cleanMoney($lineItem[$optionValueId]['line_total'] - $lineItem[$optionValueId]['tax_amount']);
+            }
+          }
+          $totalPrice += $lineItem[$optionValueId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionValueId]);
           if (
             $component &&
             // auto_renew exists and is empty in some workflows, which php treat as a 0
@@ -783,7 +804,11 @@ WHERE  id = %1";
             $selectLevel = array_keys($params['amount_priceset_level_select']);
           }
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
-          $totalPrice += $lineItem[$optionValueId]['line_total'];
+          if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
+            $lineItem = self::setLineItem($field, $lineItem, $optionValueId);
+            $totalTax += $field['options'][$optionValueId]['tax_amount'];
+          }
+          $totalPrice += $lineItem[$optionValueId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionValueId]);
           if (
             $component &&
             isset($lineItem[$optionValueId]['auto_renew']) &&
@@ -812,7 +837,11 @@ WHERE  id = %1";
           }
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           foreach ($optionIds as $optionId) {
-            $totalPrice += $lineItem[$optionId]['line_total'];
+            if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionId])) {
+              $lineItem = self::setLineItem($field, $lineItem, $optionId);
+              $totalTax += $field['options'][$optionId]['tax_amount'];
+            }
+            $totalPrice += $lineItem[$optionId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionId]);
             if (
               $component &&
               isset($lineItem[$optionId]['auto_renew']) &&
@@ -844,6 +873,7 @@ WHERE  id = %1";
     }
     $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
     $params['amount'] = $totalPrice;
+    $params['tax_amount'] = $totalTax;
     if ($component) {
       foreach ($autoRenew as $dontCare => $eachAmount) {
         if (!$eachAmount) {
@@ -1373,6 +1403,25 @@ WHERE       ps.id = %1
         }
       }
     }
+  }
+
+  /*
+   * Function to set tax_amount and tax_rate in LineItem
+   *
+   *
+   */
+  static function setLineItem($field, $lineItem, $optionValueId) {
+    if ($field['html_type'] == 'Text') {
+      $taxAmount = $field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'];
+    }
+    else {
+      $taxAmount = $field['options'][$optionValueId]['tax_amount'];
+    }
+    $taxRate = $field['options'][$optionValueId]['tax_rate'];
+    $lineItem[$optionValueId]['tax_amount'] = $taxAmount;
+    $lineItem[$optionValueId]['tax_rate'] = $taxRate;
+
+    return $lineItem;
   }
 }
 

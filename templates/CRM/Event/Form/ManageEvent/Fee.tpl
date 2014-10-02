@@ -102,6 +102,10 @@
                 </td>
             </tr>
 
+            <tr>
+               <td class="extra-long-fourty label">{$form.is_billing_required.html}</td>
+               <td>{$form.is_billing_required.label}</td>
+            </tr>
         </table>
 
         <table id="contributionType" class="form-layout">
@@ -122,7 +126,7 @@
             </tr>
             <tr>
                <td>&nbsp;</td>
-               <td class="description">{ts}This financial type will be assigned to payments made by participants when they register online.{/ts}
+               <td class="description">{ts}This financial type will be assigned to payments made by participants when they register online. If using a price set below note that the contribution record will have this financial type, however line items will be processed using the actual financial type selected for the price set item.{/ts}
                </td>
             </tr>
         </table>
