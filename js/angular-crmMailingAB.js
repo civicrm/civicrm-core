@@ -579,10 +579,7 @@
 
         $(element).on("click", function () {
           if (scope.tab_val == 0) {
-
             scope.create_abtest();
-
-
           }
           else {
             if (scope.tab_val == 2) {
@@ -606,7 +603,6 @@
               scope.a_b_update();
             }
           }
-
           scope.tab_upd();
 
           var myArray1 = [];
@@ -983,7 +979,6 @@
             }
           }
 
-
           scope.$apply();
           e.preventDefault();
         })
@@ -991,7 +986,48 @@
     };
   });
 
-  crmMailingAB.directive('stopa', function () {
+  crmMailingAB.directive('replytoselect',function(){
+    return {
+      restrict : 'AE',
+      link: function(scope, element, attrs){
+          
+        function format(item){ 
+            return item.label.replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        }
+          
+        CRM.api3('OptionGroup', 'get', {
+          "sequential": 1,
+          "name": "from_email_address"
+        }).done(function(result) {
+          var emailGroupId = result.id;
+          console.log(result);
+           CRM.api3('OptionValue', 'get', {
+            "sequential": 1,
+            "option_group_id": result.id
+          }).done(function(orgEmails) {
+              console.log(orgEmails);
+              
+              //$sce.trustAsHtml(
+          
+            $(element).select2({width:"200px", 
+                data: orgEmails.values,           
+                formatResult: format,
+              formatSelection: format,
+              placeholder:"Select reply to address"});
+          
+          });
+          
+        });  
+                    
+
+      }
+    };
+  });
+
+  crmMailingAB.directive('stopa',function(){
     return {
       restrict: 'AE',
       link: function (scope, element, attrs) {

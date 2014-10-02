@@ -11,10 +11,8 @@
   <tr>
     <td class="label">Reply to E-mail Address</td>
     <td>
-      <select style="width: 200px" ng-model="mailA.replyto_email"
-              ng-options="frm.email as frm.email for frm in eMailing" >
-        <option value="">-none-</option>
-      </select>
+      <input type="hidden" replytoselect id= "replyToEmail"   ng-model="mailA.replyto_email"
+              ng-options="frm.email as frm.email for frm in eMailing" />
     </td>
   </tr>
   <tr>
