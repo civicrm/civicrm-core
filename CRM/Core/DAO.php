@@ -450,11 +450,15 @@ class CRM_Core_DAO extends DB_DataObject {
   function save() {
     if (!empty($this->id)) {
       $this->update();
-      CRM_Core_BAO_RecurringEntity::triggerUpdate($this);
+
+      $event = new \Civi\Core\DAO\Event\PostUpdate($this);
+      \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("DAO::post-update", $event);
     }
     else {
       $this->insert();
-      CRM_Core_BAO_RecurringEntity::triggerSave($this);
+
+      $event = new \Civi\Core\DAO\Event\PostUpdate($this);
+      \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("DAO::post-insert", $event);
     }
     $this->free();
 
@@ -465,9 +469,10 @@ class CRM_Core_DAO extends DB_DataObject {
 
   function delete($useWhere = FALSE) {
     $result = parent::delete($useWhere);
-    if ($result) {
-      CRM_Core_BAO_RecurringEntity::triggerDelete($this);
-    }
+
+    $event = new \Civi\Core\DAO\Event\PostDelete($this);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("DAO::post-delete", $event);
+
     return $result;
   }
 

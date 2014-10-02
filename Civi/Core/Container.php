@@ -93,6 +93,9 @@ class Container {
     $dispatcher->addListener('hook_civicrm_post::Case', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\Events', 'delegateToXmlListeners'));
     $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\SequenceListener', 'onCaseChange_static'));
+    $dispatcher->addListener('DAO::post-insert', array('\CRM_Core_BAO_RecurringEntity', 'triggerInsert'));
+    $dispatcher->addListener('DAO::post-update', array('\CRM_Core_BAO_RecurringEntity', 'triggerUpdate'));
+    $dispatcher->addListener('DAO::post-delete', array('\CRM_Core_BAO_RecurringEntity', 'triggerDelete'));
     return $dispatcher;
   }
 

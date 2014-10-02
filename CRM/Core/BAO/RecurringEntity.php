@@ -483,14 +483,14 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * This function acts as a listener to dao->update whenever there is an update,
    * and propagates any changes to all related entities present in recurring entity table
    * 
-   * @param object $obj An object containing data that needs to be updated
+   * @param object $event An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just updated
    *   
    * @access public
    * @static
    *                          
    * @return void
    */
-  static public function triggerUpdate($obj) {
+  static public function triggerUpdate($event) {
     // if DB version is earlier than 4.6 skip any processing
     static $currentVer = NULL;
     if (!$currentVer) {
@@ -501,6 +501,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
 
     static $processedEntities = array();
+    $obj =& $event->object;
     if (empty($obj->id) || empty($obj->__table)) {
       return FALSE;
     }
@@ -554,14 +555,15 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * This function acts as a listener to dao->save,
    * and creates entries for linked entities in recurring entity table
    * 
-   * @param object $obj An object containing data that needs to be updated
+   * @param object $event An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just inserted
    *   
    * @access public
    * @static
    *                          
    * @return void
    */
-  static public function triggerSave($obj) {
+  static public function triggerInsert($event) {
+    $obj =& $event->object;
     if (!array_key_exists($obj->__table, self::$_linkedEntitiesInfo)) {
       return FALSE;
     }
@@ -643,14 +645,14 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function acts as a listener to dao->delete, and deletes an entry from recurring_entity table
    * 
-   * @param object $obj An object containing data that needs to be updated
+   * @param object $event An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just deleted
    *
    * @access public
    * @static
    *                          
    * @return void
    */
-  static public function triggerDelete($obj){
+  static public function triggerDelete($event){
     // if DB version is earlier than 4.6 skip any processing
     static $currentVer = NULL;
     if (!$currentVer) {
@@ -661,6 +663,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
 
     static $processedEntities = array();
+    $obj =& $event->object;
     if (empty($obj->id) || empty($obj->__table)) {
       return FALSE;
     }
