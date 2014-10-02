@@ -30,10 +30,10 @@ class CRM_Core_Page_AJAX_RecurringEntity {
       $dao = new CRM_Core_DAO_RecurringEntity();
       if(!empty($result)){
         $dao->entity_id = $result['entityId'];
-        $dao->entityTable = $result['entityTable'];
+        $dao->entity_table = $result['entityTable'];
       }else{
         $dao->entity_id = $entityId;
-        $dao->entityTable = $entityTable;
+        $dao->entity_table = $entityTable;
       }
       
       if($dao->find(TRUE)){
