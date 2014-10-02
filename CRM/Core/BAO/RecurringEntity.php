@@ -592,8 +592,9 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     $processedEntities[$key] = 1;
 
     // get related entities for table being saved
-    $repeatingEntities = self::getEntitiesFor($obj->id, $obj->__table, FALSE, NULL);
-    if (empty($repeatingEntities)) {
+    $hasaRecurringRecord = self::getParentFor($obj->id, $obj->__table);
+
+    if (empty($hasaRecurringRecord)) {
       // check if its a linked entity
       if (array_key_exists($obj->__table, self::$_linkedEntitiesInfo)) {
         $linkedDAO = new self::$_tableDAOMapper[$obj->__table]();
@@ -606,11 +607,23 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           $pEntityTable = $linkedDAO->$tableCol;
           
           // find all parent recurring entity set
-          $pRepeatingEntities = self::getEntitiesFor($pEntityID, $pEntityTable, FALSE, NULL);
+          $pRepeatingEntities = self::getEntitiesFor($pEntityID, $pEntityTable);
 
           if (!empty($pRepeatingEntities)) {
             // for each parent entity in the set, find out a similar linked entity,
             // if doesn't exist create one, and also create entries in recurring_entity table
+
+            foreach($pRepeatingEntities as $key => $val) {
+              if (array_key_exists($key, $processedEntities)) {
+                // this graph is already being processed
+                return NULL;
+              }
+              $processedEntities[$key] = 1;
+            }
+
+            // start with first entry with just itself
+            CRM_Core_BAO_RecurringEntity::quickAdd($obj->id, $obj->id, $obj->__table);
+
             foreach($pRepeatingEntities as $key => $val) {
               $rlinkedDAO = new self::$_tableDAOMapper[$obj->__table]();
               $rlinkedDAO->$idCol = $val['id'];
