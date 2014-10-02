@@ -2289,8 +2289,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    */
   function checkForErrorsOnPage() {
     foreach (array('Access denied', 'Page not found') as $err) {
-      if ($this->isElementPresent("xpath=//h1[text()='$err']")) {
-        $this->fail("\"$err\" encountered at " . $this->getLocation());
+      if ($this->isElementPresent("xpath=//h1[contains(., '$err')]")) {
+        $this->fail("'$err' encountered at " . $this->getLocation() . "\nwhile logged in as '{$this->loggedInAs}'");
       }
     }
     if ($this->isElementPresent("xpath=//span[text()='Sorry but we are not able to provide this at the moment.']")) {

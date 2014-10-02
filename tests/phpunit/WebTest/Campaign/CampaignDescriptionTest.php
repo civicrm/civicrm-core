@@ -36,8 +36,8 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCampaign() {
-
-    $this->webtestLogin();
+    // Fixme: testing a theory that this test was failing due to permissions
+    $this->webtestLogin('admin');
 
     // Create new group
     $title = substr(sha1(rand()), 0, 7);

@@ -149,18 +149,19 @@ CRM.$(function($) {
 });
 
 function showGreeting( element ) {
-    $("#" + element ).show( );
-    $("#" + element + '_display' ).hide( );
+    cj("#" + element ).show( );
+    cj("#" + element + '_display' ).hide( );
 
     // TO DO fix for custom greeting
     var fldName = '#' + element + '_id';
-    if ( $( fldName ).val( ) == 4 ) {
-        $("#greetings1").show( );
-        $("#greetings2").show( );
-        $( fldName + "_html").show( );
-        $( fldName + "_label").show( );
+    if ( cj( fldName ).val( ) == 4 ) {
+        cj("#greetings1").show( );
+        cj("#greetings2").show( );
+        cj( fldName + "_html").show( );
+        cj( fldName + "_label").show( );
     }
 }
+
 
 </script>
 {/literal}

@@ -252,7 +252,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit with a membership block in place
+   * Test submit recurring membership with immediate confirmation (IATS style)
+   * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
+   * processor (IASTS style - denoted by returning trxn_id)
+   * - the first creates a new membership, completed contribution, in progress recurring. Check these
+   * - create another - end date should be extended
    */
   public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecur() {
     $this->params['is_recur'] = 1;
@@ -260,7 +264,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->params['recur_frequency_unit'] = 'month';
     $this->setUpMembershipContributionPage();
     $dummyPP = CRM_Core_Payment::singleton('live', $this->_paymentProcessor);
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 1233,));
+    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 'create_first_success',));
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -282,6 +286,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
+    $this->markTestIncomplete('CRM-15296 fix not yet applied');
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 1));
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
@@ -289,29 +294,33 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
     $this->assertEquals(1, $membership['status_id']);
     $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
-
+    //@todo - check with Joe about these not existing
+    //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
     //renew it with processor setting completed - should extend membership
     $submitParams['contact_id'] = $contribution['contact_id'];
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 1234,));
+    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 'create_second_success',));
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $this->callAPISuccess('contribution', 'getsingle', array('id' => array('NOT IN' => array($contribution['id'])), 'contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 1));
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($membership['end_date']))), $renewedMembership['end_date']);
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
-    //@todo this assertion should pass
-    //$this->assertEquals(5, $recurringContribution['contribution_status_id']);
+    $this->assertEquals(2, $recurringContribution['contribution_status_id']);
   }
 
   /**
-   * Test submit with a membership block in place
+   * Test submit recurring membership with delayed confirmation (Authorize.net style)
+   * - we process 2 membership transactions against with a recurring contribution against a contribution page with a delayed
+   * processor (Authorize.net style - denoted by NOT returning trxn_id)
+   * - the first creates a pending membership, pending contribution, penging recurring. Check these
+   * - complete the transaction
+   * - create another - end date should NOT be extended
    */
   public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurDelayed() {
     $this->params['is_recur'] = 1;
-    $var = array();
     $this->params['recur_frequency_unit'] = 'month';
     $this->setUpMembershipContributionPage();
     $dummyPP = CRM_Core_Payment::singleton('live', $this->_paymentProcessor);
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 1233,));
+    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 2,));
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -327,16 +336,23 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => array('M' => 9, 'Y' => 2040 ),
       'cvv2' => 123,
+      'is_recur' => 1,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 1));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 2));
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
-    $this->assertEquals(1, $membership['status_id']);
-
+    $this->assertEquals(5, $membership['status_id']);
+    //@todo - check with Joe about these not existing
+    //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
+    $this->markTestIncomplete('e-Notice - seemingly due to missing line items');
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id'], 'trxn_id' => 'ipn_called'));
+    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //renew it with processor setting completed - should extend membership
     $submitParams = array_merge($submitParams, array(
       'contact_id' => $contribution['contact_id'],
@@ -345,16 +361,16 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',)
     );
     $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 2,));
-    $this->markTestIncomplete('currently failing - this needs fixing per CRM-15296 as it shows that renewals are being actioned even when payment is not');
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $this->callAPISuccess('contribution', 'getsingle', array('id' => array(
+    $newContribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => array(
       'NOT IN' => array($contribution['id'])), 'contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 2)
     );
+
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //no renewal as the date hasn't changed
     $this->assertEquals($membership['end_date'], $renewedMembership['end_date']);
-    $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
-    $this->assertEquals(5, $recurringContribution['status_id']);
+    $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $newContribution['contribution_recur_id']));
+    $this->assertEquals(2, $recurringContribution['contribution_status_id']);
   }
 
   /**

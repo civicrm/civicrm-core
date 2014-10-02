@@ -286,7 +286,7 @@ UNION
    */
   static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
     //if organization name is passed. CRM-15368
-    if ($newContact && is_string($organization)) {
+    if ($newContact && !is_numeric($organization)) {
       $organizationParams['organization_name'] = $organization;
       $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
 

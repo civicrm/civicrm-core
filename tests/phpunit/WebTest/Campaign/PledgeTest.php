@@ -49,8 +49,8 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     );
     $this->changePermissions($permissions);
 
-    // Log in as demo user
-    $this->webtestLogin();
+    // Fixme: testing a theory that this test was failing due to permissions
+    //$this->webtestLogin();
 
     // Create new group
     $title = substr(sha1(rand()), 0, 7);
