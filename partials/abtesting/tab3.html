@@ -1,6 +1,6 @@
 <form name="tab3Form" unsaved-warning-form>
   <div class="crm-block crm-form-block crmABTesting">
-    <h3>Select the groups you would like to add</h3><br>
+    <h3>Select the groups you would like to add</h3>
     &nbsp<br>
     <select multiple chsgroup ng-model="sparestuff.allgroups" required>
       <option id="1" ng-repeat="grp in groups" value="{{grp.id}} civicrm_group include {{grp.title}}"> {{grp.title}}
@@ -9,21 +9,27 @@
       <option ng-repeat="ml in mailList" value="{{ml.id}} civicrm_mailing include {{ml.title}}"> {{ml.name}}</option>
       <option ng-repeat="ml in mailList" value="{{ml.id}} civicrm_mailing exclude {{ml.title}}"> {{ml.name}}</option>
     </select>
-    <br> <br><br><br>
-
+    <br> <br>
     <h3>Select the size of your test group</h3><br>
     &nbsp Percentage Selected - {{currentABTest.group_percentage}}%
 
     <div sliderbar id="trial" style="margin: 10px;" required></div>
 
-    <h3>How will the winner be decided</h3><br>
-    &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=1 name="cri" required > Open <br/><br>
-    &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=2 name="cri" >
-    Total Unique Clicks <br/><br>
-    &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=3 name="cri"> Total
-    Clicks on a particular link <br/>
+    <br><h3>How will the winner be decided (metric)</h3><br>
+    <label>
+      &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=1 name="cri" required >
+      Opens <br/><br>
+    </label>
+    <label>
+      &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=2 name="cri" >
+      Total Unique Clicks <br/><br>
+    </label>
+    <label>
+      &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=3 name="cri"> Total
+      Clicks on a particular link
+    </label>
     &nbsp &nbsp &nbsp &nbsp<input type="text"  ng-show="currentABTest.winner_criteria_id==3" ng-model="currentABTest.acturl">
-    <br>
+    <br><br>
 
     <h3>Declare the winner by when?</h3><br>
     <table>

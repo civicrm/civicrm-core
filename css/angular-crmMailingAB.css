@@ -51,3 +51,10 @@ div#frag2 {
   width:800px;
   overflow: auto;
 }
+
+.abtesting-form-label {
+  width: 30%;
+}
+.abtesting-form-element *{
+  width: 100%;
+}
