@@ -470,7 +470,7 @@ class CRM_Core_DAO extends DB_DataObject {
   function delete($useWhere = FALSE) {
     $result = parent::delete($useWhere);
 
-    $event = new \Civi\Core\DAO\Event\PostDelete($this);
+    $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);
     \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("DAO::post-delete", $event);
 
     return $result;

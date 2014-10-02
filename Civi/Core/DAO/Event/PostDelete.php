@@ -38,7 +38,13 @@ class PostDelete extends \Symfony\Component\EventDispatcher\Event {
    */
   public $object;
 
-  function __construct($object) {
+  /**
+   * @var DAO delete result
+   */
+  public $result;
+
+  function __construct($object, $result) {
     $this->object = $object;
+    $this->result = $result;
   }
 }
