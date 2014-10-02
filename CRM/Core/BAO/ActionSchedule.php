@@ -1082,11 +1082,17 @@ GROUP BY c.id
         $havingClause = "HAVING TIMEDIFF({$now}, latest_log_time) >= TIME('{$hrs}:00:00')";
         $groupByClause = 'GROUP BY reminder.contact_id, reminder.entity_id, reminder.entity_table';
         $selectClause .= ', MAX(reminder.action_date_time) as latest_log_time';
+        //CRM-15376 - do not send our reminders if original criteria no longer applies
+        // the first part of the startDateClause array is the earliest the reminder can be sent. If the
+        // event (e.g membership_end_date) has changed then the reminder may no longer apply
+        // @todo - this only handles events that get moved later. Potentially they might get moved earlier
+        $originalEventStartDateClause = empty($startDateClause) ? '' : 'AND' . $startDateClause[0];
+
         $sqlInsertValues = "{$selectClause}
 {$fromClause}
 {$joinClause}
 INNER JOIN {$reminderJoinClause}
-{$whereClause} {$limitWhereClause} AND {$repeatEventClause}
+{$whereClause} {$limitWhereClause} AND {$repeatEventClause} $originalEventStartDateClause
 {$groupByClause}
 {$havingClause}";
 
