@@ -499,8 +499,8 @@
       if ($scope.preview == true) {
         $('#prevmail').dialog({
           title: 'Preview Mailing',
-          width: 1080,
-          height: 700,
+          width: 1000,
+          height: 500,
           closed: false,
           cache: false,
           modal: true,
@@ -920,7 +920,11 @@
     return {
       restrict: 'AE',
       link: function (scope, element, attrs) {
-        $(element).select2({width: "200px", data: CRM.crmMailing.mailTokens, placeholder: "Insert Token"});
+        $(element).select2({
+          width: "200px",
+          data: CRM.crmMailing.mailTokens,
+          placeholder: "Insert Token"
+        });
         $(element).on('select2-selecting', function (e) {
 
           scope.$evalAsync('_resetSelection()');
@@ -1003,18 +1007,17 @@
           "name": "from_email_address"
         }).done(function(result) {
           var emailGroupId = result.id;
-          console.log(result);
            CRM.api3('OptionValue', 'get', {
             "sequential": 1,
             "option_group_id": result.id
           }).done(function(orgEmails) {
-              console.log(orgEmails);
               
               //$sce.trustAsHtml(
           
-            $(element).select2({width:"200px", 
-                data: orgEmails.values,           
-                formatResult: format,
+            $(element).select2({
+              class: "abtesting-form-element",
+              data: orgEmails.values,
+              formatResult: format,
               formatSelection: format,
               placeholder:"Select reply to address"});
           
@@ -1105,7 +1108,10 @@
     return {
       restrict: 'AE',
       link: function (scope, element, attrs) {
-        $(element).timeEntry({show24Hours: true});
+        $(element).timeEntry({
+          show24Hours: true,
+          showSeconds: true,
+        });
       }
     }
   });

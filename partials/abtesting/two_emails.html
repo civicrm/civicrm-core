@@ -9,33 +9,33 @@
     <table class="form-layout-compressed">
       <tbody>
       <tr>
-        <td class="label">From E-mail Address</td>
-        <td>
-          <select style="width: 200px" ng-model="mailA.from_email"
+        <td class="abtesting-form-label label">From E-mail Address</td>
+        <td class="abtesting-form-element">
+          <select ng-model="mailA.from_email"
                   ng-options="frm.email as frm.email for frm in eMailing" >
             <option value="">-none-</option>
           </select>
         </td>
       </tr>
       <tr>
-        <td class="label">Reply to E-mail Address</td>
-        <td>
-          <select style="width: 200px" ng-model="mailA.replyto_email"
+        <td class="abtesting-form-label label">Reply to E-mail Address</td>
+        <td  class="abtesting-form-element">
+          <select ng-model="mailA.replyto_email"
                   ng-options="frm.email as frm.email for frm in eMailing">
             <option value="">-none-</option>
           </select>
         </td>
       </tr>
       <tr>
-        <td class="label">Mailing Subject</td>
-        <td>
+        <td class="abtesting-form-label label">Mailing Subject</td>
+        <td class="abtesting-form-element">
           <input placeholder="Enter Subject" name="subject" id="twomaila" type="text" ng-model="mailA.subject" required>
         </td>
       </tr>
       <tr>
-        <td class="label">Mailing Subject Token</td>
-        <td>
-          <input type="hidden" groupselect id= "subgrouptwoa"  ></input>
+        <td class="abtesting-form-label label">Mailing Subject Token</td>
+        <td class="abtesting-form-element">
+          <input type="hidden" groupselect id= "subgrouptwoa">
         </td>
       </tr>
 
@@ -45,8 +45,8 @@
         </td>
       </tr>
       <tr>
-        <td class="label">Use Template</td>
-        <td>
+        <td class="abtesting-form-label label">Use Template</td>
+        <td class="abtesting-form-element">
           <select ng-change="tmp(mailA.msg_template_id,1)" ng-model="mailA.msg_template_id"
                   ng-options="mstemp.id as mstemp.msg_title for mstemp in tmpList">
             <option value="">-none-</option>
@@ -102,18 +102,18 @@
     <div class="crm-accordion-wrapper collapsed">
       <div class="crm-accordion-header">Header and Footer</div>
       <div class="crm-accordion-body">
-        <table>
+        <table class="form-layout-compressed">
           <tr>
-            <td class="label">Mailing Header</td>
-            <td>
+            <td class="abtesting-form-label label">Mailing Header</td>
+            <td class="abtesting-form-element">
               <select ng-model="mailA.header_id" ng-options="hf.id as hf.name for hf in headerfooter| filter:isHeader">
                 <option value="">-none-</option>
               </select>
             </td>
           </tr>
           <tr>
-            <td class="label">Mailing Footer</td>
-            <td>
+            <td class="abtesting-form-label label">Mailing Footer</td>
+            <td class="abtesting-form-element">
               <select ng-model="mailA.footer_id" ng-options="f.id as f.name for f in headerfooter| filter:isFooter">
                 <option value="">-none-</option>
               </select>
@@ -130,43 +130,43 @@
     <table class="form-layout-compressed">
       <tbody>
       <tr>
-        <td class="label">From E-mail Address</td>
-        <td>
-          <select style="width: 200px" ng-model="mailB.from_email"
+        <td class="abtesting-form-label label">From E-mail Address</td>
+        <td class="abtesting-form-element">
+          <select ng-model="mailB.from_email"
                   ng-options="frm.email as frm.email for frm in eMailing">
             <option value="">-none-</option>
           </select>
         </td>
       </tr>
       <tr>
-        <td class="label">Reply to E-mail Address</td>
-        <td>
-          <select style="width: 200px" ng-model="mailB.replyto_email"
+        <td class="abtesting-form-label label">Reply to E-mail Address</td>
+        <td class="abtesting-form-element">
+          <select ng-model="mailB.replyto_email"
                   ng-options="frm.email as frm.email for frm in eMailing">
             <option value="">-none-</option>
           </select>
         </td>
       </tr>
       <tr>
-        <td class="label">Mailing Subject</td>
-        <td>
+        <td class="abtesting-form-label label">Mailing Subject</td>
+        <td class="abtesting-form-element">
           <input placeholder="Enter Subject" id = "twomailb" name="subject" type="text" ng-model="mailB.subject"/>
         </td>
       </tr>
       <tr>
-        <td class="label">Mailing Subject Token</td>
-        <td>
-          <input type="hidden" groupselect id= "subgrouptwob"  ></input>
+        <td class="abtesting-form-label label">Mailing Subject Token</td>
+        <td  class="abtesting-form-element">
+          <input type="hidden" groupselect id= "subgrouptwob">
         </td>
       </tr>
       <tr>
-        <td class="label" style="color:red" ng-show="mailing_form.subject.$invalid">
+        <td class="abtesting-form-label label" style="color:red" ng-show="mailing_form.subject.$invalid">
           Mailing subject required.
         </td>
       </tr>
       <tr>
-        <td class="label">Use Template</td>
-        <td>
+        <td class="abtesting-form-label label">Use Template</td>
+        <td class="abtesting-form-element">
           <select ng-change="tmp(mailB.msg_template_id,2)" ng-model="mailB.msg_template_id"
                   ng-options="mstemp.id as mstemp.msg_title for mstemp in tmpList">
             <option value="">-none-</option>
@@ -218,18 +218,18 @@
       <div class="crm-accordion-header">Header and Footer</div>
       <div class="crm-accordion-body">
         <body>
-        <table>
+        <table class="form-layout-compressed">
           <tr>
-            <td class="label">Mailing Header</td>
-            <td>
+            <td class="abtesting-form-label label">Mailing Header</td>
+            <td class="abtesting-form-element">
               <select ng-model="mailB.header_id" ng-options="hf.id as hf.name for hf in headerfooter| filter:isHeader">
                 <option value="">-none-</option>
               </select>
             </td>
           </tr>
           <tr>
-            <td class="label">Mailing Footer</td>
-            <td>
+            <td class="abtesting-form-label label">Mailing Footer</td>
+            <td class="abtesting-form-element">
               <select ng-model="mailB.footer_id" ng-options="f.id as f.name for f in headerfooter| filter:isFooter">
                 <option value="">-none-</option>
               </select>
