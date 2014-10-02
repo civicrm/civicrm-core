@@ -201,12 +201,13 @@
   </field>
   <field>
     <name>tax_amount</name>
+    <title>Tax Amount</title>
     <type>decimal</type>
     <import>true</import>
     <headerPattern>/tax(.?am(ou)?nt)?/i</headerPattern>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <comment>tax of each item</comment>
-    <add>4.5</add>
+    <add>4.6</add>
     <html>
      <type>Text</type>
    </html>
