@@ -653,6 +653,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @return void
    */
   static public function triggerDelete($event){
+    $obj =& $event->object;
+
     // if DB version is earlier than 4.6 skip any processing
     static $currentVer = NULL;
     if (!$currentVer) {
@@ -663,8 +665,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
 
     static $processedEntities = array();
-    $obj =& $event->object;
-    if (empty($obj->id) || empty($obj->__table)) {
+    if (empty($obj->id) || empty($obj->__table) || !$event->result) {
       return FALSE;
     }
     $key = "{$obj->__table}_{$obj->id}";
