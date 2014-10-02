@@ -3465,7 +3465,7 @@ WHERE con.id = {$contributionId}
     return CRM_Utils_Array::value( 'financial_account_id', $result );
   }
 
-  function checkTaxAmount($params, $isLineItem = FALSE) {
+  public static function checkTaxAmount($params, $isLineItem = FALSE) {
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
 
     // Update contribution
