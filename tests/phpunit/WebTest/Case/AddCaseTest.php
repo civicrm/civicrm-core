@@ -53,7 +53,6 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->openCiviPage('profile/edit', 'reset=1&gid=4', NULL);
     $testUserFirstName = "Testuserfirst";
     $testUserLastName = "Testuserlast";
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Edit_next");
     $this->type("first_name", $testUserFirstName);
     $this->type("last_name", $testUserLastName);

@@ -1150,7 +1150,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $lineItems
    *
    * @throws Exception
-   * @internal param bool $deductibleMode
    * @return CRM_Contribute_DAO_Contribution
    * @access public
    */
@@ -1821,13 +1820,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
   }
 
-  /**
-   * Static submit function allowing tests (& api access although this is being built slowly)
-   * @param $params
-   */
   static function submit($params) {
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_id = $params['id'];
+    if (!empty($params['contact_id'])) {
+      $form->_contactID = $params['contact_id'];
+    }
     CRM_Contribute_BAO_ContributionPage::setValues($form->_id, $form->_values);
     $form->_separateMembershipPayment = CRM_Contribute_BAO_ContributionPage::getIsMembershipPayment($form->_id);
     //this way the mocked up controller ignores the session stuff
@@ -1836,7 +1834,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params['invoiceID'] = md5(uniqid(rand(), TRUE));
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
     $form->_amount = $params['amount'];
-
     $priceSetID = $form->_params['priceSetId'] = $paramsProcessedForForm['price_set_id'];
     $priceFields = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
     $priceSetFields = reset($priceFields);
@@ -1845,6 +1842,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->setFormAmountFields($priceSetID);
     if (!empty($params['payment_processor'])) {
       $form->_paymentProcessor = civicrm_api3('payment_processor', 'getsingle', array('id' => $params['payment_processor']));
+      if ($form->_paymentProcessor['billing_mode'] ==1) {
+        $form->_contributeMode = 'direct';
+      }
+      else {
+        $form->_contributeMode = 'notify';
+      }
     }
     $priceFields = $priceFields[$priceSetID]['fields'];
     CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
