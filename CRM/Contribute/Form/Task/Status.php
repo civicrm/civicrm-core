@@ -307,17 +307,24 @@ AND    co.id IN ( $contribIDs )";
    * @return array
    */
   static function &getDetails($contributionIDs) {
-    $query = "
-SELECT    c.id              as contribution_id,
-          c.contact_id      as contact_id     ,
-          mp.membership_id  as membership_id  ,
-          pp.participant_id as participant_id ,
-          p.event_id        as event_id
-FROM      civicrm_contribution c
-LEFT JOIN civicrm_membership_payment  mp ON mp.contribution_id = c.id
-LEFT JOIN civicrm_participant_payment pp ON pp.contribution_id = c.id
-LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id
-WHERE     c.id IN ( $contributionIDs )";
+    $query = 
+        "SELECT    c.id              as contribution_id,
+                  c.contact_id      as contact_id     ,
+                  mp.membership_id  as membership_id  ,
+                  pp.participant_id as participant_id ,
+                  p.event_id        as event_id
+        FROM      civicrm_contribution c
+        LEFT JOIN civicrm_membership_payment  mp ON mp.contribution_id = c.id
+        LEFT JOIN civicrm_participant_payment pp ON pp.contribution_id = c.id
+        LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id";
+    if ($contributionIDs) {
+      $query .= "
+        WHERE     c.id IN ( $contributionIDs )";
+    }
+    else {
+      $query .= "
+        WHERE     c.id IN (NULL)";
+    }
 
     $rows = array();
     $dao = CRM_Core_DAO::executeQuery($query,
