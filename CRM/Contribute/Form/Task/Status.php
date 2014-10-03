@@ -317,10 +317,11 @@ AND    co.id IN ( $contribIDs )";
         LEFT JOIN civicrm_membership_payment  mp ON mp.contribution_id = c.id
         LEFT JOIN civicrm_participant_payment pp ON pp.contribution_id = c.id
         LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id";
-    if($contributionIDs){
+    if ($contributionIDs) {
       $query .= "
         WHERE     c.id IN ( $contributionIDs )";
-    }else{
+    }
+    else {
       $query .= "
         WHERE     c.id IN (NULL)";
     }

@@ -623,7 +623,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $value['eventID']   = $this->_eventId;
         $value['item_name'] = $value['description'];
       }
-      if($value['contributionID']){
+      if ($value['contributionID']) {
         $this->_values['contributionId'] = $value['contributionID'] ;
       }
 
