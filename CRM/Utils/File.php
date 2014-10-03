@@ -415,9 +415,9 @@ class CRM_Utils_File {
    * Restrict access to a given directory (by planting there a restrictive .htaccess file)
    *
    * @param string $dir the directory to be secured
-   * @param bool $overwrite
+   * @param string $access = 'Deny' or 'Allow'
    */
-  static function restrictAccess($dir, $overwrite = FALSE) {
+  static function restrictAccess($dir, $access = 'Deny') {
     // note: empty value for $dir can play havoc, since that might result in putting '.htaccess' to root dir
     // of site, causing site to stop functioning.
     // FIXME: we should do more checks here -
@@ -425,12 +425,12 @@ class CRM_Utils_File {
       $htaccess = <<<HTACCESS
 <Files "*">
   Order allow,deny
-  Deny from all
+  $access from all
 </Files>
 
 HTACCESS;
-      $file = $dir . '.htaccess';
-      if ($overwrite || !file_exists($file)) {
+      $file = self::addTrailingSlash($dir) . '.htaccess';
+      if (!file_exists($file)) {
         if (file_put_contents($file, $htaccess) === FALSE) {
           CRM_Core_Error::movedSiteError($file);
         }
@@ -702,6 +702,7 @@ HTACCESS;
     if (!is_dir($path)) {
       self::createDir($path);
       self::restrictBrowsing($path);
+      self::restrictAccess($path, 'Allow');
     }
     file_put_contents("$path/$fileName", $contents);
   }
