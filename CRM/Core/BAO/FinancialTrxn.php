@@ -480,7 +480,7 @@ FROM civicrm_financial_trxn ft
   LEFT JOIN civicrm_contribution c ON (eft.entity_id = c.id)
   LEFT JOIN civicrm_participant_payment pp ON (pp.contribution_id = c.id)
 WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFinancialAccount}
-  AND ft.status_id IN ({$statusId}, {$refundStatusId})
+  AND ft.status_id IN ({$statusId}, {$refundStatusId}) AND ft.from_financial_account IS NULL
 ";
         $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
         $value = 0;
