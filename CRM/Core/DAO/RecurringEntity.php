@@ -94,21 +94,25 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO
    */
   public $id;
   /**
+   * Recurring Entity Parent ID
    *
    * @var int unsigned
    */
   public $parent_id;
   /**
+   * Recurring Entity Child ID
    *
    * @var int unsigned
    */
   public $entity_id;
   /**
+   * Physical tablename for entity, e.g. civicrm_event
    *
    * @var string
    */
   public $entity_table;
   /**
+   * 1-this entity, 2-this and the following entities, 3-all the entities
    *
    * @var boolean
    */

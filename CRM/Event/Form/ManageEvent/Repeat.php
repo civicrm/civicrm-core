@@ -94,9 +94,12 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       $this->_scheduleReminderDetails = self::getReminderDetailsByEventId($this->_id, 'event');
       $this->_parentEventId = $this->_id;
     }
+
     //Assign this to hide summary
-    $this->assign('scheduleReminderId', $this->_scheduleReminderDetails->id);
-    
+    if (property_exists($this->_scheduleReminderDetails, 'id')) {
+      $this->assign('scheduleReminderId', $this->_scheduleReminderDetails->id);
+    }
+
     $parentEventParams = array('id' => $this->_id);
     $parentEventValues = array();
     $parentEventReturnProperties = array('start_date', 'end_date');
@@ -128,7 +131,9 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     $defaults = array();
     
     //Set Schedule Reminder Id
-    $this->_scheduleReminderId = $this->_scheduleReminderDetails->id;
+    if (property_exists($this->_scheduleReminderDetails, 'id')) {
+      $this->_scheduleReminderId = $this->_scheduleReminderDetails->id;
+    }
     //Always pass current event's start date by default
     $currentEventStartDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'start_date', 'id');
     list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($currentEventStartDate, 'activityDateTime');
@@ -156,9 +161,11 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         $defaults['repeats_by'] = 1;
       }
       $explodeStartActionCondition = array();
-      $explodeStartActionCondition = explode(" ", $this->_scheduleReminderDetails->entity_status);
-      $defaults['entity_status_1'] = $explodeStartActionCondition[0];
-      $defaults['entity_status_2'] = $explodeStartActionCondition[1];
+      if ($this->_scheduleReminderDetails->entity_status) {
+        $explodeStartActionCondition = explode(" ", $this->_scheduleReminderDetails->entity_status);
+        $defaults['entity_status_1'] = $explodeStartActionCondition[0];
+        $defaults['entity_status_2'] = $explodeStartActionCondition[1];
+      }
       if($this->_scheduleReminderDetails->entity_status){
         $defaults['repeats_by'] = 2;
       }
