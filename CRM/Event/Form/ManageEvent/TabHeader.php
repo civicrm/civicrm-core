@@ -138,7 +138,7 @@ WHERE      e.id = %1
       if (!$dao->is_reminder) {
         $tabs['reminder']['valid'] = FALSE;
       }
-      if(!$dao->is_repeating_event){
+      if (!$dao->is_repeating_event) {
         $tabs['repeat']['valid'] = FALSE;
       }
     }
