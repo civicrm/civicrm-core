@@ -124,7 +124,7 @@ function buildPaymentDetails( pledgeId, contactId )
                               cj( '#paymentDetails' + pledgeId ).html( data ).trigger('crmLoad');
                          },
                error   : function( XMLHttpRequest, textStatus, errorThrown ) {
-                                 console.error( 'Error: '+ textStatus );
+                                 CRM.console('error', 'Error: ', textStatus);
                         }
          });
 }
