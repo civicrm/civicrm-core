@@ -50,7 +50,7 @@ class CRM_Core_Form_RecurringEntity {
     
     $form->_freqUnits = array('hour' => 'hour') + CRM_Core_OptionGroup::values('recur_frequency_units');
     foreach ($form->_freqUnits as $val => $label) {
-      if($label == "day"){
+      if ($label == "day") {
           $label = "dai";
       }
       $freqUnitsDisplay[$val] = ts('%1ly', array(1 => $label));
@@ -68,7 +68,7 @@ class CRM_Core_Form_RecurringEntity {
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 30);
     $form->add('select', 'repetition_frequency_interval', ts('Repeats every:'), $numericOptions, TRUE, array('style' => 'width:55px;'));
     $form->addDateTime('repetition_start_date', ts('Repetition Start Date'), FALSE, array('formatType' => 'activityDateTime'));
-    foreach($dayOfTheWeek as $key => $val){
+    foreach($dayOfTheWeek as $key => $val) {
         $startActionCondition[] = $form->createElement('checkbox', $key, NULL, substr($val."&nbsp;", 0, 3));
     }
     $form->addGroup($startActionCondition, 'start_action_condition', ts('Repeats on'));
@@ -128,62 +128,68 @@ class CRM_Core_Form_RecurringEntity {
     $dayOfTheWeek = array(monday,tuesday,wednesday,thursday,friday,saturday,sunday);
     
     //Repeats
-    if(!CRM_Utils_Array::value('repetition_frequency_unit', $values)){
+    if (!CRM_Utils_Array::value('repetition_frequency_unit', $values)) {
       $errors['repetition_frequency_unit'] = ts('This is a required field');
     }
     //Repeats every
-    if(!CRM_Utils_Array::value('repetition_frequency_interval', $values)){
+    if (!CRM_Utils_Array::value('repetition_frequency_interval', $values)) {
       $errors['repetition_frequency_interval'] = ts('This is a required field');
     }
     //Ends
-    if(CRM_Utils_Array::value('ends', $values)){
-      if($values['ends'] == 1){
+    if (CRM_Utils_Array::value('ends', $values)) {
+      if ($values['ends'] == 1) {
         if ($values['start_action_offset'] == "") {
           $errors['start_action_offset'] = ts('This is a required field');
-        }else if($values['start_action_offset'] > 30){
+        }
+        else if ($values['start_action_offset'] > 30) {
           $errors['start_action_offset'] = ts('Occurrences should be less than or equal to 30');
         }
       }
-      if($values['ends'] == 2){
+      if ($values['ends'] == 2) {
         if ($values['repeat_absolute_date'] != "") {
           $eventStartDate = CRM_Utils_Date::processDate($values['repetition_start_date']);
           $end = CRM_Utils_Date::processDate($values['repeat_absolute_date']);
           if (($end < $eventStartDate) && ($end != 0)) {
             $errors['repeat_absolute_date'] = ts('End date should be after event\'s start date');
           }
-        }else{
+        }
+        else {
           $errors['repeat_absolute_date'] = ts('This is a required field');
         }
       }
-    }else{
+    }
+    else {
       $errors['ends'] = ts('This is a required field');
     }
     
     //Repeats BY
-    if(CRM_Utils_Array::value('repeats_by', $values)){
-      if($values['repeats_by'] == 1){
-        if($values['limit_to'] != ""){
-          if($values['limit_to'] < 1 && $values['limit_to'] > 31){
+    if (CRM_Utils_Array::value('repeats_by', $values)) {
+      if ($values['repeats_by'] == 1) {
+        if ($values['limit_to'] != "") {
+          if ($values['limit_to'] < 1 && $values['limit_to'] > 31) {
             $errors['limit_to'] = ts('Invalid day of the month');
           }
-        }else{
+        }
+        else {
           $errors['limit_to'] = ts('Invalid day of the month');
         }
       }
-      if($values['repeats_by'] == 2){
-        if($values['entity_status_1'] != "" ) {
+      if ($values['repeats_by'] == 2) {
+        if ($values['entity_status_1'] != "" ) {
           $dayOfTheWeekNo = array(first, second, third, fourth, last);
-          if(!in_array($values['entity_status_1'], $dayOfTheWeekNo)){
+          if (!in_array($values['entity_status_1'], $dayOfTheWeekNo)) {
              $errors['entity_status_1'] = ts('Invalid option');
           }
-        }else{
+        }
+        else {
           $errors['entity_status_1'] = ts('Invalid option');
         }
-        if($values['entity_status_2'] != "" ) {
-          if(!in_array($values['entity_status_2'], $dayOfTheWeek)){
+        if ($values['entity_status_2'] != "" ) {
+          if (!in_array($values['entity_status_2'], $dayOfTheWeek)) {
              $errors['entity_status_2'] = ts('Invalid day name');
           }
-        }else{
+        }
+        else {
           $errors['entity_status_2'] = ts('Invalid day name');
         }
       }
@@ -199,7 +205,7 @@ class CRM_Core_Form_RecurringEntity {
    * @return None
    */
   static function postProcess($params=array(), $type) {
-    if(!empty($type)){
+    if (!empty($type)) {
       $params['used_for'] = $type;
     }
     
@@ -207,7 +213,7 @@ class CRM_Core_Form_RecurringEntity {
     $dbParams = CRM_Core_BAO_RecurringEntity::mapFormValuesToDB($params);
 
     //Delete repeat configuration and rebuild
-    if(CRM_Utils_Array::value('id', $params)){
+    if (CRM_Utils_Array::value('id', $params)) {
       CRM_Core_BAO_ActionSchedule::del($params['id']);
       unset($params['id']);
     }
@@ -215,7 +221,7 @@ class CRM_Core_Form_RecurringEntity {
     
     //exclude dates 
     $excludeDateList = array();
-    if(CRM_Utils_Array::value('copyExcludeDates', $params) && CRM_Utils_Array::value('parent_event_id', $params)){   
+    if (CRM_Utils_Array::value('copyExcludeDates', $params) && CRM_Utils_Array::value('parent_event_id', $params)) {   
       //Since we get comma separated values lets get them in array
       $exclude_date_list = array();
       $exclude_date_list = explode(",", $params['copyExcludeDates']);
@@ -226,7 +232,7 @@ class CRM_Core_Form_RecurringEntity {
           'id',
           'name'
         );
-      if($optionGroupIdExists){
+      if ($optionGroupIdExists) {
         CRM_Core_BAO_OptionGroup::del($optionGroupIdExists);
       }
       $optionGroupParams = 
@@ -237,10 +243,10 @@ class CRM_Core_Form_RecurringEntity {
             'is_active'   => 1
           );
       $opGroup = CRM_Core_BAO_OptionGroup::add($optionGroupParams);
-      if($opGroup->id){
+      if ($opGroup->id) {
         $oldWeight= 0;
         $fieldValues = array('option_group_id' => $opGroup->id);
-        foreach($exclude_date_list as $val){
+        foreach($exclude_date_list as $val) {
           $optionGroupValue = 
               array(
                 'option_group_id' =>  $opGroup->id,
@@ -258,12 +264,12 @@ class CRM_Core_Form_RecurringEntity {
     }
 
     //Delete relations if any from recurring entity tables before inserting new relations for this entity id
-    if($params['event_id']){
+    if ($params['event_id']) {
       $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['event_id'], 'civicrm_event', TRUE);
       $participantDetails = CRM_Event_Form_ManageEvent_Repeat::getParticipantCountforEvent($getRelatedEntities);
       //Check if participants exists for events
       foreach ($getRelatedEntities as $key => $value) {
-        if(!CRM_Utils_Array::value($value['id'], $participantDetails['countByID']) && $value['id'] != $params['event_id']){
+        if (!CRM_Utils_Array::value($value['id'], $participantDetails['countByID']) && $value['id'] != $params['event_id']) {
           CRM_Event_BAO_Event::del($value['id']);
         }
       }

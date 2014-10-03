@@ -195,7 +195,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $resultDates = array_diff($actualDates, $expectedDates);
     $this->assertEquals(0, count($resultDates), "Check if all the value in expected array matches actual array");
     
-    foreach($generatedEntities['civicrm_tell_friend'] as $key => $val){
+    foreach($generatedEntities['civicrm_tell_friend'] as $key => $val) {
       $this->assertDBNotNull('CRM_Friend_DAO_Friend', $val, 'id', 'id', 'Check if friends were created in loop');
       $this->assertDBCompareValue('CRM_Friend_DAO_Friend', $val, 'entity_id', 'id', $generatedEntities['civicrm_event'][$key], 'Check DB if correct FK was maintained with event for Friend');
     }

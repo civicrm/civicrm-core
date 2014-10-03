@@ -157,7 +157,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
         $configureText = ts('Configure Event');
         $title = CRM_Utils_Array::value('title', $eventInfo);
         //If it is a repeating event change title
-        if($this->_isRepeatingEvent){
+        if ($this->_isRepeatingEvent) {
           $configureText = 'Configure Repeating Event';
         }
         CRM_Utils_System::setTitle($configureText . " - $title");
@@ -189,7 +189,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     $this->_templateId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
     
     //Is a repeating event
-    if($this->_isRepeatingEvent){
+    if ($this->_isRepeatingEvent) {
       $isRepeat = 'repeat';
       $this->assign('isRepeat', $isRepeat);
     }

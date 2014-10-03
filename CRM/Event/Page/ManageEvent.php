@@ -319,10 +319,11 @@ ORDER BY start_date desc
         $manageEvent[$dao->id] = array();
         $isRepeatingEvent = CRM_Core_BAO_RecurringEntity::getParentFor($dao->id, 'civicrm_event');
         $manageEvent[$dao->id]['repeat'] = '';
-        if($isRepeatingEvent){
-          if($dao->id == $isRepeatingEvent){
+        if ($isRepeatingEvent) {
+          if ($dao->id == $isRepeatingEvent) {
             $manageEvent[$dao->id]['repeat'] = 'Repeating Event - (Parent)';
-          }else{
+          }
+          else {
             $manageEvent[$dao->id]['repeat'] = 'Repeating Event - (Child)';
           }
         }
