@@ -61,9 +61,9 @@
             {if $values.is_repeating_event}
                 <br/>
                 {if $values.is_repeating_event eq $id}
-                    <span>Repeating Event - (Parent)</span>
+                    <span>{ts}Repeating Event{/ts} - ({ts}Parent{/ts})</span>
                 {else}
-                    <span>Repeating Event - (Child)</span>
+                    <span>{ts}Repeating Event{/ts} - ({ts}Child{/ts})</span>
                 {/if}
             {/if}
         </td>
