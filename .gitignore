@@ -78,6 +78,7 @@ CRM/Core/DAO/PriceField.php
 CRM/Core/DAO/PriceSet.php
 CRM/Core/DAO/PriceSetEntity.php
 CRM/Core/DAO/PrintLabel.php
+CRM/Core/DAO/RecurringEntity.php
 CRM/Core/DAO/Setting.php
 CRM/Core/DAO/StateProvince.php
 CRM/Core/DAO/SystemLog.php
