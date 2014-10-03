@@ -56,3 +56,7 @@ ALTER TABLE `civicrm_contribution` ADD `creditnote_id` varchar(255) COLLATE utf8
 -- Add new column is_billing_required in contribution_page and event table
 ALTER TABLE `civicrm_event` ADD COLUMN `is_billing_required` tinyint(4) DEFAULT '0' COMMENT 'Billing block required for Event';
 ALTER TABLE `civicrm_contribution_page` ADD COLUMN `is_billing_required` tinyint(4) DEFAULT '0' COMMENT 'Billing block required for Contribution Page';
+
+-- New columns for email location selection
+ALTER TABLE civicrm_mailing ADD COLUMN location_type_id INT(10) unsigned DEFAULT 0 COMMENT 'With email_selection_method, determines which email address to use';
+ALTER TABLE civicrm_mailing ADD COLUMN email_selection_method enum('automatic', 'location-only', 'location-exclude', 'location-prefer') DEFAULT 'automatic' COMMENT 'With location_type_id, determine how to choose the email address to use.';
