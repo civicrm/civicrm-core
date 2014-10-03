@@ -939,7 +939,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     if ($startDate && $endDate) {
       $startDate = new DateTime($startDate);
       $endDate   = new DateTime($endDate);
-
       return $startDate->diff($endDate);
     }
   }
