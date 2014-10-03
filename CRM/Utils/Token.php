@@ -1341,6 +1341,9 @@ class CRM_Utils_Token {
       // check if there are any unevaluated tokens
       $greetingTokens = self::getTokens($tokenString);
 
+      // CRM-11342 Check if hook tokens to avoid escape
+      CRM_Utils_Hook::tokens($hookTokens);
+
       // $greetingTokens not empty, means there are few tokens which are not evaluated, like custom data etc
       // so retrieve it from database
       if (!empty($greetingTokens) && array_key_exists('contact', $greetingTokens)) {
@@ -1361,35 +1364,14 @@ class CRM_Utils_Token {
           TRUE,
           $greetingTokens,
           FALSE,
-          $escapeSmarty
+          empty($hookTokens) ? $escapeSmarty : FALSE //avoid escaping of hook tokens
         );
       }
-      // check if there are still any unevaluated tokens
-      $greetingTokens = self::getTokens($tokenString);
-
-      // $greetingTokens not empty, there are hook tokens to replace 
-      if (!empty($greetingTokens) ) {
-        // Fill the return properties array
-        reset($greetingTokens);
-        $greetingsReturnProperties = array();
-        while(list($key) = each($greetingTokens)) {
-          $props = array_flip(CRM_Utils_Array::value($key, $greetingTokens));
-          $props = array_fill_keys(array_keys($props), 1);
-          $greetingsReturnProperties = $greetingsReturnProperties + $props;
-        }
-        $contactParams = array('contact_id' => $contactId);
-        $greetingDetails = self::getTokenDetails($contactParams,
-          $greetingsReturnProperties,
-          FALSE, FALSE, NULL,
-          $greetingTokens,
-          $className
-        );
-        // Prepare variables for calling replaceHookTokens
-        $categories = array_keys($greetingTokens);
-        list($contact) = $greetingDetails;
-        // Replace tokens defined in Hooks.
-        $tokenString = CRM_Utils_Token::replaceHookTokens($tokenString, $contact[$contactId], $categories);
-      }
+      //CRM-11342
+      //Replace hook tokens
+      CRM_Utils_Hook::tokenValues($contact, array($contactId), NULL, $hookTokens);
+      $categories = array_keys($hookTokens);
+      $tokenString = CRM_Utils_Token::replaceHookTokens($tokenString, $contact[$contactId], $categories);
     }
   }
 

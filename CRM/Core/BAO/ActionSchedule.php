@@ -457,10 +457,16 @@ WHERE   cas.entity_value = $id AND
       $contact = array_merge($contact, $tokenParams);
 
       //CRM-5734
-      CRM_Utils_Hook::tokenValues($contact, $contactId);
-
+      //CRM-11342
+      // merge hook tokens with contact array
+      $escapeSmarty = TRUE;
       CRM_Utils_Hook::tokens($hookTokens);
+      CRM_Utils_Hook::tokenValues($hookValues, array($contactId), NULL, $hookTokens);
+      $contact = array_merge($contact, $hookValues[$contactId]);
       $categories = array_keys($hookTokens);
+      if (!empty($hookTokens)) {
+        $escapeSmarty = FALSE;
+      }
 
       $type = array('body_html' => 'html', 'body_text' => 'text', 'sms_body_text' => 'text');
 
@@ -477,7 +483,7 @@ WHERE   cas.entity_value = $id AND
         if ($$bodyType) {
           CRM_Utils_Token::replaceGreetingTokens($$bodyType, NULL, $contact['contact_id']);
           $$bodyType = CRM_Utils_Token::replaceDomainTokens($$bodyType, $domain, TRUE, $tokens[$value], TRUE);
-          $$bodyType = CRM_Utils_Token::replaceContactTokens($$bodyType, $contact, FALSE, $tokens[$value], FALSE, TRUE);
+          $$bodyType = CRM_Utils_Token::replaceContactTokens($$bodyType, $contact, FALSE, $tokens[$value], FALSE, $escapeSmarty);
           $$bodyType = CRM_Utils_Token::replaceComponentTokens($$bodyType, $contact, $tokens[$value], TRUE, FALSE);
           $$bodyType = CRM_Utils_Token::replaceHookTokens($$bodyType, $contact, $categories, TRUE);
         }
@@ -1168,8 +1174,14 @@ reminder.action_schedule_id = %1";
         $op = ($actionSchedule->start_action_condition == 'before' ? '<=' : '>=');
         $operator = ($actionSchedule->start_action_condition == 'before' ? 'DATE_SUB' : 'DATE_ADD');
         $date = $operator . "({$dateField}, INTERVAL {$actionSchedule->start_action_offset} {$actionSchedule->start_action_unit})";
-        $startDateClause[] = "'{$now}' >= {$date}";
-        if ($mapping->entity == 'civicrm_participant') {
+        //CRM-11342
+        //replaced hardcoded op '>=' below with {$op} since
+        //if scheduled date is before end date and is repeat then now >= mem_end_date
+        $startDateClause[] = "'{$now}' {$op} {$date}";
+        //CRM-11342
+        //also handled condition for membership to avoid
+        //if scheduled date is after join date and is repeat than else part DATE_SUB({$now}, INTERVAL 1 DAY ) <= {$date} ie now+1 <= mem_join_date
+        if ($mapping->entity == 'civicrm_participant' || $mapping->entity == 'civicrm_membership') {
           $startDateClause[] = $operator. "({$now}, INTERVAL 1 DAY ) {$op} " . $dateField;
         }
         else {
@@ -1242,7 +1254,8 @@ GROUP BY c.id
       // if repeat is turned ON:
       if ($actionSchedule->is_repeat) {
         $repeatEvent = ($actionSchedule->end_action == 'before' ? 'DATE_SUB' : 'DATE_ADD') . "({$dateField}, INTERVAL {$actionSchedule->end_frequency_interval} {$actionSchedule->end_frequency_unit})";
-
+        //CRM-11342
+        $op = ($actionSchedule->end_action == 'before' ? '<=' : '>=');
         if ($actionSchedule->repetition_frequency_unit == 'day') {
           $hrs = 24 * $actionSchedule->repetition_frequency_interval;
         }
@@ -1260,7 +1273,11 @@ GROUP BY c.id
         }
 
         // (now <= repeat_end_time )
-        $repeatEventClause = "'{$now}' <= {$repeatEvent}";
+        //CRM-11342
+        //replaced hardcoded op '<=' below with {$op}
+        //to handle after join date now <= mem_join_date
+        //also added {notInClause} so that schedule repeat job does not goes to non-permissioned emp
+        $repeatEventClause = "'{$now}' {$op} {$repeatEvent}";
         // diff(now && logged_date_time) >= repeat_interval
         $havingClause = "HAVING TIMEDIFF({$now}, latest_log_time) >= TIME('{$hrs}:00:00')";
         $groupByClause = 'GROUP BY reminder.contact_id, reminder.entity_id, reminder.entity_table';
@@ -1269,7 +1286,7 @@ GROUP BY c.id
 {$fromClause}
 {$joinClause}
 INNER JOIN {$reminderJoinClause}
-{$whereClause} {$limitWhereClause} AND {$repeatEventClause}
+{$whereClause} {$limitWhereClause} AND {$repeatEventClause} {$notINClause}
 {$groupByClause}
 {$havingClause}";
 
