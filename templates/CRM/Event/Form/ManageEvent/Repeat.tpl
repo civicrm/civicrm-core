@@ -82,7 +82,7 @@
     {literal}
         <script type="text/javascript">
         cj(document).ready(function() {
-            if(cj('#rec-summary').length){
+            if (cj('#rec-summary').length) {
                 cj('#rec-summary').parent().parent().hide();
             }
         });

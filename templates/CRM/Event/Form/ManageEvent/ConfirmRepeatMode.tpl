@@ -64,7 +64,7 @@
     var form = '';
     $('#crm-main-content-wrapper').on('click', 'div.crm-submit-buttons span.crm-button input[value="Save"], div.crm-submit-buttons span.crm-button input[value="Save and Done"]', function() {
         form = $(this).parents('form:first').attr('class');
-        if( form != "" && mapper.hasOwnProperty(form) ){
+        if (form != "" && mapper.hasOwnProperty(form)) {
           $("#recurring-dialog").dialog({
             title: ts('How does this change affect other repeating events in the set?'),
             modal: true,
@@ -79,15 +79,15 @@
         }
     }); 
 
-    $(".only-this-event").click(function(){
+    $(".only-this-event").click(function() {
       updateMode(1);
     });
   
-    cj(".this-and-all-following-event").click(function(){
+    cj(".this-and-all-following-event").click(function() {
       updateMode(2);
     });
   
-    cj(".all-events").click(function(){
+    cj(".all-events").click(function() {
       updateMode(3);
     });
     
@@ -101,10 +101,10 @@
           data: data,
           url:  ajaxurl,
           success: function (result) {
-            if(result.status != "" && result.status == 'Done'){
+            if (result.status != "" && result.status == 'Done') {
               $("#recurring-dialog").dialog('close');
               $('#mainTabContainer div:visible Form').submit();
-            }else if(result.status != "" && result.status == 'Error'){
+            } else if (result.status != "" && result.status == 'Error') {
               var errorBox = confirm(ts("Mode could not be updated, save only this event?"));
               if (errorBox == true) {
                 $("#recurring-dialog").dialog('close');
