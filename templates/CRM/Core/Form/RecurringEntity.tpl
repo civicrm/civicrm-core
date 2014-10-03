@@ -88,20 +88,11 @@
       </div>
     </div>
 </div>
-<div id="preview-dialog" style="display:none;height:auto;">
-    <div style="display:block;" id="generated_dates"></div>
+<div id="preview-dialog" class="hide-block">
+    <div id="generated_dates" class="show-block"></div>
     
 </div>
 {literal}
-<style type="text/css">
-    .highlight-record{
-        font-weight:  bold !important;
-        background-color: #FFFFCC !important;
-    }
-    #start_action_offset{
-        width: 40px;
-    }
-</style>
 <script type="text/javascript">
   cj(document).ready(function() {
     cj('#repetition_start_date_display').closest("tr").hide();
@@ -305,7 +296,7 @@
             if(errors.length > 0){
               html = '';
               for (var j = 0; j < errors.length; j++) {
-                html += '<span style="color: #8A1F11;">*&nbsp;' + errors[j] + '</span><br/>';
+                html += '<span class="crm-error">*&nbsp;' + errors[j] + '</span><br/>';
               }
             }
             if(warningHtml != ""){
@@ -322,7 +313,7 @@
             }
           }else{
             cj('div.ui-dialog-buttonset button span:contains(Ok)').hide();
-            cj('#generated_dates').append("<span style='color:red;'>Sorry, no dates could be generated for the given criteria!</span>");
+            cj('#generated_dates').append("<span class='crm-error'>Sorry, no dates could be generated for the given criteria!</span>");
           }
         },
         complete: function(){
