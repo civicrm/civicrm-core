@@ -24,46 +24,30 @@
  +--------------------------------------------------------------------+
 *}
 
-<div id="repeat-mode-dailog" style="display:none;">
-    How would you like this change to affect other events in the repetition set?<br/><br/>
-    <div style="display: inline-block">
-        <div style="display:inline-block;width:100%;">
-            <div style="width:30%;float:left;">
-                <button class="repeat-mode-dailog-button only-this-event">Only this Event</button>
+<div id="recurring-dialog" class="hide-block">
+    {ts}How would you like this change to affect other events in the repetition set?{/ts}<br/><br/>
+    <div class="show-block">
+        <div class="recurring-dialog-inner-wrapper">
+            <div class="recurring-dialog-inner-left">
+                <button class="recurring-dialog-button only-this-event">{ts}Only this Event{/ts}</button>
             </div>
-            <div style="width:70%;float:left;">All other events in the series will remain same.</div>
+          <div class="recurring-dialog-inner-right">{ts}All other events in the series will remain same.{/ts}</div>
         </div>
-        <div style="display:inline-block;width:100%;">
-            <div style="width:30%;float:left;">
-                <button class="repeat-mode-dailog-button this-and-all-following-event">This and Following Events</button>
+        <div class="recurring-dialog-inner-wrapper">
+            <div class="recurring-dialog-inner-left">
+                <button class="recurring-dialog-button this-and-all-following-event">{ts}This and Following Events{/ts}</button>
             </div>
-            <div style="width:70%;float:left;">Change applies to this and all the following events.</div>
+            <div class="recurring-dialog-inner-right">{ts}Change applies to this and all the following events.{/ts}</div>
         </div>
-        <div style="display:inline-block;width:100%;">
-            <div style="width:30%;float:left;">
-                <button class="repeat-mode-dailog-button all-events">All the Events</button>
+        <div class="recurring-dialog-inner-wrapper">
+            <div class="recurring-dialog-inner-left">
+                <button class="recurring-dialog-button all-events">{ts}All the Events{/ts}</button>
             </div>
-            <div style="width:70%;float:left;">Change applies to all the events in the series.</div>
+            <div class="recurring-dialog-inner-right">{ts}Change applies to all the events in the series.{/ts}</div>
         </div>
     </div>
 </div>
 <input type="hidden" value="" name="isRepeatingEvent" id="is-repeating-event"/>
-{literal}
-   <style type="text/css">
-      .repeat-mode-dailog-button{
-         background: #f5f5f5;
-         background-image: -webkit-linear-gradient(top,#f5f5f5,#f1f1f1);
-         border: 1px solid rgba(0,0,0,0.1);
-         padding: 5px 8px;
-         text-align: center;
-         border-radius: 2px;
-         cursor: pointer;  
-         font-size: 11px !important;
-      }
-   </style>
-{/literal}
-
-
 {if $isRepeat eq 'repeat'}
 {literal}
 <script>
@@ -81,8 +65,8 @@
     $('#crm-main-content-wrapper').on('click', 'div.crm-submit-buttons span.crm-button input[value="Save"], div.crm-submit-buttons span.crm-button input[value="Save and Done"]', function() {
         form = $(this).parents('form:first').attr('class');
         if( form != "" && mapper.hasOwnProperty(form) ){
-          $("#repeat-mode-dailog").dialog({
-            title: 'How does this change affect other repeating events in the set?',
+          $("#recurring-dialog").dialog({
+            title: ts('How does this change affect other repeating events in the set?'),
             modal: true,
             width: '650',
             buttons: {
@@ -118,15 +102,15 @@
           url:  ajaxurl,
           success: function (result) {
             if(result.status != "" && result.status == 'Done'){
-              $("#repeat-mode-dailog").dialog('close');
+              $("#recurring-dialog").dialog('close');
               $('#mainTabContainer div:visible Form').submit();
             }else if(result.status != "" && result.status == 'Error'){
-              var errorBox = confirm("Mode could not be updated, save only this event?");
+              var errorBox = confirm(ts("Mode could not be updated, save only this event?"));
               if (errorBox == true) {
-                $("#repeat-mode-dailog").dialog('close');
+                $("#recurring-dialog").dialog('close');
                 $('#mainTabContainer div:visible Form').submit();
               } else {
-                $("#repeat-mode-dailog").dialog('close');
+                $("#recurring-dialog").dialog('close');
                 return false;
               }
             }

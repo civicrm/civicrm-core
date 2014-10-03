@@ -90,7 +90,7 @@ class CRM_Core_Form_RecurringEntity {
         '2' => ts('On'),
       );
     $form->addRadio('ends', ts("Ends:"), $eoptionTypes, array(), NULL, TRUE);
-    $form->add('text', 'start_action_offset', ts(''), array('maxlength' => 2));
+    $form->add('text', 'start_action_offset', ts(''), array('size' => 3, 'maxlength' => 2));
     $form->addFormRule(array('CRM_Core_Form_RecurringEntity', 'formRule'));
     $form->addDate('repeat_absolute_date', ts('On'), FALSE, array('formatType' => 'mailing'));
     $form->addDate('exclude_date', ts('Exclude Date(s)'), FALSE);

@@ -27,7 +27,7 @@
 {include file="CRM/Core/Form/RecurringEntity.tpl"}
 {if $rows}
 <div id="event_status_id" class="crm-block crm-manage-events crm-accordion-wrapper">
-  <div class="crm-accordion-header">Connected Repeating Events</div>
+  <div class="crm-accordion-header">{ts}Connected Repeating Events{/ts}</div>
   <div class="crm-accordion-body">
   {strip}
   {include file="CRM/common/jsortable.tpl"}
@@ -47,7 +47,7 @@
       {foreach from=$rows key=keys item=row}
         {if $keys neq 'tab'}
           {if $currentEventId eq $row.id}
-              {assign var="highlight" value=" highlight-record"}
+              {assign var="highlight" value=" status bold"}
           {else}
               {assign var="highlight" value=""}
           {/if}
