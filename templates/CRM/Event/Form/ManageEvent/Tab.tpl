@@ -102,7 +102,9 @@ CRM.$(function($) {
   $('#crm-main-content-wrapper').on('keyup change', 'input#title', function() {
     $('#crm-event-name-page-title').text($(this).val());
   });
-  
+
 });
 </script>
 {/literal}
+
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl"}

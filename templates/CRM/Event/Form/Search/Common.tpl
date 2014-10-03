@@ -24,7 +24,10 @@
  +--------------------------------------------------------------------+
 *}
 <tr>
-  <td class="crm-event-form-block-event_id"> {$form.event_id.label}  <br />{$form.event_id.html|crmAddClass:huge} </td>
+  <td class="crm-event-form-block-event_id"> 
+      {$form.event_id.label}  <br />{$form.event_id.html|crmAddClass:huge} <br/>
+      {$form.event_include_repeating_events.label}&nbsp;&nbsp;{$form.event_include_repeating_events.html}
+  </td>
   <td class="crm-event-form-block-event_type_id"> {$form.event_type_id.label}<br />{$form.event_type_id.html} </td>
 </tr>
 <tr>
