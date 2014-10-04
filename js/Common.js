@@ -907,6 +907,9 @@ CRM.strings = CRM.strings || {};
     });
   }
 
+  /**
+   * Improve blockUI when used with jQuery dialog
+   */
   var originalBlock = $.fn.block,
     originalUnblock = $.fn.unblock;
 
@@ -916,17 +919,16 @@ CRM.strings = CRM.strings || {};
       return $(this);
     }
     return originalBlock.call(this, opts);
-  }
-
+  };
   $.fn.unblock = function(opts) {
     if ($(this).is('.ui-dialog-content')) {
       originalUnblock.call($(this).parents('.ui-dialog'), opts);
       return $(this);
     }
     return originalUnblock.call(this, opts);
-  }
+  };
 
-  // Preprocess all cj ajax calls to display messages
+  // Preprocess all CRM ajax calls to display messages
   $(document).ajaxSuccess(function(event, xhr, settings) {
     try {
       if ((!settings.dataType || settings.dataType == 'json') && xhr.responseText) {
@@ -968,7 +970,7 @@ CRM.strings = CRM.strings || {};
         CRM.confirm({
           title: ts('Preview'),
           resizable: true,
-          message: '<div class="crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>',
+          message: '<div class="crm-custom-image-popup"><img style="max-width: 100%" src="' + $(this).attr('href') + '"></div>',
           options: null
         });
         e.preventDefault();
@@ -1031,10 +1033,9 @@ CRM.strings = CRM.strings || {};
 
   /**
    * Clientside currency formatting
-   * @param value
-   * @param format - currency representation of the number 1234.56
+   * @param number value
+   * @param [optional] string format - currency representation of the number 1234.56
    * @return string
-   * @see CRM_Core_Resources::addCoreResources
    */
   var currencyTemplate;
   CRM.formatMoney = function(value, format) {
@@ -1067,5 +1068,5 @@ CRM.strings = CRM.strings || {};
         return console[method](title, msg);
       }
     }
-  }
+  };
 })(jQuery, _);
