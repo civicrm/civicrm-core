@@ -1088,7 +1088,7 @@ GROUP BY c.id
 {$fromClause}
 {$joinClause}
 INNER JOIN {$reminderJoinClause}
-{$whereClause} {$limitWhereClause} AND {$repeatEventClause} $originalEventStartDateClause
+{$whereClause} {$limitWhereClause} AND {$repeatEventClause} {$notINClause} $originalEventStartDateClause
 {$groupByClause}
 {$havingClause}";
 
@@ -1157,10 +1157,10 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     $excludeIds = array();
     $dao = CRM_Core_DAO::executeQuery($query, array());
     while ($dao->fetch()) {
-      if ($dao->slave_contact == $dao->contact_id_a && $dao->is_permission_b_a == 0) {
+      if ($dao->slave_contact == $dao->contact_id_a && $dao->is_permission_a_b == 0) {
         $excludeIds[] = $dao->slave_contact;
       }
-      elseif ($dao->slave_contact == $dao->contact_id_b && $dao->is_permission_a_b == 0) {
+      elseif ($dao->slave_contact == $dao->contact_id_b && $dao->is_permission_b_a == 0) {
         $excludeIds[] = $dao->slave_contact;
       }
     }
