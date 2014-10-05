@@ -198,6 +198,17 @@ class CRM_Core_Page_AJAX {
   }
 
   /**
+   * Set headers appropriate for a js file
+   */
+  static function setJsHeaders() {
+    // Encourage browsers to cache for a long time - 1 year
+    $year = 60*60*24*364;
+    header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
+    header('Content-Type:	application/javascript');
+    header("Cache-Control: max-age=$year, public");
+  }
+
+  /**
    * Send autocomplete results to the client. Input can be a simple or nested array.
    * @param array $results - If nested array, also provide:
    * @param string $val - array key to use as the value

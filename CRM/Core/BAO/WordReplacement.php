@@ -208,7 +208,7 @@ WHERE  domain_id = %1
         // Reset navigation
         CRM_Core_BAO_Navigation::resetNavigation();
         // Clear js localization
-        CRM_Core_Resources::singleton()->flushStrings()->rebuildDynamicResources();
+        CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
       }
 
       return TRUE;
