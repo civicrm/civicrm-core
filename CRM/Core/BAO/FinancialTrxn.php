@@ -459,6 +459,8 @@ WHERE ceft.entity_id = %1";
 
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
         $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $relationTypeId);
+        $feeRelationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));
+        $feeFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $feeRelationTypeId);
 
         if (empty($lineItemTotal)) {
           $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
@@ -479,7 +481,7 @@ FROM civicrm_financial_trxn ft
   LEFT JOIN civicrm_entity_financial_trxn eft ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution')
   LEFT JOIN civicrm_contribution c ON (eft.entity_id = c.id)
   LEFT JOIN civicrm_participant_payment pp ON (pp.contribution_id = c.id)
-WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFinancialAccount}
+WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_account_id != {$feeFinancialAccount}
   AND ft.status_id IN ({$statusId}, {$refundStatusId})
 ";
         $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
