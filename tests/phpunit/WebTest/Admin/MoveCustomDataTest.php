@@ -129,7 +129,6 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
 
     //click the save button
     $this->click("_qf_MoveField_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //assert that the success text is present
     $this->waitForText('crm-notification-container', "has been moved");
@@ -377,13 +376,14 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     }
 
     //clicking save
-    $this->click("_qf_Field_next");
+    $this->click("_qf_Field_done-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
     $this->waitForText('crm-notification-container', "Custom field '$fieldLabel' has been saved.");
 
     //get the custom id of the custom field that was just created
+    CRM_Utils_System::flushCache();
     $results = $this->webtest_civicrm_api("CustomField", "get", array('label' => $fieldLabel, 'custom_group_id' => $group_id));
     //While there _technically_ could be two fields with the same name, its highly unlikely
     //so assert that exactly one result is return
@@ -445,7 +445,10 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     //fill a value in for each field
     foreach ($fields as $field_id => $field) {
       //if there is an option group id, we grab the labels and select on randomly
-      if (isset($field['option_group_id'])) {
+      if ($field['data_type'] == 'Date') {
+        $this->webtestFillDate("custom_" . $field['id'] . "_" . $table_pk, "+1 week");
+      }
+      elseif (isset($field['option_group_id'])) {
         $options = $this->webtest_civicrm_api("OptionValue", "get", array('option_group_id' => $field['option_group_id']));
         $options = $options['values'];
         $pick_me = $options[array_rand($options)]['label'];
