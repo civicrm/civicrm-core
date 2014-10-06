@@ -236,10 +236,10 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select2("country", "United States", False);
     $this->clickLink("_qf_Advanced_refresh");
 
-    $stateBeforeSort = $this->getText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]");
+    $stateBeforeSort = $this->getText("xpath=//div[@class='crm-search-results']//table/tbody/tr[2]/td[6]");
     $this->click("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
     $this->waitForElementPresent("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
-    $this->assertElementNotContainsText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]", $stateBeforeSort);
+    $this->assertElementNotContainsText("xpath=//div[@class='crm-search-results']//table/tbody/tr[2]/td[6]", $stateBeforeSort);
     $this->clickAjaxLink("xpath=//form[@id='Advanced']//div//div[contains(text(),'Edit Search Criteria')]/../div", 'group');
     $this->select2("group", "Summer", TRUE);
     $this->waitForElementPresent('state_province');
