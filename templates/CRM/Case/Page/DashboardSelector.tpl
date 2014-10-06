@@ -127,7 +127,7 @@ function {/literal}{$context}{$list}{literal}CaseDetails( caseId, contactId, typ
                   cj( '#'+ context + '-' + type +'-casedetails-' + caseId ).html( data );
                       },
             error   : function( XMLHttpRequest, textStatus, errorThrown ) {
-                        console.error( 'Error: '+ textStatus );
+                        CRM.console('error', 'Error: ', textStatus);
                       }
          });
 }

@@ -268,7 +268,7 @@ function setLocationDetails(contactID , reset) {
       }
     },
     error       : function(XMLHttpRequest, textStatus, errorThrown) {
-      console.error("HTTP error status: ", textStatus);
+      CRM.console('error', "HTTP error status: ", textStatus);
     }
   });
 }
