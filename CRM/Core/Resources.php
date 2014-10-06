@@ -571,7 +571,7 @@ class CRM_Core_Resources {
       'otherSearch' => json_encode(ts('Enter search term...')),
       'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
     );
-    print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/localization.js.tpl', $vars);
+    print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
     CRM_Utils_System::civiExit();
   }
 
