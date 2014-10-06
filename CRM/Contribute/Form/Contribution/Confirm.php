@@ -576,17 +576,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     $defaults = array();
-    $fields = array();
-    foreach ($this->_fields as $name => $dontCare) {
-      if ($name != 'onbehalf' || $name != 'honor') {
-        $fields[$name] = 1;
-      }
-    }
+    $fields = array_fill_keys(array_keys($this->_fields), 1);
     $fields["billing_state_province-{$this->_bltID}"] = $fields["billing_country-{$this->_bltID}"] = $fields["email-{$this->_bltID}"] = 1;
 
     $contact = $this->_params;
     foreach ($fields as $name => $dontCare) {
-      if (isset($contact[$name])) {
+      // Recursively set defaults for nested fields
+      if (isset($contact[$name]) && is_array($contact[$name]) && ($name == 'onbehalf' || $name == 'honor')) {
+        foreach ($contact[$name] as $fieldName => $fieldValue) {
+          $defaults["{$name}[{$fieldName}]"] = $fieldValue;
+        }
+      }
+      elseif (isset($contact[$name])) {
         $defaults[$name] = $contact[$name];
         if (substr($name, 0, 7) == 'custom_') {
           $timeField = "{$name}_time";
