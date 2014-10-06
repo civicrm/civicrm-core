@@ -43,6 +43,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $cid_to_missing   = $this->_createContact("destination_missing", "move_custom_data");
 
     $from_group_id = $this->_buildCustomFieldSet("source");
+    CRM_Utils_System::flushCache();
     $to_group_id = $this->_buildCustomFieldSet("destination");
 
     $this->_fillCustomDataForContact($cid_all, $from_group_id);
@@ -383,7 +384,6 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Custom field '$fieldLabel' has been saved.");
 
     //get the custom id of the custom field that was just created
-    CRM_Utils_System::flushCache();
     $results = $this->webtest_civicrm_api("CustomField", "get", array('label' => $fieldLabel, 'custom_group_id' => $group_id));
     //While there _technically_ could be two fields with the same name, its highly unlikely
     //so assert that exactly one result is return
