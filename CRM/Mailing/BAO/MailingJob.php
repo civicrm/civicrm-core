@@ -665,7 +665,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         CRM_Core_Error::setCallback();
       }
 
-      // FIXME: for now we skipping bounce handling for sms
       if (is_a($result, 'PEAR_Error') && !$mailing->sms_provider_id) {
         // CRM-9191
         $message = $result->getMessage();
@@ -708,6 +707,13 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           CRM_Mailing_BAO_BouncePattern::match($result->getMessage())
         );
         CRM_Mailing_Event_BAO_Bounce::create($params);
+      }
+      elseif (is_a($result, 'PEAR_Error') && $mailing->sms_provider_id) {
+        // Handle SMS errors: CRM-15426
+        $job_id = intval($this->id);
+        $mailing_id = intval($mailing->id);
+        CRM_Core_Error::debug_log_message("Failed to send SMS message. Vars: mailing_id: ${mailing_id}, job_id: ${job_id}. Error message follows.");
+        CRM_Core_Error::debug_log_message($result->getMessage());
       }
       else {
         /* Register the delivery event */
