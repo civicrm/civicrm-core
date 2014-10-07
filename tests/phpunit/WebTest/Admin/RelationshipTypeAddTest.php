@@ -74,7 +74,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
       'Contact Type B' => 'Individual',
     );
     foreach ($data as $param => $val) {
-      $this->assertElementContainsText('option11', $val, "Could not able to save $param");
+      $this->assertElementContainsText("xpath=//table[@class='display dataTable no-footer']", $val, "Could not able to save $param");
     }
   }
 
