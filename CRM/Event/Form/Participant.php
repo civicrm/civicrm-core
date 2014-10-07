@@ -1396,6 +1396,9 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
         if ($contributionParams['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name')) {
           $contributionParams['is_pay_later'] = 1;
         }
+        elseif ($contributionParams['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
+	        $contributionParams['is_pay_later'] = 0;
+	      }
 
         if ($params['status_id'] == array_search('Partially paid', $participantStatus)) {
           if (!$amountOwed && $this->_action & CRM_Core_Action::UPDATE) {

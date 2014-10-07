@@ -430,24 +430,15 @@
             url: dataUrl,
             success: function ( html ) {
               $("#feeBlock").html( html ).trigger('crmLoad');
+              //show event real full as well as waiting list message.
+              if ( $("#hidden_eventFullMsg").val( ) ) {
+                $( "#eventFullMsg" ).show( ).html( $("#hidden_eventFullMsg" ).val( ) );
+              }
+              else {
+                $( "#eventFullMsg" ).hide( );
+              }
             }
           });
-
-          $("#feeBlock").ajaxStart(function(){
-            $(".disable-buttons input").prop('disabled', true);
-          });
-
-          $("#feeBlock").ajaxStop(function(){
-            $(".disable-buttons input").prop('disabled', false);
-          });
-
-          //show event real full as well as waiting list message.
-          if ( $("#hidden_eventFullMsg").val( ) ) {
-            $( "#eventFullMsg" ).show( ).html( $("#hidden_eventFullMsg" ).val( ) );
-          }
-          else {
-            $( "#eventFullMsg" ).hide( );
-          }
         }
 
         {/literal}
