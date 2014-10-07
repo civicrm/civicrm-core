@@ -4,7 +4,7 @@
   <title></title>
 
   <style type="text/css">
-    {/literal}
+    {literal}
     /* Client-specific Styles */ 
     #outlook a {padding:0;} /* Force Outlook to provide a "view in browser" menu link. */
     body{width:100% !important; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; margin:0; padding:0;}
@@ -68,7 +68,7 @@
     @media only screen and (max-width: 640px) {
     .desktop-spacer {display:none !important;}
  }
- {/literal}
+  {/literal}
   </style>
 
 <body>
