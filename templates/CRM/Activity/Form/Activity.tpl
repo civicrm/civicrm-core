@@ -204,7 +204,29 @@
       </td>
     </tr>
   {/if}
-
+  
+  {if $action eq 2}
+    <tr class="crm-activity-form-block-recurring_activity">
+      <td colspan="2">
+        {include file="CRM/Core/Form/RecurringEntity.tpl"}
+        {literal}
+          <script type="text/javascript">
+            CRM.$(function($) {
+              if ($('#activity_date_time').val() !== "" && $('#activity_date_time_time').val() !== "") {
+                $('#repetition_start_date').val($('#activity_date_time').val());
+                $('#repetition_start_date_time').val($('#activity_date_time_time').val());
+              }
+              $('#activity_date_time_display').blur(function() {
+                $('#repetition_start_date').val($('#activity_date_time').val());
+                $('#repetition_start_date_time').val($('#activity_date_time_time').val());
+              });
+            });
+          </script>
+        {/literal}
+      </td>
+    </tr>
+  {/if}
+  
   {if $action neq 4} {* Don't include "Schedule Follow-up" section in View mode. *}
   <tr class="crm-activity-form-block-schedule_followup">
     <td colspan="2">
