@@ -286,7 +286,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
-    $this->markTestIncomplete('CRM-15296 fix not yet applied');
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 1));
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
@@ -350,7 +349,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals(5, $membership['status_id']);
     //@todo - check with Joe about these not existing
     //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
-    $this->markTestIncomplete('e-Notice - seemingly due to missing line items');
     $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id'], 'trxn_id' => 'ipn_called'));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //renew it with processor setting completed - should extend membership
