@@ -122,7 +122,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   protected $_values = array();
 
   protected $unsavedWarn = TRUE;
-
+  
   /**
    * The _fields var can be used by sub class to set/unset/edit the
    * form fields based on their requirement
@@ -503,8 +503,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
       $this->set('values', $this->_values);
     }
+    
+    if ($this->_action & CRM_Core_Action::UPDATE) {
+      CRM_Core_Form_RecurringEntity::preProcess('activity');
+    }
   }
-
+      
   /**
    * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
@@ -529,6 +533,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         list($defaults['activity_date_time'],
           $defaults['activity_date_time_time']
           ) = CRM_Utils_Date::setDateDefaults($defaults['activity_date_time'], 'activityDateTime');
+        list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($defaults['activity_date_time'], 'activityDateTime');
+        $recurringEntityDefaults = array();
+        $recurringEntityDefaults = CRM_Core_Form_RecurringEntity::setDefaultValues();
+        $defaults = array_merge($defaults, $recurringEntityDefaults);
       }
 
       if ($this->_context != 'standalone') {
@@ -630,6 +638,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     //freeze for update mode.
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $element->freeze();
+      CRM_Core_Form_RecurringEntity::buildQuickForm($this);
     }
 
     foreach ($this->_fields as $field => $values) {
@@ -940,6 +949,20 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     else {
       // save activity
       $activity = $this->processActivity($params);
+      $params['parent_entity_start_date'] = $this->_parentActivityStartDate;
+      //Unset activity id
+      unset($params['id']);
+      $linkedEntities = array(
+        array(
+          'table'         => 'civicrm_activity_contact',
+          'findCriteria'  => array(
+            'activity_id' => $this->_activityId, 
+          ),
+          'linkedColumns' => array('activity_id'),
+          'isRecurringEntityRecord' => FALSE,
+        )
+      );
+      CRM_Core_Form_RecurringEntity::postProcess($params, 'activity', $linkedEntities);
     }
 
     return array('activity' => $activity);

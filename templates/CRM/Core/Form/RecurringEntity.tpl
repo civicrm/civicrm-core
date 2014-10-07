@@ -219,7 +219,8 @@
         
     //Dialog for preview repeat Configuration dates
     cj('#preview-dialog').dialog({ autoOpen: false });
-    cj('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom').click( function () {
+    cj('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom, #_qf_Activity_upload-top, #_qf_Activity_upload-bottom').click( function (e) {
+      e.preventDefault();
       cj('#exclude_date_list option').attr('selected',true);
       //Copy exclude dates
       var dateTxt=[];
@@ -239,7 +240,7 @@
         buttons: {
           Ok: function() {
               cj(this).dialog( "close" );
-              cj('form#Repeat').submit();
+              cj('form#Repeat, form#Activity').submit();
           },
           Cancel: function() { //cancel
               cj(this).dialog( "close" );

@@ -223,7 +223,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         }
       }
       if (empty($findCriteria)) {
-        CRM_Core_Error::fatal("Find criteria missing to generate from. Make sure entity_id and table is set.");
+        CRM_Core_Error::fatal("Find criteria missing to generate form. Make sure entity_id and table is set.");
       }
 
       $count = 0;
@@ -720,8 +720,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       $dbParams['used_for'] = $formParams['used_for'];
     }
 
-    if (CRM_Utils_Array::value('event_id', $formParams)) {
-      $dbParams['entity_value'] = $formParams['event_id'];
+    if (CRM_Utils_Array::value('entity_id', $formParams)) {
+      $dbParams['entity_value'] = $formParams['entity_id'];
     }
 
     if (CRM_Utils_Array::value('repetition_start_date', $formParams)) {
@@ -964,5 +964,35 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       $dao->parent_id = $parentID;
       return $dao->delete();
     }
+  }
+  
+  /**
+   * This function gets all columns from civicrm_action_schedule on the basis of event id
+   * 
+   * @param int $eventId Entity ID
+   * @param string $used_for Specifies for which entity type it's used for
+   * 
+   * @access public
+   * @static
+   * 
+   * @return object
+   */
+  static public function getReminderDetailsByEntityId($entityId, $used_for) {
+    if ($entityId) {
+      $query = "
+        SELECT *
+        FROM   civicrm_action_schedule 
+        WHERE  entity_value = %1";
+      if ($used_for) {
+        $query .= " AND used_for = %2";
+      }
+      $params = array(
+        1 => array($entityId, 'Integer'),
+        2 => array($used_for, 'String')
+      );
+      $dao = CRM_Core_DAO::executeQuery($query, $params);
+      $dao->fetch();
+    }
+    return $dao;
   }
 }
