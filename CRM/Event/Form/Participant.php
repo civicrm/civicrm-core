@@ -1287,6 +1287,10 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           $this->_params['role_id']
         );
       }
+      
+      //CRM-15372 patch to fix fee amount replacing amount
+      $this->_params['fee_amount'] =  $this->_params['amount'];
+
       $participants[] = CRM_Event_Form_Registration::addParticipant($this, $contactID);
 
       //add custom data for participant
