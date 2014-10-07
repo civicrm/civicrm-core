@@ -959,7 +959,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           // Eliminate contacts that have already been assigned to this event.
           $dupeCheck = new CRM_Event_BAO_Participant;
           $dupeCheck->contact_id = $dupeCheckContactId;
-          $dupeCheck->event_id = $this->_eventId;
+          $dupeCheck->event_id = $this->_eventId;
           $dupeCheck->find(TRUE);
           if(!empty($dupeCheck->id)) {
             $duplicateContacts++;
@@ -1287,7 +1287,11 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           $this->_params['role_id']
         );
       }
-      $participants[] = CRM_Event_Form_Registration::addParticipant($this, $contactID);
+      
+      //CRM-15372 patch to fix fee amount replacing amount
+      $participantParams = $this->_params;
+      $participantParams['fee_amount'] =  $this->_params["amount"];
+      $participants[] = CRM_Event_Form_Registration::addParticipant($participantParams, $contactID);
 
       //add custom data for participant
       CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
