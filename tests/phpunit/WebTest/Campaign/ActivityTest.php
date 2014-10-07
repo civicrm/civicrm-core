@@ -200,10 +200,10 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     // click through to the Activity view screen
     $this->click("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr[2]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
-    $this->waitForElementPresent("xpath=id('Activity')/div[2]/table[1]/tbody/tr[5]/td[2]/span");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]");
 
     // verify Activity created
-    $this->verifyText("xpath=id('Activity')/div[2]/table[1]/tbody/tr[5]/td[2]/span", $campaignTitle);
+    $this->verifyText("xpath=//form[@id='Activity']/div[2]/table/tbody/tr[5]/td[2]/span", $campaignTitle);
   }
 }
 
