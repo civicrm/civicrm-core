@@ -45,12 +45,7 @@ class CRM_Admin_Page_AJAX {
   static function getNavigationMenu() {
     $contactID = CRM_Core_Session::singleton()->get('userID');
     if ($contactID) {
-      // Set headers to encourage browsers to cache for a long time
-      $year = 60*60*24*364;
-      header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
-      header('Content-Type:	application/javascript');
-      header("Cache-Control: max-age=$year, public");
-
+      CRM_Core_Page_AJAX::setJsHeaders();
       print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/navigation.js.tpl', array(
         'navigation' => CRM_Core_BAO_Navigation::createNavigation($contactID),
       ));
