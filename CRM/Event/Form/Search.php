@@ -212,6 +212,13 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
           $roles = array_keys($this->_formValues['participant_role_id']);
           $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', $roles) . ' ) )';
         }
+        // CRM-15379
+        if (!empty($this->_formValues['participant_fee_id'])) {
+          $participant_fee_id = $this->_formValues['participant_fee_id'];
+          $feeLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $participant_fee_id, 'label');
+          $feeLabel = CRM_Core_DAO::escapeString(trim($feeLabel));
+          $seatClause[] = "( participant.fee_level LIKE '%$feeLabel%' )";
+        }
         $clause = NULL;
         if (!empty($seatClause)) {
           $clause = implode(' AND ', $seatClause);
