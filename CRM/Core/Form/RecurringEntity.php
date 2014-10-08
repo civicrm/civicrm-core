@@ -63,8 +63,14 @@ class CRM_Core_Form_RecurringEntity {
   */
   public static $_excludeDateInfo = array();
   
+  /**
+   * Entity Type
+  */
+  public static $_entityType;
+  
   static function preProcess($entityType) {
    self::$_entityId = (int) CRM_Utils_Request::retrieve('id', 'Positive');
+   self::$_entityType = $entityType;
    if (self::$_entityId && $entityType) {
      $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor(self::$_entityId, 'civicrm_'.$entityType);    
      if ($checkParentExistsForThisId) {
@@ -132,6 +138,7 @@ class CRM_Core_Form_RecurringEntity {
   
   static function buildQuickForm(&$form) {
     $form->assign('currentEntityId', self::$_entityId);
+    $form->assign('entityType', self::$_entityType);
     
     $form->_freqUnits = array('hour' => 'hour') + CRM_Core_OptionGroup::values('recur_frequency_units');
     foreach ($form->_freqUnits as $val => $label) {
@@ -357,7 +364,7 @@ class CRM_Core_Form_RecurringEntity {
           $participantDetails = CRM_Event_Form_ManageEvent_Repeat::getParticipantCountforEvent($getRelatedEntities);
           //Check if participants exists for events
           foreach ($getRelatedEntities as $key => $value) {
-            if (!CRM_Utils_Array::value($value['id'], $participantDetails['countByID']) && $value['id'] != $params['event_id']) {
+            if (!CRM_Utils_Array::value($value['id'], $participantDetails['countByID']) && $value['id'] != $params['entity_id']) {
               CRM_Event_BAO_Event::del($value['id']);
             }
           }
@@ -366,12 +373,21 @@ class CRM_Core_Form_RecurringEntity {
       }
 
       $recursion = new CRM_Core_BAO_RecurringEntity();
-      $recursion->dateColumns  = array('start_date');
+      if (CRM_Utils_Array::value('start_date_column_name', $params)) {
+        $recursion->dateColumns  = array($params['start_date_column_name']);
+      }
       $recursion->scheduleId   = $actionScheduleObj->id;
 
       if (!empty($excludeDateList)) {
         $recursion->excludeDates = $excludeDateList;
-        $recursion->excludeDateRangeColumns = array('start_date', 'end_date');
+        $excludeDateRangeColumns = array();
+        if (CRM_Utils_Array::value('start_date_column_name', $params)) {
+          $excludeDateRangeColumns[] = $params['start_date_column_name'];
+        }
+        if (CRM_Utils_Array::value('end_date_column_name', $params)) {
+          $excludeDateRangeColumns[] = $params['end_date_column_name'];
+        }
+        $recursion->excludeDateRangeColumns = $excludeDateRangeColumns;
       }
 
       if ($params['parent_entity_end_date']) {

@@ -248,9 +248,10 @@
         }
       });
       var ajaxurl = CRM.url("civicrm/ajax/recurringentity/generate-preview");
-      var eventID = {/literal}{$currentEntityId}{literal};
-      if (eventID != "") {
-          ajaxurl += "?event_id="+eventID;
+      var entityID = {/literal}{$currentEntityId}{literal};
+      var entityType = '{/literal}{$entityType}{literal}';
+      if (entityID != "" && entityType != "") {
+          ajaxurl += "?entity_id="+entityID+"&entity_type="+entityType;
       }
       var formData = cj('form').serializeArray();
       cj.ajax({

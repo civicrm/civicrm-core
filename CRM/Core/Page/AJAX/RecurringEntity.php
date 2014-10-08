@@ -62,9 +62,9 @@ class CRM_Core_Page_AJAX_RecurringEntity {
         $recursion->excludeDateRangeColumns = array('start_date', 'end_date');
       }
 
-      $parentEventId = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['event_id'], 'civicrm_event');
+      $parentEventId = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['entity_id'], 'civicrm_event');
       if (!$parentEventId) {
-        $parentEventId = $formValues['event_id'];
+        $parentEventId = $formValues['entity_id'];
       }
 
       $endDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $parentEventId, 'end_date');
