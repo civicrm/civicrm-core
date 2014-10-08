@@ -51,6 +51,20 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   public $isRecurringEntityRecord = TRUE;
 
   protected $recursion = NULL;
+  
+  static $_recurringEntityHelper = 
+    array(
+      'civicrm_event' => array(
+      'helper_class' => 'CRM_Event_BAO_Event',
+      'delete_func' => 'del',
+      'count_func' => ''
+      ),
+      'civicrm_activity' => array(
+      'helper_class' => 'CRM_Activity_BAO_Activity',
+      'delete_func' => 'del',
+      'count_func' => ''
+      ) 
+    ); 
 
   static $_tableDAOMapper = 
     array(

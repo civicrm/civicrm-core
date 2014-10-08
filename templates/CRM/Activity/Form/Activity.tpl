@@ -330,3 +330,31 @@
   {/if}
   </div>{* end of form block*}
 {/if} {* end of snippet if*}
+{literal}
+<script type="text/javascript">
+  CRM.$(function($) {
+    var mapper = {'CRM_Activity_Form_Activity': ''};
+    var form = '';
+    $('#_qf_Activity_upload-top, #_qf_Activity_upload-bottom').click( function () {      
+        form = $(this).parents('form:first').attr('class');
+        if (form != "" && mapper.hasOwnProperty(form)) {
+          $("#recurring-dialog").dialog({
+            title: ts('How does this change affect other repeating events in the set?'),
+            modal: true,
+            width: '650',
+            buttons: {
+              Cancel: function() { //cancel
+                $( this ).dialog( "close" );
+              }
+            }
+          }).dialog('open');
+          return false;
+        }
+    }); 
+  });
+</script>
+{/literal}
+{foreach from=$mapper key=k item=item}
+  {$k} {$item}
+{/foreach}
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityType="activity" entityID=$activityId entityTable="civicrm_activity" mapper=$mapper}
