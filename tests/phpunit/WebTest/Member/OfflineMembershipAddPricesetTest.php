@@ -332,16 +332,19 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     else {
       $this->click("xpath=//div[@id='memberships']/div//table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
       $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
+      $this->waitForAjaxContent();
       $this->click('_qf_MembershipRenewal_upload-bottom');
 
       $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr");
       $this->click("xpath=//div[@id='memberships']/div//table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
       $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
+      $this->waitForAjaxContent();
       $this->click('_qf_MembershipRenewal_upload-bottom');
     }
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[9]/span/a[text()='View']");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@id='memberships']//table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[9]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]");
 
     //View Membership Record
     $verifyData = array(
@@ -353,10 +356,10 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     );
     $this->webtestVerifyTabularData($verifyData);
 
-    $this->click('_qf_MembershipView_cancel-bottom');
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[9]/span/a[text()='View']");
     $this->click("xpath=//div[@id='memberships']//table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[9]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]");
 
     //View Membership Record
     $verifyData = array(
@@ -368,7 +371,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     );
     $this->webtestVerifyTabularData($verifyData);
 
-    $this->click("_qf_MembershipView_cancel-bottom");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr");
   }
 
