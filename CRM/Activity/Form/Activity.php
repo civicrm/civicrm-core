@@ -505,6 +505,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
     
     if ($this->_action & CRM_Core_Action::UPDATE) {
+      $mapper = array('CRM_Activity_Form_Activity' => '');
+      $this->assign('mapper', json_encode($mapper));
       CRM_Core_Form_RecurringEntity::preProcess('activity');
     }
   }

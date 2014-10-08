@@ -107,4 +107,4 @@ CRM.$(function($) {
 </script>
 {/literal}
 
-{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl"}
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityType="event"}
