@@ -108,6 +108,8 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       $params = $this->controller->exportValues($this->_name); 
       $params['parent_entity_start_date'] = $this->_parentEventStartDate;
       $params['parent_entity_end_date'] = $this->_parentEventEndDate;
+      $params['start_date_column_name'] = 'start_date';
+      $params['end_date_column_name'] = 'end_date';
       //Unset event id
       unset($params['id']);
 
