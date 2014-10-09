@@ -484,31 +484,6 @@
       cj("#crm-submit-buttons").hide();
     }
   }
-
-  cj(function(){
-    // highlight price sets
-    function updatePriceSetHighlight() {
-      cj('#priceset .price-set-row span').removeClass('highlight');
-      cj('#priceset .price-set-row input:checked').parent().addClass('highlight');
-    }
-    cj('#priceset input[type="radio"]').change(updatePriceSetHighlight);
-    updatePriceSetHighlight();
-
-    function toggleBillingBlockIfFree(){
-      var total_amount_tmp =  cj(this).data('raw-total');
-      // Hide billing questions if this is free
-      if (total_amount_tmp == 0){
-        cj("#billing-payment-block").hide();
-        cj(".payment_options-group").hide();
-      }
-      else {
-        cj("#billing-payment-block").show();
-        cj(".payment_options-group").show();
-      }
-    }
-
-    cj('#pricevalue').each(toggleBillingBlockIfFree).on('change', toggleBillingBlockIfFree);
-  });
   {/literal}
 </script>
 {/if}
