@@ -488,7 +488,7 @@
     updatePriceSetHighlight();
 
     function toggleBillingBlockIfFree(){
-      var total_amount_tmp =  $(this).data('raw-total'); 
+      var total_amount_tmp =  cj(this).data('raw-total');
       // Hide billing questions if this is free
       if (total_amount_tmp == 0){
         cj("#billing-payment-block").hide(); 
@@ -498,7 +498,7 @@
       }
     }
 
-    $('#pricevalue').each(toggleBillingBlockIfFree).on('change', toggleBillingBlockIfFree);
+    cj('#pricevalue').each(toggleBillingBlockIfFree).on('change', toggleBillingBlockIfFree);
   });
   {/literal}
 </script>
