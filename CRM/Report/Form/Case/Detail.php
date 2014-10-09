@@ -628,7 +628,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_activity_last_completed_last_completed_activity_subject', $row) && empty($row['civicrm_activity_last_completed_last_completed_activity_subject'])) {
-        $rows[$rowNum]['civicrm_activity_last_completed_last_completed_activity_subject'] = ts('(No Subject)');
+        $rows[$rowNum]['civicrm_activity_last_completed_last_completed_activity_subject'] = ts('(no subject)');
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_contact_client_sort_name', $row) &&
