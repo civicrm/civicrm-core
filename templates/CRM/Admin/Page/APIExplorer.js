@@ -10,7 +10,12 @@
     fieldTpl = _.template($('#api-param-tpl').html()),
     optionsTpl = _.template($('#api-options-tpl').html()),
     returnTpl = _.template($('#api-return-tpl').html()),
-    chainTpl = _.template($('#api-chain-tpl').html());
+    chainTpl = _.template($('#api-chain-tpl').html()),
+
+    // Operators with special properties
+    BOOL = ['IS NULL', 'IS NOT NULL'],
+    TEXT = ['LIKE', 'NOT LIKE'],
+    MULTI = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'];
 
   /**
    * Call prettyPrint function if it successfully loaded from the cdn
@@ -28,7 +33,7 @@
   function addField(name) {
     $('#api-params').append($(fieldTpl({name: name || ''})));
     var $row = $('tr:last-child', '#api-params');
-    $('.api-param-name', $row).crmSelect2({
+    $('input.api-param-name', $row).crmSelect2({
       data: fields.concat({id: '-', text: ts('Other') + '...'})
     }).change();
   }
@@ -167,20 +172,45 @@
   }
 
   /**
-   * Add/remove option list for selected field's pseudoconstant
+   * Render value input as a textfield, option list, or hidden,
+   * Depending on selected param name and operator
    */
-  function toggleOptions() {
-    var name = $(this).val(),
-      $valField = $(this).closest('tr').find('.api-param-value');
-    if (options[name]) {
-      $valField.val('').select2({
-        multiple: true,
+  function renderValueField() {
+    var $row = $(this).closest('tr'),
+      name = $('input.api-param-name', $row).val(),
+      operator = $('.api-param-op', $row).val(),
+      operatorType = $.inArray(operator, MULTI) > -1 ? 'multi' : ($.inArray(operator, BOOL) > -1 ? 'bool' : 'single'),
+      $valField = $('input.api-param-value', $row),
+      currentVal = $valField.val();
+    // Boolean fields only have 1 possible value
+    if (operatorType == 'bool') {
+      if ($valField.data('select2')) {
+        $valField.select2('destroy');
+      }
+      $valField.css('visibility', 'hidden').val('1');
+      return;
+    }
+    $valField.css('visibility', '');
+    // Option list input
+    if (options[name] && $.inArray(operator, TEXT) < 0) {
+      // Reset value before switching to a select from something else
+      if ($(this).is('.api-param-name') || !$valField.data('select2')) {
+        $valField.val('');
+      }
+      // When switching from multi-select to single select
+      else if (operatorType == 'single' && currentVal.indexOf(',') > -1) {
+        $valField.val(currentVal.split(',')[0]);
+      }
+      $valField.select2({
+        multiple: (operatorType === 'multi'),
         data: _.transform(options[name], function(result, option) {
           result.push({id: option.key, text: option.value});
         })
       });
+      return;
     }
-    else if ($valField.data('select2')) {
+    // Plain text input
+    if ($valField.data('select2')) {
       $valField.select2('destroy');
     }
   }
@@ -193,17 +223,13 @@
   function evaluate(val, makeArray) {
     try {
       if (!val.length) {
-        return val;
+        return makeArray ? [] : '';
       }
       var first = val.charAt(0),
         last = val.slice(-1);
       // Simple types
       if (val === 'true' || val === 'false' || val === 'null') {
         return eval(val);
-      }
-      // Integers - quote any number that starts with 0 to avoid oddities
-      if (!isNaN(val) && val.search(/[^\d]/) < 0 && (val.length === 1 || first !== '0')) {
-        return parseInt(val, 10);
       }
       // Quoted strings
       if ((first === '"' || first === "'") && last === first) {
@@ -214,8 +240,16 @@
         return eval('(' + val + ')');
       }
       // Transform csv to array
-      if (makeArray && val.indexOf(',') > 0) {
-        return val.split(',');
+      if (makeArray) {
+        var result = [];
+        $.each(val.split(','), function(k, v) {
+          result.push(evaluate($.trim(v)) || v);
+        });
+        return result;
+      }
+      // Integers - quote any number that starts with 0 to avoid oddities
+      if (!isNaN(val) && val.search(/[^\d]/) < 0 && (val.length === 1 || first !== '0')) {
+        return parseInt(val, 10);
       }
       // Ok ok it's really a string
       return val;
@@ -269,9 +303,9 @@
     });
     $('input.api-param-value, input.api-option-value').each(function() {
       var $row = $(this).closest('tr'),
-        val = evaluate($(this).val(), $(this).is('.select2-offscreen')),
+        op = $('select.api-param-op', $row).val() || '=',
         name = $('input.api-param-name', $row).val(),
-        op = $('select.api-param-op', $row).val() || '=';
+        val = evaluate($(this).val(), $.inArray(op, MULTI) > -1);
 
       // Ignore blank values for the return field
       if ($(this).is('#api-return-value') && !val) {
@@ -348,6 +382,7 @@
       q.php += "  '" + key + "' => " + phpFormat(value) + ",\n";
       q.json += "  \"" + key + '": ' + js;
       q.smarty += ' ' + key + '=' + smartyFormat(js, key);
+      // FIXME: This is not totally correct cli syntax
       q.drush += key + '=' + js + ' ';
       q.wpcli += key + '=' + js + ' ';
     });
@@ -383,6 +418,10 @@
     }
   }
 
+  /**
+   * Execute api call and display the results
+   * Note: We have to manually execute the ajax in order to add the secret extra "prettyprint" param
+   */
   function execute() {
     $('#api-result').html('<div class="crm-loading-element"></div>');
     $.ajax({
@@ -422,8 +461,8 @@
       .on('change keyup', 'input.api-input, #api-params select', buildParams)
       .on('submit', submit);
     $('#api-params')
-      .on('change', '.api-param-name', toggleOptions)
-      .on('change', '.api-param-name, .api-option-name', function() {
+      .on('change', 'input.api-param-name, select.api-param-op', renderValueField)
+      .on('change', 'input.api-param-name, .api-option-name', function() {
         if ($(this).val() === '-') {
           $(this).select2('destroy');
           $(this).val('').focus();
