@@ -298,7 +298,7 @@ class CRM_Core_Form_RecurringEntity {
    */
   static function postProcess($params = array(), $type, $linkedEntities = array()) {
     $params['entity_id'] = self::$_entityId;
-    if ($type && CRM_Utils_Array::value('entity_id', $params)) {
+    if (CRM_Utils_Array::value('entity_table', $params) && CRM_Utils_Array::value('entity_id', $params) && $type) {
       $params['used_for'] = $type;
       $params['parent_entity_id'] = self::$_parentEntityId;
       $params['id'] = self::$_scheduleReminderID;
@@ -359,18 +359,37 @@ class CRM_Core_Form_RecurringEntity {
 
       //Delete relations if any from recurring entity tables before inserting new relations for this entity id
       if ($params['entity_id']) {
-        $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['entity_id'], 'civicrm_'.$type, TRUE);
-        
-        if ($type == 'event') {
-          $participantDetails = CRM_Event_Form_ManageEvent_Repeat::getParticipantCountforEvent($getRelatedEntities);
-          //Check if participants exists for events
-          foreach ($getRelatedEntities as $key => $value) {
-            if (!CRM_Utils_Array::value($value['id'], $participantDetails['countByID']) && $value['id'] != $params['entity_id']) {
-              CRM_Event_BAO_Event::del($value['id']);
-            }
-          }
+        //If entity has any pre delete function, consider that first
+        if (CRM_Utils_Array::value('pre_delete_func', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]) &&
+            CRM_Utils_Array::value('helper_class', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']])) {
+            call_user_func(array(
+              CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'], 
+              call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], array($params['entity_id'])))
+            );
         }
-        CRM_Core_BAO_RecurringEntity::delEntityRelations($params['entity_id'], 'civicrm_'.$type);
+        //Ready to execute delete on entities if it has delete function set
+        if (CRM_Utils_Array::value('delete_func', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]) &&
+            CRM_Utils_Array::value('helper_class', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']])) {
+            //Check if pre delete function has some ids to be deleted
+            if (!empty(CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted)) {
+              foreach (CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted as $value) {
+                call_user_func(array(
+                CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'], 
+                call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array($value)))
+                );
+              }
+            }
+            else {
+              $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['entity_id'], $params['entity_table'], FALSE);
+              foreach ($getRelatedEntities as $key => $value) {
+                call_user_func(array(
+                CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'], 
+                call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array(array('id' => $value['id']))))
+                );
+              }
+            }
+        }
+        CRM_Core_BAO_RecurringEntity::delEntityRelations($params['entity_id'], $params['entity_table']);
       }
 
       $recursion = new CRM_Core_BAO_RecurringEntity();
@@ -397,7 +416,7 @@ class CRM_Core_Form_RecurringEntity {
       }
 
       $recursion->entity_id = $params['entity_id'];
-      $recursion->entity_table = 'civicrm_'.$type;
+      $recursion->entity_table = $params['entity_table'];
       if (!empty($linkedEntities)) {
         $recursion->linkedEntities = $linkedEntities;
       }
