@@ -77,15 +77,3 @@
 </div>
 {/if}
 </div>
-{*Hide Summary*}
-{if empty($scheduleReminderId)}
-    {literal}
-        <script type="text/javascript">
-        cj(document).ready(function() {
-            if (cj('#rec-summary').length) {
-                cj('#rec-summary').parent().parent().hide();
-            }
-        });
-        </script>
-    {/literal}
-{/if}
