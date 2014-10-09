@@ -1391,6 +1391,10 @@ class CiviCRM_For_WordPress {
     // add modal to WP selected post types, if allowed
     if ( $this->post_type_has_button() ) {
 
+      if ( ! $this->initialize() ) {
+        return '';
+      }
+
       $title = __( 'Please select a CiviCRM front-end page type.', 'civicrm-wordpress' );
       ?>
       <div id="civicrm_frontend_pages" style="display:none;">
