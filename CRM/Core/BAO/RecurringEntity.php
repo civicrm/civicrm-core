@@ -52,17 +52,19 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
   protected $recursion = NULL;
   
+  public static $_entitiesToBeDeleted = array();
+  
   static $_recurringEntityHelper = 
     array(
       'civicrm_event' => array(
-      'helper_class' => 'CRM_Event_BAO_Event',
-      'delete_func' => 'del',
-      'count_func' => ''
+      'helper_class' => 'CRM_Event_DAO_Event',
+      'delete_func' => 'CRM_Event_BAO_Event::del',
+      'pre_delete_func' => 'CRM_Event_Form_ManageEvent_Repeat::checkRegistrationForEvents'
       ),
       'civicrm_activity' => array(
-      'helper_class' => 'CRM_Activity_BAO_Activity',
-      'delete_func' => 'del',
-      'count_func' => ''
+      'helper_class' => 'CRM_Activity_DAO_Activity',
+      'delete_func' => 'CRM_Activity_BAO_Activity::deleteActivity',
+      'pre_delete_func' => ''
       ) 
     ); 
 
@@ -983,7 +985,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function gets all columns from civicrm_action_schedule on the basis of event id
    * 
-   * @param int $eventId Entity ID
+   * @param int $entityId Entity ID
    * @param string $used_for Specifies for which entity type it's used for
    * 
    * @access public
@@ -991,7 +993,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * 
    * @return object
    */
-  static public function getReminderDetailsByEntityId($entityId, $used_for) {
+  public static function getReminderDetailsByEntityId($entityId, $used_for) {
     if ($entityId) {
       $query = "
         SELECT *

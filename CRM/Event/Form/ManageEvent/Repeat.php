@@ -110,6 +110,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       $params['parent_entity_end_date'] = $this->_parentEventEndDate;
       $params['start_date_column_name'] = 'start_date';
       $params['end_date_column_name'] = 'end_date';
+      $params['entity_table'] = 'civicrm_event';
       //Unset event id
       unset($params['id']);
 
@@ -195,13 +196,13 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     return $participantDetails;
   }
   
-   /**
-   * Update mode column in civicrm_recurring_entity table for event related tabs
-   * 
-   * @params int $entityId event id
-   * @params string $linkedEntityTable Linked entity table name for this event
-   * @return array
-   */
+  /**
+  * Update mode column in civicrm_recurring_entity table for event related tabs
+  * 
+  * @params int $entityId event id
+  * @params string $linkedEntityTable Linked entity table name for this event
+  * @return array
+  */
   public static function updateModeRecurringEntityForEvent($entityId, $linkedEntityTable) {
     $result = array();
     if ( $entityId && $linkedEntityTable ) {
@@ -238,5 +239,28 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         }
     } 
     return $result;
-  }  
+  } 
+  
+  /**
+   * This function checks if there was any registraion for related event ids,
+   * and returns array of ids with no regsitrations
+   * @param type $eventID Event ID
+   * @return type
+   */
+  public static function checkRegistrationForEvents($eventID) {
+    $eventIdsWithNoRegistration = array();
+    if ($eventID) {
+      $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($eventID, 'civicrm_event', TRUE);
+      $participantDetails = CRM_Event_Form_ManageEvent_Repeat::getParticipantCountforEvent($getRelatedEntities);
+      //Check if participants exists for events
+      foreach ($getRelatedEntities as $key => $value) {
+        if (!CRM_Utils_Array::value($value['id'], $participantDetails['countByID']) && $value['id'] != $eventID) {
+          //CRM_Event_BAO_Event::del($value['id']);
+          $eventIdsWithNoRegistration[] = $value['id'];
+        }
+      }
+    }
+    CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted = $eventIdsWithNoRegistration;
+    return CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted;
+  }
 }
