@@ -4,6 +4,7 @@
     action,
     actions = ['get'],
     fields = [],
+    getFieldData = {},
     options = {},
     params = {},
     smartyStub,
@@ -79,7 +80,7 @@
   function getFields() {
     var required = [];
     fields = [];
-    options = {};
+    options = getFieldData = {};
     // Special case for getfields
     if (action === 'getfields') {
       fields.push({
@@ -90,7 +91,8 @@
       showFields(['api_action']);
       return;
     }
-    CRM.api3(entity, 'getFields', {'api_action': action, sequential: 1, options: {get_options: 'all'}}).done(function(data) {
+    CRM.api3(entity, 'getFields', {'api_action': action, options: {get_options: 'all'}}).done(function(data) {
+      getFieldData = data.values;
       _.each(data.values, function(field) {
         if (field.name) {
           fields.push({
@@ -167,7 +169,7 @@
   }
 
   /**
-   * Render value input as a textfield, option list, or hidden,
+   * Render value input as a textfield, option list, entityRef, or hidden,
    * Depending on selected param name and operator
    */
   function renderValueField() {
@@ -186,8 +188,8 @@
       return;
     }
     $valField.css('visibility', '');
-    // Option list input
-    if (options[name] && $.inArray(operator, TEXT) < 0) {
+    // Option list or entityRef input
+    if ((options[name] || (getFieldData[name] && getFieldData[name].FKApiName)) && $.inArray(operator, TEXT) < 0) {
       // Reset value before switching to a select from something else
       if ($(this).is('.api-param-name') || !$valField.data('select2')) {
         $valField.val('');
@@ -196,12 +198,23 @@
       else if (operatorType == 'single' && currentVal.indexOf(',') > -1) {
         $valField.val(currentVal.split(',')[0]);
       }
-      $valField.select2({
-        multiple: (operatorType === 'multi'),
-        data: _.transform(options[name], function(result, option) {
-          result.push({id: option.key, text: option.value});
-        })
-      });
+      // Select options
+      if (options[name]) {
+
+        $valField.select2({
+          multiple: (operatorType === 'multi'),
+          data: _.map(options[name], function (value, key) {
+            return {id: key, text: value};
+          })
+        });
+      }
+      // EntityRef
+      else {
+        $valField.crmEntityRef({
+          entity: getFieldData[name].FKApiName,
+          select: {multiple: (operatorType === 'multi')}
+        });
+      }
       return;
     }
     // Plain text input
