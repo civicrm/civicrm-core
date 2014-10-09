@@ -180,8 +180,9 @@
             <td>
               <table class="compressed">
                 <tr class="crm-membership-form-block-soft-credit-type">
-                  <td class="label">{$form.soft_credit_type.label}</td>
-                  <td>{$form.soft_credit_type.html}</td>
+                {*CRM-15366*}
+                  <td class="label">{$form.soft_credit_type_id.label}</td>
+                  <td>{$form.soft_credit_type_id.html}</td>
                 </tr>
                 <tr class="crm-membership-form-block-soft-credit-contact-id">
                   <td class="label">{$form.soft_credit_contact_id.label}</td>
