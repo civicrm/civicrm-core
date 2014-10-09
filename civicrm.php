@@ -214,6 +214,9 @@ class CiviCRM_For_WordPress {
     add_action( 'user_register', array( $this, 'update_user' ) );
     add_action( 'profile_update', array( $this, 'update_user' ) );
 
+    // delete ufMatch record when a WordPress user is deleted
+    add_action( 'delete_user', array( $this, 'delete_user_ufmatch' ) );
+    
     // register the CiviCRM shortcode
     add_shortcode( 'civicrm', array( $this, 'shortcode_handler' ) );
 
@@ -948,6 +951,25 @@ class CiviCRM_For_WordPress {
       */
 
     }
+
+  }
+
+
+  /**
+   * @description: when a WordPress user is deleted, delete the ufMatch record
+   * Callback function for 'delete_user' hook
+   *
+   * @param $userID The numerical ID of the WordPress user
+   */
+  public function delete_user_ufmatch( $userID ) {
+
+    if (!$this->initialize()) {
+      return;
+    }
+
+    // delete the ufMatch record
+    require_once 'CRM/Core/BAO/UFMatch.php';
+    CRM_Core_BAO_UFMatch::deleteUser($userID);
 
   }
 
