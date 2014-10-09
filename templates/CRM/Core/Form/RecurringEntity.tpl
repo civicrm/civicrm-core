@@ -37,11 +37,11 @@
           </tr>
           <tr class="crm-core-form-recurringentity-block-repetition_frequency_unit">
             <td class="label">{$form.repetition_frequency_unit.label}</td>
-            <td>{$form.repetition_frequency_unit.html} {help id="id-repeats"}</td>
+            <td>{$form.repetition_frequency_unit.html} {help id="id-repeats" file="CRM/Core/Form/RecurringEntity.hlp"}</td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-repetition_frequency_interval">
             <td class="label">{$form.repetition_frequency_interval.label}</td>
-            <td>{$form.repetition_frequency_interval.html} &nbsp;<span id="repeats-every-text">hour(s)</span> {help id="id-repeats-every"}</td>
+            <td>{$form.repetition_frequency_interval.html} &nbsp;<span id="repeats-every-text">hour(s)</span> {help id="id-repeats-every" file="CRM/Core/Form/RecurringEntity.hlp"}</td>
             </td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-start_action_condition">
@@ -49,33 +49,33 @@
                 <label for="repeats_on">{$form.start_action_condition.label}: </label>
             </td>
             <td>
-                {$form.start_action_condition.html} {help id="id-repeats-on"}</td>
+                {$form.start_action_condition.html} {help id="id-repeats-on" file="CRM/Core/Form/RecurringEntity.hlp"}</td>
             </td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-repeats_by">
             <td class="label">{$form.repeats_by.label}</td>
-            <td>{$form.repeats_by.1.html}&nbsp;&nbsp;{$form.limit_to.html} {help id="id-repeats-by-month"}
+            <td>{$form.repeats_by.1.html}&nbsp;&nbsp;{$form.limit_to.html} {help id="id-repeats-by-month" file="CRM/Core/Form/RecurringEntity.hlp"}
             </td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-repeats_by">
             <td class="label"></td>
-            <td>{$form.repeats_by.2.html}&nbsp;&nbsp;{$form.entity_status_1.html}&nbsp;&nbsp;{$form.entity_status_2.html} {help id="id-repeats-by-week"}
+            <td>{$form.repeats_by.2.html}&nbsp;&nbsp;{$form.entity_status_1.html}&nbsp;&nbsp;{$form.entity_status_2.html} {help id="id-repeats-by-week" file="CRM/Core/Form/RecurringEntity.hlp"}
             </td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-ends">
             <td class="label">{$form.ends.label}</td>
-            <td>{$form.ends.1.html}&nbsp;{$form.start_action_offset.html}&nbsp;occurrences&nbsp;{help id="id-ends-after"}</td>
+            <td>{$form.ends.1.html}&nbsp;{$form.start_action_offset.html}&nbsp;occurrences&nbsp;{help id="id-ends-after" file="CRM/Core/Form/RecurringEntity.hlp"}</td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-absolute_date">
               <td class="label"></td>
-              <td>{$form.ends.2.html}&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=repeat_absolute_date} {help id="id-ends-on"}
+              <td>{$form.ends.2.html}&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=repeat_absolute_date} {help id="id-ends-on" file="CRM/Core/Form/RecurringEntity.hlp"}
               </td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-exclude_date">
               <td class="label">{$form.exclude_date.label}</td>
               <td>&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=exclude_date}
                   &nbsp;{$form.add_to_exclude_list.html}&nbsp;{$form.remove_from_exclude_list.html}
-                  {$form.exclude_date_list.html} {help id="id-exclude-date"}
+                  {$form.exclude_date_list.html} {help id="id-exclude-date" file="CRM/Core/Form/RecurringEntity.hlp"}
               </td>
           </tr>
           <tr>
