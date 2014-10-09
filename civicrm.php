@@ -215,7 +215,7 @@ class CiviCRM_For_WordPress {
     add_action( 'profile_update', array( $this, 'update_user' ) );
 
     // delete ufMatch record when a WordPress user is deleted
-    add_action( 'delete_user', array( $this, 'delete_user_ufmatch' ) );
+    add_action( 'deleted_user', array( $this, 'delete_user_ufmatch' ), 10, 1 );
     
     // register the CiviCRM shortcode
     add_shortcode( 'civicrm', array( $this, 'shortcode_handler' ) );
