@@ -1175,22 +1175,13 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: callback method for 'media_buttons_context' hook as set in register_hooks()
+   * @description: callback method for 'media_buttons' hook as set in register_hooks()
    * @return string HTML for output or empty if CiviCRM not initialized
    */
   public function add_form_button( $context ) {
 
-    // get screen object
-    $screen = get_current_screen();
-    
-    // default allowed to true on all post types
-    $allowed = ( $screen->base == 'post' ) ? true : false;
-    
-    // allow plugins to override
-    $allowed = apply_filters( 'civicrm_restrict_button_appearance', $allowed, $screen );
-
-    // add button to WP selected post types
-    if ( $allowed ) {
+    // add button to WP selected post types, if allowed
+    if ( $this->post_type_has_button() ) {
 
       if ( ! $this->initialize() ) {
         return '';
@@ -1240,6 +1231,71 @@ class CiviCRM_For_WordPress {
       $in_footer
     );
 
+  }
+
+  /**
+   * @description: does a WordPress post type have the CiviCRM button on it?
+   *
+   * @return bool $has_button True if the post type has the button, false otherwise
+   */
+  private function post_type_has_button() {
+  
+    // get screen object
+    $screen = get_current_screen();
+    
+    // get post types that support the editor
+    $capable_post_types = $this->get_post_types_with_editor();
+    
+    // default allowed to true on all capable post types
+    $allowed = ( in_array( $screen->post_type, $capable_post_types ) ) ? true : false;
+    
+    // allow plugins to override
+    $allowed = apply_filters( 'civicrm_restrict_button_appearance', $allowed, $screen );
+    
+    return $allowed;
+
+  }
+  
+  /**
+   * @description: get WordPress post types that support the editor
+   *
+   * @return array $supported_post_types Array of post types that have an editor
+   */
+  private function get_post_types_with_editor() {
+  
+    static $supported_post_types = array();
+    if ( !empty( $supported_post_types) ) {
+      return $supported_post_types;
+    }
+    
+    // get only post types with an admin UI
+    $args = array(
+      'public'   => true,
+      'show_ui' => true,
+    );
+    
+    $output = 'names'; // names or objects, note names is the default
+    $operator = 'and'; // 'and' or 'or'
+    
+    // get post types
+    $post_types = get_post_types($args, $output, $operator);
+    
+    // init outputs
+    $output = array();
+    $options = '';
+    
+    // sanity check
+    if ( count($post_types) > 0 ) {
+      foreach($post_types AS $post_type) {
+      
+      	// filter only those which have an editor
+      	if ( post_type_supports($post_type, 'editor') ) {
+      	  $supported_post_types[] = $post_type;
+      	}
+      }
+    }
+    
+    return $supported_post_types;
   }
 
   private function get_contribution_pages() {
@@ -1332,17 +1388,8 @@ class CiviCRM_For_WordPress {
    */
   public function add_form_button_html() {
 
-    // get screen object
-    $screen = get_current_screen();
-
-    // default allowed to true on all post types
-    $allowed = ( $screen->base == 'post' ) ? true : false;
-    
-    // allow plugins to override
-    $allowed = apply_filters( 'civicrm_restrict_button_appearance', $allowed, $screen );
-
-    // add modal to WP selected post types
-    if ( $allowed ) {
+    // add modal to WP selected post types, if allowed
+    if ( $this->post_type_has_button() ) {
 
       $title = __( 'Please select a CiviCRM front-end page type.', 'civicrm-wordpress' );
       ?>
