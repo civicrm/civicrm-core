@@ -106,7 +106,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify number of registered participants
-    $this->assertStringsPresent(array('2 Result'));
+    $this->assertTrue($this->isTextPresent('2 Result'));
   }
 
   function testParticipantCountWithPriceset() {
