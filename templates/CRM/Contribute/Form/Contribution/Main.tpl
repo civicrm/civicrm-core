@@ -498,10 +498,12 @@
       var total_amount_tmp =  cj(this).data('raw-total');
       // Hide billing questions if this is free
       if (total_amount_tmp == 0){
-        cj("#billing-payment-block").hide(); 
-      } 
+        cj("#billing-payment-block").hide();
+        cj(".payment_options-group").hide();
+      }
       else {
-        cj("#billing-payment-block").show(); 
+        cj("#billing-payment-block").show();
+        cj(".payment_options-group").show();
       }
     }
 
