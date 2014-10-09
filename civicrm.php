@@ -1176,9 +1176,11 @@ class CiviCRM_For_WordPress {
 
   /**
    * @description: callback method for 'media_buttons' hook as set in register_hooks()
-   * @return string HTML for output or empty if CiviCRM not initialized
+   *
+   * @param string $editor_id Unique editor identifier, e.g. 'content'
+   * @return void
    */
-  public function add_form_button( $context ) {
+  public function add_form_button( $editor_id ) {
 
     // add button to WP selected post types, if allowed
     if ( $this->post_type_has_button() ) {
