@@ -108,7 +108,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $eventName = "Fall Fundraiser Dinner";
     $this->select2("event_id", $eventName);
 
-    $this->clickLink("_qf_Search_refresh");
+    $this->clickLink("_qf_Search_refresh", "search-status");
 
     $stringsToCheck = array(
       "Event = $eventName",
@@ -157,7 +157,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $eventTypeName = 'Fundraiser';
     $this->select2("event_type_id", $eventTypeName);
 
-    $this->clickLink("_qf_Search_refresh");
+    $this->clickLink("_qf_Search_refresh", "search-status");
 
     $stringsToCheck = array(
       "Start Date - greater than or equal to",
