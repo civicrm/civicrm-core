@@ -36,7 +36,6 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
      * Get connected event information list
      */
       //Get all connected event ids
-      //$allEventIds = CRM_Core_Form_RecurringEntity::getAllConnectedEvents($checkParentExistsForThisId);
       $allEventIdsArray = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($checkParentExistsForThisId, 'civicrm_event');
       $allEventIds = array();
       if (!empty($allEventIdsArray)) {
@@ -64,12 +63,6 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         $this->assign('rows', $manageEvent);
       }
     }
-
-    //FIX ME : For summary
-    //Assign this to hide summary
-//    if (property_exists($this->_scheduleReminderDetails, 'id')) {
-//      $this->assign('scheduleReminderId', $this->_scheduleReminderDetails->id);
-//    }
 
     $parentEventParams = array('id' => $this->_id);
     $parentEventValues = array();

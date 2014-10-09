@@ -139,6 +139,7 @@ class CRM_Core_Form_RecurringEntity {
   static function buildQuickForm(&$form) {
     $form->assign('currentEntityId', self::$_entityId);
     $form->assign('entityType', self::$_entityType);
+    $form->assign('scheduleReminderId', self::$_scheduleReminderID);
     
     $form->_freqUnits = array('hour' => 'hour') + CRM_Core_OptionGroup::values('recur_frequency_units');
     foreach ($form->_freqUnits as $val => $label) {
