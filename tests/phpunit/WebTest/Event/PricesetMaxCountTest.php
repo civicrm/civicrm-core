@@ -1074,6 +1074,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       else {
         $this->click('_qf_Field_next-bottom');
       }
+      $this->waitForAjaxContent();
       $this->waitForText('crm-notification-container', "Price Field '$label' has been saved.");
 
       $count++;
