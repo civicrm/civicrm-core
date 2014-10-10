@@ -142,11 +142,12 @@
     }
   }
 
+  function isActionDeprecated(action) {
+    return !!(typeof actions.deprecated === 'object' && actions.deprecated[action]);
+  }
+
   function renderAction(option) {
-    if (actions.deprecated && actions.deprecated[option.id]) {
-      return '<span class="strikethrough">' + option.text + '</span>';
-    }
-    return option.text;
+    return isActionDeprecated(option.id) ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
   }
 
   /**
@@ -167,7 +168,7 @@
   }
 
   function onChangeAction(action) {
-    if (actions.deprecated && actions.deprecated[action]) {
+    if (isActionDeprecated(action)) {
       CRM.alert(actions.deprecated[action], action + ' deprecated');
     }
   }
