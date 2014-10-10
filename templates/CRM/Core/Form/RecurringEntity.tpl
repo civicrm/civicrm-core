@@ -89,8 +89,7 @@
     </div>
 </div>
 <div id="preview-dialog" class="hide-block">
-    <div id="generated_dates" class="show-block"></div>
-    
+    <div id="generated_dates" class="show-block"></div>    
 </div>
 {literal}
 <script type="text/javascript">
