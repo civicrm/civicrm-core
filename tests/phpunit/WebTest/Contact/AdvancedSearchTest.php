@@ -231,27 +231,13 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
     $this->openCiviPage('contact/search/advanced', 'reset=1', 'group');
     $this->select2("group", "Newsletter", TRUE);
+    $this->select2("group", "Summer", TRUE);
     $this->select2("group", "Advisory", TRUE);
     $this->clickAjaxLink("location", 'country');
     $this->select2("country", "United States", False);
-    $this->clickLink("_qf_Advanced_refresh");
-
-    $stateBeforeSort = $this->getText("xpath=//div[@class='crm-search-results']//table/tbody/tr[2]/td[6]");
-    $this->click("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
-    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
-    $this->assertElementNotContainsText("xpath=//div[@class='crm-search-results']//table/tbody/tr[2]/td[6]", $stateBeforeSort);
-    $this->clickAjaxLink("xpath=//form[@id='Advanced']//div//div[contains(text(),'Edit Search Criteria')]/../div", 'group');
-    $this->select2("group", "Summer", TRUE);
     $this->waitForElementPresent('state_province');
-    $this->select2("state_province", "Ohio", TRUE);
-    $this->select2("state_province", "New York", TRUE);
-    $this->select2("state_province", "New Mexico", TRUE);
-    $this->select2("state_province", "Mississippi", TRUE);
-    $this->select2("state_province", "Connecticut", TRUE);
-    $this->select2("state_province", "Georgia", TRUE);
-    $this->select2("state_province", "New Jersey", TRUE);
-    $this->select2("state_province", "Texas", TRUE);
-    $this->clickLink("_qf_Advanced_refresh");
+    $this->multiselect2("state_province", array("Ohio", "New York", "New Mexico", "Connecticut", "Georgia", "New Jersey", "Texas"));
+    $this->clickLink("_qf_Advanced_refresh", "xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]");
 
     $stateBeforeSort = $this->getText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]");
     $this->click("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
