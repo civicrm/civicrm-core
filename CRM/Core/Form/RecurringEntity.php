@@ -250,7 +250,7 @@ class CRM_Core_Form_RecurringEntity {
           $entityStartDate = CRM_Utils_Date::processDate($values['repetition_start_date']);
           $end = CRM_Utils_Date::processDate($values['repeat_absolute_date']);
           if (($end < $entityStartDate) && ($end != 0)) {
-            $errors['repeat_absolute_date'] = ts('End date should be after event\'s start date');
+            $errors['repeat_absolute_date'] = ts('End date should be after current entity\'s start date');
           }
         }
         else {
@@ -407,28 +407,14 @@ class CRM_Core_Form_RecurringEntity {
       }
 
       $recursion = new CRM_Core_BAO_RecurringEntity();
-      if (CRM_Utils_Array::value('start_date_column_name', $params)) {
-        $recursion->dateColumns  = array($params['start_date_column_name']);
-      }
+      $recursion->dateColumns  = $params['dateColumns'];
       $recursion->scheduleId   = $actionScheduleObj->id;
 
       if (!empty($excludeDateList)) {
         $recursion->excludeDates = $excludeDateList;
-        $excludeDateRangeColumns = array();
-        if (CRM_Utils_Array::value('start_date_column_name', $params)) {
-          $excludeDateRangeColumns[] = $params['start_date_column_name'];
-        }
-        if (CRM_Utils_Array::value('end_date_column_name', $params)) {
-          $excludeDateRangeColumns[] = $params['end_date_column_name'];
-        }
-        $recursion->excludeDateRangeColumns = $excludeDateRangeColumns;
+        $recursion->excludeDateRangeColumns = $params['excludeDateRangeColumns'];
       }
-
-      if ($params['parent_entity_end_date']) {
-        $interval = $recursion->getInterval($params['parent_entity_start_date'], $params['parent_entity_end_date']);
-        $recursion->intervalDateColumns = array('end_date' => $interval);
-      }
-
+      $recursion->intervalDateColumns = $params['intervalDateColumns'];
       $recursion->entity_id = $params['entity_id'];
       $recursion->entity_table = $params['entity_table'];
       if (!empty($linkedEntities)) {
@@ -450,7 +436,7 @@ class CRM_Core_Form_RecurringEntity {
    * @access public
    */
   public function getTitle() {
-    return ts('Repeat Event');
+    return ts('Repeat Entity');
   }
      
 }
