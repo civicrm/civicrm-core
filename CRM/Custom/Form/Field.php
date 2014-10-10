@@ -138,7 +138,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       self::$_dataToLabels = array(
         array('Text' => ts('Text'), 'Select' => ts('Select'),
           'Radio' => ts('Radio'), 'CheckBox' => ts('CheckBox'), 'Multi-Select' => ts('Multi-Select'),
-          'AdvMulti-Select' => ts('Advanced Multi-Select'),
+          'AdvMulti-Select' => ts('Adv Multi-Select (obsolete)'),
           'Autocomplete-Select' => ts('Autocomplete Select'),
         ),
         array('Text' => ts('Text'), 'Select' => ts('Select'),
@@ -150,7 +150,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         array('Text' => ts('Text'), 'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
-        array('TextArea' => ts('TextArea'), 'RichTextEditor' => 'RichTextEditor'),
+        array('TextArea' => ts('TextArea'), 'RichTextEditor' => ts('RichTextEditor')),
         array('Date' => ts('Select Date')),
         array('Radio' => ts('Radio')),
         array('StateProvince' => ts('Select State/Province'), 'Multi-Select' => ts('Multi-Select State/Province')),
