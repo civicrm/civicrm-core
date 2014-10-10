@@ -37,6 +37,14 @@
  */
 
 /**
+ * @deprecated api notice
+ * @return string to indicate this entire api entity is deprecated
+ */
+function _civicrm_api3_constant_deprecation() {
+  return 'The constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.';
+}
+
+/**
  * @deprecated as of CiviCRM 4.4.
  * It's recommended to use the api getoptions action instead
  *
@@ -117,12 +125,12 @@ function civicrm_api3_constant_get($params) {
       //@TODO XAV take out the param the COOKIE, Entity, Action and so there are only the "real param" in it
       //$values = call_user_func_array( array( $className, $name ), $params );
     }
-    return civicrm_api3_create_success($values, $params);
+    return civicrm_api3_create_success($values, $params, 'constant');
   }
   else{
     $values = call_user_func(array('CRM_Utils_PseudoConstant', 'getConstant'), $name);
     if(!empty($values)){
-      return civicrm_api3_create_success($values, $params);
+      return civicrm_api3_create_success($values, $params, 'constant');
     }
   }
   return civicrm_api3_create_error('Unknown civicrm constant or method not callable');
@@ -132,53 +140,55 @@ function civicrm_api3_constant_get($params) {
  * @param $params
  */
 function _civicrm_api3_constant_get_spec(&$params) {
-
+  $options = array(
+    'activityStatus',
+    'activityType',
+    'addressee',
+    'allGroup',
+    'country',
+    'countryIsoCode',
+    'county',
+    'currencyCode',
+    'currencySymbols',
+    'customGroup',
+    'emailGreeting',
+    'fromEmailAddress',
+    'gender',
+    'group',
+    'groupIterator',
+    'honor',
+    'IMProvider',
+    'individualPrefix',
+    'individualSuffix',
+    'locationType',
+    'locationVcardName',
+    'mailProtocol',
+    'mappingTypes',
+    'paymentInstrument',
+    'paymentProcessor',
+    'paymentProcessorType',
+    'pcm',
+    'phoneType',
+    'postalGreeting',
+    'priority',
+    'relationshipType',
+    'stateProvince',
+    'stateProvinceAbbreviation',
+    'stateProvinceForCountry',
+    'staticGroup',
+    'tag',
+    'tasks',
+    'ufGroup',
+    'visibility',
+    'worldRegion',
+    'wysiwygEditor',
+  );
   $params = (array
     ('name' => array(
       'title' => 'Constant Name',
+      'name' => 'name',
       'api.required' => 1,
-        'options' =>
-          'activityStatus',
-          'activityType',
-          'addressee',
-          'allGroup',
-          'country',
-          'countryIsoCode',
-          'county',
-          'currencyCode',
-          'currencySymbols',
-          'customGroup',
-          'emailGreeting',
-          'fromEmailAddress',
-          'gender',
-          'group',
-          'groupIterator',
-          'honor',
-          'IMProvider',
-          'individualPrefix',
-          'individualSuffix',
-          'locationType',
-          'locationVcardName',
-          'mailProtocol',
-          'mappingTypes',
-          'paymentInstrument',
-          'paymentProcessor',
-          'paymentProcessorType',
-          'pcm',
-          'phoneType',
-          'postalGreeting',
-          'priority',
-          'relationshipType',
-          'stateProvince',
-          'stateProvinceAbbreviation',
-          'stateProvinceForCountry',
-          'staticGroup',
-          'tag',
-          'tasks',
-          'ufGroup',
-          'visibility',
-          'worldRegion',
-          'wysiwygEditor',
+        'options' => array_combine($options, $options)
       ))
   );
 }

@@ -273,7 +273,18 @@ SELECT DISTINCT case_id
  * @return array
  */
 function civicrm_api3_case_activity_create($params) {
-  return civicrm_api3_activity_create($params);
+  require_once "api/v3/Activity.php";
+  return civicrm_api3_activity_create($params) + array(
+    'deprecated' => CRM_Utils_Array::value('activity_create', _civicrm_api3_case_deprecation()),
+  );
+}
+
+/**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_case_deprecation() {
+  return array('activity_create' => 'Case api "activity_create" action is deprecated. Use the activity api instead.');
 }
 
 /**
