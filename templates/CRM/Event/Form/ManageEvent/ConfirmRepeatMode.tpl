@@ -47,6 +47,7 @@
         </div>
     </div>
 </div>
+{if $hasParent || $isRepeatingEntity}
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {  
@@ -137,4 +138,5 @@
       }  
     });
   </script>
-  {/literal}
+{/literal}
+{/if}

@@ -68,12 +68,18 @@ class CRM_Core_Form_RecurringEntity {
   */
   public static $_entityType;
   
+  /**
+   * Checks current entityID has parent
+   */
+  public static $_hasParent = FALSE;
+  
   static function preProcess($entityType) {
    self::$_entityId = (int) CRM_Utils_Request::retrieve('id', 'Positive');
    self::$_entityType = $entityType;
    if (self::$_entityId && $entityType) {
      $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor(self::$_entityId, 'civicrm_'.$entityType);    
      if ($checkParentExistsForThisId) {
+       self::$_hasParent = TRUE;
        self::$_parentEntityId = $checkParentExistsForThisId;
        self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($checkParentExistsForThisId, $entityType);
      }
@@ -90,7 +96,7 @@ class CRM_Core_Form_RecurringEntity {
         $excludeOptionValues[$val['value']] = date('m/d/Y', strtotime($val['value']));
       }
       self::$_excludeDateInfo = $excludeOptionValues;
-    } 
+    }
   }
   
    /**
@@ -140,6 +146,7 @@ class CRM_Core_Form_RecurringEntity {
     $form->assign('currentEntityId', self::$_entityId);
     $form->assign('entityType', self::$_entityType);
     $form->assign('scheduleReminderId', self::$_scheduleReminderID);
+    $form->assign('hasParent', self::$_hasParent);
     
     $form->_freqUnits = array('hour' => 'hour') + CRM_Core_OptionGroup::values('recur_frequency_units');
     foreach ($form->_freqUnits as $val => $label) {
