@@ -58,12 +58,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     array(
       'civicrm_event' => array(
       'helper_class' => 'CRM_Event_DAO_Event',
-      'delete_func' => 'CRM_Event_BAO_Event::del',
+      'delete_func' => 'delete',
       'pre_delete_func' => 'CRM_Event_Form_ManageEvent_Repeat::checkRegistrationForEvents'
       ),
       'civicrm_activity' => array(
       'helper_class' => 'CRM_Activity_DAO_Activity',
-      'delete_func' => 'CRM_Activity_BAO_Activity::deleteActivity',
+      'delete_func' => 'delete',
       'pre_delete_func' => ''
       ) 
     ); 
