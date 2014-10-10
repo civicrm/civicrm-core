@@ -374,19 +374,25 @@ class CRM_Core_Form_RecurringEntity {
             //Check if pre delete function has some ids to be deleted
             if (!empty(CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted)) {
               foreach (CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted as $value) {
-                call_user_func(array(
-                CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'], 
-                call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array($value)))
-                );
+                $result = civicrm_api3(ucfirst(strtolower($type)), CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array(
+                          'sequential' => 1,
+                          'id' => $value,
+                          ));
+                if ($result['error']) {
+                  CRM_Core_Error::statusBounce('Error creating recurring list');
+                }
               }
             }
             else {
               $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['entity_id'], $params['entity_table'], FALSE);
               foreach ($getRelatedEntities as $key => $value) {
-                call_user_func(array(
-                CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'], 
-                call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array(array('id' => $value['id']))))
-                );
+                $result = civicrm_api3(ucfirst(strtolower($type)), CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array(
+                          'sequential' => 1,
+                          'id' => $value['id'],
+                          ));
+                if ($result['error']) {
+                  CRM_Core_Error::statusBounce('Error creating recurring list');
+                }
               }
             }
         }
