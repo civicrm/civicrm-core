@@ -25,34 +25,75 @@
 *}
 
 <div id="recurring-dialog" class="hide-block">
-    {ts}How would you like this change to affect other {$entityType}s in the repetition set?{/ts}<br/><br/>
+    {ts}How would you like this change to affect other entities in the repetition set?{/ts}<br/><br/>
     <div class="show-block">
         <div class="recurring-dialog-inner-wrapper">
             <div class="recurring-dialog-inner-left">
-                <button class="recurring-dialog-button only-this-event">{ts}Only this {$entityType}{/ts}</button>
+                <button class="recurring-dialog-button only-this-event">{ts}Only this entity{/ts}</button>
             </div>
-          <div class="recurring-dialog-inner-right">{ts}All other {$entityType}s in the series will remain same.{/ts}</div>
+          <div class="recurring-dialog-inner-right">{ts}All other entities in the series will remain same.{/ts}</div>
         </div>
         <div class="recurring-dialog-inner-wrapper">
             <div class="recurring-dialog-inner-left">
-                <button class="recurring-dialog-button this-and-all-following-event">{ts}This and Following {$entityType}s{/ts}</button>
+                <button class="recurring-dialog-button this-and-all-following-event">{ts}This and Following entities{/ts}</button>
             </div>
-            <div class="recurring-dialog-inner-right">{ts}Change applies to this and all the following {$entityType}s.{/ts}</div>
+            <div class="recurring-dialog-inner-right">{ts}Change applies to this and all the following entities.{/ts}</div>
         </div>
         <div class="recurring-dialog-inner-wrapper">
             <div class="recurring-dialog-inner-left">
-                <button class="recurring-dialog-button all-events">{ts}All the {$entityType}s{/ts}</button>
+                <button class="recurring-dialog-button all-events">{ts}All the entities{/ts}</button>
             </div>
-            <div class="recurring-dialog-inner-right">{ts}Change applies to all the {$entityType}s in the series.{/ts}</div>
+            <div class="recurring-dialog-inner-right">{ts}Change applies to all the entities in the series.{/ts}</div>
         </div>
     </div>
 </div>
-<input type="hidden" value="" name="isRepeatingEvent" id="is-repeating-event"/>
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {  
+      /** Add your linked entity mapper here **/
+      var mapper = {'CRM_Event_Form_ManageEvent_EventInfo': '',
+                'CRM_Event_Form_ManageEvent_Location': '',
+                'CRM_Event_Form_ManageEvent_Fee': '',
+                'CRM_Event_Form_ManageEvent_Registration': '',
+                'CRM_Friend_Form_Event': 'civicrm_tell_friend',
+                'CRM_PCP_Form_Event': 'civicrm_pcp_block',
+                'CRM_Activity_Form_Activity': ''
+                };
       var form = '';
-      form = $(this).parents('form:first').attr('class');
+      $('#crm-main-content-wrapper').on('click', 'div.crm-submit-buttons span.crm-button input[value="Save"], div.crm-submit-buttons span.crm-button input[value="Save and Done"]', function() {
+          form = $(this).parents('form:first').attr('class');
+          if( form != "" && mapper.hasOwnProperty(form) ){
+            $("#recurring-dialog").dialog({
+              title: 'How does this change affect other repeating entities in the set?',
+              modal: true,
+              width: '650',
+              buttons: {
+                Cancel: function() { //cancel
+                  $( this ).dialog( "close" );
+                }
+              }
+            }).dialog('open');
+            return false;
+          }
+      }); 
+
+      
+      $("#_qf_Activity_upload-top, #_qf_Activity_upload-bottom").click(function() {
+          form = $(this).parents('form:first').attr('class');
+          if( form != "" && mapper.hasOwnProperty(form) ){
+            $("#recurring-dialog").dialog({
+              title: 'How does this change affect other repeating entities in the set?',
+              modal: true,
+              width: '650',
+              buttons: {
+                Cancel: function() { //cancel
+                  $( this ).dialog( "close" );
+                }
+              }
+            }).dialog('open');
+            return false;
+          }
+      });
       
       $(".only-this-event").click(function() {
         updateMode(1);
@@ -69,11 +110,9 @@
       function updateMode(mode) {
         var entityID = parseInt('{/literal}{$entityID}{literal}');
         var entityTable = '{/literal}{$entityTable}{literal}';
-        var testmapper = '{/literal}$mapper['{literal}+form+{/literal}']{literal}';
-        alert(testmapper);
-        if (entityID != "" && mode && form != "" && entityTable !="") {
+        if (entityID != "" && mode && mapper.hasOwnProperty(form) && entityTable !="") {
           var ajaxurl = CRM.url("civicrm/ajax/recurringentity/update-mode");
-          var data    = {mode: mode, entityId: entityID, entityTable: entityTable, linkedEntityTable:'{/literal}$mapper['{literal}+form+{/literal}']{literal}'};
+          var data    = {mode: mode, entityId: entityID, entityTable: entityTable, linkedEntityTable: mapper[form]};
           $.ajax({
             dataType: "json",
             data: data,
@@ -81,12 +120,12 @@
             success: function (result) {
               if (result.status != "" && result.status == 'Done') {
                 $("#recurring-dialog").dialog('close');
-                $('#mainTabContainer div:visible Form').submit();
+                $('#mainTabContainer div:visible Form, form.'+form).submit();
               } else if (result.status != "" && result.status == 'Error') {
                 var errorBox = confirm(ts("Mode could not be updated, save only this event?"));
                 if (errorBox == true) {
                   $("#recurring-dialog").dialog('close');
-                  $('#mainTabContainer div:visible Form').submit();
+                  $('#mainTabContainer div:visible Form, form.'+form).submit();
                 } else {
                   $("#recurring-dialog").dialog('close');
                   return false;
