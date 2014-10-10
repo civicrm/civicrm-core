@@ -941,9 +941,12 @@ CRM.strings = CRM.strings || {};
         if (response.backtrace) {
           CRM.console('log', response.backtrace);
         }
+        if (typeof response.deprecated === 'string') {
+          CRM.console('warn', response.deprecated);
+        }
       }
     }
-    // Suppress errors
+    // Ignore errors thrown by parseJSON
     catch (e) {}
   });
 
