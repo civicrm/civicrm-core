@@ -2,7 +2,7 @@
   var
     entity,
     action,
-    actions = ['get'],
+    actions = {values: ['get']},
     fields = [],
     getFieldData = {},
     options = {},
@@ -77,7 +77,7 @@
   /**
    * Fetch fields for entity+action
    */
-  function getFields() {
+  function getFields(changedElement) {
     var required = [];
     fields = [];
     options = getFieldData = {};
@@ -108,6 +108,9 @@
           }
         }
       });
+      if ($(changedElement).is('#api-entity') && data.deprecated) {
+        CRM.alert(data.deprecated, entity + ' Deprecated');
+      }
       showFields(required);
       if (action === 'get' || action === 'getsingle') {
         showReturn();
@@ -130,13 +133,20 @@
     if (entity) {
       $('#api-action').addClass('loading');
       CRM.api3(entity, 'getactions').done(function(data) {
-        actions = data.values || ['get'];
+        actions = data;
         populateActions();
       });
     } else {
-      actions = ['get'];
+      actions = {values: ['get']};
       populateActions();
     }
+  }
+
+  function renderAction(option) {
+    if (actions.deprecated && actions.deprecated[option.id]) {
+      return '<span class="strikethrough">' + option.text + '</span>';
+    }
+    return option.text;
   }
 
   /**
@@ -146,11 +156,19 @@
   function populateActions(el) {
     var val = $('#api-action').val();
     $('#api-action').removeClass('loading').select2({
-      data: _.transform(actions, function(ret, item) {ret.push({text: item, id: item})})
+      data: _.transform(actions.values, function(ret, item) {ret.push({text: item, id: item})}),
+      formatSelection: renderAction,
+      formatResult: renderAction
     });
     // If previously selected action is not available, set it to 'get' if possible
-    if (_.indexOf(actions, val) < 0) {
-      $('#api-action').select2('val', _.indexOf(actions, 'get') < 0 ? actions[0] : 'get', true);
+    if (_.indexOf(actions.values, val) < 0) {
+      $('#api-action').select2('val', _.indexOf(actions.values, 'get') < 0 ? actions.values[0] : 'get', true);
+    }
+  }
+
+  function onChangeAction(action) {
+    if (actions.deprecated && actions.deprecated[action]) {
+      CRM.alert(actions.deprecated[action], action + ' deprecated');
     }
   }
 
@@ -449,17 +467,25 @@
   }
 
   $(document).ready(function() {
+    $('#api-entity').crmSelect2({
+      // Add strikethough class to selection to indicate deprecated apis
+      formatSelection: function(option) {
+        return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
+      }
+    });
     $('form#api-explorer')
       .on('change', '#api-entity, #api-action', function() {
         entity = $('#api-entity').val();
+        action = $('#api-action').val();
         if ($(this).is('#api-entity')) {
           getActions();
+        } else {
+          onChangeAction(action);
         }
-        action = $('#api-action').val();
         if (entity && action) {
           $('#api-params').html('<tr><td colspan="4" class="crm-loading-element"></td></tr>');
           $('#api-params-table thead').show();
-          getFields();
+          getFields(this);
           buildParams();
         } else {
           $('#api-params, #api-generated pre').empty();

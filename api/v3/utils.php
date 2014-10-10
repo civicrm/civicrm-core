@@ -164,7 +164,7 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
   $result = array();
   $result['is_error'] = 0;
   //lets set the ['id'] field if it's not set & we know what the entity is
-  if (is_array($values) && !empty($entity)) {
+  if (is_array($values) && !empty($entity) && $action != 'getfields') {
     foreach ($values as $key => $item) {
       if (empty($item['id']) && !empty($item[$entity . "_id"])) {
         $values[$key]['id'] = $item[$entity . "_id"];
@@ -233,9 +233,25 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
   }
   if(!empty($params['options']['metadata'])) {
     // we've made metadata an array but only supporting 'fields' atm
-    if(in_array('fields', (array) $params['options']['metadata'])) {
+    if(in_array('fields', (array) $params['options']['metadata']) && $action !== 'getfields') {
       $fields = civicrm_api3($entity, 'getfields', array('action' => substr($action, 0, 3) == 'get' ? 'get' : 'create'));
       $result['metadata']['fields'] = $fields['values'];
+    }
+  }
+  // Report deprecations
+  $deprecated = _civicrm_api3_deprecation_check($entity, $result);
+  // Always report "update" action as deprecated
+  if (!is_string($deprecated) && ($action == 'getactions' || $action == 'update')) {
+    $deprecated = ((array) $deprecated) + array('update' => 'The "update" action is deprecated. Use "create" with an id instead.');
+  }
+  if ($deprecated) {
+    // Metadata-level deprecations or wholesale entity deprecations
+    if ($entity == 'entity' || $action == 'getactions' || is_string($deprecated)) {
+      $result['deprecated'] = $deprecated;
+    }
+    // Action-specific deprecations
+    elseif (!empty($deprecated[$action])) {
+      $result['deprecated'] = $deprecated[$action];
     }
   }
   return array_merge($result, $extraReturnValues);
@@ -1953,4 +1969,20 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
     }
   }
   return FALSE;
+}
+
+/**
+ * @param string $entity
+ * @param array $result
+ */
+function _civicrm_api3_deprecation_check($entity, $result = array()) {
+  $apiFile = 'api/v3/' . _civicrm_api_get_camel_name($entity) . '.php';
+  if (CRM_Utils_File::isIncludable($apiFile)) {
+    require_once $apiFile;
+  }
+  $entity = _civicrm_api_get_entity_name_from_camel($entity);
+  $fnName = "_civicrm_api3_{$entity}_deprecation";
+  if (function_exists($fnName)) {
+    return $fnName($result);
+  }
 }

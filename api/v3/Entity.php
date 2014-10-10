@@ -1,6 +1,23 @@
 <?php
 
 /**
+ * @deprecated api notice
+ * @param array entities
+ * @return array of deprecated api entities
+ */
+function _civicrm_api3_entity_deprecation($entities) {
+  $deprecated = array();
+  if (!empty($entities['values'])) {
+    foreach ($entities['values'] as $entity) {
+      if (is_string(_civicrm_api3_deprecation_check($entity))) {
+        $deprecated[] = $entity;
+      }
+    }
+  }
+  return $deprecated;
+}
+
+/**
  *  Placeholder function. This should never be called, as it doesn't have any meaning
  */
 function civicrm_api3_entity_create($params) {
