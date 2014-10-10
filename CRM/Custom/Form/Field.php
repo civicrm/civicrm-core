@@ -138,7 +138,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       self::$_dataToLabels = array(
         array('Text' => ts('Text'), 'Select' => ts('Select'),
           'Radio' => ts('Radio'), 'CheckBox' => ts('CheckBox'), 'Multi-Select' => ts('Multi-Select'),
-          'AdvMulti-Select' => ts('Advanced Multi-Select'),
+          'AdvMulti-Select' => ts('Adv Multi-Select (obsolete)'),
           'Autocomplete-Select' => ts('Autocomplete Select'),
         ),
         array('Text' => ts('Text'), 'Select' => ts('Select'),
