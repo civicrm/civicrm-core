@@ -99,3 +99,18 @@ function civicrm_api3_system_check($params) {
   // Spec: civicrm_api3_create_success($values = 1, $params = array(), $entity = NULL, $action = NULL)
   return civicrm_api3_create_success($returnValues, $params, 'System', 'Check');
 }
+
+/**
+ * System.Get API
+ *
+ * @param arary $params
+ */
+function civicrm_api3_system_get($params) {
+  $returnValues = array(
+    array(
+      'version' => CRM_Utils_System::version(),
+      'uf' => CIVICRM_UF,
+    ),
+  );
+  return civicrm_api3_create_success($returnValues, $params, 'System', 'get');
+}
