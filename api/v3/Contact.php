@@ -976,6 +976,10 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   if (!empty($request['input'])) {
     $request['params'][$request['search_field']] = $request['input'];
   }
+  // Exclude deceased contacts by default
+  if (!isset($request['params']['is_deceased'])) {
+    $request['params']['is_deceased'] = 0;
+  }
 }
 
 /**
