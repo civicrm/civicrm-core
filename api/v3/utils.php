@@ -1583,7 +1583,7 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
   $fields = $d->fields();
   // replace uniqueNames by the normal names as the key
   if (empty($unique)) {
-    foreach ($fields as $name => & $field) {
+    foreach ($fields as $name => &$field) {
       //getting rid of unused attributes
       foreach ($unsetIfEmpty as $attr) {
         if (empty($field[$attr])) {
@@ -1601,6 +1601,15 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
       $fields[$field['name']] = $field;
       $fields[$field['name']]['uniqueName'] = $name;
       unset($fields[$name]);
+    }
+  }
+  // Translate FKClassName to the corresponding api
+  foreach ($fields as $name => &$field) {
+    if (!empty($field['FKClassName'])) {
+      $FKApi = CRM_Core_DAO_AllCoreTables::getBriefName($field['FKClassName']);
+      if ($FKApi) {
+        $field['FKApiName'] = $FKApi;
+      }
     }
   }
   $fields += _civicrm_api_get_custom_fields($entity, $params);
