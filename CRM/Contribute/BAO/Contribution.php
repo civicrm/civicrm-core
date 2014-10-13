@@ -885,7 +885,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *
    * @param boolean $addExtraFields true if special fields needs to be added
    *
-   * @return return the list of contribution fields
+   * @return array the list of contribution fields
    * @static
    * @access public
    */
@@ -3504,7 +3504,7 @@ WHERE con.id = {$contributionId}
     }
 
     // New Contrbution and update of contribution with tax rate financial type
-    if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates) && 
+    if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates) &&
       empty($params['skipLineItem']) && !$isLineItem)
       {
         $taxRateParams = $taxRates[$params['financial_type_id']];
@@ -3524,19 +3524,19 @@ WHERE con.id = {$contributionId}
           }
         }
         $params['total_amount'] = $params['total_amount'] + $params['tax_amount'];
-      } 
+      }
     else if (isset($params['api.line_item.create'])) {
-      // Update total amount of contribution using lineItem 
+      // Update total amount of contribution using lineItem
       $taxAmountArray = array();
       foreach ($params['api.line_item.create'] as $key => $value) {
         if (isset($value['financial_type_id']) && array_key_exists($value['financial_type_id'], $taxRates)) {
          $taxRate = $taxRates[$value['financial_type_id']];
-          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($value['line_total'], $taxRate);                   
+          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($value['line_total'], $taxRate);
           $taxAmountArray[] = round($taxAmount['tax_amount'], 2);
         }
       }
       $params['tax_amount'] = array_sum($taxAmountArray);
-      $params['total_amount'] = $params['total_amount'] + $params['tax_amount'];  
+      $params['total_amount'] = $params['total_amount'] + $params['tax_amount'];
     }
     else {
       // update line item of contrbution
