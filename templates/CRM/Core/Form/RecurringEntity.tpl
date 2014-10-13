@@ -215,10 +215,18 @@
       }
         
     });
-        
+    
+    //Detect changes in Repeat configuration field
+    var unsavedChanges = false;
+    cj('div.crm-core-form-recurringentity-block').on('change', function() {
+      unsavedChanges = true;
+    });
+    
+    //If there are changes in repeat configuration enable save button
     //Dialog for preview repeat Configuration dates
     cj('#preview-dialog').dialog({ autoOpen: false });
     cj('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom, #_qf_Activity_upload-top, #_qf_Activity_upload-bottom').click( function (e) {
+      if (unsavedChanges) {
       e.preventDefault();
       cj('#exclude_date_list option').attr('selected',true);
       //Copy exclude dates
@@ -322,7 +330,12 @@
         }
       });
       return false;
-    });
+      }
+      else {
+        alert("No changes to save");
+        return false;
+      }
+      });
     
     //Build Summary
     var finalSummary = '';
