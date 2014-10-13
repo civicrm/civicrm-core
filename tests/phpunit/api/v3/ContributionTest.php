@@ -93,19 +93,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   function tearDown() {
-    $this->quickCleanup(array(
-      'civicrm_contribution',
-      'civicrm_contribution_soft',
-      'civicrm_event',
-      'civicrm_contribution_page',
-      'civicrm_participant',
-      'civicrm_participant_payment',
-      'civicrm_line_item',
-      'civicrm_financial_trxn',
-      'civicrm_financial_item',
-      'civicrm_entity_financial_trxn',
-      'civicrm_contact',
-    ));
+    $this->quickCleanUpFinancialEntities();
   }
 
   function testGetContribution() {
