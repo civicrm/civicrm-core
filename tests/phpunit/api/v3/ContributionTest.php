@@ -48,6 +48,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   protected $_entity = 'Contribution';
   public $debug = 0;
   protected $_params;
+  protected $_ids = array();
+  protected $_pageParams = array();
 
   function setUp() {
     parent::setUp();
@@ -128,7 +130,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPIAndDocument('contribution', 'get', $params, __FUNCTION__, __FILE__);
     $financialParams['id'] = $this->_financialTypeId;
     $default = null;
-    $financialType  =  CRM_Financial_BAO_FinancialType::retrieve($financialParams,$default);
+    CRM_Financial_BAO_FinancialType::retrieve($financialParams, $default);
 
     $this->assertEquals(1,$contribution['count']);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
@@ -207,7 +209,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPIAndDocument('contribution', 'get', $params, __FUNCTION__, __FILE__);
     $financialParams['id'] = $this->_financialTypeId;
     $default = null;
-    $financialType  =  CRM_Financial_BAO_FinancialType::retrieve($financialParams,$default);
+    CRM_Financial_BAO_FinancialType::retrieve($financialParams, $default);
 
     $this->assertEquals(1,$contribution['count']);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
@@ -268,7 +270,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'check_permissions' => false,
       'financial_type_id' => 'Donation',
     );
-    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'create', $params);
  }
   /*
    * ensure we continue to support contribution_type_id as part of the api commitment to
@@ -543,11 +545,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     );
 
-    $contribution = $this->callAPIFailure('contribution', 'create', $params,
-      'contact_id is not valid : 999');
+    $this->callAPIFailure('contribution', 'create', $params, 'contact_id is not valid : 999');
   }
 
-  function testCreateContributionSourceInvalidContContac() {
+  function testCreateContributionSourceInvalidContContact() {
 
     $params = array(
       'contribution_contact_id' => 999,
@@ -564,10 +565,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     );
 
-    $contribution = $this->callAPIFailure('contribution', 'create', $params,
-      'contact_id is not valid : 999');
+    $this->callAPIFailure('contribution', 'create', $params, 'contact_id is not valid : 999');
   }
 
+  /**
+   * test note created correctly
+   */
   function testCreateContributionWithNote() {
     $description = "Demonstrates creating contribution with Note Entity";
     $subfile     = "ContributionCreateWithNote";
@@ -746,7 +749,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Function tests that additional financial records are created when online contribution is created
    */
   function testCreateContributionOnline() {
-    $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
+    CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $contributionPage = $this->callAPISuccess( 'contribution_page','create',  $this->_pageParams );
     $this->assertAPISuccess($contributionPage);
     $params = array(
@@ -781,7 +784,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   function testCreateInvalidFinancialType() {
     $params = $this->_params;
     $params['financial_type_id'] = 99999;
-    $result = $this->callAPIFailure($this->_entity, 'create', $params, "'99999' is not a valid option for field financial_type_id");
+    $this->callAPIFailure($this->_entity, 'create', $params, "'99999' is not a valid option for field financial_type_id");
   }
 
   /**
@@ -791,7 +794,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   function testValidNamedFinancialType() {
     $params = $this->_params;
     $params['financial_type_id'] = 'Donation';
-    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+    $this->callAPISuccess($this->_entity, 'create', $params);
   }
 
   /**
@@ -799,7 +802,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * is created
    */
   function testCreateContributionPayLaterOnline() {
-    $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
+    CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $this->_pageParams['is_pay_later'] = 1;
     $contributionPage = $this->callAPISuccess( 'contribution_page','create',$this->_pageParams );
     $this->assertAPISuccess($contributionPage);
@@ -991,9 +994,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'contribution_status_id' => 2,
       )
     );
-    $contribution = $this->callAPIFailure('contribution', 'create', $newParams,
-      ts('Cannot change contribution status from Completed to Pending.')
-    );
+    $this->callAPIFailure('contribution', 'create', $newParams,ts('Cannot change contribution status from Completed to Pending.'));
 
   }
 
@@ -1076,10 +1077,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $old_fee_amount = $original['values'][$contributionID]['fee_amount'];
     $old_source = $original['values'][$contributionID]['contribution_source'];
 
-    //note: current behavior is to return ISO.  Is this
-    //documented behavior?  Is this correct
-    $old_receive_date = date('Ymd', strtotime($original['values'][$contributionID]['receive_date']));
-
     $old_trxn_id = $original['values'][$contributionID]['trxn_id'];
     $old_invoice_id = $original['values'][$contributionID]['invoice_id'];
 
@@ -1131,7 +1128,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   ///////////////// civicrm_contribution_delete methods
   function testDeleteEmptyParamsContribution() {
     $params = array();
-    $contribution = $this->callAPIFailure('contribution', 'delete', $params);
+    $this->callAPIFailure('contribution', 'delete', $params);
   }
 
   function testDeleteParamsNotArrayContribution() {
@@ -1145,7 +1142,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_source' => 'SSF',
 
     );
-    $contribution = $this->callAPIFailure('contribution', 'delete', $params);
+    $this->callAPIFailure('contribution', 'delete', $params);
   }
 
   function testDeleteContribution() {
@@ -1285,10 +1282,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $params = array_merge($this->_params, array('contribution_status_id' => 2,'receipt_date' => 'now'));
     $contribution = $this->callAPISuccess('contribution','create', $params);
-    $apiResult = $this->callAPISuccess('contribution', 'completetransaction', array(
-      'id' => $contribution['id'],
-    )
-    );
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id'],));
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'sequential' => 1,));
     $this->assertEquals('Completed', $contribution['values'][0]['contribution_status']);
     $mut->checkMailLog(array(
@@ -1312,7 +1306,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'completetransaction', array(
       'id' => $contributionID,)
     );
-    $participantStatus = $this->callAPISuccessGetValue('participant', array('id' => $this->ids['participant'], 'return' => 'participant_status_id'));
+    $participantStatus = $this->callAPISuccessGetValue('participant', array('id' => $this->_ids['participant'], 'return' => 'participant_status_id'));
     $this->assertEquals(1, $participantStatus);
     $mut->checkMailLog(array(
       'Annual CiviCRM meet',
@@ -1461,8 +1455,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   function testSendMail() {
     $mut = new CiviMailUtils( $this, true );
     $contribution = $this->callAPISuccess('contribution','create',$this->_params);
-    $apiResult = $this->callAPISuccess('contribution', 'sendconfirmation', array(
-
+    $this->callAPISuccess('contribution', 'sendconfirmation', array(
       'id' => $contribution['id'],
       'receipt_from_email' => 'api@civicrm.org',
       )
@@ -1554,11 +1547,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   function createPendingParticipantContribution(){
     $event = $this->eventCreate(array('is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org',));
     $participantID = $this->participantCreate(array('event_id' => $event['id'], 'status_id' => 6));
-    $this->ids['participant']  = $participantID;
+    $this->_ids['participant']  = $participantID;
     $params = array_merge($this->_params, array('contribution_status_id' => 2, 'financial_type_id' => 'Event Fee'));
     $contribution = $this->callAPISuccess('contribution','create', $params);
     $this->callAPISuccess('participant_payment', 'create', array('contribution_id' => $contribution['id'], 'participant_id' => $participantID));
-    $lineItem = $this->callAPISuccess('line_item', 'get', array(
+    $this->callAPISuccess('line_item', 'get', array(
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'api.line_item.create' => array(
@@ -1761,7 +1754,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'account_relationship' => $relationTypeId,
      'financial_account_id' => 7,
    );
-   $financialType = CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, CRM_Core_DAO::$_nullArray);
+   CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, CRM_Core_DAO::$_nullArray);
    $this->assertNotEmpty($optionValue['values'][$optionValue['id']]['value']);
    return $optionValue['values'][$optionValue['id']]['value'];
  }
@@ -1808,7 +1801,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
        'status_id' => 2,
      );
    }
-   $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn',$trxnParams,$compareParams);
+   $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn',$trxnParams, $compareParams);
    $entityParams = array(
      'financial_trxn_id' => $trxn['financial_trxn_id'],
      'entity_table' => 'civicrm_financial_item',
