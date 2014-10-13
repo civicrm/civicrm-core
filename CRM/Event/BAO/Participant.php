@@ -1722,7 +1722,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @param int  $contributionId     Contribution Id
    * @param bool $excludeCancelled   Exclude cancelled additional participant
    *
-   * @return int $participantsId
+   * @return array $participantsId
    * @access public
    * @static
    */
@@ -1943,10 +1943,10 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
 
     if (!empty($updateLines)) {
       foreach ($updateLines as $valueId => $vals) {
-        if (isset($vals['tax_amount'])) { 
+        if (isset($vals['tax_amount'])) {
           $taxAmount = $vals['tax_amount'];
         }
-        else { 
+        else {
           $taxAmount = "NULL";
         }
         $updateLineItem = "
