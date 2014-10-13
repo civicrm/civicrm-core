@@ -67,6 +67,18 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       'pre_delete_func' => ''
       ) 
     ); 
+  
+  static $_dateColumns = 
+    array(
+      'civicrm_event' => array(
+        'dateColumns' => array('start_date'),
+        'excludeDateRangeColumns' => array('start_date', 'end_date'),
+        'intervalDateColumns' => array('end_date')
+      ),
+      'civicrm_activity' => array(
+        'dateColumns' => array('activity_date_time'),
+      )
+    );
 
   static $_tableDAOMapper = 
     array(
