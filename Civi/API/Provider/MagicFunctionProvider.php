@@ -131,6 +131,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
    * {inheritdoc}
    */
   public function getActionNames($version, $entity) {
+    $entity = _civicrm_api_get_camel_name($entity);
     $entities = $this->getEntityNames($version);
     if (!in_array($entity, $entities)) {
       return array();
