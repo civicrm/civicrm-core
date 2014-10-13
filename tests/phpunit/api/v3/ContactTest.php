@@ -1851,4 +1851,18 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contact', 'get', array('city' => 'Cool City', 'return' => 'contact_type'));
     $this->assertEquals(1, $result['count']);
   }
+
+
+  /**
+   * CRM-15443 - ensure getlist api does not return deleted or deceased contacts
+   */
+  function testGetlistExcludeConditions() {
+    $name = md5(time());
+    $contact1 = $this->individualCreate(array('last_name' => $name, 'is_deceased' => 1));
+    $contact2 = $this->individualCreate(array('last_name' => $name, 'is_deleted' => 1));
+    $contact3 = $this->individualCreate(array('last_name' => $name));
+    $result = $this->callAPISuccess('contact', 'getlist', array('input' => $name));
+    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals($contact3, $result['values'][0]['id'], 'In line ' . __LINE__);
+  }
 }
