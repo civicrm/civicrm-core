@@ -359,16 +359,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @access public
    */
   public function addScript($code, $region) {
-    switch ($region) {
-      case 'html-header':
-      case 'page-footer':
-        $scope = substr($region, 5);
-        break;
-      default:
-        return FALSE;
-    }
-    drupal_add_js($code, 'inline', $scope);
-    return TRUE;
+    // CRM-15450 - ensure scripts are in correct order
+    return FALSE;
   }
 
   /**
