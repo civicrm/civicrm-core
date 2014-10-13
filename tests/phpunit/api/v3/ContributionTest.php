@@ -854,6 +854,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords($contribution, 'pending');
   }
 
+  /**
+   * test that BAO defaults work
+   */
+  function testCreateBAODefaults() {
+    unset($this->_params['contribution_source_id'], $this->_params['payment_instrument_id']);
+    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id'], 'api.contribution.delete' => 1));
+    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertEquals(1, $contribution['payment_instrument_id']);
+  }
+
   /*
    * Function tests that line items, financial records are updated when contribution amount is changed
    */
