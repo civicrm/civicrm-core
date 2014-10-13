@@ -67,12 +67,7 @@ class CRM_Core_Form_RecurringEntity {
   * Entity Table
   */
   public static $_entityTable;
-  
-  /**
-  * Entity Type
-  */
-  public static $_entityType;
-  
+    
   /**
    * Checks current entityID has parent
    */
@@ -81,27 +76,22 @@ class CRM_Core_Form_RecurringEntity {
   static function preProcess($entityTable) {
     self::$_entityId = (int) CRM_Utils_Request::retrieve('id', 'Positive');
     self::$_entityTable = $entityTable;
-    $entityType = array();
+    
     if (self::$_entityId && $entityTable) {
       $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor(self::$_entityId, $entityTable);    
-      $entityType = explode("_", $entityTable);
-      self::$_entityType = $entityType[1];
-      if (self::$_entityType) {
-        self::$_entityType = self::$_entityType;
-      }
       if ($checkParentExistsForThisId) {
         self::$_hasParent = TRUE;
         self::$_parentEntityId = $checkParentExistsForThisId;
-        self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($checkParentExistsForThisId, self::$_entityType);
+        self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($checkParentExistsForThisId, $entityTable);
       }
       else {
         self::$_parentEntityId = self::$_entityId;
-        self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId(self::$_entityId, self::$_entityType);
+        self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId(self::$_entityId, $entityTable);
       }
       self::$_scheduleReminderID = self::$_scheduleReminderDetails->id;
     }
-    if (self::$_entityType) {
-      CRM_Core_OptionValue::getValues(array('name' => self::$_entityType.'_repeat_exclude_dates_'.self::$_parentEntityId), $optionValue);
+    if ($entityTable) {
+      CRM_Core_OptionValue::getValues(array('name' => $entityTable.'_repeat_exclude_dates_'.self::$_parentEntityId), $optionValue);
       $excludeOptionValues = array();
       if (!empty($optionValue)) {
         foreach($optionValue as $key => $val) {
@@ -378,6 +368,12 @@ class CRM_Core_Form_RecurringEntity {
         }
       }
 
+      //Set type for API
+      $apiEntityType = array();
+      $apiEntityType = explode("_", $type);
+      if (!empty($apiEntityType[1])) {
+        $apiType = $apiEntityType[1];
+      }
       //Delete relations if any from recurring entity tables before inserting new relations for this entity id
       if ($params['entity_id']) {
         //If entity has any pre delete function, consider that first
@@ -394,7 +390,7 @@ class CRM_Core_Form_RecurringEntity {
             //Check if pre delete function has some ids to be deleted
             if (!empty(CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted)) {
               foreach (CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted as $value) {
-                $result = civicrm_api3(ucfirst(strtolower($type)), CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array(
+                $result = civicrm_api3(ucfirst(strtolower($apiType)), CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array(
                           'sequential' => 1,
                           'id' => $value,
                           ));
@@ -406,7 +402,7 @@ class CRM_Core_Form_RecurringEntity {
             else {
               $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['entity_id'], $params['entity_table'], FALSE);
               foreach ($getRelatedEntities as $key => $value) {
-                $result = civicrm_api3(ucfirst(strtolower($type)), CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array(
+                $result = civicrm_api3(ucfirst(strtolower($apiType)), CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array(
                           'sequential' => 1,
                           'id' => $value['id'],
                           ));

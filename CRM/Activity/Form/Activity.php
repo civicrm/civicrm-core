@@ -964,7 +964,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           'isRecurringEntityRecord' => FALSE,
         )
       );
-      CRM_Core_Form_RecurringEntity::postProcess($params, 'activity', $linkedEntities);
+      CRM_Core_Form_RecurringEntity::postProcess($params, 'civicrm_activity', $linkedEntities);
     }
 
     return array('activity' => $activity);
