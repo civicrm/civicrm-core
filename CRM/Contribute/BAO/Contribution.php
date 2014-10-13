@@ -134,10 +134,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
-    // CRM-13420, set payment instrument to default if payment_instrument_id is empty
-    if (!$contributionID && empty($params['payment_instrument_id'])) {
-      $params['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument',
-        FALSE, FALSE, FALSE, 'AND is_default = 1'));
+   //set defaults in create mode
+    if (!$contributionID) {
+      self::setDefaults($params);
+      self::calculateMissingAmountParams($params);
     }
 
     if (!empty($params['payment_instrument_id'])) {
@@ -147,11 +147,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
-    // contribution status is missing, choose Completed as default status
-    // do this for create mode only
-    if (!$contributionID && empty($params['contribution_status_id'])) {
-      $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
-    }
     $setPrevContribution = TRUE;
     // CRM-13964 partial payment
     if (!empty($params['partial_payment_total']) && !empty($params['partial_amount_pay'])) {
@@ -209,6 +204,31 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
+   * Get defaults for new entity
+   * @return array
+   */
+  static function getDefaults() {
+    return array(
+      'payment_instrument_id' => key(CRM_Core_OptionGroup::values('payment_instrument',
+          FALSE, FALSE, FALSE, 'AND is_default = 1')
+      ),
+      'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name'),
+    );
+
+  }
+
+  /**
+   * Set defautls when creating new entity
+   * @param $params
+   */
+  static function setDefaults(&$params) {
+    foreach (self::getDefaults() as $key => $value) {
+      if (empty($params[$key])) {
+        $params[$key] = $value;
+      }
+    }
+  }
+  /**
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
@@ -236,6 +256,25 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       return $contribution;
     }
     return NULL;
+  }
+
+  /**
+   * @param $params
+   *
+   * @return mixed
+   */
+  public static function calculateMissingAmountParams(&$params) {
+    if (!isset($params['fee_amount'])) {
+      if (isset($params['total_amount']) && isset($params['net_amount'])) {
+        $params['fee_amount'] = $params['total_amount'] - $params['net_amount'];
+      }
+      else {
+        $params['fee_amount'] = 0;
+      }
+    }
+    if (!isset($params['net_amount'])) {
+      $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
+    }
   }
 
   /**
