@@ -2928,6 +2928,33 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    $result = $this->callAPISuccess('payment_processor', 'create', $params);
    return $result['id'];
  }
+  /**
+   * Set up initial recurring payment allowing subsequent IPN payments
+   */
+  function setupRecurringPaymentProcessorTransaction() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+      'contact_id' => $this->_contactID,
+      'amount' => 1000,
+      'sequential' => 1,
+      'installments' => 5,
+      'frequency_unit' => 'Month',
+      'frequency_interval' => 1,
+      'invoice_id' => $this->_invoiceID,
+      'contribution_status_id' => 2,
+      'processor_id' => $this->_paymentProcessorID,
+      'api.contribution.create' => array(
+        'total_amount' => '200',
+        'invoice_id' => $this->_invoiceID,
+        'financial_type_id' => 1,
+        'contribution_status_id' => 'Pending',
+        'contact_id' => $this->_contactID,
+        'contribution_page_id' => $this->_contributionPageID,
+        'payment_processor_id' => $this->_paymentProcessorID,
+      )
+    ));
+    $this->_contributionRecurID = $contributionRecur['id'];
+    $this->_contributionID = $contributionRecur['values']['0']['api.contribution.create']['id'];
+  }
 
 
   /**

@@ -33,10 +33,16 @@
  *
  */
 class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
+
   /**
-   * Constructor
+   * constructor function
+   *
+   * @param $inputData array contents of HTTP REQUEST
+   *
+   * @throws CRM_Core_Exception
    */
-  function __construct() {
+  function __construct($inputData) {
+    $this->setInputParameters($inputData);
     parent::__construct();
   }
 
@@ -49,7 +55,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
     //we only get invoice num as a key player from payment gateway response.
     //for ARB we get x_subscription_id and x_subscription_paynum
-    $x_subscription_id = self::retrieve('x_subscription_id', 'String');
+    $x_subscription_id = $this->retrieve('x_subscription_id', 'String');
 
     if ($x_subscription_id) {
       //Approved
@@ -80,12 +86,13 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         return $this->recur($input, $ids, $objects, $first);
       }
     }
+    return TRUE;
   }
 
   /**
    * @param array $input
    * @param array $ids
-   * @param $objects
+   * @param array $objects
    * @param $first
    *
    * @return bool
@@ -219,14 +226,15 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @param $ids
    */
   function getInput(&$input, &$ids) {
-    $input['amount'] = self::retrieve('x_amount', 'String');
-    $input['subscription_id'] = self::retrieve('x_subscription_id', 'Integer');
-    $input['response_code'] = self::retrieve('x_response_code', 'Integer');
-    $input['MD5_Hash'] = self::retrieve('x_MD5_Hash', 'String', FALSE, '');
-    $input['response_reason_code'] = self::retrieve('x_response_reason_code', 'String', FALSE);
-    $input['response_reason_text'] = self::retrieve('x_response_reason_text', 'String', FALSE);
-    $input['subscription_paynum'] = self::retrieve('x_subscription_paynum', 'Integer', FALSE, 0);
-    $input['trxn_id'] = self::retrieve('x_trans_id', 'String', FALSE);
+    $input['amount'] = $this->retrieve('x_amount', 'String');
+    $input['subscription_id'] = $this->retrieve('x_subscription_id', 'Integer');
+    $input['response_code'] = $this->retrieve('x_response_code', 'Integer');
+    $input['MD5_Hash'] = $this->retrieve('x_MD5_Hash', 'String', FALSE, '');
+    $input['response_reason_code'] = $this->retrieve('x_response_reason_code', 'String', FALSE);
+    $input['response_reason_text'] = $this->retrieve('x_response_reason_text', 'String', FALSE);
+    $input['subscription_paynum'] = $this->retrieve('x_subscription_paynum', 'Integer', FALSE, 0);
+    $input['trxn_id'] = $this->retrieve('x_trans_id', 'String', FALSE);
+
     if ($input['trxn_id']) {
       $input['is_test'] = 0;
     }
@@ -250,7 +258,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       "email-{$billingID}" => 'x_email',
     );
     foreach ($params as $civiName => $resName) {
-      $input[$civiName] = self::retrieve($resName, 'String', FALSE);
+      $input[$civiName] = $this->retrieve($resName, 'String', FALSE);
     }
   }
 
@@ -259,8 +267,8 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @param $input
    */
   function getIDs(&$ids, &$input) {
-    $ids['contact'] = self::retrieve('x_cust_id', 'Integer', FALSE, 0);
-    $ids['contribution'] = self::retrieve('x_invoice_num', 'Integer');
+    $ids['contact'] = $this->retrieve('x_cust_id', 'Integer', FALSE, 0);
+    $ids['contribution'] = $this->retrieve('x_invoice_num', 'Integer');
 
     // joining with contribution table for extra checks
     $sql = "
@@ -313,28 +321,25 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
   }
 
   /**
-   * @param $name
-   * @param $type
-   * @param bool $abort
-   * @param null $default
-   * @param string $location
+   * @param string $name parameter name
+   * @param string $type parameter type
+   * @param bool $abort abort if not present
+   * @param null $default default value
    *
+   * @throws CRM_Core_Exception
    * @return mixed
    */
-  static function retrieve($name, $type, $abort = TRUE, $default = NULL, $location = 'POST') {
-    static $store = NULL;
-    $value = CRM_Utils_Request::retrieve($name, $type, $store,
-      FALSE, $default, $location
+  function retrieve($name, $type, $abort = TRUE, $default = NULL) {
+    $value = CRM_Utils_Type::validate(
+      empty($this->_inputParameters[$name]) ? $default : $this->_inputParameters[$name],
+      $type,
+      FALSE
     );
     if ($abort && $value === NULL) {
-      CRM_Core_Error::debug_log_message("Could not find an entry for $name in $location");
-      CRM_Core_Error::debug_var('POST', $_POST);
-      CRM_Core_Error::debug_var('REQUEST', $_REQUEST);
-      echo "Failure: Missing Parameter<p>";
-      exit();
+      throw new CRM_Core_Exception("Could not find an entry for $name");
     }
     return $value;
-  }
+}
 
   /**
    * @param $ids
