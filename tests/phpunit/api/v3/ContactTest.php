@@ -1852,7 +1852,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
   }
 
-
   /**
    * CRM-15443 - ensure getlist api does not return deleted or deceased contacts
    */
@@ -1864,5 +1863,42 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contact', 'getlist', array('input' => $name));
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertEquals($contact3, $result['values'][0]['id'], 'In line ' . __LINE__);
+  }
+
+  /**
+   * Test contact.getactions
+   */
+  function testGetActions() {
+    $description = "Getting the available actions for an entity.";
+    $result = $this->callAPIAndDocument($this->_entity, 'getactions', array(), __FUNCTION__, __FILE__, $description);
+    $expected = array(
+      'create',
+      'delete',
+      'get',
+      'getactions',
+      'getcount',
+      'getfields',
+      'getlist',
+      'getoptions',
+      'getquick',
+      'getrefcount',
+      'getsingle',
+      'getvalue',
+      'merge',
+      'proximity',
+      'replace',
+      'setvalue',
+      'update',
+    );
+    $deprecated = array(
+      'update',
+      'getquick',
+    );
+    foreach ($expected as $action) {
+      $this->assertTrue(in_array($action, $result['values']), "Expected action $action");
+    }
+    foreach ($deprecated as $action) {
+      $this->assertArrayKeyExists($action, $result['deprecated']);
+    }
   }
 }
