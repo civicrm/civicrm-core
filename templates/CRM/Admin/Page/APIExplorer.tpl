@@ -85,11 +85,13 @@
 
 <form id="api-explorer">
   <label for="api-entity">{ts}Entity{/ts}:</label>
-  <select class="crm-form-select crm-select2" id="api-entity" name="entity">
+  <select class="crm-form-select" id="api-entity" name="entity">
     <option value="" selected="selected">{ts}Choose{/ts}...</option>
     {crmAPI entity="Entity" action="get" var="entities" version=3}
     {foreach from=$entities.values item=entity}
-      <option value="{$entity}">{$entity}</option>
+      <option value="{$entity}" {if !empty($entities.deprecated) && in_array($entity, $entities.deprecated)}class="strikethrough"{/if}>
+        {$entity}
+      </option>
     {/foreach}
   </select>
   &nbsp;&nbsp;

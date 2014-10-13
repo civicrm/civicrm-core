@@ -835,7 +835,15 @@ LIMIT    0, {$limit}
     }
   }
 
-  return civicrm_api3_create_success($contactList, $params);
+  return civicrm_api3_create_success($contactList, $params, 'contact', 'getquick');
+}
+
+/**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_contact_deprecation() {
+  return array('getquick' => 'The "getquick" action is deprecated in favor of "getlist".');
 }
 
 /**
