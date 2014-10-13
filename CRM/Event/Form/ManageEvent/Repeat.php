@@ -150,7 +150,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
           'isRecurringEntityRecord' => TRUE,
         ),
       );
-      CRM_Core_Form_RecurringEntity::postProcess($params, 'event', $linkedEntities);
+      CRM_Core_Form_RecurringEntity::postProcess($params, 'civicrm_event', $linkedEntities);
       CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
     }
     else {
