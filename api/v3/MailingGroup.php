@@ -116,6 +116,6 @@ function civicrm_api3_mailing_group_getfields($params) {
     unset($field['pseudoconstant']);
   }
 
-  return civicrm_api3_create_success($fields, $params, 'mailing_group');
+  return civicrm_api3_create_success($fields, $params, 'mailing_group', 'getfields');
 }
 

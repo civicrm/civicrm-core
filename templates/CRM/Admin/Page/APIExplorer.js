@@ -87,7 +87,10 @@
         id: 'api_action',
         text: 'Action'
       });
-      options.api_action = _.transform(actions, function(ret, item) {ret.push({value: item, key: item})});
+      options.api_action = _.reduce(actions.values, function(ret, item) {
+        ret[item] = item;
+        return ret;
+      }, {});
       showFields(['api_action']);
       return;
     }
