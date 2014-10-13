@@ -2362,7 +2362,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   function quickCleanUpFinancialEntities() {
     $tablesToTruncate = array(
       'civicrm_contribution',
+      'civicrm_contribution_soft',
       'civicrm_financial_trxn',
+      'civicrm_financial_item',
       'civicrm_contribution_recur',
       'civicrm_line_item',
       'civicrm_contribution_page',
