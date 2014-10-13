@@ -75,7 +75,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    */
   public function onApiResolve(\Civi\API\Event\ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
-    $actions = isset($this->actions[$apiRequest['entity']]) ? $this->actions[$apiRequest['entity']] : $this->actions['*'];
+    $actions = $this->getActionNames($apiRequest['version'], $apiRequest['entity']);
     if (in_array($apiRequest['action'], $actions)) {
       $apiRequest['is_metadata'] = TRUE;
       $event->setApiRequest($apiRequest);
@@ -127,6 +127,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    * {inheritdoc}
    */
   function getActionNames($version, $entity) {
+    $entity = _civicrm_api_get_camel_name($entity, $version);
     return isset($this->actions[$entity]) ? $this->actions[$entity] : $this->actions['*'];
   }
 }
