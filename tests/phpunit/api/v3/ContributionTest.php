@@ -131,18 +131,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $financialType  =  CRM_Financial_BAO_FinancialType::retrieve($financialParams,$default);
 
     $this->assertEquals(1,$contribution['count']);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     // note there was an assertion converting financial_type_id to 'Donation' which wasn't working.
     // passing back a string rather than an id seems like an error / cruft - & if it is to be introduced we should discuss
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], 1);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 5.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 95.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 23456, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 78910, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_source'], 'SSF', 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed', 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 5.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 95.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 23456);
+    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 78910);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_source'], 'SSF');
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
     //create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id)
     $p['trxn_id'] = '3847';
     $p['invoice_id'] = '3847';
@@ -168,12 +168,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'get', array(
       'id' => $this->_contribution['id'],
     ));
-    $this->assertEquals(1, $contribution['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $contribution['count']);
 
     //test get by contact id works
     $contribution = $this->callAPISuccess('contribution', 'get', array('contact_id' => $this->_individualId));
 
-    $this->assertEquals(2, $contribution['count'], 'In line ' . __LINE__);
+    $this->assertEquals(2, $contribution['count']);
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $this->_contribution['id'],
     ));
@@ -210,17 +210,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $financialType  =  CRM_Financial_BAO_FinancialType::retrieve($financialParams,$default);
 
     $this->assertEquals(1,$contribution['count']);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->_financialTypeId);
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_type_id'], $this->_financialTypeId);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 5.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 95.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 23456, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 78910, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_source'], 'SSF', 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed', 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 5.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 95.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 23456);
+    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 78910);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_source'], 'SSF');
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
     //create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id)
     $p['trxn_id'] = '3847';
     $p['invoice_id'] = '3847';
@@ -246,12 +246,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $this->_contribution['id'],
     ));
     //test id as field
-    $this->assertEquals(1, $contribution['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $contribution['count']);
     // $this->assertEquals($this->_contribution['id'], $contribution['id'] )  ;
     //test get by contact id works
     $contribution = $this->callAPISuccess('contribution', 'get', array('contact_id' => $this->_individualId));
 
-    $this->assertEquals(2, $contribution['count'], 'In line ' . __LINE__);
+    $this->assertEquals(2, $contribution['count']);
     $this->callAPISuccess('Contribution', 'Delete', array(
     'id' => $this->_contribution['id'],
     ));
@@ -416,13 +416,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
 
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1, 'In line ' . __LINE__ );
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1 );
+    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
+    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
+    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1);
     $lineItems = $this->callAPISuccess('line_item','get',array(
       'entity_id' => $contribution['id'],
       'contribution_id' => $contribution['id'],
@@ -506,8 +506,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
 
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
   }
 
   /*
@@ -565,7 +565,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
 
     $contribution = $this->callAPIFailure('contribution', 'create', $params,
-      'contact_id is not valid : 999', 'In line ' . __LINE__);
+      'contact_id is not valid : 999');
   }
 
   function testCreateContributionWithNote() {
@@ -714,13 +714,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
 
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1, 'In line ' . __LINE__ );
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1 );
+    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
+    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
+    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1);
     $lineItems = $this->callAPISuccess('line_item','get',array(
 
       'entity_id' => $contribution['id'],
@@ -764,13 +764,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
 
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1, 'In line ' . __LINE__ );
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1 );
+    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
+    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
+    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1);
     $this->_checkFinancialRecords($contribution, 'online');
   }
 
@@ -818,13 +818,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
 
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1, 'In line ' . __LINE__ );
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1 );
+    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
+    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
+    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2);
     $this->_checkFinancialRecords($contribution, 'payLater');
   }
 
@@ -849,13 +849,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
 
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1, 'In line ' . __LINE__ );
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1 );
+    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
+    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
+    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2);
     $this->_checkFinancialRecords($contribution, 'pending');
   }
 
@@ -1066,8 +1066,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $original = $this->callAPISuccess('contribution', 'get', $old_params);
     //Make sure it came back
-    $this->assertAPISuccess($original, 'In line ' . __LINE__);
-    $this->assertEquals($original['id'], $contributionID, 'In line ' . __LINE__);
+    $this->assertAPISuccess($original);
+    $this->assertEquals($original['id'], $contributionID);
     //set up list of old params, verify
 
     //This should not be required on update:
@@ -1084,11 +1084,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $old_invoice_id = $original['values'][$contributionID]['invoice_id'];
 
     //check against values in CiviUnitTestCase::createContribution()
-    $this->assertEquals($old_contact_id, $this->_individualId, 'In line ' . __LINE__);
-    $this->assertEquals($old_fee_amount, 5.00, 'In line ' . __LINE__);
-    $this->assertEquals($old_source, 'SSF', 'In line ' . __LINE__);
-    $this->assertEquals($old_trxn_id, 212355, 'In line ' . __LINE__);
-    $this->assertEquals($old_invoice_id, 'idofsh', 'In line ' . __LINE__);
+    $this->assertEquals($old_contact_id, $this->_individualId);
+    $this->assertEquals($old_fee_amount, 5.00);
+    $this->assertEquals($old_source, 'SSF');
+    $this->assertEquals($old_trxn_id, 212355);
+    $this->assertEquals($old_invoice_id, 'idofsh');
     $params = array(
       'id' => $contributionID,
       'contact_id' => $this->_individualId,
@@ -1109,17 +1109,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $contribution = $this->callAPISuccess('contribution', 'get', $new_params);
 
-    $this->assertEquals($contribution['values'][$contributionID]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contributionID]['total_amount'], 110.00, 'In line ' . __LINE__);
-        $this->assertEquals($contribution['values'][$contributionID]['financial_type_id'],$this->_financialTypeId, 'In line ' . __LINE__ );
-    $this->assertEquals($contribution['values'][$contributionID]['instrument_id'], $old_payment_instrument, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contributionID]['non_deductible_amount'], 10.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contributionID]['fee_amount'], $old_fee_amount, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contributionID]['net_amount'], 100.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contributionID]['trxn_id'], $old_trxn_id, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contributionID]['invoice_id'], $old_invoice_id, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contributionID]['contribution_source'], $old_source, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contributionID]['contribution_status'], 'Completed', 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contributionID]['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['values'][$contributionID]['total_amount'], 110.00);
+        $this->assertEquals($contribution['values'][$contributionID]['financial_type_id'],$this->_financialTypeId );
+    $this->assertEquals($contribution['values'][$contributionID]['instrument_id'], $old_payment_instrument);
+    $this->assertEquals($contribution['values'][$contributionID]['non_deductible_amount'], 10.00);
+    $this->assertEquals($contribution['values'][$contributionID]['fee_amount'], $old_fee_amount);
+    $this->assertEquals($contribution['values'][$contributionID]['net_amount'], 100.00);
+    $this->assertEquals($contribution['values'][$contributionID]['trxn_id'], $old_trxn_id);
+    $this->assertEquals($contribution['values'][$contributionID]['invoice_id'], $old_invoice_id);
+    $this->assertEquals($contribution['values'][$contributionID]['contribution_source'], $old_source);
+    $this->assertEquals($contribution['values'][$contributionID]['contribution_status'], 'Completed');
     $params = array(
       'contribution_id' => $contributionID,
 
@@ -1184,17 +1184,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // We're taking the first element.
     $res = $result['values'][$contribution['id']];
 
-    $this->assertEquals($p['contact_id'], $res['contact_id'], 'In line ' . __LINE__);
-    $this->assertEquals($p['total_amount'], $res['total_amount'], 'In line ' . __LINE__);
-    $this->assertEquals($p['financial_type_id'], $res['financial_type_id'], 'In line ' . __LINE__ );
-    $this->assertEquals($p['net_amount'], $res['net_amount'], 'In line ' . __LINE__);
-    $this->assertEquals($p['non_deductible_amount'], $res['non_deductible_amount'], 'In line ' . __LINE__);
-    $this->assertEquals($p['fee_amount'], $res['fee_amount'], 'In line ' . __LINE__);
-    $this->assertEquals($p['trxn_id'], $res['trxn_id'], 'In line ' . __LINE__);
-    $this->assertEquals($p['invoice_id'], $res['invoice_id'], 'In line ' . __LINE__);
-    $this->assertEquals($p['source'], $res['contribution_source'], 'In line ' . __LINE__);
+    $this->assertEquals($p['contact_id'], $res['contact_id']);
+    $this->assertEquals($p['total_amount'], $res['total_amount']);
+    $this->assertEquals($p['financial_type_id'], $res['financial_type_id'] );
+    $this->assertEquals($p['net_amount'], $res['net_amount']);
+    $this->assertEquals($p['non_deductible_amount'], $res['non_deductible_amount']);
+    $this->assertEquals($p['fee_amount'], $res['fee_amount']);
+    $this->assertEquals($p['trxn_id'], $res['trxn_id']);
+    $this->assertEquals($p['invoice_id'], $res['invoice_id']);
+    $this->assertEquals($p['source'], $res['contribution_source']);
     // contribution_status_id = 1 => Completed
-    $this->assertEquals('Completed', $res['contribution_status'], 'In line ' . __LINE__);
+    $this->assertEquals('Completed', $res['contribution_status']);
 
     $this->contributionDelete($contribution['id']);
   }
@@ -1236,16 +1236,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contribution', 'get', $params);
     $res = $result['values'][$contribution2['id']];
 
-    $this->assertEquals($p2['contact_id'], $res['contact_id'], 'In line ' . __LINE__);
-    $this->assertEquals($p2['total_amount'], $res['total_amount'], 'In line ' . __LINE__);
-    $this->assertEquals($p2['financial_type_id'], $res['financial_type_id'], 'In line ' . __LINE__ );
-    $this->assertEquals($p2['net_amount'], $res['net_amount'], 'In line ' . __LINE__);
-    $this->assertEquals($p2['non_deductible_amount'], $res['non_deductible_amount'], 'In line ' . __LINE__);
-    $this->assertEquals($p2['fee_amount'], $res['fee_amount'], 'In line ' . __LINE__);
-    $this->assertEquals($p2['trxn_id'], $res['trxn_id'], 'In line ' . __LINE__);
-    $this->assertEquals($p2['invoice_id'], $res['invoice_id'], 'In line ' . __LINE__);
+    $this->assertEquals($p2['contact_id'], $res['contact_id']);
+    $this->assertEquals($p2['total_amount'], $res['total_amount']);
+    $this->assertEquals($p2['financial_type_id'], $res['financial_type_id'] );
+    $this->assertEquals($p2['net_amount'], $res['net_amount']);
+    $this->assertEquals($p2['non_deductible_amount'], $res['non_deductible_amount']);
+    $this->assertEquals($p2['fee_amount'], $res['fee_amount']);
+    $this->assertEquals($p2['trxn_id'], $res['trxn_id']);
+    $this->assertEquals($p2['invoice_id'], $res['invoice_id']);
     // contribution_status_id = 2 => Pending
-    $this->assertEquals('Pending', $res['contribution_status'], 'In line ' . __LINE__);
+    $this->assertEquals('Pending', $res['contribution_status']);
 
     $this->contributionDelete($contribution1['id']);
     $this->contributionDelete($contribution2['id']);
@@ -1535,7 +1535,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     if ($delete) {
       $this->callAPISuccess('contribution', 'delete', array('id' => $id));
     }
-    $this->assertAPISuccess($contribution, 0, 'In line ' . __LINE__);
+    $this->assertAPISuccess($contribution, 0);
     $values = $contribution['values'][$contribution['id']];
     $params['receive_date'] = date('Y-m-d H:i:s', strtotime($params['receive_date']));
     // this is not returned in id format
