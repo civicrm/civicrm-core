@@ -505,7 +505,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
     
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      CRM_Core_Form_RecurringEntity::preProcess('activity');
+      CRM_Core_Form_RecurringEntity::preProcess('civicrm_activity');
     }
   }
       
@@ -951,7 +951,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $activity = $this->processActivity($params);
       $params['parent_entity_start_date'] = $this->_parentActivityStartDate;
       $params['dateColumns'] = array('activity_date_time');
-      $params['excludeDateRangeColumns'] = array('activity_date_time');
       $params['entity_table'] = 'civicrm_activity';
       //Unset activity id
       unset($params['id']);

@@ -64,7 +64,12 @@ class CRM_Core_Form_RecurringEntity {
   public static $_excludeDateInfo = array();
   
   /**
-   * Entity Type
+  * Entity Table
+  */
+  public static $_entityTable;
+  
+  /**
+  * Entity Type
   */
   public static $_entityType;
   
@@ -73,29 +78,37 @@ class CRM_Core_Form_RecurringEntity {
    */
   public static $_hasParent = FALSE;
   
-  static function preProcess($entityType) {
-   self::$_entityId = (int) CRM_Utils_Request::retrieve('id', 'Positive');
-   self::$_entityType = $entityType;
-   if (self::$_entityId && $entityType) {
-     $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor(self::$_entityId, 'civicrm_'.$entityType);    
-     if ($checkParentExistsForThisId) {
-       self::$_hasParent = TRUE;
-       self::$_parentEntityId = $checkParentExistsForThisId;
-       self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($checkParentExistsForThisId, $entityType);
-     }
-     else {
-       self::$_parentEntityId = self::$_entityId;
-       self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId(self::$_entityId, $entityType);
-     }
-     self::$_scheduleReminderID = self::$_scheduleReminderDetails->id;
-   }
-    CRM_Core_OptionValue::getValues(array('name' => $entityType.'_repeat_exclude_dates_'.self::$_parentEntityId), $optionValue);
-    $excludeOptionValues = array();
-    if (!empty($optionValue)) {
-      foreach($optionValue as $key => $val) {
-        $excludeOptionValues[$val['value']] = date('m/d/Y', strtotime($val['value']));
+  static function preProcess($entityTable) {
+    self::$_entityId = (int) CRM_Utils_Request::retrieve('id', 'Positive');
+    self::$_entityTable = $entityTable;
+    $entityType = array();
+    if (self::$_entityId && $entityTable) {
+      $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor(self::$_entityId, $entityTable);    
+      $entityType = explode("_", $entityTable);
+      self::$_entityType = $entityType[1];
+      if (self::$_entityType) {
+        self::$_entityType = self::$_entityType;
       }
-      self::$_excludeDateInfo = $excludeOptionValues;
+      if ($checkParentExistsForThisId) {
+        self::$_hasParent = TRUE;
+        self::$_parentEntityId = $checkParentExistsForThisId;
+        self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($checkParentExistsForThisId, self::$_entityType);
+      }
+      else {
+        self::$_parentEntityId = self::$_entityId;
+        self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId(self::$_entityId, self::$_entityType);
+      }
+      self::$_scheduleReminderID = self::$_scheduleReminderDetails->id;
+    }
+    if (self::$_entityType) {
+      CRM_Core_OptionValue::getValues(array('name' => self::$_entityType.'_repeat_exclude_dates_'.self::$_parentEntityId), $optionValue);
+      $excludeOptionValues = array();
+      if (!empty($optionValue)) {
+        foreach($optionValue as $key => $val) {
+          $excludeOptionValues[$val['value']] = date('m/d/Y', strtotime($val['value']));
+        }
+        self::$_excludeDateInfo = $excludeOptionValues;
+      }
     }
   }
   
@@ -144,7 +157,7 @@ class CRM_Core_Form_RecurringEntity {
   
   static function buildQuickForm(&$form) {
     $form->assign('currentEntityId', self::$_entityId);
-    $form->assign('entityType', self::$_entityType);
+    $form->assign('entityTable', self::$_entityTable);
     $form->assign('scheduleReminderId', self::$_scheduleReminderID);
     $form->assign('hasParent', self::$_hasParent);
     
