@@ -90,15 +90,15 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Get the list of dashlets for the current user or the specified user. 
+   * Get the list of dashlets for the current user or the specified user.
    *
    * Additionlly, initializes the dashboard with defaults if this is the
    * user's first visit to their dashboard.
    *
-   * @param boolean $flatFormat this is true if you want simple associated 
+   * @param boolean $flatFormat this is true if you want simple associated
    * array of all the contact's dashlets whether or not they are enabled.
    *
-   * @param integer $contactID provide the dashlets for the contact id 
+   * @param integer $contactID provide the dashlets for the contact id
    * passed rather than the current user.
    *
    * @return array $dashlets array of dashlets
@@ -139,7 +139,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     }
 
     // If empty, then initialize contact dashboard for this user.
-    if(!$hasDashlets) {
+    if (!$hasDashlets) {
       return self::initializeDashlets();
     }
     return $dashlets;
@@ -183,7 +183,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     }
     return $dashlets;
   }
- 
+
 
   /**
    * Function to check dashlet permission for current user
