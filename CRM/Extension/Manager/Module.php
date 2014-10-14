@@ -54,7 +54,7 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
   /**
    * @param CRM_Extension_Info $info
    */
-  public function onPostInstall(CRM_Extension_Info $info) {
+  public function onPostPostInstall(CRM_Extension_Info $info) {
     $this->callHook($info, 'postInstall');
   }
 
