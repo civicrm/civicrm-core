@@ -131,6 +131,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
    * {inheritdoc}
    */
   public function getActionNames($version, $entity) {
+    $entity = _civicrm_api_get_camel_name($entity);
     $entities = $this->getEntityNames($version);
     if (!in_array($entity, $entities)) {
       return array();
@@ -257,22 +258,24 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     $loaded_files = array(); // array($relativeFilePath => TRUE)
     $include_dirs = array_unique(explode(PATH_SEPARATOR, get_include_path()));
     foreach ($include_dirs as $include_dir) {
-      $action_dir = implode(DIRECTORY_SEPARATOR, array($include_dir, 'api', "v${version}", $camelName));
-      if (!is_dir($action_dir)) {
-        continue;
-      }
-
-      $iterator = new \DirectoryIterator($action_dir);
-      foreach ($iterator as $fileinfo) {
-        $file = $fileinfo->getFilename();
-        if (array_key_exists($file, $loaded_files)) {
-          continue; // action provided by an earlier item on include_path
+      foreach (array($camelName, 'Generic') as $name) {
+        $action_dir = implode(DIRECTORY_SEPARATOR, array($include_dir, 'api', "v${version}", $name));
+        if (!is_dir($action_dir)) {
+          continue;
         }
 
-        $parts = explode(".", $file);
-        if (end($parts) == "php" && !preg_match('/Tests?\.php$/', $file)) {
-          require_once $action_dir . DIRECTORY_SEPARATOR . $file;
-          $loaded_files[$file] = TRUE;
+        $iterator = new \DirectoryIterator($action_dir);
+        foreach ($iterator as $fileinfo) {
+          $file = $fileinfo->getFilename();
+          if (array_key_exists($file, $loaded_files)) {
+            continue; // action provided by an earlier item on include_path
+          }
+
+          $parts = explode(".", $file);
+          if (end($parts) == "php" && !preg_match('/Tests?\.php$/', $file)) {
+            require_once $action_dir . DIRECTORY_SEPARATOR . $file;
+            $loaded_files[$file] = TRUE;
+          }
         }
       }
     }

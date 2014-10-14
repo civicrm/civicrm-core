@@ -82,7 +82,7 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
     'extra' => array(),
   );
   // Find main field from meta
-  foreach (array('sort_name', 'title', 'label', 'name') as $field) {
+  foreach (array('sort_name', 'title', 'label', 'name', 'subject') as $field) {
     if (isset($fields[$field])) {
       $defaults['label_field'] = $defaults['search_field'] = $field;
       break;

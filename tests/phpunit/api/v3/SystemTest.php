@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
 | CiviCRM version 4.5                                                |
@@ -26,38 +25,12 @@
 +--------------------------------------------------------------------+
 */
 
-/*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
-*/
-
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Test class for System API - civicrm_system_*
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_SystemTest extends CiviUnitTestCase {
 
@@ -68,7 +41,8 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    *  Constructor
    *
    *  Initialize configuration
-   */ function __construct() {
+   */
+  function __construct() {
     parent::__construct();
   }
 
@@ -120,7 +94,10 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    */
   function testSystemLog() {
     $this->callAPISuccess('system', 'log', array('level' => 'info', 'message' => 'We wish you a merry Christmas'));
-    $result = $this->callAPISuccess('SystemLog', 'getsingle', array('sequential' => 1, 'message' => array('LIKE' => '%Chris%')));
+    $result = $this->callAPISuccess('SystemLog', 'getsingle', array(
+        'sequential' => 1,
+        'message' => array('LIKE' => '%Chris%')
+      ));
     $this->assertEquals($result['message'], 'We wish you a merry Christmas');
     $this->assertEquals($result['level'], 'info');
   }
@@ -129,9 +106,18 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    * Test system log function
    */
   function testSystemLogNoLevel() {
-    $this->callAPISuccess('system', 'log', array( 'message' => 'We wish you a merry Christmas', 'level' => 'alert'));
-    $result = $this->callAPISuccess('SystemLog', 'getsingle', array('sequential' => 1, 'message' => array('LIKE' => '%Chris%')));
+    $this->callAPISuccess('system', 'log', array('message' => 'We wish you a merry Christmas', 'level' => 'alert'));
+    $result = $this->callAPISuccess('SystemLog', 'getsingle', array(
+      'sequential' => 1,
+      'message' => array('LIKE' => '%Chris%')
+    ));
     $this->assertEquals($result['message'], 'We wish you a merry Christmas');
     $this->assertEquals($result['level'], 'alert');
+  }
+
+  function testSystemGet() {
+    $result = $this->callAPISuccess('system', 'get', array());
+    $this->assertRegExp('/^[0-9]+\.[0-9]+\.[0-9a-z\-]+$/', $result['values'][0]['version']);
+    $this->assertEquals('UnitTests', $result['values'][0]['uf']);
   }
 }

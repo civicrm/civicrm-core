@@ -26,10 +26,7 @@
 */
 
 /**
- * Definition of the ActivityType part of the CRM API.
- * More detailed documentation can be found
- * {@link http://objectledge.org/confluence/display/CRM/CRM+v1.0+Public+APIs
- * here}
+ * @deprecated
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Activity
@@ -38,6 +35,14 @@
  * $Id: ActivityType.php 30171 2010-10-14 09:11:27Z mover $
  *
  */
+
+/**
+ * @deprecated api notice
+ * @return string to indicate this entire api entity is deprecated
+ */
+function _civicrm_api3_activity_type_deprecation() {
+  return 'The activity_type api is deprecated. Please use the option_value api instead.';
+}
 
 /**
  * Function to retrieve activity types
@@ -66,7 +71,7 @@ function civicrm_api3_activity_type_get($params) {
  *
  * @access public
  *
- * @deprecated - we will introduce OptionValue Create - plse consider helping with this if not done
+ * @deprecated - use option_value create
  */
 function civicrm_api3_activity_type_create($params) {
 

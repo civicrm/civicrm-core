@@ -476,7 +476,7 @@ class CRM_Core_Resources {
       }
 
       // Dynamic localization script
-      $this->addScriptUrl($this->addLocalizationJs(), $jsWeight++, $region);
+      $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $config->lcMessages, array('r' => $this->getCacheCode())), $jsWeight++, $region);
 
       // Add global settings
       $settings = array('config' => array(
@@ -532,16 +532,6 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Deletes and rebuilds dynamic resource files
-   * @return CRM_Core_Resources
-   */
-  public function rebuildDynamicResources() {
-    CRM_Utils_File::flushDynamicResources();
-    $this->addLocalizationJs();
-    return $this;
-  }
-
-  /**
    * Translate strings in a javascript file
    *
    * @param $ext string, extension name
@@ -568,26 +558,12 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Add dynamic l10n js
-   *
-   * @return string URL of JS file
-   */
-  private function addLocalizationJs() {
-    $config = CRM_Core_Config::singleton();
-    $fileName = 'l10n-' . $config->lcMessages . '.js';
-    if (!is_file(CRM_Utils_File::dynamicResourcePath($fileName))) {
-      CRM_Utils_File::addDynamicResource($fileName, $this->createLocalizationJs());
-    }
-    // Dynamic localization script
-    return CRM_Utils_File::dynamicResourceUrl($fileName);
-  }
-
-  /**
    * Create dynamic script for localizing js widgets
    *
    * @return string javascript content
    */
-  private function createLocalizationJs() {
+  static function outputLocalizationJS() {
+    CRM_Core_Page_AJAX::setJsHeaders();
     $config = CRM_Core_Config::singleton();
     $vars = array(
       'moneyFormat' => json_encode(CRM_Utils_Money::format(1234.56)),
@@ -595,7 +571,8 @@ class CRM_Core_Resources {
       'otherSearch' => json_encode(ts('Enter search term...')),
       'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
     );
-    return CRM_Core_Smarty::singleton()->fetchWith('CRM/common/localization.js.tpl', $vars);
+    print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
+    CRM_Utils_System::civiExit();
   }
 
   /**
