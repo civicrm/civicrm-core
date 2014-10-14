@@ -1853,16 +1853,20 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-15443 - ensure getlist api does not return deleted or deceased contacts
+   * CRM-15443 - ensure getlist api does not return deleted contacts
    */
   function testGetlistExcludeConditions() {
     $name = md5(time());
-    $contact1 = $this->individualCreate(array('last_name' => $name, 'is_deceased' => 1));
-    $contact2 = $this->individualCreate(array('last_name' => $name, 'is_deleted' => 1));
-    $contact3 = $this->individualCreate(array('last_name' => $name));
+    $contact = $this->individualCreate(array('last_name' => $name));
+    $deceasedContact = $this->individualCreate(array('last_name' => $name, 'is_deceased' => 1));
+    $deletedContact = $this->individualCreate(array('last_name' => $name, 'is_deleted' => 1));
+    // We should get all but the deleted contact
     $result = $this->callAPISuccess('contact', 'getlist', array('input' => $name));
+    $this->assertEquals(2, $result['count'], 'In line ' . __LINE__);
+    // Force-exclude the deceased contact
+    $result = $this->callAPISuccess('contact', 'getlist', array('input' => $name, 'params' => array('is_deceased' => 0)));
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals($contact3, $result['values'][0]['id'], 'In line ' . __LINE__);
+    $this->assertEquals($contact, $result['values'][0]['id'], 'In line ' . __LINE__);
   }
 
   /**
