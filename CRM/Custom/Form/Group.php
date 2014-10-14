@@ -546,16 +546,26 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   static function getFormattedList(&$list) {
     $relName = array();
 
-    foreach ($list as $k => $v) {
-      $key = substr($k, 0, strpos($k, '_'));
-      if (isset($list["{$key}_b_a"])) {
+    foreach ($list as $listItemKey => $itemValue) {
+      // Extract the relationship ID.
+      $key = substr($listItemKey, 0, strpos($listItemKey, '_'));
+      // Does the '_b_a' of the relationship exist in the list?
+      if (isset($list["{$key}_b_a"])) { // could I remove this? because all relationships have labels?
+        // Save the '_a_b' entry
+        $relName["$key"] = $list["{$key}_a_b"];
+        // Are the two labels different?
         if ($list["{$key}_a_b"] != $list["{$key}_b_a"]) {
+          // If so rewrite the entry with the new name
           $relName["$key"] = $list["{$key}_a_b"] . ' / ' . $list["{$key}_b_a"];
         }
+        // Unset from the list both entries of the same relationship
         unset($list["{$key}_b_a"]);
+        unset($list["{$key}_a_b"]);
       }
-      else {
+      else { // this may be useless if both labels always exist
+        // If no '_b_a' label exists save the '_a_b' one and unset it from the list
         $relName["{$key}"] = $list["{$key}_a_b"];
+        unset($list["{$key}_a_b"]);
       }
     }
     return $relName;
