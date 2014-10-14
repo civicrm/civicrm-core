@@ -764,12 +764,13 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $participantEmails = array($primaryParticipant, $secParticipant, $thirdParticipant);
     $addtlPart = array($secParticipant, $thirdParticipant);
     $primaryParticipantInfo =
-      $this->_testOnlineRegistration($registerUrl, 2, $anonymous, FALSE, $participantEmails, "Test Processor");
+    $this->_testOnlineRegistration($registerUrl, 2, $anonymous, FALSE, $participantEmails, "Test Processor");
     $primaryDisplayName = "{$primaryParticipantInfo['first_name']} {$primaryParticipantInfo['last_name']}";
     $this->webtestLogin();
     $this->openCiviPage("event/search", "reset=1");
     $this->select2("event_id", $eventTitle, FALSE);
     $this->clickLink('_qf_Search_refresh');
+    $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a");
     $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
      '{$secParticipant['last_name']}, {$secParticipant['first_name']}')]/../../td[6]", preg_quote('225.00'));
     $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),

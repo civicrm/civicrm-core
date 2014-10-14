@@ -1073,6 +1073,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         elseif ($this->_context == 'membership') {
           $isRelatedId = TRUE;
         }
+        else {
+          $pId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'participant_id', 'contribution_id');
+        }
       }
       else {
         $contributionDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);

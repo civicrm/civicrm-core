@@ -835,7 +835,15 @@ LIMIT    0, {$limit}
     }
   }
 
-  return civicrm_api3_create_success($contactList, $params);
+  return civicrm_api3_create_success($contactList, $params, 'contact', 'getquick');
+}
+
+/**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_contact_deprecation() {
+  return array('getquick' => 'The "getquick" action is deprecated in favor of "getlist".');
 }
 
 /**
@@ -975,6 +983,10 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   // Contact api doesn't support array(LIKE => 'foo') syntax
   if (!empty($request['input'])) {
     $request['params'][$request['search_field']] = $request['input'];
+  }
+  // Exclude deceased contacts by default
+  if (!isset($request['params']['is_deceased'])) {
+    $request['params']['is_deceased'] = 0;
   }
 }
 

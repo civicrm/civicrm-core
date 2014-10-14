@@ -4,6 +4,7 @@
   <title></title>
 
   <style type="text/css">
+    {literal}
     /* Client-specific Styles */ 
     #outlook a {padding:0;} /* Force Outlook to provide a "view in browser" menu link. */
     body{width:100% !important; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; margin:0; padding:0;}
@@ -29,7 +30,7 @@
     .mobile_link a[href^="tel"], .mobile_link a[href^="sms"] {text-decoration: default;color:#136388;pointer-events: auto;cursor: default;}
     table[class=devicewidth] {width: 440px!important;text-align:center!important;}
     table[class=devicewidthmob] {width: 416px!important;text-align:center!important;}
- table[class=devicewidthinner] {width: 416px!important;text-align:center!important;}
+    table[class=devicewidthinner] {width: 416px!important;text-align:center!important;}
     img[class=banner] {width: 440px!important;auto!important;}
     img[class=col2img] {width: 440px!important;height:auto!important;}
     table[class="cols3inner"] {width: 100px!important;}
@@ -67,7 +68,7 @@
     @media only screen and (max-width: 640px) {
     .desktop-spacer {display:none !important;}
  }
-
+  {/literal}
   </style>
 
 <body>

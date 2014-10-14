@@ -2931,6 +2931,13 @@ WHERE  contribution_id = %1 ";
           'entity_table' => 'civicrm_financial_item',
           'financial_trxn_id' => $trxn->id,
         );
+        if (empty($params['line_item'])) {
+          //CRM-15296
+          //@todo - check with Joe regarding this situation - payment processors create pending transactions with no line items
+          // when creating recurring membership payment - there are 2 lines to comment out in contributonPageTest if fixed
+          // & this can be removed
+          return;
+        }
         foreach ($params['line_item'] as $fieldId => $fields) {
           foreach ($fields as $fieldValueId => $fieldValues) {
             $fparams = array(
@@ -3420,7 +3427,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
 SELECT ft.total_amount, con.financial_type_id, ft.payment_instrument_id, ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number
 FROM civicrm_contribution con
   LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
-  LEFT JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id AND ft.to_financial_account_id != {$feeFinancialAccount}
+  INNER JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id AND ft.to_financial_account_id != {$feeFinancialAccount}
 WHERE con.id = {$contributionId}
 ";
 
