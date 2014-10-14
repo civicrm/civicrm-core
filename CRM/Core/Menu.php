@@ -69,10 +69,14 @@ class CRM_Core_Menu {
   CONST MENU_ITEM = 1;
 
   /**
+   * This function fetches the menu items from xml and xmlMenu hooks
+   *
+   * @param boolen $fetchFromXML fetch the menu items from xml and not from cache
+   *
    * @return array
    */
-  static function &xmlItems() {
-    if (!self::$_items) {
+  static function &xmlItems($fetchFromXML = FALSE) {
+    if (!self::$_items || $fetchFromXML) {
       $config = CRM_Core_Config::singleton();
 
       // We needs this until Core becomes a component
@@ -158,11 +162,13 @@ class CRM_Core_Menu {
   /**
    * This function defines information for various menu items
    *
+   * @param boolen $fetchFromXML fetch the menu items from xml and not from cache
+   *
    * @static
    * @access public
    */
-  static function &items() {
-    return self::xmlItems();
+  static function &items($fetchFromXML = FALSE) {
+    return self::xmlItems($fetchFromXML);
   }
 
   /**
@@ -255,6 +261,7 @@ class CRM_Core_Menu {
   }
 
   /**
+   * This function recomputes menu from xml and populates civicrm_menu
    * @param bool $truncate
    */
   static function store($truncate = TRUE) {
@@ -263,7 +270,7 @@ class CRM_Core_Menu {
       $query = 'TRUNCATE civicrm_menu';
       CRM_Core_DAO::executeQuery($query);
     }
-    $menuArray = self::items();
+    $menuArray = self::items($truncate);
 
     self::build($menuArray);
 
