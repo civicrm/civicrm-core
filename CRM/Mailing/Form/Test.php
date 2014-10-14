@@ -291,6 +291,7 @@ WHERE      e.email IN ($emails)
 AND        e.on_hold = 0
 AND        c.is_opt_out = 0
 AND        c.do_not_email = 0
+AND        c.is_deleted = 0
 AND        c.is_deceased = 0
 GROUP BY   e.id
 ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
@@ -308,7 +309,9 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
 
       $dao->free();
       foreach ($testParams['emails'] as $key => $email) {
-        $email = trim($email);
+        // Email addresses are forced to lower case when saved, so ensure
+        // we have the same case when comparing.
+        $email = trim(strtolower($email));
         $contactId = $emailId = NULL;
         if (array_key_exists($email, $emailDetail)) {
           $emailId = $emailDetail[$email]['email_id'];
