@@ -374,7 +374,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
 
-    $searchContext = CRM_Utils_Request::retrieve('searchContext', 'String', $this);
+    $searchContext = CRM_Utils_Request::retrieve('searchContext', 'String', $form);
 
     //validate the qfKey
     if (!CRM_Utils_Rule::qfKey($qfKey)) {
