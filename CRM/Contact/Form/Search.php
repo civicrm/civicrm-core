@@ -337,7 +337,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   function buildQuickForm() {
     parent::buildQuickForm();
-    $this->addClass('crm-ajax-selection-form');
     CRM_Core_Resources::singleton()
       // jsTree is needed for tags popup
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
@@ -459,7 +458,11 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->addTaskMenu($tasks);
     }
 
-    if ($qfKeyParam = CRM_Utils_Array::value('qfKey', $this->_formValues)) {
+    $selectedContactIds = array();
+    $qfKeyParam = CRM_Utils_Array::value('qfKey', $this->_formValues);
+    // We use ajax to handle selections only if the search results component_mode is set to "contacts"
+    if ($qfKeyParam && $this->get('component_mode') <= 1) {
+      $this->addClass('crm-ajax-selection-form');
       $qfKeyParam = "civicrm search {$qfKeyParam}";
       $selectedContactIdsArr = CRM_Core_BAO_PrevNextCache::getSelection($qfKeyParam);
       $selectedContactIds = array_keys($selectedContactIdsArr[$qfKeyParam]);

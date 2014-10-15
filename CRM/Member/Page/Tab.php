@@ -208,10 +208,12 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId);
       // Refresh other tabs with related data
       $this->ajaxResponse['updateTabs'] = array(
-        '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
         '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
         '#tab_rel' => CRM_Contact_BAO_Contact::getCountComponent('rel', $this->_contactId),
       );
+      if (CRM_Core_Permission::access('CiviContribute')) {
+        $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
+      }
     }
   }
 
@@ -374,7 +376,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
 
-    $searchContext = CRM_Utils_Request::retrieve('searchContext', 'String', $this);
+    $searchContext = CRM_Utils_Request::retrieve('searchContext', 'String', $form);
 
     //validate the qfKey
     if (!CRM_Utils_Rule::qfKey($qfKey)) {
