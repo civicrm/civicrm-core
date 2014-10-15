@@ -982,11 +982,8 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   $request['params']['options']['sort'] = 'sort_name';
   // Contact api doesn't support array(LIKE => 'foo') syntax
   if (!empty($request['input'])) {
-    $request['params'][$request['search_field']] = $request['input'];
-  }
-  // Exclude deceased contacts by default
-  if (!isset($request['params']['is_deceased'])) {
-    $request['params']['is_deceased'] = 0;
+    // CRM-15442 - change spaces to % wildcards when searching by name
+    $request['params'][$request['search_field']] = strpos($request['search_field'], 'name') ? str_replace(' ', '%', $request['input']) : $request['input'];
   }
 }
 

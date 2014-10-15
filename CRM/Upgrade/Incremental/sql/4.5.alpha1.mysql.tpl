@@ -127,9 +127,10 @@ ALTER TABLE civicrm_action_schedule ADD CONSTRAINT FK_civicrm_action_schedule_sm
 INSERT INTO `civicrm_uf_group`
      (`name`, `group_type`, {localize field='title'}`title`{/localize}, `is_cms_user`, `is_reserved`)
 VALUES
-   ('honoree_individual', 'Individual, Contact', {localize}'{ts escape="sql"}Honoree Individual{/ts}'{/localize}, 0, 1);
+   ('honoree_individual', 'Individual,Contact', {localize}'{ts escape="sql"}Honoree Individual{/ts}'{/localize}, 0, 1);
 
 SELECT @uf_group_id_honoree_individual := id from civicrm_uf_group where name = 'honoree_individual';
+SELECT @primaryLocation := id FROM civicrm_location_type WHERE is_default = 1;
 
 INSERT INTO `civicrm_uf_field`
       (`uf_group_id`, `field_name`, `is_required`, `is_reserved`, `weight`, `visibility`, `in_selector`, `is_searchable`, `location_type_id`, {localize field='label'}`label`{/localize}, field_type)
@@ -137,7 +138,7 @@ VALUES
       (@uf_group_id_honoree_individual, 'prefix_id',  0, 1, 1, 'User and User Admin Only', 0, 1, NULL, {localize}'{ts escape="sql"}Individual Prefix{/ts}'{/localize}, 'Individual'),
       (@uf_group_id_honoree_individual, 'first_name', 0, 1, 2, 'User and User Admin Only', 0, 1, NULL, {localize}'{ts escape="sql"}First Name{/ts}'{/localize},        'Individual'),
       (@uf_group_id_honoree_individual, 'last_name',  0, 1, 3, 'User and User Admin Only', 0, 1, NULL, {localize}'{ts escape="sql"}Last Name{/ts}'{/localize},         'Individual'),
-      (@uf_group_id_honoree_individual, 'email',      0, 1, 4, 'User and User Admin Only', 0, 1, 1,    {localize}'{ts escape="sql"}Email Address{/ts}'{/localize},     'Individual');
+      (@uf_group_id_honoree_individual, 'email',      0, 1, 4, 'User and User Admin Only', 0, 1, @primaryLocation, {localize}'{ts escape="sql"}Email Address{/ts}'{/localize},     'Individual');
 
 UPDATE civicrm_uf_join SET uf_group_id = @uf_group_id_honoree_individual WHERE module = 'soft_credit';
 
