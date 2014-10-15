@@ -60,38 +60,34 @@
                 'CRM_PCP_Form_Event': 'civicrm_pcp_block',
                 'CRM_Activity_Form_Activity': ''
                 };
+      function cascadeChangesDialog() {
+        $("#recurring-dialog").dialog({
+          title: 'How does this change affect other repeating entities in the set?',
+          modal: true,
+          width: '650',
+          buttons: {
+            Cancel: function() { //cancel
+              $( this ).dialog( "close" );
+            }
+          }
+        }).dialog('open');
+      }
       var form = '';
       $('#crm-main-content-wrapper').on('click', 'div.crm-submit-buttons span.crm-button input[value="Save"], div.crm-submit-buttons span.crm-button input[value="Save and Done"]', function() {
           form = $(this).parents('form:first').attr('class');
           if( form != "" && mapper.hasOwnProperty(form) ){
-            $("#recurring-dialog").dialog({
-              title: 'How does this change affect other repeating entities in the set?',
-              modal: true,
-              width: '650',
-              buttons: {
-                Cancel: function() { //cancel
-                  $( this ).dialog( "close" );
-                }
-              }
-            }).dialog('open');
+            cascadeChangesDialog();
             return false;
           }
       }); 
-
       
       $("#_qf_Activity_upload-top, #_qf_Activity_upload-bottom").click(function() {
           form = $(this).parents('form:first').attr('class');
           if( form != "" && mapper.hasOwnProperty(form) ){
-            $("#recurring-dialog").dialog({
-              title: 'How does this change affect other repeating entities in the set?',
-              modal: true,
-              width: '650',
-              buttons: {
-                Cancel: function() { //cancel
-                  $( this ).dialog( "close" );
-                }
-              }
-            }).dialog('open');
+            var showPreviewDialog = $.data( document.body, "preview-dialog");
+            if (showPreviewDialog == false) {
+              cascadeChangesDialog();
+            }
             return false;
           }
       });

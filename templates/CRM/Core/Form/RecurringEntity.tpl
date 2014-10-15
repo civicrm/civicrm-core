@@ -222,120 +222,138 @@
       unsavedChanges = true;
     });
     
-    //If there are changes in repeat configuration enable save button
+    //If there are changes in repeat configuration, enable save button
     //Dialog for preview repeat Configuration dates
     cj('#preview-dialog').dialog({ autoOpen: false });
-    cj('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom, #_qf_Activity_upload-top, #_qf_Activity_upload-bottom').click( function (e) {
-      if (unsavedChanges) {
-      e.preventDefault();
-      cj('#exclude_date_list option').attr('selected',true);
-      //Copy exclude dates
-      var dateTxt=[];
-      cj('#exclude_date_list option:selected').each(function() {
-          dateTxt.push(cj(this).text());
-      });
-      var completeDateText = dateTxt.join(',');
-      cj('#copyExcludeDates').val(completeDateText);
+    function previewDialog () {        
+        cj('#exclude_date_list option').attr('selected',true);
+        //Copy exclude dates
+        var dateTxt=[];
+        cj('#exclude_date_list option:selected').each(function() {
+            dateTxt.push(cj(this).text());
+        });
+        var completeDateText = dateTxt.join(',');
+        cj('#copyExcludeDates').val(completeDateText);
 
-      cj('#generated_dates').html('').html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Just a moment, generating dates{/ts}{literal}...</span></div>');
-      cj('#preview-dialog').dialog('open');
-      cj('#preview-dialog').dialog({
-        title: 'Confirm event dates',
-        width: '650',
-        position: 'center',
-        //draggable: false,
-        buttons: {
-          Ok: function() {
-              cj(this).dialog( "close" );
-              cj('form#Repeat, form#Activity').submit();
-          },
-          Cancel: function() { //cancel
-              cj(this).dialog( "close" );
+        cj('#generated_dates').html('').html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Just a moment, generating dates{/ts}{literal}...</span></div>');
+        cj('#preview-dialog').dialog('open');
+        cj('#preview-dialog').dialog({
+          title: 'Confirm event dates',
+          width: '650',
+          position: 'center',
+          //draggable: false,
+          buttons: {
+            Ok: function() {
+                cj(this).dialog( "close" );
+                cj('form#Repeat, form#Activity').submit();
+            },
+            Cancel: function() { //cancel
+                cj(this).dialog( "close" );
+            }
           }
+        });
+        var ajaxurl = CRM.url("civicrm/ajax/recurringentity/generate-preview");
+        var entityID = parseInt('{/literal}{$currentEntityId}{literal}');
+        var entityTable = '{/literal}{$entityTable}{literal}';
+        if (entityID != "" && entityTable != "") {
+            ajaxurl += "?entity_id="+entityID+"&entity_table="+entityTable;
         }
-      });
-      var ajaxurl = CRM.url("civicrm/ajax/recurringentity/generate-preview");
-      var entityID = {/literal}{$currentEntityId}{literal};
-      var entityTable = '{/literal}{$entityTable}{literal}';
-      if (entityID != "" && entityTable != "") {
-          ajaxurl += "?entity_id="+entityID+"&entity_table="+entityTable;
-      }
-      var formData = cj('form').serializeArray();
-      cj.ajax({
-        dataType: "json",
-        type: "POST",
-        data: formData,
-        url:  ajaxurl,
-        success: function (result) {
-          if (Object.keys(result).length > 0) {
-            var errors = [];
-            var participantData = [];
-            var html = 'Based on your repeat configuration here is the list of event dates, Do you wish to proceed creating events for these dates?<br/><table id="options" class="display"><thead><tr><th>Sr No</th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
-            var count = 1;
-            for(var i in result) {
-              if (i != 'errors') {
-                if (i == 'participantData') {
-                  participantData = result.participantData;
-                  break;
-                }
-                var start_date = result[i].start_date;
-                var end_date = result[i].end_date;
+        var formData = cj('form').serializeArray();
+        cj.ajax({
+          dataType: "json",
+          type: "POST",
+          data: formData,
+          url:  ajaxurl,
+          success: function (result) {
+            if (Object.keys(result).length > 0) {
+              var errors = [];
+              var participantData = [];
+              var html = 'Based on your repeat configuration here is the list of event dates, Do you wish to proceed creating events for these dates?<br/><table id="options" class="display"><thead><tr><th>Sr No</th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
+              var count = 1;
+              for(var i in result) {
+                if (i != 'errors') {
+                  if (i == 'participantData') {
+                    participantData = result.participantData;
+                    break;
+                  }
+                  var start_date = result[i].start_date;
+                  var end_date = result[i].end_date;
 
-                var end_date_text = '';
-                if (end_date !== undefined) {
-                  end_date_text = '<td>'+end_date+'</td>';
+                  var end_date_text = '';
+                  if (end_date !== undefined) {
+                    end_date_text = '<td>'+end_date+'</td>';
+                  }
+                  html += '<tr><td>'+count+'</td><td>'+start_date+'</td>'+end_date_text+'</tr>';
+                  count = count + 1;
+                } else {
+                  errors = result.errors;
                 }
-                html += '<tr><td>'+count+'</td><td>'+start_date+'</td>'+end_date_text+'</tr>';
-                count = count + 1;
+              }
+              html += '</table>';
+              var warningHtml = '';
+              if (Object.keys(participantData).length > 0) {               
+                warningHtml += '<div class="messages status no-popup"><div class="icon inform-icon"></div>&nbsp;There are registrations for the repeating events already present in the set, continuing with the process would unlink them and repeating events without registration would be trashed. </div><table id="options" class="display"><thead><tr><th>Event ID</th><th>Event</th><th>Participant Count</th></tr><thead>';
+                for (var id in participantData) {
+                  for(var data in participantData[id]) {
+                  warningHtml += '<tr><td>'+id+'</td><td> <a href="{/literal}{crmURL p="civicrm/event/manage/settings" q="reset=1&action=update&id="}{literal}'+id+'{/literal}{literal}">'+data+'</a></td><td><a href="{/literal}{crmURL p='civicrm/event/search' q="reset=1&force=1&status=true&event="}{literal}'+id+'{/literal}{literal}">'+participantData[id][data]+'</a></td></tr>';
+                  }
+                }
+                warningHtml += '</table><br/>';
+              }
+              if (errors.length > 0) {
+                html = '';
+                for (var j = 0; j < errors.length; j++) {
+                  html += '<span class="crm-error">*&nbsp;' + errors[j] + '</span><br/>';
+                }
+              }
+              if (warningHtml != "") {
+                cj('#generated_dates').append(warningHtml).append(html);
               } else {
-                errors = result.errors;
+                cj('#generated_dates').html(html);
               }
-            }
-            html += '</table>';
-            var warningHtml = '';
-            if (Object.keys(participantData).length > 0) {               
-              warningHtml += '<div class="messages status no-popup"><div class="icon inform-icon"></div>&nbsp;There are registrations for the repeating events already present in the set, continuing with the process would unlink them and repeating events without registration would be trashed. </div><table id="options" class="display"><thead><tr><th>Event ID</th><th>Event</th><th>Participant Count</th></tr><thead>';
-              for (var id in participantData) {
-                for(var data in participantData[id]) {
-                warningHtml += '<tr><td>'+id+'</td><td> <a href="{/literal}{crmURL p="civicrm/event/manage/settings" q="reset=1&action=update&id="}{literal}'+id+'{/literal}{literal}">'+data+'</a></td><td><a href="{/literal}{crmURL p='civicrm/event/search' q="reset=1&force=1&status=true&event="}{literal}'+id+'{/literal}{literal}">'+participantData[id][data]+'</a></td></tr>';
-                }
+              if (end_date_text == "") {
+                cj('#th-end-date').hide();
               }
-              warningHtml += '</table><br/>';
-            }
-            if (errors.length > 0) {
-              html = '';
-              for (var j = 0; j < errors.length; j++) {
-                html += '<span class="crm-error">*&nbsp;' + errors[j] + '</span><br/>';
+              if (cj("#preview-dialog").height() >= 300) {
+                cj('#preview-dialog').css('height', '300');
+                cj('#preview-dialog').css('overflow-y', 'auto');
               }
-            }
-            if (warningHtml != "") {
-              cj('#generated_dates').append(warningHtml).append(html);
             } else {
-              cj('#generated_dates').html(html);
+              cj('div.ui-dialog-buttonset button span:contains(Ok)').hide();
+              cj('#generated_dates').append("<span class='crm-error'>Sorry, no dates could be generated for the given criteria!</span>");
             }
-            if (end_date_text == "") {
-              cj('#th-end-date').hide();
-            }
-            if (cj("#preview-dialog").height() >= 300) {
-              cj('#preview-dialog').css('height', '300');
-              cj('#preview-dialog').css('overflow-y', 'auto');
-            }
-          } else {
-            cj('div.ui-dialog-buttonset button span:contains(Ok)').hide();
-            cj('#generated_dates').append("<span class='crm-error'>Sorry, no dates could be generated for the given criteria!</span>");
+          },
+          complete: function() {
+            cj('div.crm-loading-element').hide();
           }
-        },
-        complete: function() {
-          cj('div.crm-loading-element').hide();
-        }
-      });
-      return false;
-      }
-      else {
-        alert("No changes to save");
+        });
         return false;
+    }
+    
+    cj('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom').click( function () {
+      return previewDialog();
+    });
+    
+    cj('#_qf_Activity_upload-top, #_qf_Activity_upload-bottom').click( function () {
+      //Process this only when repeat is configured. We need to do this test here as there is a common save for activity.
+      var isRepeatConfigured = '{/literal}{$scheduleReminderId}{literal}';
+      if (isRepeatConfigured) {
+         if (unsavedChanges) {
+          //Set this variable to decide which dialog box to show
+          cj.data( document.body, "preview-dialog", true );
+          return previewDialog();
+        }
+        else {
+          cj.data( document.body, "preview-dialog", false );
+          return false;
+        }
+      } 
+      else {
+        if (unsavedChanges) {
+          return previewDialog();
+        }
       }
-      });
+    });
     
     //Build Summary
     var finalSummary = '';
