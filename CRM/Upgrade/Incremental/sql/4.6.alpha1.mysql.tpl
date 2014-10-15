@@ -68,3 +68,16 @@ CREATE TABLE IF NOT EXISTS `civicrm_recurring_entity` (
   `mode` tinyint(4) NOT NULL DEFAULT '1' COMMENT '1-this entity, 2-this and the following entities, 3-all the entities',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=87 ;
+
+-- CRM-15453 mailing detail report template
+SELECT @option_group_id_report := MAX(id)     FROM civicrm_option_group WHERE name = 'report_template';
+SELECT @weight                 := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_report;
+SELECT @mailCompId       := MAX(id)     FROM civicrm_component where name = 'CiviContribute';
+INSERT INTO civicrm_option_value
+  (option_group_id, {localize field='label'}label{/localize}, value, name, weight, {localize field='description'}description{/localize}, is_active, component_id) VALUES
+  (@option_group_id_report, {localize}'Recurring Contributions Report'{/localize}, 'contribute/recur', 'CRM_Report_Form_Contribute_Recur', @weight := @weight + 1, {localize}'Shows information about the status of recurring contributions'{/localize}, 1, @mailCompId);
+
+INSERT INTO `civicrm_report_instance`
+    ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
+VALUES
+    ( {$domainID}, 'Pending Recurring Contributions', 'contribute/recur', 'Shows all pending recurring contributions', 'access CiviContribute', '{literal}a:20:{s:8:"entryURL";s:58:"http://head.piglet/civicrm/report/contribute/recur?reset=1";s:6:"fields";a:6:{s:9:"sort_name";s:1:"1";s:6:"amount";s:1:"1";s:22:"contribution_status_id";s:1:"1";s:18:"frequency_interval";s:1:"1";s:14:"frequency_unit";s:1:"1";s:12:"installments";s:1:"1";}s:25:"contribution_status_id_op";s:2:"in";s:28:"contribution_status_id_value";a:1:{i:0;s:1:"5";}s:11:"currency_op";s:2:"in";s:14:"currency_value";a:0:{}s:20:"financial_type_id_op";s:2:"in";s:23:"financial_type_id_value";a:0:{}s:17:"frequency_unit_op";s:2:"in";s:20:"frequency_unit_value";a:0:{}s:9:"order_bys";a:1:{i:1;a:1:{s:6:"column";s:1:"-";}}s:11:"description";s:41:"Shows all pending recurring contributions";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:9:"row_count";s:0:"";s:14:"addToDashboard";s:1:"1";s:10:"permission";s:17:"access CiviReport";s:9:"parent_id";s:0:"";s:11:"instance_id";N;}{/literal}');
