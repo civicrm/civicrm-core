@@ -1023,4 +1023,36 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
     return $dao;
   }
+  
+  /**
+  * Update mode column in civicrm_recurring_entity table for event related tabs
+  * 
+  * @params int $entityId event id
+  * @params string $linkedEntityTable Linked entity table name for this event
+  * @return array
+  */
+  public static function updateModeLinkedEntity($entityId, $linkedEntityTable, $mainEntityTable) {
+    $result = array();
+    if ( $entityId && $linkedEntityTable && $mainEntityTable ) {
+      if (CRM_Utils_Array::value($linkedEntityTable, self::$_tableDAOMapper)) {
+        $dao = self::$_tableDAOMapper[$linkedEntityTable];
+      }
+      else {
+        CRM_Core_Session::setStatus('Could not update mode for linked entities');
+        return;
+      }
+      $entityTable = $linkedEntityTable;
+      $params = array(
+                      'entity_id' => $entityId,
+                      'entity_table' => $mainEntityTable
+                    );
+      $defaults = array();
+      CRM_Core_DAO::commonRetrieve($dao, $params, $defaults);
+      if (CRM_Utils_Array::value('id', $defaults)) {
+        $result['entityId'] = $defaults['id'];
+        $result['entityTable'] = $entityTable;
+      }
+    } 
+    return $result;
+  } 
 }
