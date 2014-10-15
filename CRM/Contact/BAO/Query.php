@@ -2539,16 +2539,16 @@ class CRM_Contact_BAO_Query {
             }
             else {
               $from .= " $side JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = contact_a.id OR civicrm_relationship.contact_id_a = contact_a.id)";
-              $from .= " $side JOIN civicrm_contact contact_b ON ((civicrm_relationship.contact_id_a = contact_b.id OR civicrm_relationship.contact_id_b = contact_b.id) AND contact_b.is_deleted != 1)";
+              $from .= " $side JOIN civicrm_contact contact_b ON ((civicrm_relationship.contact_id_a = contact_b.id OR civicrm_relationship.contact_id_b = contact_b.id) AND contact_b.is_deleted = 0)";
             }
           }
           elseif (self::$_relType == 'b') {
             $from .= " $side JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = contact_a.id )";
-            $from .= " $side JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_a = contact_b.id AND contact_b.is_deleted != 1)";
+            $from .= " $side JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_a = contact_b.id AND contact_b.is_deleted = 0)";
           }
           else {
             $from .= " $side JOIN civicrm_relationship ON (civicrm_relationship.contact_id_a = contact_a.id )";
-            $from .= " $side JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_b = contact_b.id AND contact_b.is_deleted != 1)";
+            $from .= " $side JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_b = contact_b.id AND contact_b.is_deleted = 0)";
           }
           continue;
 
