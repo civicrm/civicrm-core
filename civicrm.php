@@ -131,14 +131,14 @@ class CiviCRM_For_WordPress {
    * Dummy magic method to prevent CiviCRM_For_WordPress from being cloned
    */
   public function __clone() {
-    _doing_it_wrong( __FUNCTION__, __( 'Only one instance of CiviCRM_For_WordPress please', 'civicrm' ), '4.5' );
+    _doing_it_wrong( __FUNCTION__, __( 'Only one instance of CiviCRM_For_WordPress please', 'civicrm' ), '4.4' );
   }
 
   /**
    * Dummy magic method to prevent CiviCRM_For_WordPress from being unserialized
    */
   public function __wakeup() {
-    _doing_it_wrong( __FUNCTION__, __( 'Please do not serialize CiviCRM_For_WordPress', 'civicrm' ), '4.5' );
+    _doing_it_wrong( __FUNCTION__, __( 'Please do not serialize CiviCRM_For_WordPress', 'civicrm' ), '4.4' );
   }
 
 
