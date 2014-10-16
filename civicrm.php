@@ -417,7 +417,8 @@ class CiviCRM_For_WordPress {
     return TRUE;
 
   }
-  
+
+
   /**
    * Detect Ajax, snippet, or file requests
    *
@@ -447,6 +448,7 @@ class CiviCRM_For_WordPress {
       return TRUE;
     }
   }
+
 
   /**
    * Invoke CiviCRM in a WordPress context
@@ -525,6 +527,7 @@ class CiviCRM_For_WordPress {
 
   }
 
+
   /**
    * Load translation files
    * A good reference on how to implement translation in WordPress:
@@ -549,6 +552,7 @@ class CiviCRM_For_WordPress {
     );
 
   }
+
 
   /**
    * Adds menu items to WordPress admin menu
@@ -919,6 +923,7 @@ class CiviCRM_For_WordPress {
 
     return TRUE;
   }
+
 
   /**
    * Called when authentication fails in wp_frontend()
@@ -1307,8 +1312,8 @@ class CiviCRM_For_WordPress {
     );
 
   }
-  
-  
+
+
   /**
    * Does a WordPress post type have the CiviCRM button on it?
    *
@@ -1331,8 +1336,8 @@ class CiviCRM_For_WordPress {
     return $allowed;
 
   }
-  
-  
+
+
   /**
    * Get WordPress post types that support the editor
    *
@@ -1374,8 +1379,8 @@ class CiviCRM_For_WordPress {
     
     return $supported_post_types;
   }
-  
-  
+
+
   /**
    * Get ID and title of CiviCRM contribution pages
    *
@@ -1403,8 +1408,8 @@ class CiviCRM_For_WordPress {
     }
     return $contributionPages;
   }
-  
-  
+
+
   /**
    * Get ID and title of CiviCRM events
    *
@@ -1434,9 +1439,8 @@ class CiviCRM_For_WordPress {
     }
     return $eventPages;
   }
-  
-  
-  
+
+
   /**
    * Get ID and title of CiviCRM profile pages
    *
@@ -1462,8 +1466,8 @@ class CiviCRM_For_WordPress {
     }
     return $profilePages;
   }
-  
-  
+
+
   /**
    * Get ID and title of CiviCRM petition pages
    *
