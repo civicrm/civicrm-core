@@ -82,17 +82,14 @@ if (!defined('CIVICRM_SETTINGS_PATH')) {
 define( 'CIVICRM_UF_HEAD', TRUE );
 
 
-/*
---------------------------------------------------------------------------------
-CiviCRM_For_WordPress Class
---------------------------------------------------------------------------------
-*/
-
+/**
+ * Define CiviCRM_For_WordPress Class
+ */
 class CiviCRM_For_WordPress {
 
 
   /**
-   * declare our properties
+   * Declare our properties
    */
 
   // plugin instance
@@ -103,9 +100,10 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: getter method which returns the CiviCRM instance and optionally
-   * creates one if it does not already exist. Standard CiviCRM singleton pattern.
-   * @return CiviCRM plugin instance
+   * Getter method which returns the CiviCRM instance and optionally creates one 
+   * if it does not already exist. Standard CiviCRM singleton pattern.
+   *
+   * @return object CiviCRM plugin instance
    */
   public static function singleton() {
 
@@ -125,19 +123,19 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: dummy instance constructor
+   * Dummy instance constructor
    */
   function __construct() {}
 
   /**
-   * @description: dummy magic method to prevent CiviCRM_For_WordPress from being cloned
+   * Dummy magic method to prevent CiviCRM_For_WordPress from being cloned
    */
   public function __clone() {
     _doing_it_wrong( __FUNCTION__, __( 'Only one instance of CiviCRM_For_WordPress please', 'civicrm' ), '4.5' );
   }
 
   /**
-   * @description: dummy magic method to prevent CiviCRM_For_WordPress from being unserialized
+   * Dummy magic method to prevent CiviCRM_For_WordPress from being unserialized
    */
   public function __wakeup() {
     _doing_it_wrong( __FUNCTION__, __( 'Please do not serialize CiviCRM_For_WordPress', 'civicrm' ), '4.5' );
@@ -145,7 +143,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: method that runs only when CiviCRM plugin is activated
+   * Method that runs only when CiviCRM plugin is activated
+   *
+   * @return void
    */
   public function activate() {
 
@@ -156,7 +156,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: set up the CiviCRM plugin instance
+   * Set up the CiviCRM plugin instance
+   *
+   * @return void
    */
   public function setup_instance() {
 
@@ -189,8 +191,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: getter for testing if CiviCRM is currently being displayed in WordPress
-   * @return bool $in_wordpress
+   * Getter for testing if CiviCRM is currently being displayed in WordPress
+   *
+   * @return bool $in_wordpress True if Civi is displayed in WordPress, false otherwise
    */
   public function civicrm_in_wordpress() {
 
@@ -201,7 +204,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: register hooks
+   * Register hooks
+   *
+   * @return void
    */
   public function register_hooks() {
 
@@ -281,7 +286,8 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: initialize CiviCRM
+   * Initialize CiviCRM
+   *
    * @return bool $success
    */
   public function initialize() {
@@ -411,12 +417,12 @@ class CiviCRM_For_WordPress {
     return TRUE;
 
   }
-
-/**
- * Detect Ajax, snippet, or file requests
- *
- * @return boolean
- */
+  
+  /**
+   * Detect Ajax, snippet, or file requests
+   *
+   * @return boolean True if request is for a CiviCRM page, false otherwise
+   */
   public function isPageRequest() {
     $argString = NULL;
     $args = array();
@@ -443,10 +449,12 @@ class CiviCRM_For_WordPress {
   }
 
   /**
-   * @description: invoke CiviCRM in a WordPress context
+   * Invoke CiviCRM in a WordPress context
    * Callback function from add_menu_page()
    * Callback from WordPress 'init' and 'the_content' hooks
    * Also called by add_shortcode_includes() and _civicrm_update_user()
+   *
+   * @return void
    */
   public function invoke() {
 
@@ -519,9 +527,11 @@ class CiviCRM_For_WordPress {
   }
 
   /**
-   * @description: load translation files
+   * Load translation files
    * A good reference on how to implement translation in WordPress:
    * http://ottopress.com/2012/internationalization-youre-probably-doing-it-wrong/
+   *
+   * @return void
    */
   public function enable_translation() {
 
@@ -542,8 +552,10 @@ class CiviCRM_For_WordPress {
   }
 
   /**
-   * @description: Adds menu items to WordPress admin menu
+   * Adds menu items to WordPress admin menu
    * Callback method for 'admin_menu' hook as set in register_hooks()
+   *
+   * @return void
    */
   public function add_menu_items() {
 
@@ -586,7 +598,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: callback function for add_options_page() that runs the CiviCRM installer
+   * Callback method for add_options_page() that runs the CiviCRM installer
+   *
+   * @return void
    */
   public function run_installer() {
 
@@ -605,7 +619,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: callback function for missing settings file in register_hooks()
+   * Callback method for missing settings file in register_hooks()
+   *
+   * @return void
    */
   public function show_setup_warning() {
 
@@ -624,8 +640,10 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: merge CiviCRM's HTML header with the WordPress theme's header
+   * Merge CiviCRM's HTML header with the WordPress theme's header
    * Callback from WordPress 'admin_head' and 'wp_head' hooks
+   *
+   * @return void
    */
   public function wp_head() {
 
@@ -644,7 +662,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: callback function for 'get_header' hook
+   * Callback method for 'get_header' hook
+   *
+   * @return void
    */
   public function add_shortcode_includes() {
 
@@ -672,7 +692,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: start buffering, called in register_hooks()
+   * Start buffering, called in register_hooks()
+   *
+   * @return void
    */
   public function buffer_start() {
     ob_start( array( $this, 'buffer_callback' ) );
@@ -680,7 +702,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: flush buffer, callback for 'wp_footer'
+   * Flush buffer, callback for 'wp_footer'
+   *
+   * @return void
    */
   public function buffer_end() {
     ob_end_flush();
@@ -688,7 +712,8 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: Callback for ob_start() in buffer_start()
+   * Callback for ob_start() in buffer_start()
+   *
    * @return string $buffer the markup
    */
   public function buffer_callback($buffer) {
@@ -700,9 +725,11 @@ class CiviCRM_For_WordPress {
 
 
   /**
-  * @description: CiviCRM's theme integration method
-  * Called by register_hooks() and shortcode_handler()
-  */
+   * CiviCRM's theme integration method
+   * Called by register_hooks() and shortcode_handler()
+   *
+   * @return void
+   */
   public function wp_frontend( $shortcode = FALSE ) {
 
     // kick out if not CiviCRM
@@ -785,8 +812,11 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: override WordPress post comment status attribute in wp_frontend()
-   * see comments on set_post_blank()
+   * Override WordPress post comment status attribute in wp_frontend()
+   *
+   * @see comments on set_post_blank()
+   *
+   * @return void
    */
   public function turn_comments_off() {
 
@@ -802,11 +832,13 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: override WordPress post attributes in wp_frontend()
+   * Override WordPress post attributes in wp_frontend()
    *
    * CMW: the process of overriding WordPress post content should be done in a way
    * analogous to how BuddyPress injects its content into a theme. After I have
    * refactored the plugin, I will look into this more thoroughly.
+   *
+   * @return void
    */
   public function set_post_blank() {
 
@@ -854,8 +886,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: callback from 'edit_post_link' hook to remove edit link in set_post_blank()
-   * @return string always empty
+   * Callback from 'edit_post_link' hook to remove edit link in set_post_blank()
+   *
+   * @return string Always empty
    */
   public function set_blank() {
     return '';
@@ -863,8 +896,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: authentication function used by wp_frontend()
-   * @return bool true if authenticated, false otherwise
+   * Authentication function used by wp_frontend()
+   *
+   * @return bool True if authenticated, false otherwise
    */
   public function check_permission( $args ) {
     if ( $args[0] != 'civicrm' ) {
@@ -888,8 +922,9 @@ class CiviCRM_For_WordPress {
   }
 
   /**
-   * @description: called when authentication fails in wp_frontend()
-   * @return string warning message
+   * Called when authentication fails in wp_frontend()
+   *
+   * @return string Warning message
    */
   public function show_permission_denied() {
     return __( 'You do not have permission to execute this url.', 'civicrm' );
@@ -897,8 +932,10 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: only called by invoke() to undo WordPress default behaviour
+   * Only called by invoke() to undo WordPress default behaviour
    * CMW: Should probably be a private method
+   *
+   * @return void
    */
   public function remove_wp_magic_quotes() {
 
@@ -912,12 +949,14 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: keep WordPress user synced with CiviCRM Contact
+   * Keep WordPress user synced with CiviCRM Contact
    * Callback function for 'user_register' hook
    * Callback function for 'profile_update' hook
    *
    * CMW: seems to (wrongly) create new CiviCRM Contact every time a user changes their
    * first_name or last_name attributes in WordPress.
+   *
+   * @return void
    */
   public function update_user( $userID ) {
 
@@ -960,10 +999,11 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: when a WordPress user is deleted, delete the ufMatch record
+   * When a WordPress user is deleted, delete the ufMatch record
    * Callback function for 'delete_user' hook
    *
    * @param $userID The numerical ID of the WordPress user
+   * @return void
    */
   public function delete_user_ufmatch( $userID ) {
 
@@ -979,11 +1019,13 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: function to create 'anonymous_user' role, if 'anonymous_user' role is not
-   * in the WordPress installation and assign minimum capabilities for all WordPress roles
+   * Function to create 'anonymous_user' role, if 'anonymous_user' role is not in 
+   * the WordPress installation and assign minimum capabilities for all WordPress roles
    *
    * The legacy global scope function civicrm_wp_set_capabilities() is called from
    * upgrade_4_3_alpha1()
+   *
+   * @return void
    */
   public function set_wp_user_capabilities() {
 
@@ -1031,11 +1073,13 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: add CiviCRM access capabilities to WordPress roles
+   * Add CiviCRM access capabilities to WordPress roles
    * this is a callback for the 'init' hook in register_hooks()
    *
    * The legacy global scope function wp_civicrm_capability() is called by
    * postProcess() in civicrm/CRM/ACL/Form/WordPress/Permissions.php
+   *
+   * @return void
    */
   public function set_access_capabilities() {
 
@@ -1062,7 +1106,8 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: get CiviCRM contact type
+   * Get CiviCRM contact type
+   *
    * @param string $default contact type
    * @return string $ctype contact type
    */
@@ -1095,7 +1140,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: handles CiviCRM-defined shortcodes
+   * Handles CiviCRM-defined shortcodes
+   *
+   * @param array Shortcode attributes array
    * @return string HTML for output
    */
   public function shortcode_handler( $atts ) {
@@ -1200,7 +1247,7 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: callback method for 'media_buttons' hook as set in register_hooks()
+   * Callback method for 'media_buttons' hook as set in register_hooks()
    *
    * @param string $editor_id Unique editor identifier, e.g. 'content'
    * @return void
@@ -1225,7 +1272,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: callback method for 'admin_enqueue_scripts' hook as set in register_hooks()
+   * Callback method for 'admin_enqueue_scripts' hook as set in register_hooks()
+   *
+   * @return void
    */
   public function add_form_button_js( $hook ) {
 
@@ -1259,9 +1308,10 @@ class CiviCRM_For_WordPress {
     );
 
   }
-
+  
+  
   /**
-   * @description: does a WordPress post type have the CiviCRM button on it?
+   * Does a WordPress post type have the CiviCRM button on it?
    *
    * @return bool $has_button True if the post type has the button, false otherwise
    */
@@ -1283,8 +1333,9 @@ class CiviCRM_For_WordPress {
 
   }
   
+  
   /**
-   * @description: get WordPress post types that support the editor
+   * Get WordPress post types that support the editor
    *
    * @return array $supported_post_types Array of post types that have an editor
    */
@@ -1324,7 +1375,14 @@ class CiviCRM_For_WordPress {
     
     return $supported_post_types;
   }
-
+  
+  
+  /**
+   * Get ID and title of CiviCRM contribution pages
+   *
+   * @access private
+   * @return array $contributionPages Array of contribution pages
+   */
   private function get_contribution_pages() {
     $now = date('Ymdhis');
     $sql = "
@@ -1346,8 +1404,14 @@ class CiviCRM_For_WordPress {
     }
     return $contributionPages;
   }
-
-
+  
+  
+  /**
+   * Get ID and title of CiviCRM events
+   *
+   * @access private
+   * @return array $eventPages Array of event pages
+   */
   private function get_event() {
     $now = date('Ymdhis');
     $sql = "
@@ -1371,7 +1435,15 @@ class CiviCRM_For_WordPress {
     }
     return $eventPages;
   }
-
+  
+  
+  
+  /**
+   * Get ID and title of CiviCRM profile pages
+   *
+   * @access private
+   * @return array $profilePages Array of profile pages
+   */
   private function get_profile_page() {
     $sql = "
         SELECT g.id as id, g.title as title
@@ -1391,7 +1463,14 @@ class CiviCRM_For_WordPress {
     }
     return $profilePages;
   }
-
+  
+  
+  /**
+   * Get ID and title of CiviCRM petition pages
+   *
+   * @access private
+   * @return array $petitionPages Array of petition pages
+   */
   private function get_petition() {
     $params = array(
       'version' => 3,
@@ -1411,7 +1490,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: callback method for 'admin_footer' hook as set in register_hooks()
+   * Callback method for 'admin_footer' hook as set in register_hooks()
+   *
+   * @return void
    */
   public function add_form_button_html() {
 
