@@ -202,11 +202,11 @@
 
     CRM.$(function($) {
       toggleConfirmButton();
-      skipPaymentMethod();
+      skipPaymentMethod(totalfee);
     });
 
     // Called from display() in Calculate.tpl, depends on display() having been called
-    function skipPaymentMethod() {
+    function skipPaymentMethod(totalfee) {
       var symbol = '{/literal}{$currencySymbol}{literal}';
       var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
 
@@ -215,11 +215,12 @@
       var payment_processor = cj("div.payment_processor-section");
       var payment_information = cj("div#payment_information");
 
-      if (isMultiple && cj("#additional_participants").val() && cj('#pricevalue').text() !== symbol + " 0.00") {
+      // Do NOT hide payment blocks if user is registering more than 1 participant since we do not know what total fees will be. dgg
+      if (isMultiple && cj("#additional_participants").val()) {
         flag = 0;
       }
 
-      if ((cj('#pricevalue').text() == symbol + " 0.00") && flag) {
+      if ((totalfee == 0) && flag) {
         payment_options.hide();
         payment_processor.hide();
         payment_information.hide();
