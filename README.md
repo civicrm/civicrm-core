@@ -9,7 +9,7 @@ This is the development repository for the *CiviCRM* plugin for *WordPress*. Wha
 
 If you want to contribute to the development of this plugin, please bear the following in mind:
 
-a. Bug fixes should go in the branch 4.5 branch (stable)b. Structural changes should go under master (trunk, i.e. 4.6).
+* Bug fixes should go in the branch 4.5 branch (stable)* Structural changes should go under master (trunk, i.e. 4.6).
 ### About CiviCRM ###
 CiviCRM is web-based, open source, Constituent Relationship Management (CRM) software geared toward meeting the needs of non-profit and other civic-sector organizations.
 
