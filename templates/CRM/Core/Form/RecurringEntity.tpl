@@ -36,11 +36,11 @@
             <td>{include file="CRM/common/jcalendar.tpl" elementName=repetition_start_date}</td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-repetition_frequency_unit">
-            <td class="label">{$form.repetition_frequency_unit.label}</td>
+            <td class="label">{$form.repetition_frequency_unit.label}&nbsp;<span class="crm-marker" title="This field is required.">*</span></td>
             <td>{$form.repetition_frequency_unit.html} {help id="id-repeats" file="CRM/Core/Form/RecurringEntity.hlp"}</td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-repetition_frequency_interval">
-            <td class="label">{$form.repetition_frequency_interval.label}</td>
+            <td class="label">{$form.repetition_frequency_interval.label}&nbsp;<span class="crm-marker" title="This field is required.">*</span></td>
             <td>{$form.repetition_frequency_interval.html} &nbsp;<span id="repeats-every-text">hour(s)</span> {help id="id-repeats-every" file="CRM/Core/Form/RecurringEntity.hlp"}</td>
             </td>
           </tr>
@@ -63,7 +63,7 @@
             </td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-ends">
-            <td class="label">{$form.ends.label}</td>
+            <td class="label">{$form.ends.label}&nbsp;<span class="crm-marker" title="This field is required.">*</span></td>
             <td>{$form.ends.1.html}&nbsp;{$form.start_action_offset.html}&nbsp;occurrences&nbsp;{help id="id-ends-after" file="CRM/Core/Form/RecurringEntity.hlp"}</td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-absolute_date">
@@ -225,7 +225,7 @@
     //If there are changes in repeat configuration, enable save button
     //Dialog for preview repeat Configuration dates
     cj('#preview-dialog').dialog({ autoOpen: false });
-    function previewDialog () {        
+    function previewDialog() {        
         cj('#exclude_date_list option').attr('selected',true);
         //Copy exclude dates
         var dateTxt=[];
@@ -339,6 +339,7 @@
       var isRepeatConfigured = '{/literal}{$scheduleReminderId}{literal}';
       if (isRepeatConfigured) {
          if (unsavedChanges) {
+          cj('#allowRepeatConfigToSubmit').val('1');
           //Set this variable to decide which dialog box to show
           cj.data( document.body, "preview-dialog", true );
           return previewDialog();
@@ -350,6 +351,7 @@
       } 
       else {
         if (unsavedChanges) {
+          cj('#allowRepeatConfigToSubmit').val('1');
           return previewDialog();
         }
       }
