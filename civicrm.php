@@ -482,9 +482,8 @@ class CiviCRM_For_WordPress {
     CRM_Core_Resources::singleton()->addCoreResources();
 
     // CRM-95XX
-    // At this point we are calling a civicrm function
-    // Since WP messes up and always quotes the request, we need to reverse
-    // what it just did
+    // At this point we are calling a CiviCRM function
+    // WP always quotes the request, CiviCRM needs to reverse what it just did
     $this->remove_wp_magic_quotes();
 
     if ( isset( $_GET['q'] ) ) {
