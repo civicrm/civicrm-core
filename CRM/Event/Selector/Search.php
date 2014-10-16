@@ -464,12 +464,12 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
         ),
         array(
           'name' => ts('Fee Level'),
-          'sort' => 'fee_level',
+          'sort' => 'participant_fee_level',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
           'name' => ts('Amount'),
-          'sort' => 'fee_amount',
+          'sort' => 'participant_fee_amount',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
