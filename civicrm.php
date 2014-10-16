@@ -1,5 +1,18 @@
 <?php
 /*
+Plugin Name: CiviCRM
+Description: CiviCRM - Growing and Sustaining Relationships
+Version: 4.5
+Author: CiviCRM LLC
+Author URI: http://civicrm.org/
+Plugin URI: http://wiki.civicrm.org/confluence/display/CRMDOC/WordPress+Installation+Guide+for+CiviCRM+4.5
+License: AGPL3
+Text Domain: civicrm
+Domain Path: /languages
+*/
+
+
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                              |
  +--------------------------------------------------------------------+
@@ -31,16 +44,6 @@
  * @copyright CiviCRM LLC (c) 2004-2013
  *
  */
-
-/*
-Plugin Name: CiviCRM
-Plugin URI: http://civicrm.org/
-Description: CiviCRM - Growing and Sustaining Relationships
-Author: CiviCRM LLC
-Version: 4.5
-Author URI: http://civicrm.org/
-License: AGPL3
-*/
 
 
 /*
