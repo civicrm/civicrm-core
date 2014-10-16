@@ -167,7 +167,8 @@ class CiviCRM_For_WordPress {
       wp_die( __( 'Only one instance of CiviCRM_For_WordPress please', 'civicrm' ) );
     }
 
-    // store context
+    // store context - this becomes true whe CiviCRM is shown in WordPress back-end and when
+    // CiviCRM content is being displayed on the front-end via wpBasePage
     self::$in_wordpress = ( isset( $_GET['page'] ) && $_GET['page'] == 'CiviCRM' ) ? TRUE : FALSE;
 
     // there is no session handling in WP hence we start it for CiviCRM pages
@@ -262,11 +263,11 @@ class CiviCRM_For_WordPress {
     // not in admin
     } else {
 
+      // add core resources CiviCRM when a shortcode is detected in the post content
+      add_action( 'wp', array( $this, 'add_shortcode_includes' ), 10, 1 );
+
       // merge CiviCRM's HTML header with the WordPress theme's header
       add_action( 'wp_head', array( $this, 'wp_head' ) );
-
-      // invoke CiviCRM when a shortcode is detected in the post content
-      add_filter( 'get_header', array( $this, 'add_shortcode_includes' ) );
 
       // if embedded...
       if ( $this->civicrm_in_wordpress() ) {
@@ -665,29 +666,43 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Callback method for 'get_header' hook
+   * Determine if a CiviCRM shortcode is present in any of the posts about to be displayed
+   * Callback method for 'wp' hook, always called from WP front-end
    *
+   * @param object $wp The WP object, present but not used
    * @return void
    */
-  public function add_shortcode_includes() {
+  public function add_shortcode_includes( $wp ) {
 
-    global $post;
+    global $wp_query;
+    
+    // sanity check
+    if ( ! is_object( $wp_query ) ) return;
+    
+    //print_r( $wp_query ); die();
+    
+    // is this a single post/page?
+    if ( is_singular() ) {
 
-    // don't parse content when there's no post object, eg on 404 pages
-    if ( ! is_object( $post ) ) return;
+      global $post;
+      
+      // don't parse content when there's no post object, eg on 404 pages
+      if ( ! is_object( $post ) ) return;
 
-    // check for existence of shortcode in content
-    if ( preg_match( '/\[civicrm/', $post->post_content ) ) {
+      // check for existence of shortcode in content
+      if ( has_shortcode( 'civicrm', $post->post_content ) ) {
 
-      if (!$this->initialize()) {
-        return;
+        if (!$this->initialize()) {
+          return;
+        }
+
+        $config = CRM_Core_Config::singleton();
+        $config->userFrameworkFrontend = TRUE;
+
+        // add CiviCRM core resources
+        CRM_Core_Resources::singleton()->addCoreResources();
+        
       }
-
-      $config = CRM_Core_Config::singleton();
-      $config->userFrameworkFrontend = TRUE;
-
-      // add CiviCRM core resources
-      CRM_Core_Resources::singleton()->addCoreResources();
 
     }
 
