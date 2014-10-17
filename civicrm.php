@@ -496,107 +496,6 @@ class CiviCRM_For_WordPress {
 
 
   // ---------------------------------------------------------------------------
-  // CiviCRM Invocation (this outputs Civi's markup)
-  // ---------------------------------------------------------------------------
-
-
-  /**
-   * Invoke CiviCRM in a WordPress context
-   * Callback function from add_menu_page()
-   * Callback from WordPress 'init' and 'the_content' hooks
-   * Also called by do_shortcode() and _civicrm_update_user()
-   *
-   * @return void
-   */
-  public function invoke() {
-
-    static $alreadyInvoked = FALSE;
-    if ( $alreadyInvoked ) {
-      echo __( 'Already invoked', 'civicrm' );
-      return;
-    }
-
-    if ( ! $this->initialize() ) {
-      return '';
-    }
-
-    // CRM-12523
-    // WordPress has it's own timezone calculations
-    // Civi relies on the php default timezone which WP
-    // overrides with UTC in wp-settings.php
-    $wpBaseTimezone = date_default_timezone_get();
-    $wpUserTimezone = get_option('timezone_string');
-    if ($wpUserTimezone) {
-      date_default_timezone_set($wpUserTimezone);
-      CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
-    }
-
-    // Add our standard css & js
-    //CRM_Core_Resources::singleton()->addCoreResources();
-
-    // CRM-95XX
-    // At this point we are calling a CiviCRM function
-    // WP always quotes the request, CiviCRM needs to reverse what it just did
-    $this->remove_wp_magic_quotes();
-
-    if ( isset( $_GET['q'] ) ) {
-      $args = explode('/', trim($_GET['q']));
-    } else {
-      $_GET['q']     = 'civicrm/dashboard';
-      $_GET['reset'] = 1;
-      $args          = array('civicrm', 'dashboard');
-    }
-
-    global $current_user;
-    get_currentuserinfo();
-
-    /*
-     * bypass synchronize if running upgrade
-     * to avoid any serious non-recoverable error
-     * which might hinder the upgrade process.
-     */
-    if ( CRM_Utils_Array::value('q', $_GET) != 'civicrm/upgrade' ) {
-      require_once 'CRM/Core/BAO/UFMatch.php';
-      CRM_Core_BAO_UFMatch::synchronize( $current_user, FALSE, 'WordPress', 'Individual', TRUE );
-    }
-
-    if ( $this->isPageRequest() && !in_the_loop() && !is_admin() ) {
-      return;
-    }
-    $alreadyInvoked = TRUE;
-
-    // do the business
-    CRM_Core_Invoke::invoke($args);
-
-    // restore WP's timezone
-    if ($wpBaseTimezone) {
-      date_default_timezone_set($wpBaseTimezone);
-    }
-
-    // notify plugins
-    do_action( 'civicrm_invoked' );
-
-  }
-
-
-  /**
-   * Only called by invoke() to undo WordPress default behaviour
-   * CMW: Should probably be a private method
-   *
-   * @return void
-   */
-  public function remove_wp_magic_quotes() {
-
-    // reassign globals
-    $_GET     = stripslashes_deep($_GET);
-    $_POST    = stripslashes_deep($_POST);
-    $_COOKIE  = stripslashes_deep($_COOKIE);
-    $_REQUEST = stripslashes_deep($_REQUEST);
-
-  }
-
-
-  // ---------------------------------------------------------------------------
   // Plugin setup
   // ---------------------------------------------------------------------------
 
@@ -716,6 +615,107 @@ class CiviCRM_For_WordPress {
         $installLink
        ) .
        '</p></div>';
+
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // CiviCRM Invocation (this outputs Civi's markup)
+  // ---------------------------------------------------------------------------
+
+
+  /**
+   * Invoke CiviCRM in a WordPress context
+   * Callback function from add_menu_page()
+   * Callback from WordPress 'init' and 'the_content' hooks
+   * Also called by do_shortcode() and _civicrm_update_user()
+   *
+   * @return void
+   */
+  public function invoke() {
+
+    static $alreadyInvoked = FALSE;
+    if ( $alreadyInvoked ) {
+      echo __( 'Already invoked', 'civicrm' );
+      return;
+    }
+
+    if ( ! $this->initialize() ) {
+      return '';
+    }
+
+    // CRM-12523
+    // WordPress has it's own timezone calculations
+    // Civi relies on the php default timezone which WP
+    // overrides with UTC in wp-settings.php
+    $wpBaseTimezone = date_default_timezone_get();
+    $wpUserTimezone = get_option('timezone_string');
+    if ($wpUserTimezone) {
+      date_default_timezone_set($wpUserTimezone);
+      CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
+    }
+
+    // Add our standard css & js
+    //CRM_Core_Resources::singleton()->addCoreResources();
+
+    // CRM-95XX
+    // At this point we are calling a CiviCRM function
+    // WP always quotes the request, CiviCRM needs to reverse what it just did
+    $this->remove_wp_magic_quotes();
+
+    if ( isset( $_GET['q'] ) ) {
+      $args = explode('/', trim($_GET['q']));
+    } else {
+      $_GET['q']     = 'civicrm/dashboard';
+      $_GET['reset'] = 1;
+      $args          = array('civicrm', 'dashboard');
+    }
+
+    global $current_user;
+    get_currentuserinfo();
+
+    /*
+     * bypass synchronize if running upgrade
+     * to avoid any serious non-recoverable error
+     * which might hinder the upgrade process.
+     */
+    if ( CRM_Utils_Array::value('q', $_GET) != 'civicrm/upgrade' ) {
+      require_once 'CRM/Core/BAO/UFMatch.php';
+      CRM_Core_BAO_UFMatch::synchronize( $current_user, FALSE, 'WordPress', 'Individual', TRUE );
+    }
+
+    if ( $this->isPageRequest() && !in_the_loop() && !is_admin() ) {
+      return;
+    }
+    $alreadyInvoked = TRUE;
+
+    // do the business
+    CRM_Core_Invoke::invoke($args);
+
+    // restore WP's timezone
+    if ($wpBaseTimezone) {
+      date_default_timezone_set($wpBaseTimezone);
+    }
+
+    // notify plugins
+    do_action( 'civicrm_invoked' );
+
+  }
+
+
+  /**
+   * Only called by invoke() to undo WordPress default behaviour
+   * CMW: Should probably be a private method
+   *
+   * @return void
+   */
+  public function remove_wp_magic_quotes() {
+
+    // reassign globals
+    $_GET     = stripslashes_deep($_GET);
+    $_POST    = stripslashes_deep($_POST);
+    $_COOKIE  = stripslashes_deep($_COOKIE);
+    $_REQUEST = stripslashes_deep($_REQUEST);
 
   }
 
