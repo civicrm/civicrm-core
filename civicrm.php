@@ -2295,16 +2295,6 @@ function wp_set_breadcrumb( $breadCrumb ) {
 
 
 /**
- * FIXME: This is probably a hack to work around some drupal-centric issue. This function should be removed.
- */
-function t( $str, $sub = NULL ) {
-  if ( is_array( $sub ) ) {
-    $str = str_replace( array_keys( $sub ), array_values( $sub ), $str );
-  }
-  return $str;
-}
-
-/**
  * Incorporate WP-CLI Integration
  * Based on drush civicrm functionality, work done by Andy Walker
  * https://github.com/andy-walker/wp-cli-civicrm
