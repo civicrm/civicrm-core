@@ -7,7 +7,7 @@ This is the development repository for the *CiviCRM* plugin for *WordPress*. Wha
 
 ### "hooks" Branch Instructions ###
 
-It now invokes CiviCRM on the front-end before any template is reached. I have split the handling of Civi into the four contexts in which it may be called: 
+This version of the plugin now invokes CiviCRM on the front-end before any template is reached. I have split the handling of Civi into the four contexts in which it may be called: 
 
 * In WordPress admin 
 * On the wpBasePage 
@@ -16,17 +16,17 @@ It now invokes CiviCRM on the front-end before any template is reached. I have s
 
 The plugin now invokes Civi on the admin side properly, so that Civi's resources are only added when the Civi admin page is loaded. Previously they were added on every admin page. 
 
-On the wpBasePage, the Civi content is rendered into a property, then returned later when called for by 'the_content'. I have added things like filtering 'wp_title' and the page title with the title of the Civi entity. This works nicely, but introduces a new issue, which is that I think the logic of displaying the Civi title in the Civi template is the reverse of what it should be... I don't want the Civi title to be rendered on wpBasePage, because I am now able to override the theme's page title. In shortcodes, by contrast, I *do* want the Civi entity's title, because it forms a part of the parent page and does not try to hijack it any more. 
+On the `wpBasePage`, the Civi content is rendered into a property, then returned later when called for by `the_content()`. I have added things like filtering 'wp_title' and the page title with the title of the Civi entity. This works nicely, but introduces a new issue, which is that I think the logic of displaying the Civi title in the Civi template is the reverse of what it should be... I don't want the Civi title to be rendered on wpBasePage, because I am now able to override the theme's page title. In shortcodes, by contrast, I *do* want the Civi entity's title, because, by default, it forms a part of the parent page and does not try to hijack it. Hijacking has become an option in the modal dialog. See below. 
 
-AJAX/snippet/iCal calls exit much earlier now, which seems appropriate. As a result, I've ditched the multi-purpose 'wp_frontend' method, which I think was causing confusion by trying to be, um, all things in all contexts. I realise that this still requires the 'is_page_request()' method to distinguish between contexts - perhaps we can think that through sometime. 
+AJAX/snippet/iCal calls exit much earlier now, which seems appropriate. As a result, I've ditched the multi-purpose `wp_frontend()` method, which I think was causing confusion by trying to be, um, all things in all contexts. I realise that this still requires the `is_page_request()` method to distinguish between contexts - this still needs thinking through. 
 
 And lastly, shortcodes... 
 
-When there is a single shortcode to display, its markup is generated and stored, then returned when the shortcode is rendered in 'the_content', regardless of whether it's an archive or singular page/post. 
+When there is a single shortcode to display, its markup is generated and stored, then returned when the shortcode is rendered in `the_content()`, regardless of whether it's an archive or singular page/post. 
 
-Multiple shortcodes are not handled particularly well as yet (there is dummy content like you suggested that links to the singular page it is embedded in) but the architecture is there to enhance this. At present, Civi is only allowed to be invoked once - I assume this was by design? - and this would have to be changed if multiple shortcodes are to be rendered on the same page.
+Multiple shortcodes are not handled particularly well as yet (there is dummy content that links to the singular page it is embedded in) but the architecture is there to enhance this. At present, Civi is only allowed to be invoked once - I assume this was by design? - and this would have to be changed if multiple shortcodes are to be rendered on the same page.
 
-I have added an option in the CiviCRM button modal dialog which allows a single instance of a shortcode to "hijack" the containing page - it overwrites the HTML title, page title and page content with the relevant parts of the CiviCRM entity that the shortcode represents. To enable this, a change to CiviCRM core is required. You must replace `function setTitle() `in /wp-content/plugins/civicrm/civicrm/CRM/Utils/System/WordPress.php with...
+I have added an option in the CiviCRM button modal dialog which allows a single instance of a shortcode to "hijack" the containing page - it overwrites the HTML title, page title and page content with the relevant parts of the CiviCRM entity that the shortcode represents. To enable this, a change to CiviCRM core is required. You must replace `function setTitle()` in '/wp-content/plugins/civicrm/civicrm/CRM/Utils/System/WordPress.php' with...
 
 ```php
 
