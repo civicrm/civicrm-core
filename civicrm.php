@@ -580,6 +580,28 @@ class CiviCRM_For_WordPress {
 
 
   /**
+   * Only called by invoke() to undo WordPress default behaviour
+   * CMW: Should probably be a private method
+   *
+   * @return void
+   */
+  public function remove_wp_magic_quotes() {
+
+    // reassign globals
+    $_GET     = stripslashes_deep($_GET);
+    $_POST    = stripslashes_deep($_POST);
+    $_COOKIE  = stripslashes_deep($_COOKIE);
+    $_REQUEST = stripslashes_deep($_REQUEST);
+
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // Plugin setup
+  // ---------------------------------------------------------------------------
+
+
+  /**
    * Load translation files
    * A good reference on how to implement translation in WordPress:
    * http://ottopress.com/2012/internationalization-youre-probably-doing-it-wrong/
@@ -1029,6 +1051,11 @@ class CiviCRM_For_WordPress {
   }
 
 
+  // ---------------------------------------------------------------------------
+  // Standalone front-end pages
+  // ---------------------------------------------------------------------------
+
+
   /**
    * CiviCRM's theme integration method
    * Called by register_hooks() and do_shortcode()
@@ -1185,6 +1212,11 @@ class CiviCRM_For_WordPress {
   }
 
 
+  // ---------------------------------------------------------------------------
+  // User-related methods
+  // ---------------------------------------------------------------------------
+
+
   /**
    * Authentication function used by wp_frontend()
    *
@@ -1219,23 +1251,6 @@ class CiviCRM_For_WordPress {
    */
   public function get_permission_denied() {
     return __( 'You do not have permission to execute this url.', 'civicrm' );
-  }
-
-
-  /**
-   * Only called by invoke() to undo WordPress default behaviour
-   * CMW: Should probably be a private method
-   *
-   * @return void
-   */
-  public function remove_wp_magic_quotes() {
-
-    // reassign globals
-    $_GET     = stripslashes_deep($_GET);
-    $_POST    = stripslashes_deep($_POST);
-    $_COOKIE  = stripslashes_deep($_COOKIE);
-    $_REQUEST = stripslashes_deep($_REQUEST);
-
   }
 
 
@@ -1428,6 +1443,11 @@ class CiviCRM_For_WordPress {
     return $ctype;
 
   }
+
+
+  // ---------------------------------------------------------------------------
+  // CiviCRM Shortcode button
+  // ---------------------------------------------------------------------------
 
 
   /**
