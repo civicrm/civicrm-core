@@ -1080,11 +1080,8 @@ class CiviCRM_For_WordPress {
       return '';
     }
 
-    // get permission args
-    $args = $this->get_permission_args();
-    
     // check permission
-    if ( ! $this->check_permission( $args ) ) {
+    if ( ! $this->check_permission( $this->get_permission_args() ) ) {
       return $this->get_permission_denied();;
     }
 
@@ -1117,11 +1114,8 @@ class CiviCRM_For_WordPress {
       return;
     }
     
-    // get permission args
-    $args = $this->get_permission_args();
-    
     // check permission
-    if ( ! $this->check_permission( $args ) ) {
+    if ( ! $this->check_permission( $this->get_permission_args() ) ) {
       add_filter( 'the_content', array( $this, 'get_permission_denied' ) );
       return;
     }
