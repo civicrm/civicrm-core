@@ -167,8 +167,7 @@ class CiviCRM_For_WordPress {
       wp_die( __( 'Only one instance of CiviCRM_For_WordPress please', 'civicrm' ) );
     }
 
-    // store context - this becomes true whe CiviCRM is shown in WordPress back-end and when
-    // CiviCRM content is being displayed on the front-end via wpBasePage
+    // Store context
     self::$in_wordpress = ( isset( $_GET['page'] ) && $_GET['page'] == 'CiviCRM' ) ? TRUE : FALSE;
 
     // there is no session handling in WP hence we start it for CiviCRM pages
@@ -176,8 +175,8 @@ class CiviCRM_For_WordPress {
       session_start();
     }
 
-    // this is required for ajax calls in civicrm
     if ( $this->civicrm_in_wordpress() ) {
+      // this is required for AJAX calls in WordPress admin
       $_GET['noheader'] = TRUE;
     } else {
       $_GET['civicrm_install_type'] = 'wordpress';
@@ -192,7 +191,14 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Getter for testing if CiviCRM is currently being displayed in WordPress
+   * Getter for testing if CiviCRM is currently being displayed in WordPress. This 
+   * becomes true whe CiviCRM is called in the following contexts:
+   *
+   * (a) in the WordPress back-end
+   * (b) when CiviCRM content is being displayed on the front-end via wpBasePage
+   * (c) when an AJAX request is made to CiviCRM
+   *
+   * It is NOT true when CiviCRM is called via a shortcode
    *
    * @return bool $in_wordpress True if Civi is displayed in WordPress, false otherwise
    */
@@ -211,8 +217,64 @@ class CiviCRM_For_WordPress {
    */
   public function register_hooks() {
 
-    // always add the following hooks
+    // always add the common hooks
+    $this->register_common_hooks();
+    
+    // when in WordPress admin...
+    if ( is_admin() ) {
 
+      // handle WP admin context
+      $this->register_admin_hooks();
+      return;
+      
+    }
+
+    // when embedded via wpBasePage or AJAX call...
+    if ( $this->civicrm_in_wordpress() ) {
+      
+      // add core resources
+      $this->add_core_resources();
+      
+      // output civicrm html only in a few cases and skip WP templating
+      if (
+        // snippet is set - i.e. ajax call
+        // ical feed (unless 'html' is specified)
+        // ajax and file download urls
+        ! $this->isPageRequest()
+      ) {
+        // from my limited understanding, putting this in the init hook allows civi to
+        // echo all output and exit before the theme code outputs anything - lobo
+        $this->invoke();
+        die();
+      }
+      
+      // output buffer in footer
+      add_action( 'wp_footer', array( $this, 'buffer_end' ) );
+      
+      // merge CiviCRM's HTML header with the WordPress theme's header
+      add_action( 'wp_head', array( $this, 'wp_head' ) );
+      
+      // we do this here rather than as an action, since we don't control the order
+      $this->buffer_start();
+      $this->wp_frontend();
+        
+      return;
+    
+    }
+      
+    // that leaves us with handling shortcodes, should they exist
+    $this->register_shortcode_hooks();
+
+  }
+
+
+  /**
+   * Register hooks that must always be present
+   *
+   * @return void
+   */
+  public function register_common_hooks() {
+  
     // use translation files
     add_action( 'plugins_loaded', array( $this, 'enable_translation' ) );
 
@@ -228,61 +290,59 @@ class CiviCRM_For_WordPress {
     
     // register the CiviCRM shortcode
     add_shortcode( 'civicrm', array( $this, 'shortcode_handler' ) );
-
-
-    // only when in WordPress admin...
-    if ( is_admin() ) {
-
-      // modify the admin menu
-      add_action( 'admin_menu', array( $this, 'add_menu_items' ) );
-
-      // the following three hooks CiviCRM button to post and page screens
-
-      // adds the CiviCRM button to post and page edit screens
-      // use priority 100 to position button to the farright
-      add_action( 'media_buttons', array( $this, 'add_form_button' ), 100 );
-
-      // adds the HTML triggered by the button above
-      add_action( 'admin_footer', array( $this, 'add_form_button_html' ) );
-
-      // add the javascript to make it all happen
-      add_action( 'admin_enqueue_scripts', array( $this, 'add_form_button_js' ) );
-
-      // check if settings file exist, do not show configuration link on
-      // install / settings page
-      if ( isset( $_GET['page'] ) && $_GET['page'] != 'civicrm-install' ) {
-        if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
-          add_action( 'admin_notices', array( $this, 'show_setup_warning' ) );
-        }
+    
+  }
+  
+   
+  /**
+   * Register hooks to handle CiviCRM in a WordPress admin context
+   *
+   * @return void
+   */
+  public function register_admin_hooks() {
+    
+    // modify the admin menu
+    add_action( 'admin_menu', array( $this, 'add_menu_items' ) );
+    
+    // the following three hooks CiviCRM button to post and page screens
+    
+    // adds the CiviCRM button to post and page edit screens
+    // use priority 100 to position button to the farright
+    add_action( 'media_buttons', array( $this, 'add_form_button' ), 100 );
+    
+    // adds the HTML triggered by the button above
+    add_action( 'admin_footer', array( $this, 'add_form_button_html' ) );
+    
+    // add the javascript to make it all happen
+    add_action( 'admin_enqueue_scripts', array( $this, 'add_form_button_js' ) );
+    
+    // check if settings file exist, do not show configuration link on
+    // install / settings page
+    if ( isset( $_GET['page'] ) && $_GET['page'] != 'civicrm-install' ) {
+      if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
+        add_action( 'admin_notices', array( $this, 'show_setup_warning' ) );
       }
-
-      // merge CiviCRM's HTML header with the WordPress theme's header
-      add_action( 'admin_head', array( $this, 'wp_head' ) );
-
-
-    // not in admin
-    } else {
-
-      // add core resources CiviCRM when a shortcode is detected in the post content
-      add_action( 'wp', array( $this, 'add_shortcode_includes' ), 10, 1 );
-
-      // merge CiviCRM's HTML header with the WordPress theme's header
-      add_action( 'wp_head', array( $this, 'wp_head' ) );
-
-      // if embedded...
-      if ( $this->civicrm_in_wordpress() ) {
-
-        // output buffer in footer
-        add_action( 'wp_footer', array( $this, 'buffer_end' ) );
-
-        // we do this here rather than as an action, since we don't control the order
-        $this->buffer_start();
-        $this->wp_frontend();
-
-      }
-
     }
+    
+    // merge CiviCRM's HTML header with the WordPress theme's header
+    add_action( 'admin_head', array( $this, 'wp_head' ) );
+    
+  }
 
+
+  /**
+   * Register hooks to handle the presence of shortcodes in content
+   *
+   * @return void
+   */
+  public function register_shortcode_hooks() {
+
+    // add CiviCRM core resources when a shortcode is detected in the post content
+    add_action( 'wp', array( $this, 'handle_shortcodes' ), 10, 1 );
+        
+    // merge CiviCRM's HTML header with the WordPress theme's header
+    add_action( 'wp_head', array( $this, 'wp_head' ) );
+      
   }
 
 
@@ -426,6 +486,10 @@ class CiviCRM_For_WordPress {
    * @return boolean True if request is for a CiviCRM page, false otherwise
    */
   public function isPageRequest() {
+    
+    // kick out if not CiviCRM
+    if ( ! $this->initialize() ) { return; }
+
     $argString = NULL;
     $args = array();
     if (isset( $_GET['q'])) {
@@ -455,7 +519,7 @@ class CiviCRM_For_WordPress {
    * Invoke CiviCRM in a WordPress context
    * Callback function from add_menu_page()
    * Callback from WordPress 'init' and 'the_content' hooks
-   * Also called by add_shortcode_includes() and _civicrm_update_user()
+   * Also called by get_shortcode_markup() and _civicrm_update_user()
    *
    * @return void
    */
@@ -463,6 +527,7 @@ class CiviCRM_For_WordPress {
 
     static $alreadyInvoked = FALSE;
     if ( $alreadyInvoked ) {
+      echo __( 'Already invoked', 'civicrm' );
       return;
     }
 
@@ -482,7 +547,7 @@ class CiviCRM_For_WordPress {
     }
 
     // Add our standard css & js
-    CRM_Core_Resources::singleton()->addCoreResources();
+    //CRM_Core_Resources::singleton()->addCoreResources();
 
     // CRM-95XX
     // At this point we are calling a CiviCRM function
@@ -672,40 +737,129 @@ class CiviCRM_For_WordPress {
    * @param object $wp The WP object, present but not used
    * @return void
    */
-  public function add_shortcode_includes( $wp ) {
+  public function handle_shortcodes( $wp ) {
 
-    global $wp_query;
-    
-    // sanity check
-    if ( ! is_object( $wp_query ) ) return;
-    
-    //print_r( $wp_query ); die();
+    // bail if this is a 404
+    if ( is_404() ) return;
     
     // is this a single post/page?
     if ( is_singular() ) {
 
       global $post;
       
-      // don't parse content when there's no post object, eg on 404 pages
-      if ( ! is_object( $post ) ) return;
-
       // check for existence of shortcode in content
-      if ( has_shortcode( 'civicrm', $post->post_content ) ) {
+      if ( has_shortcode( $post->post_content, 'civicrm' ) ) {
 
-        if (!$this->initialize()) {
-          return;
+        // flag that we have a shortcode present
+        $this->shortcode_present = TRUE;
+        
+        // add core resources
+        $this->add_core_resources();
+        
+        // get shortcodes
+        $shortcodes = $this->get_shortcodes( $post->post_content );
+        
+        // add the to a property
+        $this->shortcode_markup = array();
+        foreach( $shortcodes AS $shortcode ) {      
+          $this->shortcode_markup[$post->ID][] = do_shortcode( $shortcode );
         }
-
-        $config = CRM_Core_Config::singleton();
-        $config->userFrameworkFrontend = TRUE;
-
-        // add CiviCRM core resources
-        CRM_Core_Resources::singleton()->addCoreResources();
         
       }
 
+    } else {
+    
+      /**
+       * We're on an archive page of some sort:
+       * @see http://codex.wordpress.org/Conditional_Tags
+       */
+      
+      // let's loop through the results
+      if ( have_posts() ) {
+        while ( have_posts() ) : the_post();
+        
+          global $post;
+          
+          // check for existence of shortcode in content
+          if ( has_shortcode( $post->post_content, 'civicrm' ) ) {
+          
+            // add core resources
+            $this->add_core_resources();
+            
+            // flag that we have a shortcode present
+            $this->shortcode_present = TRUE;
+            
+            // we only need one post to have a shortcode for us to require the
+            // core resources, so we can safely skip the rest of the posts now
+            break;
+            
+          }
+        
+        endwhile;
+      }
+      
+      // reset query so it runs again in the template
+      rewind_posts();
+    
     }
 
+  }
+
+
+  /**
+   * Detect and return CiviCRM shortcodes in post content
+   *
+   * @param $content The content to parse
+   * @return mixed Array of shortcodes or FALSE if none exist
+   */
+  private function get_shortcodes( $content ) {
+  
+    // attempt to discover all instances of the shortcode
+    $pattern = get_shortcode_regex();
+    
+    if ( 
+      preg_match_all( '/' . $pattern . '/s', $content, $matches )
+      && array_key_exists( 2, $matches )
+      && in_array( 'civicrm', $matches[2] ) )
+    {
+    
+      // shortcode is being used - init return array
+      $shortcodes = array();
+      
+      // get keys for our shortcode
+      $keys = array_keys( $matches[2], 'civicrm' );
+      
+      foreach( $keys AS $key ) {
+      	$shortcodes[] = $matches[0][$key];
+      }
+      
+      return $shortcodes;
+      
+    }
+    
+    // none found
+    return FALSE;
+    
+  }
+
+
+  /**
+   * Add CiviCRM core resources
+   *
+   * @return void
+   */
+  private function add_core_resources() {
+  
+    if (!$this->initialize()) {
+      return;
+    }
+        
+    $config = CRM_Core_Config::singleton();
+    $config->userFrameworkFrontend = TRUE;
+    
+    // add CiviCRM core resources
+    CRM_Core_Resources::singleton()->addCoreResources();
+    
   }
 
 
@@ -753,12 +907,42 @@ class CiviCRM_For_WordPress {
     // kick out if not CiviCRM
     if ( ! $this->initialize() ) { return; }
 
-    // set the frontend part for civicrm code
-    $config = CRM_Core_Config::singleton();
-    $config->userFrameworkFrontend = TRUE;
+    $argString = NULL;
+    $args = array();
+    if (isset( $_GET['q'])) {
+      $argString = trim($_GET['q']);
+      $args = explode('/', $argString);
+    }
+    $args = array_pad($args, 2, '');
 
-    // add CiviCRM core resources
-    CRM_Core_Resources::singleton()->addCoreResources();
+    add_filter( 'get_header', array( $this, 'turn_comments_off' ) );
+    add_filter( 'get_header', array( $this, 'set_post_blank' ) );
+    
+    // check permission
+    if ( ! $this->check_permission( $args ) ) {
+      add_filter( 'the_content', array( $this, 'get_permission_denied' ) );
+      return;
+    }
+
+    // CMW: why do we need this? Nothing that follows uses it...
+    require_once ABSPATH . WPINC . '/pluggable.php';
+
+    // see comments on set_post_blank()
+    add_filter( 'the_content', array( $this, 'invoke' ) );
+
+  }
+
+
+  /**
+   * Build CiviCRM shortcode as HTML
+   * Called by shortcode_handler()
+   *
+   * @return string $html The markup for the shortcode
+   */
+  public function get_shortcode_markup() {
+
+    // kick out if not CiviCRM
+    if ( ! $this->initialize() ) { return ''; }
 
     $argString = NULL;
     $args = array();
@@ -768,63 +952,18 @@ class CiviCRM_For_WordPress {
     }
     $args = array_pad($args, 2, '');
 
-    // CMW: hacky procedure for overriding WordPress page/post:
-    // see comments on set_post_blank()
-    if ( $shortcode ) {
-      $this->turn_comments_off();
-      // CMW: this fails, because a lot of the page (eg, title) has already been rendered
-      $this->set_post_blank();
-    } else {
-      add_filter( 'get_header', array( $this, 'turn_comments_off' ) );
-      add_filter( 'get_header', array( $this, 'set_post_blank' ) );
-    }
-
     // check permission
     if ( ! $this->check_permission( $args ) ) {
-      if ( $shortcode ) {
-        $this->show_permission_denied();
-      } else {
-        add_filter( 'the_content', array( $this, 'show_permission_denied' ) );
-      }
-      return;
+      return $this->get_permission_denied();;
     }
 
     // CMW: why do we need this? Nothing that follows uses it...
     require_once ABSPATH . WPINC . '/pluggable.php';
-
-    // output civicrm html only in a few cases and skip the WP header
-    if (
-      // snippet is set - i.e. ajax call
-      // ical feed (unless 'html' is specified)
-      // ajax and file download urls
-      ! $this->isPageRequest()
-    ) {
-      // from my limited understanding, putting this in the init hook allows civi to
-      // echo all output and exit before the theme code outputs anything - lobo
-      add_filter( 'init', array( $this, 'invoke' ) );
-      return;
-    }
-
-    // this places civicrm inside frontend theme
-    // wp documentation rocks if you know what you are looking for
-    // but best way is to check other plugin implementation :)
-    if ( $shortcode ) {
-
-      // CMW: review in the light of proper shortcode research
-      // First question: I can add more than one shortcode to a page, but
-      // only the first one appears in the output, even though this runs twice
-
-      ob_start(); // start buffering
-      $this->invoke(); // now, instead of echoing, shortcode output ends up in buffer
-      $content = ob_get_clean(); // save the output and flush the buffer
-      return $content;
-
-    } else {
-
-      // see comments on set_post_blank()
-      add_filter( 'the_content', array( $this, 'invoke' ) );
-
-    }
+    
+    ob_start(); // start buffering
+    $this->invoke(); // now, instead of echoing, shortcode output ends up in buffer
+    $content = ob_get_clean(); // save the output and flush the buffer
+    return $content;
 
   }
 
@@ -945,7 +1084,7 @@ class CiviCRM_For_WordPress {
    *
    * @return string Warning message
    */
-  public function show_permission_denied() {
+  public function get_permission_denied() {
     return __( 'You do not have permission to execute this url.', 'civicrm' );
   }
 
@@ -1260,7 +1399,7 @@ class CiviCRM_For_WordPress {
     }
 
     // call wp_frontend with $shortcode param
-    return $this->wp_frontend( TRUE );
+    return $this->get_shortcode_markup();
 
   }
 
@@ -1385,10 +1524,10 @@ class CiviCRM_For_WordPress {
     if ( count($post_types) > 0 ) {
       foreach($post_types AS $post_type) {
       
-      	// filter only those which have an editor
-      	if ( post_type_supports($post_type, 'editor') ) {
-      	  $supported_post_types[] = $post_type;
-      	}
+        // filter only those which have an editor
+        if ( post_type_supports($post_type, 'editor') ) {
+          $supported_post_types[] = $post_type;
+        }
       }
     }
     
@@ -1606,7 +1745,7 @@ class CiviCRM_For_WordPress {
               </span>
 
               <span id="petition-section" style="display:none;">
-		            <select id="add_petition_id">
+                <select id="add_petition_id">
                 <?php
                 $petitionPages = $this->get_petition();
                 foreach ($petitionPages as $key => $value) { ?>
@@ -1741,7 +1880,7 @@ function civicrm_check_permission( $args ) {
  * Called when authentication fails in civicrm_wp_frontend()
  */
 function civicrm_set_frontendmessage() {
-  return civi_wp()->show_permission_denied();
+  return civi_wp()->get_permission_denied();
 }
 
 /**
