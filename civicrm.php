@@ -1103,7 +1103,7 @@ class CiviCRM_For_WordPress {
 
   /**
    * CiviCRM's theme integration method
-   * Called by register_hooks() and do_shortcode()
+   * Called by register_hooks()
    *
    * @return void
    */
@@ -1167,9 +1167,7 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Override WordPress post comment status attribute in wp_frontend()
-   *
-   * @see comments on set_post_blank()
+   * Override WordPress post comment status
    *
    * @return void
    */
@@ -1187,7 +1185,7 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Override WordPress post attributes in wp_frontend()
+   * Override WordPress post attributes
    *
    * CMW: the process of overriding WordPress post content should be done in a way
    * analogous to how BuddyPress injects its content into a theme. After I have
