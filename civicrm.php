@@ -960,6 +960,61 @@ class CiviCRM_For_WordPress {
   }
 
 
+  /**
+   * Detect Ajax, snippet, or file requests
+   *
+   * @return boolean True if request is for a CiviCRM page, false otherwise
+   */
+  public function is_page_request() {
+    
+    // kick out if not CiviCRM
+    if (!$this->initialize()) {
+      return;
+    }
+
+    // get args
+    $argdata = $this->get_request_args();
+    
+    // FIXME: It's not sustainable to hardcode a whitelist of all of non-HTML
+    // pages. Maybe the menu-XML should include some metadata to make this
+    // unnecessary?
+    if (CRM_Utils_Array::value('HTTP_X_REQUESTED_WITH', $_SERVER) == 'XMLHttpRequest'
+        || ($argdata['args'][0] == 'civicrm' && in_array($argdata['args'][1], array('ajax', 'file')) )
+        || !empty($_REQUEST['snippet'])
+        || strpos($argdata['argString'], 'civicrm/event/ical') === 0 && empty($_GET['html'])
+        || strpos($argdata['argString'], 'civicrm/contact/imagefile') === 0
+    ) {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
+  }
+
+
+  /**
+   * Get arguments from $_GET
+   *
+   * @return array $args Request arguments
+   */
+  private function get_request_args() {
+  
+    $argString = NULL;
+    $args = array();
+    if (isset( $_GET['q'])) {
+      $argString = trim($_GET['q']);
+      $args = explode('/', $argString);
+    }
+    $args = array_pad($args, 2, '');
+    
+    return array( 
+      'args' => $args,
+      'argString' => $argString
+    );
+    
+  }
+
+
   // ---------------------------------------------------------------------------
   // Shortcode Handling
   // ---------------------------------------------------------------------------
@@ -1437,38 +1492,6 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Detect Ajax, snippet, or file requests
-   *
-   * @return boolean True if request is for a CiviCRM page, false otherwise
-   */
-  public function is_page_request() {
-    
-    // kick out if not CiviCRM
-    if (!$this->initialize()) {
-      return;
-    }
-
-    // get args
-    $argdata = $this->get_request_args();
-    
-    // FIXME: It's not sustainable to hardcode a whitelist of all of non-HTML
-    // pages. Maybe the menu-XML should include some metadata to make this
-    // unnecessary?
-    if (CRM_Utils_Array::value('HTTP_X_REQUESTED_WITH', $_SERVER) == 'XMLHttpRequest'
-        || ($argdata['args'][0] == 'civicrm' && in_array($argdata['args'][1], array('ajax', 'file')) )
-        || !empty($_REQUEST['snippet'])
-        || strpos($argdata['argString'], 'civicrm/event/ical') === 0 && empty($_GET['html'])
-        || strpos($argdata['argString'], 'civicrm/contact/imagefile') === 0
-    ) {
-      return FALSE;
-    }
-    else {
-      return TRUE;
-    }
-  }
-
-
-  /**
    * Callback from 'edit_post_link' hook to remove edit link in set_post_blank()
    *
    * @return string Always empty
@@ -1481,29 +1504,6 @@ class CiviCRM_For_WordPress {
   // ---------------------------------------------------------------------------
   // User-related methods
   // ---------------------------------------------------------------------------
-
-
-  /**
-   * Get arguments from $_GET
-   *
-   * @return array $args Request arguments
-   */
-  private function get_request_args() {
-  
-    $argString = NULL;
-    $args = array();
-    if (isset( $_GET['q'])) {
-      $argString = trim($_GET['q']);
-      $args = explode('/', $argString);
-    }
-    $args = array_pad($args, 2, '');
-    
-    return array( 
-      'args' => $args,
-      'argString' => $argString
-    );
-    
-  }
 
 
   /**
