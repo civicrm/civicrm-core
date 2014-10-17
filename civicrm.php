@@ -179,8 +179,8 @@ class CiviCRM_For_WordPress {
     }
 
     // Store context
-    self::$in_wordpress = ( isset( $_GET['page'] ) && $_GET['page'] == 'CiviCRM' ) ? TRUE : FALSE;
-
+    $this->civicrm_in_wordpress_set();
+    
     // there is no session handling in WP hence we start it for CiviCRM pages
     if (!session_id()) {
       session_start();
@@ -202,8 +202,8 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Getter for testing if CiviCRM is currently being displayed in WordPress. This 
-   * becomes true whe CiviCRM is called in the following contexts:
+   * Setter for determining if CiviCRM is currently being displayed in WordPress.
+   * This becomes true whe CiviCRM is called in the following contexts:
    *
    * (a) in the WordPress back-end
    * (b) when CiviCRM content is being displayed on the front-end via wpBasePage
@@ -211,12 +211,27 @@ class CiviCRM_For_WordPress {
    *
    * It is NOT true when CiviCRM is called via a shortcode
    *
+   * @return void
+   */
+  public function civicrm_in_wordpress_set() {
+
+    // store
+    self::$in_wordpress = ( isset( $_GET['page'] ) && $_GET['page'] == 'CiviCRM' ) ? TRUE : FALSE;
+
+  }
+
+
+  /**
+   * Getter for testing if CiviCRM is currently being displayed in WordPress.
+   *
+   * @see $this->civicrm_in_wordpress_set()
+   *
    * @return bool $in_wordpress True if Civi is displayed in WordPress, false otherwise
    */
   public function civicrm_in_wordpress() {
 
     // already stored
-    return self::$in_wordpress;
+    return apply_filters( 'civicrm_in_wordpress', self::$in_wordpress );
 
   }
 
