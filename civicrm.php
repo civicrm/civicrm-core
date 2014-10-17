@@ -426,7 +426,8 @@ class CiviCRM_For_WordPress {
     add_action( 'wp_head', array( $this, 'wp_head' ) );
       
     // check permission
-    if ( ! $this->check_permission( $this->get_permission_args() ) ) {
+    $argdata = $this->get_request_args();
+    if ( ! $this->check_permission( $argdata['args'] ) ) {
       add_filter( 'the_content', array( $this, 'get_permission_denied' ) );
       return;
     }
@@ -839,18 +840,10 @@ class CiviCRM_For_WordPress {
     // At this point we are calling a CiviCRM function
     // WP always quotes the request, CiviCRM needs to reverse what it just did
     $this->remove_wp_magic_quotes();
-
-    if ( isset( $_GET['q'] ) ) {
-      $args = explode('/', trim($_GET['q']));
-    } else {
-      $_GET['q']     = 'civicrm/dashboard';
-      $_GET['reset'] = 1;
-      $args          = array('civicrm', 'dashboard');
-    }
-
+    
     global $current_user;
     get_currentuserinfo();
-
+    
     /*
      * bypass synchronize if running upgrade
      * to avoid any serious non-recoverable error
@@ -864,8 +857,11 @@ class CiviCRM_For_WordPress {
     // set flag
     $alreadyInvoked = TRUE;
 
+    // get args
+    $argdata = $this->get_request_args();
+    
     // do the business
-    CRM_Core_Invoke::invoke($args);
+    CRM_Core_Invoke::invoke($argdata['args']);
 
     // restore WP's timezone
     if ($wpBaseTimezone) {
@@ -1298,7 +1294,8 @@ class CiviCRM_For_WordPress {
     }
 
     // check permission
-    if ( ! $this->check_permission( $this->get_permission_args() ) ) {
+    $argdata = $this->get_request_args();
+    if ( ! $this->check_permission( $argdata['args'] ) ) {
       return $this->get_permission_denied();;
     }
 
@@ -1451,22 +1448,17 @@ class CiviCRM_For_WordPress {
       return;
     }
 
-    $argString = NULL;
-    $args = array();
-    if (isset( $_GET['q'])) {
-      $argString = trim($_GET['q']);
-      $args = explode('/', $argString);
-    }
-    $args = array_pad($args, 2, '');
-
+    // get args
+    $argdata = $this->get_request_args();
+    
     // FIXME: It's not sustainable to hardcode a whitelist of all of non-HTML
     // pages. Maybe the menu-XML should include some metadata to make this
     // unnecessary?
     if (CRM_Utils_Array::value('HTTP_X_REQUESTED_WITH', $_SERVER) == 'XMLHttpRequest'
-        || ($args[0] == 'civicrm' && in_array($args[1], array('ajax', 'file')) )
+        || ($argdata['args'][0] == 'civicrm' && in_array($argdata['args'][1], array('ajax', 'file')) )
         || !empty($_REQUEST['snippet'])
-        || strpos($argString, 'civicrm/event/ical') === 0 && empty($_GET['html'])
-        || strpos($argString, 'civicrm/contact/imagefile') === 0
+        || strpos($argdata['argString'], 'civicrm/event/ical') === 0 && empty($_GET['html'])
+        || strpos($argdata['argString'], 'civicrm/contact/imagefile') === 0
     ) {
       return FALSE;
     }
@@ -1492,11 +1484,11 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Get permission arguments
+   * Get arguments from $_GET
    *
-   * @return array $args Permission arguments
+   * @return array $args Request arguments
    */
-  private function get_permission_args() {
+  private function get_request_args() {
   
     $argString = NULL;
     $args = array();
@@ -1506,7 +1498,10 @@ class CiviCRM_For_WordPress {
     }
     $args = array_pad($args, 2, '');
     
-    return $args;
+    return array( 
+      'args' => $args,
+      'argString' => $argString
+    );
     
   }
 
