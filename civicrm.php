@@ -368,22 +368,15 @@ class CiviCRM_For_WordPress {
     // merge CiviCRM's HTML header with the WordPress theme's header
     add_action( 'wp_head', array( $this, 'wp_head' ) );
       
-    // why why why?
-    //add_action( 'wp', array( $this, 'turn_comments_off' ) );
-    //add_action( 'wp', array( $this, 'set_post_blank' ) );
-    
     // check permission
     if ( ! $this->check_permission( $this->get_permission_args() ) ) {
       add_filter( 'the_content', array( $this, 'get_permission_denied' ) );
       return;
     }
 
-    // CMW: why do we need this? Nothing that follows uses it...
-    require_once ABSPATH . WPINC . '/pluggable.php';
-
-    // see comments on set_post_blank()
-    add_filter( 'the_content', array( $this, 'invoke' ) );
-
+    // cache CiviCRM base page markup
+    add_action( 'wp', array( $this, 'handle_basepage' ), 10, 1 );
+        
   }
 
 
@@ -822,7 +815,7 @@ class CiviCRM_For_WordPress {
       date_default_timezone_set($wpBaseTimezone);
     }
 
-    // restore WP's timezone
+    // restore WP's arrays
     $this->restore_wp_magic_quotes();
     
     // notify plugins
@@ -959,10 +952,18 @@ class CiviCRM_For_WordPress {
           }
           
           // get CiviCRM shortcodes in this post
-          $this->shortcodes[$post->ID] = $this->get_shortcodes( $post->post_content );
+          $shortcodes_array = $this->get_shortcodes( $post->post_content );
           
-          // bump shortcode counter
-          $shortcodes_present += count( $this->shortcodes[$post->ID] );
+          // sanity check
+          if ( !empty( $shortcodes_array ) ) {
+            
+            // add it to our property
+            $this->shortcodes[$post->ID] = $shortcodes_array;
+            
+            // bump shortcode counter
+            $shortcodes_present += count( $this->shortcodes[$post->ID] );
+          
+          }
           
         }
         
@@ -1028,10 +1029,13 @@ class CiviCRM_For_WordPress {
    * Detect and return CiviCRM shortcodes in post content
    *
    * @param $content The content to parse
-   * @return mixed Array of shortcodes or FALSE if none exist
+   * @return array $shortcodes Array of shortcodes
    */
   private function get_shortcodes( $content ) {
   
+    // init return array
+    $shortcodes = array();
+      
     // attempt to discover all instances of the shortcode
     $pattern = get_shortcode_regex();
     
@@ -1041,9 +1045,6 @@ class CiviCRM_For_WordPress {
       && in_array( 'civicrm', $matches[2] ) )
     {
     
-      // shortcode is being used - init return array
-      $shortcodes = array();
-      
       // get keys for our shortcode
       $keys = array_keys( $matches[2], 'civicrm' );
       
@@ -1051,12 +1052,9 @@ class CiviCRM_For_WordPress {
         $shortcodes[] = $matches[0][$key];
       }
       
-      return $shortcodes;
-      
     }
     
-    // none found
-    return FALSE;
+    return $shortcodes;
     
   }
 
@@ -1200,6 +1198,124 @@ class CiviCRM_For_WordPress {
   // ---------------------------------------------------------------------------
   // Standalone front-end pages
   // ---------------------------------------------------------------------------
+
+
+  /**
+   * Build CiviCRM base page content
+   * Callback method for 'wp' hook, always called from WP front-end
+   *
+   * @param object $wp The WP object, present but not used
+   * @return void
+   */
+  public function handle_basepage( $wp ) {
+
+    /**
+     * At this point, all conditional tags are available
+     * @see http://codex.wordpress.org/Conditional_Tags
+     */
+    
+    // bail if this is a 404
+    if ( is_404() ) return;
+    
+    // kick out if not CiviCRM
+    if (!$this->initialize()) {
+      return '';
+    }
+    
+    //add_filter( 'civicrm_in_wordpress', '__return_false' );
+
+    // CMW: why do we need this? Nothing that follows uses it...
+    require_once ABSPATH . WPINC . '/pluggable.php';
+
+    // let's do the_loop
+    // this has the effect of bypassing the logic in
+    // https://github.com/civicrm/civicrm-wordpress/pull/36
+    if ( have_posts() ) {
+      while ( have_posts() ) : the_post();
+        
+        global $post;
+        
+        ob_start(); // start buffering
+        $this->invoke(); // now, instead of echoing, base page output ends up in buffer
+        $this->basepage_markup = ob_get_clean(); // save the output and flush the buffer
+        
+        // override post title
+        global $civicrm_wp_title;
+        $post->post_title = $civicrm_wp_title;
+        
+        // disallow commenting
+        $post->comment_status = 'closed';
+        
+      endwhile;
+    }
+    
+    // reset loop
+    rewind_posts();
+    
+    // override page title
+    add_filter( 'wp_title', array( $this, 'basepage_title' ), 50, 3 );
+    
+    // include this content when base page is rendered
+    add_filter( 'the_content', array( $this, 'do_basepage' ) );
+
+    // hide the edit link
+    add_action( 'edit_post_link', array( $this, 'set_blank' ) );
+    
+    // why why why?
+    //add_action( 'wp', array( $this, 'turn_comments_off' ) );
+    //add_action( 'wp', array( $this, 'set_post_blank' ) );
+    
+    // flag that we have parsed the base page
+    $this->basepage_parsed = TRUE;
+    
+    // broadcast this as well
+    do_action( 'civicrm_basepage_parsed' );
+    
+    /*
+    // trace
+    print_r( 'handle_basepage' . "\n" ); //die();
+    print_r( 'title: ' . $civicrm_wp_title ); //die();
+    print_r( $this->basepage_markup ); die();
+    */
+    
+  }
+
+
+  /**
+   * Get CiviCRM base page content
+   * Callback method for 'the_content' hook, always called from WP front-end
+   *
+   * @param object $wp The WP object, present but not used
+   * @return void
+   */
+  public function do_basepage() {
+    
+    // hand back our base page markup
+    return $this->basepage_markup;
+  
+  }
+
+
+  /**
+   * Get CiviCRM base page title
+   * Callback method for 'wp_title' hook, always called from WP front-end
+   *
+   * @return str $title The title of the CiviCRM entity
+   */
+  public function basepage_title( $title, $sep, $seplocation ) {
+    
+    global $civicrm_wp_title;
+    
+    // Determines position of the separator and direction of the breadcrumb
+    if ( 'right' == $seplocation ) { // sep on right, so reverse the order
+      $title = $civicrm_wp_title . " $sep ";
+    } else {
+      $title = " $sep " . $civicrm_wp_title;
+    }
+    
+    return $title;
+  
+  }
 
 
   /**
