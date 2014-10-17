@@ -50,14 +50,17 @@
  */
 function civicrm_api3_contact_type_create($params) {
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__), array('name', 'parent_id'));
-  if (!array_key_exists('label', $params)) {
-    $params['label'] = $params['name'];
-  }
-  if (!array_key_exists('is_active', $params)) {
-    $params['is_active'] = TRUE;
+
+  if (empty($params['id'])) {
+    if (!array_key_exists('label', $params)) {
+      $params['label'] = $params['name'];
+    }
+    if (!array_key_exists('is_active', $params)) {
+      $params['is_active'] = TRUE;
+    }
+    $params['name'] = CRM_Utils_String::munge($params['name']);
   }
 
-  $params['name'] = CRM_Utils_String::munge($params['name']);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
