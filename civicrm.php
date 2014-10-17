@@ -250,7 +250,7 @@ class CiviCRM_For_WordPress {
         // snippet is set - i.e. ajax call
         // ical feed (unless 'html' is specified)
         // ajax and file download urls
-        ! $this->isPageRequest()
+        ! $this->is_page_request()
       ) {
         // from my limited understanding, putting this in the init hook allows civi to
         // echo all output and exit before the theme code outputs anything - lobo
@@ -717,7 +717,7 @@ class CiviCRM_For_WordPress {
     }
 
     // bail if this is called via a content-preprocessing plugin
-    if ( $this->isPageRequest() && !in_the_loop() && !is_admin() ) {
+    if ( $this->is_page_request() && !in_the_loop() && !is_admin() ) {
       return;
     }
     
@@ -1147,7 +1147,7 @@ class CiviCRM_For_WordPress {
    *
    * @return boolean True if request is for a CiviCRM page, false otherwise
    */
-  public function isPageRequest() {
+  public function is_page_request() {
     
     // kick out if not CiviCRM
     if (!$this->initialize()) {
