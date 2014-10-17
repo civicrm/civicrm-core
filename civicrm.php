@@ -2299,7 +2299,7 @@ function wp_set_breadcrumb( $breadCrumb ) {
  * Based on drush civicrm functionality, work done by Andy Walker
  * https://github.com/andy-walker/wp-cli-civicrm
  */
-
 if ( defined('WP_CLI') && WP_CLI ) {
-    include __DIR__ . '/wp-cli/civicrm.php';
+  // changed from __DIR__ because of possible symlink issues
+  include_once CIVICRM_PLUGIN_DIR . 'wp-cli/civicrm.php';
 }
