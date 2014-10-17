@@ -1377,7 +1377,7 @@ class CiviCRM_For_WordPress {
     add_filter( 'the_content', array( $this, 'do_basepage' ) );
 
     // hide the edit link
-    add_action( 'edit_post_link', array( $this, 'set_blank' ) );
+    add_action( 'edit_post_link', array( $this, 'clear_edit_post_link' ) );
     
     // why why why?
     //add_action( 'wp', array( $this, 'turn_comments_off' ) );
@@ -1481,7 +1481,7 @@ class CiviCRM_For_WordPress {
    *
    * @return string Always empty
    */
-  public function set_blank() {
+  public function clear_edit_post_link() {
     return '';
   }
 
@@ -2214,7 +2214,7 @@ function civicrm_initialize() {
  * Callback from 'edit_post_link' hook to remove edit link in civicrm_set_post_blank()
  */
 function civicrm_set_blank() {
-  return civi_wp()->set_blank();
+  return civi_wp()->clear_edit_post_link();
 }
 
 /**
