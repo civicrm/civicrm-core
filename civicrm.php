@@ -99,6 +99,11 @@ class CiviCRM_For_WordPress {
   static $in_wordpress;
 
 
+  // ---------------------------------------------------------------------------
+  // Setup
+  // ---------------------------------------------------------------------------
+
+
   /**
    * Getter method which returns the CiviCRM instance and optionally creates one 
    * if it does not already exist. Standard CiviCRM singleton pattern.
@@ -210,6 +215,11 @@ class CiviCRM_For_WordPress {
   }
 
 
+  // ---------------------------------------------------------------------------
+  // Hooks
+  // ---------------------------------------------------------------------------
+
+
   /**
    * Register hooks
    *
@@ -289,7 +299,7 @@ class CiviCRM_For_WordPress {
     add_action( 'deleted_user', array( $this, 'delete_user_ufmatch' ), 10, 1 );
     
     // register the CiviCRM shortcode
-    add_shortcode( 'civicrm', array( $this, 'shortcode_handler' ) );
+    add_shortcode( 'civicrm', array( $this, 'do_shortcode' ) );
     
   }
   
@@ -344,6 +354,11 @@ class CiviCRM_For_WordPress {
     add_action( 'wp_head', array( $this, 'wp_head' ) );
       
   }
+
+
+  // ---------------------------------------------------------------------------
+  // CiviCRM Initialisation
+  // ---------------------------------------------------------------------------
 
 
   /**
@@ -480,46 +495,16 @@ class CiviCRM_For_WordPress {
   }
 
 
-  /**
-   * Detect Ajax, snippet, or file requests
-   *
-   * @return boolean True if request is for a CiviCRM page, false otherwise
-   */
-  public function isPageRequest() {
-    
-    // kick out if not CiviCRM
-    if ( ! $this->initialize() ) { return; }
-
-    $argString = NULL;
-    $args = array();
-    if (isset( $_GET['q'])) {
-      $argString = trim($_GET['q']);
-      $args = explode('/', $argString);
-    }
-    $args = array_pad($args, 2, '');
-
-    // FIXME: It's not sustainable to hardcode a whitelist of all of non-HTML
-    // pages. Maybe the menu-XML should include some metadata to make this
-    // unnecessary?
-    if (CRM_Utils_Array::value('HTTP_X_REQUESTED_WITH', $_SERVER) == 'XMLHttpRequest'
-        || ($args[0] == 'civicrm' && in_array($args[1], array('ajax', 'file')) )
-        || !empty($_REQUEST['snippet'])
-        || strpos($argString, 'civicrm/event/ical') === 0 && empty($_GET['html'])
-        || strpos($argString, 'civicrm/contact/imagefile') === 0
-    ) {
-      return FALSE;
-    }
-    else {
-      return TRUE;
-    }
-  }
+  // ---------------------------------------------------------------------------
+  // CiviCRM Invocation (this outputs Civi's markup)
+  // ---------------------------------------------------------------------------
 
 
   /**
    * Invoke CiviCRM in a WordPress context
    * Callback function from add_menu_page()
    * Callback from WordPress 'init' and 'the_content' hooks
-   * Also called by get_shortcode_markup() and _civicrm_update_user()
+   * Also called by do_shortcode() and _civicrm_update_user()
    *
    * @return void
    */
@@ -666,6 +651,11 @@ class CiviCRM_For_WordPress {
   }
 
 
+  // ---------------------------------------------------------------------------
+  // Installation
+  // ---------------------------------------------------------------------------
+
+
   /**
    * Callback method for add_options_page() that runs the CiviCRM installer
    *
@@ -708,6 +698,31 @@ class CiviCRM_For_WordPress {
   }
 
 
+  // ---------------------------------------------------------------------------
+  // HTML head
+  // ---------------------------------------------------------------------------
+
+
+  /**
+   * Add CiviCRM core resources
+   *
+   * @return void
+   */
+  private function add_core_resources() {
+  
+    if (!$this->initialize()) {
+      return;
+    }
+        
+    $config = CRM_Core_Config::singleton();
+    $config->userFrameworkFrontend = TRUE;
+    
+    // add CiviCRM core resources
+    CRM_Core_Resources::singleton()->addCoreResources();
+    
+  }
+
+
   /**
    * Merge CiviCRM's HTML header with the WordPress theme's header
    * Callback from WordPress 'admin_head' and 'wp_head' hooks
@@ -728,6 +743,49 @@ class CiviCRM_For_WordPress {
     }
 
   }
+
+
+  // ---------------------------------------------------------------------------
+  // Buffering
+  // ---------------------------------------------------------------------------
+
+
+  /**
+   * Start buffering, called in register_hooks()
+   *
+   * @return void
+   */
+  public function buffer_start() {
+    ob_start( array( $this, 'buffer_callback' ) );
+  }
+
+
+  /**
+   * Flush buffer, callback for 'wp_footer'
+   *
+   * @return void
+   */
+  public function buffer_end() {
+    ob_end_flush();
+  }
+
+
+  /**
+   * Callback for ob_start() in buffer_start()
+   *
+   * @return string $buffer the markup
+   */
+  public function buffer_callback($buffer) {
+
+    // modify buffer here, and then return the updated code
+    return $buffer;
+
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // Shortcode Handling
+  // ---------------------------------------------------------------------------
 
 
   /**
@@ -844,61 +902,136 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Add CiviCRM core resources
+   * Handles CiviCRM-defined shortcodes
    *
-   * @return void
+   * @param array Shortcode attributes array
+   * @return string HTML for output
    */
-  private function add_core_resources() {
-  
-    if (!$this->initialize()) {
-      return;
+  public function do_shortcode( $atts ) {
+
+    extract( shortcode_atts( array(
+      'component' => 'contribution',
+      'action' => NULL,
+      'mode' => NULL,
+      'id' => NULL,
+      'cid' => NULL,
+      'gid' => NULL,
+      'cs' => NULL,
+      'force' => NULL,
+      ),
+      $atts
+    ) );
+
+    $args = array(
+      'reset' => 1,
+      'id'    => $id,
+      'force' => $force,
+    );
+
+    switch ( $component ) {
+
+      case 'contribution':
+
+        if ( $mode == 'preview' || $mode == 'test' ) {
+          $args['action'] = 'preview';
+        }
+        $args['q'] = 'civicrm/contribute/transact';
+        break;
+
+      case 'event':
+
+        switch ( $action ) {
+          case 'register':
+            $args['q'] = 'civicrm/event/register';
+            if ( $mode == 'preview' || $mode == 'test' ) {
+              $args['action'] = 'preview';
+            }
+            break;
+
+          case 'info':
+            $args['q'] = 'civicrm/event/info';
+            break;
+
+          default:
+            echo '<p>' . __( 'Do not know how to handle this shortcode', 'civicrm' ) . '</p>';
+            return;
+        }
+        break;
+
+      case 'user-dashboard':
+
+        $args['q'] = 'civicrm/user';
+        unset( $args['id'] );
+        break;
+
+      case 'profile':
+
+        if ($mode == 'edit') {
+          $args['q'] = 'civicrm/profile/edit';
+        }
+        elseif ($mode == 'view') {
+          $args['q'] = 'civicrm/profile/view';
+        }
+        elseif ($mode == 'search') {
+          $args['q'] = 'civicrm/profile';
+        }
+        else {
+          $args['q'] = 'civicrm/profile/create';
+        }
+        $args['gid'] = $gid;
+        break;
+
+
+      case 'petition':
+
+        $args['q'] = 'civicrm/petition/sign';
+        $args['sid'] = $args['id'];
+        unset($args['id']);
+        break;
+
+      default:
+
+        echo '<p>' . __( 'Do not know how to handle this shortcode', 'civicrm' ) . '</p>';
+        return;
+
     }
-        
-    $config = CRM_Core_Config::singleton();
-    $config->userFrameworkFrontend = TRUE;
+
+    foreach ( $args as $key => $value ) {
+      if ( $value !== NULL ) {
+        $_REQUEST[$key] = $_GET[$key] = $value;
+      }
+    }
+
+    // kick out if not CiviCRM
+    if ( ! $this->initialize() ) { return ''; }
+
+    $argString = NULL;
+    $args = array();
+    if (isset( $_GET['q'])) {
+      $argString = trim($_GET['q']);
+      $args = explode('/', $argString);
+    }
+    $args = array_pad($args, 2, '');
+
+    // check permission
+    if ( ! $this->check_permission( $args ) ) {
+      return $this->get_permission_denied();;
+    }
+
+    // CMW: why do we need this? Nothing that follows uses it...
+    require_once ABSPATH . WPINC . '/pluggable.php';
     
-    // add CiviCRM core resources
-    CRM_Core_Resources::singleton()->addCoreResources();
-    
-  }
-
-
-  /**
-   * Start buffering, called in register_hooks()
-   *
-   * @return void
-   */
-  public function buffer_start() {
-    ob_start( array( $this, 'buffer_callback' ) );
-  }
-
-
-  /**
-   * Flush buffer, callback for 'wp_footer'
-   *
-   * @return void
-   */
-  public function buffer_end() {
-    ob_end_flush();
-  }
-
-
-  /**
-   * Callback for ob_start() in buffer_start()
-   *
-   * @return string $buffer the markup
-   */
-  public function buffer_callback($buffer) {
-
-    // modify buffer here, and then return the updated code
-    return $buffer;
+    ob_start(); // start buffering
+    $this->invoke(); // now, instead of echoing, shortcode output ends up in buffer
+    $content = ob_get_clean(); // save the output and flush the buffer
+    return $content;
 
   }
 
 
   /**
    * CiviCRM's theme integration method
-   * Called by register_hooks() and shortcode_handler()
+   * Called by register_hooks() and do_shortcode()
    *
    * @return void
    */
@@ -934,15 +1067,14 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Build CiviCRM shortcode as HTML
-   * Called by shortcode_handler()
+   * Detect Ajax, snippet, or file requests
    *
-   * @return string $html The markup for the shortcode
+   * @return boolean True if request is for a CiviCRM page, false otherwise
    */
-  public function get_shortcode_markup() {
-
+  public function isPageRequest() {
+    
     // kick out if not CiviCRM
-    if ( ! $this->initialize() ) { return ''; }
+    if ( ! $this->initialize() ) { return; }
 
     $argString = NULL;
     $args = array();
@@ -952,19 +1084,20 @@ class CiviCRM_For_WordPress {
     }
     $args = array_pad($args, 2, '');
 
-    // check permission
-    if ( ! $this->check_permission( $args ) ) {
-      return $this->get_permission_denied();;
+    // FIXME: It's not sustainable to hardcode a whitelist of all of non-HTML
+    // pages. Maybe the menu-XML should include some metadata to make this
+    // unnecessary?
+    if (CRM_Utils_Array::value('HTTP_X_REQUESTED_WITH', $_SERVER) == 'XMLHttpRequest'
+        || ($args[0] == 'civicrm' && in_array($args[1], array('ajax', 'file')) )
+        || !empty($_REQUEST['snippet'])
+        || strpos($argString, 'civicrm/event/ical') === 0 && empty($_GET['html'])
+        || strpos($argString, 'civicrm/contact/imagefile') === 0
+    ) {
+      return FALSE;
     }
-
-    // CMW: why do we need this? Nothing that follows uses it...
-    require_once ABSPATH . WPINC . '/pluggable.php';
-    
-    ob_start(); // start buffering
-    $this->invoke(); // now, instead of echoing, shortcode output ends up in buffer
-    $content = ob_get_clean(); // save the output and flush the buffer
-    return $content;
-
+    else {
+      return TRUE;
+    }
   }
 
 
@@ -1293,113 +1426,6 @@ class CiviCRM_For_WordPress {
     }
 
     return $ctype;
-
-  }
-
-
-  /**
-   * Handles CiviCRM-defined shortcodes
-   *
-   * @param array Shortcode attributes array
-   * @return string HTML for output
-   */
-  public function shortcode_handler( $atts ) {
-
-    extract( shortcode_atts( array(
-      'component' => 'contribution',
-      'action' => NULL,
-      'mode' => NULL,
-      'id' => NULL,
-      'cid' => NULL,
-      'gid' => NULL,
-      'cs' => NULL,
-      'force' => NULL,
-      ),
-      $atts
-    ) );
-
-    $args = array(
-      'reset' => 1,
-      'id'    => $id,
-      'force' => $force,
-    );
-
-    switch ( $component ) {
-
-      case 'contribution':
-
-        if ( $mode == 'preview' || $mode == 'test' ) {
-          $args['action'] = 'preview';
-        }
-        $args['q'] = 'civicrm/contribute/transact';
-        break;
-
-      case 'event':
-
-        switch ( $action ) {
-          case 'register':
-            $args['q'] = 'civicrm/event/register';
-            if ( $mode == 'preview' || $mode == 'test' ) {
-              $args['action'] = 'preview';
-            }
-            break;
-
-          case 'info':
-            $args['q'] = 'civicrm/event/info';
-            break;
-
-          default:
-            echo '<p>' . __( 'Do not know how to handle this shortcode', 'civicrm' ) . '</p>';
-            return;
-        }
-        break;
-
-      case 'user-dashboard':
-
-        $args['q'] = 'civicrm/user';
-        unset( $args['id'] );
-        break;
-
-      case 'profile':
-
-        if ($mode == 'edit') {
-          $args['q'] = 'civicrm/profile/edit';
-        }
-        elseif ($mode == 'view') {
-          $args['q'] = 'civicrm/profile/view';
-        }
-        elseif ($mode == 'search') {
-          $args['q'] = 'civicrm/profile';
-        }
-        else {
-          $args['q'] = 'civicrm/profile/create';
-        }
-        $args['gid'] = $gid;
-        break;
-
-
-      case 'petition':
-
-        $args['q'] = 'civicrm/petition/sign';
-        $args['sid'] = $args['id'];
-        unset($args['id']);
-        break;
-
-      default:
-
-        echo '<p>' . __( 'Do not know how to handle this shortcode', 'civicrm' ) . '</p>';
-        return;
-
-    }
-
-    foreach ( $args as $key => $value ) {
-      if ( $value !== NULL ) {
-        $_REQUEST[$key] = $_GET[$key] = $value;
-      }
-    }
-
-    // call wp_frontend with $shortcode param
-    return $this->get_shortcode_markup();
 
   }
 
