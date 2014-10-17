@@ -819,15 +819,40 @@ class CiviCRM_For_WordPress {
   /**
    * Return a generic display instead of a CiviCRM invocation
    *
-   * @param $content The content to parse
-   * @return mixed Array of shortcodes or FALSE if none exist
+   * @param int $post_id The containing WordPress post ID
+   * @return str $markup Generic markup for multiple instances
    */
-  private function invoke_multiple() {
+  private function invoke_multiple( $post_id = FALSE ) {
     
-    // init markup
-    $markup = __( 'Already invoked', 'civicrm' );
+    // sanity check
+    if ( ! $post_id ) return '';
     
-    return $markup;
+    // init markup with a container
+    $markup = '<div class="crm-container crm-public">';
+    
+    $markup .= '<h2>' . __( 'Content via CiviCRM', 'civicrm' ) . '</h2>';
+    
+    $markup .= '<p>' . sprintf(
+      __( 'To view this content, <a href="%s">visit the entry</a>.', 'civicrm' ),
+      get_permalink( $post_id )
+    ) . '</p>';
+    
+    // let's have a footer
+    $markup .= '<div class="crm-public-footer">';
+    $civi = __( 'CiviCRM.org - Growing and Sustaining Relationships', 'civicrm' );
+    $logo = '<div class="empowered-by-logo"><span>CiviCRM</span></div>';
+    $markup .= sprintf( 
+      __( 'Empowered by <a href="http://civicrm.org/" title="%s" target="_blank" class="empowered-by-link">%s</a>', 'civicrm' ),
+      $civi,
+      $logo
+    );
+    $markup .= '</div>';
+    
+    // close container
+    $markup .= '</div>';
+    
+    // allow plugins to override
+    return apply_filters( 'civicrm_invoke_multiple', $markup, $post_id );
     
   }
 
@@ -941,7 +966,7 @@ class CiviCRM_For_WordPress {
         // let's add dummy markup
         foreach( $this->shortcodes AS $post_id => $shortcode_array ) {
           foreach( $shortcode_array AS $shortcode ) {
-            $this->shortcode_markup[$post_id][] = $this->invoke_multiple();
+            $this->shortcode_markup[$post_id][] = $this->invoke_multiple( $post_id );
           }
         }
         
