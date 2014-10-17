@@ -1040,14 +1040,6 @@ class CiviCRM_For_WordPress {
         foreach( $this->shortcodes AS $post_id => $shortcode_array ) {
           foreach( $shortcode_array AS $shortcode ) {
             
-            /*
-            // check to see if a shortcode component has been repeated?
-            $text = str_replace( '[civicrm ', '', $shortcode );
-            $text = str_replace( ']', '', $text );
-            $atts = shortcode_parse_atts( $text );
-            print_r( $atts );
-            */
-            
             $this->shortcode_markup[$post_id][] = $this->invoke_multiple( $post_id );
             
           }
@@ -1062,11 +1054,42 @@ class CiviCRM_For_WordPress {
           
             global $post;
             
+            // is this the post?
+            if ( ! array_key_exists( $post->ID, $this->shortcodes ) ) {
+              continue;
+            }
+            
             // the shortcode must be the first item in the shortcodes array
             $shortcode = $this->shortcodes[$post->ID][0];
             
+            // check to see if a shortcode component has been repeated?
+            $text = str_replace( '[civicrm ', '', $shortcode );
+            $text = str_replace( ']', '', $text );
+            $atts = shortcode_parse_atts( $text );
+            //print_r( $atts );
+            
+            // test for hijacking
+            if ( isset( $atts['hijack'] ) AND $atts['hijack'] == '1' ) {
+              add_filter( 'civicrm_context', array( $this, 'shortcode_context' ) );
+            }
+            
             // store corresponding markup
             $this->shortcode_markup[$post->ID][] = do_shortcode( $shortcode );
+            
+            // test for hijacking
+            if ( isset( $atts['hijack'] ) AND $atts['hijack'] == '1' ) {
+              
+              // ditch the filter
+              remove_filter( 'civicrm_context', array( $this, 'shortcode_context' ) );
+              
+              // set title
+              global $civicrm_wp_title;
+              $post->post_title = $civicrm_wp_title;
+              
+              // overwrite content
+              add_filter( 'the_content', array( $this, 'shortcode_content' ) );
+              
+            }
             
           endwhile;
         }
@@ -1089,6 +1112,31 @@ class CiviCRM_For_WordPress {
     //print_r( $this->shortcodes );
     //print_r( $this->shortcode_markup ); die();
     
+  }
+
+
+  /**
+   * In order to hijack the page, we need to override the context
+   *
+   * @return str Overridden context code
+   */
+  public function shortcode_context() {
+    return 'nonpage';
+  }
+
+
+  /**
+   * In order to hijack the page, we need to override the content
+   *
+   * @return str Overridden context code
+   */
+  public function shortcode_content( $content ) {
+  	global $post;
+    // is this the post?
+    if ( ! array_key_exists( $post->ID, $this->shortcode_markup ) ) {
+      return $content;
+    }
+    return $this->shortcode_markup[$post->ID][0];
   }
 
 
@@ -2118,6 +2166,11 @@ class CiviCRM_For_WordPress {
               </span>
 
               <div style="padding:8px 0 0 0; font-size:11px; font-style:italic; color:#5A5A5A"><?php _e( "Can't find your form? Make sure it is active.", 'civicrm' ); ?></div>
+              <div style="padding:8px 0 0 0; line-height: 1.6;">
+                <?php _e( 'If you only insert one shortcode, you can choose to override all page content with the content of the shortcode.', 'civicrm' ); ?><br/>
+                <input type="radio" name="hijack-page" value="0" checked="checked"/> <?php _e( 'Override page content', 'civicrm' ); ?>
+                <input type="radio" name="hijack-page" value="1" /> <?php _e( "Don't override", 'civicrm' ); ?>
+              </div>
             </div>
             <div style="padding:15px;">
               <input type="button" class="button-primary" value="Insert Form" id="crm-wp-insert-shortcode"/>&nbsp;&nbsp;&nbsp;

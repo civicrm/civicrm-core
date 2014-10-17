@@ -29,6 +29,7 @@ jQuery(function ($) {
         shortcode += ' id="' + $("#add_petition_id").val() + '"';
         break;
     }
+    shortcode += ' hijack="' + $("input[name='hijack-page']:checked").val() + '"';
     shortcode += ']';
     window.send_to_editor(shortcode);
   });
