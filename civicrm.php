@@ -875,44 +875,6 @@ class CiviCRM_For_WordPress {
 
 
   // ---------------------------------------------------------------------------
-  // Buffering
-  // ---------------------------------------------------------------------------
-
-
-  /**
-   * Start buffering, called in register_hooks()
-   *
-   * @return void
-   */
-  public function buffer_start() {
-    ob_start( array( $this, 'buffer_callback' ) );
-  }
-
-
-  /**
-   * Flush buffer, callback for 'wp_footer'
-   *
-   * @return void
-   */
-  public function buffer_end() {
-    ob_end_flush();
-  }
-
-
-  /**
-   * Callback for ob_start() in buffer_start()
-   *
-   * @return string $buffer the markup
-   */
-  public function buffer_callback($buffer) {
-
-    // modify buffer here, and then return the updated code
-    return $buffer;
-
-  }
-
-
-  // ---------------------------------------------------------------------------
   // Shortcode Handling
   // ---------------------------------------------------------------------------
 
