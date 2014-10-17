@@ -2174,8 +2174,8 @@ class CiviCRM_For_WordPress {
               <div style="padding:8px 0 0 0; font-size:11px; font-style:italic; color:#5A5A5A"><?php _e( "Can't find your form? Make sure it is active.", 'civicrm' ); ?></div>
               <div style="padding:8px 0 0 0; line-height: 1.6;">
                 <?php _e( 'If you only insert one shortcode, you can choose to override all page content with the content of the shortcode.', 'civicrm' ); ?><br/>
-                <input type="radio" name="hijack-page" value="0" checked="checked"/> <?php _e( 'Override page content', 'civicrm' ); ?>
-                <input type="radio" name="hijack-page" value="1" /> <?php _e( "Don't override", 'civicrm' ); ?>
+                <input type="radio" name="hijack-page" value="1" checked="checked"/> <?php _e( 'Override page content', 'civicrm' ); ?>
+                <input type="radio" name="hijack-page" value="0" /> <?php _e( "Don't override", 'civicrm' ); ?>
               </div>
             </div>
             <div style="padding:15px;">
