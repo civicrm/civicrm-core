@@ -261,20 +261,8 @@ class CiviCRM_For_WordPress {
         
       }
       
-      // merge CiviCRM's HTML header with the WordPress theme's header
-      add_action( 'wp_head', array( $this, 'wp_head' ) );
-      
-      // why why why?
-      add_action( 'wp', array( $this, 'turn_comments_off' ) );
-      add_action( 'wp', array( $this, 'set_post_blank' ) );
-    
-      // output buffer in footer
-      add_action( 'wp_footer', array( $this, 'buffer_end' ) );
-      
-      // we do this here rather than as an action, since we don't control the order
-      $this->buffer_start();
-      $this->wp_frontend();
-        
+      // if we get here, we must be in a wpBasePage context
+      $this->register_basepage_hooks();
       return;
     
     }
@@ -341,6 +329,40 @@ class CiviCRM_For_WordPress {
       }
     }
     
+  }
+
+
+  /**
+   * Register hooks to handle CiviCRM in a WordPress wpBasePage context
+   *
+   * @return void
+   */
+  public function register_basepage_hooks() {
+    
+    // merge CiviCRM's HTML header with the WordPress theme's header
+    add_action( 'wp_head', array( $this, 'wp_head' ) );
+      
+    // why why why?
+    add_action( 'wp', array( $this, 'turn_comments_off' ) );
+    add_action( 'wp', array( $this, 'set_post_blank' ) );
+    
+    // kick out if not CiviCRM
+    if (!$this->initialize()) {
+      return;
+    }
+    
+    // check permission
+    if ( ! $this->check_permission( $this->get_permission_args() ) ) {
+      add_filter( 'the_content', array( $this, 'get_permission_denied' ) );
+      return;
+    }
+
+    // CMW: why do we need this? Nothing that follows uses it...
+    require_once ABSPATH . WPINC . '/pluggable.php';
+
+    // see comments on set_post_blank()
+    add_filter( 'the_content', array( $this, 'invoke' ) );
+
   }
 
 
@@ -1102,34 +1124,6 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * CiviCRM's theme integration method
-   * Called by register_hooks()
-   *
-   * @return void
-   */
-  public function wp_frontend( $shortcode = FALSE ) {
-
-    // kick out if not CiviCRM
-    if (!$this->initialize()) {
-      return;
-    }
-    
-    // check permission
-    if ( ! $this->check_permission( $this->get_permission_args() ) ) {
-      add_filter( 'the_content', array( $this, 'get_permission_denied' ) );
-      return;
-    }
-
-    // CMW: why do we need this? Nothing that follows uses it...
-    require_once ABSPATH . WPINC . '/pluggable.php';
-
-    // see comments on set_post_blank()
-    add_filter( 'the_content', array( $this, 'invoke' ) );
-
-  }
-
-
-  /**
    * Detect Ajax, snippet, or file requests
    *
    * @return boolean True if request is for a CiviCRM page, false otherwise
@@ -1274,7 +1268,7 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Authentication function used by wp_frontend()
+   * Authentication function used by register_basepage_hooks()
    *
    * @return bool True if authenticated, false otherwise
    */
@@ -1304,7 +1298,7 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Called when authentication fails in wp_frontend()
+   * Called when authentication fails in register_basepage_hooks()
    *
    * @return string Warning message
    */
