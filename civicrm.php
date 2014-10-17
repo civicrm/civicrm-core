@@ -1086,6 +1086,9 @@ class CiviCRM_For_WordPress {
               global $civicrm_wp_title;
               $post->post_title = $civicrm_wp_title;
               
+              // override page title
+              add_filter( 'wp_title', array( $this, 'override_page_title' ), 50, 3 );
+    
               // overwrite content
               add_filter( 'the_content', array( $this, 'shortcode_content' ) );
               
@@ -1368,7 +1371,7 @@ class CiviCRM_For_WordPress {
     rewind_posts();
     
     // override page title
-    add_filter( 'wp_title', array( $this, 'basepage_title' ), 50, 3 );
+    add_filter( 'wp_title', array( $this, 'override_page_title' ), 50, 3 );
     
     // include this content when base page is rendered
     add_filter( 'the_content', array( $this, 'do_basepage' ) );
@@ -1412,13 +1415,16 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Get CiviCRM base page title
+   * Override a WordPress page title with the CiviCRM entity title
    * Callback method for 'wp_title' hook, always called from WP front-end
    *
    * @return str $title The title of the CiviCRM entity
    */
-  public function basepage_title( $title, $sep, $seplocation ) {
+  public function override_page_title( $title, $sep, $seplocation ) {
     
+    // only on singular pages
+    if ( ! is_singular() ) return $title;
+
     global $civicrm_wp_title;
     
     // Determines position of the separator and direction of the breadcrumb
