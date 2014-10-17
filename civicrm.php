@@ -98,6 +98,12 @@ class CiviCRM_For_WordPress {
   // plugin context
   static $in_wordpress;
 
+  // init property to store shortcodes
+  public $shortcodes = array();
+    
+  // init property to store shortcode markup
+  public $shortcode_markup = array();
+    
 
   // ---------------------------------------------------------------------------
   // Setup
@@ -339,17 +345,17 @@ class CiviCRM_For_WordPress {
    */
   public function register_basepage_hooks() {
     
-    // merge CiviCRM's HTML header with the WordPress theme's header
-    add_action( 'wp_head', array( $this, 'wp_head' ) );
-      
-    // why why why?
-    add_action( 'wp', array( $this, 'turn_comments_off' ) );
-    add_action( 'wp', array( $this, 'set_post_blank' ) );
-    
     // kick out if not CiviCRM
     if (!$this->initialize()) {
       return;
     }
+    
+    // merge CiviCRM's HTML header with the WordPress theme's header
+    add_action( 'wp_head', array( $this, 'wp_head' ) );
+      
+    // why why why?
+    //add_action( 'wp', array( $this, 'turn_comments_off' ) );
+    //add_action( 'wp', array( $this, 'set_post_blank' ) );
     
     // check permission
     if ( ! $this->check_permission( $this->get_permission_args() ) ) {
@@ -737,7 +743,7 @@ class CiviCRM_For_WordPress {
 
     static $alreadyInvoked = FALSE;
     if ( $alreadyInvoked ) {
-      echo __( 'Already invoked', 'civicrm' );
+      echo $this->invoke_multiple();
       return;
     }
 
@@ -807,6 +813,22 @@ class CiviCRM_For_WordPress {
     // notify plugins
     do_action( 'civicrm_invoked' );
 
+  }
+
+
+  /**
+   * Return a generic display instead of a CiviCRM invocation
+   *
+   * @param $content The content to parse
+   * @return mixed Array of shortcodes or FALSE if none exist
+   */
+  private function invoke_multiple() {
+    
+    // init markup
+    $markup = __( 'Already invoked', 'civicrm' );
+    
+    return $markup;
+    
   }
 
 
@@ -912,9 +934,9 @@ class CiviCRM_For_WordPress {
     // bail if this is a 404
     if ( is_404() ) return;
     
-    // init property to store shortcode markup
-    $this->shortcode_markup = array();
-      
+    // a counter's useful
+    $shortcodes_present = 0;
+    
     // let's loop through the results
     // this also has the effect of bypassing the logic in
     // https://github.com/civicrm/civicrm-wordpress/pull/36
@@ -934,26 +956,67 @@ class CiviCRM_For_WordPress {
             
           }
           
-          // get shortcodes
-          $shortcodes = $this->get_shortcodes( $post->post_content );
+          // get CiviCRM shortcodes in this post
+          $this->shortcodes[$post->ID] = $this->get_shortcodes( $post->post_content );
           
-          // add the to a property
-          foreach( $shortcodes AS $shortcode ) {      
-            $this->shortcode_markup[$post->ID][] = do_shortcode( $shortcode );
-          }
-          
-          // flag that we have a shortcode present
-          $this->shortcode_present = TRUE;
+          // bump shortcode counter
+          $shortcodes_present += count( $this->shortcodes[$post->ID] );
           
         }
         
       endwhile;
     }
-
-    // reset loop so it runs again in the template
+    
+    // reset loop
     rewind_posts();
     
+    // did we get any?
+    if ( $shortcodes_present ) {
+      
+      // how should we handle multiple shortcodes?
+      if ( $shortcodes_present > 1 ) {
+        
+        // let's add dummy markup
+        foreach( $this->shortcodes AS $post_id => $shortcode_array ) {
+          foreach( $shortcode_array AS $shortcode ) {
+            $this->shortcode_markup[$post_id][] = $this->invoke_multiple();
+          }
+        }
+        
+      } else {
+        
+        // since we have only one shortcode, run the_loop again
+        // the DB query has already been done, so this has no significant impact
+        if ( have_posts() ) {
+          while ( have_posts() ) : the_post();
+          
+            global $post;
+            
+            // the shortcode must be the first item in the shortcodes array
+            $shortcode = $this->shortcodes[$post->ID][0];
+            
+            // store corresponding markup
+            $this->shortcode_markup[$post->ID][] = do_shortcode( $shortcode );
+            
+          endwhile;
+        }
+        
+        // reset loop
+        rewind_posts();
+    
+      }
+      
+    }
+      
+    // flag that we have parsed shortcodes
+    $this->shortcodes_parsed = TRUE;
+    
+    // broadcast this as well
+    do_action( 'civicrm_shortcodes_parsed' );
+  
     // trace
+    //print_r( 'shortcodes_present: ' . $shortcodes_present ."\n" );
+    //print_r( $this->shortcodes );
     //print_r( $this->shortcode_markup ); die();
     
   }
@@ -983,7 +1046,7 @@ class CiviCRM_For_WordPress {
       $keys = array_keys( $matches[2], 'civicrm' );
       
       foreach( $keys AS $key ) {
-      	$shortcodes[] = $matches[0][$key];
+        $shortcodes[] = $matches[0][$key];
       }
       
       return $shortcodes;
@@ -1003,7 +1066,20 @@ class CiviCRM_For_WordPress {
    * @return string HTML for output
    */
   public function do_shortcode( $atts ) {
-
+    
+    // check if we've already parsed this shortcode
+    global $post;
+    if ( is_object($post) ) {
+      if ( !empty( $this->shortcode_markup ) ) {
+        if ( isset( $this->shortcode_markup[$post->ID] ) ) {
+          
+          // this shortcode must have been done
+          return $this->shortcode_markup[$post->ID][0];
+          
+        }
+      }
+    }
+    
     extract( shortcode_atts( array(
       'component' => 'contribution',
       'action' => NULL,
@@ -1045,6 +1121,7 @@ class CiviCRM_For_WordPress {
 
           case 'info':
             $args['q'] = 'civicrm/event/info';
+            $_REQUEST['page'] = $_GET['page'] = 'CiviCRM';
             break;
 
           default:
@@ -1303,7 +1380,7 @@ class CiviCRM_For_WordPress {
    * @return string Warning message
    */
   public function get_permission_denied() {
-    return __( 'You do not have permission to execute this url.', 'civicrm' );
+    return __( 'You do not have permission to access this content.', 'civicrm' );
   }
 
 
