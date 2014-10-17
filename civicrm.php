@@ -95,8 +95,11 @@ class CiviCRM_For_WordPress {
   // plugin instance
   private static $instance;
 
-  // plugin context
+  // plugin context (broad)
   static $in_wordpress;
+
+  // plugin context (specific)
+  static $context;
 
   // init property to store shortcodes
   public $shortcodes = array();
@@ -236,6 +239,48 @@ class CiviCRM_For_WordPress {
   }
 
 
+  /**
+   * Setter for determining how CiviCRM is currently being displayed in WordPress.
+   * This can be one of the following contexts:
+   *
+   * (a) in the WordPress back-end
+   * (b) when CiviCRM content is being displayed on the front-end via wpBasePage
+   * (c) when a "non-page" request is made to CiviCRM
+   * (d) when CiviCRM is called via a shortcode
+   *
+   * The following codes correspond to the different contexts
+   *
+   * (a) 'admin'
+   * (b) 'basepage'
+   * (c) 'nonpage'
+   * (d) 'shortcode'
+   *
+   * @param $context One of the four context codes above
+   * @return void
+   */
+  public function civicrm_context_set( $context ) {
+
+    // store
+    self::$context = $context;
+
+  }
+
+
+  /**
+   * Getter for determining how CiviCRM is currently being displayed in WordPress.
+   *
+   * @see $this->civicrm_context_set()
+   *
+   * @return str $context The context in which Civi is displayed in WordPress
+   */
+  public function civicrm_context_get() {
+
+    // already stored
+    return apply_filters( 'civicrm_context', self::$context );
+
+  }
+
+
   // ---------------------------------------------------------------------------
   // Hooks
   // ---------------------------------------------------------------------------
@@ -254,6 +299,9 @@ class CiviCRM_For_WordPress {
     // when in WordPress admin...
     if ( is_admin() ) {
 
+      // set context
+      $this->civicrm_context_set( 'admin' );
+      
       // handle WP admin context
       $this->register_admin_hooks();
       return;
@@ -276,17 +324,26 @@ class CiviCRM_For_WordPress {
        */
       if ( ! $this->is_page_request() ) {
         
+        // set context
+        $this->civicrm_context_set( 'nonpage' );
+      
         // echo all output and exit
         $this->invoke();
         die();
         
       }
       
+      // set context
+      $this->civicrm_context_set( 'basepage' );
+      
       // if we get here, we must be in a wpBasePage context
       $this->register_basepage_hooks();
       return;
     
     }
+      
+    // set context
+    $this->civicrm_context_set( 'shortcode' );
       
     // that leaves us with handling shortcodes, should they exist
     $this->register_shortcode_hooks();
@@ -982,7 +1039,17 @@ class CiviCRM_For_WordPress {
         // let's add dummy markup
         foreach( $this->shortcodes AS $post_id => $shortcode_array ) {
           foreach( $shortcode_array AS $shortcode ) {
+            
+            /*
+            // check to see if a shortcode component has been repeated?
+            $text = str_replace( '[civicrm ', '', $shortcode );
+            $text = str_replace( ']', '', $text );
+            $atts = shortcode_parse_atts( $text );
+            print_r( $atts );
+            */
+            
             $this->shortcode_markup[$post_id][] = $this->invoke_multiple( $post_id );
+            
           }
         }
         
