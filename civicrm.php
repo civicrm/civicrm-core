@@ -245,17 +245,20 @@ class CiviCRM_For_WordPress {
       // add core resources for front end
       $this->add_core_resources( TRUE );
       
-      // output civicrm html only in a few cases and skip WP templating
-      if (
-        // snippet is set - i.e. ajax call
-        // ical feed (unless 'html' is specified)
-        // ajax and file download urls
-        ! $this->is_page_request()
-      ) {
-        // from my limited understanding, putting this in the init hook allows civi to
-        // echo all output and exit before the theme code outputs anything - lobo
+      /**
+       * Directly output CiviCRM html only in a few cases and skip WP templating:
+       *
+       * (a) when a snippet is set
+       * (b) when there is an AJAX call
+       * (c) for an iCal feed (unless 'html' is specified)
+       * (d) for file download URLs
+       */
+      if ( ! $this->is_page_request() ) {
+        
+        // echo all output and exit
         $this->invoke();
         die();
+        
       }
       
       // merge CiviCRM's HTML header with the WordPress theme's header
@@ -1077,14 +1080,9 @@ class CiviCRM_For_WordPress {
       return '';
     }
 
-    $argString = NULL;
-    $args = array();
-    if (isset( $_GET['q'])) {
-      $argString = trim($_GET['q']);
-      $args = explode('/', $argString);
-    }
-    $args = array_pad($args, 2, '');
-
+    // get permission args
+    $args = $this->get_permission_args();
+    
     // check permission
     if ( ! $this->check_permission( $args ) ) {
       return $this->get_permission_denied();;
@@ -1118,15 +1116,10 @@ class CiviCRM_For_WordPress {
     if (!$this->initialize()) {
       return;
     }
-
-    $argString = NULL;
-    $args = array();
-    if (isset( $_GET['q'])) {
-      $argString = trim($_GET['q']);
-      $args = explode('/', $argString);
-    }
-    $args = array_pad($args, 2, '');
-
+    
+    // get permission args
+    $args = $this->get_permission_args();
+    
     // check permission
     if ( ! $this->check_permission( $args ) ) {
       add_filter( 'the_content', array( $this, 'get_permission_denied' ) );
@@ -1266,6 +1259,26 @@ class CiviCRM_For_WordPress {
   // ---------------------------------------------------------------------------
   // User-related methods
   // ---------------------------------------------------------------------------
+
+
+  /**
+   * Get permission arguments
+   *
+   * @return array $args Permission arguments
+   */
+  private function get_permission_args() {
+  
+    $argString = NULL;
+    $args = array();
+    if (isset( $_GET['q'])) {
+      $argString = trim($_GET['q']);
+      $args = explode('/', $argString);
+    }
+    $args = array_pad($args, 2, '');
+    
+    return $args;
+    
+  }
 
 
   /**
