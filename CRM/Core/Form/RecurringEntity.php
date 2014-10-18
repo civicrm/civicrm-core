@@ -425,7 +425,7 @@ class CRM_Core_Form_RecurringEntity {
             }
           }
           // lets delete current entity from recurring-entity table, which is going to be a new parent
-          CRM_Core_BAO_RecurringEntity::delEntity($params['entity_id'], $params['entity_table']);
+          CRM_Core_BAO_RecurringEntity::delEntity($params['entity_id'], $params['entity_table'], TRUE);
         }
 
         $recursion = new CRM_Core_BAO_RecurringEntity();
