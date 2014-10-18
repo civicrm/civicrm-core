@@ -53,6 +53,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   protected $recursion = NULL;
   
   public static $_entitiesToBeDeleted = array();
+
+  public static $status = NULL;
   
   static $_recurringEntityHelper = 
     array(
@@ -239,6 +241,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @return array
    */
   function generateEntities() {
+    self::$status = "Running"; 
+
     $newEntities  = array();
     $findCriteria = array();
     if (!empty($this->recursionDates)) {
@@ -292,6 +296,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       }
     }
 
+    self::$status = NULL;
     return $newEntities;
   }
 
@@ -620,6 +625,11 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     
     if (array_key_exists($key, $processedEntities)) {
       // already being processed. Exit recursive calls.
+      return NULL;
+    }
+
+    if (self::$status == 'Running') {
+      // if recursion->generate() is doing some work, lets not intercept
       return NULL;
     }
 
