@@ -23,6 +23,19 @@
     return $('input.select-row:checked', form).length;
   }
 
+  function clearSelections(e) {
+    if (selected) {
+      var $form = $(this).closest('form');
+      $('input.select-row, input.select-rows', $form).prop('checked', false).closest('tr').removeClass('crm-row-selected');
+      if (usesAjax()) {
+        phoneHome(false, $(this));
+      } else {
+        selected = 0;
+        displayCount();
+      }
+    }
+  }
+
   function usesAjax() {
     return $(form).hasClass('crm-ajax-selection-form');
   }
@@ -31,7 +44,7 @@
   function phoneHome(single, $el, event) {
     var url = CRM.url('civicrm/ajax/markSelection');
     var params = {qfKey: 'civicrm search ' + $('input[name=qfKey]', form).val()};
-    if (!$el.is(':checked')) {
+    if (!$el.is(':checked') || $el.is('input[name=radio_ts][value=ts_all]')) {
       params.action = 'unselect';
       params.state = 'unchecked';
     }
@@ -45,7 +58,7 @@
         $("input.select-row, input.select-rows", form).prop('checked', false).closest('tr').removeClass('crm-row-selected');
       }
       // Master checkbox
-      else {
+      else if ($el.hasClass('select-rows')) {
         params.name = $('input.select-row').map(function() {return $(this).attr('id')}).get().join('-');
       }
     }
@@ -90,6 +103,7 @@
       clearTaskMenu();
       enableTaskMenu();
     })
+    .on('click', 'input[name=radio_ts][value=ts_all]', clearSelections)
     // When making a selection
     .on('click', 'input.select-row, input.select-rows, a.crm-selection-reset', function(event) {
       var $el = $(this),
