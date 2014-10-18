@@ -342,6 +342,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
     $this->assign('location', $values['location']);
 
+    if (CRM_Core_Permission::check('access CiviEvent')) {
+      $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME, 'enable_cart');
+      $this->assign('manageEventLinks', CRM_Event_Page_ManageEvent::tabs($enableCart));
+    }
+
     return parent::run();
   }
 
