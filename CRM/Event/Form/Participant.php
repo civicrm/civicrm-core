@@ -1231,6 +1231,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
       $this->_params['amount_level'] = $params['amount_level'];
       $this->_params['currencyID'] = $config->defaultCurrency;
       $this->_params['payment_action'] = 'Sale';
+      $this->_params['description'] = ts('Office Event Cretit Card contribution');
       $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
 
       // at this point we've created a contact and stored its address etc
