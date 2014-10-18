@@ -23,10 +23,11 @@ UPDATE civicrm_state_province SET name = 'Keelung City'     WHERE id = 4864;
 
 -- Create additional Taiwan provinces
 SELECT @country_id := id from civicrm_country where name = 'Taiwan';
-INSERT INTO civicrm_state_province ( country_id, abbreviation, name ) VALUES
+INSERT IGNORE INTO civicrm_state_province ( country_id, abbreviation, name ) VALUES
 ( @country_id, 'TXG', 'Taichung City'  ),
 ( @country_id, 'KHH', 'Kaohsiung City' ),
 ( @country_id, 'TPE', 'Taipei City'    ),
 ( @country_id, 'CYI', 'Chiayi City'    ),
 ( @country_id, 'HSZ', 'Hsinchu City'   ),
 ( @country_id, 'TNN', 'Tainan City'    );
+

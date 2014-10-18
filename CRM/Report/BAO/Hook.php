@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 /**
  * Report hooks that allow extending a particular report.
- * Example: Adding new tables to log reports 
+ * Example: Adding new tables to log reports
  */
 class CRM_Report_BAO_Hook {
 
@@ -72,19 +72,29 @@ class CRM_Report_BAO_Hook {
     return $this->_queryObjects;
   }
 
+  /**
+   * @param $reportObj
+   * @param $logTables
+   */
   public function alterLogTables(&$reportObj, &$logTables) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->alterLogTables($reportObj, $logTables);
     }
   }
 
+  /**
+   * @param $reportObj
+   * @param $table
+   *
+   * @return array
+   */
   public function logDiffClause(&$reportObj, $table) {
     $contactIdClause = $join = '';
     foreach (self::getSearchQueryObjects() as $obj) {
       list($cidClause, $joinClause) = $obj->logDiffClause($reportObj, $table);
-      if ($joinClause) 
+      if ($joinClause)
         $join .= $joinClause;
-      if ($cidClause) 
+      if ($cidClause)
         $contactIdClause .= $cidClause;
     }
     return array($contactIdClause, $join);

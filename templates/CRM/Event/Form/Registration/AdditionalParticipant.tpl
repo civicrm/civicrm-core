@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,6 +41,8 @@
     </div>
 {/if}
 
+{include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
+
 {if $priceSet && $allowGroupOnWaitlist}
     {include file="CRM/Price/Form/ParticipantCount.tpl"}
     <div id="waiting-status" style="display:none;" class="messages status no-popup"></div>
@@ -64,14 +66,6 @@
     {/if}
 {/if}
 
-{assign var=n value=email-$bltID}
-<table class="form-layout-compressed">
-    <tr>
-        <td class="label nowrap">{$form.$n.label}</td><td>{$form.$n.html}</td>
-    </tr>
-</table>
-
-{include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
 {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost}
 
 <div id="crm-submit-buttons">
@@ -85,7 +79,7 @@
 
 function allowGroupOnWaitlist( participantCount, currentCount )
 {
-  var formId          = {/literal}'{$formId}'{literal};
+  var formId          = {/literal}'{$formName}'{literal};
   var waitingMsg      = {/literal}'{$waitingMsg}'{literal};
   var confirmedMsg    = {/literal}'{$confirmedMsg}'{literal};
   var paymentBypassed = {/literal}'{$paymentBypassed}'{literal};

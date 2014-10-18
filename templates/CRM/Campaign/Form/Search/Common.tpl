@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,10 +49,10 @@
 
           {if $showInterviewer}
             <td class="font-size12pt">
-              {$form.survey_interviewer_name.label}
+              {$form.survey_interviewer_id.label}
             </td>
             <td class="font-size12pt ">
-              {$form.survey_interviewer_name.html}
+              {$form.survey_interviewer_id.html}
             </td>
           {/if}
 
@@ -156,32 +156,13 @@
 {literal}
 <script type="text/javascript">
 
-  cj(function() {
-    cj().crmAccordions();
-
+  CRM.$(function($) {
     {/literal}
     {if !$isFormSubmitted}
       buildCampaignGroups( );
     {/if}
     {literal}
   });
-
-//load interviewer autocomplete.
-var interviewerDataUrl = "{/literal}{$dataUrl}{literal}";
-var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing contact.{/ts}{literal}";
-cj( "#survey_interviewer_name" ).autocomplete( interviewerDataUrl,
-  { width : 256,
-    selectFirst : false,
-    hintText: hintText,
-    matchContains: true,
-    minChars: 1
-  }
-).result( function( event, data, formatted ) {
-    cj( "#survey_interviewer_id" ).val( data[1] );
-  }).bind( 'click', function( ) {
-    cj( "#survey_interviewer_id" ).val('');
-  });
-
 
 function buildCampaignGroups( surveyId ) {
   if ( !surveyId ) surveyId = cj("#campaign_survey_id").val( );

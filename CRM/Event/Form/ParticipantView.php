@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,8 @@
  *
  */
 class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * Function to set variables up before form is built
@@ -68,6 +70,21 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
     $this->assign('contactId', $contactID);
     $this->assign('participantId', $participantID);
+
+    $paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+      $participantID, 'id', 'participant_id'
+    );
+    $this->assign('hasPayment', $paymentId);
+
+    if ($parentParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
+          $participantID, 'registered_by_id'
+      )) {
+      $parentHasPayment = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+        $parentParticipantId, 'id', 'participant_id'
+      );
+      $this->assign('parentHasPayment', $parentHasPayment);
+    }
+
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
 
@@ -162,10 +179,17 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
     $participantCount = array();
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $totalTaxAmount = 0;
     foreach ($lineItem as $k => $v) {
       if (CRM_Utils_Array::value('participant_count', $lineItem[$k]) > 0) {
         $participantCount[] = $lineItem[$k]['participant_count'];
       }
+      $totalTaxAmount = $v['tax_amount'] + $totalTaxAmount;
+    }
+    if ($invoicing) {
+      $this->assign('totalTaxAmount', $totalTaxAmount);
     }
     if ($participantCount) {
       $this->assign('pricesetFieldsCount', $participantCount);
@@ -202,7 +226,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $this->addButtons(array(
         array(
           'type' => 'cancel',

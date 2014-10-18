@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,15 +23,43 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $formType}
+{if $transaction}
+  {if !empty($rows)}
+   <table id='info'>
+     <tr class="columnheader">
+       <th>{ts}Amount{/ts}</th>
+       <th>{ts}Type{/ts}</th>
+       <th>{ts}Paid By{/ts}</th>
+       <th>{ts}Received{/ts}</th>
+       <th>{ts}Transaction ID{/ts}</th>
+       <th>{ts}Status{/ts}</th>
+     </tr>
+     {foreach from=$rows item=row}
+     <tr>
+       <td>{$row.total_amount|crmMoney}</td>
+       <td>{$row.financial_type}</td>
+       <td>{$row.payment_instrument}{if $row.check_number} (#{$row.check_number}){/if}</td>
+       <td>{$row.receive_date|crmDate}</td>
+       <td>{$row.trxn_id}</td>
+       <td>{$row.status}</td>
+     </tr>
+     {/foreach}
+    <table>
+  {else}
+     {if $component eq 'event'}
+       {assign var='entity' value='participant'}
+     {else}
+       {assign var='entity' value=$component}
+     {/if}
+    {ts 1=$entity}No additional payments found for this %1 record{/ts}
+  {/if}
+ <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl"}
+ </div>
+{elseif $formType}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 
-{if $paymentType eq 'refund'}
-<h3>{ts}New Event Refund{/ts}</h3>
-{else}
-<h3>{if $component eq 'event'}{if $contributionMode}{ts}Credit Card Event Payment{/ts}{else}{ts}New Event Payment{/ts}{/if}{/if}</h3>
-{/if}
 <div class="crm-block crm-form-block crm-payment-form-block">
 
   {if $contributionMode == 'test'}
@@ -45,16 +73,18 @@
     <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
   </div>
   {/if}
+  {if $newCredit AND $contributionMode EQ null}
+    {if $contactId}
+      {capture assign=ccModeLink}{crmURL p='civicrm/payment/add' q="reset=1&action=add&cid=`$contactId`&id=`$id`&component=`$component`&mode=live"}{/capture}
+    {/if}
+    {if $paymentType eq 'owed'}
+      <div class="action-link css_right crm-link-credit-card-mode">
+        <a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a>
+      </div>
+    {/if}
+  {/if}
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl"}
-    {if $newCredit AND $contributionMode EQ null}
-      {if $contactId}
-        {capture assign=ccModeLink}{crmURL p='civicrm/payment/add' q="reset=1&action=add&cid=`$contactId`&id=`$id`&component=`$component`&mode=live"}{/capture}
-       {/if}
-      {if $paymentType eq 'owed'}
-        <span class="action-link crm-link-credit-card-mode">&nbsp;<a href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a>
-      {/if}
-    {/if}
   </div>
   <table class="form-layout-compressed">    
     <tr>
@@ -65,10 +95,6 @@
     {/if}   
     <tr>
       <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
-    </tr>
-    <tr class="crm-payment-form-block-contribution_type_id crm-payment-form-block-financial_type_id">
-      <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
-      </td>
     </tr>
     <tr class="crm-payment-form-block-total_amount">
       <td class="label">{$form.total_amount.label}</td>
@@ -97,12 +123,12 @@
           {if $showCheckNumber || !$isOnline}
             <tr id="checkNumber" class="crm-payment-form-block-check_number">
               <td class="label">{$form.check_number.label}</td>
-              <td>{$form.check_number.html|crmReplace:class:six}</td>
+              <td>{$form.check_number.html}</td>
             </tr>
           {/if}
           <tr class="crm-payment-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
-            <td {$valueStyle}>{$form.trxn_id.html|crmReplace:class:twelve} {help id="id-trans_id"}</td>
+            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
           </tr>
           {if $email and $outBound_option != 2}
             <tr class="crm-payment-form-block-is_email_receipt">
@@ -157,7 +183,7 @@
 
     var url = "{/literal}{$dataUrl}{literal}";
 
-      cj( function( ) {
+      CRM.$(function($) {
         showHideByValue( 'is_email_receipt', '', 'notice', 'table-row', 'radio', false );
         showHideByValue( 'is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false );
       });
@@ -170,7 +196,7 @@
   {literal}
   <script type="text/javascript">
   function verify( ) {
-    if (cj('#is_email_receipt').attr( 'checked' )) {
+    if (cj('#is_email_receipt').prop('checked')) {
       var ok = confirm( '{/literal}{ts escape='js'}Click OK to save this payment record AND send a receipt to the contributor now{/ts}{literal}.' );
       if (!ok) {
         return false;
@@ -182,7 +208,7 @@
 
     {literal}
     <script type="text/javascript">
-      cj( function( ) {
+      CRM.$(function($) {
         checkEmailDependancies( );
         cj('#is_email_receipt').click( function( ) {
           checkEmailDependancies( );
@@ -204,7 +230,7 @@
 
     // bind first click of accordion header to load crm-accordion-body with snippet
     // everything else taken care of by cj().crm-accordions()
-    cj(function() {
+    CRM.$(function($) {
       cj('#adjust-option-type').hide();
       cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
         loadPanes(cj(this).attr('id'));
@@ -229,7 +255,7 @@
         cj('div.'+id).html(loading);
         cj.ajax({
           url    : url,
-          success: function(data) { cj('div.'+id).html(data); }
+          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
         });
       }
     }
@@ -254,15 +280,4 @@ cj('#fee_amount').change( function() {
         invert              = 0
         }
     {/if}
- 
-  {* include jscript to warn if unsaved form field changes *}
-  {include file="CRM/common/formNavigate.tpl"}
-
 {/if}
-{literal}
-<script type="text/javascript">
-cj(function() {
-  cj().crmAccordions();
-});
-</script>
-{/literal}

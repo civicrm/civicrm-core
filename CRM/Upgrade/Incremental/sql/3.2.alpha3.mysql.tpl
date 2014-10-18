@@ -107,7 +107,7 @@ ALTER TABLE `civicrm_contact` MODIFY COLUMN `is_deleted` boolean NOT NULL DEFAUL
 
 DELETE FROM `civicrm_state_province` WHERE `name` IN ('Freeport', 'Fresh Creek', 'Governor\'s Harbour' , 'Green Turtle Cay', 'Harbour Island', 'High Rock', 'Kemps Bay', 'Marsh Harbour','Nicholls Town and Berry Islands' ,'Rock Sound','Sandy Point','San Salvador and Rum Cay','Bandundu', 'Bas-Congo' ,'Haut-Congo', 'Kasai-Occidental','Katanga', 'Orientale' );
 
-INSERT INTO civicrm_state_province
+INSERT IGNORE INTO civicrm_state_province
         (`name`, `abbreviation`, `country_id` )
    VALUES
         ( 'Abaco Islands', 'AB',1212),

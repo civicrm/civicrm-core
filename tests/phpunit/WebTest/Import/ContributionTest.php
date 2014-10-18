@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_ContributionTest
+ */
 class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
@@ -75,6 +79,9 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Contribution', $headers, $rows, 'Household', 'Insert new contributions', $fieldMapper);
   }
 
+  /**
+   * @return array
+   */
   function _contributionIndividualCSVData() {
     $firstName1 = substr(sha1(rand()), 0, 7);
     $email1 = 'mail_' . substr(sha1(rand()), 0, 7) . '@example.com';
@@ -112,6 +119,9 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
+  /**
+   * @return array
+   */
   function _contributionHouseholdCSVData() {
     $household1 = substr(sha1(rand()), 0, 7) . ' home';
     $this->webtestAddHousehold($household1, TRUE);
@@ -147,6 +157,9 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
+  /**
+   * @return array
+   */
   function _contributionOrganizationCSVData() {
     $organization1 = substr(sha1(rand()), 0, 7) . ' org';
     $this->webtestAddOrganization($organization1, TRUE);

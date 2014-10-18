@@ -37,6 +37,10 @@
 require_once 'CRM/Core/Payment/BaseIPN.php';
 
 define('GOOGLE_DEBUG_PP', 1);
+
+/**
+ * Class org_civicrm_payment_googlecheckout_GoogleIPN
+ */
 class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
@@ -56,6 +60,14 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    */
   static protected $_mode = NULL;
 
+  /**
+   * @param $name
+   * @param $type
+   * @param $object
+   * @param bool $abort
+   *
+   * @return mixed
+   */
   static function retrieve($name, $type, $object, $abort = TRUE) {
     $value = CRM_Utils_Array::value($name, $object);
     if ($abort && $value === NULL) {
@@ -80,7 +92,9 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \org_civicrm_payment_googlecheckout_GoogleIPN
    */
   function __construct($mode, &$paymentProcessor) {
     parent::__construct();
@@ -92,11 +106,11 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
   /**
    * The function gets called when a new order takes place.
    *
-   * @param xml   $dataRoot    response send by google in xml format
+   * @param xml $dataRoot response send by google in xml format
    * @param array $privateData contains the name value pair of <merchant-private-data>
    *
+   * @param $component
    * @return void
-   *
    */
   function newOrderNotify($dataRoot, $privateData, $component) {
     $ids = $input = $params = array();
@@ -179,11 +193,12 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
   /**
    * The function gets called when the state(CHARGED, CANCELLED..) changes for an order
    *
-   * @param string $status      status of the transaction send by google
-   * @param array  $privateData contains the name value pair of <merchant-private-data>
+   * @param string $status status of the transaction send by google
+   * @param $dataRoot
+   * @param $component
+   * @internal param array $privateData contains the name value pair of <merchant-private-data>
    *
    * @return void
-   *
    */
   function orderStateChange($status, $dataRoot, $component) {
     $input = $objects = $ids = array();
@@ -260,6 +275,8 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param $component
+   * @param $paymentProcessor
    * @return object
    * @static
    */
@@ -519,7 +536,13 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
       }
     }
 
-    function getInput(&$input, &$ids) {
+  /**
+   * @param $input
+   * @param $ids
+   *
+   * @return bool
+   */
+  function getInput(&$input, &$ids) {
       if (!$this->getBillingID($ids)) {
         return FALSE;
       }

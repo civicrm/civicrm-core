@@ -1,4 +1,9 @@
 <?php
+/**
+ * @param $query
+ *
+ * @return array
+ */
 function compare($query) { $compares = array();
 $result = mysql_query($query);
 while ($row = mysql_fetch_object($result)) {
@@ -83,6 +88,11 @@ while ($row = mysql_fetch_object($result)) {
   return array('url' => $trend, 'last' => $pie);
 }
 
+/**
+ * @param $query
+ *
+ * @return array
+ */
 function trend($query) {
   $data = array();
   $result = mysql_query($query);

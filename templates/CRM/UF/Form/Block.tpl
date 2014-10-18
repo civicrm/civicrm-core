@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -137,8 +137,6 @@
               {if $field.html_type eq 'Autocomplete-Select'}
                 {if $field.data_type eq 'ContactReference'}
                 {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
-                {else}
-                {include file="CRM/Custom/Form/AutoComplete.tpl" element_name = $n}
                 {/if}
               {/if}
           </div>
@@ -175,9 +173,9 @@
 
 {literal}
 <script type="text/javascript">
-  cj(function(){
-    cj('#selector tr:even').addClass('odd-row ');
-    cj('#selector tr:odd ').addClass('even-row');
+  CRM.$(function($) {
+    $('#selector tr:even').addClass('odd-row');
+    $('#selector tr:odd ').addClass('even-row');
   });
 </script>
 {/literal}

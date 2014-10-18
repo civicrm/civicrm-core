@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -115,6 +115,9 @@
             <strong> -------------------------------------------</strong><br />
             {ts}Total{/ts}: <strong>{$amount+$membership_amount|crmMoney}</strong><br />
           {else}
+            {if $totalTaxAmount}
+              {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
+            {/if}
             {ts}Amount{/ts}: <strong>{$amount|crmMoney} {if $amount_level} - {$amount_level} {/if}</strong><br />
           {/if}
     {/if}
@@ -134,7 +137,7 @@
 {crmRegion name="contribution-thankyou-recur-membership"}
                     <br />
                     <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
-                    <div class="description crm-auto-renew-cancel-info">({ts}You will receive an email receipt which includes information about how to cancel the auto-renwal option.{/ts})</div>
+                    <div class="description crm-auto-renew-cancel-info">({ts}You will receive an email receipt which includes information about how to cancel the auto-renewal option.{/ts})</div>
 {/crmRegion}
                 {else}
 {crmRegion name="contribution-thankyou-recur"}
@@ -180,7 +183,7 @@
             </div>
             <div class="display-block">
                 <div class="label-left crm-section honoree_profile-section">
-                    {$honorName}</br></br>
+                    <strong>{$honorName}</strong></br>
                     {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
                 </div>
             </div>
@@ -221,7 +224,7 @@
 
     {if $onbehalfProfile}
       <div class="crm-group onBehalf_display-group label-left crm-profile-view">
-         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile}
+         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
          <div class="crm-section organization_email-section">
             <div class="label">{ts}Organization Email{/ts}</div>
             <div class="content">{$onBehalfEmail}</div>
@@ -230,8 +233,8 @@
       </div>
     {/if}
 
-    {if ( $contributeMode ne 'notify' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
-        {if $contributeMode ne 'notify' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) }
+    {if ( $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
+        {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) }
           {if $billingName or $address}
             <div class="crm-group billing_name_address-group">
                 <div class="header-dark">

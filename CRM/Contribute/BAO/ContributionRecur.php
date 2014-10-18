@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
   /**
-   * funtion to create recurring contribution
+   * function to create recurring contribution
    *
    * @param array  $params           (reference ) an assoc array of name/value pairs
    *
@@ -54,8 +54,9 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * contribution object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   * @param array $params (reference ) an assoc array of name/value pairs
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Contribute_BAO_Contribution object
    * @access public
@@ -153,6 +154,12 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     return $result;
   }
 
+  /**
+   * @param $id
+   * @param $mode
+   *
+   * @return array|null
+   */
   static function getPaymentProcessor($id, $mode) {
     //FIX ME:
     $sql = "
@@ -200,7 +207,9 @@ SELECT r.payment_processor_id
   /**
    * Delete Recurring contribution.
    *
-   * @return true / false.
+   * @param $recurId
+   *
+   * @return bool
    * @access public
    * @static
    */
@@ -220,11 +229,13 @@ SELECT r.payment_processor_id
   /**
    * Cancel Recurring contribution.
    *
-   * @param integer  $recurId recur contribution id.
-   * @param array    $objects an array of objects that is to be cancelled like
+   * @param integer $recurId recur contribution id.
+   * @param array $objects an array of objects that is to be cancelled like
    *                          contribution, membership, event. At least contribution object is a must.
    *
-   * @return true / false.
+   * @param array $activityParams
+   *
+   * @return bool
    * @access public
    * @static
    */
@@ -249,7 +260,7 @@ SELECT r.payment_processor_id
       $recur->save();
 
       $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurId);
-      if ($dao->recur_id) {
+      if ($dao && $dao->recur_id) {
         $details = CRM_Utils_Array::value('details', $activityParams);
         if ($dao->auto_renew && $dao->membership_id) {
           // its auto-renewal membership mode
@@ -318,7 +329,7 @@ SELECT r.payment_processor_id
    *
    * @param int $contactId Contact ID
    *
-   * @return return the list of recurring contribution fields
+   * @return array list of recurring contribution fields
    *
    * @access public
    * @static
@@ -335,7 +346,7 @@ SELECT r.payment_processor_id
       $params[$recurDAO->id]['contactId'] = $recurDAO->contact_id;
       $params[$recurDAO->id]['start_date'] = $recurDAO->start_date;
       $params[$recurDAO->id]['end_date'] = $recurDAO->end_date;
-      $params[$recurDAO->id]['next_sched_contribution_date'] = $recurDAO->next_sched_contribution;
+      $params[$recurDAO->id]['next_sched_contribution_date'] = $recurDAO->next_sched_contribution_date;
       $params[$recurDAO->id]['amount'] = $recurDAO->amount;
       $params[$recurDAO->id]['currency'] = $recurDAO->currency;
       $params[$recurDAO->id]['frequency_unit'] = $recurDAO->frequency_unit;
@@ -351,21 +362,11 @@ SELECT r.payment_processor_id
   }
 
   /**
-   * update the is_active flag in the db
+   * @param $entityID
+   * @param string $entity
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
-   *
-   * @return Object             DAO object on sucess, null otherwise
-   * @static
+   * @return null|Object
    */
-  static function setIsActive($id, $is_active) {
-    if (!$is_active) {
-      return self::cancelRecurContribution($id, CRM_Core_DAO::$_nullObject);
-    }
-    return FALSE;
-  }
-
   static function getSubscriptionDetails($entityID, $entity = 'recur') {
     $sql = "
 SELECT rec.id                   as recur_id,
@@ -379,13 +380,13 @@ SELECT rec.id                   as recur_id,
        rec.currency,
        con.id                   as contribution_id,
        con.contribution_page_id,
-       con.contact_id,
+       rec.contact_id,
        mp.membership_id";
 
     if ($entity == 'recur') {
       $sql .= "
       FROM civicrm_contribution_recur rec
-INNER JOIN civicrm_contribution       con ON ( con.contribution_recur_id = rec.id )
+LEFT JOIN civicrm_contribution       con ON ( con.contribution_recur_id = rec.id )
 LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
      WHERE rec.id = %1
   GROUP BY rec.id";
@@ -460,4 +461,3 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     }
   }
 }
-

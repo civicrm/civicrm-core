@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -121,6 +121,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   protected $_values = array();
 
+  protected $unsavedWarn = TRUE;
+
   /**
    * The _fields var can be used by sub class to set/unset/edit the
    * form fields based on their requirement
@@ -178,20 +180,18 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'assignee_contact_id' => array(
         'type' => 'entityRef',
         'label' => ts('Assigned To'),
-        'attributes' => array('multiple' => TRUE),
+        'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
       ),
       'followup_assignee_contact_id' => array(
         'type' => 'entityRef',
         'label' => ts('Assigned To'),
-        'attributes' => array('multiple' => TRUE),
+        'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
       ),
       'followup_activity_type_id' => array(
         'type' => 'select',
         'label' => ts('Followup Activity'),
-        'attributes' => array(
-          '' => '- ' . ts('select activity') . ' -'
-        ) +
-        CRM_Core_PseudoConstant::ActivityType(FALSE)
+        'attributes' => array('' => '- ' . ts('select activity') . ' -') + CRM_Core_PseudoConstant::ActivityType(FALSE),
+        'extra' => array('class' => 'crm-select2'),
       ),
       // Add optional 'Subject' field for the Follow-up Activiity, CRM-4491
       'followup_activity_subject' => array(
@@ -277,6 +277,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     $this->_activityTypeId = CRM_Utils_Request::retrieve('atype', 'Positive', $this);
     $this->assign('atype', $this->_activityTypeId);
+
+    $this->assign('activityId', $this->_activityId);
 
     //check for required permissions, CRM-6264
     if ($this->_activityId &&
@@ -437,7 +439,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
       elseif ($path == 'civicrm/contact/search'
         || $path == 'civicrm/contact/search/advanced'
-        || $path == 'civicrm/contact/search/custom') {
+        || $path == 'civicrm/contact/search/custom'
+        || $path == 'civicrm/group/search') {
         $urlString = $path;
       }
       else {
@@ -516,7 +519,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     $defaults = $this->_values;
-
     // if we're editing...
     if (isset($this->_activityId)) {
       if (empty($defaults['activity_date_time'])) {
@@ -539,8 +541,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
 
       // Fixme: why are we getting the wrong keys from upstream?
-      $defaults['target_contact_id'] = $defaults['target_contact'];
-      $defaults['assignee_contact_id'] = $defaults['assignee_contact'];
+      $defaults['target_contact_id'] = CRM_Utils_Array::value('target_contact', $defaults);
+      $defaults['assignee_contact_id'] = CRM_Utils_Array::value('assignee_contact', $defaults);
 
       // set default tags if exists
       $defaults['tag'] = CRM_Core_BAO_EntityTag::getTag($this->_activityId, 'civicrm_activity');
@@ -559,6 +561,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_activityTypeId) {
       $defaults['activity_type_id'] = $this->_activityTypeId;
+    }
+
+    if (!$this->_single && !empty($this->_contactIds)) {
+      $defaults['target_contact_id'] = $this->_contactIds;
     }
 
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::RENEW)) {
@@ -641,7 +647,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           $this->addEntityRef($field, $values['label'], $attribute, $required);
         }
         else {
-          $this->add($values['type'], $field, $values['label'], $attribute, $required);
+          $this->add($values['type'], $field, $values['label'], $attribute, $required, CRM_Utils_Array::value('extra', $values));
         }
       }
     }
@@ -728,7 +734,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if (!in_array($this->_activityTypeName, $specialActivities)) {
       // build tag widget
       $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_activity');
-      CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_activity', $this->_activityId, TRUE, TRUE);
+      CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_activity', $this->_activityId);
     }
 
     // if we're viewing, we're assigning different buttons than for adding/editing
@@ -736,24 +742,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       if (isset($this->_groupTree)) {
         CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $this->_groupTree);
       }
-      $buttons = array();
-      // do check for permissions
-      if (CRM_Case_BAO_Case::checkPermission($this->_activityId, 'File On Case', $this->_activityTypeId)) {
-        $buttons[] = array(
-          'type' => 'cancel',
-          'name' => ts('File on case'),
-          'subName' => 'file_on_case',
-          'js' => array('onClick' => "javascript:fileOnCase( \"file\", $this->_activityId ); return false;")
-        );
-      }
       // form should be frozen for view mode
       $this->freeze();
 
+      $buttons = array();
       $buttons[] = array(
         'type' => 'cancel',
         'name' => ts('Done')
       );
-
       $this->addButtons($buttons);
     }
     else {
@@ -801,9 +797,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -850,6 +848,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    *
    * @access public
    *
+   * @param null $params
    * @return void
    */
   public function postProcess($params = NULL) {
@@ -927,11 +926,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $this->_activityId
     );
 
-    // format target params
-    if (!$this->_single) {
-      $params['target_contact_id'] = $this->_contactIds;
-    }
-
     $activity = array();
     if (!empty($params['is_multi_activity']) &&
       !CRM_Utils_Array::crmIsEmptyArray($params['target_contact_id'])
@@ -955,6 +949,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * Process activity creation
    *
    * @param array $params associated array of submitted values
+   *
+   * @return $this|null|object
    * @access protected
    */
   protected function processActivity(&$params) {
@@ -1050,7 +1046,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
         }
       }
-      
+
       // Also send email to follow-up activity assignees if set
       if ($followupActivity) {
         $mailToFollowupContacts = array();

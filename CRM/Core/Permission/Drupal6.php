@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -65,6 +65,8 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * given a permission string, check for access requirements
    *
    * @param string $str the permission to check
+   *
+   * @param null $contactID
    *
    * @return boolean true if yes, else false
    * @access public
@@ -193,6 +195,8 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
   /**
    * Get the permissions defined in the hook_civicrm_permission implementation
    * of the given module.
+   *
+   * @param $module
    *
    * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */

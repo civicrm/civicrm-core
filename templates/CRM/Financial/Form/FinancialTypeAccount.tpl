@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting financial type  *}
-<h3>{if $action eq 8}{ts}Delete Financial Type Account{/ts}{elseif $action eq 1}{ts}Add New Financial Type Account{/ts}{elseif $action eq 2}{ts}Edit Financial Type Account{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-financial_type-form-block">
   {if $action eq 8}
     <div class="messages status">

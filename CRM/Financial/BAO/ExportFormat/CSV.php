@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -54,6 +54,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     parent::__construct();
   }
 
+  /**
+   * @param $exportParams
+   */
   function export($exportParams) {
     $export = parent::export($exportParams);
 
@@ -71,6 +74,11 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     $this->output($fileName);
   }
 
+  /**
+   * @param $batchId
+   *
+   * @return Object
+   */
   function generateExportQuery($batchId) {
     $sql = "SELECT
       ft.id as financial_trxn_id,
@@ -119,6 +127,11 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     return $dao;
   }
 
+  /**
+   * @param $export
+   *
+   * @return string
+   */
   function putFile($export) {
     $config = CRM_Core_Config::singleton();
     $fileName = $config->uploadDir.'Financial_Transactions_'.$this->_batchIds.'_'.date('YmdHis').'.'.$this->getFileExtension();
@@ -177,12 +190,14 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
         }
 
         $financialItems[] = array(
+          'Internal ID' => $dao->financial_trxn_id,
           'Transaction Date' => $dao->trxn_date,
           'Debit Account' => $dao->to_account_code,
           'Debit Account Name' => $dao->to_account_name,
           'Debit Account Type' => $dao->to_account_type_code,
           'Debit Account Amount (Unsplit)' => $dao->debit_total_amount,
           'Transaction ID (Unsplit)' => $dao->trxn_id,
+          'Debit amount (Split)' => $dao->amount,
           'Payment Instrument' => $dao->payment_instrument,
           'Check Number' => $dao->check_number,
           'Source' => $dao->source,
@@ -201,6 +216,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     parent::initiateDownload();
   }
 
+  /**
+   * @return string
+   */
   function getFileExtension() {
     return 'csv';
   }

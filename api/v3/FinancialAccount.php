@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,6 +41,8 @@
  * {@getfields financial_account_create}
  * @example financial_accountCreate.php
  *
+ * @param $params
+ *
  * @return array of newly created financial_account property values.
  * @access public
  */
@@ -55,6 +57,8 @@ function civicrm_api3_financial_account_create($params) {
  * {@getfields financial_account_get}
  * @example financial_accountCreate.php
  *
+ * @param $params
+ *
  * @return array of retrieved financial_account property values.
  * @access public
  */
@@ -68,6 +72,8 @@ function civicrm_api3_financial_account_get($params) {
  * Allowed @params array keys are:
  * {@getfields financial_account_delete}
  * @example financial_accountCreate.php
+ *
+ * @param $params
  *
  * @return array of deleted values.
  * @access public

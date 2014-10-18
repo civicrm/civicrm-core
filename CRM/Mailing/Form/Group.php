@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -143,8 +143,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
         $mailingGroups[$entityTable][$dao->group_type][] = $dao->entity_id;
       }
 
-      $defaults['includeGroups'] = $mailingGroups['civicrm_group']['Include'];
-      $defaults['excludeGroups'] = CRM_Utils_Array::value('Exclude', $mailingGroups['civicrm_group']);
+      $defaults['includeGroups'] = $mailingGroups['civicrm_group']['include'];
+      $defaults['excludeGroups'] = CRM_Utils_Array::value('exclude', $mailingGroups['civicrm_group']);
 
       if (!empty($mailingGroups['civicrm_mailing'])) {
         $defaults['includeMailings'] = CRM_Utils_Array::value('Include', $mailingGroups['civicrm_mailing']);
@@ -214,7 +214,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     $this->addElement('checkbox', 'dedupe_email', ts('Remove duplicate emails?'));
 
     //get the mailing groups.
-    $groups = CRM_Core_PseudoConstant::group('Mailing');
+    $groups = CRM_Core_PseudoConstant::nestedGroup('Mailing');
     if ($hiddenMailingGroup) {
       $groups[$hiddenMailingGroup] =
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $hiddenMailingGroup, 'title');
@@ -235,81 +235,45 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       $this->add('select', 'baseGroup',
         ts('Unsubscription Group'),
         array(
-          '' => ts('- select -')) + $staticGroups,
-        TRUE
+          '' => ts('- select -')) + CRM_Contact_BAO_Group::getGroupsHierarchy($staticGroups, NULL, '&nbsp;&nbsp;', TRUE),
+        TRUE,
+        array('class' => 'crm-select2 huge')
       );
     }
 
-    if (count($groups) <= 10) {
-      // setting minimum height to 2 since widget looks strange when size (height) is 1
-      $groupSize = max(count($groups), 2);
-    }
-    else {
-      $groupSize = 10;
-    }
-    $inG = &$this->addElement('advmultiselect', 'includeGroups',
-      ts('Include Group(s)') . ' ',
-      $groups,
-      array(
-        'size' => $groupSize,
-        'style' => 'width:auto; min-width:240px;',
-        'class' => 'advmultiselect',
-      )
+    $select2style = array(
+      'multiple' => TRUE,
+      'style' => 'width: 100%; max-width: 60em;',
+      'class' => 'crm-select2',
+      'placeholder' => ts('- select -'),
     );
 
-    //as we are having hidden smart group so no need.
-    if (!$this->_searchBasedMailing) {
-      $this->addRule('includeGroups', ts('Please select a group to be mailed.'), 'required');
-    }
-
-    $outG = &$this->addElement('advmultiselect', 'excludeGroups',
-      ts('Exclude Group(s)') . ' ',
+    $this->add('select', 'includeGroups',
+      ts('Include Group(s)'),
       $groups,
-      array(
-        'size' => $groupSize,
-        'style' => 'width:auto; min-width:240px;',
-        'class' => 'advmultiselect',
-      )
+      !$this->_searchBasedMailing,
+      $select2style
     );
 
-    $inG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $outG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-    $outG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
+    $this->add('select', 'excludeGroups',
+      ts('Exclude Group(s)'),
+      $groups,
+      FALSE,
+      $select2style
+    );
 
-    if (count($mailings) <= 10) {
-      // setting minimum height to 2 since widget looks strange when size (height) is 1
-      $mailingSize = max(count($mailings), 2);
-    }
-    else {
-      $mailingSize = 10;
-    }
-    $inM = &$this->addElement('advmultiselect', 'includeMailings',
+    $this->add('select', 'includeMailings',
       ts('INCLUDE Recipients of These Mailing(s)') . ' ',
       $mailings,
-      array(
-        'size' => $mailingSize,
-        'style' => 'width:auto; min-width:240px;',
-        'class' => 'advmultiselect',
-      )
+      FALSE,
+      $select2style
     );
-    $outM = &$this->addElement('advmultiselect', 'excludeMailings',
+    $this->add('select', 'excludeMailings',
       ts('EXCLUDE Recipients of These Mailing(s)') . ' ',
       $mailings,
-      array(
-        'size' => $mailingSize,
-        'style' => 'width:auto; min-width:240px;',
-        'class' => 'advmultiselect',
-      )
+      FALSE,
+      $select2style
     );
-
-    $inM->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $outM->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inM->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-    $outM->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-
-    $urls = array('' => ts('- select -'), -1 => ts('CiviCRM Search'),
-    ) + CRM_Contact_Page_CustomSearch::info();
 
     $this->addFormRule(array('CRM_Mailing_Form_Group', 'formRule'));
 

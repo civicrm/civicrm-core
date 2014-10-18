@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -49,12 +49,10 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
 
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
-    CRM_Pledge_Page_Tab::setContext();
+    CRM_Pledge_Page_Tab::setContext($this);
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $this->edit();
-      // set page title
-      CRM_Contact_Page_View::setTitle($this->_contactId);
     }
     else {
       $pledgeId = CRM_Utils_Request::retrieve('pledgeId', 'Positive', $this);
@@ -66,7 +64,7 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
       $this->assign('contactId', $this->_contactId);
 
       // check if we can process credit card contribs
-      CRM_Core_Payment::allowBackofficeCreditCard($this);
+      $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
 
       // check is the user has view/edit signer permission
       $permission = 'view';

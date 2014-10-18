@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,8 +29,14 @@ require_once 'CRM/Financial/DAO/FinancialAccount.php';
 require_once 'CRM/Financial/BAO/FinancialAccount.php';
 require_once 'CRM/Financial/BAO/FinancialTypeAccount.php';
 
+/**
+ * Class CRM_Financial_BAO_PaymentProcessorTypeTest
+ */
 class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'        => 'PaymentProcessorType BAOs',

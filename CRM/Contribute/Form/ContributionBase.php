@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,19 +28,19 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 /**
- * This class generates form components for processing a ontribution
+ * This class generates form components for processing a contribution
  *
  */
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
-   * the id of the contribution page that we are proceessing
+   * the id of the contribution page that we are processsing
    *
    * @var int
    * @public
@@ -89,6 +89,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_membershipBlock = NULL;
 
   /**
+   * Does this form support a separate membership payment
+   * @var bool
+   */
+  protected $_separateMembershipPayment;
+  /**
    * the default values for the form
    *
    * @var array
@@ -110,7 +115,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var array
    * @public
    */
-  public $_fields;
+  public $_fields = array();
 
   /**
    * The billing location id for this contribiution page
@@ -155,9 +160,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * The contact id of the person for whom membership is being added or renewed based on the cid in the url,
    * checksum, or session
-   * @var unknown_type
+   * @var int
    */
-  protected $_contactID;
+  public $_contactID;
 
   protected $_userID;
 
@@ -187,6 +192,27 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   public $_action;
 
+ /**
+   * Is honor block is enabled for this contribution?
+   *
+   * @var boolean
+   * @protected
+   */
+  public $_honor_block_is_active = FALSE;
+
+  /**
+   * Contribution mode e.g express for payment express, notify for off-site + notification back to CiviCRM
+   * @var string
+   */
+  public $_contributeMode;
+
+  /**
+   * contribution page supports memberships
+   * @var boolean
+   */
+  public $_useForMember;
+
+  public $_isBillingAddressRequiredForPayLater;
   /**
    * Function to set variables up before form is built
    *
@@ -207,6 +233,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // this was used prior to the cleverer this_>getContactID - unsure now
     $this->_userID = $session->get('userID');
+
+    //Check if honor block is enabled for current contribution
+    $ufJoinParams = array(
+      'module' => 'soft_credit',
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $this->_id,
+    );
+    $ufJoin = new CRM_Core_DAO_UFJoin();
+    $ufJoin->copyValues($ufJoinParams);
+    $ufJoin->find(TRUE);
+    $this->_honor_block_is_active = $ufJoin->is_active;
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->_mid = NULL;
@@ -353,7 +390,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // this avoids getting E_NOTICE errors in php
       $setNullFields = array(
         'amount_block_is_active',
-        'honor_block_is_active',
         'is_allow_other_amount',
         'footer_text',
       );
@@ -491,6 +527,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     //do check for cancel recurring and clean db, CRM-7696
     if (CRM_Utils_Request::retrieve('cancel', 'Boolean', CRM_Core_DAO::$_nullObject)) {
       self::cancelRecurring();
+    }
+
+    // check if billing block is required for pay later
+    if (CRM_Utils_Array::value('is_pay_later', $this->_values)) {
+      $this->_isBillingAddressRequiredForPayLater = CRM_Utils_Array::value('is_billing_required', $this->_values);
+      $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
     }
   }
 
@@ -635,12 +677,16 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Function to add the custom fields
    *
+   * @param $id
+   * @param $name
+   * @param bool $viewOnly
+   * @param null $profileContactType
+   * @param null $fieldTypes
+   *
    * @return void
    * @access public
    */
   function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
-    $stateCountryMap = array();
-
     if ($id) {
       $contactID = $this->getContactID();
 
@@ -676,7 +722,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       if ($fields) {
         // unset any email-* fields since we already collect it, CRM-2888
         foreach (array_keys($fields) as $fieldName) {
-          if (substr($fieldName, 0, 6) == 'email-') {
+          if (substr($fieldName, 0, 6) == 'email-' && $profileContactType != 'honor') {
             unset($fields[$fieldName]);
           }
         }
@@ -697,33 +743,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           ) {
             // ignore file upload fields
             continue;
-          }
-
-          list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
-          if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
-            if (!array_key_exists($index, $stateCountryMap)) {
-              $stateCountryMap[$index] = array();
-            }
-            $stateCountryMap[$index][$prefixName] = $key;
-
-            if ($prefixName == "state_province") {
-              if ($profileContactType == 'onbehalf') {
-                //CRM-11881: Bypass required-ness check for state/province on Contribution Confirm page
-                //as already done during Contribution registration via onBehalf's quickForm
-                $field['is_required'] = FALSE;
-              }
-              else {
-                if (count($this->_submitValues)) {
-                  $locationTypeId = $field['location_type_id'];
-                  if (array_key_exists("country-{$locationTypeId}", $fields) &&
-                  array_key_exists("state_province-{$locationTypeId}", $fields) &&
-                    !empty($this->_submitValues["country-{$locationTypeId}"])) {
-                    $field['is_required'] =
-                      CRM_Core_Payment_Form::checkRequiredStateProvince($this, "country-{$locationTypeId}");
-                  }
-                }
-              }
-            }
           }
 
           if ($profileContactType) {
@@ -766,8 +785,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         $this->assign($name, $fields);
 
-        CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-
         if ($addCaptcha && !$viewOnly) {
           $captcha = CRM_Utils_ReCAPTCHA::singleton();
           $captcha->add($this);
@@ -777,6 +794,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Check template file exists
+   * @param null $suffix
+   *
+   * @return null|string
+   */
   function checkTemplateFileExists($suffix = NULL) {
     if ($this->_id) {
       $templateFile = "CRM/Contribute/Form/Contribution/{$this->_id}/{$this->_name}.{$suffix}tpl";
@@ -788,11 +811,30 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     return NULL;
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
+  /**
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl
+   * i.e. we dont override
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();

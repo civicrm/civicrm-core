@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -39,7 +39,18 @@
 class CRM_Utils_JSON {
 
   /**
+   * Output json to the client
+   * @param mixed $input
+   */
+  static function output($input) {
+    header('Content-Type: application/json');
+    echo json_encode($input);
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
    * Function to create JSON object
+   * @deprecated
    *
    * @param  array  $params     associated array, that needs to be
    *                            converted to JSON array
@@ -63,9 +74,10 @@ class CRM_Utils_JSON {
   /**
    * Function to encode json format for flexigrid, NOTE: "id" should be present in $params for each row
    *
-   * @param array  $params associated array of values rows
-   * @param int    $page  page no for selector
-   * @param array  $selectorElements selector rows
+   * @param array $params associated array of values rows
+   * @param int $page page no for selector
+   * @param $total
+   * @param array $selectorElements selector rows
    *
    * @return json encode string
    */
@@ -126,7 +138,6 @@ class CRM_Utils_JSON {
         if ($addcomma) {
           $sOutput .= ",";
         }
-
         //CRM-7130 --lets addslashes to only double quotes,
         //since we are using it to quote the field value.
         //str_replace helps to provide a break for new-line

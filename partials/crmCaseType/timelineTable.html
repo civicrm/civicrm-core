@@ -1,0 +1,87 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: activitySet
+-->
+<table>
+  <thead>
+  <tr>
+    <th>Activity</th>
+    <th>Status</th>
+    <th>Reference</th>
+    <th>Offset</th>
+    <th>Select</th>
+    <th></th>
+  </tr>
+  </thead>
+
+  <tbody ui-sortable ng-model="activitySet.activityTypes">
+  <tr ng-repeat="activity in activitySet.activityTypes">
+    <td>
+      <span class="icon ui-icon-grip-dotted-vertical"></span>
+      {{ activity.name }}
+    </td>
+    <td>
+      <select
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
+        ng-model="activity.status"
+        ng-options="actStatus.name as actStatus.name for actStatus in activityStatuses|orderBy:'name'"
+        >
+        <option value=""></option>
+      </select>
+    </td>
+    <td>
+      <select
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
+        ng-model="activity.reference_activity"
+        ng-options="actTypeName as actTypeName for actTypeName in activityTypeNames"
+        ng-hide="activity.name == 'Open Case'"
+        ng-required="activity.name != 'Open Case'"
+        >
+      </select>
+    </td>
+    <td>
+      <input
+        class="number"
+        type="text"
+        ng-pattern="/^-?[0-9]*$/"
+        ng-model="activity.reference_offset"
+        ng-hide="activity.name == 'Open Case'"
+        ng-required="activity.name != 'Open Case'"
+        />
+    </td>
+    <td>
+      <select
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
+        ng-model="activity.reference_select"
+        ng-options="key as value for (key,value) in {newest: 'Newest', oldest: 'Oldest'}"
+        ng-hide="activity.name == 'Open Case'"
+        ng-required="activity.name != 'Open Case'"
+        >
+      </select>
+    </td>
+    <td>
+      <a class="crm-hover-button"
+         ng-show="isActivityRemovable(activitySet, activity)"
+         ng-click="removeItem(activitySet.activityTypes, activity)">
+        <span class="icon delete-icon" title="Remove"></span>
+      </a>
+    </td>
+  </tr>
+  </tbody>
+
+  <tfoot>
+  <tr class="addRow">
+    <td colspan="6">
+      Add activity:
+      <span crm-add-name
+           crm-options="activityTypeNames"
+           crm-var="newActivity"
+           crm-on-add="addActivity(activitySet, newActivity)"
+              />
+    </td>
+  </tr>
+  </tfoot>
+</table>

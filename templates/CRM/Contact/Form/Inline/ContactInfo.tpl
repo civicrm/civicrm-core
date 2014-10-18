@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,7 +40,7 @@
     <div class="crm-summary-row">
       <div class="crm-label">{$form.job_title.label}</div>
       <div class="crm-content">{$form.job_title.html}</div>
-    <div>
+    </div>
     {/if}
     <div class="crm-summary-row">
       <div class="crm-label">{$form.nick_name.label}</div>

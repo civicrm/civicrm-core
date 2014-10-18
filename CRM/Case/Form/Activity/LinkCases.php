@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,21 +38,31 @@
  *
  */
 class CRM_Case_Form_Activity_LinkCases {
+  /**
+   * @param $form
+   *
+   * @throws Exception
+   */
   static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
+    if (count($form->_caseId) != 1) {
+      CRM_Core_Resources::fatal(ts('Expected one case-type'));
+    }
+
+    $caseId = CRM_Utils_Array::first($form->_caseId);
 
     $form->assign('clientID', $form->_currentlyViewedContactId);
-    $form->assign('caseTypeLabel', CRM_Case_BAO_Case::getCaseType($form->_caseId));
+    $form->assign('caseTypeLabel', CRM_Case_BAO_Case::getCaseType($caseId));
 
     // get the related cases for given case.
     $relatedCases = $form->get('relatedCases');
     if (!isset($relatedCases)) {
-      $relatedCases = CRM_Case_BAO_Case::getRelatedCases($form->_caseId, $form->_currentlyViewedContactId);
+      $relatedCases = CRM_Case_BAO_Case::getRelatedCases($caseId, $form->_currentlyViewedContactId);
       $form->set('relatedCases', empty($relatedCases) ? FALSE : $relatedCases);
     }
-    $excludeCaseIds = array($form->_caseId);
+    $excludeCaseIds = array($caseId);
     if (is_array($relatedCases) && !empty($relatedCases)) {
       $excludeCaseIds = array_merge($excludeCaseIds, array_keys($relatedCases));
     }
@@ -65,21 +75,28 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function setDefaultValues(&$form) {
     return $defaults = array();
   }
 
+  /**
+   * @param $form
+   */
   static function buildQuickForm(&$form) {
-    $form->add('text', 'link_to_case', ts('Link To Case'));
-    $form->add('hidden', 'link_to_case_id', '', array('id' => 'link_to_case_id'));
+    $form->add('text', 'link_to_case_id', ts('Link To Case'), array('class' => 'huge'), TRUE);
   }
 
   /**
    * global validation rules for the form
    *
    * @param array $values posted values of the form
+   *
+   * @param $files
+   * @param $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -89,17 +106,15 @@ class CRM_Case_Form_Activity_LinkCases {
     $errors = array();
 
     $linkCaseId = CRM_Utils_Array::value('link_to_case_id', $values);
-    if (!$linkCaseId) {
-      $errors['link_to_case'] = ts('Please select a case to link.');
-    }
-    elseif ($linkCaseId == $form->_caseId) {
+    assert('is_numeric($linkCaseId)');
+    if ($linkCaseId == CRM_Utils_Array::first($form->_caseId)) {
       $errors['link_to_case'] = ts('Please select some other case to link.');
     }
 
     // do check for existing related cases.
     $relatedCases = $form->get('relatedCases');
     if (is_array($relatedCases) && array_key_exists($linkCaseId, $relatedCases)) {
-      $errors['link_to_case'] = ts('It looks like selected case is already linked.');
+      $errors['link_to_case'] = ts('Selected case is already linked.');
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -110,16 +125,21 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
+   * @param $form
+   * @param $params
+   *
    * @return void
    */
-  static function beginPostProcess(&$form, &$params) {
-    $params['id'] = $params['case_id'];
-  }
+  static function beginPostProcess(&$form, &$params) {}
 
   /**
    * Function to process the form
    *
    * @access public
+   *
+   * @param $form
+   * @param $params
+   * @param $activity
    *
    * @return void
    */

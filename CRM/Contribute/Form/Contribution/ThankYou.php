@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -63,7 +63,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('max_reminders', CRM_Utils_Array::value('max_reminders', $this->_values));
     $this->assign('initial_reminder_day', CRM_Utils_Array::value('initial_reminder_day', $this->_values));
     CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values));
-    // Make the contributionPageID avilable to the template
+    // Make the contributionPageID available to the template
     $this->assign('contributionPageID', $this->_id);
     $this->assign('isShare', $this->_values['is_share']);
 
@@ -119,12 +119,29 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('useForMember', $this->get('useForMember'));
 
     $params = $this->_params;
-    $honor_block_is_active = $this->get('honor_block_is_active');
-    if ($honor_block_is_active && !empty($params['soft_credit_type_id'])) {
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    if ($invoicing) {
+      $getTaxDetails = FALSE;
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      foreach ($this->_lineItem as $key => $value) {
+        foreach ($value as $v) {
+          if (isset($v['tax_rate'])) {
+            if ($v['tax_rate'] != '') {
+              $getTaxDetails = TRUE;
+            }
+          }
+        }
+      }
+      $this->assign('getTaxDetails', $getTaxDetails);
+      $this->assign('taxTerm', $taxTerm);
+      $this->assign('totalTaxAmount', $params['tax_amount']);
+    }
+    if ($this->_honor_block_is_active && !empty($params['soft_credit_type_id'])) {
       $honorName = null;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
-      $this->assign('honor_block_is_active', $honor_block_is_active);
+      $this->assign('honor_block_is_active', $this->_honor_block_is_active);
       $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
       CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor'], $params['honoree_profile_id']);
 
@@ -226,9 +243,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         }
       }
     }
-
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
 
     $this->_submitValues = array_merge($this->_submitValues, $defaults);
     $this->setDefaults($defaults);

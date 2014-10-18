@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,10 @@ class CRM_Logging_Reverter {
   private $log_conn_id;
   private $log_date;
 
+  /**
+   * @param $log_conn_id
+   * @param $log_date
+   */
   function __construct($log_conn_id, $log_date) {
     $dsn               = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
     $this->db          = $dsn['database'];
@@ -44,6 +48,9 @@ class CRM_Logging_Reverter {
     $this->log_date    = $log_date;
   }
 
+  /**
+   * @param $tables
+   */
   function revert($tables) {
     // FIXME: split off the table → DAO mapping to a GenCode-generated class
     $daos = array(

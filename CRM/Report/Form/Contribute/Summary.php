@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -45,6 +45,12 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
   // Check if CiviCampaign is a) enabled and b) has active campaigns
@@ -258,27 +264,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           ),
         ),
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-            'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
-      ),
     ) + $this->addAddressFields();
 
     // If we have a campaign, build out the relevant elements
-    $this->_tagFilter = TRUE;
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
         'title' => 'Campaign',
@@ -291,6 +279,8 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $this->_columns['civicrm_contribution']['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
     }
 
+    $this->_tagFilter = TRUE;
+    $this->_groupFilter = TRUE;
     $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
   }
@@ -299,6 +289,11 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     parent::preProcess();
   }
 
+  /**
+   * @param bool $freeze
+   *
+   * @return array
+   */
   function setDefaultValues($freeze = TRUE) {
     return parent::setDefaultValues($freeze);
   }
@@ -405,6 +400,13 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     //check for searching combination of dispaly columns and
@@ -521,6 +523,11 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -598,6 +605,9 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
     $graphRows = array();
 
@@ -643,6 +653,9 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

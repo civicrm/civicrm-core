@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -173,7 +173,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
               $optionIds[$rowCount] = $optionIds[$key];
               unset($optionIds[$key]);
             }
-          } 
+          }
         }
         $rowCount++;
       }
@@ -288,6 +288,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     );
     $this->addWysiwyg('pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_receipt'));
 
+    $this->addElement('checkbox', 'is_billing_required', ts('Is billing block required'));
     $this->add('text', 'fee_label', ts('Fee Label'));
 
     $price = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviEvent');
@@ -386,7 +387,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     }
     $_showHide->addToTemplate();
     $this->addElement('submit', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
-      array('class' => 'form-submit')
+      array('class' => 'crm-form-submit cancel')
     );
 
     $this->buildAmountLabel();
@@ -577,11 +578,17 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     }
 
     $params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, 0);
+    $params['is_billing_required'] = CRM_Utils_Array::value('is_billing_required', $params, 0);
 
     if ($this->_id) {
 
       // delete all the prior label values or discounts in the custom options table
       // and delete a price set if one exists
+      //@todo note that this removes the reference from existing participants -
+      // even where there is not change - redress?
+      // note that a more tentative form of this is invoked by passing price_set_id as an array
+      // to event.create see CRM-14069
+      // @todo get all of this logic out of form layer (currently partially in BAO/api layer)
       if (CRM_Price_BAO_PriceSet::removeFrom('civicrm_event', $this->_id)) {
         CRM_Core_BAO_Discount::del($this->_id,'civicrm_event');
       }
@@ -589,6 +596,9 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
     if ($params['is_monetary']) {
       if (!empty($params['price_set_id'])) {
+        //@todo this is now being done in the event BAO if passed price_set_id as an array
+        // per notes on that fn - looking at the api converting to an array
+        // so calling via the api may cause this to be done in the api
         CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_id, $params['price_set_id']);
         if (!empty($params['price_field_id'])) {
           $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $params['price_field_id'], 'price_set_id');
@@ -717,7 +727,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                   $setParams['extends'] = CRM_Core_Component::getComponentID('CiviEvent');
                   $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
                   $priceSetID = $priceSet->id;
-                } 
+                }
                 else {
                   $priceSetID = $discountPriceSets[$j-1];
                   $setParams = array (
@@ -783,13 +793,18 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       }
       $params['financial_type_id'] = '';
       $params['is_pay_later'] = 0;
+      $params['is_billing_required'] = 0;
+    }
+
+    //update 'is_billing_required' 
+    if (empty($params['is_pay_later'])) {
+      $params['is_billing_required'] = False;
     }
 
     //update events table
     $params['id'] = $this->_id;
     // skip update of financial type in price set
     $params['skipFinancialType'] = TRUE;
-    
     CRM_Event_BAO_Event::add($params);
 
     // Update tab "disabled" css class

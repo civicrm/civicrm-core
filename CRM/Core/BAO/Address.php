@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,15 +41,17 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   /**
    * takes an associative array and creates a address
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
-   * @param boolean  $fixAddress   true if you need to fix (format) address values
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param boolean $fixAddress true if you need to fix (format) address values
    *                               before inserting in db
+   *
+   * @param null $entity
    *
    * @return array $blocks array of created address
    * @access public
    * @static
    */
-  static function create(&$params, $fixAddress, $entity = NULL) {
+  static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
     if (!isset($params['address']) || !is_array($params['address'])) {
       return;
     }
@@ -453,15 +455,15 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array   $entityBlock   associated array of fields
-   * @param boolean $microformat   if microformat output is required
-   * @param int     $fieldName     conditional field name
+   * @param array $entityBlock associated array of fields
+   * @param boolean $microformat if microformat output is required
+   * @param int|string $fieldName conditional field name
    *
    * @return array  $addresses     array with address fields
    * @access public
    * @static
    */
-  static function &getValues(&$entityBlock, $microformat = FALSE, $fieldName = 'contact_id') {
+  static function &getValues($entityBlock, $microformat = FALSE, $fieldName = 'contact_id') {
     if (empty($entityBlock)) {
       return NULL;
     }
@@ -541,12 +543,13 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   /**
    * Add the formatted address to $this-> display
    *
-   * @param NULL
+   * @param bool $microformat
+   *
+   * @internal param $NULL
    *
    * @return void
    *
    * @access public
-   *
    */
   function addDisplay($microformat = FALSE) {
     $fields = array(
@@ -581,6 +584,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * Get all the addresses for a specified contact_id, with the primary address being first
    *
    * @param int $id the contact id
+   *
+   * @param bool $updateBlankLocInfo
    *
    * @return array  the array of adrress data
    * @access public
@@ -623,6 +628,7 @@ ORDER BY civicrm_address.is_primary DESC, address_id ASC";
    * @static
    */
   static function allEntityAddress(&$entityElements) {
+    $addresses = array();
     if (empty($entityElements)) {
       return $addresses;
     }
@@ -640,7 +646,6 @@ WHERE ev.id = %1
 ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC, address_id ASC ";
 
     $params = array(1 => array($entityId, 'Integer'));
-    $addresses = array();
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     $locationCount = 1;
     while ($dao->fetch()) {
@@ -648,54 +653,6 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
       $locationCount++;
     }
     return $addresses;
-  }
-
-  static function addStateCountryMap(&$stateCountryMap, $defaults = NULL) {
-    // first fix the statecountry map if needed
-    if (empty($stateCountryMap)) {
-      return;
-    }
-
-    $config = CRM_Core_Config::singleton();
-    if (!isset($config->stateCountryMap)) {
-      $config->stateCountryMap = array();
-    }
-
-    $config->stateCountryMap = array_merge($config->stateCountryMap, $stateCountryMap);
-  }
-
-  static function fixAllStateSelects(&$form, $defaults, $batchFieldNames = false) {
-    $config = CRM_Core_Config::singleton();
-    $map = null;
-    if (is_array($batchFieldNames)) {
-      $map = $batchFieldNames;
-    }
-    elseif (!empty($config->stateCountryMap)) {
-      $map = $config->stateCountryMap;
-    }
-    if (!empty($map)) {
-      foreach ($map as $index => $match) {
-        if (array_key_exists('state_province', $match)
-          || array_key_exists('country', $match)
-          || array_key_exists('county', $match)
-        ) {
-          $countryElementName = CRM_Utils_Array::value('country', $match);
-          $stateProvinceElementName = CRM_Utils_Array::value('state_province', $match);
-          $countyElementName = CRM_Utils_Array::value('county', $match);
-          CRM_Contact_Form_Edit_Address::fixStateSelect(
-            $form,
-            $countryElementName,
-            $stateProvinceElementName,
-            $countyElementName,
-            CRM_Utils_Array::value($countryElementName, $defaults),
-            CRM_Utils_Array::value($stateProvinceElementName, $defaults)
-          );
-        }
-        else {
-          unset($config->stateCountryMap[$index]);
-        }
-      }
-    }
   }
 
   /**
@@ -768,7 +725,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
       CRM_Core_Session::setStatus(ts('Unsupported locale specified to parseStreetAddress: %1. Proceeding with en_US locale.', array(1 => $locale)), ts('Unsupported Locale'), 'alert');
       $locale = 'en_US';
     }
-    $parseFields = array(
+    $emptyParseFields = $parseFields = array(
       'street_name' => '',
       'street_unit' => '',
       'street_number' => '',
@@ -844,7 +801,8 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
       'en_CA', 'fr_CA'))) {
       $streetUnitFormats = array('APT', 'APP', 'SUITE', 'BUREAU', 'UNIT');
     }
-
+    //@todo per CRM-14459 this regex picks up words with the string in them - e.g APT picks up
+    //Captain - presuming fixing regex (& adding test) to ensure a-z does not preced string will fix
     $streetUnitPreg = '/(' . implode('|\s', $streetUnitFormats) . ')(.+)?/i';
     $matches = array();
     if (preg_match($streetUnitPreg, $streetAddress, $matches)) {
@@ -859,6 +817,14 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     //run parsed fields through stripSpaces to clean
     foreach ($parseFields as $parseField => $value) {
       $parseFields[$parseField] = CRM_Utils_String::stripSpaces($value);
+    }
+    //CRM-14459 if the field is too long we should assume it didn't get it right & skip rather than allow
+    // the DB to fatal
+    $fields = CRM_Core_BAO_Address::fields();
+    foreach ($fields as $fieldname => $field) {
+      if(!empty($field['maxlength']) && strlen(CRM_Utils_Array::value($fieldname, $parseFields)) > $field['maxlength']) {
+        return $emptyParseFields;
+      }
     }
 
     return $parseFields;
@@ -1158,8 +1124,10 @@ SELECT is_primary,
    * TODO: In context of chainselect, what to return if e.g. a country has no states?
    *
    * @param String $fieldName
-   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
-   * @param Array  $props: whatever is known about this dao object
+   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
+   * @param Array $props : whatever is known about this dao object
+   *
+   * @return Array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $params = array();
@@ -1176,7 +1144,7 @@ SELECT is_primary,
             $props['country_id'] = $config->defaultContactCountry;
           }
         }
-        if (!empty($props['country_id'])) {
+        if (!empty($props['country_id']) && $context !== 'validate') {
           $params['condition'] = 'country_id IN (' . implode(',', (array) $props['country_id']) . ')';
         }
         break;

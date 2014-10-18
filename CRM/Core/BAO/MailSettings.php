@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -45,17 +45,21 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * Return the DAO object containing to the default row of
    * civicrm_mail_settings and cache it for further calls
    *
-   * @return object  DAO with the default mail settings set
+   * @param bool $reset
+   *
+   * @return CRM_Core_BAO_MailSettings  DAO with the default mail settings set
    */
-  static function &defaultDAO() {
-    static $dao = NULL;
-    if (!$dao) {
-      $dao             = new self;
+  static function defaultDAO($reset = FALSE) {
+    static $mailSettings = array();
+    $domainID = CRM_Core_Config::domainID();
+    if (empty($mailSettings[$domainID]) || $reset) {
+      $dao = new self;
       $dao->is_default = 1;
-      $dao->domain_id  = CRM_Core_Config::domainID();
+      $dao->domain_id  = $domainID;
       $dao->find(TRUE);
+      $mailSettings[$domainID] = $dao;
     }
-    return $dao;
+    return $mailSettings[$domainID];
   }
 
   /**
@@ -140,11 +144,13 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
       return $result;
     }
 
-    $params['is_ssl'] = CRM_Utils_Array::value('is_ssl', $params, FALSE);
-    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+    if(empty($params['id'])) {
+      $params['is_ssl'] = CRM_Utils_Array::value('is_ssl', $params, FALSE);
+      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+    }
 
     //handle is_default.
-    if ($params['is_default']) {
+    if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_mail_settings SET is_default = 0 WHERE domain_id = %1';
       $queryParams = array(1 => array(CRM_Core_Config::domainID(), 'Integer'));
       CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -166,7 +172,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * @access public
    * @static
    */
-  static function &create(&$params) {
+  static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
 
     $mailSettings = self::add($params);
@@ -176,7 +182,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     }
 
     $transaction->commit();
-
+    CRM_Core_BAO_MailSettings::defaultDAO(TRUE);
     return $mailSettings;
   }
 
@@ -185,6 +191,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @param int $id mail settings id
    *
+   * @return mixed|null
    * @access public
    * @static
    *
@@ -202,4 +209,3 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     return $results;
   }
 }
-

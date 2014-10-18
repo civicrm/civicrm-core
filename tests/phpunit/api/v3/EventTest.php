@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,18 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_EventTest
+ */
 class api_v3_EventTest extends CiviUnitTestCase {
   protected $_params;
   protected $_apiversion;
   protected $_entity;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Event Create',
@@ -289,6 +296,17 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
   }
 
+  /**
+   * Test that an event with a price set can be created
+   */
+  function testCreatePaidEvent() {
+    //@todo alter API so that an integer is converted to an array
+    $priceSetParams = array('price_set_id' => (array) 1, 'is_monetary' => 1);
+    $result = $this->callAPISuccess('Event', 'Create', array_merge($this->_params[0], $priceSetParams));
+    $event = $this->callAPISuccess('Event', 'getsingle', array('id' => $result['id'], 'return' => 'price_set_id'));
+    $this->assertArrayKeyExists('price_set_id', $event);
+  }
+
   function testCreateEventParamsNotArray() {
     $params = NULL;
     $result = $this->callAPIFailure('event', 'create', $params);
@@ -482,7 +500,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   function testgetfields() {
-    $description = "demonstrate use of getfields to interogate api";
+    $description = "demonstrate use of getfields to interrogate api";
     $params = array('action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['title']['api.required'], 'in line ' . __LINE__);
@@ -491,19 +509,19 @@ class api_v3_EventTest extends CiviUnitTestCase {
      * test api_action param also works
      */
   function testgetfieldsRest() {
-    $description = "demonstrate use of getfields to interogate api";
+    $description = "demonstrate use of getfields to interrogate api";
     $params = array('api_action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['title']['api.required'], 'in line ' . __LINE__);
   }
   function testgetfieldsGet() {
-    $description = "demonstrate use of getfields to interogate api";
+    $description = "demonstrate use of getfields to interrogate api";
     $params = array('action' => 'get');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals('title', $result['values']['event_title']['name'], 'in line ' . __LINE__);
   }
   function testgetfieldsDelete() {
-    $description = "demonstrate use of getfields to interogate api";
+    $description = "demonstrate use of getfields to interrogate api";
     $params = array('action' => 'delete');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['id']['api.required']);

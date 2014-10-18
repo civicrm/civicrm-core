@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,6 +41,8 @@
  * {@getfields acl_role_create}
  * @example acl_roleCreate.php
  *
+ * @param $params
+ *
  * @return array of newly created acl_role property values.
  * @access public
  */
@@ -55,6 +57,8 @@ function civicrm_api3_acl_role_create($params) {
  * {@getfields acl_role_get}
  * @example acl_roleCreate.php
  *
+ * @param $params
+ *
  * @return array of retrieved acl_role property values.
  * @access public
  */
@@ -68,6 +72,8 @@ function civicrm_api3_acl_role_get($params) {
  * Allowed @params array keys are:
  * {@getfields acl_role_delete}
  * @example acl_roleCreate.php
+ *
+ * @param $params
  *
  * @return array of deleted values.
  * @access public

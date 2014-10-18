@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,7 +54,6 @@
             if you want to cancel the automatic renewal option.{/ts}</p>
       </div>
     {/if}
-    <h3>{ts}Renew Membership{/ts}</h3>
   {/if}
   <div class="crm-block crm-form-block crm-member-membershiprenew-form-block">
     <div id="help" class="description">
@@ -303,9 +302,9 @@
   {/if}
 {literal}
   <script type="text/javascript">
-    cj(function () {
-      cj('#membershipOrgType').hide();
-      cj('#changeNumTerms').hide();
+    CRM.$(function($) {
+      $('#membershipOrgType').hide();
+      $('#changeNumTerms').hide();
       {/literal}
       CRM.buildCustomData('{$customDataType}');
       {if $customDataSubType}
@@ -339,7 +338,7 @@
       cj('#defaultNumTerms').hide();
     }
 
-    cj(function () {
+    CRM.$(function($) {
       cj('#record_contribution').click(function () {
         if (cj(this).prop('checked')) {
           cj('#recordContribution').show();

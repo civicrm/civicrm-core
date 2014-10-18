@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -74,6 +74,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_ContributionPage', $id, 'is_active', $is_active);
   }
 
+  /**
+   * @param $id
+   * @param $values
+   */
   static function setValues($id, &$values) {
     $params = array(
       'id' => $id,
@@ -104,16 +108,18 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Function to send the emails
    *
-   * @param int     $contactID         contact id
-   * @param array   $values            associated array of fields
-   * @param boolean $isTest            if in test mode
+   * @param int $contactID contact id
+   * @param array $values associated array of fields
+   * @param boolean $isTest if in test mode
    * @param boolean $returnMessageText return the message text instead of sending the mail
+   *
+   * @param null $fieldTypes
    *
    * @return void
    * @access public
    * @static
    */
-  static function sendMail($contactID, &$values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
+  static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
     $gIds = $params = array();
     $email = NULL;
     if (isset($values['custom_pre_id'])) {
@@ -269,6 +275,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       if ($preID = CRM_Utils_Array::value('custom_pre_id', $values)) {
         if (!empty($values['related_contact'])) {
           $preProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($preID);
+          //@todo - following line should not refer to undefined $postProfileTypes? figure out way to test
           if (in_array('Individual', $preProfileTypes) || in_array('Contact', $postProfileTypes)) {
             //Take Individual contact ID
             $userID = CRM_Utils_Array::value('related_contact', $values);
@@ -307,7 +314,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'displayName' => $displayName,
         'contributionID' => CRM_Utils_Array::value('contribution_id', $values),
         'contributionOtherID' => CRM_Utils_Array::value('contribution_other_id', $values),
-        'membershipID' => CRM_Utils_Array::value('membership_id', $values),
         // CRM-5095
         'lineItem' => CRM_Utils_Array::value('lineItem', $values),
         // CRM-5095
@@ -341,6 +347,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         list($ccDisplayName, $ccEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($values['related_contact']);
         $ccMailId = "{$ccDisplayName} <{$ccEmail}>";
 
+        //@todo - this is the only place in this function where  $values is altered - but I can't find any evidence it is used
         $values['cc_receipt'] = !empty($values['cc_receipt']) ? ($values['cc_receipt'] . ',' . $ccMailId) : $ccMailId;
 
         // reset primary-email in the template
@@ -362,8 +369,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
       // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
       $sendTemplateParams = array(
-        'groupName' => $tplParams['membershipID'] ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
-        'valueName' => $tplParams['membershipID'] ? 'membership_online_receipt' : 'contribution_online_receipt',
+        'groupName' => !empty($values['isMembership']) ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
+        'valueName' => !empty($values['isMembership']) ? 'membership_online_receipt' : 'contribution_online_receipt',
         'contactId' => $contactID,
         'tplParams' => $tplParams,
         'isTest' => $isTest,
@@ -386,6 +393,15 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_receipt', $values);
         $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_receipt', $values);
+        //send email with pdf invoice
+        $template = CRM_Core_Smarty::singleton( );
+        $taxAmt = $template->get_template_vars('dataArray');
+        $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+        $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+        if (count($taxAmt) > 0 && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+          $sendTemplateParams['isEmailPdf'] = True; 
+          $sendTemplateParams['contributionId'] = $values['contribution_id'];
+        }
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
 
@@ -411,6 +427,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
      * Construct the message to be sent by the send function
      *
      */
+  /**
+   * @param $tplParams
+   * @param $contactID
+   * @param $isTest
+   *
+   * @return array
+   */
   function composeMessage($tplParams, $contactID, $isTest) {
     $sendTemplateParams = array(
       'groupName' => $tplParams['membershipID'] ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
@@ -434,11 +457,11 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Function to send the emails for Recurring Contribution Notication
    *
-   * @param string  $type         txnType
-   * @param int     $contactID    contact id for contributor
-   * @param int     $pageID       contribution page id
-   * @param object  $recur        object of recurring contribution table
-   * @param object  $autoRenewMembership   is it a auto renew membership.
+   * @param string $type txnType
+   * @param int $contactID contact id for contributor
+   * @param int $pageID contribution page id
+   * @param object $recur object of recurring contribution table
+   * @param bool|object $autoRenewMembership is it a auto renew membership.
    *
    * @return void
    * @access public
@@ -532,10 +555,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Function to add the custom fields for contribution page (ie profile)
    *
-   * @param int    $gid            uf group id
+   * @param int $gid uf group id
    * @param string $name
-   * @param int    $cid            contact id
-   * @param array  $params         params to build component whereclause
+   * @param int $cid contact id
+   * @param $template
+   * @param array $params params to build component whereclause
+   *
+   * @param null $fieldTypes
    *
    * @return void
    * @access public
@@ -704,6 +730,7 @@ WHERE entity_table = 'civicrm_contribution_page'
   /**
    * Function to get info for all sections enable/disable.
    *
+   * @param array $contribPageIds
    * @return array $info info regarding all sections.
    * @access public
    * @static
@@ -793,6 +820,112 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
         break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  }
+
+  /**
+   * Get or Set multilingually affected honor params for processing module_data or setting default values.
+   *
+   * @param Array|String $params: Array when we need to format it according to language state or String as a json encode
+   * @param Boolean      $setDefault: If yes then returns array to used for setting default value afterward
+   *
+   * @return array|string
+   */
+  public static function formatMultilingualHonorParams($params, $setDefault = FALSE) {
+    $config = CRM_Core_Config::singleton();
+    $sctJson = $sctJsonDecode = NULL;
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+
+    //When we are fetching the honor params respecting both multi and mono lingual state
+    //and setting it to default param of Contribution Page's Main and Setting form
+    if ($setDefault) {
+      $sctJsonDecode = json_decode($params);
+      $sctJsonDecode = (array) $sctJsonDecode->soft_credit;
+      if (!$domain->locales && !empty($sctJsonDecode['default'])) {
+        //monolingual state
+        $sctJsonDecode += (array) $sctJsonDecode['default'];
+      }
+      elseif (!empty($sctJsonDecode[$config->lcMessages])) {
+        //multilingual state
+        foreach ($sctJsonDecode[$config->lcMessages] as $column => $value) {
+          $sctJsonDecode[$column] = $value;
+        }
+        unset($sctJsonDecode[$config->lcMessages]);
+      }
+      return $sctJsonDecode;
+    }
+
+    //check and handle multilingual honoree params
+    if (!$domain->locales) {
+      //if in singlelingual state simply return the array format
+      $sctJson = json_encode(
+        array(
+          'soft_credit' => array(
+            'soft_credit_types' => $params['soft_credit_types'],
+            'default' => array(
+              'honor_block_title' => $params['honor_block_title'],
+              'honor_block_text' => $params['honor_block_text']
+            )
+          )
+        )
+      );
+    }
+    else {
+      //if in multilingual state then retrieve the module_data against this contribution and
+      //merge with earlier module_data json data to current so not to lose earlier multilingual module_data information
+      $sctJson =  array(
+        'soft_credit' => array(
+          'soft_credit_types' => $params['soft_credit_types'],
+          $config->lcMessages => array (
+            'honor_block_title' => $params['honor_block_title'],
+            'honor_block_text' => $params['honor_block_text']
+          )
+        )
+      );
+
+      $ufJoinDAO = new CRM_Core_DAO_UFJoin();
+      $ufJoinDAO->module = 'soft_credit';
+      $ufJoinDAO->entity_id = $params['id'];
+      $ufJoinDAO->find(TRUE);
+      $jsonData = json_decode($ufJoinDAO->module_data);
+      if ($jsonData) {
+        $sctJson['soft_credit'] = array_merge((array)$jsonData->soft_credit, $sctJson['soft_credit']);
+      }
+      $sctJson = json_encode($sctJson);
+    }
+    return $sctJson;
+  }
+
+   /**
+   * Generate html for pdf in confirmation receipt email  attachment
+   * @param int $contributionId Contribution Page Id
+   * @param int $userID contact id for contributor
+   * @return array $pdfHtml
+   */
+  static function addInvoicePdfToEmail($contributionId, $userID) {
+    $contributionID = array($contributionId);
+    $contactId = array($userID);
+    $pdfParams = array(
+      'output' => 'pdf_invoice',
+      'forPage' => 'confirmpage'
+    );
+    $pdfHtml = CRM_Contribute_Form_Task_Invoice::printPDF($contributionID,
+      $pdfParams, $contactId, CRM_Core_DAO::$_nullObject);
+    return $pdfHtml;
+  }
+
+  /**
+   * helper to determine if the page supports separate membership payments
+   * @param integer id form id
+   *
+   * @return bool isSeparateMembershipPayment
+   */
+  static function getIsMembershipPayment($id) {
+    $membershipBlocks = civicrm_api3('membership_block', 'get', array('entity_table' => 'civicrm_contribution_page', 'entity_id' => $id, 'sequential' => TRUE));
+    if(!$membershipBlocks['count']) {
+      return FALSE;
+    }
+    return $membershipBlocks['values'][0]['is_separate_payment'];
   }
 }
 

@@ -1,6 +1,13 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Contact_BAO_ContactType_ContactTypeTest
+ */
 class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Contact Subtype',

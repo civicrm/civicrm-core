@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_PricesetMaxCountTest
+ */
 class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -35,8 +39,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create priceset
@@ -113,32 +117,28 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $pricesetLoc = $this->getLocation();
 
     // get text field Id.
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $textFieldId = $this->urlArg('fid');
+    $this->waitForElementPresent("xpath=//div[@id='crm-main-content-wrapper']/div/a[1]");
+    $textFieldIdURL = $this->getAttribute("xpath=//div[@id='field_page']/table/tbody/tr[1]/td[9]/span[1]/a[2]@href");
+    $textFieldId = $this->urlArg('fid', $textFieldIdURL);
 
     $this->open($pricesetLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // get select field id
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[2]/span[2]");
     $selectFieldLoc = $this->getLocation();
-    $selectFieldId = $this->urlArg('fid');
+    $selectFieldURL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[9]/span[1]/a[2]@href");
+    $selectFieldId = $this->urlArg('fid', $selectFieldURL);
 
     // get select field ids
     // get select field option1
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $selectFieldOp1 = $this->urlArg('oid');
-
-    $this->open($selectFieldLoc);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp1 = $this->urlArg('oid', $selectFieldOp1URL);
 
     // get select field option2
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $selectFieldOp2 = $this->urlArg('oid');
+    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp2 = $this->urlArg('oid', $selectFieldOp2URL);
 
     // create event.
     $eventTitle = 'Meeting - ' . substr(sha1(rand()), 0, 7);
@@ -230,8 +230,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create priceset
@@ -315,31 +315,28 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $pricesetLoc = $this->getLocation();
 
     // get text field Id.
-    $this->clickLink("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]");
-    $textFieldId = $this->urlArg('fid');
+    $this->waitForElementPresent("xpath=//div[@id='crm-main-content-wrapper']/div/a[1]");
+    $textFieldIdURL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]@href");
+    $textFieldId = $this->urlArg('fid', $textFieldIdURL);
 
     $this->open($pricesetLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // get select field id
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[2]/span[2]");
     $selectFieldLoc = $this->getLocation();
-    $selectFieldId = $this->urlArg('fid');
+    $selectFieldURL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[9]/span[1]/a[2]@href");
+    $selectFieldId = $this->urlArg('fid', $selectFieldURL);
 
     // get select field ids
     // get select field option1
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $selectFieldOp1 = $this->urlArg('oid');
-
-    $this->open($selectFieldLoc);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp1 = $this->urlArg('oid', $selectFieldOp1URL);
 
     // get select field option2
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $selectFieldOp2 = $this->urlArg('oid');
+    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp2 = $this->urlArg('oid', $selectFieldOp2URL);
 
     // create event.
     $eventTitle = 'Meeting - ' . substr(sha1(rand()), 0, 7);
@@ -432,8 +429,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create priceset
@@ -510,31 +507,28 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $pricesetLoc = $this->getLocation();
 
     // get text field Id.
-    $this->clickLink("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]");
-    $textFieldId = $this->urlArg('fid');
+    $this->waitForElementPresent("xpath=//div[@id='crm-main-content-wrapper']/div/a[1]");
+    $textFieldURL = $this->getAttribute("xpath=//div[@id='field_page']/table/tbody/tr[1]/td[9]/span[1]/a[2]@href");
+    $textFieldId = $this->urlArg('fid', $textFieldURL);
 
     $this->open($pricesetLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // get select field id
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[2]/span[2]");
     $selectFieldLoc = $this->getLocation();
-    $selectFieldId = $this->urlArg('fid');
+    $selectFieldURL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[9]/span[1]/a[2]@href");
+    $selectFieldId = $this->urlArg('fid', $selectFieldURL);
 
     // get select field ids
     // get select field option1
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $selectFieldOp1 = $this->urlArg('oid');
-
-    $this->open($selectFieldLoc);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']/table/tbody/tr[1]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp1 = $this->urlArg('oid', $selectFieldOp1URL);
 
     // get select field option2
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $selectFieldOp2 = $this->urlArg('oid');
+    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']/table/tbody/tr[2]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp2 = $this->urlArg('oid', $selectFieldOp2URL);
 
     // create event.
     $eventTitle = 'Meeting - ' . substr(sha1(rand()), 0, 7);
@@ -720,8 +714,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create priceset
@@ -805,32 +799,28 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $pricesetLoc = $this->getLocation();
 
     // get text field Id.
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $textFieldId = $this->urlArg('fid');
+    $this->waitForElementPresent("xpath=//div[@id='crm-main-content-wrapper']/div/a[1]");
+    $textFieldIdURL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]@href");
+    $textFieldId = $this->urlArg('fid', $textFieldIdURL);
 
     $this->open($pricesetLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // get select field id
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[2]/span[2]");
     $selectFieldLoc = $this->getLocation();
-    $selectFieldId = $this->urlArg('fid');
+    $selectFieldURL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[9]/span[1]/a[2]@href");
+    $selectFieldId = $this->urlArg('fid', $selectFieldURL);
 
     // get select field ids
     // get select field option1
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $selectFieldOp1 = $this->urlArg('oid');
-
-    $this->open($selectFieldLoc);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $selectFieldOp1URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp1 = $this->urlArg('oid', $selectFieldOp1URL);
 
     // get select field option2
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $selectFieldOp2 = $this->urlArg('oid');
+    $selectFieldOp2URL = $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]@href");
+    $selectFieldOp2 = $this->urlArg('oid', $selectFieldOp2URL);
 
     // create event.
     $eventTitle = 'Meeting - ' . substr(sha1(rand()), 0, 7);
@@ -1012,6 +1002,10 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->_checkConfirmationAndRegister();
   }
 
+  /**
+   * @param $setTitle
+   * @param null $financialType
+   */
   function _testAddSet($setTitle, $financialType = NULL) {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
@@ -1020,20 +1014,25 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->check('extends_1');
 
     if ($financialType) {
-      $this->select("css=select.form-select", "label={$financialType}");
+      $this->select("css=select.crm-form-select", "label={$financialType}");
     }
 
     $this->click("xpath=//form[@id='Set']/div[3]/table/tbody/tr[4]/td[2]/select");
     $this->type('help_pre', 'This is test priceset.');
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom');
   }
 
+  /**
+   * @param $fields
+   */
   function _testAddPriceFields($fields) {
     $fieldCount = count($fields);
     $count = 1;
+    $this->waitForElementPresent('label');
     foreach ($fields as $label => $field) {
+      $this->waitForElementPresent('label');
       $this->type('label', $label);
       $this->select('html_type', "value={$field['type']}");
 
@@ -1075,12 +1074,17 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       else {
         $this->click('_qf_Field_next-bottom');
       }
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->waitForAjaxContent();
+      $this->waitForText('crm-notification-container', "Price Field '$label' has been saved.");
 
       $count++;
     }
   }
 
+  /**
+   * @param $options
+   * @param $fieldType
+   */
   function _testAddMultipleChoiceOptions($options, $fieldType) {
     foreach ($options as $oIndex => $oValue) {
       $this->type("option_label_{$oIndex}", $oValue['label']);
@@ -1112,6 +1116,11 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $params
+   *
+   * @return string
+   */
   function _testAddEvent($params) {
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
@@ -1157,8 +1166,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       }
     }
 
-    $this->click('_qf_Fee_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Fee_upload-bottom', 'link=Online Registration', FALSE);
 
     // Go to Online Registration tab
     $this->click('link=Online Registration');
@@ -1171,6 +1179,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       $this->click('is_multiple_registrations');
     }
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField('intro_text', 'Fill in all the fields below and click Continue.');
 
     // enable confirmation email
@@ -1179,8 +1188,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type('confirm_from_email', 'jane.doe@example.org');
 
     $this->click('_qf_Registration_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Registration' information has been saved.");
+    $this->waitForTextPresent("'Fees' information has been saved.");
 
     // verify event input on info page
     // start at Manage Events listing

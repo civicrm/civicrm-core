@@ -2,5 +2,5 @@
 
 <tables xmlns:xi="http://www.w3.org/2001/XInclude">
 
-<xi:include href="Instance.xml" parse="xml" />
+<xi:include href="ReportInstance.xml" parse="xml" />
 </tables>

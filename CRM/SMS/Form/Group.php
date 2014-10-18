@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -121,7 +121,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     );
 
     //get the mailing groups.
-    $groups = CRM_Core_PseudoConstant::group('Mailing');
+    $groups = CRM_Core_PseudoConstant::nestedGroup('Mailing');
 
     //get the sms mailing list
     $mailings = CRM_Mailing_PseudoConstant::completed('sms');
@@ -132,56 +132,39 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     // run the groups through a hook so users can trim it if needed
     CRM_Utils_Hook::mailingGroups($this, $groups, $mailings);
 
-    $inG = &$this->addElement('advmultiselect', 'includeGroups',
-      ts('Include Group(s)') . ' ',
+    $select2style = array(
+      'multiple' => TRUE,
+      'style' => 'width: 100%; max-width: 60em;',
+      'class' => 'crm-select2',
+      'placeholder' => ts('- select -'),
+    );
+
+    $this->add('select', 'includeGroups',
+      ts('Include Group(s)'),
       $groups,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+      TRUE,
+      $select2style
     );
 
-    $this->addRule('includeGroups', ts('Please select a group to be SMSed.'), 'required');
-
-    $outG = &$this->addElement('advmultiselect', 'excludeGroups',
-      ts('Exclude Group(s)') . ' ',
+    $this->add('select', 'excludeGroups',
+      ts('Exclude Group(s)'),
       $groups,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+      FALSE,
+      $select2style
     );
 
-    $inG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $outG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-    $outG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-
-    $inM = &$this->addElement('advmultiselect', 'includeMailings',
-      ts('INCLUDE Recipients of These Mailing(s)') . ' ',
+    $this->add('select', 'includeMailings',
+      ts('INCLUDE Recipients of These Message(s)'),
       $mailings,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+      FALSE,
+      $select2style
     );
-    $outM = &$this->addElement('advmultiselect', 'excludeMailings',
-      ts('EXCLUDE Recipients of These Mailing(s)') . ' ',
+    $this->add('select', 'excludeMailings',
+      ts('EXCLUDE Recipients of These Message(s)'),
       $mailings,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+      FALSE,
+      $select2style
     );
-
-    $inM->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $outM->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inM->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-    $outM->setButtonAttributes('remove', array('value' => ts('<< Remove')));
 
     $this->addFormRule(array('CRM_SMS_Form_Group', 'formRule'));
 

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Survey
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 
@@ -63,11 +63,11 @@ function _civicrm_api3_survey_create_spec(&$params) {
 /**
  * Returns array of surveys  matching a set of one or more group properties
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params Array of one or more valid
  *                       property_name=>value pairs. If $params is set
  *                       as null, all surveys will be returned
  *
- * @return array  (referance) Array of matching surveys
+ * @return array  API result Array of matching surveys
  * {@getfields survey_get}
  * @access public
  */
@@ -81,11 +81,10 @@ function civicrm_api3_survey_get($params) {
  * This method is used to delete any existing survey. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params  (reference) array containing id of the group
+ * @param array $params array containing id of the group
  *                       to be deleted
  *
- * @return array  (referance) returns flag true if successfull, error
- *                message otherwise
+ * @return array api result array
  * {@getfields survey_delete}
  * @access public
  */

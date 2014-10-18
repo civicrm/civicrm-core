@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -76,6 +76,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     );
 
     $fields = array_merge($fields, array(
+      'source_contact_id' => array(
+        'title' => ts('Source Contact'),
+        'headerPattern' => '/Source.Contact?/i',
+      ),
       'activity_label' => array(
         'title' => ts('Activity Type Label'),
         'headerPattern' => '/(activity.)?type label?/i',
@@ -261,7 +265,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     foreach ($params as $key => $val) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        if ($key == 'activity_date_time' && $val) {
+        if ($val) {
           $params[$key] = CRM_Utils_Date::formatDate($val, $dateType);
         }
         elseif ($customFields[$customFieldID]['data_type'] == 'Date') {
@@ -270,6 +274,9 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
         elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
           $params[$key] = CRM_Utils_String::strtoboolstr($val);
         }
+      }
+      elseif ($key == 'activity_date_time') {
+        $params[$key] = CRM_Utils_Date::formatDate($val, $dateType);
       }
       elseif ($key == 'activity_subject') {
         $params['subject'] = $val;

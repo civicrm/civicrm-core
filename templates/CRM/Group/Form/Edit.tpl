@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -87,29 +87,8 @@
   </tr>
     </table>
 
-    {if $parent_groups|@count > 0 or $form.parents.html}
-  <h3>{ts}Parent Groups{/ts} {help id="id-group-parent" file="CRM/Group/Page/Group.hlp"}</h3>
-        {if $parent_groups|@count > 0}
-      <table class="form-layout-compressed">
-    <tr>
-        <td><label>{ts}Remove Parent?{/ts}</label></td>
-    </tr>
-    {foreach from=$parent_groups item=cgroup key=group_id}
-        {assign var="element_name" value="remove_parent_group_"|cat:$group_id}
-        <tr>
-      <td>&nbsp;&nbsp;{$form.$element_name.html}&nbsp;{$form.$element_name.label}</td>
-        </tr>
-    {/foreach}
-      </table>
-      <br />
-        {/if}
-        <table class="form-layout-compressed">
-      <tr class="crm-group-form-block-parents">
-          <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.parents.label}</td>
-          <td>{$form.parents.html|crmAddClass:huge}</td>
-      </tr>
-  </table>
-    {/if}
+  {*CRM-14190*}
+  {include file="CRM/Group/Form/ParentGroups.tpl"}
 
     {if $form.organization_id}
   <h3>{ts}Associated Organization{/ts} {help id="id-group-organization" file="CRM/Group/Page/Group.hlp"}</h3>
@@ -125,7 +104,7 @@
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
     {if $action neq 1}
   <div class="action-link">
-      <a class="no-popup" href="{$crmURL}">&raquo; {ts}Contacts in this Group{/ts}</a>
+      <a {$crmURL}>&raquo; {ts}Contacts in this Group{/ts}</a>
       {if $group.saved_search_id}
           <br />
     {if $group.mapping_id}

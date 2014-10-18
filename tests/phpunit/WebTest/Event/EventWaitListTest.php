@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_EventWaitListTest
+ */
 class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -33,8 +37,8 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage("event/add", "reset=1&action=add");
@@ -75,14 +79,15 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->type("address_1_street_address", $streetAddress);
     $this->type("address_1_city", "San Francisco");
     $this->type("address_1_postal_code", "94117");
+    $this->select('address_1_country_id', 'United States');
     $this->select("address_1_state_province_id", "value=1004");
     $this->type("email_1_email", "info@civicrm.org");
 
     $this->click("_qf_Location_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Location' information has been saved.");
+    $this->waitForElementPresent("_qf_Location_upload-bottom");
+    $this->waitForTextPresent("'Event Location' information has been saved.");
 
     // Go to Fees tab
     $this->click("link=Fees");
@@ -101,8 +106,8 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->click("_qf_Fee_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Fee' information has been saved.");
+    $this->waitForElementPresent("_qf_Fee_upload-bottom");
+    $this->waitForTextPresent("'Fees' information has been saved.");
 
     // intro text for registration page
     $registerIntro = "Fill in all the fields below and click Continue.";
@@ -119,6 +124,7 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
       $this->assertChecked("is_multiple_registrations");
     }
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField("intro_text", $registerIntro);
 
     // enable confirmation email
@@ -127,8 +133,8 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->type("confirm_from_email", "jane.doe@example.org");
 
     $this->click("_qf_Registration_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Registration' information has been saved.");
+    $this->waitForElementPresent("_qf_Registration_upload-bottom");
+    $this->waitForTextPresent("'Online Registration' information has been saved.");
 
     $eventInfoStrings = array($eventTitle, $eventDescription, $streetAddress);
     $this->_testVerifyEventInfo($eventTitle, $eventInfoStrings);
@@ -149,6 +155,10 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent("This event is currently full.");
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventInfoStrings
+   */
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings) {
     // verify event input on info page
     // start at Manage Events listing
@@ -159,6 +169,11 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent($eventInfoStrings);
   }
 
+  /**
+   * @param $registerStrings
+   *
+   * @return string
+   */
   function _testVerifyRegisterPage($registerStrings) {
     // Go to Register page and check for intro text and fee levels
     $this->click("link=Register Now");
@@ -167,6 +182,11 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     return $this->getLocation();
   }
 
+  /**
+   * @param $registerUrl
+   * @param int $numberRegistrations
+   * @param bool $anonymous
+   */
   function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
     if ($anonymous) {
       $this->webtestLogout();

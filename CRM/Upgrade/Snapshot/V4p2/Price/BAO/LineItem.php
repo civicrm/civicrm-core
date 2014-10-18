@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -98,6 +98,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    *
    * @param $entityId  int    participant/contribution id
    * @param $entity    string participant/contribution.
+   *
+   * @param null $isQuick
    *
    * @return array of line items
    */
@@ -169,10 +171,10 @@ WHERE     %2.id = %1";
    * processAmount method
    *
    * @param  int   $fid       price set field id
-   * @param  array $params    referance to form values
-   * @param  array $fields    referance to array of fields belonging
+   * @param  array $params    reference to form values
+   * @param  array $fields    reference to array of fields belonging
    *                          to the price set used for particular event
-   * @param  array $values    referance to the values array(
+   * @param  array $values    reference to the values array(
      this is
    *                          lineItem array)
    *
@@ -203,7 +205,7 @@ WHERE     %2.id = %1";
     foreach ($params["price_{$fid}"] as $oid => $qty) {
       $price = $options[$oid]['amount'];
 
-      // lets clean the price in case it is not yet cleant
+      // lets clean the price in case it is not yet cleaned
       // CRM-10974
       $price = CRM_Utils_Rule::cleanMoney($price);
 
@@ -233,6 +235,7 @@ WHERE     %2.id = %1";
    * @param int $entityId
    * @param int $entityTable
    *
+   * @return bool
    * @access public
    * @static
    */
@@ -251,6 +254,12 @@ WHERE     %2.id = %1";
     return $result;
   }
 
+  /**
+   * @param $entityId
+   * @param string $entityTable
+   * @param $amount
+   * @param null $otherParams
+   */
   public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
     if (!$entityId || CRM_Utils_System::isNull($amount))
       return;

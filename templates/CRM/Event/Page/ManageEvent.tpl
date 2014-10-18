@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,7 +49,7 @@
 {include file="CRM/Event/Form/SearchEvent.tpl"}
 
 <div class="action-link">
-  <a accesskey="N" href="{$newEventURL}" id="newManageEvent" class="button">
+  <a accesskey="N" href="{$newEventURL}" id="newManageEvent" class="button crm-popup">
     <span><div class="icon add-icon"></div>{ts}Add Event{/ts}</span>
   </a>
   <div class="clear"></div>
@@ -87,7 +87,8 @@
           <tr id="event-{$row.id}" class="crm-entity {if NOT $row.is_active} disabled{/if}">
           <td class="crm-event_{$row.id}">
             <a href="{crmURL p='civicrm/event/info' q="id=`$row.id`&reset=1"}"
-               title="{ts}View event info page{/ts}" class="bold">{$row.title}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})
+               title="{ts}View event info page{/ts}" class="bold">{$row.title}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})<br/>
+               <span><b>{$row.repeat}</b></span>
           </td>
           <td class="crm-event-city">{$row.city}</td>
           <td class="crm-event-state_province">{$row.state_province}</td>
@@ -103,12 +104,12 @@
           </td>
           <td class="crm-event-actions right nowrap">
             <div class="crm-configure-actions">
-              <span id="event-configure-{$row.id}" class="btn-slide">{ts}Configure{/ts}
+              <span id="event-configure-{$row.id}" class="btn-slide crm-hover-button">{ts}Configure{/ts}
                 <ul class="panel" id="panel_info_{$row.id}">
                   {foreach from=$rows.tab key=k item=v}
                     {assign var="fld" value=$v.field}
                     {if NOT $row.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
-                    <li><a title="{$v.title}" class="action-item-wrap {$status}"
+                    <li><a title="{$v.title}" class="action-item crm-hover-button {$status}"
                            href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$row.id`"}">{$v.title}</a></li>
                   {/foreach}
                 </ul>
@@ -116,18 +117,18 @@
             </div>
 
             <div class=crm-event-participants>
-              <span id="event-participants-{$row.id}" class="btn-slide">{ts}Participants{/ts}
+              <span id="event-participants-{$row.id}" class="btn-slide crm-hover-button">{ts}Participants{/ts}
                 <ul class="panel" id="panel_participants_{$row.id}">
                   {if $findParticipants.statusCounted}
                     <li>
-                      <a title="Counted" class="action-item-wrap" href="{crmURL p='civicrm/event/search'
+                      <a title="Counted" class="action-item crm-hover-button" href="{crmURL p='civicrm/event/search'
                       q="reset=1&force=1&status=true&event=`$row.id`"}">{$findParticipants.statusCounted}
                       </a>
                     </li>
                   {/if}
                   {if $findParticipants.statusNotCounted}
                     <li>
-                      <a title="Not Counted" class="action-item-wrap"
+                      <a title="Not Counted" class="action-item crm-hover-button"
                            href="{crmURL p='civicrm/event/search'
                            q="reset=1&force=1&status=false&event=`$row.id`"}">{$findParticipants.statusNotCounted}
                       </a>
@@ -135,7 +136,7 @@
                   {/if}
                   {if $row.participant_listing_id}
                     <li>
-                      <a title="Public Participant Listing" class="action-item-wrap"
+                      <a title="Public Participant Listing" class="action-item crm-hover-button"
                          href="{crmURL p='civicrm/event/participant' q="reset=1&id=`$row.id`"
                          fe='true'}">{ts}Public Participant Listing{/ts}
                       </a>
@@ -146,26 +147,26 @@
             </div>
 
             <div class="crm-event-links">
-              <span id="event-links-{$row.id}" class="btn-slide">{ts}Event Links{/ts}
+              <span id="event-links-{$row.id}" class="btn-slide crm-hover-button">{ts}Event Links{/ts}
                 <ul class="panel" id="panel_links_{$row.id}">
                   <li>
-                    <a title="Register Participant" class="action-item" href="{crmURL p='civicrm/participant/add'
+                    <a title="Register Participant" class="action-item crm-hover-button" href="{crmURL p='civicrm/participant/add'
                     q="reset=1&action=add&context=standalone&eid=`$row.id`"}">{ts}Register Participant{/ts}</a>
                   </li>
                   <li>
-                    <a title="Event Info" class="action-item" href="{crmURL p='civicrm/event/info'
+                    <a title="Event Info" class="action-item crm-hover-button" href="{crmURL p='civicrm/event/info'
                     q="reset=1&id=`$row.id`" fe='true'}" target="_blank">{ts}Event Info{/ts}
                     </a>
                   </li>
                   {if $row.is_online_registration}
                     <li>
-                      <a title="Online Registration (Test-drive)" class="action-item"
+                      <a title="Online Registration (Test-drive)" class="action-item crm-hover-button"
                          href="{crmURL p='civicrm/event/register'
                          q="reset=1&action=preview&id=`$row.id`"}">{ts}Registration (Test-drive){/ts}
                       </a>
                     </li>
                     <li>
-                      <a title="Online Registration (Live)" class="action-item" href="{crmURL p='civicrm/event/register'
+                      <a title="Online Registration (Live)" class="action-item crm-hover-button" href="{crmURL p='civicrm/event/register'
                       q="reset=1&id=`$row.id`" fe='true'}" target="_blank">{ts}Registration (Live){/ts}
                       </a>
                     </li>

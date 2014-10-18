@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,17 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 
 require_once 'CRM/Auction/DAO/Auction.php';
+
+/**
+ * Class CRM_Auction_BAO_Item
+ */
 class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
 
   /**
@@ -136,6 +140,7 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
    *
    * @param array $params reference array contains the values submitted by the form
    *
+   * @return object
    * @access public
    * @static
    *
@@ -177,12 +182,13 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
   /**
    * Function to check if email is enabled for a given profile
    *
-   * @param int $id profile id
+   * @param $profileId
+   *
+   * @internal param int $id profile id
    *
    * @return boolean
    * @access public
    * @static
-   *
    */
   static
   function isEmailInProfile($profileId) {

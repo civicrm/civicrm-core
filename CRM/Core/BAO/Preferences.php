@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,9 @@
  */
 class CRM_Core_BAO_Preferences {
 
+  /**
+   * @param $params
+   */
   static function fixAndStoreDirAndURL(&$params) {
     $sql = "
 SELECT v.name as valueName, g.name as optionName
@@ -74,6 +77,10 @@ AND    v.is_active = 1
     }
   }
 
+  /**
+   * @param $params
+   * @param string $type
+   */
   static function storeDirectoryOrURLPreferences(&$params, $type = 'directory') {
     $optionName = ($type == 'directory') ? 'directory_preferences' : 'url_preferences';
 
@@ -103,6 +110,10 @@ AND    v.name = %3
     }
   }
 
+  /**
+   * @param $params
+   * @param bool $setInConfig
+   */
   static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
     if ($setInConfig) {
       $config = CRM_Core_Config::singleton();

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -139,37 +139,59 @@ WHERE  id IN ( $idString )
   }
 
   /**
-   * Generate a checksum for a contactID
+   * Generate a checksum for a $entityId of type $entityType
    *
-   * @param int    $contactID
-   * @param int    $ts         timestamp that checksum was generated
-   * @param int    $live       life of this checksum in hours/ 'inf' for infinite
-   * @param string $hash       contact hash, if sent, prevents a query in inner loop
+   * @param int $entityId
+   * @param int $ts timestamp that checksum was generated
+   * @param int $live life of this checksum in hours/ 'inf' for infinite
+   * @param string $hash contact hash, if sent, prevents a query in inner loop
+   *
+   * @param string $entityType
+   * @param null $hashSize
    *
    * @return array ( $cs, $ts, $live )
    * @static
    * @access public
    */
-  static function generateChecksum($contactID, $ts = NULL, $live = NULL, $hash = NULL) {
-    // return a warning message if we dont get a contactID
+  static function generateChecksum($entityId, $ts = NULL, $live = NULL, $hash = NULL, $entityType = 'contact', $hashSize = NULL) {
+    // return a warning message if we dont get a entityId
     // this typically happens when we do a message preview
     // or an anon mailing view - CRM-8298
-    if (!$contactID) {
+    if (!$entityId) {
       return 'invalidChecksum';
     }
 
     if (!$hash) {
-      $hash = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $contactID, 'hash'
-      );
+      if ($entityType == 'contact') {
+        $hash = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+          $entityId, 'hash'
+        );
+      }
+      elseif ($entityType == 'mailing') {
+        $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing',
+          $entityId, 'hash'
+        );
+      }
     }
 
     if (!$hash) {
       $hash = md5(uniqid(rand(), TRUE));
-      CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact',
-        $contactID,
-        'hash', $hash
-      );
+      if ($hashSize) {
+        $hash = substr($hash, 0, $hashSize);
+      }
+
+      if ($entityType == 'contact') {
+        CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact',
+          $entityId,
+          'hash', $hash
+        );
+      }
+      elseif ($entityType == 'mailing') {
+        CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Mailing',
+          $entityId,
+          'hash', $hash
+        );
+      }
     }
 
     if (!$ts) {
@@ -185,7 +207,7 @@ WHERE  id IN ( $idString )
       $live = 24 * $days;
     }
 
-    $cs = md5("{$hash}_{$contactID}_{$ts}_{$live}");
+    $cs = md5("{$hash}_{$entityId}_{$ts}_{$live}");
     return "{$cs}_{$ts}_{$live}";
   }
 
@@ -253,26 +275,19 @@ UNION
   /**
    * Create Current employer relationship for a individual
    *
-   * @param int    $contactID        contact id of the individual
-   * @param string $organization     it can be name or id of organization
+   * @param int $contactID contact id of the individual
+   * @param $organization (id or name)
+   * @param null $previousEmployerID
+   *
+   * @internal param string $organization it can be name or id of organization
    *
    * @access public
    * @static
    */
-  static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL) {
-    $organizationId = NULL;
-
-    // if organization id is passed.
-    if (is_numeric($organization)) {
-      $organizationId = $organization;
-    }
-    else {
-      $orgName = explode('::', $organization);
-      trim($orgName[0]);
-
-      $organizationParams = array();
-      $organizationParams['organization_name'] = $orgName[0];
-
+  static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
+    //if organization name is passed. CRM-15368
+    if ($newContact && !is_numeric($organization)) {
+      $organizationParams['organization_name'] = $organization;
       $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
 
       $dedupeParams['check_permission'] = FALSE;
@@ -281,7 +296,7 @@ UNION
       if (is_array($dupeIDs) && !empty($dupeIDs)) {
         // we should create relationship only w/ first org CRM-4193
         foreach ($dupeIDs as $orgId) {
-          $organizationId = $orgId;
+          $organization = $orgId;
           break;
         }
       }
@@ -289,14 +304,14 @@ UNION
         //create new organization
         $newOrg = array(
           'contact_type' => 'Organization',
-          'organization_name' => trim($orgName[0]),
+          'organization_name' => $organization,
         );
         $org = CRM_Contact_BAO_Contact::create($newOrg);
-        $organizationId = $org->id;
+        $organization = $org->id;
       }
     }
 
-    if ($organizationId) {
+    if ($organization && is_numeric($organization)) {
       $cid = array('contact' => $contactID);
 
       // get the relationship type id of "Employee of"
@@ -309,40 +324,43 @@ UNION
       $relationshipParams = array(
         'is_active' => TRUE,
         'relationship_type_id' => $relTypeId . '_a_b',
-        'contact_check' => array($organizationId => TRUE),
+        'contact_check' => array($organization => TRUE),
       );
       list($valid, $invalid, $duplicate,
         $saved, $relationshipIds
       ) = CRM_Contact_BAO_Relationship::create($relationshipParams, $cid);
 
 
-      // In case we change employer, clean prveovious employer related records.
-      if (!$previousEmployerID) {
+      // In case we change employer, clean previous employer related records.
+      if (!$previousEmployerID && !$newContact) {
         $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
       }
       if ($previousEmployerID &&
-        $previousEmployerID != $organizationId
+        $previousEmployerID != $organization
       ) {
         self::clearCurrentEmployer($contactID, $previousEmployerID);
       }
 
       // set current employer
-      self::setCurrentEmployer(array($contactID => $organizationId));
+      self::setCurrentEmployer(array($contactID => $organization));
 
       $relationshipParams['relationship_ids'] = $relationshipIds;
       // handle related meberships. CRM-3792
-      self::currentEmployerRelatedMembership($contactID, $organizationId, $relationshipParams, $duplicate, $previousEmployerID);
+      self::currentEmployerRelatedMembership($contactID, $organization, $relationshipParams, $duplicate, $previousEmployerID);
     }
   }
 
   /**
    * create related memberships for current employer
    *
-   * @param int     $contactID          contact id of the individual
-   * @param int     $employerID         contact id of the organization.
-   * @param array   $relationshipParams relationship params.
-   * @param boolean $duplicate          are we triggered existing relationship.
+   * @param int $contactID contact id of the individual
+   * @param int $employerID contact id of the organization.
+   * @param array $relationshipParams relationship params.
+   * @param boolean $duplicate are we triggered existing relationship.
    *
+   * @param null $previousEmpID
+   *
+   * @throws CiviCRM_API3_Exception
    * @access public
    * @static
    */
@@ -455,29 +473,21 @@ WHERE id={$contactId}; ";
    *
    * @param $form              object  invoking Object
    * @param $contactType       string  contact type
+   * @param $countryID
+   * @param $stateID
    * @param $title             string  fieldset title
-   * @param $maxLocationBlocks int     number of location blocks
+   *
+   * @internal param int $maxLocationBlocks number of location blocks
    *
    * @static
-   *
    */
-  static function buildOnBehalfForm(&$form,
-    $contactType       = 'Individual',
-    $countryID         = NULL,
-    $stateID           = NULL,
-    $title             = 'Contact Information',
-    $contactEditMode   = FALSE,
-    $maxLocationBlocks = 1
-  ) {
-    if ($title == 'Contact Information') {
-      $title = ts('Contact Information');
-    }
+  static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
 
     $config = CRM_Core_Config::singleton();
 
     $form->assign('contact_type', $contactType);
     $form->assign('fieldSetTitle', $title);
-    $form->assign('contactEditMode', $contactEditMode);
+    $form->assign('contactEditMode', TRUE);
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
     if ($form->_contactId) {
@@ -486,41 +496,11 @@ WHERE id={$contactId}; ";
 
     switch ($contactType) {
       case 'Organization':
-        $session = CRM_Core_Session::singleton();
-        $contactID = $session->get('userID');
-
-        if ($contactID) {
-          $employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($contactID);
-        }
-
-        $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', 'cid=', FALSE, NULL, FALSE);
-        $form->assign('locDataURL', $locDataURL);
-
-        if (!$contactEditMode && $contactID && (count($employers) >= 1)) {
-
-          $dataURL = CRM_Utils_System::url('civicrm/ajax/employer',
-            'cid=' . $contactID,
-            FALSE, NULL, FALSE
-          );
-          $form->assign('employerDataURL', $dataURL);
-
-          $form->add('text', 'organization_id', ts('Select an existing related Organization OR Enter a new one'));
-          $form->add('hidden', 'onbehalfof_id', '', array('id' => 'onbehalfof_id'));
-          $orgOptions = array('0' => ts('Create new organization'),
-            '1' => ts('Select existing organization'),
-          );
-          $orgOptionExtra = array('onclick' => "showHideByValue('org_option','true','select_org','table-row','radio',true);showHideByValue('org_option','true','create_org','table-row','radio',false);");
-          $form->addRadio('org_option', ts('options'), $orgOptions, $orgOptionExtra);
-          $form->assign('relatedOrganizationFound', TRUE);
-        }
-
         $form->add('text', 'organization_name', ts('Organization Name'), $attributes['organization_name'], TRUE);
         break;
 
       case 'Household':
-        $form->add('text', 'household_name', ts('Household Name'),
-          $attributes['household_name']
-        );
+        $form->add('text', 'household_name', ts('Household Name'),  $attributes['household_name']);
         break;
 
       default:
@@ -563,15 +543,6 @@ WHERE id={$contactId}; ";
     );
     //build the address block
     CRM_Contact_Form_Edit_Address::buildQuickForm($form);
-
-    // also fix the state country selector
-    CRM_Contact_Form_Edit_Address::fixStateSelect($form,
-      'address[1][country_id]',
-      'address[1][state_province_id]',
-      "address[1][county_id]",
-      $countryID,
-      $stateID
-    );
   }
 
   /**
@@ -594,6 +565,8 @@ UPDATE civicrm_contact
    * Given an array of contact ids this function will return array with links to view contact page
    *
    * @param array $contactIDs associated contact id's
+   * @param bool $addViewLink
+   * @param bool $addEditLink
    * @param int $originalId associated with the contact which is edited
    *
    *
@@ -664,7 +637,7 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
 
       // do check for view.
       if (array_key_exists('view', $hasPermissions)) {
-        $contactLinks['rows'][$i]['view'] = '<a class="action-item action-item-first" href="' . CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $dao->id) . '" target="_blank">' . ts('View') . '</a>';
+        $contactLinks['rows'][$i]['view'] = '<a class="action-item" href="' . CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $dao->id) . '" target="_blank">' . ts('View') . '</a>';
         if (!$contactLinks['msg']) {
           $contactLinks['msg'] = 'view';
         }
@@ -698,11 +671,11 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
   /**
    * This function retrieve component related contact information.
    *
-   * @param array  $componentIds     array of component Ids.
-   * @param array  $returnProperties array of return elements.
+   * @param array $componentIds array of component Ids.
+   * @param $componentName
+   * @param array $returnProperties array of return elements.
    *
-   * @return $contactDetails array of contact info.
-   * @static
+   * @return array $contactDetails array of contact info.@static
    */
   static function contactDetails($componentIds, $componentName, $returnProperties = array(
     )) {
@@ -879,8 +852,7 @@ Group By  componentId";
    *
    * @param array $addresses associated array of
    *
-   * @return $contactNames associated array of contact names
-   * @static
+   * @return array $contactNames associated array of contact names@static
    */
   static function getAddressShareContactNames(&$addresses) {
     $contactNames = array();
@@ -904,6 +876,7 @@ Group By  componentId";
         $contactNames[$dao->id] = array(
           'name' => "<a href='{$contactViewUrl}'>{$dao->display_name}</a>",
           'is_deleted' => $dao->is_deleted,
+          'contact_id' => $dao->cid,
         );
       }
     }
@@ -933,11 +906,17 @@ Group By  componentId";
     CRM_Contact_BAO_GroupContactCache::remove();
   }
 
+  /**
+   * @param $params
+   *
+   * @throws Exception
+   */
   public static function updateGreeting($params) {
     $contactType = $params['ct'];
     $greeting    = $params['gt'];
     $valueID     = $id = CRM_Utils_Array::value('id', $params);
     $force       = CRM_Utils_Array::value('force', $params);
+    $limit       = CRM_Utils_Array::value('limit', $params);
 
     // if valueID is not passed use default value
     if (!$valueID) {
@@ -981,6 +960,8 @@ Group By  componentId";
     }
 
     if ($idFldName) {
+      $queryParams = array(1 => array($contactType, 'String'));
+
       // if $force == 1 then update all contacts else only
       // those with NULL greeting or addressee value CRM-9476
       if ($processAll) {
@@ -995,7 +976,12 @@ Group By  componentId";
           OR ( {$idFldName} IS NOT NULL AND ({$displayFldName} IS NULL OR {$displayFldName} = '')) )";
       }
 
-      $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contactType, 'String')));
+      if ($limit) {
+        $sql .= " LIMIT 0, %2";
+        $queryParams += array(2 => array($limit, 'Integer'));
+      }
+
+      $dao = CRM_Core_DAO::executeQuery($sql, $queryParams);
       while ($dao->fetch()) {
         $filterContactFldIds[$dao->id] = $dao->$idFldName;
 
@@ -1111,6 +1097,10 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    *
    * @param string $templateString the greeting template string with contact tokens + Smarty syntax
    *
+   * @param $contactDetails
+   * @param $contactID
+   * @param $className
+   *
    * @return void
    * @static
    */
@@ -1121,4 +1111,3 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
     $templateString = $smarty->fetch("string:$templateString");
   }
 }
-

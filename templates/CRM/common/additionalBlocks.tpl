@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 {literal}
 <script type="text/javascript" >
-cj( function( ) {
+CRM.$(function($) {
     {/literal}
     {if $generateAjaxRequest}
         {foreach from=$ajaxRequestBlocks key="blockName" item="instances"}
@@ -80,9 +80,7 @@ function buildAdditionalBlocks( blockName, className ) {
         async   : false,
         success : function(html){
             cj(fname).after(html);
-            if ((typeof(Drupal) != 'undefined') && Drupal.attachBehaviors) {
-              Drupal.attachBehaviors(cj('#' + blockName + '_Block_'+ currentInstance)[0]);
-            }
+            cj(fname).nextAll().trigger('crmLoad');
         }
     });
 
@@ -179,7 +177,7 @@ function clearFirstBlock( blockName , blockId ) {
 }
 
 function getAddressBlock( position ) {
-   var addressBlockIds = new Array();
+   var addressBlockIds = [];
    var i = 0;
    switch ( position ) {
         case 'last':

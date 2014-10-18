@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -60,12 +60,13 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   /**
    * Constructor
    *
-   * @param array   $config  an array of configuration params
+   * @param array $config an array of configuration params
    *   - group: string
    *   - componentID: int
    *   - prefetch: bool, whether to preemptively read the entire cache group; default: TRUE
    *
-   * @return void
+   * @throws RuntimeException
+   * @return \CRM_Utils_Cache_SqlGroup
    */
   function __construct($config) {
     if (isset($config['group'])) {
@@ -84,11 +85,20 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     }
   }
 
+  /**
+   * @param string $key
+   * @param mixed $value
+   */
   function set($key, &$value) {
     CRM_Core_BAO_Cache::setItem($value, $this->group, $key, $this->componentID);
     $this->frontCache[$key] = $value;
   }
 
+  /**
+   * @param string $key
+   *
+   * @return mixed
+   */
   function get($key) {
     if (! array_key_exists($key, $this->frontCache)) {
       $this->frontCache[$key] = CRM_Core_BAO_Cache::getItem($this->group, $key, $this->componentID);
@@ -96,10 +106,19 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     return $this->frontCache[$key];
   }
 
+  /**
+   * @param $key
+   * @param null $default
+   *
+   * @return mixed
+   */
   function getFromFrontCache($key, $default = NULL) {
     return CRM_Utils_Array::value($key, $this->frontCache, $default);
   }
 
+  /**
+   * @param string $key
+   */
   function delete($key) {
     CRM_Core_BAO_Cache::deleteGroup($this->group, $key);
     unset($this->frontCache[$key]);

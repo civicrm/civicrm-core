@@ -1,0 +1,39 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: caseType
+-->
+<table>
+  <thead>
+	  <tr>
+	    <th>Name</th>
+	    <th>Assign to Creator</th>
+	    <th>Is Manager</th>
+	    <th></th>
+	  </tr>
+  </thead>
+  <tbody>
+	  <tr ng-repeat="relType in caseType.definition.caseRoles | orderBy:'name'" ng-class-even="'crm-entity even-row even'" ng-class-odd="'crm-entity odd-row odd'">
+	    <td>{{relType.name}}</td>
+	    <td><input type="checkbox" ng-model="relType.creator" ng-true-value="1" ng-false-value="0"/></td>
+	    <td><input type="radio" ng-model="relType.manager" value="1" ng-change="onManagerChange(relType)"/></td>
+	    <td>
+	      <a class="crm-hover-button" ng-click="removeItem(caseType.definition.caseRoles,relType)">
+	        <span class="icon delete-icon" title="Remove"></span>
+	      </a>
+	    </td>
+	  </tr>
+  </tbody>
+
+  <tfoot>
+	  <tr class="addRow">
+	    <td colspan="4">
+	      Add role:
+	      <span crm-add-name
+	           crm-options="relationshipTypeNames"
+	           crm-var="newRole"
+	           crm-on-add="addRole(caseType.definition.caseRoles, newRole)"
+	              />
+	    </td>
+	  </tr>
+  </tfoot>
+</table>

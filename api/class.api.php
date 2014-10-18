@@ -198,6 +198,13 @@ class civicrm_api3 {
     return $res;
   }
 
+  /**
+   * @param $entity
+   * @param string $action
+   * @param array $params
+   *
+   * @return bool
+   */
   function call($entity, $action = 'Get', $params = array()) {
     if (is_int($params)) {
       $params = array('id' => $params);

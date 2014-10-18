@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_EntityTag
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: EntityTag.php 30879 2010-11-22 15:45:55Z shot $
  */
 
@@ -111,9 +111,9 @@ function _civicrm_api3_entity_tag_delete_spec(&$params) {
 /**
  *
  * @param <type> $params
- * @param <type> $op
+ * @param string $op
  *
- * @return <type>
+ * @return array <type>
  */
 function _civicrm_api3_entity_tag_common($params, $op = 'add') {
 

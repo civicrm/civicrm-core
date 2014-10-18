@@ -23,7 +23,7 @@
         WHERE civicrm_navigation.name= 'New Grant';
 
 -- CRM-5048
-INSERT INTO civicrm_state_province (id,    country_id, abbreviation, name) VALUES
+INSERT IGNORE INTO civicrm_state_province (id,    country_id, abbreviation, name) VALUES
                                    (10010, 1107,       "Bar",        "Barletta-Andria-Trani"),
                                    (10011, 1107,       "Fer",        "Fermo"),
                                    (10012, 1107,       "Mon",        "Monza e Brianza");

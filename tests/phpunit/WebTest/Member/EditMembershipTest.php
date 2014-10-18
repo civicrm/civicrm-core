@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_EditMembershipTest
+ */
 class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
   protected function setUp() {
     parent::setUp();
@@ -89,8 +93,7 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $this->type("sort_name", $contactName);
     $this->click('activity_type_id[35]');
     $this->click('activity_type_id[36]');
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Search_refresh");
 
     $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[2][text()='Change Membership Status']"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[3][text()='Status changed from New to Current']"));

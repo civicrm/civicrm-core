@@ -1,0 +1,28 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: activitySet
+-->
+<table class="form-layout-compressed">
+  <tbody>
+  <tr>
+    <td class="label">Label</td>
+    <td>
+      <input type="text" name="label" ng-model="activitySet.label"/>
+    </td>
+  </tr>
+  <tr>
+    <td class="label">Name</td>
+    <td>
+      <input type="text" name="name" ng-model="activitySet.name" ng-disabled="locks.activitySetName" />
+      <a crm-ui-lock binding="locks.activitySetName"></a>
+
+    </td>
+  </tr>
+  <tr>
+    <td class="label">Workflow</td>
+    <td>
+      {{ getWorkflowName(activitySet) }}
+    </td>
+  </tr>
+  </tbody>
+</table>

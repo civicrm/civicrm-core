@@ -124,6 +124,9 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
      * Get all the files in the API directory for the relevant version which contain API functions
      * @return array $files array of php files in the directory excluding helper files
      */
+  /**
+   * @return array
+   */
   function getAllFilesinAPIDir() {
     $files = array();
     $handle = opendir($this->_apiDir);
@@ -146,6 +149,9 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
      * Require once  Files
      * @files array list of files to load
      */
+  /**
+   * @param $files
+   */
   function requireOnceFilesArray($files) {
     foreach ($files as $key => $file) {
       require_once $this->_apiDir . $file;
@@ -156,6 +162,9 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
      * Get all api exposed functions that are expected to conform to standards
      * @return array $functionlist
      */
+  /**
+   * @return array
+   */
   function getAllAPIStdFunctions() {
     $functionlist = get_defined_functions();
     $functions = preg_grep($this->_regexForGettingAPIStdFunctions, $functionlist['user']);

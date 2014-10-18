@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * it need to be defined here first.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -332,6 +332,13 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $versionCheck = TRUE;
 
   /**
+   * Whether public pages should display "empowered by CiviCRM"
+   *
+   * @var boolean
+   */
+  public $empoweredBy = TRUE;
+
+  /**
    * Array of enabled add-on components (e.g. CiviContribute, CiviMail...)
    *
    * @var array
@@ -427,14 +434,14 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $oldInputStyle = 1;
 
   /**
-   * should we disbable key generation for forms
+   * should we disable key generation for forms
    *
    * @var boolean
    */
   public $formKeyDisable = FALSE;
 
   /**
-   * to determine wether the call is from cms or civicrm
+   * to determine whether the call is from cms or civicrm
    */
   public $inCiviCRM = FALSE;
 
@@ -444,7 +451,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $componentRegistry = NULL;
 
   /**
-   * PDF reciept as attachment is disabled by default (CRM-8350)
+   * PDF receipt as attachment is disabled by default (CRM-8350)
    */
   public $doNotAttachPDFReceipt = FALSE;
 
@@ -534,7 +541,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
    */
   public function defaultContactCountryName() {
     static $cachedContactCountryName = NULL;
-    if (!$cachedContactCountryName) {
+    if (!$cachedContactCountryName && $this->defaultContactCountry) {
       $countryCodes = CRM_Core_PseudoConstant::country();
       $cachedContactCountryName = $countryCodes[$this->defaultContactCountry];
     }

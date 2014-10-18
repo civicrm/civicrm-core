@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@
   <script type="text/javascript">
     {* very crude refresh of tabs - fixme: use datatable native refresh method *}
     {literal}
-    cj(function($) {
+    CRM.$(function($) {
       $('#mainTabContainer').on('tabsbeforeactivate', function(e, ui) {
         // fixme - can't search more than once! Uncomment this code, switching tabs gives qfkey error.
         //if (ui.newTab.is('#tab_reserve')) {

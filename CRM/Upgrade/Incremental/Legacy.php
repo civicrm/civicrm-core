@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -43,6 +43,8 @@ class CRM_Upgrade_Incremental_Legacy {
    * Compute any messages which should be displayed before upgrade
    *
    * @param $preUpgradeMessage string, alterable
+   * @param $currentVer
+   * @param $latestVer
    */
   static function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
     $upgrade = new CRM_Upgrade_Form();
@@ -108,8 +110,27 @@ SELECT  id
         ));
       }
     }
+
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME, 'enable_innodb_fts', NULL, FALSE)) {
+      // The FTS indexing feature dynamically manipulates the schema which could
+      // cause conflicts with other layers that manipulate the schema. The
+      // simplest thing is to turn it off and back on.
+
+      // It may not always be necessary to do this -- but I doubt we're going to test
+      // systematically in future releases.  When it is necessary, one could probably
+      // ignore the matter and simply run CRM_Core_InnoDBIndexer::fixSchemaDifferences
+      // after the upgrade.  But that's speculative.  For now, we'll leave this
+      // advanced feature in the hands of the sysadmin.
+      $preUpgradeMessage .= '<br />' . ts('This database uses InnoDB Full Text Search for optimized searching. The upgrade procedure has not been tested with this feature. You should disable (and later re-enable) the feature by navigating to "Administer => System Settings => Miscellaneous".');
+    }
   }
 
+  /**
+   * @param $template
+   * @param $message
+   * @param $latestVer
+   * @param $currentVer
+   */
   static function checkMessageTemplate(&$template, &$message, $latestVer, $currentVer) {
     if (version_compare($currentVer, '3.1.alpha1') < 0) {
       return;
@@ -175,7 +196,7 @@ SELECT  id
     if ($flag == TRUE) {
       $html = "<ul>" . $html . "<ul>";
 
-      $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Message+Templates#MessageTemplates-UpgradesandCustomizedSystemWorkflowTemplates', 2 => $html));
+      $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Message+Templates#MessageTemplates-UpgradesandCustomizedSystemWorkflowTemplates', 2 => $html));
     }
   }
 

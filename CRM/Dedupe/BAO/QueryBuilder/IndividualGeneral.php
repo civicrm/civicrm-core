@@ -1,7 +1,15 @@
 <?php
 
 // TODO: How to handle NULL values/records?
+/**
+ * Class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral
+ */
 class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_QueryBuilder {
+  /**
+   * @param $rg
+   *
+   * @return array
+   */
   static function record($rg) {
     $civicrm_contact = CRM_Utils_Array::value('civicrm_contact', $rg->params);
     $civicrm_address = CRM_Utils_Array::value('civicrm_address', $rg->params);
@@ -36,6 +44,11 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_Query
     return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
   }
 
+  /**
+   * @param $rg
+   *
+   * @return array
+   */
   static function internal($rg) {
     $query = "
             SELECT contact1.id id1,  contact2.id id2, {$rg->threshold} weight

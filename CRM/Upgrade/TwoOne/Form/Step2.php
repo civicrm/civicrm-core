@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Upgrade_TwoOne_Form_Step2 extends CRM_Upgrade_Form {
+  /**
+   * @param $errorMessage
+   *
+   * @return bool
+   */
   function verifyPreDBState(&$errorMessage) {
     $errorMessage = ts('Pre-condition failed for upgrade step %1.', array(1 => '2'));
 
@@ -101,6 +106,11 @@ AND    `label` IN ('html', 'htm')
     $this->setVersion('2.02');
   }
 
+  /**
+   * @param $errorMessage
+   *
+   * @return bool
+   */
   function verifyPostDBState(&$errorMessage) {
     // check if Option Group & Option Values tables exists
     if (!CRM_Core_DAO::checkTableExists('civicrm_option_group') ||
@@ -136,14 +146,23 @@ AND    `label` IN ('html', 'htm')
     return $this->checkVersion('2.02');
   }
 
+  /**
+   * @return string
+   */
   function getTitle() {
     return ts('CiviCRM 2.1 Upgrade: Step Two (Option Group And Values)');
   }
 
+  /**
+   * @return string
+   */
   function getTemplateMessage() {
     return '<p>' . ts('Step Two will upgrade the Option Group And Values in your database.') . '</p>';
   }
 
+  /**
+   * @return string
+   */
   function getButtonTitle() {
     return ts('Upgrade & Continue');
   }

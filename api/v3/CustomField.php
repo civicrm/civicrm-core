@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_CustomField
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: CustomField.php 30879 2010-11-22 15:45:55Z shot $
  */
 
@@ -110,6 +110,8 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
  * Use this API to delete an existing custom group field.
  *
  * @param $params     Array id of the field to be deleted
+ *
+ * @return array
  * @example CustomFieldDelete.php
  *
  * {@example CustomFieldDelete.php 0}
@@ -130,7 +132,10 @@ function civicrm_api3_custom_field_delete($params) {
  * Use this API to get existing custom fields.
  *
  * @param array $params Array to search on
- *{@getfields CustomField_get}
+ *{*
+ *
+ * @return array
+@getfields CustomField_get}
  * @access public
  *
  **/
@@ -157,6 +162,11 @@ function civicrm_api3_custom_field_get($params) {
  * @params Mixed  $value        Field value to be validate
  * @params Array  $fieldDetails Field Details
  * @params Array  $errors       Collect validation  errors
+ *
+ * @param $fieldName
+ * @param $value
+ * @param $fieldDetails
+ * @param array $errors
  *
  * @return Array  Validation errors
  * @todo remove this function - not in use but need to review functionality before
@@ -269,3 +279,14 @@ SELECT count(*)
   return $errors;
 }
 
+/**
+ * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom field
+ */
+function civicrm_api3_custom_field_setvalue($params) {
+  require_once 'api/v3/Generic/Setvalue.php';
+  $result = civicrm_api3_generic_setValue(array("entity" => 'custom_field', 'params' => $params));
+  if (empty($result['is_error'])) {
+    CRM_Utils_System::flushCache();
+  }
+  return $result;
+}

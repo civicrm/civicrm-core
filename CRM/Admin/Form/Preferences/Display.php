@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Display.php 45499 2013-02-08 12:31:05Z kurund $
  *
  */
@@ -40,12 +40,6 @@
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   function preProcess() {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
-
-    if (defined('CIVICRM_ACTIVITY_ASSIGNEE_MAIL') && CIVICRM_ACTIVITY_ASSIGNEE_MAIL) {
-      CRM_Core_Session::setStatus(ts('Your civicrm.settings.php file contains CIVICRM_ACTIVITY_ASSIGNEE_MAIL but this
-      constant is no longer used. Please remove this from your config file and set your "Notify Activity Assignees"
-      preference below.'), ts("Deprecated Constant"), "alert");
-    }
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME =>
@@ -104,12 +98,20 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'html_type' => NULL,
           'weight' => 11,
         ),
+        'ajaxPopupsEnabled' => array(
+          'html_type' => 'checkbox',
+          'title' => ts('Enable Popup Forms'),
+          'weight' => 12,
+        ),
       ),
     );
 
     parent::preProcess();
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     parent::cbsDefaultValues($defaults);
@@ -149,6 +151,10 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   public function buildQuickForm() {
     $wysiwyg_options = array('' => ts('Textarea')) + CRM_Core_OptionGroup::values('wysiwyg_editor');
 
+    //changes for freezing the invoices/credit notes checkbox if invoicing is uncheck
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $this->assign('invoicing', $invoicing);
     $config = CRM_Core_Config::singleton();
     $extra = array();
 
@@ -194,6 +200,9 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
     $this->addElement('hidden', 'contact_edit_preferences', NULL, array('id' => 'contact_edit_preferences'));
 
+    $optionValues = CRM_Core_OptionGroup::values('user_dashboard_options', FALSE, FALSE, FALSE, NULL, 'name');
+    $invoicesKey = array_search('Invoices / Credit Notes', $optionValues);
+    $this->assign('invoicesKey', $invoicesKey);
     parent::buildQuickForm();
   }
 

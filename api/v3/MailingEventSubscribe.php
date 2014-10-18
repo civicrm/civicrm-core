@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_MailerGroup
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,9 +40,10 @@
 /**
  * Subscribe from mailing group
  *
- * @param array $params  Associative array of property
+ * @param array $params Associative array of property
  *                       name/value pairs to insert in new 'survey'
  *
+ * @throws API_Exception
  * @return array api result array
  * {@getfields mailing_event_subscribe_create}
  * @access public
@@ -85,6 +86,8 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
  */
 function _civicrm_api3_mailing_event_subscribe_create_spec(&$params) {
   $params['email']['api.required'] = 1;
+  $params['email']['title'] = 'Unsubscribe Email';
   $params['group_id']['api.required'] = 1;
+  $params['group_id']['title'] = 'Unsubscribe From Group';
 }
 

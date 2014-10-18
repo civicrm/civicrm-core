@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -157,7 +157,7 @@ class CRM_Utils_Geocode_Yahoo {
       $values['geo_code_1'] = $ret['latitude'];
       $values['geo_code_2'] = $ret['longitude'];
 
-      if ($ret['postal']) {
+      if (!empty($ret['postal'])) {
         $current_pc = CRM_Utils_Array::value('postal_code', $values);
         $skip_postal = FALSE;
 

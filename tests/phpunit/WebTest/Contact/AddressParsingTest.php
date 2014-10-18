@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AddressParsingTest
+ */
 class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -117,7 +121,9 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
       $this->waitForElementPresent("address_{$i}_street_address");
       $address[$i] = $location[$this->getSelectedLabel("address_{$i}_location_type_id")];
       // Open "Edit Address Elements"
-      $this->click("//table[@id='address_{$i}']//a[text()='Edit Address Elements']");
+      $this->waitForElementPresent('addressBlockId');
+      $this->click('addressBlockId');
+      $this->click("//table[@id='address_table_{$i}']//a[text()='Edit Address Elements']");
     }
 
     //verify all the address fields were parsed correctly

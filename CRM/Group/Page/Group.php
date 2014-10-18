@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   protected $_sortByCharacter;
 
+  /**
+   * @return string
+   */
   function getBAOName() {
     return 'CRM_Contact_BAO_Group';
   }
@@ -80,6 +83,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   /**
    * return user context uri to return to
    *
+   * @param null $mode
+   *
    * @return string
    * @access public
    */
@@ -89,6 +94,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
 
   /**
    * return user context uri params
+   *
+   * @param null $mode
    *
    * @return string
    * @access public
@@ -100,8 +107,10 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   /**
    * make sure that the user has permission to access this group
    *
-   * @param int $id   the id of the object
-   * @param int $name the name or title of the object
+   * @param int $id the id of the object
+   * @param int $title
+   *
+   * @internal param int $name the name or title of the object
    *
    * @return string   the permission that the user has (or null)
    * @access public
@@ -135,6 +144,14 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
       $showOrgInfo = TRUE;
     }
     $this->assign('showOrgInfo', $showOrgInfo);
+
+    // Refresh smart group cache
+    if (!empty($_GET['update_smart_groups'])) {
+      CRM_Contact_BAO_GroupContactCache::loadAll();
+    }
+    else {
+      CRM_Contact_BAO_GroupContactCache::fillIfEmpty();
+    }
 
     $this->search();
   }

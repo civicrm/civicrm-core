@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -95,6 +95,9 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
     return $errors;
   }
 
+  /**
+   * @return array
+   */
   private function _getComponentSelectValues() {
     $ret = array();
     $this->_components = CRM_Core_Component::getComponents();
@@ -115,6 +118,11 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
     CRM_Core_BAO_Navigation::resetNavigation();
   }
 
+  /**
+   * @param $dsn
+   * @param $fileName
+   * @param bool $lineMode
+   */
   public static function loadCaseSampleData($dsn, $fileName, $lineMode = FALSE) {
     global $crmPath;
 
@@ -123,9 +131,16 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
       die("Cannot open $dsn: " . $db->getMessage());
     }
 
-    if (!$lineMode) {
-      $string = file_get_contents($fileName);
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    $multiLingual = (bool) $domain->locales;
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('multilingual', $multiLingual);
+    $smarty->assign('locales', explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales));
 
+    if (!$lineMode) {
+
+      $string = $smarty->fetch($fileName);
       // change \r\n to fix windows issues
       $string = str_replace("\r\n", "\n", $string);
 

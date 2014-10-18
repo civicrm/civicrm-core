@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class CRM_Core_CodeGen_Main
+ */
 class CRM_Core_CodeGen_Main {
   var $buildVersion;
   var $db_version;
@@ -22,6 +25,17 @@ class CRM_Core_CodeGen_Main {
    */
   var $digest;
 
+  /**
+   * @param $CoreDAOCodePath
+   * @param $sqlCodePath
+   * @param $phpCodePath
+   * @param $tplCodePath
+   * @param $smartyPluginDirs
+   * @param $argCms
+   * @param $argVersion
+   * @param $schemaPath
+   * @param $digestPath
+   */
   function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath) {
     $this->CoreDAOCodePath = $CoreDAOCodePath;
     $this->sqlCodePath = $sqlCodePath;
@@ -33,7 +47,7 @@ class CRM_Core_CodeGen_Main {
     // default cms is 'drupal', if not specified
     $this->cms = isset($argCms) ? strtolower($argCms) : 'drupal';
 
-    CRM_Core_CodeGen_Util_Template::$smartyPluginDirs = $smartyPluginDirs;
+    CRM_Core_CodeGen_Util_Smarty::singleton()->setPluginDirs($smartyPluginDirs);
 
     $versionFile        = "version.xml";
     $versionXML         = CRM_Core_CodeGen_Util_Xml::parse($versionFile);
@@ -116,7 +130,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       'CRM_Core_CodeGen_Reflection',
       'CRM_Core_CodeGen_Schema',
       'CRM_Core_CodeGen_DAO',
-      'CRM_Core_CodeGen_Test',
+      //'CRM_Core_CodeGen_Test',
       'CRM_Core_CodeGen_I18n',
     );
     return $components;
@@ -156,6 +170,9 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     return $this->digest;
   }
 
+  /**
+   * @return array
+   */
   function getExpectedFiles() {
     return array(
       $this->sqlCodePath . '/civicrm.mysql',
@@ -163,6 +180,9 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     );
   }
 
+  /**
+   * @return bool
+   */
   function hasExpectedFiles() {
     foreach ($this->getExpectedFiles() as $file) {
       if (!file_exists($file)) {

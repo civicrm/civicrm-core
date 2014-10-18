@@ -122,7 +122,7 @@
     <weight>580</weight>
   </item>
   <item>
-    <path>civicrm/payment/add</path>
+    <path>civicrm/payment</path>
     <title>New Payment</title>
     <page_callback>CRM_Contribute_Form_AdditionalPayment</page_callback>
     <path_arguments>action=add</path_arguments>
@@ -225,11 +225,6 @@
     <access_arguments>make online contributions</access_arguments>
   </item>
   <item>
-    <path>civicrm/ajax/employer</path>
-    <page_callback>CRM_Contact_Page_AJAX::getPermissionedEmployer</page_callback>
-    <access_arguments>make online contributions</access_arguments>
-  </item>
-  <item>
     <path>civicrm/contribute/unsubscribe</path>
     <title>Cancel Subscription</title>
     <page_callback>CRM_Contribute_Form_CancelSubscription</page_callback>
@@ -295,6 +290,32 @@
     <path_arguments>action=view</path_arguments>
     <access_arguments>access CiviContribute</access_arguments>
     <page_type>1</page_type>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/admin/setting/preferences/contribute</path>
+    <title>CiviContribute Component Settings</title>
+    <page_callback>CRM_Admin_Form_Preferences_Contribute</page_callback>
+    <desc>Configure global CiviContribute behaviors.</desc>
+    <access_arguments>access CiviContribute,administer CiviCRM</access_arguments>
+    <adminGroup>CiviContribute</adminGroup>
+  </item>
+  <item>
+    <path>civicrm/contribute/invoice</path>
+    <title>CiviContributePdf</title>
+    <page_callback>CRM_Contribute_Form_Task_Invoice::getPrintPDF</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>620</weight>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/contribute/invoice/email</path>
+    <title>CiviContributePdf</title>
+    <page_callback>CRM_Contribute_Form_Task_Invoice</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>630</weight>
     <component>CiviContribute</component>
   </item>
 </menu>

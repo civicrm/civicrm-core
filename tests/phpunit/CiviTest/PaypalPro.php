@@ -1,12 +1,15 @@
 <?php
 require_once "CRM/Financial/DAO/PaymentProcessor.php";
+
+/**
+ * Class PaypalPro
+ */
 class PaypalPro extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to create
    * a payment processor of type Paypal Pro
    *
-   * @return $paymentProcessor id of created payment processor
-   * @todo this appears not to be working but because it doesn't extend the test class
+   * @return int $paymentProcessor id of created payment processor@todo this appears not to be working but because it doesn't extend the test class
    * callAPISuccess won't work
    * I have duplicated this on the main test class as a work around
    */

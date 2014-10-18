@@ -1,5 +1,9 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Utils_HookTest
+ */
 class CRM_Utils_HookTest extends CiviUnitTestCase {
 
   static $activeTest = NULL;
@@ -14,6 +18,8 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
       'hooktesta',
       'hooktestb',
       'hooktestc',
+      'hooktestd',
+      'hookteste',
     );
     // our goal is to test a helper in CRM_Utils_Hook, but we need a concrete class
     $this->hook = new CRM_Utils_Hook_UnitTests();
@@ -42,6 +48,21 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
         'c-outer',
       ),
       $this->log
+    );
+  }
+
+  /**
+   * Verify that the results of runHooks() are correctly merged
+   */
+  function testRunHooks_merge() {
+    $result = $this->hook->runHooks($this->fakeModules, 'civicrm_testRunHooks_merge', 0, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject);
+    $this->assertEquals(
+      array(
+        'from-module-a1',
+        'from-module-a2',
+        'from-module-e',
+      ),
+      $result
     );
   }
 }
@@ -73,4 +94,22 @@ function hooktesta_civicrm_testRunHooks_inner() {
 function hooktestb_civicrm_testRunHooks_inner() {
   $test = CRM_Utils_HookTest::$activeTest;
   $test->log[] = 'b-inner';
+}
+
+function hooktesta_civicrm_testRunHooks_merge() {
+  return array('from-module-a1', 'from-module-a2');
+}
+
+// OMIT: function hooktestb_civicrm_testRunHooks_merge
+
+function hooktestc_civicrm_testRunHooks_merge() {
+  return array();
+}
+
+function hooktestd_civicrm_testRunHooks_merge() {
+  return NULL;
+}
+
+function hookteste_civicrm_testRunHooks_merge() {
+  return array('from-module-e');
 }

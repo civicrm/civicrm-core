@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 
     <p>If you do not want users to send outbound mail from CiviCRM, select "Disable Outbound Email". NOTE: If you disable outbound email, and you are using Online Contribution pages or online Event Registration - you will need to disable automated receipts and registration confirmations.</p>
 
-   <p>If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out.</p>{/ts}
+   <p>If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out. They can be found in the civicrm_mailing_spool table in the CiviCRM database.</p>{/ts}
 
 </div>
      <table class="form-layout-compressed">
@@ -100,47 +100,47 @@
 
 {literal}
 <script type="text/javascript">
-    cj( function( ) {
-      var mailSetting = cj("input[name='outBound_option']:checked").val( );
+    CRM.$(function($) {
+      var mailSetting = $("input[name='outBound_option']:checked").val( );
 
       var archiveWarning = "{/literal}{ts escape='js'}WARNING: You are switching from a testing mode (Redirect to Database) to a live mode. Check Mailings > Archived Mailings, and delete any test mailings that are not in Completed status prior to running the mailing cron job for the first time. This will ensure that test mailings are not actually sent out.{/ts}{literal}"
 
-        showHideMailOptions( cj("input[name='outBound_option']:checked").val( ) ) ;
+        showHideMailOptions( $("input[name='outBound_option']:checked").val( ) ) ;
 
         function showHideMailOptions( value ) {
             switch( value ) {
               case "0":
-                cj("#bySMTP").show( );
-                cj("#bySendmail").hide( );
-                cj("#_qf_Smtp_refresh_test").show( );
+                $("#bySMTP").show( );
+                $("#bySendmail").hide( );
+                $("#_qf_Smtp_refresh_test").show( );
                 if (mailSetting == '5') {
                   alert(archiveWarning);
                 }
               break;
               case "1":
-                cj("#bySMTP").hide( );
-                cj("#bySendmail").show( );
-                cj("#_qf_Smtp_refresh_test").show( );
+                $("#bySMTP").hide( );
+                $("#bySendmail").show( );
+                $("#_qf_Smtp_refresh_test").show( );
                 if (mailSetting == '5') {
                   alert(archiveWarning);
                 }
               break;
               case "3":
-                cj('.mailoption').hide();
-                cj("#_qf_Smtp_refresh_test").show( );
+                $('.mailoption').hide();
+                $("#_qf_Smtp_refresh_test").show( );
                 if (mailSetting == '5') {
                   alert(archiveWarning);
                 }
               break;
               default:
-                cj("#bySMTP").hide( );
-                cj("#bySendmail").hide( );
-                cj("#_qf_Smtp_refresh_test").hide( );
+                $("#bySMTP").hide( );
+                $("#bySendmail").hide( );
+                $("#_qf_Smtp_refresh_test").hide( );
             }
         }
 
-        cj("input[name='outBound_option']").click( function( ) {
-            showHideMailOptions( cj(this).val( ) );
+        $("input[name='outBound_option']").click( function( ) {
+            showHideMailOptions( $(this).val( ) );
         });
     });
 

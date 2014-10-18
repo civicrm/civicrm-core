@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,8 @@
  * Page for displaying list of Gender
  */
 class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -71,6 +73,14 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
   static $_gId = NULL;
 
   /**
+   * A boolean determining if you can add options to this group in the GUI
+   *
+   * @var boolean
+   * @static
+   */
+  static $_isLocked = FALSE;
+
+  /**
    * Obtains the group name from url string or id from $_GET['gid'].
    * Sets the title.
    *
@@ -86,6 +96,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     elseif (!self::$_gName && !empty($_GET['gid'])) {
       self::$_gId = $_GET['gid'];
       self::$_gName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gId, 'name');
+      self::$_isLocked = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gId, 'is_locked');
       $breadCrumb = array(
         'title' => ts('Option Groups'),
         'url' => CRM_Utils_System::url('civicrm/admin/options', 'reset=1'),
@@ -132,7 +143,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
           'communication_style',
           'case_status', 'encounter_medium',
           'case_type', 'payment_instrument',
-          'soft_credit_type'
+          'soft_credit_type', 'website_type'
         )
       )) {
       $this->assign('showIsDefault', TRUE);
@@ -145,6 +156,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     if (self::$_gName == 'participant_role') {
       $this->assign('showCounted', TRUE);
     }
+    $this->assign('isLocked', self::$_isLocked);
     $config = CRM_Core_Config::singleton();
     if (self::$_gName == 'activity_type') {
       $this->assign('showComponent', TRUE);
@@ -228,7 +240,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     if (!self::$_gName) {
       return parent::browse();
     }
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $groupParams = array('name' => self::$_gName);
     $optionValue = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
     $gName       = self::$_gName;
@@ -246,7 +257,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
         $optionValue[$key]['financial_account'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($key, 'civicrm_option_value');
       }
     }
-    $this->assign('includeWysiwygEditor', TRUE);
     $this->assign('rows', $optionValue);
   }
 
@@ -270,6 +280,8 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

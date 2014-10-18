@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Upgrade_TwoOne_Form_Step3 extends CRM_Upgrade_Form {
+  /**
+   * @param $errorMessage
+   *
+   * @return bool
+   */
   function verifyPreDBState(&$errorMessage) {
     $errorMessage = ts('Pre-condition failed for upgrade step %1.', array(1 => '3'));
 
@@ -80,6 +85,11 @@ class CRM_Upgrade_TwoOne_Form_Step3 extends CRM_Upgrade_Form {
     $this->setVersion('2.03');
   }
 
+  /**
+   * @param $errorMessage
+   *
+   * @return bool
+   */
   function verifyPostDBState(&$errorMessage) {
     if (!CRM_Core_DAO::checkTableExists('civicrm_cache') ||
       !CRM_Core_DAO::checkTableExists('civicrm_discount') ||
@@ -111,14 +121,23 @@ class CRM_Upgrade_TwoOne_Form_Step3 extends CRM_Upgrade_Form {
     return $this->checkVersion('2.03');
   }
 
+  /**
+   * @return string
+   */
   function getTitle() {
     return ts('CiviCRM 2.1 Upgrade: Step Three (Miscellaneous)');
   }
 
+  /**
+   * @return string
+   */
   function getTemplateMessage() {
     return '<p>' . ts('Step Three will upgrade rest of your database.') . '</p>';
   }
 
+  /**
+   * @return string
+   */
   function getButtonTitle() {
     return ts('Upgrade & Continue');
   }

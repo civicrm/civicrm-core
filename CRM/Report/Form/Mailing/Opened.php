@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -49,6 +49,12 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
     'pieChart' => 'Pie Chart',
   );
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array();
 
@@ -145,20 +151,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
       'grouping' => 'contact-fields',
     );
 
-    $this->_columns['civicrm_group'] = array(
-      'dao' => 'CRM_Contact_DAO_Group',
-      'alias' => 'cgroup',
-      'filters' => array(
-        'gid' => array(
-          'name' => 'group_id',
-          'title' => ts('Group'),
-          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'group' => TRUE,
-          'options' => CRM_Core_PseudoConstant::group(),
-        ),
-      ),
-    );
-
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
@@ -199,6 +192,13 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
@@ -261,6 +261,9 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
     if (empty($rows)) {
       return;
@@ -281,6 +284,9 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
     $this->assign('chartType', $this->_params['charts']);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

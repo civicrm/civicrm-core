@@ -1,0 +1,71 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: caseType
+
+The original form used table layout; don't know if we have an alternative, CSS-based layout
+-->
+<table class="form-layout">
+  <tbody>
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="title">
+        Title
+      </label>
+    </td>
+    <td>
+      <input
+        type="text"
+        name="title"
+        ng-model="caseType.title"
+        class="big crm-form-text"
+        required
+        />
+    </td>
+  </tr>
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="caseTypeName">
+        Name
+      </label>
+    </td>
+    <td>
+      <input
+        type="text"
+        name="caseTypeName"
+        ng-model="caseType.name"
+        ng-disabled="locks.caseTypeName"
+        required
+        class="big crm-form-text"/>
+
+      <a crm-ui-lock binding="locks.caseTypeName"></a>
+
+      <div ng-show="!isValidName(caseType.name)">
+        <em>WARNING: The case type name includes deprecated characters.</em>
+      </div>
+      <div ng-show="caseType.id && !locks.caseTypeName">
+        <em>WARNING: If any external files or programs reference the old "Name", then they must be updated manually.</em>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="description">
+        Description
+      </label>
+    </td>
+    <td>
+      <textarea name="description" ng-model="caseType.description" class="big crm-form-textarea"></textarea>
+    </td>
+  </tr>
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="is_active">
+        Enabled?
+      </label>
+    </td>
+    <td>
+      <input name="is_active" type="checkbox" ng-model="caseType.is_active" ng-true-value="1" ng-false-value="0"/>
+    </td>
+  </tr>
+  </tbody>
+</table>

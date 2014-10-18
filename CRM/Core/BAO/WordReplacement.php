@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,15 @@
  */
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_Core_DAO_WordReplacement
+   */
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -60,6 +69,8 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Get the domain BAO
    *
+   * @param null $reset
+   *
    * @return null|object CRM_Core_BAO_WordRepalcement
    * @access public
    * @static
@@ -80,6 +91,9 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Save the values of a WordReplacement
    *
+   * @param $params
+   * @param $id
+   *
    * @return WordReplacement array
    * @access public
    */
@@ -96,6 +110,8 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
   /**
    * Create a new WordReplacement
+   *
+   * @param $params
    *
    * @return WordReplacement array
    * @access public
@@ -179,7 +195,7 @@ WHERE  domain_id = %1
   /**
    * Rebuild
    */
-  static function rebuild() {
+  static function rebuild($clearCaches = TRUE) {
     $id = CRM_Core_Config::domainID();
     $stringOverride = self::getAllAsConfigArray($id);
     $params = array('locale_custom_strings' => serialize($stringOverride));
@@ -187,10 +203,13 @@ WHERE  domain_id = %1
     if ($wordReplacementSettings) {
       CRM_Core_Config::singleton()->localeCustomStrings = $stringOverride;
 
-      // Reset navigation
-      CRM_Core_BAO_Navigation::resetNavigation();
-      // Clear js string cache
-      CRM_Core_Resources::singleton()->flushStrings();
+      // Partially mitigate the inefficiency introduced in CRM-13187 by doing this conditionally
+      if ($clearCaches) {
+        // Reset navigation
+        CRM_Core_BAO_Navigation::resetNavigation();
+        // Clear js localization
+        CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
+      }
 
       return TRUE;
     }

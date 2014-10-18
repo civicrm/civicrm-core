@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -47,43 +47,6 @@
       {ts 1=$reminderName}WARNING: You are about to delete the Reminder titled <strong>%1</strong>.{/ts} {ts}Do you want to continue?{/ts}
     </div>
   {else}
-    {* added onload javascript for source contact*}
-    {literal}
-      <script type="text/javascript">
-        cj().crmAccordions();
-      var recipient_manual = '';
-      var recipient_manual_id = null;
-      var toDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1&noemail=1' h=0 }{literal}"; {/literal}
-
-  {if $recipients}
-  {foreach from=$recipients key=id item=name}
-  {literal} recipient_manual += '{"name":"'+{/literal}"{$name}"{literal}+'","id":"'+{/literal}"{$id}"{literal}+'"},';{/literal}
-  {/foreach}
-  {literal} eval( 'recipient_manual = [' + recipient_manual + ']'); {/literal}
-  {/if}
-
-  {literal}
-  if ( recipient_manual_id ) {
-    eval( 'recipient_manual = ' + recipient_manual_id );
-  }
-
-    cj(document).ready( function( ) {
-    {/literal}
-    {literal}
-
-    eval( 'tokenClass = { tokenList: "token-input-list-facebook", token: "token-input-token-facebook", tokenDelete: "token-input-delete-token-facebook", selectedToken: "token-input-selected-token-facebook", highlightedToken: "token-input-highlighted-token-facebook", dropdown: "token-input-dropdown-facebook", dropdownItem: "token-input-dropdown-item-facebook", dropdownItem2: "token-input-dropdown-item2-facebook", selectedDropdownItem: "token-input-selected-dropdown-item-facebook", inputToken: "token-input-input-token-facebook" } ');
-
-  var sourceDataUrl = "{/literal}{$dataUrl}{literal}";
-  var tokenDataUrl  = "{/literal}{$tokenUrl}{literal}";
-  var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing recipient.{/ts}{literal}";
-    cj( "#recipient_manual_id").tokenInput( tokenDataUrl, { prePopulate: recipient_manual, classes: tokenClass, hintText: hintText });
-    cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
-    cj('#source_contact_id').autocomplete( sourceDataUrl, { width : 180, selectFirst : false, hintText: hintText, matchContains: true, minChars: 1
-    }).result( function(event, data, formatted) {
-      }).bind( 'click', function( ) {  });
-    });
-    </script>
-  {/literal}
     <table class="form-layout-compressed">
       <tr class="crm-scheduleReminder-form-block-title">
         <td class="right">{$form.title.label}</td><td colspan="3">{$form.title.html}</td>
@@ -130,7 +93,7 @@
       </tr>
       <tr id="recipientManual" class="crm-scheduleReminder-form-block-recipient_manual_id">
         <td class="label">{$form.recipient_manual_id.label}</td>
-        <td>{$form.recipient_manual_id.html}{edit}<span class="description">{ts}You can manually send out the reminders to these recipients.{/ts}</span>{/edit}</td>
+        <td>{$form.recipient_manual_id.html}{edit}<div class="description">{ts}You can manually send out the reminders to these recipients.{/ts}</div>{/edit}</td>
       </tr>
       <tr id="recipientGroup" class="crm-scheduleReminder-form-block-recipient_group_id">
         <td class="label">{$form.group_id.label}</td>
@@ -185,49 +148,48 @@
 
   {literal}
     <script type='text/javascript'>
-      cj(function() {
+      CRM.$(function($) {
+        var $form = $('form.{/literal}{$form.formClass}{literal}'),
+          recipientMapping = eval({/literal}{$recipientMapping}{literal});
+
         populateRecipient();
-        cj('#recipient').click( function( ) {
-          populateRecipient();
+        $('#recipient', $form).change(populateRecipient);
+
+        function populateRecipient() {
+          var recipient = $("#recipient", $form).val();
+
+          if (recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') {
+            CRM.api3('participant', 'getoptions', {field: recipientMapping[recipient] == 'participant_role' ? 'role_id' : 'status_id', sequential: 1})
+              .done(function(result) {
+                CRM.utils.setOptions($('#recipient_listing', $form), result.values);
+              });
+            $("#recipientList", $form).show();
+            $('#is_recipient_listing', $form).val(1);
+          } else {
+            $("#recipientList", $form).hide();
+            $('#is_recipient_listing', $form).val('');
+          }
+        }
+
+        $('#absolute_date_display', $form).change(function() {
+          if($(this).val()) {
+            $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
+          } else {
+            $('#relativeDate, #relativeDateRepeat', $form).show();
+          }
         });
-      });
 
-      function populateRecipient( ) {
-        var recipientMapping = eval({/literal}{$recipientMapping}{literal});
-        var recipient = cj("#recipient option:selected").val();
-        var postUrl = "{/literal}{crmURL p='civicrm/ajax/populateRecipient' h=0}{literal}";
-        if(recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role'){
-          var elementID = '#recipient_listing';
-          cj( elementID ).html('');
-          cj.post(postUrl, {recipient: recipientMapping[recipient]},
-            function ( response ) {
-              response = eval( response );
-              for (iota = 0; iota < response.length; iota++) {
-                cj( elementID ).get(0).add(new Option(response[iota].name, response[iota].value), document.all ? iota : null);
-              }
-            }
-          );
-          cj("#recipientList").show();
-        } else {
-          cj("#recipientList").hide();
+        if ($('#absolute_date_display', $form).val()) {
+          $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
         }
-      }
 
-      cj('#absolute_date_display').click( function( ) {
-        if(cj('#absolute_date_display').val()) {
-          cj('#relativeDate').hide();
-          cj('#relativeDateRepeat').hide();
-          cj('#repeatFields').hide();
-        } else {
-          cj('#relativeDate').show();
-          cj('#relativeDateRepeat').show();
-        }
       });
 
     </script>
   {/literal}
   {/if}
   <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+    {include file="CRM/common/formButtons.tpl" location="bottom"}
+  </div>
 </div>
 {/if}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,12 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 require_once 'api/api.php';
+
+/**
+ * Class CRM_Contact_Form_Merge
+ */
 class CRM_Contact_Form_Merge extends CRM_Core_Form {
   // the id of the contact that tere's a duplicate for; this one will
   // possibly inherit some of $_oid's properties and remain in the system
@@ -66,6 +70,11 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->_rgid    = $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE);
     $this->_gid     = $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE);
     $this->_mergeId = CRM_Utils_Request::retrieve('mergeId', 'Positive', $this, FALSE);
+
+    // Sanity check
+    if ($cid == $oid) {
+      CRM_Core_Error::statusBounce(ts('Cannot merge a contact with itself.'));
+    }
 
     if (!CRM_Dedupe_BAO_Rule::validateContacts($cid, $oid)) {
       CRM_Core_Error::statusBounce(ts('The selected pair of contacts are marked as non duplicates. If these records should be merged, you can remove this exception on the <a href=\'%1\'>Dedupe Exceptions</a> page.', array(1 => CRM_Utils_System::url('civicrm/dedupe/exception', 'reset=1'))));
@@ -179,8 +188,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($cid, $oid);
-    $main                = &$rowsElementsAndInfo['main_details'];
-    $other               = &$rowsElementsAndInfo['other_details'];
+    $main = $this->_mainDetails = &$rowsElementsAndInfo['main_details'];
+    $other = $this->_otherDetails = &$rowsElementsAndInfo['other_details'];
 
     if ($main['contact_id'] != $cid) {
       CRM_Core_Error::fatal(ts('The main contact record does not exist'));
@@ -190,19 +199,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('The other contact record does not exist'));
     }
 
-    $subtypes = CRM_Contact_BAO_ContactType::subTypePairs(NULL, TRUE, '');
-
     $this->assign('contact_type', $main['contact_type']);
-    if (!empty($main['contact_sub_type'])) {
-      $this->assign('main_contact_subtype',
-        CRM_Utils_Array::value('contact_sub_type', $subtypes[$main['contact_sub_type'][0]])
-      );
-    }
-    if (!empty($other['contact_sub_type'])) {
-      $this->assign('other_contact_subtype',
-        CRM_Utils_Array::value('contact_sub_type', $subtypes[$other['contact_sub_type'][0]])
-      );
-    }
     $this->assign('main_name', $main['display_name']);
     $this->assign('other_name', $other['display_name']);
     $this->assign('main_cid', $main['contact_id']);
@@ -244,6 +241,18 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->assign('userContextURL', $session->readUserContext());
   }
 
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     return array('deleteOther' => 1);
   }
@@ -296,6 +305,13 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->addFormRule(array('CRM_Contact_Form_Merge', 'formRule'), $this);
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = array();
     $link = CRM_Utils_System::href(ts('Flip between the original and duplicate contacts.'),
@@ -318,14 +334,15 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $session->resetScope('selectedSearchContactIds');
     }
 
-    $formValues['main_details'] = $formValues['other_details'] = array();
-    $formValues['main_details']['contact_type'] = $this->_contactType;
-    $formValues['main_details']['loc_block_ids'] = $this->_locBlockIds['main'];
-    $formValues['other_details']['loc_block_ids'] = $this->_locBlockIds['other'];
+    $formValues['main_details'] = $this->_mainDetails;
+    $formValues['other_details'] = $this->_otherDetails;
 
     CRM_Dedupe_Merger::moveAllBelongings($this->_cid, $this->_oid, $formValues);
 
-    CRM_Core_Session::setStatus(ts('Contact id %1 has been updated and contact id %2 has been deleted.', array(1 => $this->_cid, 2 => $this->_oid)), ts('Contacts Merged'), 'success');
+    $name = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_cid, 'display_name');
+    $message = '<ul><li>' . ts('%1 has been updated.', array(1 => $name)) . '</li><li>' . ts('Contact ID %1 has been deleted.', array(1 => $this->_oid)) . '</li></ul>';
+    CRM_Core_Session::setStatus($message, ts('Contacts Merged'), 'success');
+
     $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_cid}");
     if (!empty($formValues['_qf_Merge_submit'])) {
       $listParamsURL = "reset=1&action=update&rgid={$this->_rgid}";

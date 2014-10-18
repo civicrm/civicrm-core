@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -298,6 +298,10 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
           elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
             $params[$key] = CRM_Utils_String::strtoboolstr($val);
           }
+        }
+        if($key == 'participant_register_date') {
+          CRM_Utils_Date::convertToDefaultDate($params, $dateType, 'participant_register_date');
+          $formatted['participant_register_date'] = CRM_Utils_Date::processDate($params['participant_register_date']);
         }
       }
     }

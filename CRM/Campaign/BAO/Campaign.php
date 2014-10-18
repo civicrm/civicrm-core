@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -102,6 +102,8 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * function to delete the campaign
    *
    * @param  int $id id of the campaign
+   *
+   * @return bool|mixed
    */
   public static function del($id) {
     if (!$id) {
@@ -117,9 +119,10 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * retrieves the relevant objects. Typically the valid params are only
    * campaign_id.
    *
-   * @param array  $params   (reference ) an assoc array of name/value pairs
-   * @param array  $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
+   * @return \CRM_Campaign_DAO_Campaign|null
    * @access public
    */
   public function retrieve(&$params, &$defaults) {
@@ -137,12 +140,15 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   /**
    * Return the all eligible campaigns w/ cache.
    *
-   * @param int      $includeId  lets inlcude this campaign by force.
-   * @param int      $excludeId  do not include this campaign.
-   * @param boolean  $onlyActive consider only active campaigns.
+   * @param int $includeId lets inlcude this campaign by force.
+   * @param int $excludeId do not include this campaign.
+   * @param boolean $onlyActive consider only active campaigns.
    *
-   * @return $campaigns a set of campaigns.
-   * @access public
+   * @param bool $onlyCurrent
+   * @param bool $appendDatesToTitle
+   * @param bool $forceAll
+   *
+   * @return mixed $campaigns a set of campaigns.@access public
    */
   public static function getCampaigns(
     $includeId = NULL,
@@ -283,9 +289,9 @@ Order By  camp.title";
     return $validCampaigns[$cacheKey];
   }
 
-  /*
+  /**
    * Is CiviCampaign enabled.
-   *
+   * @return bool
    */
   public static function isCampaignEnable() {
     static $isEnable = NULL;
@@ -464,6 +470,7 @@ SELECT  campaign.id               as id,
    *
    * @param int $campaignId campaign id
    *
+   * @return array
    * @static
    */
   static function getCampaignGroups($campaignId) {
@@ -505,6 +512,9 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Campaign', $id, 'is_active', $is_active);
   }
 
+  /**
+   * @return bool
+   */
   static function accessCampaign() {
     static $allow = NULL;
 
@@ -524,6 +534,10 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    * Add select element for campaign
    * and assign needful info to templates.
    *
+   */
+  /**
+   * @param $form
+   * @param null $connectedCampaignId
    */
   public static function addCampaign(&$form, $connectedCampaignId = NULL) {
     //some forms do set default and freeze.
@@ -601,10 +615,12 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     $form->assign('campaignInfo', $campaignInfo);
   }
 
-  /*
+  /**
    * Add campaign in compoent search.
    * and assign needful info to templates.
    *
+   * @param $form
+   * @param string $elementName
    */
   public static function addCampaignInComponentSearch(&$form, $elementName = 'campaign_id') {
     $campaignInfo    = array();

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -46,7 +46,7 @@ function smarty_function_crmAPI($params, &$smarty) {
     $smarty->trigger_error("assign: missing 'entity' parameter");
     return "crmAPI: missing 'entity' parameter";
   }
-  CRM_Core_Error::setCallback(array('CRM_Utils_REST', 'fatal'));
+  $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Utils_REST', 'fatal'));
   $action = $params['action'];
   $entity = $params['entity'];
   unset($params['entity']);
@@ -55,7 +55,7 @@ function smarty_function_crmAPI($params, &$smarty) {
   $params['version'] = 3;
   require_once 'api/api.php';
   $result = civicrm_api($entity, $action, $params);
-  CRM_Core_Error::setCallback();
+  unset($errorScope);
   if ($result === FALSE) {
     $smarty->trigger_error("Unkown error");
     return;

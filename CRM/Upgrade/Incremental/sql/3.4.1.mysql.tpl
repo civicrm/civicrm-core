@@ -56,7 +56,7 @@ ALTER TABLE civicrm_custom_field MODIFY start_date_years INT(10);
 ALTER TABLE civicrm_custom_field MODIFY end_date_years INT(10);
 
 -- CRM-8009
-INSERT INTO civicrm_state_province
+INSERT IGNORE INTO civicrm_state_province
   (`name`, `abbreviation`, `country_id` )
 VALUES
   ( 'Toledo' , 'TO', '1198' ),

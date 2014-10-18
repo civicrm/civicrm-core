@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * and display names
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -168,14 +168,23 @@ class CRM_Core_Selector_Base {
     return NULL;
   }
 
+  /**
+   * @return null
+   */
   public function getSummary() {
     return NULL;
   }
 
+  /**
+   * @param $key
+   */
   public function setKey($key) {
     $this->_key = $key;
   }
 
+  /**
+   * @return string
+   */
   public function getKey() {
     return $this->_key;
   }

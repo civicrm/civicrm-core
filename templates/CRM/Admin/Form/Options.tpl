@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing options *}
-<h3>{if $action eq 1}{ts 1=$gLabel}New %1 Option{/ts}{elseif $action eq 8}{ts 1=$gLabel}Delete %1 Option{/ts}{else}{ts 1=$gLabel}Edit %1 Option{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-admin-options-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 /**
- * This class provides the functionality for batch entry for contributions/memeberships
+ * This class provides the functionality for batch entry for contributions/memberships
  */
 class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
@@ -50,7 +50,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $_batchId;
 
   /**
-   * Batch informtaion
+   * Batch information
    */
   protected $_batchInfo = array();
 
@@ -359,7 +359,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $paramValues = array(
       'id' => $this->_batchId,
       // close status
-      'status_id' => 2,
+      'status_id' => CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name'),
       'total' => $params['actualBatchTotal'],
     );
 
@@ -391,7 +391,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     // get the price set associated with offline contribution record.
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
     $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-    $fieldID = key($this->_priceSet['fields']);
+    $priceFieldID = CRM_Price_BAO_PriceSet::getOnlyPriceFieldID($this->_priceSet);
+    $priceFieldValueID = CRM_Price_BAO_PriceSet::getOnlyPriceFieldValueID($this->_priceSet);
 
     if (isset($params['field'])) {
       foreach ($params['field'] as $key => $value) {
@@ -409,7 +410,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         if (!empty($params['soft_credit_contact_id'][$key]) && !empty($params['soft_credit_amount'][$key])) {
           $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_id'][$key];
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
-          $value['soft_credit'][$key]['soft_credit_type_id'] = $params['field'][$key]['soft_credit_type'];
+
+          //CRM-15350: if soft-credit-type profile field is disabled or removed then
+          //we choose configured SCT default value
+          if (!empty($params['soft_credit_type'][$key])) {
+            $value['soft_credit'][$key]['soft_credit_type_id'] = $params['soft_credit_type'][$key];
+          }
+          else {
+            $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_OptionGroup::getDefaultValue("soft_credit_type");
+          }
         }
 
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
@@ -427,35 +436,28 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         if (!empty($value['send_receipt'])) {
           $value['receipt_date'] = date('Y-m-d His');
         }
+        // these translations & date handling are required because we are calling BAO directly rather than the api
+        $fieldTranslations = array(
+          'financial_type' => 'financial_type_id',
+          'payment_instrument' => 'payment_instrument_id',
+          'contribution_source' => 'source',
+          'contribution_note' => 'note',
 
-        if ($value['financial_type']) {
-          $value['financial_type_id'] = $value['financial_type'];
-        }
-
-        if (!empty($value['payment_instrument'])) {
-          $value['payment_instrument_id'] = $value['payment_instrument'];
-        }
-
-        if (!empty($value['contribution_source'])) {
-          $value['source'] = $value['contribution_source'];
-        }
-
-        if (!empty($value['contribution_note'])) {
-          $value['note'] = $value['contribution_note'];
+        );
+        foreach ($fieldTranslations as $formField => $baoField) {
+          if(isset($value[$formField])) {
+            $value[$baoField] = $value[$formField];
+          }
+          unset($value[$formField]);
         }
 
         $params['actualBatchTotal'] += $value['total_amount'];
-
-        unset($value['contribution_note']);
-        unset($value['financial_type']);
-        unset($value['contribution_source']);
-
         $value['batch_id'] = $this->_batchId;
         $value['skipRecentView'] = TRUE;
 
         // build line item params
-        $this->_priceSet['fields'][$fieldID]['options'][$fieldID]['amount'] =  $value['total_amount'];
-        $value['price_'.$fieldID] = 1;
+        $this->_priceSet['fields'][$priceFieldID]['options'][$priceFieldValueID ]['amount'] =  $value['total_amount'];
+        $value['price_'. $priceFieldID] = 1;
 
         $lineItem = array();
         CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $value, $lineItem[$priceSetId]);
@@ -463,9 +465,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         //unset amount level since we always use quick config price set
         unset($value['amount_level']);
 
-        //CRM-11529 for backoffice transactions
+        //CRM-11529 for back office transactions
         //when financial_type_id is passed in form, update the
-        //lineitems with the financial type selected in form
+        //line items with the financial type selected in form
         if (!empty($value['financial_type_id']) && !empty($lineItem[$priceSetId])) {
           foreach ($lineItem[$priceSetId] as &$values) {
             $values['financial_type_id'] = $value['financial_type_id'];
@@ -510,6 +512,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
       }
     }
+    return TRUE;
   }
   //end of function
 
@@ -520,7 +523,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return bool
    */
   private function processMembership(&$params) {
     $dateTypes = array(
@@ -620,9 +623,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         // handle soft credit
-        if (is_array(CRM_Utils_Array::value('soft_credit_contact_id', $params)) && !empty($params['soft_credit_contact_id'][$key]) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+        if (!empty($params['soft_credit_contact_id'][$key]) && !empty($params['soft_credit_amount'][$key])) {
           $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_id'][$key];
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
+
+          //CRM-15350: if soft-credit-type profile field is disabled or removed then
+          //we choose Gift as default value as per Gift Membership rule
+          if (!empty($params['soft_credit_type'][$key])) {
+            $value['soft_credit'][$key]['soft_credit_type_id'] = $params['soft_credit_type'][$key];
+          }
+          else {
+            $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'Gift', 'name');
+          }
         }
 
         if (!empty($value['receive_date'])) {
@@ -694,7 +706,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         if (!empty($params['member_option']) && CRM_Utils_Array::value( $key, $params['member_option'] ) == 2 ) {
           $this->_params = $params;
           $value['is_renew'] = true;
-          $membership = CRM_Member_BAO_Membership::renewMembership(
+          $membership = CRM_Member_BAO_Membership::renewMembershipFormWrapper(
             $value['contact_id'],
             $value['membership_type_id'],
             FALSE, $this, NULL, NULL,
@@ -765,14 +777,31 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $value['contact_id']
     );
   }
+
   /**
    * Function exists purely for unit testing purposes. If you feel tempted to use this in live code
    * then it probably means there is some functionality that needs to be moved
    * out of the form layer
+   *
    * @param unknown_type $params
+   *
+   * @return bool
    */
   function testProcessMembership($params) {
     return $this->processMembership($params);
+  }
+
+  /**
+   * Function exists purely for unit testing purposes. If you feel tempted to use this in live code
+   * then it probably means there is some functionality that needs to be moved
+   * out of the form layer
+   *
+   * @param array $params
+   *
+   * @return bool
+   */
+  function testProcessContribution($params) {
+    return $this->processContribution($params);
   }
 }
 

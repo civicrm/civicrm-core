@@ -2,8 +2,14 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Utils_TypeTest
+ */
 class CRM_Utils_TypeTest extends CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'      => 'Type Test',
@@ -23,6 +29,9 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_Type::validate($inputData, $inputType, FALSE));
   }
 
+  /**
+   * @return array
+   */
   function validateDataProvider() {
     return array(
       array(10, 'Int', 10),

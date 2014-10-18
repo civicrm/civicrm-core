@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_CustomGroup
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: CustomGroup.php 30879 2010-11-22 15:45:55Z shot $
  */
 
@@ -120,6 +120,7 @@ function civicrm_api3_custom_group_delete($params) {
  *
  * @param array $params Array to search on
  *
+ * @return array
  * @access public
  * {@getfields CustomGroup_get}
  * @example CustomGroupGet.php
@@ -128,3 +129,14 @@ function civicrm_api3_custom_group_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom group
+ */
+function civicrm_api3_custom_group_setvalue($params) {
+  require_once 'api/v3/Generic/Setvalue.php';
+  $result = civicrm_api3_generic_setValue(array("entity" => 'custom_group', 'params' => $params));
+  if (empty($result['is_error'])) {
+    CRM_Utils_System::flushCache();
+  }
+  return $result;
+}

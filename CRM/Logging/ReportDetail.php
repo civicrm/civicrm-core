@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -49,6 +49,9 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected $detail;
   protected $summary;
 
+  /**
+   *
+   */
   function __construct() {
     // don’t display the ‘Add these Contacts to Group’ button
     $this->_add2groupSupported = FALSE;
@@ -64,7 +67,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $this->altered_name  = CRM_Utils_Request::retrieve('alteredName', 'String',  CRM_Core_DAO::$_nullObject);
     $this->altered_by    = CRM_Utils_Request::retrieve('alteredBy',   'String',  CRM_Core_DAO::$_nullObject);
     $this->altered_by_id = CRM_Utils_Request::retrieve('alteredById', 'Integer', CRM_Core_DAO::$_nullObject);
- 
+
     parent::__construct();
 
     CRM_Utils_System::resetBreadCrumb();
@@ -109,8 +112,15 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     );
   }
 
+  /**
+   * @param bool $applyLimit
+   */
   function buildQuery($applyLimit = TRUE) {}
 
+  /**
+   * @param $sql
+   * @param $rows
+   */
   function buildRows($sql, &$rows) {
     // safeguard for when there aren’t any log entries yet
     if (!$this->log_conn_id or !$this->log_date) {
@@ -128,6 +138,11 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $table
+   *
+   * @return array
+   */
   protected function diffsInTable($table) {
     $rows = array();
 
@@ -161,9 +176,9 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         }
 
         // special-case for multiple values. Also works for CRM-7251: preferred_communication_method
-        if ((substr($from, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR && 
-            substr($from, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR) || 
-          (substr($to, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR && 
+        if ((substr($from, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
+            substr($from, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR) ||
+          (substr($to, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
             substr($to, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)) {
           $froms = $tos = array();
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($from, CRM_Core_DAO::VALUE_SEPARATOR)) as $val) {

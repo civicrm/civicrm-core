@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,15 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 require_once 'Mail/mime.php';
+
+/**
+ * Class CRM_Mailing_BAO_Mailing
+ */
 class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
   /**
@@ -91,6 +95,13 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     parent::__construct();
   }
 
+  /**
+   * @param $job_id
+   * @param null $mailing_id
+   * @param null $mode
+   *
+   * @return int
+   */
   static function &getRecipientsCount($job_id, $mailing_id = NULL, $mode = NULL) {
     // need this for backward compatibility, so we can get count for old mailings
     // please do not use this function if possible
@@ -100,6 +111,17 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
   // note that $job_id is used only as a variable in the temp table construction
   // and does not play a role in the queries generated
+  /**
+   * @param $job_id
+   * @param null $mailing_id
+   * @param null $offset
+   * @param null $limit
+   * @param bool $storeRecipients
+   * @param bool $dedupeEmail
+   * @param null $mode
+   *
+   * @return CRM_Mailing_Event_BAO_Queue|string
+   */
   static function &getRecipients(
     $job_id,
     $mailing_id = NULL,
@@ -519,6 +541,11 @@ ORDER BY   i.contact_id, i.{$tempColumn}
     return $eq;
   }
 
+  /**
+   * @param string $type
+   *
+   * @return array
+   */
   private function _getMailingGroupIds($type = 'Include') {
     $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
     $group = CRM_Contact_DAO_Group::getTableName();
@@ -845,6 +872,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *
    * @params array $params contains form values
    *
+   * @param $testParams
+   *
    * @return void
    * @access public
    */
@@ -881,7 +910,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
             'email_id' => $dao->email_id,
             'contact_id' => $groupContact,
           );
-          $queue = CRM_Mailing_Event_BAO_Queue::create($params);
+          CRM_Mailing_Event_BAO_Queue::create($params);
         }
       }
     }
@@ -951,12 +980,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * static wrapper for getting verp and urls
    *
-   * @param int $job_id           ID of the Job associated with this message
-   * @param int $event_queue_id   ID of the EventQueue
-   * @param string $hash          Hash of the EventQueue
-   * @param string $email         Destination address
+   * @param int $job_id ID of the Job associated with this message
+   * @param int $event_queue_id ID of the EventQueue
+   * @param string $hash Hash of the EventQueue
+   * @param string $email Destination address
    *
-   * @return (reference) array    array ref that hold array refs to the verp info and urls
+   * @return array (reference) array    array ref that hold array refs to the verp info and urls
    */
   static function getVerpAndUrls($job_id, $event_queue_id, $hash, $email) {
     // create a skeleton object and set its properties that are required by getVerpAndUrlsAndHeaders()
@@ -973,13 +1002,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * get verp, urls and headers
    *
-   * @param int $job_id           ID of the Job associated with this message
-   * @param int $event_queue_id   ID of the EventQueue
-   * @param string $hash          Hash of the EventQueue
-   * @param string $email         Destination address
+   * @param int $job_id ID of the Job associated with this message
+   * @param int $event_queue_id ID of the EventQueue
+   * @param string $hash Hash of the EventQueue
+   * @param string $email Destination address
    *
-   * @return (reference) array    array ref that hold array refs to the verp info, urls, and headers
-   * @access private
+   * @param bool $isForward
+   *
+   * @return array (reference) array    array ref that hold array refs to the verp info, urls, and headers@access private
    */
   private function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -1064,17 +1094,21 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Compose a message
    *
-   * @param int $job_id           ID of the Job associated with this message
-   * @param int $event_queue_id   ID of the EventQueue
-   * @param string $hash          Hash of the EventQueue
-   * @param string $contactId     ID of the Contact
-   * @param string $email         Destination address
-   * @param string $recipient     To: of the recipient
-   * @param boolean $test         Is this mailing a test?
-   * @param boolean $isForward    Is this mailing compose for forward?
-   * @param string  $fromEmail    email address of who is forwardinf it.
+   * @param int $job_id ID of the Job associated with this message
+   * @param int $event_queue_id ID of the EventQueue
+   * @param string $hash Hash of the EventQueue
+   * @param string $contactId ID of the Contact
+   * @param string $email Destination address
+   * @param string $recipient To: of the recipient
+   * @param boolean $test Is this mailing a test?
+   * @param $contactDetails
+   * @param $attachments
+   * @param boolean $isForward Is this mailing compose for forward?
+   * @param string $fromEmail email address of who is forwardinf it.
    *
-   * @return object               The mail object
+   * @param null $replyToEmail
+   *
+   * @return Mail_mime               The mail object
    * @access public
    */
   public function &compose($job_id, $event_queue_id, $hash, $contactId,
@@ -1109,6 +1143,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     if ($contactDetails) {
       $contact = $contactDetails;
+    }
+    elseif ($contactId === 0) {
+      //anonymous user
+      $contact = array();
+      CRM_Utils_Hook::tokenValues($contact, $contactId, $job_id);
     }
     else {
       $params = array(array('contact_id', '=', $contactId, 0, 0));
@@ -1473,6 +1512,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @params array $params        Form values
    *
+   * @param $params
+   * @param array $ids
+   *
    * @return object $mailing      The new mailing object
    * @access public
    * @static
@@ -1513,7 +1555,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'forward_replies' => FALSE,
         'open_tracking'   => TRUE,
         'url_tracking'    => TRUE,
-        'visibility'      => 'User and User Admin Only',
+        'visibility'      => 'Public Pages',
         'replyto_email'   => $domain_email,
         'header_id'       => CRM_Mailing_PseudoConstant::defaultComponent('header_id', ''),
         'footer_id'       => CRM_Mailing_PseudoConstant::defaultComponent('footer_id', ''),
@@ -1557,6 +1599,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $transaction->rollback();
       return $mailing;
     }
+    // update mailings with hash values
+    CRM_Contact_BAO_Contact_Utils::generateChecksum($mailing->id, NULL, NULL, NULL, 'mailing', 16);
 
     $groupTableName = CRM_Contact_BAO_Group::getTableName();
     $mailingTableName = CRM_Mailing_BAO_Mailing::getTableName();
@@ -1618,11 +1662,25 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
+   * get hash value of the mailing
+   *
+   */
+  public static function getMailingHash($id) {
+    $hash = NULL;
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'hash_mailing_url')) {
+      $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $id, 'hash', 'id');
+    }
+    return $hash;
+  }
+
+  /**
    * Generate a report.  Fetch event count information, mailing data, and job
    * status.
    *
-   * @param int     $id          The mailing id to report
+   * @param int $id The mailing id to report
    * @param boolean $skipDetails whether return all detailed report
+   *
+   * @param bool $isSMS
    *
    * @return array        Associative array of reporting data
    * @access public
@@ -2112,6 +2170,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     return $this->count;
   }
 
+  /**
+   * @param $id
+   *
+   * @throws Exception
+   */
   static function checkPermission($id) {
     if (!$id) {
       return;
@@ -2128,6 +2191,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     return;
   }
 
+  /**
+   * @param null $alias
+   *
+   * @return string
+   */
   static function mailingACL($alias = NULL) {
     $mailingACL = " ( 0 ) ";
 
@@ -2195,9 +2263,12 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   /**
    * Get the rows for a browse operation
    *
-   * @param int $offset       The row number to start from
-   * @param int $rowCount     The nmber of rows to return
-   * @param string $sort      The sql string that describes the sort order
+   * @param int $offset The row number to start from
+   * @param int $rowCount The nmber of rows to return
+   * @param string $sort The sql string that describes the sort order
+   *
+   * @param null $additionalClause
+   * @param null $additionalParams
    *
    * @return array            The rows
    * @access public
@@ -2288,6 +2359,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    *
    * @param int $id
    *
+   * @return string
    * @static
    * @access public
    */
@@ -2345,6 +2417,9 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     $dao->delete();
   }
 
+  /**
+   * @return array
+   */
   function getReturnProperties() {
     $tokens = &$this->getTokens();
 
@@ -2405,32 +2480,10 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     //sorted in ascending order tokens by ignoring word case
     $form->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
-    $form->_templates = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
-    if (!empty($form->_templates)) {
-      $form->assign('templates', TRUE);
-      $form->add('select', 'template', ts('Use Template'),
-        array(
-          '' => ts('- select -')) + $form->_templates, FALSE,
-        array('onChange' => "selectValue( this.value );")
-      );
-      $form->add('checkbox', 'updateTemplate', ts('Update Template'), NULL);
-    }
+    $templates = array();
 
-    $form->add('checkbox', 'saveTemplate', ts('Save As New Template'), NULL, FALSE,
-      array('onclick' => "showSaveDetails(this);")
-    );
-    $form->add('text', 'saveTemplateName', ts('Template Title'));
-
-
-    //insert message Text by selecting "Select Template option"
-    $form->add('textarea',
-      'text_message',
-      ts('Plain-text format'),
-      array(
-        'cols' => '80', 'rows' => '8',
-        'onkeyup' => "return verify(this)",
-      )
-    );
+    $textFields = array('text_message' => ts('HTML format'), 'sms_text_message' => ts('SMS Message'));
+    $modePrefixes = array('Mail' => NULL, 'SMS' => 'SMS');
 
     if ($className != 'CRM_SMS_Form_Upload' && $className != 'CRM_Contact_Form_Task_SMS' &&
       $className != 'CRM_Contact_Form_Task_SMS'
@@ -2442,6 +2495,53 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
           'onkeyup' => "return verify(this)",
         )
       );
+
+      if ($className != 'CRM_Admin_Form_ScheduleReminders') {
+        unset($modePrefixes['SMS']);
+      }
+    }
+    else {
+      unset($textFields['text_message']);
+      unset($modePrefixes['Mail']);
+    }
+
+    //insert message Text by selecting "Select Template option"
+    foreach ($textFields as $id => $label) {
+      $prefix = NULL;
+      if ($id == 'sms_text_message') {
+        $prefix = "SMS";
+        $form->assign('max_sms_length', CRM_SMS_Provider::MAX_SMS_CHAR);
+      }
+      $form->add('textarea', $id, $label,
+        array(
+          'cols' => '80', 'rows' => '8',
+          'onkeyup' => "return verify(this, '{$prefix}')",
+        )
+      );
+    }
+
+    foreach ($modePrefixes as $prefix) {
+      if ($prefix == 'SMS') {
+        $templates[$prefix] = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE, TRUE);
+      }
+      else {
+        $templates[$prefix] = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
+      }
+
+      if (!empty($templates[$prefix])) {
+        $form->assign('templates', TRUE);
+
+        $form->add('select', "{$prefix}template", ts('Use Template'),
+          array('' => ts('- select -')) + $templates[$prefix], FALSE,
+          array('onChange' => "selectValue( this.value, '{$prefix}');")
+        );
+      }
+      $form->add('checkbox', "{$prefix}updateTemplate", ts('Update Template'), NULL);
+
+      $form->add('checkbox', "{$prefix}saveTemplate", ts('Save As New Template'), NULL, FALSE,
+        array('onclick' => "showSaveDetails(this, '{$prefix}');")
+      );
+      $form->add('text', "{$prefix}saveTemplateName", ts('Template Title'));
     }
   }
 
@@ -2476,7 +2576,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $form->add('select', 'template', ts('Select Template'),
         array(
           '' => ts('- select -')) + $form->_templates, FALSE,
-        array('onChange' => "selectValue( this.value );")
+        array('onChange' => "selectValue( this.value,'' );")
       );
       $form->add('checkbox', 'updateTemplate', ts('Update Template'), NULL);
     }
@@ -2534,8 +2634,9 @@ SELECT  $mailing.id as mailing_id
    *
    * @param $form reference of this
    *
-   * @return $report array content/component.
-   * @access public
+   * @param bool $isSMS
+   *
+   * @return array $report array content/component.@access public
    */
   static function getMailingContent(&$report, &$form, $isSMS = FALSE) {
     $htmlHeader = $textHeader = NULL;
@@ -2559,32 +2660,22 @@ SELECT  $mailing.id as mailing_id
       }
     }
 
-    $text = CRM_Utils_Request::retrieve('text', 'Boolean', $form);
-    if ($text) {
-      echo "<pre>{$textHeader}</br>{$report['mailing']['body_text']}</br>{$textFooter}</pre>";
-      CRM_Utils_System::civiExit();
-    }
-
+    $mailingKey = $form->_mailing_id;
     if (!$isSMS) {
-      $html = CRM_Utils_Request::retrieve('html', 'Boolean', $form);
-      if ($html) {
-        $output = $htmlHeader . $report['mailing']['body_html'] . $htmlFooter ;
-        echo str_replace( "\n", '<br />', $output );
-        CRM_Utils_System::civiExit();
+      if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($mailingKey)) {
+        $mailingKey = $hash;
       }
     }
 
     if (!empty($report['mailing']['body_text'])) {
-      $url = CRM_Utils_System::url('civicrm/mailing/report', 'reset=1&text=1&mid=' . $form->_mailing_id);
-      $popup = "javascript:popUp(\"$url\");";
-      $form->assign('textViewURL', $popup);
+      $url = CRM_Utils_System::url('civicrm/mailing/view', 'reset=1&text=1&id=' . $mailingKey);
+      $form->assign('textViewURL', $url);
     }
 
     if (!$isSMS) {
       if (!empty($report['mailing']['body_html'])) {
-        $url = CRM_Utils_System::url('civicrm/mailing/report', 'reset=1&html=1&mid=' . $form->_mailing_id);
-        $popup = "javascript:popUp(\"$url\");";
-        $form->assign('htmlViewURL', $popup);
+        $url = CRM_Utils_System::url('civicrm/mailing/view', 'reset=1&id=' . $mailingKey);
+        $form->assign('htmlViewURL', $url);
       }
     }
 
@@ -2594,6 +2685,11 @@ SELECT  $mailing.id as mailing_id
     return $report;
   }
 
+  /**
+   * @param $jobID
+   *
+   * @return mixed
+   */
   static function overrideVerp($jobID) {
     static $_cache = array();
 
@@ -2610,12 +2706,18 @@ WHERE  civicrm_mailing_job.id = %1
     return $_cache[$jobID];
   }
 
+  /**
+   * @param null $mode
+   *
+   * @return bool
+   * @throws Exception
+   */
   static function processQueue($mode = NULL) {
     $config = &CRM_Core_Config::singleton();
     //   CRM_Core_Error::debug_log_message("Beginning processQueue run: {$config->mailerJobsMax}, {$config->mailerJobSize}");
 
     if ($mode == NULL && CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG") {
-      CRM_Core_Error::fatal(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in the online user and administrator guide</a>', array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'), 2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/")));
+      throw new CRM_Core_Exception(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in the online user and administrator guide</a>', array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'), 2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/")));
     }
 
     // check if we are enforcing number of parallel cron jobs
@@ -2663,6 +2765,9 @@ WHERE  civicrm_mailing_job.id = %1
     return TRUE;
   }
 
+  /**
+   * @param $mailingID
+   */
   private static function addMultipleEmails($mailingID) {
     $sql = "
 INSERT INTO civicrm_mailing_recipients
@@ -2679,6 +2784,11 @@ AND    e.id NOT IN ( SELECT email_id FROM civicrm_mailing_recipients mr WHERE ma
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
   }
 
+  /**
+   * @param bool $isSMS
+   *
+   * @return mixed
+   */
   static function getMailingsList($isSMS = FALSE) {
     static $list = array();
     $where = " WHERE ";
@@ -2705,6 +2815,11 @@ ORDER BY civicrm_mailing.name";
     return $list;
   }
 
+  /**
+   * @param $mid
+   *
+   * @return null|string
+   */
   static function hiddenMailingGroup($mid) {
     $sql = "
 SELECT     g.id
@@ -2742,8 +2857,8 @@ AND        m.id = %1
 
     //CRM-12814
     if (!empty($mailings)) {
-      $openCounts = CRM_Mailing_Event_BAO_Opened::getMailingTotalCount(array_keys($mailings));
-      $clickCounts = CRM_Mailing_Event_BAO_TrackableURLOpen::getMailingTotalCount(array_keys($mailings));
+      $openCounts = CRM_Mailing_Event_BAO_Opened::getMailingContactCount(array_keys($mailings), $params['contact_id']);
+      $clickCounts = CRM_Mailing_Event_BAO_TrackableURLOpen::getMailingContactCount(array_keys($mailings), $params['contact_id']);
     }
 
     // format params and add links
@@ -2760,16 +2875,18 @@ AND        m.id = %1
         "reset=1&cid={$values['creator_id']}");
 
       //CRM-12814
-      $contactMailings[$mailingId]['openstats'] = ts('Opens') . ': ' . $openCounts[$values['mailing_id']] .
-        '<br />' . ts('Clicks') . ': ' . $clickCounts[$values['mailing_id']];
+      $contactMailings[$mailingId]['openstats'] = "Opens: ".
+        CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0).
+        "<br />Clicks: ".
+        CRM_Utils_Array::value($values['mailing_id'], $clickCounts, 0);
 
       $actionLinks = array(
         CRM_Core_Action::VIEW => array(
           'name' => ts('View'),
           'url' => 'civicrm/mailing/view',
-          'qs' => "reset=1&id=%%mid%%",
+          'qs' => "reset=1&id=%%mkey%%",
           'title' => ts('View Mailing'),
-          'class' => 'crm-mailing-view',
+          'class' => 'crm-popup',
         ),
         CRM_Core_Action::BROWSE => array(
           'name' => ts('Mailing Report'),
@@ -2779,12 +2896,18 @@ AND        m.id = %1
         )
       );
 
+      $mailingKey = $values['mailing_id'];
+      if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($mailingKey)) {
+        $mailingKey = $hash;
+      }
+
       $contactMailings[$mailingId]['links'] = CRM_Core_Action::formLink(
         $actionLinks,
         null,
         array(
           'mid' => $values['mailing_id'],
           'cid' => $params['contact_id'],
+          'mkey' => $mailingKey,
         ),
         ts('more'),
         FALSE,
@@ -2832,4 +2955,3 @@ AND        m.id = %1
     return civicrm_api('MailingContact', 'getcount', $params);
   }
 }
-

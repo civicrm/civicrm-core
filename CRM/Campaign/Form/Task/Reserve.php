@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -164,12 +164,12 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     $this->addElement('text', 'ActivityType', ts('Activity Type'));
     $this->addElement('text', 'newGroupName', ts('Name for new group'));
     $this->addElement('text', 'newGroupDesc', ts('Description of new group'));
-    $groups = CRM_Core_PseudoConstant::group();
+    $groups = CRM_Core_PseudoConstant::nestedGroup();
     $hasExistingGroups = FALSE;
     if (is_array($groups) && !empty($groups)) {
       $hasExistingGroups = TRUE;
       $this->addElement('select', 'groups', ts('Add respondent(s) to existing group(s)'),
-        $groups, array('multiple' => "multiple", 'size' => 5)
+        $groups, array('multiple' => "multiple", 'class' => 'crm-select2')
       );
     }
     $this->assign('hasExistingGroups', $hasExistingGroups);
@@ -204,6 +204,9 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    * global validation rules for the form
    *
    * @param array $fields posted values of the form
+   *
+   * @param $files
+   * @param $self
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -300,6 +303,11 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     }
   }
 
+  /**
+   * @param $contactIds
+   *
+   * @return array
+   */
   private function _addRespondentToGroup($contactIds) {
     $groupAdditions = array();
     if (empty($contactIds)) {

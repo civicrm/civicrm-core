@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,12 +38,22 @@
 
 class CRM_Core_Exception extends PEAR_Exception {
   private $errorData = array();
+
+  /**
+   * @param $message
+   * @param int $error_code
+   * @param array $errorData
+   * @param null $previous
+   */
   public function __construct($message, $error_code = 0, $errorData = array(), $previous = null) {
     parent::__construct(ts($message));
     $this->errorData = $errorData + array('error_code' => $error_code);
   }
 
   // custom string representation of object
+  /**
+   * @return string
+   */
   public function __toString() {
     return __CLASS__ . ": [{$this->errorData['error_code']}: {$this->message}\n";
   }
@@ -51,6 +61,21 @@ class CRM_Core_Exception extends PEAR_Exception {
   public function getErrorCode() {
     return $this->errorData['error_code'];
   }
+
+  /**
+   * Return specific error information that can be used for more detailed
+   * error messages or translation.
+   *
+   * This method may be overridden in child exception classes in order
+   * to add functionality not present in PEAR_Exception and is a placeholder
+   * to define API
+   *
+   * The returned array must be an associative array of parameter => value like so:
+   * <pre>
+   * array('name' => $name, 'context' => array(...))
+   * </pre>
+   * @return array
+   */
   public function getErrorData() {
     return $this->errorData;
   }

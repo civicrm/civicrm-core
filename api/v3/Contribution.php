@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Contribute
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Contribution.php 30486 2010-11-02 16:12:09Z shot $
  *
  */
@@ -40,8 +40,9 @@
 /**
  * Add or update a contribution
  *
- * @param  array   $params           (reference ) input parameters
+ * @param  array $params (reference ) input parameters
  *
+ * @throws API_Exception
  * @return array  Api result array
  * @static void
  * @access public
@@ -53,13 +54,6 @@ function civicrm_api3_contribution_create(&$params) {
   _civicrm_api3_custom_format_params($params, $values, 'Contribution');
   $params = array_merge($params, $values);
 
-  //legacy soft credit handling - recommended approach is chaining
-  if(!empty($params['soft_credit_to'])){
-    $params['soft_credit'] = array(array(
-      'contact_id' => $params['soft_credit_to'],
-      'amount' => $params['total_amount']));
-  }
-
   if (!empty($params['id']) && !empty($params['contribution_status_id'])) {
     $error = array();
     //throw error for invalid status change such as setting completed back to pending
@@ -70,6 +64,12 @@ function civicrm_api3_contribution_create(&$params) {
       throw new API_Exception($error['contribution_status_id']);
     }
   }
+
+  _civicrm_api3_contribution_create_legacy_support_45($params);
+
+  // make sure tax calculation is handled via api
+  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
+  
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
 }
 
@@ -108,8 +108,15 @@ function _civicrm_api3_contribution_create_spec(&$params) {
     'description' => 'ID of Contact to be Soft credited to',
     'FKClassName' => 'CRM_Contact_DAO_Contact',
   );
+  $params['honor_contact_id'] = array(
+    'name' => 'honor_contact_id',
+    'title' => 'Honoree contact ID',
+    'type' => 1,
+    'description' => 'ID of honoree contact',
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+  );
   // note this is a recommended option but not adding as a default to avoid
-  // creating unecessary changes for the dev
+  // creating unnecessary changes for the dev
   $params['skipRecentView'] = array(
     'name' => 'skipRecentView',
     'title' => 'Skip adding to recent view',
@@ -128,6 +135,28 @@ function _civicrm_api3_contribution_create_spec(&$params) {
     'type' => 1,
     'description' => 'Batch which relevant transactions should be added to',
   );
+}
+
+/**
+* Support for schema changes made in 4.5
+* The main purpose of the API is to provide integrators a level of stability not provided by
+* the core code or schema - this means we have to provide support for api calls (where possible)
+* across schema changes.
+*/
+function _civicrm_api3_contribution_create_legacy_support_45(&$params){
+  //legacy soft credit handling - recommended approach is chaining
+  if(!empty($params['soft_credit_to'])){
+    $params['soft_credit'] = array(array(
+      'contact_id'          => $params['soft_credit_to'],
+      'amount'              => $params['total_amount'],
+      'soft_credit_type_id' => CRM_Core_OptionGroup::getDefaultValue("soft_credit_type")));
+  }
+  if(!empty($params['honor_contact_id'])){
+    $params['soft_credit'] = array(array(
+      'contact_id'          => $params['honor_contact_id'],
+      'amount'              => $params['total_amount'],
+      'soft_credit_type_id' => CRM_Core_OptionGroup::getValue('soft_credit_type', 'in_honor_of', 'name')));
+  }
 }
 
 /**
@@ -162,8 +191,9 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
 /**
  * Retrieve a set of contributions, given a set of input params
  *
- * @param  array   $params           (reference ) input parameters
- * @param array    $returnProperties Which properties should be included in the
+ * @param  array $params (reference ) input parameters
+ *
+ * @internal param array $returnProperties Which properties should be included in the
  * returned Contribution object. If NULL, the default
  * set of properties will be included.
  *
@@ -175,30 +205,9 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
  */
 function civicrm_api3_contribution_get($params) {
 
-  $options          = _civicrm_api3_get_options_from_params($params, TRUE,'contribution','get');
-  $sort             = CRM_Utils_Array::value('sort', $options, NULL);
-  $offset           = CRM_Utils_Array::value('offset', $options);
-  $rowCount         = CRM_Utils_Array::value('limit', $options);
-  $smartGroupCache  = CRM_Utils_Array::value('smartGroupCache', $params);
-  $inputParams      = CRM_Utils_Array::value('input_params', $options, array());
-  $returnProperties = CRM_Utils_Array::value('return', $options, NULL);
-  if (empty($returnProperties)) {
-    $returnProperties = CRM_Contribute_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
-  }
-
-  $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
-  $query = new CRM_Contact_BAO_Query($newParams, $returnProperties, NULL,
-    FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE
-  );
-  list($select, $from, $where, $having) = $query->query();
-
-  $sql = "$select $from $where $having";
-
-  if (!empty($sort)) {
-    $sql .= " ORDER BY $sort ";
-  }
-  $sql .= " LIMIT $offset, $rowCount ";
-  $dao = CRM_Core_DAO::executeQuery($sql);
+  $mode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
+  $entity = 'contribution';
+  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, $entity);
 
   $contribution = array();
   while ($dao->fetch()) {
@@ -235,6 +244,7 @@ function _civicrm_api3_format_soft_credit(&$contribution) {
  */
 function _civicrm_api3_contribution_get_spec(&$params) {
   $params['contribution_test']['api.default'] = 0;
+  $params['contribution_test']['title'] = 'Get Test Contributions?';
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
   $params['contact_id'] = $params['contribution_contact_id'];
   $params['contact_id']['api.aliases'] = array('contribution_contact_id');
@@ -245,10 +255,12 @@ function _civicrm_api3_contribution_get_spec(&$params) {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params Associative array of property name/value
  * pairs to insert in new contact.
- * @param array  $values       The reformatted properties that we can use internally
+ * @param array $values The reformatted properties that we can use internally
  * '
+ *
+ * @param bool $create
  *
  * @return array|CRM_Error
  * @access public
@@ -266,8 +278,8 @@ function _civicrm_api3_contribute_format_params($params, &$values, $create = FAL
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_contribution_transact_spec(&$params) {
-  // This function calls create, so should inherit create spec
-  _civicrm_api3_contribution_create_spec($params);
+  $fields = civicrm_api3('contribution', 'getfields', array('action' => 'create'));
+  $params = array_merge($params, $fields['values']);
   $params['receive_date']['api.default'] = 'now';
 }
 
@@ -316,19 +328,22 @@ function civicrm_api3_contribution_transact($params) {
       return CRM_Core_Error::createApiError($last_error['message']);
     }
   }
-
+  $params['payment_instrument_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', $paymentProcessor['payment_processor_type_id'], 'payment_type') == 1 ? 'Credit Card' : 'Debit Card';
   return civicrm_api('contribution', 'create', $params);
 }
+
 /**
  * Send a contribution confirmation (receipt or invoice)
  * The appropriate online template will be used (the existence of related objects
  * (e.g. memberships ) will affect this selection
+ *
  * @param array $params input parameters
  * {@getfields Contribution_sendconfirmation}
+ *
+ * @throws Exception
  * @return array  Api result array
  * @static void
  * @access public
- *
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
   $contribution = new CRM_Contribute_BAO_Contribution();
@@ -379,10 +394,11 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  *
  * @param array $params input parameters
  * {@getfields Contribution_completetransaction}
+ *
+ * @throws API_Exception
  * @return array  Api result array
  * @static void
  * @access public
- *
  */
 function civicrm_api3_contribution_completetransaction(&$params) {
 
@@ -397,11 +413,14 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     if(!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)){
       throw new API_Exception('failed to load related objects');
     }
+    elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
+      throw new API_Exception(ts('Contribution already completed'));
+    }
     $objects = $contribution->_relatedObjects;
     $objects['contribution'] = &$contribution;
     $input['component'] = $contribution->_component;
     $input['is_test'] = $contribution->is_test;
-    $input['trxn_id']= $contribution->trxn_id;
+    $input['trxn_id']= !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
     $input['amount'] = $contribution->total_amount;
     if(isset($params['is_email_receipt'])){
       $input['is_email_receipt'] = $params['is_email_receipt'];
@@ -416,6 +435,21 @@ function civicrm_api3_contribution_completetransaction(&$params) {
   }
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_contribution_completetransaction(&$params) {
-
+  $params['id'] = array(
+    'title' => 'Contribution ID',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => TRUE,
+  );
+  $params['trxn_id'] = array(
+    'title' => 'Transaction ID',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['is_email_receipt'] = array(
+    'title' => 'Send email Receipt?',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
 }

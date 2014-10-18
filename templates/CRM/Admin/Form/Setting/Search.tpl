@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -77,6 +77,14 @@
             <td>{$form.search_autocomplete_count.html}<br />
             <span class="description">{ts}The maximum number of contacts to show at a time when typing in an autocomplete field.{/ts}</span></td>
         </tr>
+        <tr class="crm-miscellaneous-form-block-enable_innodb_fts">
+            <td class="label">{$form.enable_innodb_fts.label}</td>
+            <td>{$form.enable_innodb_fts.html}<br />
+                <p class="description">{$enable_innodb_fts_description}</p>
+            </td>
+        </tr>
+
+
        </table>
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 

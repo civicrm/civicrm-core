@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -206,6 +206,14 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
       $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId);
+      // Refresh other tabs with related data
+      $this->ajaxResponse['updateTabs'] = array(
+        '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
+        '#tab_rel' => CRM_Contact_BAO_Contact::getCountComponent('rel', $this->_contactId),
+      );
+      if (CRM_Core_Permission::access('CiviContribute')) {
+        $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
+      }
     }
   }
 
@@ -247,6 +255,16 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       if (CRM_Core_Permission::access('CiviContribute')) {
         $this->assign('accessContribution', TRUE);
         CRM_Member_Page_Tab::associatedContribution($this->_contactId, $this->_id);
+
+        //show associated soft credit when contribution payment is paid by different person in edit mode
+        if ($this->_id && $this->_contactId) {
+          $filter = " AND cc.id IN (SELECT contribution_id FROM civicrm_membership_payment WHERE membership_id = {$this->_id})";
+          $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $filter);
+          if (!empty($softCreditList)) {
+            $this->assign('softCredit', TRUE);
+            $this->assign('softCreditRows', $softCreditList);
+          }
+        }
       }
     }
 
@@ -281,9 +299,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
       // check logged in url permission
       CRM_Contact_Page_View::checkUserPermission($this);
-
-      // set page title
-      CRM_Contact_Page_View::setTitle($this->_contactId);
     }
 
     $this->assign('action', $this->_action);
@@ -305,7 +320,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $this->preProcess();
 
     // check if we can process credit card membership
-    $newCredit = CRM_Core_Payment::allowBackofficeCreditCard($this);
+    $newCredit = CRM_Core_Config::isEnabledBackOfficeCreditCardPayments();
+    $this->assign('newCredit', $newCredit);
+
     if ($newCredit) {
       $this->_isPaymentProcessor = TRUE;
     }
@@ -317,10 +334,21 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     if (CRM_Core_Permission::access('CiviContribute')) {
       $this->_accessContribution = TRUE;
       $this->assign('accessContribution', TRUE);
+
+      //show associated soft credit when contribution payment is paid by different person
+      if ($this->_id && $this->_contactId) {
+        $filter = " AND cc.id IN (SELECT contribution_id FROM civicrm_membership_payment WHERE membership_id = {$this->_id})";
+        $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $filter);
+        if (!empty($softCreditList)) {
+          $this->assign('softCredit', TRUE);
+          $this->assign('softCreditRows', $softCreditList);
+        }
+      }
     }
     else {
       $this->_accessContribution = FALSE;
       $this->assign('accessContribution', FALSE);
+      $this->assign('softCredit', FALSE);
     }
 
     if ($this->_action & CRM_Core_Action::VIEW) {
@@ -339,10 +367,17 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     return parent::run();
   }
 
+  /**
+   * @param $form
+   * @param null $contactId
+   */
   public static function setContext(&$form, $contactId = NULL) {
     $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search' );
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
+
+    $searchContext = CRM_Utils_Request::retrieve('searchContext', 'String', $form);
+
     //validate the qfKey
     if (!CRM_Utils_Rule::qfKey($qfKey)) {
       $qfKey = NULL;
@@ -368,7 +403,12 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         }
         $form->assign('searchKey', $qfKey);
 
-        $url = CRM_Utils_System::url('civicrm/member/search', $urlParams);
+        if ($searchContext) {
+          $url = CRM_Utils_System::url("civicrm/$searchContext/search", $urlParams);
+        }
+        else {
+          $url = CRM_Utils_System::url('civicrm/member/search', $urlParams);
+        }
         break;
 
       case 'home':
@@ -392,7 +432,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $urlString = 'civicrm/contact/search/custom';
         if ($action == CRM_Core_Action::UPDATE) {
           if ($form->_contactId) {
-            $urlParams .= '&cid=' . $this->_contactId;
+            $urlParams .= '&cid=' . $form->_contactId;
           }
           $keyName = '&key';
           $urlParams .= '&context=fulltext&action=view';
@@ -420,6 +460,12 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
   /**
    * Get action links
+   *
+   * @param string $status
+   * @param null $isPaymentProcessor
+   * @param null $accessContribution
+   * @param bool $isCancelSupported
+   * @param bool $isUpdateBilling
    *
    * @return array (reference) of action links
    * @static

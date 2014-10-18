@@ -101,8 +101,12 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
   /**
    *  Add all test classes *Test and all test suites *Tests in subdirectories
    *
-   * @param  &object Test suite object to add tests to
-   * @param  object  Directory to scan
+   * @param PHPUnit_Framework_TestSuite $suite
+   * @param $myfile
+   * @param SplFileInfo $dirInfo
+   *
+   * @internal param $ &object Test suite object to add tests to
+   * @internal param \Directory $object to scan
    * @return Test suite has been updated
    */
   protected function addAllTests(PHPUnit_Framework_TestSuite & $suite,
@@ -191,7 +195,7 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
         foreach (array_diff($newClassNames,
           $oldClassNames
                  ) as $name) {
-          if (strpos($fileInfo->getRealPath(), str_replace('_', '/', $name) . ".php") !== FALSE) {
+          if (strpos($fileInfo->getRealPath(), strtr($name, '_\\', '//') . ".php") !== FALSE) {
             if (preg_match('/Test$/', $name)) {
               $addTestSuites[] = $name;
             }

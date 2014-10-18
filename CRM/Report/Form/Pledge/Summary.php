@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,6 +42,12 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
   protected $_addressField = FALSE;
   protected $_emailField = FALSE;
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -184,24 +190,9 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
             ),
         ),
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_Group',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts(' Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
     ) + $this->addAddressFields();
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     $this->_currencyColumn = 'civicrm_pledge_currency';
     parent::__construct();
@@ -296,6 +287,11 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -386,12 +382,14 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound   = FALSE;
     $checkList    = array();
     $display_flag = $prev_cid = $cid = 0;
-    crm_Core_error::Debug('$rows', $rows);
     foreach ($rows as $rowNum => $row) {
 
       // convert display name to links

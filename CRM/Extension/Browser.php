@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * system.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -67,6 +67,9 @@ class CRM_Extension_Browser {
     return (FALSE !== $this->getRepositoryUrl());
   }
 
+  /**
+   * @return string
+   */
   public function getRepositoryUrl() {
     return $this->repoUrl;
   }
@@ -132,6 +135,8 @@ class CRM_Extension_Browser {
   /**
    * Get a description of a particular extension
    *
+   * @param $key
+   *
    * @return CRM_Extension_Info|NULL
    */
   public function getExtension($key) {
@@ -145,6 +150,10 @@ class CRM_Extension_Browser {
     }
   }
 
+  /**
+   * @return array
+   * @throws CRM_Extension_Exception_ParseException
+   */
   private function _discoverRemote() {
     $tsPath    = $this->getTsPath();
     $timestamp = FALSE;
@@ -181,6 +190,9 @@ class CRM_Extension_Browser {
     return $this->_remotesDiscovered;
   }
 
+  /**
+   * @return array
+   */
   private function grabCachedKeyList() {
     $result     = array();
     $cachedPath = $this->cacheDir . DIRECTORY_SEPARATOR;
@@ -289,6 +301,9 @@ class CRM_Extension_Browser {
     }
   }
 
+  /**
+   * @return string
+   */
   private function getTsPath() {
       return $this->cacheDir . DIRECTORY_SEPARATOR . 'timestamp.txt';
   }

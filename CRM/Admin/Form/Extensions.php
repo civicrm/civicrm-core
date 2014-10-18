@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -105,30 +105,34 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
 
+    $info = CRM_Extension_System::singleton()->getMapper()->keyToInfo($this->_key);
+    $extInfo = CRM_Admin_Page_Extensions::createExtendedInfo($info);
+    $extName = $extInfo['name'];
+
     switch ($this->_action) {
       case CRM_Core_Action::ADD:
         $buttonName = ts('Install');
-        $title = ts('Install Extension');
+        $title = ts('Install ' . $extName  . '?');
         break;
 
       case CRM_Core_Action::UPDATE:
         $buttonName = ts('Download and Install');
-        $title = ts('Download and Install Extension');
+        $title = ts('Download and Install ' . $extName  . '?');
         break;
 
       case CRM_Core_Action::DELETE:
         $buttonName = ts('Uninstall');
-        $title = ts('Uninstall Extension');
+        $title = ts('Uninstall ' . $extName . '?');
         break;
 
       case CRM_Core_Action::ENABLE:
         $buttonName = ts('Enable');
-        $title = ts('Enable Extension');
+        $title = ts('Enable ' . $extName . '?');
         break;
 
       case CRM_Core_Action::DISABLE:
-        $buttonName = 'Disable';
-        $title = ts('Disable Extension');
+        $buttonName = ts('Disable');
+        $title = ts('Disable ' . $extName . '?');
         break;
     }
 

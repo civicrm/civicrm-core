@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  *
  */
 
@@ -39,18 +39,17 @@ class CRM_Group_Page_AJAX {
   static function getGroupList() {
     $params = $_REQUEST;
 
-    if ( isset($params['parent_id']) ) {
+    if (isset($params['parent_id'])) {
       // requesting child groups for a given parent
       $params['page'] = 1;
-      $params['rp']   = 25;
+      $params['rp']   = 0;
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
 
-      echo json_encode($groups);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($groups);
     }
     else {
       $sortMapper = array(
-        0 => 'groups.title', 1 => 'groups.id', 2 => 'createdBy.sort_name', 3 => '',
+        0 => 'groups.title', 1 => 'count', 2 => 'createdBy.sort_name', 3 => '',
         4 => 'groups.group_type', 5 => 'groups.visibility',
       );
 
@@ -84,14 +83,19 @@ class CRM_Group_Page_AJAX {
 
       $iFilteredTotal = $iTotal = $params['total'];
       $selectorElements = array(
-        'group_name', 'group_id', 'created_by', 'group_description',
+        'group_name', 'count', 'created_by', 'group_description',
         'group_type', 'visibility', 'org_info', 'links', 'class',
       );
 
       if (empty($params['showOrgInfo'])) {
         unset($selectorElements[6]);
       }
-
+     //add setting so this can be tested by unit test
+     //@todo - ideally the portion of this that retrieves the groups should be extracted into a function separate
+     // from the one which deals with web inputs & outputs so we have a properly testable & re-usable function
+      if(!empty($params['is_unit_test'])) {
+        return array($groups, $iFilteredTotal);
+      }
       echo CRM_Utils_JSON::encodeDataTableSelector($groups, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
       CRM_Utils_System::civiExit();
     }

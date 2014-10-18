@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -98,6 +98,10 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     self::preProcessCommon($this);
   }
 
+  /**
+   * @param $form
+   * @param bool $useTable
+   */
   static function preProcessCommon(&$form, $useTable = FALSE) {
 
     $form->_contactIds = array();
@@ -328,7 +332,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return array
    */
   function setDefaultValues() {
     $defaults = array();
@@ -371,7 +375,11 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button
-   * @param string $type  button type for the form after processing
+   * @param string $nextType
+   * @param string $backType
+   * @param bool $submitOnce
+   *
+   * @internal param string $type button type for the form after processing
    *
    * @return void
    * @access public

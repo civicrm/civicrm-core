@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Grant_StandaloneAddTest
+ */
 class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -48,8 +52,7 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('grant/add', 'reset=1&context=standalone', '_qf_Grant_upload');
 
     // create new contact using dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, "Grantor", $firstName . "@example.com");
+    $contact = $this->createDialogContact();
 
     // select grant Status
     $this->select("status_id", "value=1");
@@ -85,10 +88,10 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->type("note", "Grant Note");
 
     // Clicking save.
-    $this->clickLink("_qf_Grant_upload", "xpath=//div[@id='Grants']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink("_qf_Grant_upload", "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[8]/span/a[text()='View']", FALSE);
 
     //click through to the Grant view screen
-    $this->click("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
 
     $this->waitForElementPresent("_qf_GrantView_cancel-bottom");
 

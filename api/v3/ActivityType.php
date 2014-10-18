@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,21 +26,28 @@
 */
 
 /**
- * Definition of the ActivityType part of the CRM API.
- * More detailed documentation can be found
- * {@link http://objectledge.org/confluence/display/CRM/CRM+v1.0+Public+APIs
- * here}
+ * @deprecated
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Activity
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: ActivityType.php 30171 2010-10-14 09:11:27Z mover $
  *
  */
 
 /**
+ * @deprecated api notice
+ * @return string to indicate this entire api entity is deprecated
+ */
+function _civicrm_api3_activity_type_deprecation() {
+  return 'The activity_type api is deprecated. Please use the option_value api instead.';
+}
+
+/**
  * Function to retrieve activity types
+ *
+ * @param $params
  *
  * @return array $activityTypes activity types keyed by id
  * @access public
@@ -64,7 +71,7 @@ function civicrm_api3_activity_type_get($params) {
  *
  * @access public
  *
- * @deprecated - we will introduce OptionValue Create - plse consider helping with this if not done
+ * @deprecated - use option_value create
  */
 function civicrm_api3_activity_type_create($params) {
 
@@ -89,7 +96,9 @@ function civicrm_api3_activity_type_create($params) {
  */
 function _civicrm_api3_activity_type_create_spec(&$params) {
   $params['label']['api.required'] = 1;
+  $params['label']['title'] = 'Label';
   $params['weight']['api.required'] = 1;
+  $params['weight']['title'] = 'Weight';
 }
 
 /**

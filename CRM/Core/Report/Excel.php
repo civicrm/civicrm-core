@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,6 +24,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 */
+
+/**
+ * Class CRM_Core_Report_Excel
+ */
 class CRM_Core_Report_Excel {
 
   /**
@@ -34,9 +38,12 @@ class CRM_Core_Report_Excel {
    * Outputs a result set with a given header
    * in the string buffer result
    *
-   * @param   string   $header (reference ) column headers
-   * @param   string   $rows   (reference ) result set rows
-   * @param   boolean  $print should the output be printed
+   * @param   string $header (reference ) column headers
+   * @param   string $rows (reference ) result set rows
+   * @param null $titleHeader
+   * @param   boolean $print should the output be printed
+   *
+   * @param bool $outputHeader
    *
    * @return  mixed    empty if output is printed, else output
    *
@@ -144,6 +151,13 @@ class CRM_Core_Report_Excel {
     }
   }
 
+  /**
+   * @param $fileName
+   * @param $header
+   * @param $rows
+   * @param null $titleHeader
+   * @param bool $outputHeader
+   */
   function writeHTMLFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE) {
     if ($outputHeader) {
       CRM_Utils_System::download(CRM_Utils_String::munge($fileName),

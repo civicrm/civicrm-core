@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -24,8 +24,17 @@
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
 */
+
+/**
+ * Class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised
+ */
 class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised extends CRM_Dedupe_BAO_QueryBuilder {
 
+  /**
+   * @param $rg
+   *
+   * @return array
+   */
   static function record($rg) {
     $civicrm_email = CRM_Utils_Array::value('civicrm_email', $rg->params, array());
 
@@ -43,6 +52,11 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised extends CRM_Dedupe_BAO_
     );
   }
 
+  /**
+   * @param $rg
+   *
+   * @return array
+   */
   static function internal($rg) {
     $query = "
             SELECT contact1.id as id1, contact2.id as id2, {$rg->threshold} as weight

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Upgrade_TwoTwo_Form_Step1 extends CRM_Upgrade_Form {
+  /**
+   * @param $errorMessage
+   *
+   * @return bool
+   */
   function verifyPreDBState(&$errorMessage) {
     // check if log file is writable
     $config = CRM_Core_Config::singleton();
@@ -174,21 +179,35 @@ class CRM_Upgrade_TwoTwo_Form_Step1 extends CRM_Upgrade_Form {
     $this->setVersion('2.1.101');
   }
 
+  /**
+   * @param $errorMessage
+   *
+   * @return bool
+   */
   function verifyPostDBState(&$errorMessage) {
     $errorMessage = ts('Post-condition failed for upgrade step %1.', array(1 => '1'));
     return $this->checkVersion('2.1.101');
   }
 
+  /**
+   * @return string
+   */
   function getTitle() {
     return ts('CiviCRM 2.2 Upgrade: Step One (Check Version)');
   }
 
+  /**
+   * @return string
+   */
   function getTemplateMessage() {
     $msg = '<p><strong>' . ts('This process will upgrade your v2.1 CiviCRM database to the v2.2 database format.') . '</strong></p><div class="messsages status"><ul><li><strong>' . ts('Make sure you have a current and complete backup of your CiviCRM database and codebase files before starting the upgrade process.') . '</strong></li><li>' . '</li></ul></div><p>' . ts('Click <strong>Begin Upgrade</strong> to begin the process.') . '</p>';
 
     return $msg;
   }
 
+  /**
+   * @return string
+   */
   function getButtonTitle() {
     return ts('Begin Upgrade');
   }

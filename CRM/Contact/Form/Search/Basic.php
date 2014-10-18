@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -69,11 +69,17 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
       'advanced_search_options'
     );
 
+    $shortCuts = array();
+    //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
+    // this is loaded onto then replace with something like '__' & test
+    $separator = CRM_Core_DAO::VALUE_SEPARATOR;
     if (!empty($searchOptions['contactType'])) {
-      $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
+      $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
       $this->add('select', 'contact_type',
         ts('is...'),
-        $contactTypes
+        $contactTypes,
+        FALSE,
+        array('class' => 'crm-select2')
       );
     }
 
@@ -83,15 +89,14 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
       // add select for groups
       $group = array('' => ts('- any group -')) + $groupHierarchy;
-      $this->_groupElement = &$this->addElement('select', 'group', ts('in'), $group);
+      $this->add('select', 'group', ts('in'), $group, FALSE, array('class' => 'crm-select2'));
     }
 
     if (!empty($searchOptions['tags'])) {
       // tag criteria
       if (!empty($this->_tag)) {
-        $tag = array(
-          '' => ts('- any tag -')) + $this->_tag;
-        $this->_tagElement = &$this->addElement('select', 'tag', ts('with'), $tag);
+        $tag = array('' => ts('- any tag -')) + $this->_tag;
+        $this->add('select', 'tag', ts('with'), $tag, FALSE, array('class' => 'crm-select2'));
       }
     }
 
@@ -153,6 +158,9 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     parent::preProcess();
   }
 
+  /**
+   * @return array
+   */
   function &getFormValues() {
     return $this->_formValues;
   }
@@ -271,6 +279,15 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     return TRUE;
   }
 
+  /**
+   * Return a descriptive name for the page, used in wizard header
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTitle() {
     return ts('Find Contacts');
   }

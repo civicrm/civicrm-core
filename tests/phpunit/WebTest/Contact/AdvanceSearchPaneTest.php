@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AdvanceSearchPaneTest
+ */
 class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -82,6 +86,9 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
     $this->_checkOpenedPanes(array_keys($allpanes));
   }
 
+  /**
+   * @param array $openedPanes
+   */
   function _checkOpenedPanes($openedPanes = array(
     )) {
     if (!$this->isTextPresent('No matches found')) {
@@ -101,6 +108,10 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $paneRef
+   * @param array $selectFields
+   */
   function _selectPaneFields($paneRef, $selectFields = array(
     )) {
     $pane = $this->_advanceSearchPanes($paneRef);
@@ -140,6 +151,13 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
           }
           break;
 
+        case 'multiselect2':
+          foreach ($field['values'] as $op) {
+            $this->waitForVisible($fldLocator);
+            $this->multiselect2($fldLocator, $op);
+          }
+          break;
+
         case 'date':
           $this->webtestFillDate($fldLocator, current($field['values']));
           break;
@@ -147,6 +165,11 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param null $paneRef
+   *
+   * @return array
+   */
   function _advanceSearchPanes($paneRef = NULL) {
     static $_advance_search_panes;
 
@@ -161,8 +184,9 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
           array(
             'Location Type' =>
             array(
-              'type' => 'checkbox',
-              'values' => array('location_type[1]', 'location_type[2]'),
+              'type' => 'multiselect2',
+              'locator' => 'location_type',
+              'values' => array(array('Home', 'Work')),
             ),
             'Country' =>
             array(
@@ -172,9 +196,9 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
             ),
             'State' =>
             array(
-              'type' => 'select',
+              'type' => 'multiselect2',
               'locator' => 'state_province',
-              'values' => array('Alabama', 'California', 'New Jersey', 'New York'),
+              'values' => array(array('Alabama', 'California', 'New Jersey', 'New York')),
             ),
           ),
         ),
@@ -351,7 +375,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
         'event' =>
         array(
           'headerLocator' => 'div#CiviEvent',
-          'bodyLocator' => 'input#event_name',
+          'bodyLocator' => 'input#event_id',
           'title' => 'Events',
           'fields' =>
           array(

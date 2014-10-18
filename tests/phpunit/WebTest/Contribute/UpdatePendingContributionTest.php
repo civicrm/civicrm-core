@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_UpdatePendingContributionTest
+ */
 class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -33,18 +37,15 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
 
   function testUpdatePendingContribution() {
     $this->webtestLogin();
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = 'Contributor';
-    $email = $firstName . "@example.com";
 
     //Offline Pay Later Contribution
-    $this->_testOfflineContribution($firstName, $lastName, $email);
+    $contact = $this->_testOfflineContribution();
 
     //Online Pay Later Contribution
-    $this->_testOnlineContribution($firstName, $lastName, $email);
+    $this->_testOnlineContribution($contact);
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
-    $this->type("sort_name", "$lastName, $firstName");
+    $this->type("sort_name", $contact['sort_name']);
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -72,7 +73,10 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->verifyText("xpath=id('contributionSearch')/table[1]/tbody/tr[2]/td[9]", preg_quote($status));
   }
 
-  function _testOfflineContribution($firstName, $lastName, $email) {
+  /**
+   * @return array of contact details
+   */
+  function _testOfflineContribution() {
     // Create a contact to be used as soft creditor
     $softCreditFname = substr(sha1(rand()), 0, 7);
     $softCreditLname = substr(sha1(rand()), 0, 7);
@@ -81,7 +85,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
     // create new contact using dialog
-    $this->webtestNewDialogContact($firstName, "Contributor", $email);
+    $contact = $this->createDialogContact();
 
     // select financial type
     $this->select( "financial_type_id", "value=1" );
@@ -106,8 +110,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
-    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_1');
-
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_id_1');
+    $this->type("soft_credit_amount_1", "100");
     //Custom Data
     //$this->click('CIVICRM_QFID_3_6');
 
@@ -122,15 +126,6 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
-    //Honoree section
-    $this->click("Honoree");
-    $this->waitForElementPresent("honor_email");
-
-    $this->click("CIVICRM_QFID_1_2");
-    $this->select("honor_prefix_id", "label=Ms.");
-    $this->type("honor_first_name", "Foo");
-    $this->type("honor_last_name", "Bar");
-    $this->type("honor_email", "foo@bar.com");
 
     //Premium section
     $this->click("Premium");
@@ -147,10 +142,10 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->assertTrue($this->isTextPresent("The contribution record has been saved."), "Status message didn't show up after saving!");
 
     // verify if Contribution is created
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[2]//tbody/tr[1]/td[8]/span/a[text()='View']");
 
     //click through to the Contribution view screen
-    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[2]/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
 
     // View Contribution Record and test for expected values
@@ -166,6 +161,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     // go to soft creditor contact view page - this also does the soft credit check
     $this->click("xpath=id('ContributionView')/div[2]/div/div[1][contains(text(), 'Soft Credit')]/../div[2]/table[1]/tbody//tr/td[1]/a[contains(text(), '{$softCreditFname} {$softCreditLname}')]");
 
+    $this->waitForPageToLoad($this->getTimeoutMsec());
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
@@ -173,20 +169,24 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
 
     // verify soft credit details
     $expected = array(
-      3 => 'Donation',
+      4 => 'Donation',
       2 => '100.00',
-      5 => 'Pending',
-      1 => "{$firstName} Contributor",
+      6 => 'Pending',
+      1 => $contact['display_name'],
     );
     foreach ($expected as $value => $label) {
       $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", preg_quote($label));
     }
+    return $contact;
   }
 
-  function _testOnlineContribution($firstName, $lastName, $email) {
+  /**
+   * @param array $contact
+   */
+  function _testOnlineContribution($contact) {
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $processorType = 'Dummy';
     $pageTitle = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
@@ -230,10 +230,10 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->webtestLogout();
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
-    $this->type("email-5", $email);
+    $this->type("email-5", $contact['email']);
 
-    $this->type("first_name", $firstName);
-    $this->type("last_name", $lastName);
+    $this->type("first_name", $contact['first_name']);
+    $this->type("last_name", $contact['last_name']);
 
     $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", 100);
@@ -256,12 +256,12 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
-    $this->type("sort_name", "$lastName, $firstName");
+    $this->type("sort_name", $contact['sort_name']);
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
     // View Contribution Record and test for expected values
     $expected = array(
-      'From' => "{$firstName} {$lastName}",
+      'From' => $contact['display_name'],
       'Financial Type' => 'Donation',
       'Total Amount' => '100.00',
       'Contribution Status' => 'Pending : Pay Later',

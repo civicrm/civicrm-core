@@ -9,6 +9,8 @@
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
 {capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=emptyBlockStyle }style="padding: 10px; border-bottom: 1px solid #999;background-color: #f7f7f7;"{/capture}
+{capture assign=emptyBlockValueStyle }style="padding: 10px; border-bottom: 1px solid #999;"{/capture}
 
 <p>Dear {$contactDisplayName}</p>
 <center>
@@ -32,7 +34,9 @@
       <p>{ts}Please print this confirmation for your records.{/ts}</p>
     </td>
   </tr>
-  
+  <tr>
+   <td>
+    <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
   {if $isRefund}
   <tr>
     <th {$headerStyle}>{ts}Refund Details{/ts}</th>
@@ -44,12 +48,16 @@
     <td {$valueStyle}>
       {$totalAmount|crmMoney}
     </td>
+  </tr>
+  <tr>
     <td {$labelStyle}>
       {ts}You Paid{/ts}
     </td>
     <td {$valueStyle}>
       {$totalPaid|crmMoney}
     </td>
+  </tr>
+  <tr>
     <td {$labelStyle}>
       {ts}Refund Amount{/ts}
     </td>
@@ -68,24 +76,32 @@
       <td {$valueStyle}>
 	{$totalAmount|crmMoney}
       </td>
+      </tr>
+      <tr>
       <td {$labelStyle}>
 	{ts}This Payment Amount{/ts}
       </td>
       <td {$valueStyle}>
 	{$paymentAmount|crmMoney}
       </td>
+      </tr>
+     <tr>
       <td {$labelStyle}>
 	{ts}Balance Owed{/ts}
       </td>
-      <td>
+       <td {$valueStyle}>
 	{$amountOwed|crmMoney}
       </td> {* This will be zero after final payment. *}
+     </tr>
+     <tr> <td {$emptyBlockStyle}></td>
+     <td {$emptyBlockValueStyle}></td></tr>
       {if $paymentsComplete}
+      <tr>
       <td colspan='2' {$valueStyle}>
 	{ts}Thank-you. This completes your payment for {if $component eq 'event'}{$event.event_title}{/if}.{/ts}
       </td>
+     </tr>
       {/if}
-    </tr>
   {/if}
   {if $receive_date}
     <tr>
@@ -127,10 +143,13 @@
       </td>
     </tr>
   {/if}
+  </table>
+  </td>
+  </tr>
     <tr>
       <td>
 	<table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
-	  {if $contributeMode ne 'notify' and !$isAmountzero}
+	  {if $contributeMode eq 'direct' and !$isAmountzero}
           <tr>
             <th {$headerStyle}>
 	      {ts}Billing Name and Address{/ts}

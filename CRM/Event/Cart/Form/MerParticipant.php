@@ -1,13 +1,23 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Form_MerParticipant
+ */
 class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
   public $participant = NULL;
 
+  /**
+   * @param null|object $participant
+   */
   function __construct($participant) {
     parent::__construct();
     //XXX
     $this->participant = $participant;
   }
 
+  /**
+   * @param $form
+   */
   function appendQuickForm(&$form) {
     $textarea_size = array('size' => 30, 'maxlength' => 60);
     $form->add('text', $this->email_field_name(), ts('Email Address'), $textarea_size, TRUE);
@@ -31,6 +41,11 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
         )));
   }
 
+  /**
+   * @param $event_id
+   *
+   * @return array
+   */
   function get_profile_groups($event_id) {
     $ufJoinParams = array(
       'entity_table' => 'civicrm_event',
@@ -41,6 +56,9 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
     return $group_ids;
   }
 
+  /**
+   * @return array
+   */
   function get_participant_custom_data_fields() {
     list($custom_pre_id, $custom_post_id) = self::get_profile_groups($this->participant->event_id);
 
@@ -55,27 +73,53 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
     return array($pre_fields, $post_fields);
   }
 
+  /**
+   * @return string
+   */
   function email_field_name() {
     return $this->html_field_name("email");
   }
 
+  /**
+   * @param $event_id
+   * @param $participant_id
+   * @param $field_name
+   *
+   * @return string
+   */
   static function full_field_name($event_id, $participant_id, $field_name) {
     return "event[$event_id][participant][$participant_id][$field_name]";
   }
 
+  /**
+   * @param $field_name
+   *
+   * @return string
+   */
   function html_field_name($field_name) {
     return self::full_field_name($this->participant->event_id, $this->participant->id, $field_name);
   }
 
+  /**
+   * @return string
+   */
   function name() {
     return "Participant {$this->participant->get_participant_index()}";
   }
 
   //XXX poor name
+  /**
+   * @param $participant
+   *
+   * @return CRM_Event_Cart_Form_MerParticipant
+   */
   static public function get_form($participant) {
     return new CRM_Event_Cart_Form_MerParticipant($participant);
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array(
       $this->html_field_name('email') => $this->participant->email,

@@ -170,4 +170,24 @@
     <title>ProfileEditor</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/a</path>
+    <page_callback>CRM_Core_Page_Angular</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/ajax/recurringentity/update-mode</path>
+     <page_callback>CRM_Core_Page_AJAX_RecurringEntity::updateMode</page_callback>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/ajax/recurringentity/generate-preview</path>
+     <page_callback>CRM_Core_Page_AJAX_RecurringEntity::generatePreview</page_callback>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/ajax/l10n-js</path>
+    <page_callback>CRM_Core_Resources::outputLocalizationJS</page_callback>
+    <access_callback>1</access_callback>
+  </item>
 </menu>

@@ -4,4 +4,5 @@
 <xi:include href="Case.xml"                 parse="xml" />
 <xi:include href="CaseActivity.xml"         parse="xml" />
 <xi:include href="CaseContact.xml"          parse="xml" />
+<xi:include href="CaseType.xml"             parse="xml" />
 </tables>

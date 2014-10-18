@@ -8,14 +8,14 @@ function moduletest_civicrm_install() {
 }
 
 /**
- * Implemenation of hook_civicrm_postInstall
+ * Implementation of hook_civicrm_postInstall
  */
 function moduletest_civicrm_postInstall() {
   CRM_Extension_Manager_ModuleTest::incHookCount('moduletest', 'postInstall');
 }
 
 /**
- * Implemenation of hook_civicrm_uninstall
+ * Implementation of hook_civicrm_uninstall
  */
 function moduletest_civicrm_uninstall() {
   CRM_Extension_Manager_ModuleTest::incHookCount('moduletest', 'uninstall');

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -208,6 +208,12 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     return $ruleFields;
   }
 
+  /**
+   * @param $cid
+   * @param $oid
+   *
+   * @return bool
+   */
   static function validateContacts($cid, $oid) {
     if (!$cid || !$oid) {
       return;

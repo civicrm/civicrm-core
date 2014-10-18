@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_InheritedMembershipTest
+ */
 class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
   protected function setUp() {
     parent::setUp();
@@ -50,17 +54,14 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     $this->type('name', "Membership Type $title");
 
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
     $this->select( 'financial_type_id', 'value=2' );
     $this->type('duration_interval', 1);
     $this->select('duration_unit', 'label=year');
 
-    $this->select('period_type', 'label=rolling');
+    $this->select('period_type', 'value=rolling');
 
     $this->removeSelection('relationship_type_id', 'label=- select -');
     $this->addSelection('relationship_type_id', 'label=Employer of');
@@ -98,7 +99,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Add Membership');
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -139,25 +140,24 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     // visit relationship tab
     $this->click('css=li#tab_rel a');
     $this->waitForElementPresent('css=div.action-link');
-    $this->click("//div[@class='crm-container-snippet']/div/div[1]/div[1]/a/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("//div[@class='action-link']/a/span");
+    $this->waitForElementPresent('_qf_Relationship_cancel-bottom');
     $this->click('relationship_type_id');
     $this->select('relationship_type_id', 'label=Employee of');
 
-    $this->webtestFillAutocomplete($title1);
 
-    $this->waitForElementPresent('quick-save');
+    $this->select2('related_contact_id', $title1, TRUE);
 
     $description = 'Well here is some description !!!!';
     $this->type('description', $description);
 
     //save the relationship
-    $this->click('quick-save');
-    $this->waitForElementPresent('current-relationships');
+    $this->click('_qf_Relationship_upload-bottom');
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']");
     //check the status message
-    $this->waitForText('crm-notification-container', 'New relationship created');
+    $this->waitForText('crm-notification-container', 'Relationship created.');
 
-    $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody//tr/td[9]/span/a[text()='View']");
 
     // click through to the membership view screen
     $this->click('css=li#tab_member a');
@@ -185,9 +185,12 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('css=div.action-link');
 
     $this->click("//li[@id='tab_rel']/a");
-    $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='Edit']");
-    $this->click("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='Edit']");
-    $id = $this->urlArg('cid');
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody//tr/td[9]/span/a[text()='Edit']");
+    $id = explode('&id=', $this->getAttribute("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody//tr/td[9]/span/a@href"));
+    $id = explode('&', $id[0]);
+    $id = explode('=', $id[2]);
+    $id = $id[1];
+    $this->click("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody//tr/td[9]/span/a[text()='Edit']");
 
     $this->waitForElementPresent('is_active');
     //disable relationship
@@ -195,7 +198,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
       $this->click('is_active');
     }
     $this->click('_qf_Relationship_upload');
-    $this->waitForElementPresent('inactive-relationships');
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']");
     //check the status message
     $this->waitForText('crm-notification-container', 'Relationship record has been updated');
 
@@ -203,22 +206,22 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click('css=li#tab_member a');
 
     //verify inherited membership has been removed
-    $this->openCiviPage("contact/view", "reset=1&cid=$id&selectedChild=member", "xpath=//div[@class='crm-container-snippet']/div/div[3]");
-    $this->assertElementContainsText('Memberships', 'No memberships have been recorded for this contact.');
+    $this->openCiviPage("contact/view", "reset=1&cid=$id&selectedChild=member", "xpath=//div[@class='view-content']/div[3]");
+    $this->assertElementContainsText("xpath=//div[@class='view-content']", 'No memberships have been recorded for this contact.');
 
     // visit relationship tab and re-enable the relationship
     $this->click('css=li#tab_rel a');
     $this->waitForElementPresent('css=div.action-link');
     $this->click("//li[@id='tab_rel']/a");
 
-    $this->waitForElementPresent("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[9]/span/a[text()='Edit']");
-    $this->click("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[9]/span/a[text()='Edit']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-past']/div/table/tbody//tr/td[9]/span/a[text()='Edit']");
+    $this->click("xpath=//div[@class='crm-contact-relationship-past']/div/table/tbody//tr/td[9]/span/a[text()='Edit']");
     $this->waitForElementPresent('is_active');
     if (!$this->isChecked('is_active')) {
       $this->click('is_active');
     }
     $this->click('_qf_Relationship_upload');
-    $this->waitForElementPresent('current-relationships');
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']");
     //check the status message
     $this->waitForText('crm-notification-container', 'Relationship record has been updated.');
 
@@ -230,34 +233,25 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     //disable relationship
     $this->click('css=li#tab_rel a');
     $this->waitForElementPresent('css=div.action-link');
-    $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Disable']");
-    $this->click("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Disable']");
-
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to disable this relationship?[\s\S]$/",
-        $this->getConfirmation()
-      ));
-    $this->chooseOkOnNextConfirmation();
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Disable']");
+    $this->click("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Disable']");
+    $this->waitForText("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']", 'Are you sure you want to disable this relationship?');
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Yes']");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(10);
 
     //verify inherited membership has been removed
-    $this->openCiviPage("contact/view", "reset=1&cid={$id}&selectedChild=member", "xpath=//div[@class='crm-container-snippet']/div/div[3]");
-    $this->assertElementContainsText('Memberships', 'No memberships have been recorded for this contact.');
+    $this->openCiviPage("contact/view", "reset=1&cid={$id}&selectedChild=member", "xpath=//div[@class='view-content']/div[3]");
+    $this->assertElementContainsText("xpath=//div[@class='view-content']/div[3]", 'No memberships have been recorded for this contact.');
 
     //enable relationship
     $this->click('css=li#tab_rel a');
     $this->waitForElementPresent('css=div.action-link');
 
-    $this->waitForElementPresent("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Enable']");
-    $this->click("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Enable']");
-
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to re-enable this relationship?[\s\S]$/",
-        $this->getConfirmation()
-      ));
-    $this->chooseOkOnNextConfirmation();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Enable']");
+    $this->click("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Enable']");
 
     //verify membership
     $this->click('css=li#tab_member a');
@@ -287,17 +281,14 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     $this->type('name', "Membership Type $title");
 
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
     $this->select('financial_type_id', 'label=Member Dues');
     $this->type('duration_interval', 1);
     $this->select('duration_unit', 'label=year');
 
-    $this->select('period_type', 'label=rolling');
+    $this->select('period_type', 'value=rolling');
 
     $this->removeSelection('relationship_type_id', 'label=- select -');
     $this->addSelection('relationship_type_id', 'label=Employer of');
@@ -308,7 +299,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('link=Add Membership Type');
     $this->waitForText('crm-notification-container', "Membership Type $title");
 
-    // creating another Orgnization
+    // creating another Organization
     $this->openCiviPage('contact/add', 'reset=1&ct=Organization', '_qf_Contact_cancel');
     $org1 = substr(sha1(rand()), 0, 7);
     $this->type('organization_name', "Organization $org1");
@@ -332,7 +323,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->type('source', $sourceText);
 
     // Clicking save.
-    $this->clickLink('_qf_Membership_upload');
+    $this->click('_qf_Membership_upload');
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -349,11 +340,8 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->type("last_name", $lastName);
 
     // Set Current Employer
-    $this->type('current_employer', $org1);
-    $this->click('current_employer');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
-    $this->assertContains($org1, $this->getValue('current_employer'), "autocomplete expected $org1 but didn’t find it in " . $this->getValue('current_employer'));
+    $this->select2('employer_id', $org1);
+    $this->waitForText('s2id_employer_id', $org1);
 
     $this->type("email_1_email", $email);
     $this->clickLink("_qf_Contact_upload_view-bottom");
@@ -366,28 +354,26 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     // check number of membership for contact
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_member']/a/em"));
 
-    $this->clickLink("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
-    $expectedMembershipId = $this->urlArg('id');
-    $this->clickLink("_qf_MembershipView_cancel-bottom");
+    $url = $this->parseURL($this->getAttribute("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']@href"));
+    $expectedMembershipId = $url['queryString']['id'];
 
     // click through to the activity view screen
     $this->click('css=li#tab_activity a');
-    $this->waitForElementPresent("xpath=//table[@id='contact-activity-selector-activity']/tbody//tr/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr/td[8]/span/a[text()='View']");
 
     // check number of activity for contact
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_activity']/a/em"));
 
-    $this->clickLink("xpath=//table[@id='contact-activity-selector-activity']/tbody//tr/td[8]/span/a[text()='View']");
-    $expectedMembershipActivityId = $this->urlArg('id');
-    $this->clickLink("_qf_MembershipView_cancel-bottom");
+    $url = $this->parseURL($this->getAttribute("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr/td[8]/span/a[text()='View']@href"));
+    $expectedMembershipActivityId = $url['queryString']['id'];
 
     // verify membership id with membership activity id
     $this->assertEquals($expectedMembershipId, $expectedMembershipActivityId);
 
     // click through to the relationship view screen
     $this->click('css=li#tab_rel a');
-    $this->waitForElementPresent("xpath=//div[@id='option11_wrapper']/table/tbody/tr/td[2]/a");
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='option11_wrapper']/table/tbody/tr/td[2]/a[text()='Organization $org1']"));
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[2]/a");
+    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[2]/a[text()='Organization $org1']"));
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_rel']/a/em"));
 
     // Edit Contact but do not change any field
@@ -400,17 +386,16 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click('css=li#tab_member a');
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_member']/a/em"));
-    $this->clickLink("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
-    $actualMembershipId1 = $this->urlArg('id');
-    $this->clickLink("_qf_MembershipView_cancel-bottom");
+
+    $url = $this->parseURL($this->getAttribute("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']@href"));
+    $actualMembershipId1 = $url['queryString']['id'];
 
     // click through to the activity view screen after edit
     $this->click('css=li#tab_activity a');
-    $this->waitForElementPresent("xpath=//table[@id='contact-activity-selector-activity']/tbody//tr/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr/td[8]/span/a[text()='View']");
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_activity']/a/em"));
-    $this->clickLink("xpath=//table[@id='contact-activity-selector-activity']/tbody//tr/td[8]/span/a[text()='View']");
-    $actualMembershipActivityId1 = $this->urlArg('id');
-    $this->clickLink("_qf_MembershipView_cancel-bottom");
+    $url = $this->parseURL($this->getAttribute("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr/td[8]/span/a[text()='View']@href"));
+    $actualMembershipActivityId1 = $url['queryString']['id'];
 
     // verify membership id and membership activity id with previous one
     $this->assertEquals($expectedMembershipId, $actualMembershipId1);
@@ -418,8 +403,8 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     // click through to the relationship view screen after edit
     $this->click('css=li#tab_rel a');
-    $this->waitForElementPresent("xpath=//div[@id='option11_wrapper']/table/tbody/tr/td[2]/a");
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='option11_wrapper']/table/tbody/tr/td[2]/a[text()='Organization $org1']"));
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[2]/a");
+    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[2]/a[text()='Organization $org1']"));
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_rel']/a/em"));
 
     // change the current employer of the contact
@@ -431,17 +416,14 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     $this->type('name', "Membership Type Another $title");
 
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
     $this->select('financial_type_id', 'label=Member Dues');
     $this->type('duration_interval', 1);
     $this->select('duration_unit', 'label=year');
 
-    $this->select('period_type', 'label=rolling');
+    $this->select('period_type', 'value=rolling');
 
     $this->removeSelection('relationship_type_id', 'label=- select -');
     $this->addSelection('relationship_type_id', 'label=Employer of');
@@ -471,7 +453,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     $sourceText = 'Membership ContactAddTest with Rolling Membership Type';
     $this->type('source', $sourceText);
-    $this->clickLink('_qf_Membership_upload');
+    $this->clickLink('_qf_Membership_upload', 'link=Add Membership', FALSE);
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
@@ -481,29 +463,22 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/add", "reset=1&action=update&cid=$cid", "_qf_Contact_cancel-bottom");
 
     // change Current Employer
-    $this->type('current_employer', '');
-    $this->click('current_employer');
-    $this->type('current_employer', $org2);
-    $this->click('current_employer');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('employer_id', $org2);
     $this->clickLink("_qf_Contact_upload_view-bottom");
 
     // click through to the membership view screen
     $this->click('css=li#tab_member a');
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_member']/a/em"));
-    $this->clickLink("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
-    $actualMembershipId2 = $this->urlArg('id');
-    $this->clickLink("_qf_MembershipView_cancel-bottom");
+    $url = $this->parseURL($this->getAttribute("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']@href"));
+    $actualMembershipId2 = $url['queryString']['id'];
 
     // click through to the activity view screen
     $this->click('css=li#tab_activity a');
-    $this->waitForElementPresent("xpath=//table[@id='contact-activity-selector-activity']/tbody//tr/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr/td[8]/span/a[text()='View']");
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_activity']/a/em"));
-    $this->clickLink("xpath=//table[@id='contact-activity-selector-activity']/tbody//tr/td[8]/span/a[text()='View']");
-    $actualMembershipActivityId2 = $this->urlArg('id');
-    $this->clickLink("_qf_MembershipView_cancel-bottom");
+    $url = $this->parseURL($this->getAttribute("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr/td[8]/span/a[text()='View']@href"));
+    $actualMembershipActivityId2 = $url['queryString']['id'];
 
     // verify membership id and membership activity id with previous one
     $this->assertNotEquals($expectedMembershipId, $actualMembershipId2);
@@ -511,8 +486,8 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     // click through to the relationship view screen
     $this->click('css=li#tab_rel a');
-    $this->waitForElementPresent("xpath=//div[@id='option11_wrapper']/table/tbody/tr/td[2]/a");
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='option11_wrapper']/table/tbody/tr/td[2]/a[text()='Organization $org2']"));
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[2]/a");
+    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[2]/a[text()='Organization $org2']"));
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_rel']/a/em"));
 
     // creating another Orgnization with no membership
@@ -526,28 +501,24 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/add", "reset=1&action=update&cid=$cid", "_qf_Contact_cancel-bottom");
 
     // change Current Employer
-    $this->type('current_employer', '');
-    $this->click('current_employer');
-    $this->type('current_employer', $org3);
-    $this->click('current_employer');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('employer_id', $org3);
     $this->clickLink("_qf_Contact_upload_view-bottom");
 
     // click through to the membership view screen
     $this->click('css=li#tab_member a');
-    $this->waitForText("xpath=//div[@id='Memberships']/div/div/div[3]", "No memberships have been recorded for this contact.");
+
+    $this->waitForText("xpath=//div[@class='messages status no-popup']", "No memberships have been recorded for this contact.");
     $this->assertEquals(0, $this->getText("xpath=//li[@id='tab_member']/a/em"));
 
     // click through to the activity view screen
     $this->click('css=li#tab_activity a');
-    $this->waitForText("xpath=//table[@id='contact-activity-selector-activity']/tbody/tr/td", "No matches found.");
+    $this->waitForText("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody/tr/td", "No matches found.");
     $this->assertEquals(0, $this->getText("xpath=//li[@id='tab_activity']/a/em"));
 
     // click through to the relationship view screen
     $this->click('css=li#tab_rel a');
-    $this->waitForElementPresent("xpath=//div[@id='option11_wrapper']/table/tbody/tr/td[2]/a");
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='option11_wrapper']/table/tbody/tr/td[2]/a[text()='Organization $org3']"));
+    $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[2]/a");
+    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[2]/a[text()='Organization $org3']"));
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_rel']/a/em"));
   }
 }

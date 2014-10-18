@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,14 +38,13 @@
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
    {include file="CRM/common/crmeditable.tpl"}
-   {include file="CRM/common/jsortable.tpl"}
-       <table id="options" class="display">
+       <table id="options" class="row-highlight">
        <thead>
     <tr>
         <th>{ts}Label{/ts}</th>
         <th>{ts}URL{/ts}</th>
-        <th id="nosort">{ts}Description{/ts}</th>
-        <th id="order" class="sortable">{ts}Order{/ts}</th>
+        <th>{ts}Description{/ts}</th>
+        <th>{ts}Order{/ts}</th>
         {if $showIsDefault}
             <th>{ts}Default{/ts}</th>
         {/if}
@@ -57,11 +56,11 @@
     </tr>
         </thead>
     {foreach from=$rows item=row}
-        <tr id="report-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{$row.class}{if NOT $row.is_active} crm-report-optionList crm-report-optionList-status_disable disabled{else} crm-report-optionList crm-report-optionList-status_enable{/if}">
+        <tr id="option_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{$row.class}{if NOT $row.is_active} crm-report-optionList crm-report-optionList-status_disable disabled{else} crm-report-optionList crm-report-optionList-status_enable{/if}">
              <td class="crm-report-optionList-label crm-editable" data-field="label">{$row.label}</td>
             <td class="crm-report-optionList-value">{$row.value}</td>
             <td class="crm-report-optionList-description">{$row.description}</td>
-            <td class="nowrap crm-report-optionList-order">{$row.order}</td>
+            <td class="nowrap crm-report-optionList-order">{$row.weight}</td>
             {if $showIsDefault}
                 <td class="crm-report-optionList-default_value">{$row.default_value}</td>
             {/if}
@@ -69,7 +68,6 @@
           <td class="crm-report-optionList-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="crm-report-optionList-component_name">{$row.component_name}</td>
             <td class="crm-report-optionList-action">{$row.action}</td>
-                        <td class="order hiddenElement">{$row.weight}</td>
         </tr>
     {/foreach}
       </table>

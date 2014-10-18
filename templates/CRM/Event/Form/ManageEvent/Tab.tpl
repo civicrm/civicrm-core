@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -75,7 +75,7 @@
 
 {literal}
 <script>
-cj(function($) {
+CRM.$(function($) {
   $('body').click(function() {
     $('#crm-event-links-list, #crm-participant-list').hide();
   });
@@ -102,8 +102,9 @@ cj(function($) {
   $('#crm-main-content-wrapper').on('keyup change', 'input#title', function() {
     $('#crm-event-name-page-title').text($(this).val());
   });
-  
-  $().crmAccordions();
+
 });
 </script>
 {/literal}
+
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl"}

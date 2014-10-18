@@ -1,6 +1,10 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
+
+/**
+ * Class CRM_Dedupe_DedupeFinderTest
+ */
 class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   function testFuzzyDupes() {
     // make dupe checks based on based on following contact sets:

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * by every scheduled job (cron task) in CiviCRM.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -52,6 +52,9 @@ class CRM_Core_ScheduledJob {
      *
      */
 
+  /**
+   * @param $params
+   */
   public function __construct($params) {
     foreach ($params as $name => $param) {
       $this->$name = $param;
@@ -81,6 +84,9 @@ class CRM_Core_ScheduledJob {
     }
   }
 
+  /**
+   * @param null $date
+   */
   public function saveLastRun($date = NULL) {
     $dao           = new CRM_Core_DAO_Job();
     $dao->id       = $this->id;
@@ -88,6 +94,9 @@ class CRM_Core_ScheduledJob {
     $dao->save();
   }
 
+  /**
+   * @return bool
+   */
   public function needsRunning() {
     // run if it was never run
     if (empty($this->last_run)) {

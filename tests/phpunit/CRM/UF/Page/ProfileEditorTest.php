@@ -1,6 +1,9 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_UF_Page_ProfileEditorTest
+ */
 class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();

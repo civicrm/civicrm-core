@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,14 +33,9 @@
         </div>
     {/if}
 <div class="crm-block crm-form-block crm-event-manage-fee-form-block">
-{if $isQuick}
-    <div id="popupContainer">
-    {ts}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}
-    </div>
-{/if}
-<div class="crm-submit-buttons">
+  <div class="crm-submit-buttons">
    {include file="CRM/common/formButtons.tpl" location="top"}
-</div>
+  </div>
 
     <table class="form-layout">
        <tr class="crm-event-manage-fee-form-block-title">
@@ -107,6 +102,10 @@
                 </td>
             </tr>
 
+            <tr>
+               <td class="extra-long-fourty label">{$form.is_billing_required.html}</td>
+               <td>{$form.is_billing_required.label}</td>
+            </tr>
         </table>
 
         <table id="contributionType" class="form-layout">
@@ -127,7 +126,7 @@
             </tr>
             <tr>
                <td>&nbsp;</td>
-               <td class="description">{ts}This financial type will be assigned to payments made by participants when they register online.{/ts}
+               <td class="description">{ts}This financial type will be assigned to payments made by participants when they register online. If using a price set below note that the contribution record will have this financial type, however line items will be processed using the actual financial type selected for the price set item.{/ts}
                </td>
             </tr>
         </table>
@@ -230,8 +229,8 @@
             {if $discountSection eq 2}
                 <script type="text/javascript">
                 {literal}
-                    cj( function() {
-                        cj('#discounted_label_1').focus( );
+                    CRM.$(function($) {
+                        $('#discounted_label_1').focus( );
                     });
                 {/literal}
                 </script>
@@ -342,47 +341,23 @@
     invert              = 0
 }
 
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 {if $isQuick}
 {literal}
 <script type="text/javascript">
-cj( document ).ready( function( ) {
-    cj("#popupContainer").hide();
-});
-cj("#quickconfig").click(function(){
-cj("#popupContainer").dialog({
-  title: "Selected Price Set",
-  width:400,
-  height:220,
-  modal: true,
-  overlay: {
-                 opacity: 0.5,
-                  background: "black"
-        },
-        buttons: {
-                   "Ok": function() {
-        var dataUrl  = {/literal}'{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_event&id=$eventId" }';
-        var redirectUrl = '{crmURL p="civicrm/admin/price/field" h=0 q="reset=1&action=browse&sid=" }';
-        {literal}
-       cj.ajax({
-      url: dataUrl,
-      async: false,
-      global: false,
-      success: function ( result ) {
-        if (result) {
-          window.location= redirectUrl+eval(result);
-        }
-      }
-       });
-                   },
-       "Close": function() {
-                     cj(this).dialog("close");
-                   }
-  }
-});
-return false;
-});
+  CRM.$(function($) {
+    $("#quickconfig").click(function(e) {
+      e.preventDefault();
+      CRM.confirm({
+        width: 400,
+        message: {/literal}"{ts escape='js'}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}"{literal}
+      }).on('crmConfirm:yes', function() {
+          {/literal}
+          var dataUrl  = '{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_event&id=$eventId" }';
+          {literal}
+        $.getJSON(dataUrl).done(function(result) {window.location = CRM.url("civicrm/admin/price/field", {reset: 1, action: 'browse', sid: result});});
+        });
+      });
+    });
 </script>
 {/literal}
 {/if}

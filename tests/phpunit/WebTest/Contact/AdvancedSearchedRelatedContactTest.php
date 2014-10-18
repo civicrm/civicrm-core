@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.4                                                |
+   | CiviCRM version 4.5                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2013                                |
+   | Copyright CiviCRM LLC (c) 2004-2014                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -25,6 +25,10 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AdvancedSearchedRelatedContactTest
+ */
 class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -35,8 +39,8 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $paymentProcessorId = $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage('event/add', 'reset=1&action=add');
@@ -53,7 +57,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->type('title', $eventTitle);
     $this->click('_qf_SearchEvent_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $Id = explode('_', $this->getAttribute("xpath=//div[@id='event_status_id']/div[3]/table/tbody/tr@id"));
+    $Id = explode('-', $this->getAttribute("xpath=//div[@id='event_status_id']/div[2]/table/tbody/tr@id"));
     $eventId = $Id[1];
 
     $params = array('label_a_b' => 'Owner of ' . rand(),
@@ -97,10 +101,10 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     // wait for add Event link
     $this->waitForElementPresent("link=Add Event Registration");
     $this->click("link=Add Event Registration");
-    $this->waitForElementPresent("_qf_Participant_upload-bottom");
-    $this->select("event_id", "value={$eventId}");
+    $this->waitForText("s2id_event_id", "- select event -");
+    $this->select2("event_id", $eventTitle);
     $this->click("_qf_Participant_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("link=Add Event Registration");
 
     $this->openCiviPage('contact/search/advanced', 'reset=1');
 
@@ -108,6 +112,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->click('_qf_Advanced_refresh');
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
+    $this->waitForElementPresent('search-status');
     $this->assertElementContainsText('search-status', '1 Contact');
 
     $this->click('css=div.crm-advanced_search_form-accordion div.crm-accordion-header');
@@ -116,11 +121,11 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->click('_qf_Advanced_refresh');
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
+    $this->waitForElementPresent('search-status');
     $this->assertElementContainsText('search-status', '2 Contact');
 
     $this->select("task", "label=Add Contacts to Group");
 
-    $this->click('Go');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click('CIVICRM_QFID_1_group_option');
@@ -136,6 +141,10 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->_testSearchResult($relType);
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventDescription
+   */
   function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -161,6 +170,9 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->click("_qf_EventInfo_upload-bottom");
   }
 
+  /**
+   * @param $streetAddress
+   */
   function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -171,16 +183,22 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->type("address_1_street_address", $streetAddress);
     $this->type("address_1_city", "San Francisco");
     $this->type("address_1_postal_code", "94117");
+    $this->select('address_1_country_id', 'United States');
     $this->select("address_1_state_province_id", "value=1004");
     $this->type("email_1_email", "info@civicrm.org");
 
     $this->click("_qf_Location_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForText('crm-notification-container', "'Location' information has been saved.");
+    $this->waitForElementPresent("_qf_Location_upload-bottom");
+    $this->waitForText('crm-notification-container', "'Event Location' information has been saved.");
   }
 
+  /**
+   * @param bool $discount
+   * @param bool $priceSet
+   * @param $processorId
+   */
   function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorId) {
     // Go to Fees tab
     $this->click("link=Fees");
@@ -207,10 +225,15 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->click("_qf_Fee_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Fee' information has been saved.");
+    $this->waitForElementPresent("_qf_Fee_upload-bottom");
+    $this->waitForTextPresent("'Fees' information has been saved.");
   }
 
+  /**
+   * @param $ContactName
+   * @param $relatedName
+   * @param $relType
+   */
   function _testAddRelationship($ContactName, $relatedName, $relType) {
 
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
@@ -233,9 +256,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->select('relationship_type_id', "label={$relType}");
 
     //fill in the individual
-    $this->webtestFillAutocomplete($relatedName);
-
-    $this->waitForElementPresent("quick-save");
+    $this->select2('related_contact_id', $relatedName, TRUE);
 
     //fill in the relationship start date
     $this->webtestFillDate('start_date', '-2 year');
@@ -246,25 +267,28 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
 
     //save the relationship
     //$this->click("_qf_Relationship_upload");
-    $this->click("quick-save");
-    $this->waitForElementPresent("current-relationships");
+    $this->click('_qf_Relationship_upload-bottom');
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']");
 
     //check the status message
-    $this->waitForText('crm-notification-container', "New relationship created.");
+    $this->waitForText('crm-notification-container', "Relationship created.");
 
-    $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']//table/tbody//tr/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']//table/tbody//tr/td[9]/span/a[text()='View']");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//table[@class='crm-info-panel']");
     $this->webtestVerifyTabularData(
       array(
         'Description' => $description,
         'Status' => 'Enabled',
       )
     );
-    $this->assertElementContainsText('option11', $relType);
+    $this->assertElementContainsText("xpath=//table[@class='crm-info-panel']", $relType);
   }
 
+  /**
+   * @param $relType
+   */
   function _testSearchResult($relType) {
 
     //search related contact using Advanced Search
@@ -272,10 +296,10 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->select("component_mode", "label=Related Contacts");
     $this->select("display_relationship_type", "label={$relType}");
     $this->click("CiviEvent");
-    $this->waitForElementPresent("event_type");
-    $this->type("event_type", "Conference");
+    $this->waitForElementPresent("event_type_id");
+    $this->select2("event_type_id", "Conference");
     $this->click("_qf_Advanced_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('search-status');
     $this->assertElementContainsText('search-status', '2 Contacts');
   }
 

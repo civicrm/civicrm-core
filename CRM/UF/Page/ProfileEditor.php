@@ -35,7 +35,6 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         );
       })
       ->addScriptFile('civicrm', 'packages/backbone/json2.js', 100, 'html-header', FALSE)
-      ->addScriptFile('civicrm', 'packages/backbone/underscore.js', 110, 'html-header', FALSE)
       ->addScriptFile('civicrm', 'packages/backbone/backbone.js', 120, 'html-header')
       ->addScriptFile('civicrm', 'packages/backbone/backbone.marionette.js', 125, 'html-header', FALSE)
       ->addScriptFile('civicrm', 'packages/backbone/backbone.collectionsubset.js', 125, 'html-header', FALSE)
@@ -82,14 +81,15 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    */
   static function getSchemaJSON() {
     $entityTypes = explode(',', $_REQUEST['entityTypes']);
-    echo json_encode(self::getSchema($entityTypes));
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(self::getSchema($entityTypes));
   }
 
   /**
    * Get a list of Backbone-Form models
    *
    * @param array $entityTypes model names ("IndividualModel")
+   *
+   * @throws CRM_Core_Exception
    * @return array; keys are model names ("IndividualModel") and values describe 'sections' and 'schema'
    * @see js/model/crm.core.js
    * @see js/model/crm.mappedcore.js
@@ -152,6 +152,13 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Participant',
             ts('Participant'),
+            $availableFields
+          );
+          break;
+        case 'CaseModel':
+          $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
+            'Case',
+            ts('Case'),
             $availableFields
           );
           break;

@@ -22,13 +22,13 @@
  * 2. Pickup (Type:pickup)
  * 3. Merchant calculated (Type:merchant-calculated)
  *
- * Invoke a separate instance of this class for each type of shipping 
+ * Invoke a separate instance of this class for each type of shipping
  * to be included
- * Required fields are shipping name, shipping  type and price 
+ * Required fields are shipping name, shipping  type and price
  * Allowed and excluded country areas can be specified as part of constructor
  * arguments or using individual Set methods. Possible values here are
  * 1. CONTINENTAL_48
- * 2. FULL_50_STATES 
+ * 2. FULL_50_STATES
  * 3. ALL
  * State and zip patterns must be exclusively updated using their individual Set methods
  */
@@ -47,6 +47,15 @@ class GoogleShipping {
   var $excluded_country_area;
   var $allowed_restrictions = FALSE;
   var $excluded_restrictions = FALSE;
+
+  /**
+   * @param $name
+   * @param $type
+   * @param $price
+   * @param string $money
+   * @param string $allowed_country_area
+   * @param string $excluded_country_area
+   */
   function GoogleShipping($name, $type, $price, $money = "USD",
     $allowed_country_area = "",
     $excluded_country_area = ""
@@ -72,26 +81,41 @@ class GoogleShipping {
     $this->excluded_zip_patterns_arr = array();
   }
 
+  /**
+   * @param $areas
+   */
   function SetAllowedStateAreas($areas) {
     $this->allowed_restrictions = TRUE;
     $this->allowed_state_areas_arr = $areas;
   }
 
+  /**
+   * @param $zips
+   */
   function SetAllowedZipPattens($zips) {
     $this->allowed_restrictions = TRUE;
     $this->allowed_zip_patterns_arr = $zips;
   }
 
+  /**
+   * @param $areas
+   */
   function SetExcludedStateAreas($areas) {
     $this->excluded_restrictions = TRUE;
     $this->excluded_state_areas_arr = $areas;
   }
 
+  /**
+   * @param $zips
+   */
   function SetExcludedZipPatternsStateAreas($zips) {
     $this->excluded_restrictions = TRUE;
     $this->excluded_zip_patterns_arr = $zips;
   }
 
+  /**
+   * @param $country_area
+   */
   function SetAllowedCountryArea($country_area) {
     if ($country_area == "CONTINENTAL_48" ||
       $country_area == "FULL_50_STATES" ||
@@ -103,6 +127,9 @@ class GoogleShipping {
     else $this->allowed_country_area = "";
   }
 
+  /**
+   * @param $country_area
+   */
   function SetExcludedCountryArea($country_area) {
     if ($country_area == "CONTINENTAL_48" ||
       $country_area == "FULL_50_STATES" ||

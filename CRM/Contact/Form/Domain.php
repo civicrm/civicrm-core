@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -97,6 +97,18 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * @access public
    * @return void
    */
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults  = array();
     $params    = array();
@@ -132,21 +144,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
         $defaults['address'][1]['state_province_id'] = $config->defaultContactStateProvince;
       }
 
-      if (!empty($defaults['address'])) {
-        foreach ($defaults['address'] as $key => $value) {
-          CRM_Contact_Form_Edit_Address::fixStateSelect($this,
-            "address[$key][country_id]",
-            "address[$key][state_province_id]",
-            "address[$key][county_id]",
-            CRM_Utils_Array::value('country_id', $value,
-              $config->defaultContactCountry
-            ),
-            CRM_Utils_Array::value('state_province_id', $value,
-              $config->defaultContactStateProvince
-            )
-          );
-        }
-      }
     }
     $defaults = array_merge($defaults, $domainDefaults);
     return $defaults;

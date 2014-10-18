@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -84,7 +84,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
    * Add a new item to the queue
    *
    * @param $data serializable PHP object or array
-   * @param $options queue-dependent options; for example, if this is a
+   * @param array|\queue $options queue-dependent options; for example, if this is a
    *   priority-queue, then $options might specify the item's priority
    *
    * @return bool, TRUE on success
@@ -116,7 +116,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
   /**
    * Get the next item
    *
-   * @param $lease_time seconds
+   * @param int|\seconds $lease_time seconds
    *
    * @return object with key 'data' that matches the inputted data
    */
@@ -165,7 +165,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
   /**
    * Get the next item, even if there's an active lease
    *
-   * @param $lease_time seconds
+   * @param int|\seconds $lease_time seconds
    *
    * @return object with key 'data' that matches the inputted data
    */

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,12 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 require_once 'Mail/mime.php';
+
+/**
+ * Class CRM_Core_BAO_MessageTemplate
+ */
 class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
   /**
@@ -101,6 +105,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @access public
    * @static
    *
+   * @param $messageTemplatesID
+   *
    * @return object
    */
   static function del($messageTemplatesID) {
@@ -129,13 +135,16 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @access public
    * @static
    *
+   * @param bool $all
+   *
    * @return object
    */
-  static function getMessageTemplates($all = TRUE) {
+  static function getMessageTemplates($all = TRUE, $isSMS = FALSE) {
     $msgTpls = array();
 
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->is_active = 1;
+    $messageTemplates->is_sms = $isSMS;
 
     if (!$all) {
       $messageTemplates->workflow_id = 'NULL';
@@ -148,6 +157,14 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     return $msgTpls;
   }
 
+  /**
+   * @param $contactId
+   * @param $email
+   * @param $messageTemplateID
+   * @param $from
+   *
+   * @return bool|null
+   */
   static function sendReminder($contactId, $email, $messageTemplateID, $from) {
 
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
@@ -425,8 +442,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $contact = $contact[$contactID];
     }
 
-    $subject = CRM_Utils_Token::replaceDomainTokens($subject, $domain, TRUE, $tokens['text'], TRUE);
-    $text    = CRM_Utils_Token::replaceDomainTokens($text, $domain, TRUE, $tokens['text'], TRUE);
+    $subject = CRM_Utils_Token::replaceDomainTokens($subject, $domain, FALSE, $tokens['text'], TRUE);
+    $text    = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text'], TRUE);
     $html    = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html'], TRUE);
 
     if ($contactID) {
@@ -488,34 +505,26 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
 
       $config = CRM_Core_Config::singleton();
+      if (isset($params['isEmailPdf']) && $params['isEmailPdf'] == 1) {
+        $pdfHtml = CRM_Contribute_BAO_ContributionPage::addInvoicePdfToEmail($params['contributionId'], $params['contactId']);
+        if (empty($params['attachments'])) {
+          $params['attachments'] = array();
+        }
+        $params['attachments'][] =  CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $format) ;
+      }
       $pdf_filename = '';
       if ($config->doNotAttachPDFReceipt &&
         $params['PDFFilename'] &&
         $params['html']
       ) {
-        $pdf_filename = $config->templateCompileDir . CRM_Utils_File::makeFileName($params['PDFFilename']);
-
-        //FIXME : CRM-7894
-        //xmlns attribute is required in XHTML but it is invalid in HTML,
-        //Also the namespace "xmlns=http://www.w3.org/1999/xhtml" is default,
-        //and will be added to the <html> tag even if you do not include it.
-        $html = preg_replace('/(<html)(.+?xmlns=["\'].[^\s]+["\'])(.+)?(>)/', '\1\3\4', $params['html']);
-
-        file_put_contents($pdf_filename, CRM_Utils_PDF_Utils::html2pdf($html,
-            $params['PDFFilename'],
-            TRUE,
-            $format
-          )
-        );
-
         if (empty($params['attachments'])) {
           $params['attachments'] = array();
         }
-        $params['attachments'][] = array(
-          'fullPath' => $pdf_filename,
-          'mime_type' => 'application/pdf',
-          'cleanName' => $params['PDFFilename'],
-        );
+        $params['attachments'][] = CRM_Utils_Mail::appendPDF($params['PDFFilename'], $params['html'], $format);
+        if (isset($params['tplParams']['email_comment'])) {
+          $params['html'] = $params['tplParams']['email_comment'];
+          $params['text'] = strip_tags($params['tplParams']['email_comment']);
+        }
       }
 
       $sent = CRM_Utils_Mail::send($params);
@@ -528,4 +537,3 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     return array($sent, $subject, $text, $html);
   }
 }
-

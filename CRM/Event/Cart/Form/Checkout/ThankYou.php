@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Form_Checkout_ThankYou
+ */
 class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
   public $line_items = NULL;
   public $sub_total = 0;

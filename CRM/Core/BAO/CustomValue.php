@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -160,6 +160,9 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   }
 
 
+  /**
+   * @param $formValues
+   */
   public static function fixFieldValueOfTypeMemo(&$formValues) {
     if (empty($formValues)) {
       return NULL;
@@ -183,12 +186,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
         $formValues[$key] = '%' . $formValues[$key] . '%';
       }
 
-      $dataType = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_CustomField',
-        substr($key, 7), 'data_type'
-      );
-      if (($dataType == 'ContactReference') && ($htmlType == 'Autocomplete-Select')) {
-        $formValues[$key] = $formValues[$key . '_id'];
-      }
     }
   }
 
@@ -216,4 +213,3 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     );
   }
 }
-

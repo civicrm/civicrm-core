@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -93,6 +93,10 @@ require_once '../civicrm.config.php';
 // autoload
 require_once 'CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
+
+/**
+ * Class CRM_GCD
+ */
 class CRM_GCD {
 
   /**
@@ -275,6 +279,9 @@ class CRM_GCD {
     return $string;
   }
 
+  /**
+   * @return string
+   */
   private function randomChar() {
     return chr(mt_rand(65, 90));
   }
@@ -300,15 +307,30 @@ class CRM_GCD {
     return $items[mt_rand(0, count($items) - 1)];
   }
 
+  /**
+   * @param $items
+   *
+   * @return mixed
+   */
   private function randomIndex($items) {
     return $this->randomItem(array_keys($items));
   }
 
+  /**
+   * @param $items
+   *
+   * @return array
+   */
   private function randomKeyValue($items) {
     $key = $this->randomIndex($items);
     return array($key, $items[$key]);
   }
 
+  /**
+   * @param $chance
+   *
+   * @return int
+   */
   private function probability($chance) {
     if (mt_rand(0, 100) < ($chance * 100)) {
       return 1;
@@ -457,6 +479,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return string
+   */
   public function randomName() {
     $first_name = $this->randomItem(($this->probability(.5) ? 'fe' : '') . 'male_name');
     $middle_name = ucfirst($this->randomChar());
@@ -805,6 +830,8 @@ class CRM_GCD {
    *
    * @param $cid int: contact id
    * @param $masterContactId int: set if this is a shared address
+   *
+   * @return array
    */
   private function _addAddress($cid, $masterContactId = NULL) {
 
@@ -862,6 +889,8 @@ class CRM_GCD {
    * Add a phone number for a contact
    *
    * @param $cid int: contact id
+   *
+   * @return array
    */
   private function _addPhone($cid) {
     $area = $this->probability(.5) ? '' : mt_rand(201, 899);
@@ -882,6 +911,10 @@ class CRM_GCD {
    * Add an email for a contact
    *
    * @param $cid int: contact id
+   * @param $email
+   * @param $locationType
+   *
+   * @return array
    */
   private function _addEmail($cid, $email, $locationType) {
     $params = array(
@@ -899,6 +932,8 @@ class CRM_GCD {
    *
    * @param $cid int: contact id
    * @param $name str: contact name
+   *
+   * @return array
    */
   private function _addWebsite($cid, $name) {
     $part = array_pad(split(' ', strtolower($name)), 3, '');
@@ -933,8 +968,11 @@ class CRM_GCD {
   /**
    * Create an email address based on a person's name
    * Using common naming patterns
+   *
    * @param $contact obj: individual contact record
    * @param $domain str: supply a domain (i.e. for a work address)
+   *
+   * @return string
    */
   private function _individualEmail($contact, $domain = NULL) {
     $first = $contact->first_name;
@@ -1175,6 +1213,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return array
+   */
   function getZipCodeInfo() {
 
     if (!$this->stateMap) {
@@ -1206,6 +1247,11 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $zipCode
+   *
+   * @return array
+   */
   static function getLatLong($zipCode) {
     $query = "http://maps.google.com/maps?q=$zipCode&output=js";
     $userAgent = "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0";
@@ -1351,6 +1397,11 @@ VALUES
     $this->_query($activityContact);
   }
 
+  /**
+   * @param $date
+   *
+   * @return string
+   */
   static function repairDate($date) {
     $dropArray = array('-' => '', ':' => '', ' ' => '');
     return strtr($date, $dropArray);
@@ -1758,8 +1809,8 @@ VALUES
   }
 
   private function addContributionLineItem() {
-    $query = " INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
-SELECT 'civicrm_contribution', cc.id, cpf.id as price_field, cpfv.label, 1, cc.total_amount, cc.total_amount line_total, 0, cpfv.id as price_field_value, cpfv.financial_type_id
+    $query = " INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, contribution_id, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
+SELECT 'civicrm_contribution', cc.id, cc.id contribution_id, cpf.id as price_field, cpfv.label, 1, cc.total_amount, cc.total_amount line_total, 0, cpfv.id as price_field_value, cpfv.financial_type_id
 FROM civicrm_contribution cc
 LEFT JOIN civicrm_price_set cps ON cps.name = 'default_contribution_amount'
 LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cps.id
@@ -1792,6 +1843,10 @@ WHERE cefa.account_relationship = 1";
     $this->addFinancialItem($result);
   }
 
+  /**
+   * @param $result
+   * @param null $financialAccountId
+   */
   private function addFinancialItem($result, $financialAccountId = NULL) {
     $defaultFinancialAccount = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1");
     while($result->fetch()){
@@ -1802,7 +1857,7 @@ WHERE cefa.account_relationship = 1";
         'status_id' => 1,
         'trxn_id' => $result->trxn_id,
         'contribution_id' => $result->contribution_id,
-        'to_financial_account_id' => $result->payment_instrument_id ? $financialAccountId[$result->payment_instrument_id] : $defaultFinancialAccount,
+        'to_financial_account_id' => empty($financialAccountId[$result->payment_instrument_id]) ? $defaultFinancialAccount : $financialAccountId[$result->payment_instrument_id],
         'payment_instrument_id' => $result->payment_instrument_id,
         'check_number' => $result->check_number
       );
@@ -1825,8 +1880,9 @@ WHERE cefa.account_relationship = 1";
 
   private function addLineItemParticipants() {
     $participant = new CRM_Event_DAO_Participant();
-    $participant->query("INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
-SELECT 'civicrm_participant',cp.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as line_total, 0, cpfv.id, cpfv.financial_type_id FROM civicrm_participant cp LEFT JOIN civicrm_price_set_entity cpe ON cpe.entity_id = cp.event_id LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cpe.price_set_id LEFT JOIN civicrm_price_field_value cpfv ON cpfv.price_field_id = cpf.id WHERE cpfv.label = cp.fee_level");
+    $participant->query("INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, contribution_id, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
+SELECT 'civicrm_participant', cp.id, cpp.contribution_id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as line_total, 0, cpfv.id, cpfv.financial_type_id FROM civicrm_participant cp LEFT JOIN civicrm_participant_payment cpp ON cpp.participant_id = cp.id
+LEFT JOIN civicrm_price_set_entity cpe ON cpe.entity_id = cp.event_id LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cpe.price_set_id LEFT JOIN civicrm_price_field_value cpfv ON cpfv.price_field_id = cpf.id WHERE cpfv.label = cp.fee_level");
   }
 
   private function addMembershipPayment() {
@@ -1846,8 +1902,8 @@ WHERE cc.id > $maxContribution;";
 
     $this->_query($sql);
 
-    $sql = "INSERT INTO civicrm_line_item (entity_table, entity_id, price_field_value_id, price_field_id, label, qty, unit_price, line_total, financial_type_id)
-SELECT  'civicrm_contribution', cmp.contribution_id, cpfv.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as unit_price, cpfv.financial_type_id FROM `civicrm_membership` cm
+    $sql = "INSERT INTO civicrm_line_item (entity_table, entity_id, contribution_id, price_field_value_id, price_field_id, label, qty, unit_price, line_total, financial_type_id)
+SELECT 'civicrm_membership', cm.id, cmp.contribution_id, cpfv.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as unit_price, cpfv.financial_type_id FROM `civicrm_membership` cm
 LEFT JOIN civicrm_membership_payment cmp ON cmp.membership_id = cm.id
 LEFT JOIN civicrm_price_field_value cpfv ON cpfv.membership_type_id = cm.membership_type_id
 LEFT JOIN civicrm_price_field cpf ON cpf.id = cpfv.price_field_id
@@ -1902,10 +1958,18 @@ AND    a.details = 'Participant Payment'
   }
 }
 
+/**
+ * @param null $str
+ *
+ * @return bool
+ */
 function user_access($str = NULL) {
   return TRUE;
 }
 
+/**
+ * @return array
+ */
 function module_list() {
   return array();
 }

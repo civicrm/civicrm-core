@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.4                                                |
+   | CiviCRM version 4.5                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2013                                |
+   | Copyright CiviCRM LLC (c) 2004-2014                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -47,6 +47,9 @@ class CRM_Contact_Form_Task_SMSCommon {
   public $_toContactPhone = array();
 
 
+  /**
+   * @param $form
+   */
   static function preProcessProvider(&$form) {
     $form->_single = FALSE;
     $className = CRM_Utils_System::getClassName($form);
@@ -84,13 +87,13 @@ class CRM_Contact_Form_Task_SMSCommon {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function buildQuickForm(&$form) {
 
     $toArray = array();
-
-    $form->assign('max_sms_length', CRM_SMS_Provider::MAX_SMS_CHAR);
 
     $providers = CRM_SMS_BAO_Provider::getProviders(NULL, NULL, TRUE, 'is_default desc');
 
@@ -106,8 +109,8 @@ class CRM_Contact_Form_Task_SMSCommon {
       $form->_contactIds = array($cid);
     }
 
-    $to = $form->add('text', 'to', ts('To'), '', TRUE);
-    $form->add('text', 'activity_subject', ts('Name The SMS'), '', TRUE);
+    $to = $form->add('text', 'to', ts('To'), array('class' => 'huge'), TRUE);
+    $form->add('text', 'activity_subject', ts('Name The SMS'), array('class' => 'huge'), TRUE);
 
     $toSetDefault = TRUE;
     if (property_exists($form, '_context') && $form->_context == 'standalone') {
@@ -246,7 +249,7 @@ class CRM_Contact_Form_Task_SMSCommon {
 
         if ($phone) {
           $toArray[] = array(
-            'name' => '"' . $value['sort_name'] . '" &lt;' . $phone . '&gt;',
+            'text' => '"' . $value['sort_name'] . '" (' . $phone . ')',
             'id' => "$contactId::{$phone}",
           );
         }
@@ -312,15 +315,15 @@ class CRM_Contact_Form_Task_SMSCommon {
 
     $template = CRM_Core_Smarty::singleton();
 
-    if (empty($fields['text_message'])) {
-      $errors['text_message'] = ts('Please provide Text message.');
+    if (empty($fields['sms_text_message'])) {
+      $errors['sms_text_message'] = ts('Please provide Text message.');
     }
     else {
-      if (!empty($fields['text_message'])) {
-        $messageCheck = CRM_Utils_Array::value('text_message', $fields);
+      if (!empty($fields['sms_text_message'])) {
+        $messageCheck = CRM_Utils_Array::value('sms_text_message', $fields);
         $messageCheck = str_replace("\r\n", "\n", $messageCheck);
         if ($messageCheck && (strlen($messageCheck) > CRM_SMS_Provider::MAX_SMS_CHAR)) {
-          $errors['text_message'] = ts("You can configure the SMS message body up to %1 characters", array(1 => CRM_SMS_Provider::MAX_SMS_CHAR));
+          $errors['sms_text_message'] = ts("You can configure the SMS message body up to %1 characters", array(1 => CRM_SMS_Provider::MAX_SMS_CHAR));
         }
       }
     }
@@ -338,6 +341,8 @@ class CRM_Contact_Form_Task_SMSCommon {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function postProcess(&$form) {
@@ -350,7 +355,7 @@ class CRM_Contact_Form_Task_SMSCommon {
     // process message template
     if (!empty($thisValues['saveTemplate']) || !empty($thisValues['updateTemplate'])) {
       $messageTemplate = array(
-        'msg_text' => $thisValues['text_message'],
+        'msg_text' => $thisValues['sms_text_message'],
         'is_active' => TRUE,
       );
 
@@ -387,7 +392,7 @@ class CRM_Contact_Form_Task_SMSCommon {
     // $smsParams carries all the arguments provided on form (or via hooks), to the provider->send() method
     // this gives flexibity to the users / implementors to add their own args via hooks specific to their sms providers
     $smsParams = $thisValues;
-    unset($smsParams['text_message']);
+    unset($smsParams['sms_text_message']);
     $smsParams['provider_id'] = $fromSmsProviderId;
     $contactIds = array_keys($form->_contactDetails);
     $allContactIds = array_keys($form->_allContactDetails);

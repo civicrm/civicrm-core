@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,9 +41,12 @@
 class CRM_Contact_Form_Task_LabelCommon {
   /**
    * Check for presence of tokens to be swapped out
+   *
    * @param array $contact
    * @param array $mailingFormatProperties
    * @param array $tokenFields
+   *
+   * @return bool
    */
   function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
     foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
@@ -86,9 +89,13 @@ class CRM_Contact_Form_Task_LabelCommon {
   /**
    * function to get the rows for the labels
    *
-   * @param array $contactIds Contact IDS to do labels for
+   * @param $contactIDs
    * @param integer $locationTypeID
    * @param boolean $respectDoNotMail
+   * @param $mergeSameAddress
+   * @param $mergeSameHousehold
+   *
+   * @internal param array $contactIds Contact IDS to do labels for
    * @return array of rows for labels
    * @access  public
    */
@@ -99,7 +106,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     $addressReturnProperties = CRM_Contact_Form_Task_LabelCommon::getAddressReturnProperties();
 
     //build the returnproperties
-    $returnProperties = array('display_name' => 1, 'contact_type' => 1);
+    $returnProperties = array('display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1);
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'mailing_format'
     );
@@ -346,16 +353,26 @@ class CRM_Contact_Form_Task_LabelCommon {
       else {
         $name = $rows[$rowID]['display_name'];
       }
+      $formatted = array(
+       'first_name' => $rows[$rowID]['first_name'],
+       'individual_prefix' => $rows[$rowID]['individual_prefix']
+      );
+      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'display_name_format');
+      $firstNameWithPrefix = CRM_Utils_Address::format($formatted, $format,  FALSE, FALSE, TRUE);
+      $firstNameWithPrefix = trim($firstNameWithPrefix);
+
       // fill uniqueAddress array with last/first name tree
       if (isset($uniqueAddress[$address])) {
-        $uniqueAddress[$address]['names'][$name][] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
         // drop unnecessary rows
         unset($rows[$rowID]);
         // this is the first listing at this address
       }
       else {
         $uniqueAddress[$address]['ID'] = $rowID;
-        $uniqueAddress[$address]['names'][$name][] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
       }
     }
     foreach ($uniqueAddress as $address => $data) {
@@ -367,8 +384,13 @@ class CRM_Contact_Form_Task_LabelCommon {
         if ($count > 2) {
           break;
         }
-        // collapse the tree to summarize
-        $family = trim(implode(" & ", $first_names) . " " . $last_name);
+        if(count($first_names) == 1) {
+          $family = $first_names[current(array_keys($first_names))]['addressee_display'];
+        }
+        else {
+          // collapse the tree to summarize
+          $family = trim(implode(" & ", $first_names) . " " . $last_name);
+        }
         if ($count) {
           $processedNames .= "\n" . $family;
         }
@@ -382,6 +404,11 @@ class CRM_Contact_Form_Task_LabelCommon {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function mergeSameHousehold(&$rows) {
     # group selected contacts by type
     $individuals = array();

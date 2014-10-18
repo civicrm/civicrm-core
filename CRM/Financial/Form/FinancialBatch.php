@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -90,6 +90,8 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('Financial Batch'));
+
     if (isset( $this->_id)) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'title');
       CRM_Utils_System::setTitle($this->_title .' - '.ts( 'Accounting Batch'));
@@ -173,7 +175,11 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $values
+   * @param $files
+   * @param $self
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -289,7 +295,13 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $action
+   * @param $permissions
+   * @param $createdID
+   * @param $userContactID
+   * @param $actionName
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -305,6 +317,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       CRM_Core_Error::statusBounce(ts('You dont have permission to %1 this batch'), array(1 => $actionName));
     }
   }
+
 }
 
 

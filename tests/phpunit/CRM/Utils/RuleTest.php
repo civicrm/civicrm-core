@@ -2,13 +2,19 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Utils_RuleTest
+ */
 class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
-      'name'      => 'Rule Test',
+      'name' => 'Rule Test',
       'description' => 'Test the validation rules',
-      'group'      => 'CiviCRM BAO Tests',
+      'group' => 'CiviCRM BAO Tests',
     );
   }
 
@@ -23,14 +29,17 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::integer($inputData));
   }
 
+  /**
+   * @return array
+   */
   function integerDataProvider() {
     return array(
-      array(10, true),
-      array('145E+3', false),
-      array('10', true),
-      array(-10, true),
-      array('-10', true),
-      array('-10foo', false),
+      array(10, TRUE),
+      array('145E+3', FALSE),
+      array('10', TRUE),
+      array(-10, TRUE),
+      array('-10', TRUE),
+      array('-10foo', FALSE),
     );
   }
 
@@ -41,14 +50,17 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::positiveInteger($inputData));
   }
 
+  /**
+   * @return array
+   */
   function positiveDataProvider() {
     return array(
-      array(10, true),
-      array('145.0E+3', false),
-      array('10', true),
-      array(-10, false),
-      array('-10', false),
-      array('-10foo', false),
+      array(10, TRUE),
+      array('145.0E+3', FALSE),
+      array('10', TRUE),
+      array(-10, FALSE),
+      array('-10', FALSE),
+      array('-10foo', FALSE),
     );
   }
 
@@ -59,16 +71,18 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::numeric($inputData));
   }
 
+  /**
+   * @return array
+   */
   function numericDataProvider() {
     return array(
-      array(10, true),
-      array('145.0E+3', false),
-      array('10', true),
-      array(-10, true),
-      array('-10', true),
-      array('-10foo', false),
+      array(10, TRUE),
+      array('145.0E+3', FALSE),
+      array('10', TRUE),
+      array(-10, TRUE),
+      array('-10', TRUE),
+      array('-10foo', FALSE),
     );
   }
-
 
 }

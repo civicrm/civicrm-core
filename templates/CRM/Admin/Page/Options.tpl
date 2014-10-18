@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,7 +50,7 @@
     {ts}This page lists the credit card options that will be offered to contributors using your Online Contribution pages. You will need to verify which cards are accepted by your chosen Payment Processor and update these entries accordingly.{/ts}<br /><br />
     {ts}IMPORTANT: This page does NOT control credit card/payment method choices for sites and/or contributors using the PayPal Express service (e.g. where billing information is collected on the Payment Processor's website).{/ts}
   {elseif $gName eq "acl_role"}
-    {capture assign=docLink}{docURL page="user/initial-set-up/access-control" text="Access Control Documentation"}{/capture}
+    {capture assign=docLink}{docURL page="user/current/initial-set-up/permissions-and-access-control/" text="Access Control Documentation"}{/capture}
     {capture assign=aclURL}{crmURL p='civicrm/acl' q='reset=1'}{/capture}
     {capture assign=erURL}{crmURL p='civicrm/acl/entityrole' q='reset=1'}{/capture}
     {ts 1=$docLink}ACLs allow you control access to CiviCRM data. An ACL consists of an <strong>Operation</strong> (e.g. 'View' or 'Edit'), a <strong>set of data</strong> that the operation can be performed on (e.g. a group of contacts), and a <strong>Role</strong> that has permission to do this operation. Refer to the %1 for more info.{/ts}<br /><br />
@@ -70,7 +70,7 @@
 
 <div class="crm-content-block crm-block">
 {if $rows}
-{if $action ne 1 and $action ne 2}
+{if $isLocked ne 1}
     <div class="action-link">
         <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
     </div>
@@ -79,8 +79,7 @@
         {strip}
   {* handle enable/disable actions*}
   {include file="CRM/common/enableDisableApi.tpl"}
-    {include file="CRM/common/jsortable.tpl"}
-        <table id="options" class="display">
+        <table id="options" class="row-highlight">
          <thead>
          <tr>
             {if $showComponent}
@@ -111,11 +110,10 @@
             {if $showCounted}<th>{ts}Counted?{/ts}</th>{/if}
             {if $showVisibility}<th>{ts}Visibility{/ts}</th>{/if}
             <th id="nosort">{ts}Description{/ts}</th>
-            <th id="order">{ts}Order{/ts}</th>
+            <th>{ts}Order{/ts}</th>
             {if $showIsDefault}<th>{ts}Default{/ts}</th>{/if}
             <th>{ts}Reserved{/ts}</th>
             <th>{ts}Enabled?{/ts}</th>
-            <th class="hiddenElement"></th>
             <th></th>
           </tr>
           </thead>
@@ -138,14 +136,13 @@
             {/if}
             {if $showVisibility}<td class="crm-admin-visibility_label">{$row.visibility_label}</td>{/if}
             <td class="crm-admin-options-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
-            <td class="nowrap crm-admin-options-order">{$row.order}</td>
+            <td class="nowrap crm-admin-options-order">{$row.weight}</td>
             {if $showIsDefault}
               <td class="crm-admin-options-is_default" align="center">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
             {/if}
             <td class="crm-admin-options-is_reserved">{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td class="crm-admin-options-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{$row.action|replace:'xx':$row.id}</td>
-            <td class="order hiddenElement">{$row.weight}</td>
           </tr>
         {/foreach}
         </tbody>
@@ -153,18 +150,18 @@
         {include file="CRM/common/crmeditable.tpl"}
         {/strip}
 
-        {if $action ne 1 and $action ne 2}
-            <div class="action-link">
-                <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
-            </div>
-        {/if}
 </div>
 {else}
     <div class="messages status no-popup">
-         <div class="icon inform-icon"></div>
-        {capture assign=crmURL}{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}{/capture}
-        {ts 1=$crmURL}There are no option values entered. You can <a href='%1'>add one</a>.{/ts}
+      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+      {ts}None found.{/ts}
     </div>
 {/if}
+    <div class="action-link">
+      {if $isLocked ne 1}
+        <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
+      {/if}
+      <a href="{crmURL p="civicrm/admin" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
+    </div>
 </div>
 {/if}

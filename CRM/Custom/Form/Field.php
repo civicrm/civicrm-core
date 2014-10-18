@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -138,7 +138,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       self::$_dataToLabels = array(
         array('Text' => ts('Text'), 'Select' => ts('Select'),
           'Radio' => ts('Radio'), 'CheckBox' => ts('CheckBox'), 'Multi-Select' => ts('Multi-Select'),
-          'AdvMulti-Select' => ts('Advanced Multi-Select'),
+          'AdvMulti-Select' => ts('Adv Multi-Select (obsolete)'),
           'Autocomplete-Select' => ts('Autocomplete Select'),
         ),
         array('Text' => ts('Text'), 'Select' => ts('Select'),
@@ -150,7 +150,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         array('Text' => ts('Text'), 'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
-        array('TextArea' => ts('TextArea'), 'RichTextEditor' => 'RichTextEditor'),
+        array('TextArea' => ts('TextArea'), 'RichTextEditor' => ts('RichTextEditor')),
         array('Date' => ts('Select Date')),
         array('Radio' => ts('Radio')),
         array('StateProvince' => ts('Select State/Province'), 'Multi-Select' => ts('Multi-Select State/Province')),
@@ -261,6 +261,11 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if (isset($dontShowLink)) {
       $this->assign('dontShowLink', $dontShowLink);
     }
+    if ($this->_action & CRM_Core_Action::ADD &&
+      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple', 'id')) {
+      $defaults['in_selector'] = 1;
+    }
+
     return $defaults;
   }
 
@@ -275,7 +280,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   public function buildQuickForm() {
     if ($this->_gid) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'title');
-      CRM_Utils_System::setTitle($this->_title . ' - ' . ($this->_id ? ts('Edit Field') : ts('Add Field')));
+      CRM_Utils_System::setTitle($this->_title . ' - ' . ($this->_id ? ts('Edit Field') : ts('New Field')));
       $this->assign('gid', $this->_gid);
     }
 
@@ -304,6 +309,11 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       '&nbsp;&nbsp;&nbsp;'
     );
     $sel->setOptions(array($dt, $it));
+
+    if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple')) {
+      $this->add('checkbox', 'in_selector', ts('Display in Table?'));
+    }
+
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->freeze('data_type');
     }
@@ -517,7 +527,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     // add buttons
     $this->addButtons(array(
         array(
-          'type' => 'next',
+          'type' => 'done',
           'name' => ts('Save'),
           'isDefault' => TRUE,
         ),
@@ -551,7 +561,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   /**
    * global validation rules for the form
    *
-   * @param array  $fields   (referance) posted values of the form
+   * @param array $fields posted values of the form
+   *
+   * @param $files
+   * @param $self
    *
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise
@@ -664,13 +677,8 @@ SELECT count(*)
             if (strpos($fields['filter'], 'entity=') !== FALSE) {
               $errors['filter'] = ts("Please do not include entity parameter (entity is always 'contact')");
             }
-            elseif (strpos($fields['filter'], 'action=') === FALSE) {
-              $errors['filter'] = ts("Please specify 'action' parameter, it should be 'lookup' or 'get'");
-            }
-            elseif (strpos($fields['filter'], 'action=get') === FALSE &&
-              strpos($fields['filter'], 'action=lookup') === FALSE
-            ) {
-              $errors['filter'] = ts("Only 'get' and 'lookup' actions are supported.");
+            elseif (strpos($fields['filter'], 'action=get') === FALSE) {
+              $errors['filter'] = ts("Only 'get' action is supported.");
             }
           }
           $self->setDefaults(array('filter_selected', $fields['filter_selected']));
@@ -981,7 +989,6 @@ SELECT id
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
     }
-
     $customField = CRM_Core_BAO_CustomField::create($params);
     $this->_id = $customField->id;
 
@@ -993,7 +1000,7 @@ SELECT id
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      $msg += '<p>' . ts("Ready to add another.") . '</p>';
+      $msg .= '<p>' . ts("Ready to add another.") . '</p>';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field/add',
           'reset=1&action=add&gid=' . $this->_gid
         ));

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -90,6 +90,8 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
     }
 
+    $this->setPageTitle(ts('Grant'));
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -115,12 +117,14 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
-    $defaults = array();
     $defaults = parent::setDefaultValues();
 
     if ($this->_action & CRM_Core_Action::DELETE) {

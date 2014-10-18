@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,10 @@
  * Page for displaying list of categories for Settings
  */
 class CRM_Admin_Page_Setting extends CRM_Core_Page {
+  /**
+   * @return string
+   * @throws Exception
+   */
   function run() {
     CRM_Core_Error::fatal('This page is deprecated. If you have followed a link or have been redirected here, please change link or redirect to Admin Console (/civicrm/admin?reset=1)');
     CRM_Utils_System::setTitle(ts("Global Settings"));

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -117,6 +117,12 @@ class CRM_Core_Page {
    * @var array
    */
   public $urlPath = array();
+
+  /**
+   * Should crm.livePage.js be added to the page?
+   * @var bool
+   */
+  public $useLivePageJS;
 
   /**
    * class constructor
@@ -215,17 +221,15 @@ class CRM_Core_Page {
 
     $config = CRM_Core_Config::singleton();
 
-    // TODO: Is there a better way to ensure these actions don't happen during AJAX requests?
-    if (empty($_GET['snippet'])) {
-      // Version check and intermittent alert to admins
-      CRM_Utils_VersionCheck::singleton()->versionAlert();
-      CRM_Utils_Check_Security::singleton()->showPeriodicAlerts();
+    // Version check and intermittent alert to admins
+    CRM_Utils_VersionCheck::singleton()->versionAlert();
+    CRM_Utils_Check::singleton()->showPeriodicAlerts();
 
-      // Debug msg once per hour
-      if ($config->debug && CRM_Core_Permission::check('administer CiviCRM') && CRM_Core_Session::singleton()->timer('debug_alert', 3600)) {
-        $msg = ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1')));
-        CRM_Core_Session::setStatus($msg, ts('Debug Mode'));
-      }
+    if ($this->useLivePageJS &&
+      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajaxPopupsEnabled', NULL, TRUE))
+    {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+      $this->assign('includeWysiwygEditor', TRUE);
     }
 
     $content = self::$_template->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
@@ -275,9 +279,10 @@ class CRM_Core_Page {
   /**
    * assign value to name in template
    *
-   * @param array|string $name  name  of variable
+   * @param $var
    * @param mixed $value value of varaible
    *
+   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -288,9 +293,10 @@ class CRM_Core_Page {
   /**
    * assign value to name in template by reference
    *
-   * @param array|string $name  name  of variable
+   * @param $var
    * @param mixed $value (reference) value of varaible
    *
+   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -313,7 +319,8 @@ class CRM_Core_Page {
    * Returns an array containing template variables
    *
    * @param string $name
-   * @param string $type
+   *
+   * @internal param string $type
    * @return array
    */
   function get_template_vars($name=null) {
@@ -409,14 +416,26 @@ class CRM_Core_Page {
     return $this->_print;
   }
 
+  /**
+   * @return CRM_Core_Smarty
+   */
   static function &getTemplate() {
     return self::$_template;
   }
 
+  /**
+   * @param $name
+   *
+   * @return null
+   */
   function getVar($name) {
     return isset($this->$name) ? $this->$name : NULL;
   }
 
+  /**
+   * @param $name
+   * @param $value
+   */
   function setVar($name, $value) {
     $this->$name = $value;
   }

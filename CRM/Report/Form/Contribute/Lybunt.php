@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -46,6 +46,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   protected $lifeTime_from = NULL;
   protected $lifeTime_where = NULL;
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $yearsInPast   = 10;
     $yearsInFuture = 1;
@@ -174,22 +180,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           ),
         ),
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
     );
 
     // If we have a campaign, build out the relevant elements
@@ -204,6 +194,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       );
     }
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
@@ -336,6 +327,11 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->assign('chartSupported', TRUE);
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     if (!empty($rows)) {
@@ -429,6 +425,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
 
     $graphRows = array();
@@ -458,6 +457,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
@@ -495,6 +497,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   }
 
   // Override "This Year" $op options
+  /**
+   * @param string $type
+   * @param null $fieldName
+   *
+   * @return array
+   */
   function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'yid') {
       return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));

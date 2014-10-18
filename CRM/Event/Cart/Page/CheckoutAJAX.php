@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Page_CheckoutAJAX
+ */
 class CRM_Event_Cart_Page_CheckoutAJAX {
   function add_participant_to_cart() {
     require 'CRM/Core/Transaction.php';

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -140,10 +140,3 @@
 {/if}
 </div>
 {/if}
-{literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmaccordions(); 
-});
-</script>
-{/literal}

@@ -62,6 +62,11 @@
     <uniqueName>pledge_financial_type_id</uniqueName>
     <type>int unsigned</type>
     <comment>FK to Financial Type</comment>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <add>4.3</add>
     <html>
       <type>Select</type>

@@ -39,7 +39,7 @@ VALUES
    ( @uf_group_id_onBehalfOrganization,   'country',            1, 0, 7, 'User and User Admin Only',  0, 0, @maxId,
             {localize}'Country'{/localize},           'Contact',      {localize}NULL{/localize},  NULL ),
    ( @uf_group_id_onBehalfOrganization,   'state_province',     1, 0, 8, 'User and User Admin Only',  0, 0, @maxId,
-            {localize}'State / Province'{/localize},  'Contact',      {localize}NULL{/localize},  NULL );
+            {localize}'State/Province'{/localize},  'Contact',      {localize}NULL{/localize},  NULL );
 
 -- CRM-8150
 CREATE TABLE IF NOT EXISTS `civicrm_action_mapping` (

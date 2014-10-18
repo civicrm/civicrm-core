@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright U.S. PIRG Education Fund (c) 2007                        |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -35,7 +35,29 @@
  */
 
 require_once 'HTML/QuickForm/advmultiselect.php';
+
+/**
+ * Class CRM_Core_QuickForm_NestedAdvMultiSelect
+ */
 class CRM_Core_QuickForm_NestedAdvMultiSelect extends HTML_QuickForm_advmultiselect {
+  /**
+   * Loads options from different types of data sources
+   *
+   * This method overloaded parent method of select element, to allow
+   * loading options with fancy attributes.
+   *
+   * @param mixed &$options Options source currently supports assoc array or DB_result
+   * @param mixed $param1   (optional) See function detail
+   * @param mixed $param2   (optional) See function detail
+   * @param mixed $param3   (optional) See function detail
+   * @param mixed $param4   (optional) See function detail
+   *
+   * @access     public
+   * @since      version 1.5.0 (2009-02-15)
+   * @return     PEAR_Error|NULL on error and TRUE on success
+   * @throws     PEAR_Error
+   * @see        loadArray()
+   */
   function load(&$options, $param1 = NULL, $param2 = NULL,
     $param3 = NULL, $param4 = NULL
   ) {

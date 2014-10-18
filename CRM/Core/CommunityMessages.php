@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -71,6 +71,7 @@ class CRM_Core_CommunityMessages {
   /**
    * @param CRM_Utils_Cache_Interface $cache
    * @param CRM_Utils_HttpClient $client
+   * @param null $messagesUrl
    */
   public function __construct($cache, $client, $messagesUrl = NULL) {
     $this->cache = $cache;

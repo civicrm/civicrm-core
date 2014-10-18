@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_OfflineMembershipRenewTest
+ */
 class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -72,7 +76,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -80,25 +83,24 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
     // click through to the Membership Renewal Link
-    $this->click("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
     $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
 
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
-    $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
 
     // click through to the membership view screen
-    $this->click("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
 
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
@@ -177,7 +179,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -185,25 +186,24 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
     // click through to the Membership Renewal Link
-    $this->click("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
     $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
 
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
-    $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span[1]/a[1][text()='View']");
 
     // click through to the membership view screen
-    $this->click("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span[1]/a[1][text()='View']");
 
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
@@ -265,7 +265,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -273,10 +272,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[7]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->waitForElementPresent("xpath=//div[@id='inactive-memberships']//table/tbody/tr/td[7]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
     // click through to the Membership Renewal Link
-    $this->click("xpath=//div[@id='Memberships']//table/tbody/tr/td[7]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->click("xpath=//div[@id='inactive-memberships']//table/tbody/tr/td[7]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
     $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
 
@@ -295,15 +294,14 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
-    $this->waitForElementPresent("xpath=//div[@id='Memberships']//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
 
     // click through to the membership view screen
-    $this->click("xpath=//div[@id='Memberships']//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
 
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
@@ -375,7 +373,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -384,10 +381,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
     $this->waitForText('crm-notification-container', "A membership confirmation and receipt has been sent to {$firstName}@memberson.com.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
     // click through to the Membership Renewal Link
-    $this->click("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
     $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
     // Record contribution and set number of terms to 2
@@ -414,15 +411,14 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
-    $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
 
     // click through to the membership view screen
-    $this->click("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
 
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 

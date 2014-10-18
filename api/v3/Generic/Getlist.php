@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -50,12 +50,15 @@ function civicrm_api3_generic_getList($apiRequest) {
   $fnName = function_exists($fnName) ? $fnName : '_civicrm_api3_generic_getlist_output';
   $values = $fnName($result, $request);
 
-  $output = array(
+  $output = array('page_num' => $request['page_num']);
+
+  // Limit is set for searching but not fetching by id
+  if (!empty($request['params']['options']['limit'])) {
     // If we have an extra result then this is not the last page
-    'more_results' => isset($values[10]),
-    'page_num' => $request['page_num'],
-  );
-  unset($values[10]);
+    $last = $request['params']['options']['limit'] - 1;
+    $output['more_results'] = isset($values[$last]);
+    unset($values[$last]);
+  }
 
   return civicrm_api3_create_success($values, $request['params'], $entity, 'getlist', CRM_Core_DAO::$_nullObject, $output);
 }
@@ -79,7 +82,7 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
     'extra' => array(),
   );
   // Find main field from meta
-  foreach (array('sort_name', 'title', 'label', 'name') as $field) {
+  foreach (array('sort_name', 'title', 'label', 'name', 'subject') as $field) {
     if (isset($fields[$field])) {
       $defaults['label_field'] = $defaults['search_field'] = $field;
       break;
@@ -110,9 +113,12 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
   }
   // When looking up a field e.g. displaying existing record
   if (!empty($request['id'])) {
-    if (is_string($request['id']) && strpos(',', $request['id'])) {
-      $request['id'] = explode(',', $request['id']);
+    if (is_string($request['id']) && strpos($request['id'], ',')) {
+      $request['id'] = explode(',', trim($request['id'], ', '));
     }
+    // Don't run into search limits when prefilling selection
+    $params['options']['limit'] = NULL;
+    unset($params['options']['offset'], $request['params']['options']['limit'], $request['params']['options']['offset']);
     $params[$request['id_field']] = is_array($request['id']) ? array('IN' => $request['id']) : $request['id'];
   }
   $request['params'] += $params;

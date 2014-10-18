@@ -15,21 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* This class is used to create Tax rules to be added to the tax tables 
+/* This class is used to create Tax rules to be added to the tax tables
  * in the shopping cart
  * Ther are two types of tax rules
  * 1. default (should be added to a default tax table)
  * 2. alternate (should be added to an alternate tax table)
  *
- * Invoke a separate instance of this class for each tax rule to be 
- * added to the cart  
+ * Invoke a separate instance of this class for each tax rule to be
+ * added to the cart
  * Required fields are the rule type and the tax rate
- * Country area can be specified as part of constructor arguments or 
+ * Country area can be specified as part of constructor arguments or
  * using individual Set methods. Possible values here are
  * 1. CONTINENTAL_48
- * 2. FULL_50_STATES 
+ * 2. FULL_50_STATES
  * 3. ALL
- * State and zip patterns must be exclusively updated using their 
+ * State and zip patterns must be exclusively updated using their
  * individual Set methods
  */
 class GoogleTaxRule {
@@ -41,6 +41,13 @@ class GoogleTaxRule {
   var $state_areas_arr;
   var $zip_patterns_arr;
   var $country_area;
+
+  /**
+   * @param $type
+   * @param $tax_rate
+   * @param string $country_area
+   * @param string $shipping_taxed
+   */
   function GoogleTaxRule($type, $tax_rate, $country_area = "",
     $shipping_taxed = "false"
   ) {
@@ -57,6 +64,9 @@ class GoogleTaxRule {
     $this->zip_patterns_arr = array();
   }
 
+  /**
+   * @param $areas
+   */
   function SetStateAreas($areas) {
     if (is_array($areas)) {
       $this->state_areas_arr = $areas;
@@ -64,6 +74,9 @@ class GoogleTaxRule {
     else $this->state_areas_arr = array($areas);
   }
 
+  /**
+   * @param $zips
+   */
   function SetZipPatterns($zips) {
     if (is_array($zips)) {
       $this->zip_patterns_arr = $zips;
@@ -71,6 +84,9 @@ class GoogleTaxRule {
     else $this->zip_patterns_arr = array($zips);
   }
 
+  /**
+   * @param $country_area
+   */
   function SetCountryArea($country_area) {
     if ($country_area == "CONTINENTAL_48" || $country_area == "FULL_50_STATES"
       || $country_area = "ALL"

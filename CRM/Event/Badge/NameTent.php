@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,6 +38,9 @@
  *
  */
 class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
     // A4
@@ -59,6 +62,9 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
     $this->pdf->setPageFormat('A4', 'L');
   }
 
+  /**
+   * @param $participant
+   */
   protected function writeOneSide(&$participant) {
     $this->pdf->SetXY(0, $this->pdf->height / 2);
     $this->printBackground(TRUE);
@@ -71,6 +77,9 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
     $this->pdf->Write(0, $participant['current_employer'], NULL, NULL, 'C');
   }
 
+  /**
+   * @param $participant
+   */
   public function generateLabel($participant) {
     $this->writeOneSide($participant);
     $this->pdf->StartTransform();

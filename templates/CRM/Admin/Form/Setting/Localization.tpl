@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -112,7 +112,7 @@
             <tr class="crm-localization-form-block-provinceLimit">
                 <td class="label">{$form.provinceLimit.label}</td>
                 <td>{$form.provinceLimit.html}<br />
-                <span class="description">{ts}State/province listings are populated dynamically based on the selected Country for all standard contact address editing forms, as well as for <strong>Profile forms which include both a Country and a State/Province field</strong>.  This setting controls which countries' states and/or provinces are available in the State / Province selection field <strong>for Custom Fields</strong> or for Profile forms which do NOT include a Country field.{/ts}</span></td>
+                <span class="description">{ts}State/province listings are populated dynamically based on the selected Country for all standard contact address editing forms, as well as for <strong>Profile forms which include both a Country and a State/Province field</strong>.  This setting controls which countries' states and/or provinces are available in the State/Province selection field <strong>for Custom Fields</strong> or for Profile forms which do NOT include a Country field.{/ts}</span></td>
             </tr>
         </table>
     <h3>{ts}Multiple Languages Support{/ts}</h3>

@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -59,7 +59,10 @@ class CRM_Utils_Geocode_Google {
    * address. Note that at a later stage, we could make this function also clean up
    * the address into a more valid format
    *
-   * @param object $address
+   * @param $values
+   * @param bool $stateName
+   *
+   * @internal param object $address
    *
    * @return boolean true if we modified the address, false otherwise
    * @static

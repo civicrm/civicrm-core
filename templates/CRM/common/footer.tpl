@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 {/if}
 
 <div class="crm-footer" id="civicrm-footer">
-  {include file="CRM/common/version.tpl" assign=version}
+  {crmVersion assign=version}
   {ts 1=$version}Powered by CiviCRM %1.{/ts}
   {if !empty($newer_civicrm_version)}
     <span class="status">{ts 1=$newer_civicrm_version}A newer version (%1){/ts}

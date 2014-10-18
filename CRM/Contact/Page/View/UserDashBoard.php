@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -57,6 +57,9 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    */
   static $_links = NULL;
 
+  /**
+   * @throws Exception
+   */
   function __construct() {
     parent::__construct();
 
@@ -151,18 +154,11 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     if (!empty($this->_userOptions['Permissioned Orgs'])) {
       $dashboardElements[] = array(
         'class' => 'crm-dashboard-permissionedOrgs',
-        'templatePath' => 'CRM/Contact/Page/View/Relationship.tpl',
+        'templatePath' => 'CRM/Contact/Page/View/RelationshipSelector.tpl',
         'sectionTitle' => ts('Your Contacts / Organizations'),
         'weight' => 40,
       );
 
-      $links = self::links();
-      $currentRelationships = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId,
-        CRM_Contact_BAO_Relationship::CURRENT,
-        0, 0, 0,
-        $links, NULL, TRUE
-      );
-      $this->assign('currentRelationships', $currentRelationships);
     }
 
     if (!empty($this->_userOptions['PCP'])) {
@@ -191,6 +187,9 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
     usort($dashboardElements, array('CRM_Utils_Sort', 'cmpFunc'));
     $this->assign('dashboardElements', $dashboardElements);
+
+    // return true when 'Invoices / Credit Notes' checkbox is checked
+    $this->assign('invoices', $this->_userOptions['Invoices / Credit Notes']);
 
     if (!empty($this->_userOptions['Groups'])) {
       $this->assign('showGroup', TRUE);

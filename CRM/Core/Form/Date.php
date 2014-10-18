@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -73,6 +73,7 @@ Class CRM_Core_Form_Date {
   /**
    * This function is to retrieve the date range - relative or absolute
    * and assign it to the form
+   *
    * @param object $form - the form the dates should be added to
    * @param string $fieldName
    * @param integer $count
@@ -82,7 +83,7 @@ Class CRM_Core_Form_Date {
    * @param boolean $required
    * @param array $operators Additional value pairs to add
    * @param string $dateFormat
-   * @param string $displayTime
+   * @param bool|string $displayTime
    *
    *
    * @static
@@ -157,16 +158,20 @@ Class CRM_Core_Form_Date {
         'previous_2.month' => ts('Previous 2 Months'),
         'previous_2.week' => ts('Previous 2 Weeks'),
         'previous_2.day' => ts('Previous 2 Days'),
-        'earlier.year' => ts('To End of Prior Year'),
-        'earlier.quarter' => ts('To End of Prior Quarter'),
-        'earlier.month' => ts('To End of Prior Month'),
-        'earlier.week' => ts('To End of Prior Week'),
-        'earlier.day' => ts('To End of Prior Day'),
+        'earlier.year' => ts('To End of Previous Year'),
+        'earlier.quarter' => ts('To End of Previous Quarter'),
+        'earlier.month' => ts('To End of Previous Month'),
+        'earlier.week' => ts('To End of Previous Week'),
+        'earlier.day' => ts('To End of Previous Day'),
         'greater.year' => ts('From Start of Current Year'),
         'greater.quarter' => ts('From Start of Current Quarter'),
         'greater.month' => ts('From Start of Current Month'),
         'greater.week' => ts('From Start of Current Week'),
         'greater.day' => ts('From Start of Current Day'),
+        'greater_previous.year' => ts('From End of Previous Year'),
+        'greater_previous.quarter' => ts('From End of Previous Quarter'),
+        'greater_previous.month' => ts('From End of Previous Month'),
+        'greater_previous.week' => ts('From End of Previous Week'),
         'current.year' => ts('Current Year to-date'),
         'current.quarter' => ts('Current Quarter to-date'),
         'current.month' => ts('Current Month to-date'),
@@ -196,16 +201,17 @@ Class CRM_Core_Form_Date {
   /**
    * This function is to build the date range - relative or absolute
    *
-   * @param CRM_Core_Form  $form   the form object that we are operating on
+   * @param CRM_Core_Form $form the form object that we are operating on
    * @param string $fieldName
    * @param Array $selector array of option values to add
-   * @param integer $count
-   * @param string $from
-   * @param stringe $to
    * @param string $from Label
+   * @param string|\stringe $to
+   * @param string $fromLabel
    * @param boolean $required
    * @param string $dateFormat
    * @param boolean $displayTime
+   *
+   * @internal param int $count
    * @return null
    */
   static function addDateRangeToForm(&$form, $fieldName, $selector, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE) {

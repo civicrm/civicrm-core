@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -35,6 +35,9 @@ class CRM_Mailing_BAO_Query {
 
   static $_mailingFields = NULL;
 
+  /**
+   * @return array|null
+   */
   static function &getFields() {
     if (!self::$_mailingFields) {
       self::$_mailingFields = array();
@@ -49,6 +52,8 @@ class CRM_Mailing_BAO_Query {
 
   /**
    * if mailings are involved, add the specific Mailing fields
+   *
+   * @param $query
    *
    * @return void
    * @access public
@@ -120,6 +125,9 @@ class CRM_Mailing_BAO_Query {
     }
   }
 
+  /**
+   * @param $query
+   */
   static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
@@ -136,6 +144,13 @@ class CRM_Mailing_BAO_Query {
     }
   }
 
+  /**
+   * @param $name
+   * @param $mode
+   * @param $side
+   *
+   * @return null|string
+   */
   static function from($name, $mode, $side) {
     $from = NULL;
 
@@ -177,6 +192,12 @@ class CRM_Mailing_BAO_Query {
     return $from;
   }
 
+  /**
+   * @param $mode
+   * @param bool $includeCustomFields
+   *
+   * @return array|null
+   */
   static function defaultReturnProperties($mode,
     $includeCustomFields = TRUE
   ) {
@@ -201,6 +222,10 @@ class CRM_Mailing_BAO_Query {
     return $properties;
   }
 
+  /**
+   * @param $values
+   * @param $query
+   */
   static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
@@ -388,10 +413,10 @@ class CRM_Mailing_BAO_Query {
     );
 
     // event filters
-    $form->addRadio('mailing_delivery_status', ts('Delivery Status'), CRM_Mailing_PseudoConstant::yesNoOptions('delivered'), array('unselectable' => TRUE));
-    $form->addRadio('mailing_open_status', ts('Trackable Opens'), CRM_Mailing_PseudoConstant::yesNoOptions('open'), array('unselectable' => TRUE));
-    $form->addRadio('mailing_click_status', ts('Trackable URLs'), CRM_Mailing_PseudoConstant::yesNoOptions('click'), array('unselectable' => TRUE));
-    $form->addRadio('mailing_reply_status', ts('Trackable Replies'), CRM_Mailing_PseudoConstant::yesNoOptions('reply'), array('unselectable' => TRUE));
+    $form->addRadio('mailing_delivery_status', ts('Delivery Status'), CRM_Mailing_PseudoConstant::yesNoOptions('delivered'), array('allowClear' => TRUE));
+    $form->addRadio('mailing_open_status', ts('Trackable Opens'), CRM_Mailing_PseudoConstant::yesNoOptions('open'), array('allowClear' => TRUE));
+    $form->addRadio('mailing_click_status', ts('Trackable URLs'), CRM_Mailing_PseudoConstant::yesNoOptions('click'), array('allowClear' => TRUE));
+    $form->addRadio('mailing_reply_status', ts('Trackable Replies'), CRM_Mailing_PseudoConstant::yesNoOptions('reply'), array('allowClear' => TRUE));
 
     $form->add('checkbox', 'mailing_unsubscribe', ts('Unsubscribe Requests'));
     $form->add('checkbox', 'mailing_optout', ts('Opt-out Requests'));
@@ -400,8 +425,15 @@ class CRM_Mailing_BAO_Query {
     $form->assign('validCiviMailing', TRUE);
   }
 
+  /**
+   * @param $row
+   * @param $id
+   */
   static function searchAction(&$row, $id) {}
 
+  /**
+   * @param $tables
+   */
   static function tableNames(&$tables) {
   }
 
@@ -413,6 +445,8 @@ class CRM_Mailing_BAO_Query {
    * @param $tableName
    * @param $fieldName
    * @param $fieldTitle
+   *
+   * @param $valueTitles
    *
    * @return void
    */

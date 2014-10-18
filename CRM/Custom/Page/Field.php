@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,6 +42,8 @@
  *
  */
 class CRM_Custom_Page_Field extends CRM_Core_Page {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The group id of the field
@@ -101,6 +103,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
         CRM_Core_Action::EXPORT => array(
           'name' => ts('Move'),
           'url' => 'civicrm/admin/custom/group/field/move',
+          'class' => 'small-popup',
           'qs' => 'reset=1&fid=%%id%%',
           'title' => ts('Move Custom Field'),
         ),
@@ -124,7 +127,11 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @access public
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+    $resourceManager = CRM_Core_Resources::singleton();
+    if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
+      $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999);
+    }
+
     $customField = array();
     $customFieldBAO = new CRM_Core_BAO_CustomField();
 
@@ -274,7 +281,9 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
       $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_gid);
       $this->assign('gid', $this->_gid);
       $this->assign('groupTitle', $groupTitle);
-      CRM_Utils_System::setTitle(ts('%1 - Custom Fields', array(1 => $groupTitle)));
+      if ($action & CRM_Core_Action::BROWSE) {
+        CRM_Utils_System::setTitle(ts('%1 - Custom Fields', array(1 => $groupTitle)));
+      }
     }
 
     // assign vars to templates

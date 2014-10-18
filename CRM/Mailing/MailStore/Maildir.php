@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,21 +28,25 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 require_once 'ezc/Base/src/ezc_bootstrap.php';
 require_once 'ezc/autoload/mail_autoload.php';
+
+/**
+ * Class CRM_Mailing_MailStore_Maildir
+ */
 class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
 
   /**
    * Connect to the supplied dir and make sure the two mail dirs exist
    *
-   * @param string $dir  dir to operate upon
+   * @param string $dir dir to operate upon
    *
-   * @return void
+   * @return \CRM_Mailing_MailStore_Maildir
    */
   function __construct($dir) {
     $this->_dir = $dir;
@@ -91,8 +95,9 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local ignore folder
    *
-   * @param integer $file  file location of the message to fetch
+   * @param integer $file file location of the message to fetch
    *
+   * @throws Exception
    * @return void
    */
   function markIgnored($file) {
@@ -108,8 +113,9 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local processed folder
    *
-   * @param integer $file  file location of the message to fetch
+   * @param integer $file file location of the message to fetch
    *
+   * @throws Exception
    * @return void
    */
   function markProcessed($file) {

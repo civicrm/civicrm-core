@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -68,7 +68,8 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
           else {
             $action += CRM_Core_Action::ENABLE;
           }
-          $links = CRM_Admin_Page_ScheduleReminders::links();
+          $scheduleReminder = new CRM_Admin_Page_ScheduleReminders;
+          $links = $scheduleReminder->links();
           $links[CRM_Core_Action::DELETE]['qs'] .= "&context=event&eventId={$this->_id}";
           $links[CRM_Core_Action::UPDATE]['qs'] .= "&context=event&eventId={$this->_id}";
           $format['action'] = CRM_Core_Action::formLink(
@@ -91,6 +92,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
       // Update tab "disabled" css class
       $this->ajaxResponse['tabValid'] = !empty($reminderList) && is_array($reminderList);
     }
+    $this->setPageTitle(ts('Scheduled Reminder'));
   }
 
   /**
@@ -191,28 +193,14 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     $this->add('select', 'recipient', ts('Recipients'), $sel5[$recipient],
       FALSE, array('onchange' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
-    $recipientListing = $this->add('select', 'recipient_listing', ts('Recipient Listing'),
-      $sel3[$this->_mappingID][0], FALSE, array('class' => 'crm-select2 huge')
-    );
-    $recipientListing->setMultiple(TRUE);
-
-    //auto-complete url
-    $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-      "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=activity&reset=1",
-      FALSE, NULL, FALSE
+    $recipientListing = $this->add('select', 'recipient_listing', ts('Recipient Roles'),
+      $sel3[$this->_mappingID][0], FALSE, array('multiple' => TRUE, 'class' => 'crm-select2 huge', 'placeholder' => TRUE)
     );
 
-    $this->assign('dataUrl', $dataUrl);
-    //token input url
-    $tokenUrl = CRM_Utils_System::url('civicrm/ajax/checkemail',
-      'noemail=1',
-      FALSE, NULL, FALSE
-    );
-    $this->assign('tokenUrl', $tokenUrl);
-    $this->add('text', 'recipient_manual_id', ts('Manual Recipients'));
+    $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), array('multiple' => true));
 
     $this->add('select', 'group_id', ts('Group'),
-      CRM_Core_PseudoConstant::staticGroup(), FALSE, array('class' => 'crm-select2 huge')
+      CRM_Core_PseudoConstant::nestedGroup(), FALSE, array('class' => 'crm-select2 huge')
     );
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);
@@ -396,7 +384,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
       $params['msg_template_id'] = CRM_Utils_Array::value('template', $values);
     }
 
-    CRM_Core_BAO_ActionSchedule::add($params, $ids);
+    CRM_Core_BAO_ActionSchedule::add($params);
 
     $status = ts("Your new Reminder titled %1 has been saved.",
       array(1 => "<strong>{$values['title']}</strong>")

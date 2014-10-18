@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,9 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
   protected $_formValues;
   public $_permissionedComponent;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     $this->_formValues = $formValues;
     /**
@@ -44,7 +47,7 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
      */
 
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Name') => 'sort_name',
       ts('Donation Count') => 'donation_count',
       ts('Donation Amount') => 'donation_amount',
@@ -54,6 +57,9 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
     $this->_permissionedComponent = 'CiviContribute';
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
 
     /**
@@ -158,6 +164,9 @@ $having
     return $sql;
   }
 
+  /**
+   * @return string
+   */
   function from() {
     return "
 civicrm_contribution AS contrib,
@@ -169,6 +178,11 @@ civicrm_contact AS contact_a
       * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
       *
       */
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     $clauses = array();
 
@@ -209,6 +223,11 @@ civicrm_contact AS contact_a
     return implode(' AND ', $clauses);
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function having($includeContactIDs = FALSE) {
     $clauses = array();
     $min = CRM_Utils_Array::value('min_amount', $this->_formValues);
@@ -238,14 +257,27 @@ civicrm_contact AS contact_a
     return $dao->N;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   *
+   * @return string
+   */
   function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
+  /**
+   * @return array
+   */
   function &columns() {
     return $this->_columns;
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -255,6 +287,9 @@ civicrm_contact AS contact_a
     }
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }

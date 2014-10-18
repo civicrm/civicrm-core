@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -77,7 +77,7 @@ class CRM_Contact_Form_Edit_Organization {
     }
 
     if ( !$inlineEditMode ) {
-      $form->add('text', 'external_identifier', ts('External Id'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'external_identifier'), FALSE);
+      $form->add('text', 'external_identifier', ts('External ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'external_identifier'), FALSE);
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',
@@ -86,6 +86,13 @@ class CRM_Contact_Form_Edit_Organization {
     }
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param null $contactID
+   *
+   * @return array|bool
+   */
   static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();
     $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID);

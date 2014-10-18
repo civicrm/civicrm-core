@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Form_Cart
+ */
 class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   public $cart;
 
@@ -72,6 +76,11 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @param $event_id
+   *
+   * @return bool|int|null|string
+   */
   function checkEventCapacity($event_id) {
     $empty_seats = CRM_Event_BAO_Participant::eventFull($event_id, TRUE);
     if (is_numeric($empty_seats)) {
@@ -85,11 +94,17 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @return bool
+   */
   static function is_administrator() {
     global $user;
     return CRM_Core_Permission::check('administer CiviCRM');
   }
 
+  /**
+   * @return mixed
+   */
   function getContactID() {
     //XXX when do we query 'cid' ?
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -109,6 +124,11 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     return $session->get('userID');
   }
 
+  /**
+   * @param $fields
+   *
+   * @return mixed|null
+   */
   static function find_contact($fields) {
     $dedupe_params = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
     $dedupe_params['check_permission'] = FALSE;
@@ -119,6 +139,12 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     else return NULL;
   }
 
+  /**
+   * @param null $registeringContactID
+   * @param array $fields
+   *
+   * @return int|mixed|null
+   */
   static function find_or_create_contact($registeringContactID = NULL, $fields = array(
     )) {
     $contact_id = self::find_contact($fields);
@@ -140,6 +166,11 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     return $contact_id;
   }
 
+  /**
+   * @param $page_name
+   *
+   * @return mixed
+   */
   function getValuesForPage($page_name) {
     $container = $this->controller->container();
     return $container['values'][$page_name];

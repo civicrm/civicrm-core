@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -87,22 +87,21 @@
 {/if}
 {literal}
   <script type="text/javascript">
-    cj(function () {
-      cj().crmAccordions();
-
-      var roleId = cj('input[name=activity_role]:checked', '#Search').val();
+    CRM.$(function($) {
+      var $form = $('form.{/literal}{$form.formClass}{literal}'),
+        roleId = $('input[name=activity_role]:checked', $form).val();
       if (roleId) {
-        cj('.description .option-' + roleId).show();
+        $('.description .option-' + roleId).show();
       }
 
+      $('[name=activity_role]:input').change(function() {
+        $('.description .contact-name-option').hide();
+        if ($(this).is(':checked')) {
+          $('.description .option-' + $(this).val()).show();
+        }
+      }).change();
     });
 
-    cj('[name=activity_role]:input').change(function () {
-      cj('.description .contact-name-option').hide();
-      if (cj(this).is(':checked')) {
-        cj('.description .option-' + cj(this).val()).show();
-      }
-    }).change();
 
   </script>
 {/literal}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -302,7 +302,8 @@ FROM   {$this->_componentTable}
       $this->addGroup($postalMailing, 'postal_mailing_export', ts('Postal Mailing Export'), '<br/>');
 
       $this->addElement('select', 'additional_group', ts('Additional Group for Export'),
-        array('' => ts('- select group -')) + CRM_Core_PseudoConstant::group()
+        array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup(),
+        array('class' => 'crm-select2 huge')
       );
     }
 
@@ -334,6 +335,9 @@ FROM   {$this->_componentTable}
    * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
+   *
+   * @param $files
+   * @param $self
    *
    * @return mixed true or array of errors
    * @access public
@@ -488,6 +492,9 @@ FROM   {$this->_componentTable}
     }
   }
 
+  /**
+   * @return array
+   */
   static function getGreetingOptions() {
     $options = array();
     $greetings = array(

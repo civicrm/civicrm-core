@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,15 +54,17 @@
 </div>
 {literal}
 <script type="text/javascript">
-cj(function() {
-  showHideMapAPIkey( cj('#mapProvider').val( ) );
-});
-function showHideMapAPIkey( mapProvider ) {
-  if ( mapProvider && ( mapProvider == 'OpenStreetMaps' ) ) {
-    cj('#Mapping tr.crm-map-form-block-mapAPIKey').hide( );
-  } else {
-    cj('#Mapping tr.crm-map-form-block-mapAPIKey').show( );
+CRM.$(function($) {
+  var $form = $('form.{/literal}{$form.formClass}{literal}');
+  function showHideMapAPIkey() {
+    var mapProvider = $(this).val();
+    if ( !mapProvider || ( mapProvider === 'OpenStreetMaps' ) ) {
+      $('tr.crm-map-form-block-mapAPIKey', $form).hide( );
+    } else {
+      $('tr.crm-map-form-block-mapAPIKey', $form).show( );
+    }
   }
-}
+  $('#mapProvider').each(showHideMapAPIkey).change(showHideMapAPIkey);
+});
 </script>
 {/literal}

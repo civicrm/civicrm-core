@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This class contains functions for managing Tag(tag) for a contact
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -44,7 +44,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param string $entityTable name of the entity table usually 'civicrm_contact'
    *
    * @return array(
-     ) reference $tag array of catagory id's the contact belongs to.
+     ) reference $tag array of category id's the contact belongs to.
    *
    * @access public
    * @static
@@ -103,6 +103,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @params array  $params         (reference ) an assoc array of name/value pairs
    *
+   * @param $params
+   *
    * @return boolean
    * @access public
    * @static
@@ -134,8 +136,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Given an array of entity ids and entity table, add all the entity to the tags
    *
-   * @param array  $entityIds (reference ) the array of entity ids to be added
-   * @param int    $tagId the id of the tag
+   * @param array $entityIds (reference ) the array of entity ids to be added
+   * @param int $tagId the id of the tag
+   * @param string $entityTable
    * @params string $entityTable name of entity table default:civicrm_contact
    *
    * @return array             (total, added, notAdded) count of enities added to tag
@@ -177,8 +180,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Given an array of entity ids and entity table, remove entity(s) tags
    *
-   * @param array  $entityIds (reference ) the array of entity ids to be removed
-   * @param int    $tagId the id of the tag
+   * @param array $entityIds (reference ) the array of entity ids to be removed
+   * @param int $tagId the id of the tag
+   * @param string $entityTable
    * @params string $entityTable name of entity table default:civicrm_contact
    *
    * @return array             (total, removed, notRemoved) count of entities removed from tags
@@ -221,7 +225,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * takes an associative array and creates tag entity record for all tag entities
    *
    * @param array $params (reference )  an assoc array of name/value pairs
-   * @param array $contactId            contact id
+   * @param $entityTable
+   * @param $entityID
+   *
+   * @internal param array $contactId contact id
    *
    * @return void
    * @access public

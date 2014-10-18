@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -82,7 +82,7 @@
                     <td class="label">{$form.financial_type_id.label}<span class="marker"> *</span></td>
                     <td>{$form.financial_type_id.html}<br /><span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
                 </tr>
-                <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html|crmMoney:$currency}<br/><span class="description">{ts}Actual payment amount for this registration.{/ts}</span></td></tr>
+                <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html|crmMoney:$currency}</td></tr>
                 <tr>
                     <td class="label" >{$form.receive_date.label}</td>
                     <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
@@ -204,33 +204,25 @@
 {if $context eq 'standalone' and $outBound_option != 2 }
 <script type="text/javascript">
 {literal}
-cj( function( ) {
-    cj("#contact_1").blur( function( ) {
-        checkEmail( );
-    } );
-    checkEmail( );
-});
-function checkEmail( ) {
-    var contactID =  cj("input[name='contact_select_id[1]']").val();
-    if ( contactID ) {
-        var postUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' h=0}{literal}";
-        cj.post( postUrl, {contact_id: contactID},
-            function ( response ) {
-                if ( response ) {
-                    cj("#email-receipt").show( );
-                    if ( cj("#send_receipt").is(':checked') ) {
-                        cj("#notice").show( );
-                    }
+  CRM.$(function($) {
+    var $form = $("form.{/literal}{$form.formClass}{literal}");
+    $("#contact_id", $form).change(checkEmail);
+    checkEmail();
 
-                    cj("#email-address").html( response );
-                } else {
-                    cj("#email-receipt").hide( );
-                    cj("#notice").hide( );
-                }
-            }
-        );
+    function checkEmail( ) {
+      var data = $("#contact_id", $form).select2('data');
+      if (data && data.extra && data.extra.email && data.extra.email.length) {
+        $("#email-receipt", $form).show();
+        if ($("#send_receipt", $form).is(':checked')) {
+          $("#notice", $form).show();
+        }
+        $("#email-address", $form).html(data.extra.email);
+      }
+      else {
+        $("#email-receipt, #notice", $form).hide();
+      }
     }
-}
+  });
 {/literal}
 </script>
 {/if}

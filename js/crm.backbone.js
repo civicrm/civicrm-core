@@ -1,5 +1,4 @@
-(function($) {
-  var CRM = (window.CRM) ? (window.CRM) : (window.CRM = {});
+(function($, _) {
   if (!CRM.Backbone) CRM.Backbone = {};
 
   /**
@@ -565,8 +564,8 @@
   var wrapError = function (model, options) {
     var error = options.error;
     options.error = function(resp) {
-      if (error) error(model, resp, options);
+      if (error) error(model, resp, optio)
       model.trigger('error', model, resp, options);
     };
   };
-})(cj);
+})(CRM.$, CRM._);

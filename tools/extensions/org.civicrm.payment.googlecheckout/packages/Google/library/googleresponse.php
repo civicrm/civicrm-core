@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-/* This class is instantiated everytime any notification or 
+/* This class is instantiated everytime any notification or
   * order processing commands are received.
-  * 
+  *
   * It has a SendReq function to post different requests to the Google Server
   * Send functions are provided for most of the commands that are supported
-  * by the server 
-  * Refer demo/responsehandlerdemo.php for different use case scenarios 
+  * by the server
+  * Refer demo/responsehandlerdemo.php for different use case scenarios
   * for this code
   */
 class GoogleResponse {
@@ -40,6 +40,13 @@ class GoogleResponse {
   var $root;
   var $data;
   var $xml_parser;
+
+  /**
+   * @param $id
+   * @param $key
+   * @param $response
+   * @param string $server_type
+   */
   function GoogleResponse($id, $key, $response, $server_type = "checkout") {
     $this->merchant_id = $id;
     $this->merchant_key = $key;
@@ -72,6 +79,11 @@ class GoogleResponse {
     $this->data       = $this->xml_parser->GetData();
   }
 
+  /**
+   * @param $headers
+   *
+   * @return bool
+   */
   function HttpAuthentication($headers) {
     if (isset($headers['Authorization'])) {
       $auth_encode = $headers['Authorization'];
@@ -90,6 +102,11 @@ class GoogleResponse {
     return TRUE;
   }
 
+  /**
+   * @param $google_order
+   * @param string $amount
+   * @param $message_log
+   */
   function SendChargeOrder($google_order, $amount = '', $message_log) {
     $postargs = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
                    <charge-order xmlns=\"" . $this->schema_url . "\" google-order-number=\"" . $google_order . "\">";
@@ -102,6 +119,13 @@ class GoogleResponse {
     );
   }
 
+  /**
+   * @param $google_order
+   * @param $amount
+   * @param $reason
+   * @param $comment
+   * @param $message_log
+   */
   function SendRefundOrder($google_order, $amount, $reason, $comment, $message_log) {
     $postargs = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
                    <refund-order xmlns=\"" . $this->schema_url . "\" google-order-number=\"" . $google_order . "\">
@@ -114,6 +138,12 @@ class GoogleResponse {
     );
   }
 
+  /**
+   * @param $google_order
+   * @param $reason
+   * @param $comment
+   * @param $message_log
+   */
   function SendCancelOrder($google_order, $reason, $comment, $message_log) {
     $postargs = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
                    <cancel-order xmlns=\"" . $this->schema_url . "\" google-order-number=\"" . $google_order . "\">
@@ -125,6 +155,12 @@ class GoogleResponse {
     );
   }
 
+  /**
+   * @param $google_order
+   * @param $carrier
+   * @param $tracking_no
+   * @param $message_log
+   */
   function SendTrackingData($google_order, $carrier, $tracking_no, $message_log) {
     $postargs = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
                    <add-tracking-data xmlns=\"" . $this->schema_url . "\" google-order-number=\"" . $google_order . "\">
@@ -138,6 +174,11 @@ class GoogleResponse {
     );
   }
 
+  /**
+   * @param $google_order
+   * @param $merchant_order
+   * @param $message_log
+   */
   function SendMerchantOrderNumber($google_order, $merchant_order, $message_log) {
     $postargs = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
                    <add-merchant-order-number xmlns=\"" . $this->schema_url . "\" google-order-number=\"" . $google_order . "\">
@@ -148,6 +189,12 @@ class GoogleResponse {
     );
   }
 
+  /**
+   * @param $google_order
+   * @param $message
+   * @param string $send_mail
+   * @param $message_log
+   */
   function SendBuyerMessage($google_order, $message, $send_mail = "true", $message_log) {
     $postargs = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
                    <send-buyer-message xmlns=\"" . $this->schema_url . "\" google-order-number=\"" . $google_order . "\">
@@ -159,6 +206,10 @@ class GoogleResponse {
     );
   }
 
+  /**
+   * @param $google_order
+   * @param $message_log
+   */
   function SendProcessOrder($google_order, $message_log) {
     $postargs = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
                   <process-order xmlns=\"" . $this->schema_url . "\" google-order-number=\"" . $google_order . "\"/> ";
@@ -167,6 +218,13 @@ class GoogleResponse {
     );
   }
 
+  /**
+   * @param $google_order
+   * @param $carrier
+   * @param $tracking_no
+   * @param string $send_mail
+   * @param $message_log
+   */
   function SendDeliverOrder($google_order, $carrier, $tracking_no, $send_mail = "true", $message_log) {
     $postargs = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
                    <deliver-order xmlns=\"" . $this->schema_url . "\" google-order-number=\"" . $google_order . "\">
@@ -181,6 +239,10 @@ class GoogleResponse {
     );
   }
 
+  /**
+   * @param $google_order
+   * @param $message_log
+   */
   function SendArchiveOrder($google_order, $message_log) {
     $postargs = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
                    <archive-order xmlns=\"" . $this->schema_url . "\" google-order-number=\"" . $google_order . "\"/>";
@@ -189,6 +251,10 @@ class GoogleResponse {
     );
   }
 
+  /**
+   * @param $google_order
+   * @param $message_log
+   */
   function SendUnarchiveOrder($google_order, $message_log) {
     $postargs = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
                    <unarchive-order xmlns=\"" . $this->schema_url . "\" google-order-number=\"" . $google_order . "\"/>";
@@ -197,11 +263,17 @@ class GoogleResponse {
     );
   }
 
+  /**
+   * @param $merchant_calc
+   */
   function ProcessMerchantCalculations($merchant_calc) {
     $result = $merchant_calc->GetXML();
     echo $result;
   }
 
+  /**
+   * @return array
+   */
   function GetAuthenticationHeaders() {
     $headers = array();
     $headers[] = "Authorization: Basic " . base64_encode(
@@ -212,6 +284,12 @@ class GoogleResponse {
     return $headers;
   }
 
+  /**
+   * @param $url
+   * @param $header_arr
+   * @param $postargs
+   * @param $message_log
+   */
   function SendReq($url, $header_arr, $postargs, $message_log) {
     // Get the curl session object
     $session = curl_init($url);

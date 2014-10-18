@@ -2,9 +2,9 @@
 
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -44,6 +44,12 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   protected $_customGroupExtends = array(
     'Contribution', 'Membership');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array('CiviCampaign', $config->enableComponents);
@@ -252,22 +258,6 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           ),
         ),
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
       'civicrm_contribution_ordinality' =>
       array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -375,6 +365,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
       ),
     ) + $this->addAddressFields(FALSE);
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
     // Don't show Batch display column and filter unless batches are being used
@@ -552,6 +543,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param bool $applyLimit
+   */
   function tempTable($applyLimit = TRUE) {
     // create temp table with contact ids,contribtuion id,membership id
     $dropTempTable = 'DROP TABLE IF EXISTS civireport_membership_contribution_detail';
@@ -576,6 +570,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     CRM_Core_DAO::executeQuery($fillTemp);
   }
 
+  /**
+   * @param bool $applyLimit
+   *
+   * @return string
+   */
   function buildQuery($applyLimit = TRUE) {
     $this->select();
     //create temp table to be used as base table
@@ -611,6 +610,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -646,6 +650,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $checkList = array();

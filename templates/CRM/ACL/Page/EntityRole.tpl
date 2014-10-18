@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 {capture assign=aclURL}{crmURL p='civicrm/acl' q='reset=1'}{/capture}
 {capture assign=rolesURL}{crmURL p='civicrm/admin/options/acl_role' q='reset=1'}{/capture}
-{capture assign=docLink}{docURL page='user/initial-set-up/access-control' text='Access Control Documentation'}{/capture}
+{capture assign=docLink}{docURL page='user/current/initial-set-up/permissions-and-access-control/' text='Access Control Documentation'}{/capture}
 
 <div id="help" class="crm-block">
     <p>{ts 1=$docLink}ACLs allow you control access to CiviCRM data. An ACL consists of an <strong>Operation</strong> (e.g. 'View' or 'Edit'), a <strong>set of data</strong> that the operation can be performed on (e.g. a group of contacts), and a <strong>Role</strong> that has permission to do this operation. Refer to the %1 for more info.{/ts}</p>
@@ -54,12 +54,12 @@
         </thead>
         <tbody>
         {foreach from=$rows item=row}
-      <tr id="acl_role-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-acl_entity_role crm-entity {if NOT $row.is_active} disabled{/if}">
-          <td class="crm-acl_entity_role-acl_role">{$row.acl_role}</td>
-          <td class="crm-acl_entity_role-entity">{$row.entity}</td>
-          <td class="crm-acl_entity_role-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
-            </tr>
+          <tr id="acl_role-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-acl_entity_role crm-entity {if NOT $row.is_active} disabled{/if}">
+            <td class="crm-acl_entity_role-acl_role">{$row.acl_role}</td>
+            <td class="crm-acl_entity_role-entity">{$row.entity}</td>
+            <td class="crm-acl_entity_role-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td>{$row.action|replace:'xx':$row.id}</td>
+          </tr>
         {/foreach}
         </tbody>
     </table>

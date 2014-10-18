@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -91,7 +91,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'qs' => 'reset=1&action=copy&id=%%id%%',
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'title' => ts('Copy Event'),
-        ),
+        )
       );
     }
     return self::$_actionLinks;
@@ -99,6 +99,8 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
   /**
    * Get tab  Links for events
+   *
+   * @param $enableCart
    *
    * @return array (reference) of tab links
    */
@@ -108,48 +110,64 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       self::$_tabLinks = array();
     }
     if (!isset(self::$_tabLinks[$cacheKey])) {
-      self::$_tabLinks[$cacheKey] = array(
-        'settings' => array(
+      self::$_tabLinks[$cacheKey]['settings'] =
+        array(
           'title' => ts('Info and Settings'),
           'url' => 'civicrm/event/manage/settings',
           'field' => 'id'
-        ),
-        'location' => array(
+        );
+      self::$_tabLinks[$cacheKey]['location'] =
+        array(
           'title' => ts('Location'),
           'url' => 'civicrm/event/manage/location',
           'field' => 'loc_block_id',
-        ),
-        'fee' => array(
+        );
+
+      self::$_tabLinks[$cacheKey]['fee'] =
+        array(
           'title' => ts('Fees'),
           'url' => 'civicrm/event/manage/fee',
           'field' => 'is_monetary',
-        ),
-        'registration' => array(
+        );
+      self::$_tabLinks[$cacheKey]['registration'] =
+        array(
           'title' => ts('Online Registration'),
           'url' => 'civicrm/event/manage/registration',
           'field' => 'is_online_registration',
-        ),
-        'reminder' => array(
+        );
+      if (CRM_Core_Permission::check('administer CiviCRM')) {
+      self::$_tabLinks[$cacheKey]['reminder'] =
+        array(
           'title' => ts('Schedule Reminders'),
           'url' => 'civicrm/event/manage/reminder',
           'field' => 'reminder',
-        ),
-        'conference' => array(
+        );
+      }
+      self::$_tabLinks[$cacheKey]['conference'] =
+        array(
           'title' => ts('Conference Slots'),
           'url' => 'civicrm/event/manage/conference',
           'field' => 'slot_label_id',
-        ),
-        'friend' => array(
+        );
+      self::$_tabLinks[$cacheKey]['friend'] =
+        array(
           'title' => ts('Tell a Friend'),
           'url' => 'civicrm/event/manage/friend',
           'field' => 'friend',
-        ),
-        'pcp' => array(
+        );
+      self::$_tabLinks[$cacheKey]['pcp'] =
+        array(
           'title' => ts('Personal Campaign Pages'),
           'url' => 'civicrm/event/manage/pcp',
           'field' => 'is_pcp_enabled',
-        ),
-      );
+        );
+      self::$_tabLinks[$cacheKey]['repeat'] =
+        array(
+          'title' => ts('Repeat'),
+          'url' => 'civicrm/event/manage/repeat',
+          'field' => 'is_repeating_event',
+        );
+
     }
 
     if (!$enableCart) {
@@ -228,6 +246,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * @return void
    */
   function browse() {
+    $this->assign('includeWysiwygEditor', TRUE);
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this
@@ -298,6 +317,16 @@ ORDER BY start_date desc
     while ($dao->fetch()) {
       if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
         $manageEvent[$dao->id] = array();
+        $isRepeatingEvent = CRM_Core_BAO_RecurringEntity::getParentFor($dao->id, 'civicrm_event');
+        $manageEvent[$dao->id]['repeat'] = '';
+        if ($isRepeatingEvent) {
+          if ($dao->id == $isRepeatingEvent) {
+            $manageEvent[$dao->id]['repeat'] = 'Repeating Event - (Parent)';
+          }
+          else {
+            $manageEvent[$dao->id]['repeat'] = 'Repeating Event - (Child)';
+          }
+        }
         CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
 
         // form all action links
@@ -349,7 +378,7 @@ ORDER BY start_date desc
         $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
         $manageEvent[$dao->id]['is_pcp_enabled'] = CRM_Utils_Array::value($dao->id, $eventPCPS);
         $manageEvent[$dao->id]['event_type'] = CRM_Utils_Array::value($manageEvent[$dao->id]['event_type_id'], $eventType);
-        
+        $manageEvent[$dao->id]['is_repeating_event'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_RecurringEntity', $dao->id, 'parent_id', 'entity_id');
         // allow hooks to set 'field' value which allows configuration pop-up to show a tab as enabled/disabled
         CRM_Utils_Hook::tabset('civicrm/event/manage/rows', $manageEvent, array('event_id' => $dao->id));
       }
@@ -404,6 +433,13 @@ ORDER BY start_date desc
     $form->run();
   }
 
+  /**
+   * @param $params
+   * @param bool $sortBy
+   * @param $force
+   *
+   * @return string
+   */
   function whereClause(&$params, $sortBy = TRUE, $force) {
     $values    = array();
     $clauses   = array();
@@ -492,6 +528,10 @@ ORDER BY start_date desc
     return !empty($clauses) ? implode(' AND ', $clauses) : '(1)';
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pager($whereClause, $whereParams) {
 
     $params['status'] = ts('Event %%StatusMessage%%');
@@ -514,6 +554,10 @@ SELECT count(id)
     $this->assign_by_ref('pager', $this->_pager);
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pagerAtoZ($whereClause, $whereParams) {
 
     $query = "

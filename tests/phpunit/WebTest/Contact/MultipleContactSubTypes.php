@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_MultipleContactSubTypes
+ */
 class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -236,9 +240,11 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added.");
     $gid = $this->urlArg('gid');
 
+    // Add field
+    $this->openCiviPage('admin/custom/group/field/add', "reset=1&action=add&gid=$gid");
     $fieldLabel = "custom_field_for_{$contactSubType}" . substr(sha1(rand()), 0, 4);
     $this->type('label', $fieldLabel);
-    $this->click('_qf_Field_next-bottom');
+    $this->click('_qf_Field_done-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
     return array($customGroupTitle, $gid);

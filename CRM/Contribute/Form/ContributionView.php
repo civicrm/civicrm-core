@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -54,6 +54,12 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
+    $cancelledStatus = TRUE;
+    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    if (CRM_Utils_Array::value('contribution_status_id', $values) == array_search('Cancelled', $status)) {
+      $cancelledStatus = FALSE;
+    }
+    $this->assign('cancelledStatus', $cancelledStatus);
 
     if (!empty($values['contribution_page_id'])) {
       $contribPages = CRM_Contribute_PseudoConstant::contributionPage(NULL, TRUE);
@@ -116,13 +122,25 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $values['billing_address'] = $addressDetails[0]['display'];
     }
 
-    //get soft credit record if exists.
-    $values['softContributions'] = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($values['contribution_id']);
+    //assign soft credit record if exists.
+    $SCRecords = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($values['contribution_id'], TRUE);
+    if (!empty($SCRecords['soft_credit'])) {
+      $this->assign('softContributions', $SCRecords['soft_credit']);
+      unset($SCRecords['soft_credit']);
+    }
+
+    //assign pcp record if exists
+    foreach ($SCRecords as $name => $value) {
+      $this->assign($name, $value);
+    }
 
     $lineItems = array();
     if ($id) {
-      $lineItem = CRM_Price_BAO_LineItem::getLineItems($id, 'contribution', 1);
-      empty($lineItem) ? null :$lineItems[] =  $lineItem;
+      $lineItem = CRM_Price_BAO_LineItem::getLineItems($id, 'contribution', 1, TRUE, TRUE);
+      if (!empty($lineItem)) {
+        $lineItems[] = $lineItem;
+      }
+
     }
     $this->assign('lineItem', empty($lineItems) ? FALSE : $lineItems);
     $values['totalAmount'] = $values['total_amount'];
@@ -135,6 +153,12 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     // assign values to the template
     $this->assign($values);
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $this->assign('invoicing', $invoicing);
+    if ($invoicing && isset($values['tax_amount'])) {
+      $this->assign('totalTaxAmount', $values['tax_amount']);
+    }
 
     $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
     $this->assign('displayName', $displayName);
@@ -194,4 +218,3 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     );
   }
 }
-

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Mailing
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -45,6 +45,8 @@
  * Handle a create event.
  *
  * @param array $params
+ * @param array $ids
+ *
  * @return array API Success Array
  */
 function civicrm_api3_mailing_create($params, $ids = array()) {
@@ -64,12 +66,15 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   // making required for simplicity
   $params['created_id']['api.required'] = 1;
   $params['api.mailing_job.create']['api.default'] = 1;
+  $params['api.mailing_job.create']['title'] = 'Schedule Mailing?';
 }
 
 /**
  * Handle a delete event.
  *
  * @param array $params
+ * @param array $ids
+ *
  * @return array API Success Array
  */
 function civicrm_api3_mailing_delete($params, $ids = array()) {
@@ -92,6 +97,7 @@ function civicrm_api3_mailing_get($params) {
  *
  * @param array $params
  *
+ * @throws API_Exception
  * @return array
  */
 function civicrm_api3_mailing_event_bounce($params) {
@@ -118,9 +124,13 @@ function civicrm_api3_mailing_event_bounce($params) {
  */
 function _civicrm_api3_mailing_event_bounce_spec(&$params) {
   $params['job_id']['api.required'] = 1;
+  $params['job_id']['title'] = 'Job ID';
   $params['event_queue_id']['api.required'] = 1;
+  $params['event_queue_id']['title'] = 'Event Queue ID';
   $params['hash']['api.required'] = 1;
+  $params['hash']['title'] = 'Hash';
   $params['body']['api.required'] = 1;
+  $params['body']['title'] = 'Body';
 }
 
 /**
@@ -133,6 +143,14 @@ function _civicrm_api3_mailing_event_bounce_spec(&$params) {
  */
 function civicrm_api3_mailing_event_confirm($params) {
   return civicrm_api('mailing_event_confirm', 'create', $params);
+}
+
+/**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_mailing_deprecation() {
+  return array('event_confirm' => 'Mailing api "event_confirm" action is deprecated. Use the mailing_event_confirm api instead.');
 }
 
 /**
@@ -170,9 +188,13 @@ function civicrm_api3_mailing_event_reply($params) {
  */
 function _civicrm_api3_mailing_event_reply_spec(&$params) {
   $params['job_id']['api.required'] = 1;
+  $params['job_id']['title'] = 'Job ID';
   $params['event_queue_id']['api.required'] = 1;
+  $params['event_queue_id']['title'] = 'Event Queue ID';
   $params['hash']['api.required'] = 1;
+  $params['hash']['title'] = 'Hash';
   $params['replyTo']['api.required'] = 0;
+  $params['replyTo']['title'] = 'Reply To';//doesn't really explain adequately
 }
 
 /**
@@ -207,9 +229,13 @@ function civicrm_api3_mailing_event_forward($params) {
  */
 function _civicrm_api3_mailing_event_forward_spec(&$params) {
   $params['job_id']['api.required'] = 1;
+  $params['job_id']['title'] = 'Job ID';
   $params['event_queue_id']['api.required'] = 1;
+  $params['event_queue_id']['title'] = 'Event Queue ID';
   $params['hash']['api.required'] = 1;
+  $params['hash']['title'] = 'Hash';
   $params['email']['api.required'] = 1;
+  $params['email']['title'] = 'Forwarded to Email';
 }
 
 /**

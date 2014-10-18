@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Event
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Event.php 30964 2010-11-29 09:41:54Z shot $
  *
  */
@@ -62,22 +62,10 @@ function civicrm_api3_event_create($params) {
     $copy = CRM_Event_BAO_Event::copy($params['template_id']);
     $params['id'] = $copy->id;
     unset($params['template_id']);
-    if (empty($params['is_template'])) {
-      $params['is_template'] = 0;
-    }
   }
 
   _civicrm_api3_event_create_legacy_support_42($params);
-
-  //format custom fields so they can be added
-  $values = array();
-  _civicrm_api3_custom_format_params($params, $values, 'Event');
-  $params = array_merge($values, $params);
-
-  $eventBAO = CRM_Event_BAO_Event::create($params);
-  $event = array();
-  _civicrm_api3_object_to_array($eventBAO, $event[$eventBAO->id]);
-  return civicrm_api3_create_success($event, $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Event');
 }
 
 /**
@@ -91,6 +79,7 @@ function _civicrm_api3_event_create_spec(&$params) {
   $params['title']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
+  $params['is_template']['api.default'] = 0;
 }
 
 /**
@@ -139,13 +128,6 @@ function civicrm_api3_event_get($params) {
   $eventDAO = new CRM_Event_BAO_Event();
   _civicrm_api3_dao_set_filter($eventDAO, $params, TRUE, 'Event');
 
-  if (!empty($params['is_template'])) {
-    $eventDAO->whereAdd( '( is_template = 1 )' );
-  }
-  elseif(empty($eventDAO->id)){
-    $eventDAO->whereAdd('( is_template IS NULL ) OR ( is_template = 0 )');
-  }
-
   if (!empty($params['isCurrent'])) {
     $eventDAO->whereAdd('(start_date >= CURDATE() || end_date >= CURDATE())');
   }
@@ -154,6 +136,8 @@ function civicrm_api3_event_get($params) {
   // the return.is_full to deal with.
   // NB the std dao_to_array function should only return custom if required.
   $event = array();
+  $options = _civicrm_api3_get_options_from_params($params);
+
   $eventDAO->find();
   while ($eventDAO->fetch()) {
     $event[$eventDAO->id] = array();
@@ -163,6 +147,9 @@ function civicrm_api3_event_get($params) {
     }
     _civicrm_api3_event_get_legacy_support_42($event, $eventDAO->id);
     _civicrm_api3_custom_data_get($event[$eventDAO->id], 'Event', $eventDAO->id, NULL, $eventDAO->event_type_id);
+    if(!empty($options['return'])) {
+      $event[$eventDAO->id]['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventDAO->id);
+    }
   }
   //end of the loop
 
@@ -220,6 +207,10 @@ function civicrm_api3_event_delete($params) {
  * @param int $event_id Id of the event to be updated
  *
  */
+/**
+ * @param $event
+ * @param $event_id
+ */
 function _civicrm_api3_event_getisfull(&$event, $event_id) {
   $eventFullResult = CRM_Event_BAO_Participant::eventFull($event_id, 1);
   if (!empty($eventFullResult) && is_int($eventFullResult)) {
@@ -233,7 +224,7 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
 
 
 /**
- * Overrides _civicrm_api3_generic_getlist_params.
+ * @see _civicrm_api3_generic_getlist_params.
  *
  * @param $request array
  */
@@ -248,7 +239,7 @@ function _civicrm_api3_event_getlist_params(&$request) {
 }
 
 /**
- * Overrides _civicrm_api3_generic_getlist_output
+ * @see _civicrm_api3_generic_getlist_output
  *
  * @param $result array
  * @param $request array

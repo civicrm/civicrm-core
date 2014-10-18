@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_File
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
  *
  */
@@ -95,14 +95,14 @@ function civicrm_api3_file_get($params) {
  * Update an existing file
  *
  * This api is used for updating an existing file.
- * Required parrmeters : id of a file
+ * Required parameters : id of a file
  *
- * @param  Array   $params  an associative array of name/value property values of civicrm_file
+ * @param  Array   $params an array of name/value property values of civicrm_file
  *
  * @return array of updated file object property values
  * @access public
  */
-function &civicrm_api3_file_update($params) {
+function civicrm_api3_file_update($params) {
 
   if (!isset($params['id'])) {
     return civicrm_api3_create_error('Required parameter missing');
@@ -128,11 +128,10 @@ function &civicrm_api3_file_update($params) {
  * This API is used for deleting a file
  * Required parameters : id of a file
  *
- * @param  Int  $fileId  Id of the file to be deleted
+ * @param $params
  *
- * @return null if successfull, object of CRM_Core_Error otherwise
+ * @return array API result array
  * @access public
-
  */
 function civicrm_api3_file_delete($params) {
 

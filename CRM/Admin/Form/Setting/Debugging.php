@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -39,6 +39,12 @@
  */
 class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
+  protected $_settings = array(
+    'debug_enabled' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'backtrace' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'fatalErrorTemplate' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'fatalErrorHandler' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+  );
   /**
    * Function to build the form
    *
@@ -47,16 +53,9 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts(' Settings - Debugging and Error Handling '));
-
-    $config = CRM_Core_Config::singleton();
-
-    $this->addYesNo('debug', ts('Enable Debugging'));
-    if ($config->userSystem->is_drupal == '1') {
-      $this->addYesNo('userFrameworkLogging', ts('Enable Drupal Watchdog Logging'));
+    if (CRM_Core_Config::singleton()->userSystem->supports_UF_Logging == '1') {
+      $this->_settings['userFrameworkLogging'] = CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME;
     }
-    $this->addYesNo('backtrace', ts('Display Backtrace'));
-    $this->addElement('text', 'fatalErrorTemplate', ts('Fatal Error Template'));
-    $this->addElement('text', 'fatalErrorHandler', ts('Fatal Error Handler'));
 
     parent::buildQuickForm();
   }

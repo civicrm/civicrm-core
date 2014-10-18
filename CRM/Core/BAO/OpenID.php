@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -95,6 +95,8 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    * Get all the openids for a specified contact_id, with the primary openid being first
    *
    * @param int $id the contact id
+   *
+   * @param bool $updateBlankLocInfo
    *
    * @return array  the array of openid's
    * @access public

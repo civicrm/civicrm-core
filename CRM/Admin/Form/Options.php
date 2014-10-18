@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -150,6 +150,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('%1 Option', array(1 => $this->_gLabel)));
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -197,7 +199,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $financialAccount = CRM_Contribute_PseudoConstant::financialAccount(NULL, key($accountType));
 
       $this->add('select', 'financial_account_id', ts('Financial Account'),
-        array('' => ts('- select -')) + $financialAccount
+        array('' => ts('- select -')) + $financialAccount,
+        TRUE
       );
     }
 
@@ -258,7 +261,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       (($this->_action & CRM_Core_Action::ADD) || !$isReserved)
     ) {
       $caseID = CRM_Core_Component::getComponentID('CiviCase');
-      $components = array('' => ts('Contacts OR Cases'), $caseID => ts('Cases Only'));
+      $components = array('' => ts('Contacts AND Cases'), $caseID => ts('Cases Only'));
       $this->add('select',
         'component_id',
         ts('Component'),
@@ -284,6 +287,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'payment_instrument',
       'communication_style',
       'soft_credit_type',
+      'website_type',
     );
 
     if (in_array($this->_gName, $showIsDefaultGroups)) {
@@ -435,4 +439,5 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', array(1 => $this->_gLabel, 2 => $optionValue->label)), ts('Saved'), 'success');
     }
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@ require_once 'CRM/Core/Component/Info.php';
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -45,6 +45,15 @@ class CRM_Touchstone_Info extends CRM_Core_Component_Info {
   protected $keyword = 'touchstone';
 
   // docs inherited from interface
+  /**
+   * Provides base information about the component.
+   * Needs to be implemented in component's information
+   * class.
+   *
+   * @return array collection of required component settings
+   * @access public
+   *
+   */
   public function getInfo() {
     return array('name' => 'CiviTouchstone',
       'translatedName' => ts('CiviTouchstone'),
@@ -54,11 +63,23 @@ class CRM_Touchstone_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function getPermissions() {
     return array('access CiviTouchstone');
   }
 
   // docs inherited from interface
+  /**
+   * Provides information about user dashboard element
+   * offered by this component.
+   *
+   * @return array|null collection of required dashboard settings,
+   *                    null if no element offered
+   * @access public
+   *
+   */
   public function getUserDashboardElement() {
     return array('name' => ts('Touchstone'),
       'title' => ts('Your Touchstone'),
@@ -68,6 +89,15 @@ class CRM_Touchstone_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * Provides information about user dashboard element
+   * offered by this component.
+   *
+   * @return array|null collection of required dashboard settings,
+   *                    null if no element offered
+   * @access public
+   *
+   */
   public function registerTab() {
     return array('title' => ts('Touchstone'),
       'url' => 'touchstone',
@@ -76,6 +106,15 @@ class CRM_Touchstone_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * Provides information about advanced search pane
+   * offered by this component.
+   *
+   * @return array|null collection of required pane settings,
+   *                    null if no element offered
+   * @access public
+   *
+   */
   public function registerAdvancedSearchPane() {
     return array('title' => ts('Touchstone'),
       'weight' => 25,
@@ -83,11 +122,24 @@ class CRM_Touchstone_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * Provides potential activity types that this
+   * component might want to register in activity history.
+   * Needs to be implemented in component's information
+   * class.
+   *
+   * @return array|null collection of activity types
+   * @access public
+   *
+   */
   public function getActivityTypes() {
     return NULL;
   }
 
   // add shortcut to Create New
+  /**
+   * @param $shortCuts
+   */
   public function creatNewShortcut(&$shortCuts) {}
 }
 

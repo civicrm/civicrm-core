@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -54,8 +54,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       return NULL;
     }
 
-    $config = CRM_Core_Config::singleton();
-    $params['domain_id'] = CRM_Core_Config::domainID();
+    $instanceID = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('instance_id', $params));
 
     // convert roles array to string
     if (isset($params['grouprole']) && is_array($params['grouprole'])) {
@@ -68,13 +67,9 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       );
     }
 
-    if (!isset($params['id'])) {
+    if (!$instanceID || !isset($params['id'])) {
       $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
-    }
-
-    $instanceID = CRM_Utils_Array::value('id', $params);
-    if (!empty($params['instance_id'])) {
-      $instanceID = CRM_Utils_Array::value('instance_id', $params);
+      $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
     }
 
     if ($instanceID) {
@@ -87,7 +82,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     $instance = new CRM_Report_DAO_ReportInstance();
     $instance->copyValues($params);
 
-    if ($config->userFramework == 'Joomla') {
+    if (CRM_Core_Config::singleton()->userFramework == 'Joomla') {
       $instance->permission = 'null';
     }
 
@@ -191,7 +186,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       if (empty($params['id']) && empty($params['instance_id']) && !empty($navigationParams['id'])) {
         unset($navigationParams['id']);
       }
-      $navigationParams['url'] = "civicrm/report/instance/{$instance->id}&reset=1";
+      $navigationParams['url'] = "civicrm/report/instance/{$instance->id}?reset=1";
       $navigation = CRM_Core_BAO_Navigation::add($navigationParams);
 
       if (!empty($navigationParams['is_active'])) {
@@ -214,9 +209,13 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
         $section = 1;
         $chart   = "&charts=" . $params['charts'];
       }
-
-      $dashletParams['url'] = "civicrm/report/instance/{$instance->id}&reset=1&section={$section}&snippet=5{$chart}&context=dashlet";
-      $dashletParams['fullscreen_url'] = "civicrm/report/instance/{$instance->id}&reset=1&section={$section}&snippet=5{$chart}&context=dashletFullscreen";
+      $limitResult = NULL;
+      if (CRM_Utils_Array::value('row_count', $params)) {
+        $limitResult = '&rowCount=' . $params['row_count'];
+      }
+      $dashletParams['name'] = "report/{$instance->id}";
+      $dashletParams['url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}&snippet=5{$chart}&context=dashlet" . $limitResult;
+      $dashletParams['fullscreen_url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}&snippet=5{$chart}&context=dashletFullscreen" . $limitResult;
       $dashletParams['instanceURL'] = "civicrm/report/instance/{$instance->id}";
       CRM_Core_BAO_Dashboard::addDashlet($dashletParams);
     }
@@ -228,9 +227,9 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
   /**
    * Delete the instance of the Report
    *
-   * @return $results no of deleted Instance on success, false otherwise
-   * @access public
+   * @param null $id
    *
+   * @return mixed $results no of deleted Instance on success, false otherwise@access public
    */
   static function del($id = NULL) {
     $dao = new CRM_Report_DAO_ReportInstance();
@@ -238,6 +237,12 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     return $dao->delete();
   }
 
+  /**
+   * @param $params
+   * @param $defaults
+   *
+   * @return CRM_Report_DAO_ReportInstance|null
+   */
   static function retrieve($params, &$defaults) {
     $instance = new CRM_Report_DAO_ReportInstance();
     $instance->copyValues($params);

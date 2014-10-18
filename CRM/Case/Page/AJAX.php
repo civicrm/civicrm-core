@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  *
  */
 
@@ -41,30 +41,27 @@ class CRM_Case_Page_AJAX {
    * Retrieve unclosed cases.
    */
   static function unclosedCases() {
-    $criteria = explode('-', CRM_Utils_Type::escape(CRM_Utils_Array::value('s', $_GET), 'String'));
-
-    $limit = CRM_Utils_Array::value('limit', $_GET);
-    if ($limit) {
-      $limit = CRM_Utils_Type::escape($limit, 'Integer');
-    }
-
     $params = array(
-      'limit' => $limit,
-      'case_type' => trim(CRM_Utils_Array::value(1, $criteria)),
-      'sort_name' => trim(CRM_Utils_Array::value(0, $criteria)),
+      'limit' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10),
+      'sort_name' => CRM_Utils_Type::escape(CRM_Utils_Array::value('term', $_GET, ''), 'String'),
     );
 
     $excludeCaseIds = array();
-    if ($caseIdStr = CRM_Utils_Array::value('excludeCaseIds', $_GET)) {
-      $excludeIdStr = CRM_Utils_Type::escape($caseIdStr, 'String');
-      $excludeCaseIds = explode(',', $excludeIdStr);
+    if (!empty($_GET['excludeCaseIds'])) {
+      $excludeCaseIds = explode(',', CRM_Utils_Type::escape($_GET['excludeCaseIds'], 'String'));
     }
-    $unclosedCases = CRM_Case_BAO_Case::getUnclosedCases($params, $excludeCaseIds);
+    $unclosedCases = CRM_Case_BAO_Case::getUnclosedCases($params, $excludeCaseIds, TRUE, TRUE);
     $results = array();
     foreach ($unclosedCases as $caseId => $details) {
-      $results["$caseId|" . $details['contact_id'] . '|' . $details['case_type'] . '|' . $details['sort_name']] = $details['sort_name'] . ' (' . $details['case_type'] . ': ' . $details['case_subject'] . ')';
+      $results[] = array(
+        'id' => $caseId,
+        'label' => $details['sort_name'] . ' - ' . $details['case_type'] . ($details['end_date'] ? ' (' . ts('closed') . ')' : ''),
+        'label_class' => $details['end_date'] ? 'strikethrough' : '',
+        'description' => array($details['case_subject'] . ' (' . $details['case_status'] . ')'),
+        'extra' => $details,
+      );
     }
-    CRM_Core_Page_AJAX::autocompleteResults($results);
+    CRM_Utils_JSON::output($results);
   }
 
   function processCaseTags() {
@@ -129,18 +126,17 @@ class CRM_Case_Page_AJAX {
 
   function caseDetails() {
     $caseId    = CRM_Utils_Type::escape($_GET['caseId'], 'Integer');
-    $sql       = "SELECT * FROM civicrm_case where id = %1";
+    $sql       = "SELECT civicrm_case.*, civicrm_case_type.title as case_type
+        FROM civicrm_case
+        INNER JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
+        WHERE civicrm_case.id = %1";
     $dao       = CRM_Core_DAO::executeQuery($sql, array(1 => array($caseId, 'Integer')));
 
     if ($dao->fetch()) {
-      $caseType = CRM_Case_BAO_Case::getCaseType((str_replace(CRM_Core_DAO::VALUE_SEPARATOR,
-            "",
-            $dao->case_type_id
-          )));
       $caseStatuses = CRM_Case_PseudoConstant::caseStatus();
       $cs           = $caseStatuses[$dao->status_id];
       $caseDetails  = "<table><tr><td>" . ts('Case Subject') . "</td><td>{$dao->subject}</td></tr>
-                                    <tr><td>" . ts('Case Type') . "</td><td>{$caseType}</td></tr>
+                                    <tr><td>" . ts('Case Type') . "</td><td>{$dao->case_type}</td></tr>
                                     <tr><td>" . ts('Case Status') . "</td><td>{$cs}</td></tr>
                                     <tr><td>" . ts('Case Start Date') . "</td><td>" . CRM_Utils_Date::customFormat($dao->start_date) . "</td></tr>
                                     <tr><td>" . ts('Case End Date') . "</td><td></td></tr>" . CRM_Utils_Date::customFormat($dao->end_date) . "</table>";
@@ -185,8 +181,7 @@ class CRM_Case_Page_AJAX {
     );
 
     CRM_Case_BAO_Case::processCaseActivity($caseParams);
-    echo json_encode(TRUE);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(TRUE);
   }
 
   /**

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Participant
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Participant.php 30486 2010-11-02 16:12:09Z shot $
  *
  */
@@ -81,31 +81,58 @@ function civicrm_api3_participant_create($params) {
  * Create a default participant line item
  */
 function _civicrm_api3_participant_createlineitem(&$params, $participant){
-  $sql = "
-SELECT      ps.id AS setID, pf.id AS priceFieldID, pfv.id AS priceFieldValueID
-FROM  civicrm_price_set_entity cpse
-LEFT JOIN civicrm_price_set ps ON cpse.price_set_id = ps.id AND cpse.entity_id = {$params['event_id']} AND cpse.entity_table = 'civicrm_event'
-LEFT JOIN   civicrm_price_field pf ON pf.`price_set_id` = ps.id
-LEFT JOIN   civicrm_price_field_value pfv ON pfv.price_field_id = pf.id and pfv.label = '{$params['fee_level']}'
-where ps.id is not null
-";
+  // it is possible that a fee level contains information about multiple
+  // price field values.
 
-  $dao = CRM_Core_DAO::executeQuery($sql);
-  if ($dao->fetch()) {
-    $amount = CRM_Utils_Array::value('fee_amount', $params, 0);
-    $lineItemparams = array(
-      'price_field_id' => $dao->priceFieldID,
-      'price_field_value_id' => $dao->priceFieldValueID,
-      'entity_table' => 'civicrm_participant',
-      'entity_id' => $participant->id,
-      'label' => $params['fee_level'],
-      'qty' => 1,
-      'participant_count' => 0,
-      'unit_price' => $amount,
-      'line_total' => $amount,
-      'version' => 3,
+  $priceFieldValueDetails = CRM_Utils_Array::explodePadded(
+    $params["fee_level"]);
+
+  foreach($priceFieldValueDetails as $detail) {
+    if (preg_match('/- ([0-9]+)$/', $detail, $matches)) {
+      // it is possible that a price field value is payd for multiple times.
+      // (FIXME: if the price field value ends in minus followed by whitespace
+      // and a number, things will go wrong.)
+
+      $qty = $matches[1];
+      preg_match('/^(.*) - [0-9]+$/', $detail, $matches);
+      $label = $matches[1];
+    }
+    else {
+      $label = $detail;
+      $qty = 1;
+    }
+
+    $sql = "
+      SELECT      ps.id AS setID, pf.id AS priceFieldID, pfv.id AS priceFieldValueID, pfv.amount AS amount
+      FROM  civicrm_price_set_entity cpse
+      LEFT JOIN civicrm_price_set ps ON cpse.price_set_id = ps.id AND cpse.entity_id = %1 AND cpse.entity_table = 'civicrm_event'
+      LEFT JOIN   civicrm_price_field pf ON pf.`price_set_id` = ps.id
+      LEFT JOIN   civicrm_price_field_value pfv ON pfv.price_field_id = pf.id
+      where ps.id is not null and pfv.label = %2
+    ";
+
+    $qParams = array(
+      1 => array($params['event_id'], 'Integer'),
+      2 => array($label, 'String'),
     );
-    civicrm_api('line_item', 'create', $lineItemparams);
+
+    $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
+    if ($dao->fetch()) {
+      $lineItemparams = array(
+        'price_field_id' => $dao->priceFieldID,
+        'price_field_value_id' => $dao->priceFieldValueID,
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participant->id,
+        'label' => $label,
+        'qty' => $qty,
+        'participant_count' => 0,
+        'unit_price' => $dao->amount,
+        'line_total' => $qty*$dao->amount,
+        'version' => 3,
+      );
+      civicrm_api('line_item', 'create', $lineItemparams);
+    }
+
   }
 }
 
@@ -138,35 +165,15 @@ function _civicrm_api3_participant_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_participant_get($params) {
+  $mode = CRM_Contact_BAO_Query::MODE_EVENT;
+  $entity = 'participant';
 
-  $options          = _civicrm_api3_get_options_from_params($params, TRUE,'participant','get');
-  $sort             = CRM_Utils_Array::value('sort', $options, NULL);
-  $offset           = CRM_Utils_Array::value('offset', $options);
-  $rowCount         = CRM_Utils_Array::value('limit', $options);
-  $smartGroupCache  = CRM_Utils_Array::value('smartGroupCache', $params);
-  $inputParams      = CRM_Utils_Array::value('input_params', $options, array());
-  $returnProperties = CRM_Utils_Array::value('return', $options, NULL);
-
-  if (empty($returnProperties)) {
-    $returnProperties = CRM_Event_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_EVENT);
-  }
-  $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
-  $query = new CRM_Contact_BAO_Query($newParams, $returnProperties, NULL,
-    FALSE, FALSE, CRM_Contact_BAO_Query::MODE_EVENT
-  );
-  list($select, $from, $where, $having) = $query->query();
-
-  $sql = "$select $from $where $having";
-
-  if (!empty($sort)) {
-    $sql .= " ORDER BY $sort ";
-  }
-  $sql .= " LIMIT $offset, $rowCount ";
-  $dao = CRM_Core_DAO::executeQuery($sql);
+  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, $entity);
 
   $participant = array();
   while ($dao->fetch()) {
     $participant[$dao->participant_id] = $query->store($dao);
+    //@todo - is this required - contribution & pledge use the same query but don't self-retrieve custom data
     _civicrm_api3_custom_data_get($participant[$dao->participant_id], 'Participant', $dao->participant_id, NULL);
   }
 
@@ -181,6 +188,7 @@ function civicrm_api3_participant_get($params) {
  */
 function _civicrm_api3_participant_get_spec(&$params) {
   $params['participant_test']['api.default'] = 0;
+  $params['participant_test']['title'] = 'Get Test Participants';
 }
 
 /**
@@ -188,9 +196,11 @@ function _civicrm_api3_participant_get_spec(&$params) {
  *
  * This API is used for deleting a contact participant
  *
- * @param  array  $params Array containing  Id of the contact participant to be deleted
+ * @param  array $params Array containing  Id of the contact participant to be deleted
  *
  * {@getfields participant_delete}
+ * @throws Exception
+ * @return array
  * @access public
  */
 function civicrm_api3_participant_delete($params) {

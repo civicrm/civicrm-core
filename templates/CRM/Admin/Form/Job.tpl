@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,33 +66,35 @@
         <div class="description">{ts}Put in the API method name. You need to enter pieces of full API function name as described in the documentation.{/ts}</div>
 <script>
 {literal}
+CRM.$(function($) {
   function assembleName( ) {
 
     // dunno yet
     var apiName = "";
 
     // building prefix
-    if( cj('#api_action').val() == '' ) {
-      cj('#fname').html( "<em>API name will start appearing here as you type in fields below.</em>" );
+    if( $('#api_action').val() == '' ) {
+      $('#fname').html( "<em>API name will start appearing here as you type in fields below.</em>" );
       return;
     }
 
-    apiPrefix = 'api'
+    var apiPrefix = 'api'
 
     // building entity
-    var apiEntity = cj('#api_entity').val().replace( /([A-Z])/g, function($1) {
-                                                   return $1.toLowerCase();
-                                                   });
+    var apiEntity = $('#api_entity').val().replace( /([A-Z])/g, function($1) {
+      return $1.toLowerCase();
+    });
     // building action
-    var apiAction = cj('#api_action').val().replace(/(\_[a-z])/g, function($1) {return $1.toUpperCase().replace('_','');});
+    var apiAction = $('#api_action').val().replace(/(\_[a-z])/g, function($1) {return $1.toUpperCase().replace('_','');});
     apiName = apiPrefix + '.' + apiEntity + '.' + apiAction;
-    cj('#fname').text( apiName );
+    $('#fname').text( apiName );
   }
 
   // bind to different events to build API name live
-  cj(document).ready( function() { assembleName() } );
-  cj('#api_entity').change( function() { assembleName() } );
-  cj('#api_action').keyup( function() { assembleName() } );
+  $('#api_entity').change(assembleName)
+  $('#api_action').change(assembleName).keyup(assembleName);
+  assembleName();
+});
 
 {/literal}
 </script>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -162,7 +162,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $this->assign('auto_renew', $this->_renewOption);
       }
       $this->addGroup($membership, 'membership_type', ts('Membership Types'));
-      $this->addGroup($membershipDefault, 'membership_type_default', ts('Membership Types Default'))->setAttribute('unselectable', TRUE);
+      $this->addGroup($membershipDefault, 'membership_type_default', ts('Membership Types Default'))->setAttribute('allowClear', TRUE);
 
       $this->addFormRule(array('CRM_Member_Form_MembershipBlock', 'formRule'), $this->_id);
     }
@@ -201,6 +201,9 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
+   *
+   * @param $files
+   * @param null $contributionPageId
    *
    * @return mixed true or array of errors
    * @access public

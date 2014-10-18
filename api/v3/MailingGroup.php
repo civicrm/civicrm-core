@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,10 +32,18 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_MailerGroup
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
+
+/**
+ * @deprecated api notice
+ * @return string to indicate this entire api entity is deprecated
+ */
+function _civicrm_api3_mailing_group_deprecation() {
+  return 'The mailing_group api is deprecated. Use the mailing_event apis instead.';
+}
 
 /**
  * Handle an unsubscribe event
@@ -86,6 +94,11 @@ function civicrm_api3_mailing_group_event_subscribe($params) {
   return civicrm_api('mailing_event_subscribe', 'create', $params);
 }
 
+/**
+ * @param $params
+ *
+ * @return array
+ */
 function civicrm_api3_mailing_group_getfields($params) {
   $dao = _civicrm_api3_get_DAO('Subscribe');
   $d = new $dao();
@@ -103,6 +116,6 @@ function civicrm_api3_mailing_group_getfields($params) {
     unset($field['pseudoconstant']);
   }
 
-  return civicrm_api3_create_success($fields);
+  return civicrm_api3_create_success($fields, $params, 'mailing_group', 'getfields');
 }
 

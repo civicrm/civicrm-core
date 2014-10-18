@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -57,9 +57,9 @@ class CRM_Utils_Cache_APCcache {
   /**
    * Constructor
    *
-   * @param array   $config  an array of configuration params
+   * @param array $config an array of configuration params
    *
-   * @return void
+   * @return \CRM_Utils_Cache_APCcache
    */
   function __construct(&$config) {
     if (isset($config['timeout'])) {
@@ -70,6 +70,12 @@ class CRM_Utils_Cache_APCcache {
     }
   }
 
+  /**
+   * @param $key
+   * @param $value
+   *
+   * @return bool
+   */
   function set($key, &$value) {
     if (!apc_store($this->_prefix . $key, $value, $this->_timeout)) {
       return FALSE;
@@ -77,10 +83,20 @@ class CRM_Utils_Cache_APCcache {
     return TRUE;
   }
 
+  /**
+   * @param $key
+   *
+   * @return mixed
+   */
   function &get($key) {
     return apc_fetch($this->_prefix . $key);
   }
 
+  /**
+   * @param $key
+   *
+   * @return bool|string[]
+   */
   function delete($key) {
     return apc_delete($this->_prefix . $key);
   }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -48,9 +48,11 @@ abstract class CRM_SMS_Provider {
   /**
    * singleton function used to manage this object
    *
+   * @param array $providerParams
+   * @param bool $force
+   *
    * @return object
    * @static
-   *
    */
   static function &singleton($providerParams = array(
     ), $force = FALSE) {
@@ -106,12 +108,28 @@ abstract class CRM_SMS_Provider {
     return $html ? $html : $text;
   }
 
+  /**
+   * @param $fields
+   * @param $additionalDetails
+   *
+   * @return mixed
+   */
   function getRecipientDetails($fields, $additionalDetails) {
     // we could do more altering here
     $fields['To'] = $fields['phone'];
     return $fields;
   }
 
+  /**
+   * @param $apiMsgID
+   * @param $message
+   * @param array $headers
+   * @param null $jobID
+   * @param null $userID
+   *
+   * @return $this|null|object
+   * @throws CRM_Core_Exception
+   */
   function createActivity($apiMsgID, $message, $headers = array(
     ), $jobID = NULL, $userID = NULL) {
     if ($jobID) {
@@ -148,6 +166,15 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     return CRM_Activity_BAO_Activity::create($activityParams);
   }
 
+  /**
+   * @param $name
+   * @param $type
+   * @param bool $abort
+   * @param null $default
+   * @param string $location
+   *
+   * @return mixed
+   */
   function retrieve($name, $type, $abort = TRUE, $default = NULL, $location = 'REQUEST') {
     static $store = NULL;
     $value = CRM_Utils_Request::retrieve($name, $type, $store,
@@ -161,6 +188,15 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     return $value;
   }
 
+  /**
+   * @param $from
+   * @param $body
+   * @param null $to
+   * @param null $trackID
+   *
+   * @return $this|null|object
+   * @throws CRM_Core_Exception
+   */
   function processInbound($from, $body, $to = NULL, $trackID = NULL) {
     $formatFrom   = $this->formatPhone($this->stripPhone($from), $like, "like");
     $escapedFrom  = CRM_Utils_Type::escape($formatFrom, 'String');
@@ -224,6 +260,11 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     }
   }
 
+  /**
+   * @param $phone
+   *
+   * @return mixed|string
+   */
   function stripPhone($phone) {
     $newphone = preg_replace('/[^0-9x]/', '', $phone);
     while (substr($newphone, 0, 1) == "1") {
@@ -238,6 +279,13 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     return $newphone;
   }
 
+  /**
+   * @param $phone
+   * @param $kind
+   * @param string $format
+   *
+   * @return mixed|string
+   */
   function formatPhone($phone, &$kind, $format = "dash") {
     $phoneA = explode("x", $phone);
     switch (strlen($phoneA[0])) {
@@ -295,6 +343,11 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     }
   }
 
+  /**
+   * @param $values
+   *
+   * @return string
+   */
   function urlEncode($values) {
     $uri = '';
     foreach ($values as $key => $value) {

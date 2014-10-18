@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -87,6 +87,11 @@ class CRM_Upgrade_TwoOne_Page_Upgrade extends CRM_Core_Page {
     echo $contents;
   }
 
+  /**
+   * @param $stepID
+   *
+   * @throws Exception
+   */
   function runForm($stepID) {
     $formName = "CRM_Upgrade_TwoOne_Form_Step{$stepID}";
     $form = new $formName();

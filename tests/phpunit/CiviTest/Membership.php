@@ -1,5 +1,9 @@
 <?php
 require_once 'Contact.php';
+
+/**
+ * Class Membership
+ */
 class Membership extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to create membership type

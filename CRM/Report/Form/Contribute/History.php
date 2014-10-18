@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -50,6 +50,13 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   protected $_yearStatisticsFrom = '';
 
   protected $_yearStatisticsTo = '';
+
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $yearsInPast = 4;
     $date        = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, 0);
@@ -224,23 +231,6 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           ),
         ),
       ),
-    ) + array(
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
     );
 
     $this->_columns['civicrm_contribution']['fields']['civicrm_upto_' . $this->_yearStatisticsFrom] = array('title' => ts('Up To %1 Donation', array(1 => $this->_yearStatisticsFrom)),
@@ -265,6 +255,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
       'is_statistics' => TRUE,
     );
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
@@ -440,15 +431,26 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   }
 
   //Override to set limit is 10
+  /**
+   * @param int $rowCount
+   */
   function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
   }
 
   //Override to set pager with limit is 10
+  /**
+   * @param int $rowCount
+   */
   function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     parent::setPager($rowCount);
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     $count = 0;
@@ -470,6 +472,13 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     return $statistics;
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = array();
     if (!empty($fields['this_year_value']) && !empty($fields['other_year_value']) &&
@@ -489,13 +498,15 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $this->select();
     $this->where();
     $this->from();
+    $this->customDataFrom();
     $this->groupBy();
 
+    $sql = NULL;
     $rows = array();
 
     // build array of result based on column headers. This method also allows
     // modifying column headers before using it to build result set i.e $rows.
-    $this->buildRows($rows);
+    $this->buildRows($sql, $rows);
 
     // format result set.
     $this->formatDisplay($rows, FALSE);
@@ -516,7 +527,10 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     }
   }
 
-  function buildRows(&$rows) {
+  /**
+   * @param $rows
+   */
+  function buildRows($sql, &$rows) {
     $contactIds = array();
 
     $addWhere = '';
@@ -604,6 +618,11 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $contactIds
+   *
+   * @return array
+   */
   function buildContributionRows($contactIds) {
     $rows = array();
     if (empty($contactIds)) {
@@ -647,6 +666,11 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     return $rows;
   }
 
+  /**
+   * @param $contactIds
+   *
+   * @return array
+   */
   function buildRelationshipRows($contactIds) {
     $relationshipRows = $relatedContactIds = array();
     if (empty($contactIds)) {
@@ -685,6 +709,12 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   }
 
   // Override "This Year" $op options
+  /**
+   * @param string $type
+   * @param null $fieldName
+   *
+   * @return array
+   */
   function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'this_year' || $fieldName == 'other_year') {
       return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));
@@ -692,6 +722,9 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     return parent::getOperationPair($type, $fieldName);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     if (empty($rows)) {
       return;

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Utils_Migrate_Import {
+  /**
+   *
+   */
   function __construct() {
   }
 
@@ -89,6 +92,14 @@ class CRM_Utils_Migrate_Import {
     CRM_Core_Config::clearDBCache();
   }
 
+  /**
+   * @param $dao
+   * @param $xml
+   * @param bool $save
+   * @param null $keyName
+   *
+   * @return bool
+   */
   function copyData(&$dao, &$xml, $save = FALSE, $keyName = NULL) {
     if ($keyName) {
       if (isset($xml->$keyName)) {
@@ -123,6 +134,10 @@ class CRM_Utils_Migrate_Import {
     return TRUE;
   }
 
+  /**
+   * @param $xml
+   * @param $idMap
+   */
   function optionGroups(&$xml, &$idMap) {
     foreach ($xml->OptionGroups as $optionGroupsXML) {
       foreach ($optionGroupsXML->OptionGroup as $optionGroupXML) {
@@ -133,6 +148,10 @@ class CRM_Utils_Migrate_Import {
     }
   }
 
+  /**
+   * @param $xml
+   * @param $idMap
+   */
   function optionValues(&$xml, &$idMap) {
     foreach ($xml->OptionValues as $optionValuesXML) {
       foreach ($optionValuesXML->OptionValue as $optionValueXML) {
@@ -153,6 +172,9 @@ WHERE      v.option_group_id = %1
     }
   }
 
+  /**
+   * @param $xml
+   */
   function relationshipTypes(&$xml) {
 
     foreach ($xml->RelationshipTypes as $relationshipTypesXML) {
@@ -163,6 +185,9 @@ WHERE      v.option_group_id = %1
     }
   }
 
+  /**
+   * @param $xml
+   */
   function contributionTypes(&$xml) {
 
     foreach ($xml->ContributionTypes as $contributionTypesXML) {
@@ -173,6 +198,10 @@ WHERE      v.option_group_id = %1
     }
   }
 
+  /**
+   * @param $xml
+   * @param $idMap
+   */
   function customGroups(&$xml, &$idMap) {
     foreach ($xml->CustomGroups as $customGroupsXML) {
       foreach ($customGroupsXML->CustomGroup as $customGroupXML) {
@@ -301,6 +330,10 @@ AND        v.name = %1
     }
   }
 
+  /**
+   * @param $xml
+   * @param $idMap
+   */
   function customFields(&$xml, &$idMap) {
     // Re-index by group id so we can build out the custom fields one table
     // at a time, and then rebuild the table triggers at the end, rather than
@@ -348,6 +381,10 @@ AND        v.name = %1
     }
   }
 
+  /**
+   * @param $xml
+   * @param $idMap
+   */
   function dbTemplateString(&$xml, &$idMap) {
     foreach ($xml->Persistent as $persistentXML) {
       foreach ($persistentXML->Persistent as $persistent) {
@@ -361,6 +398,10 @@ AND        v.name = %1
     }
   }
 
+  /**
+   * @param $xml
+   * @param $idMap
+   */
   function profileGroups(&$xml, &$idMap) {
     foreach ($xml->ProfileGroups as $profileGroupsXML) {
       foreach ($profileGroupsXML->ProfileGroup as $profileGroupXML) {
@@ -372,6 +413,12 @@ AND        v.name = %1
     }
   }
 
+  /**
+   * @param $xml
+   * @param $idMap
+   *
+   * @throws Exception
+   */
   function profileFields(&$xml, &$idMap) {
     foreach ($xml->ProfileFields as $profileFieldsXML) {
       foreach ($profileFieldsXML->ProfileField as $profileFieldXML) {
@@ -410,6 +457,10 @@ AND        f.column_name = %2
     }
   }
 
+  /**
+   * @param $xml
+   * @param $idMap
+   */
   function profileJoins(&$xml, &$idMap) {
     foreach ($xml->ProfileJoins as $profileJoinsXML) {
       foreach ($profileJoinsXML->ProfileJoin as $profileJoinXML) {

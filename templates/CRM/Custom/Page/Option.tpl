@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,7 +41,7 @@
         {* handle enable/disable actions*}
          {include file="CRM/common/enableDisableApi.tpl"}
          {include file="CRM/common/crmeditable.tpl"}
-        <table class="selector">
+        <table class="selector row-highlight">
           <tr class="columnheader">
             <th>{ts}Label{/ts}</th>
             <th>{ts}Value{/ts}</th>
@@ -65,6 +65,7 @@
 
         <div class="action-link">
             <a href="{crmURL q="reset=1&action=add&fid=$fid&gid=$gid"}" class="button action-item"><span><div class="icon add-icon"></div> {ts 1=$fieldTitle}Add Option for '%1'{/ts}</span></a>
+            <a href="{crmURL p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid"}" class="button action-item cancel"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
         </div>
       </div>
     </div>

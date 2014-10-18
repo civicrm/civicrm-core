@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -25,6 +25,9 @@
 +--------------------------------------------------------------------+
 */
 
+/**
+ * Class CRM_Utils_Cache_SerializeCache
+ */
 class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
 
   /**
@@ -35,20 +38,30 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
   /**
    * Constructor
    *
-   * @param array   $config  an array of configuration params
+   * @param array $config an array of configuration params
    *
-   * @return void
+   * @return \CRM_Utils_Cache_SerializeCache
    */
   function __construct($config) {
     $this->_cache = array();
   }
 
+  /**
+   * @param $key
+   *
+   * @return string
+   */
   function fileName ($key) {
     if (strlen($key) > 50)
       return CIVICRM_TEMPLATE_COMPILEDIR ."CRM_".md5($key).".php";
     return CIVICRM_TEMPLATE_COMPILEDIR .$key.".php";
   }
 
+  /**
+   * @param string $key
+   *
+   * @return mixed
+   */
   function get ($key) {
     if (array_key_exists($key,$this->_cache))
       return $this->_cache[$key];
@@ -60,6 +73,10 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
     return $this->_cache[$key];
   }
 
+  /**
+   * @param string $key
+   * @param mixed $value
+   */
   function set($key, &$value) {
     if (file_exists($this->fileName ($key))) {
       return;
@@ -68,6 +85,9 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
     file_put_contents ($this->fileName ($key),"<?php //".serialize ($value));
   }
 
+  /**
+   * @param string $key
+   */
   function delete($key) {
     if (file_exists($this->fileName ($key))) {
       unlink ($this->fileName ($key));
@@ -75,6 +95,9 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
     unset($this->_cache[$key]);
   }
 
+  /**
+   * @param null $key
+   */
   function flush($key =null) {
     $prefix = "CRM_";
     if (!$handle = opendir(CIVICRM_TEMPLATE_COMPILEDIR)) {

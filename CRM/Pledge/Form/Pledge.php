@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -105,17 +105,12 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         $this->userEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
       $this->assign('displayName', $this->userDisplayName);
-
-      // set title to "Pledge - "+Contact Name
-      $displayName = $this->userDisplayName;
-      $pageTitle = ts('Pledge by'). ' ' . $displayName;
-      $this->assign('pageTitle', $pageTitle);
-      CRM_Utils_System::setTitle($pageTitle);
     }
+
+    $this->setPageTitle(ts('Pledge'));
 
     //build custom data
     CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Pledge', $this->_id);
-
     $this->_values = array();
     // current pledge id
     if ($this->_id) {
@@ -126,36 +121,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $params = array('id' => $this->_id);
       CRM_Pledge_BAO_Pledge::getValues($params, $this->_values);
 
-      $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
-      //check for pending pledge.
-      if (CRM_Utils_Array::value('status_id', $this->_values) ==
-        array_search('Pending', $paymentStatusTypes)
-      ) {
-        $this->_isPending = TRUE;
-      }
-      elseif (CRM_Utils_Array::value('status_id', $this->_values) ==
-        array_search('Overdue', $paymentStatusTypes)
-      ) {
-
-        $allPledgePayments = array();
-        CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment',
-          'pledge_id',
-          $this->_id,
-          $allPledgePayments,
-          array('status_id')
-        );
-
-        foreach ($allPledgePayments as $key => $value) {
-          $allStatus[$value['id']] = $paymentStatusTypes[$value['status_id']];
-        }
-
-        if (count(array_count_values($allStatus)) <= 2) {
-          if (CRM_Utils_Array::value('Pending', array_count_values($allStatus))) {
-            $this->_isPending = TRUE;
-          }
-        }
-      }
+      $this->_isPending = (CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($this->_id, CRM_Utils_Array::value('status_id', $this->_values))) ? FALSE : T;
     }
 
     //get the pledge frequency units.
@@ -163,6 +129,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
   }
+
 
   /**
    * This function sets the default values for the form.
@@ -276,7 +243,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE), TRUE);
+      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE, 'api' => array('extra' => array('email'))), TRUE);
     }
 
     $showAdditionalInfo = FALSE;
@@ -481,9 +448,11 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public

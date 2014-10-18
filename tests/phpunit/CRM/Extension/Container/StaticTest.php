@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Extension_Container_StaticTest
+ */
 class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();
@@ -47,6 +50,9 @@ class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
     $this->assertEquals('http://foobar', $c->getResUrl('test.foo.bar'));
   }
 
+  /**
+   * @return CRM_Extension_Container_Static
+   */
   function _createContainer() {
     return new CRM_Extension_Container_Static(array(
       'test.foo' => array(

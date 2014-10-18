@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright U.S. PIRG Education Fund (c) 2007                        |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -34,6 +34,13 @@
  *
  */
 class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMultiSelect {
+  /**
+   * Returns the HTML generated for the advanced mutliple select component
+   *
+   * @access     public
+   * @return     string
+   * @since      version 0.4.0 (2005-06-25)
+   */
   function toHtml() {
     if ($this->_flagFrozen) {
       return $this->getFrozenHtml();

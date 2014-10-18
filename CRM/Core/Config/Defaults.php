@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -70,6 +70,19 @@ class CRM_Core_Config_Defaults {
 
     $size = trim(ini_get('upload_max_filesize'));
     if ($size) {
+      $this->maxImportFileSize = self::formatUnitSize($size);
+    }
+  }
+
+  /**
+   * Function to format size
+   *
+   * @access public
+   * @static
+   */
+
+  public static function formatUnitSize($size, $checkForPostMax = FALSE) {
+    if ($size) {
       $last = strtolower($size{strlen($size) - 1});
       switch ($last) {
         // The 'G' modifier is available since PHP 5.1.0
@@ -81,15 +94,22 @@ class CRM_Core_Config_Defaults {
         case 'k':
           $size *= 1024;
       }
-      $this->maxImportFileSize = $size;
+
+      if ($checkForPostMax) {
+        $config     = CRM_Core_Config::singleton();
+        if($config->maxImportFileSize > $size) {
+          CRM_Core_Session::setStatus(ts("Note: Upload max filesize ('upload_max_filesize') should not exceed Post max size ('post_max_size') as defined in PHP.ini, please check with your system administrator."), ts("Warning"), "alert");
+        }
+      }
+      return $size;
     }
   }
 
   /**
    * Function to set the default values
    *
-   * @param array   $defaults  associated array of form elements
-   * @param boolena $formMode  this funtion is called to set default
+   * @param array $defaults associated array of form elements
+   * @param bool|\boolena $formMode this funtion is called to set default
    *                           values in an empty db, also called when setting component using GUI
    *                           this variable is set true for GUI
    *                           mode (eg: Global setting >> Components)
@@ -203,6 +223,7 @@ class CRM_Core_Config_Defaults {
       $customDir = $path . "custom/";
 
       CRM_Utils_File::createDir($customDir);
+      CRM_Utils_File::restrictAccess($customDir);
       $defaults['customFileUploadDir'] = $customDir;
     }
 

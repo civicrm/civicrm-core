@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{capture assign=multiURL}{crmURL p="civicrm/import/custom" q="reset=1"}{/capture}
 {htxt id='choose-data-source-intro-title'}
   {ts}Import Wizard{/ts}
 {/htxt}
@@ -35,6 +36,9 @@
   </p>
   <p>
     {ts}After importing contacts, you may also want to import <strong>contributions, membership info and/or event participation</strong> data for these contacts. If so, first make sure that the corresponding CiviCRM component is enabled from Administer CiviCRM &raquo; System Settings &raquo; Enable CiviCRM Components. Enable CiviContribute, CiviMember, and/or CiviEvent. Then navigate to the Import option found in each component's menu (e.g. CiviContribute &raquo; Import Contributions).{/ts}
+  </p>
+  <p>
+    {ts 1=$multiURL}If you need to import <strong>Multi-value Custom Data</strong> for contacts (such as employment or education history), you will need to do that as a separate step from <a href="%1">here</a>.{/ts}
   </p>
 {/htxt}
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
  * This provides greater consistency/predictability after flushing.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -203,6 +203,13 @@ class CRM_Core_PseudoConstant {
   private static $accountOptionValues;
 
   /**
+   * Tax Rates
+   * @var array
+   * @static
+   */
+  private static $taxRates;
+
+  /**
    * Low-level option getter, rarely accessed directly.
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
    * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Pseudoconstant+%28option+list%29+Reference
@@ -247,7 +254,7 @@ class CRM_Core_PseudoConstant {
 
       if (!empty($customField->option_group_id)) {
         $options = CRM_Core_OptionGroup::valuesByID($customField->option_group_id,
-          $flip,
+          FALSE,
           $params['grouping'],
           $params['localize'],
           // Note: for custom fields the 'name' column is NULL
@@ -266,10 +273,10 @@ class CRM_Core_PseudoConstant {
         elseif ($customField->data_type === 'Boolean') {
           $options = $context == 'validate' ? array(0, 1) : array(1 => ts('Yes'), 0 => ts('No'));
         }
-        $options = $options && $flip ? array_flip($options) : $options;
       }
-      if ($options !== FALSE) {
-        CRM_Utils_Hook::customFieldOptions($customField->id, $options, FALSE);
+      CRM_Utils_Hook::customFieldOptions($customField->id, $options, FALSE);
+      if ($options && $flip) {
+        $options = array_flip($options);
       }
       $customField->free();
       return $options;
@@ -531,12 +538,16 @@ class CRM_Core_PseudoConstant {
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param array   $var        the associative array we will fill
-   * @param string  $name       the name of the DAO
-   * @param boolean $all        get all objects. default is to get only active ones.
-   * @param string  $retrieve   the field that we are interested in (normally name, differs in some objects)
-   * @param string  $filter     the field that we want to filter the result set with
-   * @param string  $condition  the condition that gets passed to the final query as the WHERE clause
+   * @param array $var the associative array we will fill
+   * @param string $name the name of the DAO
+   * @param boolean $all get all objects. default is to get only active ones.
+   * @param string $retrieve the field that we are interested in (normally name, differs in some objects)
+   * @param string $filter the field that we want to filter the result set with
+   * @param string $condition the condition that gets passed to the final query as the WHERE clause
+   *
+   * @param null $orderby
+   * @param string $key
+   * @param null $force
    *
    * @return void
    * @access public
@@ -595,8 +606,7 @@ class CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param boolean $name pseudoconstant to be flushed
-   *
+   * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
     if (isset(self::$$name)) {
@@ -614,7 +624,7 @@ class CRM_Core_PseudoConstant {
    *
    * The static array activityType is returned
    *
-   * @param boolean $all - get All Activity  types - default is to get only active ones.
+   * @internal param bool $all - get All Activity  types - default is to get only active ones.
    *
    * @access public
    * @static
@@ -694,10 +704,11 @@ class CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param int $id -  Optional id to return
+   * @param bool|int $id -  Optional id to return
+   *
+   * @param bool $limit
    *
    * @return array - array reference of all State/Provinces.
-   *
    */
   public static function &stateProvince($id = FALSE, $limit = TRUE) {
     if (($id && !CRM_Utils_Array::value($id, self::$stateProvince)) || !self::$stateProvince || !$id) {
@@ -749,7 +760,9 @@ class CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param int $id  -     Optional id to return
+   * @param bool|int $id -     Optional id to return
+   *
+   * @param bool $limit
    *
    * @return array - array reference of all State/Province abbreviations.
    */
@@ -815,10 +828,11 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @param int $id - Optional id to return
+   * @param bool|int $id - Optional id to return
+   *
+   * @param bool $applyLimit
    *
    * @return array - array reference of all countries.
-   *
    */
   public static function country($id = FALSE, $applyLimit = TRUE) {
     if (($id && !CRM_Utils_Array::value($id, self::$country)) || !self::$country || !$id) {
@@ -892,8 +906,9 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @return array - array reference of all country ISO codes.
+   * @param bool $id
    *
+   * @return array - array reference of all country ISO codes.
    */
   public static function &countryIsoCode($id = FALSE) {
     if (!self::$countryIsoCode) {
@@ -921,14 +936,13 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param string $groupType     type of group(Access/Mailing)
-   * @param boolen $excludeHidden exclude hidden groups.
+   * @param string $groupType type of group(Access/Mailing)
+   * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
    * @access public
    * @static
    *
    * @return array - array reference of all groups.
-   *
    */
   public static function &allGroup($groupType = NULL, $excludeHidden = TRUE) {
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);
@@ -957,8 +971,9 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @return mixed - instance of CRM_Contact_BAO_GroupNesting
+   * @param bool $styledLabels
    *
+   * @return mixed - instance of CRM_Contact_BAO_GroupNesting
    */
   public static function &groupIterator($styledLabels = FALSE) {
     if (!self::$groupIterator) {
@@ -972,8 +987,6 @@ WHERE  id = %1";
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
-   *
    * Get all permissioned groups from database
    *
    * The static array group is returned, and if it's
@@ -982,17 +995,28 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param string $groupType     type of group(Access/Mailing)
-   * @param boolen $excludeHidden exclude hidden groups.
-
+   * @param string $groupType type of group(Access/Mailing)
+   * @param bool $excludeHidden exclude hidden groups.
+   *
    * @access public
    * @static
    *
    * @return array - array reference of all groups.
-   *
    */
   public static function group($groupType = NULL, $excludeHidden = TRUE) {
     return CRM_Core_Permission::group($groupType, $excludeHidden);
+  }
+
+  /**
+   * Fetch groups in a nested format suitable for use in select form element
+   * @param bool $checkPermissions
+   * @param string|null $groupType
+   * @param bool $excludeHidden
+   * @return array
+   */
+  public static function nestedGroup($checkPermissions = TRUE, $groupType = NULL, $excludeHidden = TRUE) {
+    $groups = $checkPermissions ? self::group($groupType, $excludeHidden) : self::allGroup($groupType, $excludeHidden);
+    return CRM_Contact_BAO_Group::getGroupsHierarchy($groups, NULL, '&nbsp;&nbsp;', TRUE);
   }
 
   /**
@@ -1007,8 +1031,11 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @return array - array reference of all groups.
+   * @param bool $onlyPublic
+   * @param null $groupType
+   * @param bool $excludeHidden
    *
+   * @return array - array reference of all groups.
    */
   public static function &staticGroup($onlyPublic = FALSE, $groupType = NULL, $excludeHidden = TRUE) {
     if (!self::$staticGroup) {
@@ -1375,10 +1402,9 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @param int $id -  Optional id to return
+   * @param bool|int $id -  Optional id to return
    *
    * @return array - array reference of all Counties
-   *
    */
   public static function &county($id = FALSE) {
     if (!self::$county) {
@@ -1407,11 +1433,12 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @param boolean $all  - get payment processors     - default is to get only active ones.
+   * @param boolean $all - get payment processors     - default is to get only active ones.
    * @param boolean $test - get test payment processors
    *
-   * @return array - array of all payment processors
+   * @param null $additionalCond
    *
+   * @return array - array of all payment processors
    */
   public static function &paymentProcessor($all = FALSE, $test = FALSE, $additionalCond = NULL) {
     $condition = "is_test = ";
@@ -1441,10 +1468,12 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @param boolean $all  - get payment processors     - default is to get only active ones.
+   * @param boolean $all - get payment processors     - default is to get only active ones.
+   *
+   * @param null $id
+   * @param string $return
    *
    * @return array - array of all payment processor types
-   *
    */
   public static function &paymentProcessorType($all = FALSE, $id = NULL, $return = 'title') {
     $cacheKey = $id . '_' .$return;
@@ -1461,6 +1490,8 @@ WHERE  id = %1";
    * Get all the World Regions from Database
    *
    * @access public
+   *
+   * @param bool $id
    *
    * @return array - array reference of all World Regions
    * @static
@@ -1492,6 +1523,8 @@ WHERE  id = %1";
    * @access public
    * @static
    *
+   * @param string $column
+   *
    * @return array - array reference of all activity statuses
    */
   public static function &activityStatus($column = 'label') {
@@ -1517,8 +1550,9 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @return array - array reference of all Visibility levels.
+   * @param string $column
    *
+   * @return array - array reference of all Visibility levels.
    */
   public static function &visibility($column = 'label') {
     if (!isset(self::$visibility)) {
@@ -1532,6 +1566,12 @@ WHERE  id = %1";
     return self::$visibility[$column];
   }
 
+  /**
+   * @param $countryID
+   * @param string $field
+   *
+   * @return array
+   */
   public static function &stateProvinceForCountry($countryID, $field = 'name') {
     static $_cache = NULL;
 
@@ -1581,6 +1621,11 @@ ORDER BY name";
     return $result;
   }
 
+  /**
+   * @param $stateID
+   *
+   * @return array
+   */
   public static function &countyForState($stateID) {
     if (is_array($stateID)) {
       $states = implode(", ", $stateID);
@@ -1669,8 +1714,9 @@ WHERE  id = %1
    *
    * @param $filter - get All Email Greetings - default is to get only active ones.
    *
-   * @return array - array reference of all greetings.
+   * @param string $columnName
    *
+   * @return array - array reference of all greetings.
    */
   public static function greeting($filter, $columnName = 'label') {
     $index = $filter['greeting_type'] . '_' . $columnName;
@@ -1780,8 +1826,10 @@ WHERE  id = %1
    *
    * @param boolean $optionGroupName - get All  Option Group values- default is to get only active ones.
    *
-   * @return array - array reference of all Option Group Name
+   * @param null $id
+   * @param null $condition
    *
+   * @return array - array reference of all Option Group Name
    */
   public static function accountOptionValues($optionGroupName, $id = null, $condition = null) {
     $cacheKey = $optionGroupName . '_' . $condition;
@@ -1806,6 +1854,39 @@ WHERE  id = %1
    */
   public static function getModuleExtensions($fresh = FALSE) {
     return CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles($fresh);
+  }
+
+
+  /**
+   * Get all tax rates
+   *
+   * The static array tax rates is returned
+   *
+   * @access public
+   * @static
+   *
+   * @return array - array list of tax rates with the financial type
+   */
+  public static function getTaxRates() {
+    if (!self::$taxRates) {
+      self::$taxRates = array();
+      $sql = "
+        SELECT fa.tax_rate, efa.entity_id
+        FROM civicrm_entity_financial_account efa
+        INNER JOIN civicrm_financial_account fa ON fa.id = efa.financial_account_id
+        INNER JOIN civicrm_option_value cov ON cov.value = efa.account_relationship
+        INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
+        WHERE efa.entity_table = 'civicrm_financial_type'
+        AND cov.name = 'Sales Tax Account is'
+        AND cog.name = 'account_relationship'
+        AND fa.is_active = 1";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      while ($dao->fetch()) {
+        self::$taxRates[$dao->entity_id] = $dao->tax_rate;
+      }
+    }
+
+    return self::$taxRates;
   }
 }
 

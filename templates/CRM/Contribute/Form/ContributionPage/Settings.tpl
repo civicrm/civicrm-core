@@ -1,9 +1,9 @@
 
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -111,9 +111,6 @@
     <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_title">
         <td class="label">
             {$form.honor_block_title.label}
-            {if $action == 2}
-                {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='honor_block_title' id=$contributionPageID}
-            {/if}
        </td>
        <td>
            {$form.honor_block_title.html}<br />
@@ -124,9 +121,6 @@
        <td class="label">
            {crmAPI var='result' entity='OptionGroup' action='get' sequential=1 name='soft_credit_type'}
            {$form.honor_block_text.label}
-           {if $action == 2}
-               {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='honor_block_text' id=$contributionPageID}
-           {/if}
        </td>
        <td>
            {$form.honor_block_text.html}<br />
@@ -138,12 +132,7 @@
           {$form.soft_credit_types.label}
       </td>
       <td>
-          <dt style="text-align:left;">{$form.soft_credit_types.html|crmAddClass:huge}</dt>
-          <dd>
-              <a class="optionvalue-link" href="#" title='Click to edit available soft credit types'>
-                  <span class="batch-edit"></span>
-              </a>
-          </dd>
+        {$form.soft_credit_types.html}
       </td>
   </tr>
   <tr class="crm-contribution-contributionpage-custom-form-block-custom_pre_id">
@@ -211,20 +200,5 @@
             document.getElementById("honor").style.display = "none";
         }
      }
-     cj('.optionvalue-link').click(function() {
-        {/literal}"{crmAPI var='result' entity='OptionGroup' action='get' sequential=1 name='soft_credit_type'}"{literal};
-        var postURL = {/literal}"{crmURL p='civicrm/admin/options' q="gid="}{$result.id}"{literal};
-        CRM.loadForm(postURL).on('crmFormSuccess', function(e, data) {
-           cj('.ui-dialog a').click(function(){
-           //Todo: inline edit facility for soft_credit_type option group in jquery popup dialog
-           });
-        });
-      return false;
-    })
-
  {/literal}
 </script>
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
-

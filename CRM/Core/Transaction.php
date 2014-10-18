@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @copyright David Strauss <david@fourkitchens.com> (c) 2007
  * $Id$
  *
@@ -84,6 +84,10 @@ class CRM_Core_Transaction {
    * of CRM_Core_Transaction
    */
   private $_pseudoCommitted = FALSE;
+
+  /**
+   *
+   */
   function __construct() {
     if (!self::$_dao) {
       self::$_dao = new CRM_Core_DAO();
@@ -134,6 +138,9 @@ class CRM_Core_Transaction {
     }
   }
 
+  /**
+   * @param $flag
+   */
   static public function rollbackIfFalse($flag) {
     if ($flag === FALSE) {
       self::$_doCommit = FALSE;
@@ -167,6 +174,9 @@ class CRM_Core_Transaction {
     }
   }
 
+  /**
+   * @return bool
+   */
   static public function willCommit() {
     return self::$_doCommit;
   }
@@ -188,13 +198,24 @@ class CRM_Core_Transaction {
    * @param mixed $params Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
    */
-  static public function addCallback($phase, $callback, $params = null) {
-    self::$_callbacks[$phase][] = array(
-      'callback' => $callback,
-      'parameters' => (is_array($params) ? $params : array($params))
-    );
+  static public function addCallback($phase, $callback, $params = null, $id = NULL) {
+    if ($id) {
+      self::$_callbacks[$phase][$id] = array(
+        'callback' => $callback,
+        'parameters' => (is_array($params) ? $params : array($params))
+      );
+    } else {
+      self::$_callbacks[$phase][] = array(
+        'callback' => $callback,
+        'parameters' => (is_array($params) ? $params : array($params))
+      );
+    }
   }
 
+  /**
+   * @param $phase
+   * @param $callbacks
+   */
   static protected function invokeCallbacks($phase, $callbacks) {
     if (is_array($callbacks[$phase])) {
       foreach ($callbacks[$phase] as $cb) {

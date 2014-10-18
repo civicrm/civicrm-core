@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,24 +28,54 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
 
+  /**
+   * Provides information about the data source
+   *
+   * @return array collection of info about this data source
+   *
+   * @access public
+   *
+   */
   public function getInfo() {
     return array('title' => ts('SQL Query'));
   }
 
+  /**
+   * Function to set variables up before form is built
+   *
+   * @access public
+   */
   public function preProcess(&$form) {}
 
+  /**
+   * This is function is called by the form object to get the DataSource's
+   * form snippet. It should add all fields necesarry to get the data
+   * uploaded to the temporary table in the DB.
+   *
+   * @param $form
+   *
+   * @return void (operates directly on form argument)
+   * @access public
+   */
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_SQL');
     $form->add('textarea', 'sqlQuery', ts('Specify SQL Query'), 'rows=10 cols=45', TRUE);
     $form->addFormRule(array('CRM_Import_DataSource_SQL', 'formRule'), $form);
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $form
+   *
+   * @return array|bool
+   */
   static function formRule($fields, $files, $form) {
     $errors = array();
 
@@ -60,6 +90,11 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
     return $errors ? $errors : TRUE;
   }
 
+  /**
+   * Function to process the form
+   *
+   * @access public
+   */
   public function postProcess(&$params, &$db, &$form) {
     $importJob = new CRM_Contact_Import_ImportJob(
       CRM_Utils_Array::value( 'import_table_name', $params ),

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -36,6 +36,10 @@
 // d6 compatible
 class CRM_Bridge_OG_Drupal {
 
+  /**
+   * @param $params
+   * @param $op
+   */
   static function nodeapi(&$params, $op) {
 
     $transaction = new CRM_Core_Transaction();
@@ -63,6 +67,11 @@ class CRM_Bridge_OG_Drupal {
     $transaction->commit();
   }
 
+  /**
+   * @param $params
+   * @param $op
+   * @param null $groupType
+   */
   static function updateCiviGroup(&$params, $op, $groupType = NULL) {
     $abort             = false;
     $params['version'] = 3;
@@ -88,6 +97,10 @@ class CRM_Bridge_OG_Drupal {
     unset($params['id']);
   }
 
+  /**
+   * @param $aclParams
+   * @param $op
+   */
   static function updateCiviACLTables($aclParams, $op) {
     if ($op == 'delete') {
       self::updateCiviACL($aclParams, $op);
@@ -101,6 +114,10 @@ class CRM_Bridge_OG_Drupal {
     }
   }
 
+  /**
+   * @param $params
+   * @param $op
+   */
   static function updateCiviACLRole(&$params, $op) {
 
     $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
@@ -144,6 +161,10 @@ SELECT v.id
     $params['acl_role_id'] = $dao->value;
   }
 
+  /**
+   * @param $params
+   * @param $op
+   */
   static function updateCiviACLEntityRole(&$params, $op) {
     $dao = new CRM_ACL_DAO_EntityRole();
 
@@ -162,6 +183,10 @@ SELECT v.id
     $params['acl_entity_role_id'] = $dao->id;
   }
 
+  /**
+   * @param $params
+   * @param $op
+   */
   static function updateCiviACL(&$params, $op) {
     $dao = new CRM_ACL_DAO_ACL();
 
@@ -184,6 +209,12 @@ SELECT v.id
     $params['acl_id'] = $dao->id;
   }
 
+  /**
+   * @param $params
+   * @param $op
+   *
+   * @throws Exception
+   */
   static function og(&$params, $op) {
 
     $contactID = CRM_Bridge_OG_Utils::contactID($params['uf_id']);

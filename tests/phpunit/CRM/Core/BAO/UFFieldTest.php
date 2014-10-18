@@ -1,6 +1,10 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
+
+/**
+ * Class CRM_Core_BAO_UFFieldTest
+ */
 class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
 
   function setUp() {

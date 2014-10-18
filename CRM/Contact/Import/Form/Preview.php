@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -69,7 +69,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $this->assign('rowDisplayCount', 2);
 
-    $groups = CRM_Core_PseudoConstant::group();
+    $groups = CRM_Core_PseudoConstant::nestedGroup();
     $this->set('groups', $groups);
 
     $tag = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
@@ -139,7 +139,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $groups = $this->get('groups');
 
     if (!empty($groups)) {
-      $this->addElement('select', 'groups', ts('Add imported records to existing group(s)'), $groups, array('multiple' => "multiple", 'size' => 5));
+      $this->addElement('select', 'groups', ts('Add imported records to existing group(s)'), $groups, array('multiple' => "multiple", 'class' => 'crm-select2'));
     }
 
     //display new tag
@@ -191,6 +191,9 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * global validation rules for the form
    *
    * @param array $fields posted values of the form
+   *
+   * @param $files
+   * @param $self
    *
    * @return array list of errors to be posted back to the form
    * @static

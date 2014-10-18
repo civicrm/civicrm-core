@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -112,14 +112,14 @@
 
 {literal}
 <script type="text/javascript">
-cj( document ).ready( function( ) {
+  CRM.$(function($) {
     {/literal}{if $customDataSubType}
-     CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-        {else}
-     CRM.buildCustomData( '{$customDataType}' );
-        {/if}
+      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
+    {else}
+      CRM.buildCustomData( '{$customDataType}' );
+    {/if}
     {literal}
-});
+  });
 </script>
 {/literal}
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -56,12 +56,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   public function preProcess() {
 
     //Test database user privilege to create table(Temporary) CRM-4725
-    CRM_Core_Error::ignoreException();
+    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $daoTestPrivilege = new CRM_Core_DAO;
     $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_one(test int) ENGINE=InnoDB");
     $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_two(test int) ENGINE=InnoDB");
     $daoTestPrivilege->query("DROP TABLE IF EXISTS import_job_permission_one, import_job_permission_two");
-    CRM_Core_Error::setCallback();
+    unset($errorScope);
 
     if ($daoTestPrivilege->_lastError) {
       CRM_Core_Error::fatal(ts('Database Configuration Error: Insufficient permissions. Import requires that the CiviCRM database user has permission to create temporary tables. Contact your site administrator for assistance.'));
@@ -71,6 +71,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $config     = CRM_Core_Config::singleton();
     $handler    = opendir($config->uploadDir);
     $errorFiles = array('sqlImport.errors', 'sqlImport.conflicts', 'sqlImport.duplicates', 'sqlImport.mismatch');
+
+    // check for post max size avoid when called twice
+    $snippet = CRM_Utils_Array::value('snippet', $_GET, 0);
+    if (empty($snippet)) {
+      CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);
+    }
 
     while ($file = readdir($handler)) {
       if ($file != '.' && $file != '..' &&
@@ -227,6 +233,18 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     );
   }
 
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $config = CRM_Core_Config::singleton();
     $defaults = array(
@@ -244,6 +262,10 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     return $defaults;
   }
 
+  /**
+   * @return array
+   * @throws Exception
+   */
   private function _getDataSources() {
     // Open the data source dir and scan it for class files
     $config        = CRM_Core_Config::singleton();
@@ -350,6 +372,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   /**
    * Add a PK and status column to the import table so we can track our progress
    * Returns the name of the primary key and status columns
+   *
+   * @param $db
+   * @param $importTableName
    *
    * @return array
    * @access private

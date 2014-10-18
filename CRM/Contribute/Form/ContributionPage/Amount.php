@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -141,6 +141,7 @@ SELECT id
       FALSE
     );
     $this->addWysiwyg('pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'pay_later_receipt'));
+    $this->addElement('checkbox', 'is_billing_required', ts('Is billing block required'));
 
     //add partial payment options
 
@@ -244,7 +245,7 @@ SELECT id
       if (empty($defaults['amount_label'])) {
         $defaults['amount_label'] = ts('Contribution Amount');
       }
-      
+
       if (!empty($defaults['value']) && is_array($defaults['value'])) {
 
         // CRM-4038: fix value display
@@ -273,9 +274,11 @@ SELECT id
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -378,11 +381,11 @@ SELECT id
         }
       }
     }
-    
+
     if (!empty($fields['payment_processor']) && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($self->_defaultValues['financial_type_id'])) {
-      $errors['payment_processor'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;  
+      $errors['payment_processor'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;
     }
-        
+
     if (!empty($fields['is_recur_interval'])) {
       foreach(array_keys($fields['payment_processor']) as $paymentProcessorID) {
         $paymentProcessorTypeId = CRM_Core_DAO::getFieldValue(
@@ -410,6 +413,12 @@ SELECT id
   public function postProcess() {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
+
+    //update 'is_billing_required' 
+    if (empty($params['is_pay_later'])) {
+      $params['is_billing_required'] = 0;
+    }
+
     if (array_key_exists('payment_processor', $params)) {
       if (array_key_exists(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor', 'AuthNet',
             'id', 'payment_processor_type_id'
@@ -431,6 +440,7 @@ SELECT id
       'max_amount' => "null",
       'is_monetary' => FALSE,
       'is_pay_later' => FALSE,
+      'is_billing_required' => FALSE,
       'is_recur_interval' => FALSE,
       'is_recur_installments' => FALSE,
       'recur_frequency_unit' => "null",
@@ -621,7 +631,7 @@ SELECT id
               $editedResults = array();
 
               CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
-              
+
               if (!$priceFieldID = CRM_Utils_Array::value('id', $editedResults)) {
                 $fieldParams = array(
                   'name' => 'other_amount',
@@ -637,16 +647,17 @@ SELECT id
                 if (!$noContriAmount) {
                   $fieldParams['is_required'] = 1;
                   $fieldParams['option_label'][1] = $fieldParams['label'] = $params['amount_label'];
-                } 
+                }
                 else {
                   $fieldParams['is_required'] = 0;
                   $fieldParams['option_label'][1] = $fieldParams['label'] = 'Other Amount';
                 }
 
                 $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
-              } 
+              }
               else {
                 if (empty($editedResults['is_active'])) {
+                  $fieldParams = $editedResults;
                   if (!$noContriAmount) {
                     $priceFieldValueID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldID, 'id', 'price_field_id');
                     CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'label', $params['amount_label']);
@@ -660,10 +671,10 @@ SELECT id
                   $priceField = CRM_Price_BAO_PriceField::add($fieldParams);
                 }
               }
-            } 
+            }
             elseif (empty($params['is_allow_other_amount']) && !empty($params['price_field_other'])) {
               CRM_Price_BAO_PriceField::setIsActive($params['price_field_other'], '0');
-            } 
+            }
             elseif ($priceFieldID = CRM_Utils_Array::value('price_field_other', $params)) {
               $priceFieldValueID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldID, 'id', 'price_field_id');
               if (!$noContriAmount) {
@@ -674,7 +685,7 @@ SELECT id
                 );
                 CRM_Price_BAO_PriceField::add($fieldParams);
                 CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'label', $params['amount_label']);
-              } 
+              }
               else {
                 CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceField', $priceFieldID, 'is_required', 0 );
                 CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'label', 'Other Amount');

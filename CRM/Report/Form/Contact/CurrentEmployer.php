@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,6 +42,12 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
 
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     $this->_columns = array(
@@ -128,6 +134,18 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           array('title' => ts('Employee Since'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
+          ),
+        ),
+      ),
+      'civicrm_phone' =>
+      array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'grouping' => 'contact-fields',
+        'fields' =>
+        array(
+          'phone' =>
+          array('title' => ts('Phone'),
+            'default' => TRUE,
           ),
         ),
       ),
@@ -235,6 +253,9 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
           ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id
              AND {$this->_aliases['civicrm_address']}.is_primary = 1 )
 
+     LEFT JOIN  civicrm_phone {$this->_aliases['civicrm_phone']}
+          ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id
+             AND {$this->_aliases['civicrm_phone']}.is_primary = 1)
      LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
           ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
              AND {$this->_aliases['civicrm_email']}.is_primary = 1) ";
@@ -299,6 +320,9 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $checkList = array();
@@ -378,4 +402,3 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
     }
   }
 }
-

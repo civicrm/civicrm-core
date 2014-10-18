@@ -8,6 +8,7 @@
 
   <field>
     <name>id</name>
+    <title>Survey ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Survey id.</comment>
@@ -32,6 +33,7 @@
 
   <field>
     <name>campaign_id</name>
+    <title>Survey Campaign ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Foreign key to the Campaign.</comment>
@@ -52,7 +54,7 @@
 
   <field>
     <name>activity_type_id</name>
-    <title>Activity Type ID</title>
+    <title>Activity Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Implicit FK to civicrm_option_value where option_group = activity_type</comment>
@@ -73,6 +75,7 @@
 
   <field>
     <name>recontact_interval</name>
+    <title>Follow up Interval</title>
     <type>text</type>
     <comment>Recontact intervals for each status.</comment>
     <html>
@@ -85,6 +88,7 @@
 
   <field>
     <name>instructions</name>
+    <title>Instructions</title>
     <type>text</type>
     <localizable>true</localizable>
     <comment>Script instructions for volunteers to use for the survey.</comment>
@@ -98,6 +102,7 @@
 
   <field>
     <name>release_frequency</name>
+    <title>Survey Hold Duration</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Number of days for recurrence of release.</comment>
@@ -124,6 +129,7 @@
 
   <field>
     <name>is_active</name>
+    <title>Survey Is Active</title>
     <type>boolean</type>
     <default>1</default>
     <comment>Is this survey enabled or disabled/cancelled?</comment>
@@ -132,6 +138,7 @@
 
   <field>
     <name>is_default</name>
+    <title>Is Default Survey</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Is this default survey?</comment>
@@ -140,16 +147,17 @@
 
   <field>
     <name>created_id</name>
+    <title>Survey Created By</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this Survey.</comment>
     <add>3.3</add>
   </field>
   <foreignKey>
-      <name>created_id</name>
-      <table>civicrm_contact</table>
-      <key>id</key>
-      <add>3.3</add>
-      <onDelete>SET NULL</onDelete>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
 
   <field>
@@ -162,6 +170,7 @@
 
   <field>
     <name>last_modified_id</name>
+    <title>Survey Modified</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who recently edited this Survey.</comment>
     <add>3.3</add>
@@ -176,6 +185,7 @@
 
   <field>
     <name>last_modified_date</name>
+    <title>Survey Modified On</title>
     <type>datetime</type>
     <comment>Date and time that Survey was edited last time.</comment>
     <add>3.3</add>
@@ -183,6 +193,7 @@
 
   <field>
     <name>result_id</name>
+    <title>Survey Result</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Used to store option group id.</comment>
@@ -190,6 +201,7 @@
   </field>
   <field>
     <name>bypass_confirm</name>
+    <title>No Email Verification</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Bypass the email verification.</comment>

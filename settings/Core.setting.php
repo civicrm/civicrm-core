@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -171,7 +171,7 @@ return array (
     'html_type' => 'Text',
     'default' => '{contact.last_name}{, }{contact.first_name}',
     'add' => '4.1',
-    'title' => null,
+    'title' => 'Sort Name Format',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,
@@ -185,7 +185,7 @@ return array (
     'html_type' => 'Text',
     'default' => null,
     'add' => '4.1',
-    'title' => null,
+    'title' => 'Wysiwig Editor',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,
@@ -199,7 +199,21 @@ return array (
     'html_type' => 'Text',
     'default' => null,
     'add' => '4.1',
-    'title' => null,
+    'title' => 'Ajax Check Similar',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => null,
+    'help_text' => null,
+  ),
+  'ajaxPopupsEnabled' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'ajaxPopupsEnabled',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'add' => '4.5',
+    'title' => 'Ajax Popups Enabled',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,
@@ -261,7 +275,7 @@ return array (
     ),
     'default' => '1234567',
     'add' => '4.1',
-    'title' => null,
+    'title' => 'Contact Reference Options',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,
@@ -292,8 +306,8 @@ return array (
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'maxFileSize',
-    'prefetch' => 1,
-    'config_only' => 1,
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -355,8 +369,8 @@ return array (
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'versionCheck',
-    'prefetch' => 1,
-    'config_only'=> 1,
+    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -368,12 +382,27 @@ return array (
 When enabled, statistics about your CiviCRM installation are reported anonymously to the CiviCRM team to assist in prioritizing ongoing development efforts. The following information is gathered: CiviCRM version, versions of PHP, MySQL and framework (Drupal/Joomla/standalone), and default language. Counts (but no actual data) of the following record types are reported: contacts, activities, cases, relationships, contributions, contribution pages, contribution products, contribution widgets, discounts, price sets, profiles, events, participants, tell-a-friend pages, grants, mailings, memberships, membership blocks, pledges, pledge blocks and active payment processor types.",
     'help_text' => null,
   ),
+  'securityAlert' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'versionCheck',
+    'prefetch' => 0,
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'add' => '4.4',
+    'title' => 'Security Alerts',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => "If enabled, CiviCRM will automatically run checks for significant mis-configurations such as ineffective file protections.",
+    'help_text' => null,
+  ),
   'doNotAttachPDFReceipt' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'doNotAttachPDFReceipt',
-    'prefetch' => 1,
-    'config_only'=> 1,
+    'prefetch' => 1,  // prefetch causes it to be cached in config object. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -388,8 +417,8 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'wkhtmltopdfPath',
-    'prefetch' => 1,
-    'config_only'=> 1,
+    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -410,8 +439,8 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'recaptchaPublicKey',
-    'prefetch' => 1,
-    'config_only'=> 1,
+    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -432,8 +461,8 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'recaptchaPrivateKey',
-    'prefetch' => 1,
-    'config_only'=> 1,
+    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only'=> 1,//@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -454,8 +483,8 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'recaptchaPrivateKey',
-    'prefetch' => 1,
-    'config_only'=> 1,
+    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -476,8 +505,8 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'dashboardCacheTimeout',
-    'prefetch' => 1,
-    'config_only'=> 1,
+    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -498,8 +527,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'checksumTimeout',
-    'prefetch' => 1,
-    'config_only'=> 1,
+    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -521,7 +549,6 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'blogUrl',
     'prefetch' => 0,
-    'config_only'=> 0,
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -543,7 +570,6 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'communityMessagesUrl',
     'prefetch' => 0,
-    'config_only'=> 1,
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -564,8 +590,8 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'resCacheCode',
-    'prefetch' => 1,
-    'config_only'=> 1,
+    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -590,7 +616,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'quick_form_type' => 'YesNo',
     'default' => 1,
     'add' => '4.3',
-    'title' => '',
+    'title' => 'Verify SSL?',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'If disabled, backend HTTPS services will allow unverified, insecure connections',
@@ -603,7 +629,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'type' => 'String',
     'html_type' => 'text',
     'quick_form_type' => 'Element',
-    'prefetch' => 1,
+    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'default' => '',
     'add' => '4.3',
     'title' => 'WordPress Base Page',
@@ -616,8 +642,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'secondDegRelPermissions',
-    'prefetch' => 1,
-    'config_only'=> 1,
+    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 0,
@@ -667,5 +692,20 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'is_contact' => 0,
     'description' => 'Prevent the stylesheet "civicrm.css" from being loaded.',
     'help_text' => NULL,
+  ),
+  'empoweredBy' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'empoweredBy',
+    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'add' => '4.5',
+    'title' => 'Display "empowered by CiviCRM"',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'When enabled, "empowered by CiviCRM" is displayed at the bottom of public forms.',
+    'help_text' => null,
   ),
 );

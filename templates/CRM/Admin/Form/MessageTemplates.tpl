@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -70,6 +70,7 @@
                 <input class="crm-token-selector big" data-field="msg_text" />
                 {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
               </div>
+              <div class="clear"></div>
                 <div class='text'>
                     {$form.msg_text.html|crmAddClass:huge}
                     <div class="description">{ts}Text formatted message.{/ts} {ts 1=$tokenDocsRepeated}Tokens may be included (%1).{/ts}</div>
@@ -88,7 +89,7 @@
              {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin editor=$editor file="CRM/Contact/Form/Task/Email.hlp"}
            </div>
                 <div class="clear"></div>
-                <div class='html'>
+                <div class='html resizable-textarea'>
                     {$form.msg_html.html}
                     <div class="description">{ts}You may optionally create an HTML formatted version of this message. It will be sent to contacts whose Email Format preference is 'HTML' or 'Both'.{/ts} {ts 1=$tokenDocsRepeated}Tokens may be included (%1).{/ts}</div>
                 </div>
@@ -123,10 +124,3 @@
 </div>
 </div> <!-- end of crm-form-block -->
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
-{literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-</script>
-{/literal}

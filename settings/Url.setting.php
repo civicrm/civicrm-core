@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,6 +40,7 @@ return array (
     'group' => 'url',
     'group_name' => 'URL Preferences',
     'name' => 'userFrameworkResourceURL',
+    'title' => 'Script and CSS Resources URL',
     'type' => 'String',
     'default' => null,
     'add' => '4.1',
@@ -53,6 +54,7 @@ return array (
   'imageUploadURL' => array(
     'group' => 'url',
     'group_name' => 'URL Preferences',
+    'title' => 'Image URL Prefix',
     'name' => 'imageUploadURL',
     'type' => 'String',
     'default' => null,
@@ -68,6 +70,7 @@ return array (
     'group' => 'url',
     'group_name' => 'URL Preferences',
     'name' => 'customCSSURL',
+    'title' => 'Custom CSS',
     'type' => 'String',
     'default' => null,
     'add' => '4.1',

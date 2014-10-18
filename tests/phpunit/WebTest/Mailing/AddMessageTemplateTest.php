@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,12 +25,20 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Mailing_AddMessageTemplateTest
+ */
 class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
+  /**
+   * @param bool $useTokens
+   * @param null $msgTitle
+   */
   function testTemplateAdd($useTokens = FALSE, $msgTitle = NULL) {
     $this->webtestLogin();
 
@@ -43,27 +51,12 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->type("msg_title", $msgTitle);
     if ($useTokens) {
       //Add Tokens
-      $this->click("css=#msg_subject + a");
-      $this->waitForElementPresent("css=#tokenSubject + .ui-dialog-buttonpane button");
-      $this->type("filter3", "display");
-      $this->addSelection("token3", "label=Display Name");
-      $this->type("filter3", "contact");
-      $this->addSelection("token3", "label=Contact Type");
-      $this->click("css=#tokenSubject + .ui-dialog-buttonpane button");
-      $this->click("//span[@id='helptext']/a/label");
-      $this->waitForElementPresent("css=#tokenText + .ui-dialog-buttonpane button");
-      $this->type("filter1", "display");
-      $this->addSelection("token1", "label=Display Name");
-      $this->type("filter1", "contact");
-      $this->addSelection("token1", "label=Contact Type");
-      $this->click("css=#tokenText + .ui-dialog-buttonpane button");
-      $this->click("//span[@id='helphtml']/a/label");
-      $this->waitForElementPresent("css=#tokenHtml + .ui-dialog-buttonpane button");
-      $this->type("filter2", "display");
-      $this->addSelection("token2", "label=Display Name");
-      $this->type("filter2", "contact");
-      $this->addSelection("token2", "label=Contact Type");
-      $this->click("css=#tokenHtml + .ui-dialog-buttonpane button");
+      $this->select2("msg_subject", "Display Name");
+      $this->select2("msg_subject", "Contact Type");
+      $this->select2("xpath=//*[contains(@data-field,'msg_text')]/../div/a", "Display Name", FALSE, TRUE);
+      $this->select2("xpath=//*[contains(@data-field,'msg_text')]/../div/a", "Contact Type", FALSE, TRUE);
+      $this->select2("xpath=//*[contains(@data-field,'html_message')]/../div/a", "Display Name", FALSE, TRUE);
+      $this->select2("xpath=//*[contains(@data-field,'html_message')]/../div/a", "Contact Type", FALSE, TRUE);
     }
     else {
       // Fill message subject.
@@ -120,8 +113,7 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->type("name", "Mailing $mailingName Webtest");
 
     // Add the test mailing group
-    $this->select("includeGroups-f", "$groupName");
-    $this->click("add");
+    $this->select("includeGroups", "$groupName");
 
     // click next
     $this->click("_qf_Group_next");
@@ -171,8 +163,8 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertElementContainsText('page-title', "Scheduled and Sent Mailings");
-    $this->assertElementContainsText("xpath=//table[@class='selector']/tbody//tr//td", "Mailing $mailingName Webtest");
+    $this->assertElementContainsText('page-title', "Find Mailings");
+    $this->isTextPresent("Mailing $mailingName Webtest");
     $this->openCiviPage('mailing/queue', 'reset=1');
 
     // verify status
@@ -183,10 +175,9 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->type("sort_name", $firstName);
     $this->click("activity_type_id[19]");
     $this->click("_qf_Search_refresh");
-    $this->waitForElementPresent("_qf_Search_next_print");
-
-    $this->click("xpath=id('Search')/div[3]/div/div[2]/table/tbody/tr[2]/td[9]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_ActivityView_next");
+    $this->waitForElementPresent("xpath=//form[@id='Search']/div[3]/div/div[2]/table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[1][text()='View']");
+    $this->click("xpath=//form[@id='Search']/div[3]/div/div[2]/table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[2]");
     $this->assertElementContainsText('help', "Bulk Email Sent.", "Status message didn't show up after saving!");
   }
 }

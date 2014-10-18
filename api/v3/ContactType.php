@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,10 +31,8 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Survey
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  */
-
-require_once 'api/v3/utils.php';
 
 /**
  * create/update contact_type
@@ -43,7 +41,7 @@ require_once 'api/v3/utils.php';
  * In case of updating existing contact_type, id of that particular contact_type must
  * be in $params array.
  *
- * @param array $params  (referance) Associative array of property
+ * @param array $params  (reference) Associative array of property
  *                       name/value pairs to insert in new 'contact_type'
  *
  * @return array   contact_type array
@@ -66,11 +64,11 @@ function civicrm_api3_contact_type_create($params) {
 /**
  * Returns array of contact_types  matching a set of one or more group properties
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params one or more valid
  *                       property_name=>value pairs. If $params is set
  *                       as null, all contact_types will be returned
  *
- * @return array  (referance) Array of matching contact_types
+ * @return array Array of matching contact_types
  * @access public
  */
 function civicrm_api3_contact_type_get($params) {
@@ -84,11 +82,10 @@ function civicrm_api3_contact_type_get($params) {
  * This method is used to delete any existing contact_type. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params  (reference) array containing id of the group
+ * @param array $params array containing id of the group
  *                       to be deleted
  *
- * @return array  (referance) returns flag true if successfull, error
- *                message otherwise
+ * @return array  API Result Array
  *
  * @access public
  */

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_OfflineMembershipAddPricesetTest
+ */
 class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -87,7 +91,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $setHelp          = 'Select your membership options.';
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1  = $memTypeParams1['membership_type'];
-    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
     $memTypeId1     = $memTypeId1[1];
     $this->_testAddSet($setTitle, $usedFor, $contributionType, $setHelp);
 
@@ -140,7 +144,6 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->select("financial_type_id", "label={$contributionType}");
     $this->waitForElementPresent('_qf_Field_next-bottom');
     $this->click('_qf_Field_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Price Field '{$fields[0]}' has been saved.");
 
     // load the Price Set Preview and check for expected values
@@ -163,6 +166,12 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
 
   }
 
+  /**
+   * @param $setTitle
+   * @param $usedFor
+   * @param null $contributionType
+   * @param $setHelp
+   */
   function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
@@ -177,26 +186,36 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     elseif ($usedFor == 'Membership') {
       $this->click('extends_3');
       $this->waitForElementPresent('financial_type_id');
-      $this->select("css=select.form-select", "label={$contributionType}");
+      $this->select("css=select.crm-form-select", "label={$contributionType}");
     }
     $this->type('help_pre', $setHelp);
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
 
     $this->click('_qf_Set_next-bottom');
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent("xpath=//div[@id='crm-main-content-wrapper']//div[2]/a");
     $this->waitForText('crm-notification-container', "Your Set '{$setTitle}' has been added. You can add fields to this set now.");
   }
 
+  /**
+   * @param $fields
+   * @param $validateString
+   * @param bool $dateSpecificFields
+   * @param $title
+   * @param $sid
+   * @param $contributionType
+   *
+   * @return array
+   */
   function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $contributionType) {
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1  = $memTypeParams1['membership_type'];
 
-    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
     $memTypeId1     = $memTypeId1[1];
 
     $memTypeParams2 = $this->webtestAddMembershipType();
     $memTypeTitle2  = $memTypeParams2['membership_type'];
-    $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
+    $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
     $memTypeId2     = $memTypeId2[1];
 
     $this->openCiviPage("admin/price/field", "reset=1&action=add&sid={$sid}");
@@ -249,13 +268,17 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     return array($memTypeTitle1, $memTypeTitle2);
   }
 
+  /**
+   * @param $validateStrings
+   * @param $sid
+   */
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
     $this->openCiviPage('admin/price', 'reset=1');
 
     // Use the price set id ($sid) to pick the correct row
-    $this->click("css=tr#row_{$sid} a[title='Preview Price Set']");
+    $this->click("css=tr#price_set-{$sid} a[title='Preview Price Set']");
 
     // Look for Register button
     $this->waitForElementPresent('_qf_Preview_cancel-bottom');
@@ -264,6 +287,13 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->assertStringsPresent($validateStrings);
   }
 
+  /**
+   * @param $sid
+   * @param $contactParams
+   * @param $memTypeTitle1
+   * @param $memTypeTitle2
+   * @param bool $renew
+   */
   function _testSignUpOrRenewMembership($sid, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = FALSE) {
     //build the membership dates.
     require_once 'CRM/Core/Config.php';
@@ -300,18 +330,21 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
       $this->click('_qf_Membership_upload-bottom');
     }
     else {
-      $this->click("xpath=//div[@id='memberships']//table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+      $this->click("xpath=//div[@id='memberships']/div//table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
       $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
+      $this->waitForAjaxContent();
       $this->click('_qf_MembershipRenewal_upload-bottom');
 
       $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr");
-      $this->click("xpath=//div[@id='memberships']//table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+      $this->click("xpath=//div[@id='memberships']/div//table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
       $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
+      $this->waitForAjaxContent();
       $this->click('_qf_MembershipRenewal_upload-bottom');
     }
-    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[9]/span/a[text()='View']");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@id='memberships']//table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[9]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]");
 
     //View Membership Record
     $verifyData = array(
@@ -323,10 +356,10 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     );
     $this->webtestVerifyTabularData($verifyData);
 
-    $this->click('_qf_MembershipView_cancel-bottom');
-    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[9]/span/a[text()='View']");
     $this->click("xpath=//div[@id='memberships']//table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[9]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]");
 
     //View Membership Record
     $verifyData = array(
@@ -338,10 +371,16 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     );
     $this->webtestVerifyTabularData($verifyData);
 
-    $this->click("_qf_MembershipView_cancel-bottom");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr");
   }
 
+  /**
+   * @param $sid
+   * @param $contactParams
+   * @param $memTypeTitle1
+   * @param $term
+   */
   function _testMultilpeTermsMembershipRegistration($sid, $contactParams, $memTypeTitle1, $term){
     //build the membership dates.
     require_once 'CRM/Core/Config.php';
@@ -378,9 +417,9 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->waitForElementPresent('recordContribution');
     $this->click('_qf_Membership_upload-bottom');
 
-    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr");
-    $this->click("xpath=//div[@id='memberships']//table/tbody//tr/td[text()='{$endDate}']/../td[9]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+    $this->waitForElementPresent("xpath=//table[@class='display dataTable no-footer']/tbody//tr/td[4][text()='{$endDate}']/../td[9]/span[1]/a[1]");
+    $this->click("xpath=//table[@class='display dataTable no-footer']/tbody//tr/td[4][text()='{$endDate}']/../td[9]/span[1]/a[1]");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
     //View Membership Record
     $verifyData = array(
       'Membership Type' => "$memTypeTitle1",
@@ -392,9 +431,8 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->webtestVerifyTabularData($verifyData);
 
     //check if the membership amount is correct
-    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[2]/tbody/tr/td/span[text()='{$amount}']");
-    $this->assertTrue($this->isElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[2]/tbody/tr/td/span[text()='{$amount}']"));
+    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[@class='crm-accordion-wrapper']/div/table/tbody/tr/td/span[text()='{$amount}']");
+    $this->assertTrue($this->isElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[@class='crm-accordion-wrapper']/div/table/tbody/tr/td/span[text()='{$amount}']"));
     $this->click("_qf_MembershipView_cancel-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }

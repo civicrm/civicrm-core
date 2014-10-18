@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing a tag (admin)  *}
-<h3>{if $action eq 1}{ts}New Tag {if $isTagSet}Set{/if}{/ts}{elseif $action eq 2}{ts}Edit Tag {if $isTagSet}Set{/if}{/ts}{else}{ts}Delete Tag {if $isTagSet}Set{/if}{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-tag-form-block">
     {if $action eq 1 or $action eq 2 }
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>

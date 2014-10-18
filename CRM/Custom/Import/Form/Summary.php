@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Custom_Import_Form_Summary
+ */
 class CRM_Custom_Import_Form_Summary extends CRM_Contact_Import_Form_Summary {
   /**
    * Function to set variables up before form is built

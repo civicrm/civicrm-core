@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -150,17 +150,15 @@
 </div>
 
 {if $action eq 1  or $action eq 2}
-<script type="text/javascript" >
-{literal}
+  <script type="text/javascript">
+  {literal}
     function reload(refresh) {
-        var paymentProcessorType = document.getElementById("payment_processor_type_id");
-        var url = {/literal}"{$refreshURL}"{literal}
-        var post = url + "&pp=" + paymentProcessorType.value;
-        if( refresh ) {
-            window.location= post;
-        }
+      var paymentProcessorType = cj("#payment_processor_type_id");
+      var url = {/literal}"{$refreshURL}"{literal} + "&pp=" + paymentProcessorType.val();
+      paymentProcessorType.closest('form').attr('data-warn-changes', 'false');
+      window.location.href = url;
     }
-{/literal}
-    </script>
+  {/literal}
+  </script>
 
 {/if}

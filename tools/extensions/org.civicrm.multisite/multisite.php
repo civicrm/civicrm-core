@@ -240,6 +240,8 @@ AND    id IN ";
 
 /**
  *
+ * @param int $permission
+ *
  * @return NULL|integer $groupID
  */
 function _multisite_get_domain_group($permission = 1) {
@@ -266,15 +268,17 @@ function _multisite_get_domain_group($permission = 1) {
     return $groupID;
   }
 
-  /**
-   * Should we be adding ACLs in this instance. If we don't add them the user
-   * will not be able to see anything. We check if the install has the permissions
-   * hook implemented correctly & if so only allow view & edit based on those.
-   *
-   * Otherwise all users get these permissions added (4.2 vs 4.3 / other CMS issues)
-   *
-   * @param integer $type type of operation
-   */
+/**
+ * Should we be adding ACLs in this instance. If we don't add them the user
+ * will not be able to see anything. We check if the install has the permissions
+ * hook implemented correctly & if so only allow view & edit based on those.
+ *
+ * Otherwise all users get these permissions added (4.2 vs 4.3 / other CMS issues)
+ *
+ * @param integer $type type of operation
+ *
+ * @return bool
+ */
   function _multisite_add_permissions($type){
     $hookclass = 'CRM_Utils_Hook';
     if(!method_exists($hookclass, 'permissions')){

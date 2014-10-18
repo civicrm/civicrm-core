@@ -42,6 +42,9 @@ function civicrm_api3_multisite_domain_create($params) {
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */
+/**
+ * @param $params
+ */
 function _civicrm_api3_multisite_domain_create_spec(&$params) {
   $params['name']['api.required'] = 1;
   $params['group_title'] = array(

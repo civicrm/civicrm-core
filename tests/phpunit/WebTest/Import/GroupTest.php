@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_GroupTest
+ */
 class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
@@ -60,8 +64,7 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     // Select GroupName
     $this->select("group", "label={$groupName}");
 
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     // To Check Number Of Imported Contacts
     $this->assertTrue($this->isTextPresent("{$count} Contacts"), "Contacts Not Found");
@@ -82,8 +85,7 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     // Select GroupName
     $this->select("group", "label={$groupName}");
 
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     // To Check Imported Contacts
     $this->assertTrue($this->isTextPresent("{$count} Contacts"), "Contacts Not Found");
@@ -92,6 +94,9 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for contact import for Individuals.
      */
+  /**
+   * @return array
+   */
   function _individualGroupCSVData() {
     $headers = array(
       'first_name' => 'First Name',

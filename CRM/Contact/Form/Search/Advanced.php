@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@ s | under the terms of the GNU Affero General Public License           |
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -177,6 +177,15 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     }
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if (!$this->_searchPane) {
       return parent::getTemplateFileName();
@@ -350,7 +359,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         $this->_formValues['contact_tags'][$value] = 1;
       }
     }
-    
+
     // CRM-13848
     $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
     if ($financialType && is_array($financialType)) {
@@ -359,7 +368,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         $this->_formValues['financial_type_id'][$typeID] = 1;
       }
     }
-    
+
     $taglist = CRM_Utils_Array::value('contact_taglist', $this->_formValues);
 
     if ($taglist && is_array($taglist)) {

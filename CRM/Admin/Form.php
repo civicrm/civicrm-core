@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -75,7 +75,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -106,27 +106,13 @@ class CRM_Admin_Form extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Add standard buttons
    *
    * @return void
    * @access public
    */
   public function buildQuickForm() {
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
-    }
-    elseif ($this->_action & CRM_Core_Action::VIEW) {
+    if ($this->_action & CRM_Core_Action::VIEW || $this->_action & CRM_Core_Action::PREVIEW) {
       $this->addButtons(array(
           array(
             'type' => 'cancel',
@@ -140,7 +126,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
       $this->addButtons(array(
           array(
             'type' => 'next',
-            'name' => ts('Save'),
+            'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
             'isDefault' => TRUE,
           ),
           array(

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,6 +24,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 */
+
+/**
+ * Class CRM_Queue_Page_AJAX
+ */
 class CRM_Queue_Page_AJAX {
 
   /**
@@ -108,8 +112,7 @@ class CRM_Queue_Page_AJAX {
         CRM_Core_Error::debug_var("CRM_Queue_Page_AJAX_{$op}_error", $result);
       }
     }
-        echo json_encode($result);
-        CRM_Utils_System::civiExit();
+        CRM_Utils_JSON::output($result);
     }
   }
 

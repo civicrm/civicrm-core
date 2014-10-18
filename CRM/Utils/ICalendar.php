@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -66,8 +66,9 @@ class CRM_Utils_ICalendar {
    *
    * @param $date Date to escape
    *
-   * @return  Escaped date
+   * @param bool $gdata
    *
+   * @return  Escaped date
    */
   static function formatDate($date, $gdata = FALSE) {
 
@@ -92,19 +93,19 @@ class CRM_Utils_ICalendar {
    *
    * @access public
    *
+   * @param string $calendar The calendar data to be published.
+   *
    * @param string $content_type
-   *
-   * @param string $filename The file name (for downloads)
-   *
-   * @param string $disposition How the file should be sent ('attachment' for downloads)
    *
    * @param string $charset The character set to use, defaults to
    * 'us-ascii'.
    *
-   * @param string $calendar The calendar data to be published.
+   * @param null $fileName
+   * @param string $disposition How the file should be sent ('attachment' for downloads)
+   *
+   * @internal param string $filename The file name (for downloads)
    *
    * @return void
-   *
    */
   static function send($calendar, $content_type = 'text/calendar', $charset = 'us-ascii', $fileName = NULL, $disposition = NULL) {
     $config = CRM_Core_Config::singleton();

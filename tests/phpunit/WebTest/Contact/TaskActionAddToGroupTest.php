@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_TaskActionAddToGroupTest
+ */
 class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -38,7 +42,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->WebtestAddGroup($newGroupName);
 
     // Create two new contacts with a common random string in email address
-    $emailString = substr(sha1(rand()), 0, 7) . '@example.com_';
+    $emailString = substr(sha1(rand()), 0, 7) . '@example.com';
     $cids = array();
     for ($i = 0; $i < 2; $i++) {
       // create new contact
@@ -68,12 +72,8 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
     // Click "check all" box and act on "Add to group" action
     $this->click('toggleSelect');
+    $this->waitForText("xpath=//input[@value='ts_sel']/following-sibling::label/span", '2');
     $this->select("task", "label=Add Contacts to Group");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(1);
-    $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Select the new group and click to add
@@ -88,7 +88,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
     // Search by group membership in newly created group
     $this->openCiviPage('contact/search/advanced', 'reset=1');
-    $this->select("crmasmSelect1", "label=" . $newGroupName);
+    $this->select("group", "label=" . $newGroupName);
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -110,17 +110,16 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->WebtestAddGroup($newGroupName);
 
     $this->openCiviPage('contact/search', 'reset=1');
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
-    $this->click("xpath=//div[@class='form-item float-right']/a[text()='25']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->type("xpath=//*[@id='CRM_Contact_Form_Search_Basic-rows-per-page-select']", '25');
+    $this->waitForElementPresent("toggleSelect");
     $this->click("toggleSelect");
     $this->click("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a", "First");
     $this->click("toggleSelect");
+    $this->waitForText("xpath=//input[@value='ts_sel']/following-sibling::label/span", '50');
     $this->select("task", "label=Add Contacts to Group");
-    $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
      // Select the new group and click to add
@@ -134,7 +133,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "50 contacts added to group");
 
     $this->openCiviPage('contact/search/advanced', 'reset=1');
-    $this->select("crmasmSelect1", "label=" . $newGroupName);
+    $this->select("group", "label=" . $newGroupName);
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

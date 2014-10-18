@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -116,6 +116,9 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $this->_defaults = array();
     if ($this->_contactID) {
@@ -125,7 +128,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
       CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
     }
-    $stateCountryMap = array();
     //set custom field defaults
     foreach ($this->_fields as $name => $field) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
@@ -135,21 +137,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
           );
         }
       }
-      if ((substr($name, 0, 14) === 'state_province') || (substr($name, 0, 7) === 'country') || (substr($name, 0, 6) === 'county')) {
-        list($fieldName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if (!array_key_exists($index, $stateCountryMap)) {
-          $stateCountryMap[$index] = array();
-        }
-        $stateCountryMap[$index][$fieldName] = $name;
-      }
-
-      // also take care of state country widget
-      if (!empty($stateCountryMap)) {
-        CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap, $this->_defaults);
-      }
     }
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
     return $this->_defaults;
   }
 
@@ -237,9 +225,11 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -291,6 +281,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
 
     $dedupeParams = CRM_Dedupe_Finder::formatParams($params, 'Individual');
+    $dedupeParams['check_permission'] = FALSE;
     $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
     if ($ids) {
       $this->_contactID = $ids['0'];

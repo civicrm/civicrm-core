@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,6 +41,9 @@
  * {@getfields mailing_component_create}
  * @example mailing_componentCreate.php
  *
+ * @param $params
+ *
+ * @throws API_Exception
  * @return array of newly created mailing_component property values.
  * @access public
  */
@@ -54,6 +57,8 @@ function civicrm_api3_mailing_component_create($params) {
  * Allowed @params array keys are:
  * {@getfields mailing_component_get}
  * @example mailing_componentCreate.php
+ *
+ * @param $params
  *
  * @return array of retrieved mailing_component property values.
  * @access public
@@ -69,6 +74,9 @@ function civicrm_api3_mailing_component_get($params) {
  * {@getfields mailing_component_delete}
  * @example mailing_componentCreate.php
  *
+ * @param $params
+ *
+ * @throws API_Exception
  * @return array of deleted values.
  * @access public
  */

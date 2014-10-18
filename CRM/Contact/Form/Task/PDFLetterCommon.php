@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,6 +41,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
    * build all the data structures needed to build the form
+   *
+   * @param $form
    *
    * @return void
    * @access public
@@ -58,22 +60,30 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     $form->assign('message', $messageText);
     $form->assign('messageSubject', $messageSubject);
+    CRM_Utils_System::setTitle('Create Printable Letters (PDF)');
   }
 
+  /**
+   * @param $form
+   * @param $cid
+   */
   static function preProcessSingle(&$form, $cid) {
     $form->_contactIds = array($cid);
     // put contact display name in title for single contact mode
-    CRM_Contact_Page_View::setTitle($cid);
+    CRM_Utils_System::setTitle(ts('Create Printable Letter (PDF) for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
   }
 
   /**
    * Build the form
    *
-   * @access public
+   * @var CRM_Core_Form $form
    *
    * @return void
    */
   static function buildQuickForm(&$form) {
+    // This form outputs a file so should never be submitted via ajax
+    $form->preventAjaxSubmit();
+
     //Added for CRM-12682: Add activity subject and campaign fields
     CRM_Campaign_BAO_Campaign::addCampaign($form);
     $form->add(
@@ -84,15 +94,14 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       FALSE
     );
 
-    $form->add('static', 'pdf_format_header', NULL, ts('Page Format'));
-    $form->add(
-      'select',
-      'format_id',
-      ts('Select Format'),
-      array(0 => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE),
-      FALSE,
-      array('onChange' => "selectFormat( this.value, false );")
-    );;
+    $form->add('static', 'pdf_format_header', NULL, ts('Page Format: %1', array(1 => '<span class="pdf-format-header-label"></span>')));
+    $form->addSelect('format_id', array(
+      'label' => ts('Select Format'),
+      'placeholder' => ts('Default'),
+      'entity' => 'message_template',
+      'field' => 'pdf_format_id',
+      'option_url' => 'civicrm/admin/pdfFormats',
+    ));
     $form->add(
       'select',
       'paper_size',
@@ -146,6 +155,17 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       array('size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"),
       TRUE
     );
+
+    $config = CRM_Core_Config::singleton();
+    if ($config->wkhtmltopdfPath == false) {
+      $form->add(
+        'text',
+        'stationery',
+        ts('Stationery (relative path to PDF you wish to use as the background)'),
+        array('size' => 25, 'maxlength' => 900, 'onkeyup' => "showUpdateFormatChkBox();"),
+        FALSE
+      );
+    }
     $form->add('checkbox', 'bind_format', ts('Always use this Page Format with the selected Template'));
     $form->add('checkbox', 'update_format', ts('Update Page Format (this will affect all templates that use this format)'));
 
@@ -155,53 +175,19 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     CRM_Mailing_BAO_Mailing::commonLetterCompose($form);
 
-    if ($form->_single) {
-      $cancelURL = CRM_Utils_System::url(
-        'civicrm/contact/view',
-        "reset=1&cid={$form->_cid}&selectedChild=activity",
-        FALSE,
-        NULL,
-        FALSE
+    $buttons = array();
+    if ($form->get('action') != CRM_Core_Action::VIEW) {
+      $buttons[] = array(
+        'type' => 'submit',
+        'name' => $form->_single ? ts('Make PDF') : ts('Make PDFs'),
+        'isDefault' => TRUE,
       );
-      if ($form->get('action') == CRM_Core_Action::VIEW) {
-        $form->addButtons(array(
-            array(
-              'type' => 'cancel',
-              'name' => ts('Done'),
-              'js' => array('onclick' => "location.href='{$cancelURL}'; return false;"),
-            ),
-          )
-        );
-      }
-      else {
-        $form->addButtons(array(
-            array(
-              'type' => 'submit',
-              'name' => ts('Make PDF Letter'),
-              'isDefault' => TRUE,
-            ),
-            array(
-              'type' => 'cancel',
-              'name' => ts('Done'),
-              'js' => array('onclick' => "location.href='{$cancelURL}'; return false;"),
-            ),
-          )
-        );
-      }
     }
-    else {
-      $form->addButtons(array(
-        array(
-          'type' => 'submit',
-          'name' => ts('Make PDF Letters'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Done'),
-        ),
-      ));
-    }
+    $buttons[] = array(
+      'type' => 'cancel',
+      'name' => $form->get('action') == CRM_Core_Action::VIEW ? ts('Done') : ts('Cancel'),
+    );
+    $form->addButtons($buttons);
 
     $form->addFormRule(array('CRM_Contact_Form_Task_PDFLetterCommon', 'formRule'), $form);
   }
@@ -254,6 +240,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @access protected
    *
+   * @param $form
+   *
    * @return array( $categories, $html_message, $messageToken, $returnProperties )
    */
   static protected function processMessageTemplate(&$form) {
@@ -269,7 +257,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       );
 
       $messageTemplate['pdf_format_id'] = 'null';
-      if (!empty($formValues['bind_format']) && $formValues['format_id'] > 0) {
+      if (!empty($formValues['bind_format']) && $formValues['format_id']) {
         $messageTemplate['pdf_format_id'] = $formValues['format_id'];
       }
       if (!empty($formValues['saveTemplate']) && $formValues['saveTemplate']) {
@@ -285,7 +273,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       }
     }
     elseif (CRM_Utils_Array::value('template', $formValues) > 0) {
-      if (!empty($formValues['bind_format']) && $formValues['format_id'] > 0) {
+      if (!empty($formValues['bind_format']) && $formValues['format_id']) {
         $query = "UPDATE civicrm_msg_template SET pdf_format_id = {$formValues['format_id']} WHERE id = {$formValues['template']}";
       }
       else {
@@ -326,6 +314,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * process the form after the input has been submitted and validated
    *
    * @access public
+   *
+   * @param $form
    *
    * @return void
    */
@@ -373,6 +363,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     CRM_Utils_System::civiExit(1);
   }
 
+  /**
+   * @param $form
+   * @param $html_message
+   * @param $contactIds
+   *
+   * @throws CRM_Core_Exception
+   */
   static function createActivities($form, $html_message, $contactIds) {
     //Added for CRM-12682: Add activity subject and campaign fields
     $formValues     = $form->controller->exportValues($form->getName());
@@ -410,6 +407,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
+    //@todo why are we using $form->_contactIds here & contactIds above - need comment
     foreach ($form->_contactIds as $contactId) {
       $activityTargetParams = array(
         'activity_id' => empty($activity->id) ? $activityIds[$contactId] : $activity->id,
@@ -420,6 +418,9 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
   }
 
+  /**
+   * @param $message
+   */
   static function formatMessage(&$message) {
     $newLineOperators = array(
       'p' => array(

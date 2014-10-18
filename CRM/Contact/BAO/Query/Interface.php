@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -39,28 +39,68 @@
 abstract class CRM_Contact_BAO_Query_Interface {
 
   abstract public function &getFields();
+
+  /**
+   * @param $fieldName
+   * @param $mode
+   * @param $side
+   *
+   * @return mixed
+   */
   abstract public function from($fieldName, $mode, $side);
 
+  /**
+   * @param $query
+   *
+   * @return null
+   */
   public function select(&$query) {
     return NULL;
   }
 
+  /**
+   * @param $query
+   *
+   * @return null
+   */
   public function where(&$query) {
     return NULL;
   }
 
+  /**
+   * @param $tables
+   *
+   * @return null
+   */
   public function setTableDependency(&$tables) {
     return NULL;
   }
 
+  /**
+   * @param $panes
+   *
+   * @return null
+   */
   public function registerAdvancedSearchPane(&$panes) {
     return NULL;
   }
 
+  /**
+   * @param $form
+   * @param $type
+   *
+   * @return null
+   */
   public function buildAdvancedSearchPaneForm(&$form, $type) {
     return NULL;
   }
 
+  /**
+   * @param $paneTemplatePathArray
+   * @param $type
+   *
+   * @return null
+   */
   public function setAdvancedSearchPaneTemplatePath(&$paneTemplatePathArray, $type) {
     return NULL;
   }

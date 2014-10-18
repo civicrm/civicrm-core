@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -62,8 +62,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $customGroup = $this->get('customProfile');
     $this->assign('customProfile', $customGroup);
 
-    $this->assign('primaryParticipantProfile', $this->get('primaryParticipantProfile'));
-    $this->assign('addParticipantProfile', $this->get('addParticipantProfile'));
+    CRM_Event_Form_Registration_Confirm::assignProfiles($this);
 
     CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values['event']));
   }
@@ -99,20 +98,50 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
     $this->assignToTemplate();
 
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $getTaxDetails = FALSE;
+    $taxAmount = 0;
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $lineItemForTemplate = array();
       foreach ($this->_lineItem as $key => $value) {
         if (!empty($value)) {
           $lineItemForTemplate[$key] = $value;
+          if ($invoicing) {
+            foreach ($value as $v) {
+              if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
+                $taxAmount += $v['tax_amount'];
+                $getTaxDetails = TRUE;
+              }
+            }
+          }
         }
       }
       if (!empty($lineItemForTemplate)) {
         $this->assign('lineItem', $lineItemForTemplate);
       }
     }
+    else {
+      if ($invoicing) {
+        foreach ($this->_lineItem as $lineItemKey => $lineItemValue) {
+          foreach ($lineItemValue as $v) {
+            if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
+              $taxAmount += $v['tax_amount'];
+              $getTaxDetails = TRUE;
+            }
+          }
+        }
+      }
+    }
 
+    if ($invoicing) {
+      $this->assign('getTaxDetails', $getTaxDetails);
+      $this->assign('totalTaxAmount', $taxAmount);
+      $this->assign('taxTerm', $taxTerm);
+    }
     $this->assign('totalAmount', $this->_totalAmount);
-
+    
     $hookDiscount = $this->get('hookDiscount');
     if ($hookDiscount) {
       $this->assign('hookDiscount', $hookDiscount);

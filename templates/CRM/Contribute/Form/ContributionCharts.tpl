@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -60,7 +60,7 @@
 {literal}
 <script type="text/javascript">
 
-  cj( function( ) {
+  CRM.$(function($) {
       buildChart( );
   });
 
@@ -85,13 +85,13 @@
   function byMonthOnClick( barIndex ) {
      var allData = {/literal}{$openFlashChartData}{literal};
      var url     = eval( "allData.by_month.on_click_urls.url_" + barIndex );
-     if ( url ) window.location = url;
+     if ( url ) window.location.href = url;
   }
 
   function byYearOnClick( barIndex ) {
      var allData = {/literal}{$openFlashChartData}{literal};
      var url     = eval( "allData.by_year.on_click_urls.url_" + barIndex );
-     if ( url ) window.location = url;
+     if ( url ) window.location.href = url;
   }
 
  </script>

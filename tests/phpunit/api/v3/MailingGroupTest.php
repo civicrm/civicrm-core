@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -38,6 +38,9 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
   protected $_apiversion;
 
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Mailer Group',

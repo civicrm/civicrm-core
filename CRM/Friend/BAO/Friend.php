@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,9 @@
  *
  */
 class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -287,6 +290,9 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *
    * @params int     $contactId      contact id
    * @params array   $values         associative array of name/value pair
+   *
+   * @param $contactID
+   * @param $values
    *
    * @return void
    * @access public

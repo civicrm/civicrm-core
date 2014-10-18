@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,7 +40,9 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * Check to see if we have cache entries for this group
    * if not, regenerate, else return
    *
-   * @param int $groupID groupID of group that we are checking against
+   * @param $groupIDs
+   *
+   * @internal param int $groupID groupID of group that we are checking against
    *
    * @return boolean true if we did not regenerate, false if we did
    */
@@ -188,6 +190,18 @@ AND    g.refresh_date IS NULL
     }
   }
 
+  /**
+   * FIXME: This function should not be needed, because the cache table should not be getting truncated
+   */
+  static function fillIfEmpty() {
+    if (!CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_group_contact_cache")) {
+      self::loadAll();
+    }
+  }
+
+  /**
+   * @param $groupID
+   */
   static function add($groupID) {
     // first delete the current cache
     self::remove($groupID);
@@ -203,6 +217,10 @@ AND    g.refresh_date IS NULL
     }
   }
 
+  /**
+   * @param $groupID
+   * @param $values
+   */
   static function store(&$groupID, &$values) {
     $processed = FALSE;
 
@@ -433,6 +451,7 @@ WHERE  id = %1
         $customClass =
           CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
         $searchSQL = $customClass->contactIDs();
+        $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
         $idName = 'contact_id';
       }
       else {
@@ -531,6 +550,9 @@ AND  civicrm_group_contact.group_id = $groupID ";
     $lock->release();
   }
 
+  /**
+   * @return int
+   */
   static function smartGroupCacheTimeout() {
     $config = CRM_Core_Config::singleton();
 
@@ -614,7 +636,7 @@ ORDER BY   gc.contact_id, g.children
       $contactGroup[$prevContactID]['groupTitle'] = implode(', ', $contactGroup[$prevContactID]['groupTitle']);
     }
 
-    if (is_numeric($contactID)) {
+    if ((!empty($contactGroup[$contactID]) && is_numeric($contactID))) {
       return $contactGroup[$contactID];
     }
     else {

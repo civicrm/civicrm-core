@@ -9,6 +9,7 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
+    <title>Extension ID</title>
     <required>true</required>
     <comment>Local Extension ID</comment>
     <add>4.2</add>
@@ -92,6 +93,7 @@
   <field>
     <name>is_active</name>
     <type>boolean</type>
+    <title>Extension is Active?</title>
     <default>1</default>
     <comment>Is this extension active?</comment>
     <add>4.2</add>

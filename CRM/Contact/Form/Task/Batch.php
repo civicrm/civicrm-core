@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -67,12 +67,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
    * when not to reset sort_name
    */
   protected $_preserveDefault = TRUE;
-
-  /**
-   * the internal QF names for the state/country/county fields
-   */
-
-  protected $_stateCountryCountyFields = array();
 
   /**
    * build all the data structures needed to build the form
@@ -142,24 +136,14 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     // CRM-6794
     $preserveDefaultsArray = array(
       'first_name', 'last_name', 'middle_name',
-      'organization_name',
+      'organization_name', 'prefix_id', 'suffix_id',
       'household_name',
     );
-
-    $stateCountryMap = array();
 
     foreach ($this->_contactIds as $contactId) {
       $profileFields = $this->_fields;
       CRM_Core_BAO_Address::checkContactSharedAddressFields($profileFields, $contactId);
       foreach ($profileFields as $name => $field) {
-
-        // Link state to country, county to state per location per contact
-        list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
-          $stateCountryMap["$index-$contactId"][$prefixName] = "field_{$contactId}_{$field['name']}";
-          $this->_stateCountryCountyFields["$index-$contactId"][$prefixName] = "field[{$contactId}][{$field['name']}]";
-        }
-
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $contactId);
 
         if (in_array($field['name'], $preserveDefaultsArray)) {
@@ -167,10 +151,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
         }
       }
     }
-
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-
-
 
     $this->assign('fields', $this->_fields);
 
@@ -190,7 +170,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return array
    */
   function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -212,9 +192,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
     $this->assign('sortName', $sortName);
 
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults, $this->_stateCountryCountyFields);
-
     return $defaults;
   }
 
@@ -234,7 +211,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       foreach ($field as $fieldName => $fieldValue) {
         if ($fieldName == 'external_identifier') {
           if (in_array($fieldValue, $externalIdentifiers)) {
-            $errors["field[$componentId][external_identifier]"] = ts('Duplicate value for External Identifier.');
+            $errors["field[$componentId][external_identifier]"] = ts('Duplicate value for External ID.');
           }
           else {
             $externalIdentifiers[$componentId] = $fieldValue;

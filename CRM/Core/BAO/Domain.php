@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -69,6 +69,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Get the domain BAO
    *
+   * @param null $reset
+   *
    * @return null|object CRM_Core_BAO_Domain
    * @access public
    * @static
@@ -108,7 +110,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Reset domain to default (ie. as loaded from settings). This is the
    * counterpart to CRM_Core_BAO_Domain::setDomain.
    *
-   * @param integer $domainID id for domain you want to set as current
+   * @internal param int $domainID id for domain you want to set as current
    * @deprecated
    * @see CRM_Core_BAO_Domain::setDomain
    */
@@ -118,6 +120,11 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     CRM_Core_Config::singleton(TRUE, TRUE);
   }
 
+  /**
+   * @param bool $skipUsingCache
+   *
+   * @return null|string
+   */
   static function version( $skipUsingCache = false ) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
       CRM_Core_Config::domainID(),
@@ -153,6 +160,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Save the values of a domain
    *
+   * @param $params
+   * @param $id
+   *
    * @return domain array
    * @access public
    */
@@ -167,6 +177,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Create a new domain
    *
+   * @param $params
+   *
    * @return domain array
    * @access public
    */
@@ -177,6 +189,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     return $domain;
   }
 
+  /**
+   * @return bool
+   */
   static function multipleDomains() {
     $session = CRM_Core_Session::singleton();
 
@@ -189,6 +204,12 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     return $numberDomains > 1 ? TRUE : FALSE;
   }
 
+  /**
+   * @param bool $skipFatal
+   *
+   * @return array name & email for domain
+   * @throws Exception
+   */
   static function getNameAndEmail($skipFatal = FALSE) {
     $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
     if (!empty($fromEmailAddress)) {
@@ -212,6 +233,11 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     CRM_Core_Error::fatal($status);
   }
 
+  /**
+   * @param $contactID
+   *
+   * @return bool|null|object|string
+   */
   static function addContactToDomainGroup($contactID) {
     $groupID = self::getGroupId();
 
@@ -224,6 +250,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     return FALSE;
   }
 
+  /**
+   * @return bool|null|object|string
+   */
   static function getGroupId() {
     static $groupID = NULL;
 
@@ -262,11 +291,19 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     return $groupID ? $groupID : FALSE;
   }
 
+  /**
+   * @param $groupId
+   *
+   * @return bool
+   */
   static function isDomainGroup($groupId) {
     $domainGroupID = self::getGroupId();
     return $domainGroupID == $groupId ? TRUE : FALSE;
   }
 
+  /**
+   * @return array
+   */
   static function getChildGroupIds() {
     $domainGroupID = self::getGroupId();
     $childGrps = array();
@@ -279,6 +316,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   // function to retrieve a list of contact-ids that belongs to current domain/site.
+  /**
+   * @return array
+   */
   static function getContactList() {
     $siteGroups = CRM_Core_BAO_Domain::getChildGroupIds();
     $siteContacts = array();

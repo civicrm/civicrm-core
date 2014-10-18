@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,7 +50,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     //  from_email_address group
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+      $this->createXMLDataSet(
         dirname(__FILE__) . '/dataset/group_admins.xml'
       )
     );
@@ -59,7 +59,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     //  from_email_address group
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+      $this->createXMLDataSet(
         dirname(__FILE__) . '/dataset/group_subscribers.xml'
       )
     );
@@ -68,7 +68,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     //  from_email_address group
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+      $this->createXMLDataSet(
         dirname(__FILE__) . '/dataset/group_nesting.xml'
       )
     );

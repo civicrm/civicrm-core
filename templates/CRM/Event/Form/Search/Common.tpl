@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,10 @@
  +--------------------------------------------------------------------+
 *}
 <tr>
-  <td class="crm-event-form-block-event_id"> {$form.event_id.label}  <br />{$form.event_id.html|crmAddClass:huge} </td>
+  <td class="crm-event-form-block-event_id"> 
+      {$form.event_id.label}  <br />{$form.event_id.html|crmAddClass:huge} <br/>
+      {$form.event_include_repeating_events.label}&nbsp;&nbsp;{$form.event_include_repeating_events.html}
+  </td>
   <td class="crm-event-form-block-event_type_id"> {$form.event_type_id.label}<br />{$form.event_type_id.html} </td>
 </tr>
 <tr>
@@ -65,8 +68,8 @@
   </td>
 </tr>
 <tr>
-  <td class="crm-event-form-block-participant_fee_level">
-    {$form.participant_fee_level.label}<br />{$form.participant_fee_level.html}
+  <td class="crm-event-form-block-participant_fee_id">
+    {$form.participant_fee_id.label}<br />{$form.participant_fee_id.html}
   </td>
   <td class="crm-event-form-block-participant_fee_amount">
     <label>{ts}Fee Amount{/ts}</label><br />
@@ -89,10 +92,27 @@ campaignTrClass='' campaignTdClass='crm-event-form-block-participant_campaign_id
 
 {literal}
 <script type="text/javascript">
-var feeUrl   = "{/literal}{$dataURLEventFee}{literal}";
-
-cj('#participant_fee_level').autocomplete( feeUrl, { width : 180, selectFirst : false, matchContains: true
-}).result(function(event, data, formatted) { cj( "input#participant_fee_id" ).val( data[1] );
-  }).bind( 'click', function( ) { cj( "input#participant_fee_id" ).val(''); });
+CRM.$(function($) {
+  // FIXME: This could be much simpler as an entityRef field but the priceFieldValue api doesn't currently support the filters we need
+  $('#participant_fee_id').crmSelect2({
+    placeholder: {/literal}'{ts escape="js"}- any -{/ts}'{literal},
+    minimumInputLength: 1,
+    allowClear: true,
+    ajax: {
+      url: "{/literal}{$dataURLEventFee}{literal}",
+      data: function(term) {
+        return {term: term};
+      },
+      results: function(response) {
+        return {results: response};
+      }
+    },
+    initSelection: function(el, callback) {
+      CRM.api3('price_field_value', 'getsingle', {id: $(el).val()}).done(function(data) {
+        callback({id: data.id, text: data.label});
+      });
+    }
+  });
+});
 </script>
 {/literal}

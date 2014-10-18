@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -39,6 +39,12 @@
 class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
   static $_processed = NULL;
 
+  /**
+   * @param $id
+   * @param string $table
+   *
+   * @return array|null
+   */
   static function &lastModified($id, $table = 'civicrm_contact') {
 
     $log = new CRM_Core_DAO_Log();
@@ -74,6 +80,12 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
     $log->save();
   }
 
+  /**
+   * @param $contactID
+   * @param $tableName
+   * @param $tableID
+   * @param null $userID
+   */
   static function register($contactID,
     $tableName,
     $tableID,
@@ -141,7 +153,9 @@ UPDATE civicrm_log
   /**
    * Function to get log record count for a Contact
    *
-   * @param int $contactId Contact ID
+   * @param $contactID
+   *
+   * @internal param int $contactId Contact ID
    *
    * @return int count of log records
    * @access public

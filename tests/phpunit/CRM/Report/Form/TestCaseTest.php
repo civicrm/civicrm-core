@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,7 +38,7 @@ require_once 'CiviTest/CiviReportTestCase.php';
  * @package CiviCRM
  */
 class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
-  static $_tablesToTruncate = array(
+  protected $_tablesToTruncate = array(
     'civicrm_contact',
     'civicrm_email',
     'civicrm_phone',
@@ -46,6 +46,9 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     'civicrm_contribution',
   );
 
+  /**
+   * @return array
+   */
   public function dataProvider() {
     $testCaseA = array(
       'CRM_Report_Form_Contribute_Detail',
@@ -77,6 +80,9 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     );
   }
 
+  /**
+   * @return array
+   */
   public function badDataProvider() {
     return array(
       // This test-case is bad because the dataset-ascii.sql does not match the
@@ -126,7 +132,7 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   function setUp() {
     parent::setUp();
     $this->foreignKeyChecksOff();
-    $this->quickCleanup(self::$_tablesToTruncate);
+    $this->quickCleanup($this->_tablesToTruncate);
   }
 
   function tearDown() {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,12 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 require_once 'Mail.php';
+
+/**
+ * Class CRM_Mailing_BAO_MailingJob
+ */
 class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   CONST MAX_CONTACTS_TO_PROCESS = 1000;
 
@@ -44,7 +48,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     parent::__construct();
   }
 
-  function create ($params){
+  /**
+   * @param $params
+   *
+   * @return CRM_Mailing_BAO_MailingJob
+   */
+  static public function create($params) {
     $job = new CRM_Mailing_BAO_MailingJob();
     $job->mailing_id = $params['mailing_id'];
     $job->status = $params['status'];
@@ -52,11 +61,15 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     $job->is_test = $params['is_test'];
     $job->save();
     $mailing = new CRM_Mailing_BAO_Mailing();
-    $eq = $mailing->getRecipients($job->id, $params['mailing_id'], NULL, NULL, true, false);
+    $mailing->getRecipients($job->id, $params['mailing_id'], NULL, NULL, TRUE, FALSE);
     return $job;
   }
+
   /**
    * Initiate all pending/ready jobs
+   *
+   * @param null $testParams
+   * @param null $mode
    *
    * @return void
    * @access public
@@ -203,6 +216,9 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
   // post process to determine if the parent job
   // as well as the mailing is complete after the run
+  /**
+   * @param null $mode
+   */
   public static function runJobs_post($mode = NULL) {
 
     $job = new CRM_Mailing_BAO_MailingJob();
@@ -271,10 +287,13 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
 
   // before we run jobs, we need to split the jobs
+  /**
+   * @param int $offset
+   * @param null $mode
+   */
   public static function runJobs_pre($offset = 200, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
 
-    $config       = CRM_Core_Config::singleton();
     $jobTable     = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
 
@@ -359,6 +378,9 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
   // Split the parent job into n number of child job based on an offset
   // If null or 0 , we create only one child job
+  /**
+   * @param int $offset
+   */
   public function split_job($offset = 200) {
     $recipient_count = CRM_Mailing_BAO_Recipients::mailingSize($this->mailing_id);
 
@@ -398,6 +420,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     }
   }
 
+  /**
+   * @param null $testParams
+   */
   public function queue($testParams = NULL) {
     $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->id = $this->mailing_id;
@@ -446,7 +471,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   /**
    * Send the mailing
    *
-   * @param object $mailer        A Mail object to send the messages
+   * @param object $mailer A Mail object to send the messages
+   *
+   * @param null $testParams
    *
    * @return void
    * @access public
@@ -578,6 +605,16 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     return $isDelivered;
   }
 
+  /**
+   * @param $fields
+   * @param $mailing
+   * @param $mailer
+   * @param $job_date
+   * @param $attachments
+   *
+   * @return bool|null
+   * @throws Exception
+   */
   public function deliverGroup(&$fields, &$mailing, &$mailer, &$job_date, &$attachments) {
     static $smtpConnectionErrors = 0;
 
@@ -647,25 +684,25 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
       // disable error reporting on real mailings (but leave error reporting for tests), CRM-5744
       if ($job_date) {
-        CRM_Core_Error::ignoreException();
+        $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       }
 
       $result = $mailer->send($recipient, $headers, $body, $this->id);
 
       if ($job_date) {
-        CRM_Core_Error::setCallback();
+        unset($errorScope);
       }
 
-      // FIXME: for now we skipping bounce handling for sms
       if (is_a($result, 'PEAR_Error') && !$mailing->sms_provider_id) {
         // CRM-9191
         $message = $result->getMessage();
-        if (strpos($message,
-            'Failed to write to socket'
-          ) !== FALSE) {
+        if (
+          strpos($message, 'Failed to write to socket') !== FALSE ||
+          strpos($message, 'Failed to set sender') !== FALSE
+        ) {
           // lets log this message and code
           $code = $result->getCode();
-          CRM_Core_Error::debug_log_message("SMTP Socket Error. Message: $message, Code: $code");
+          CRM_Core_Error::debug_log_message("SMTP Socket Error or failed to set sender error. Message: $message, Code: $code");
 
           // these are socket write errors which most likely means smtp connection errors
           // lets skip them
@@ -698,6 +735,13 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           CRM_Mailing_BAO_BouncePattern::match($result->getMessage())
         );
         CRM_Mailing_Event_BAO_Bounce::create($params);
+      }
+      elseif (is_a($result, 'PEAR_Error') && $mailing->sms_provider_id) {
+        // Handle SMS errors: CRM-15426
+        $job_id = intval($this->id);
+        $mailing_id = intval($mailing->id);
+        CRM_Core_Error::debug_log_message("Failed to send SMS message. Vars: mailing_id: ${mailing_id}, job_id: ${job_id}. Error message follows.");
+        CRM_Core_Error::debug_log_message($result->getMessage());
       }
       else {
         /* Register the delivery event */
@@ -848,6 +892,16 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
     return '';
   }
 
+  /**
+   * @param $deliveredParams
+   * @param $targetParams
+   * @param $mailing
+   * @param $job_date
+   *
+   * @return bool
+   * @throws CRM_Core_Exception
+   * @throws Exception
+   */
   public function writeToDB(
     &$deliveredParams,
     &$targetParams,

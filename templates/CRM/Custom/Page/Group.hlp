@@ -41,7 +41,7 @@
   {ts}Display Style{/ts}
 {/htxt}
 {htxt id="id-display_style"}
-    {ts}Select 'Inline' to include this set  of fields in the main contact Add/Edit form and Contact Summary screens. Select 'Tab' to create a separate navigation tab for display and editing these values (generally for less frequently accessed and/or larger sets of fields).{/ts}
+    {ts}Select 'Inline' to include this set of fields in the main contact Add/Edit form and Contact Summary screens. Select 'Tab' or 'Tab with Table' to create a separate navigation tab for display and editing these values (generally for less frequently accessed and/or larger sets of fields). 'Tab with Table' is recommended for customs data sets which allow multiple records.{/ts} 
     <p class="font-italic">{ts}NOTE: This setting applies only to custom sets used for Contact records (e.g. Individuals, Households, Organizations, or ALL contact types).{/ts}</p>
 {/htxt}
 

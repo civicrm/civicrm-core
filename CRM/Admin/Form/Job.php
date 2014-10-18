@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
  *
  */
@@ -63,6 +63,8 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
   /**
    * Function to build the form
+   *
+   * @param bool $check
    *
    * @return void
    * @access public
@@ -106,19 +108,24 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $this->addFormRule(array('CRM_Admin_Form_Job', 'formRule'));
   }
 
+  /**
+   * @param $fields
+   *
+   * @return array|bool
+   * @throws API_Exception
+   */
   static function formRule($fields) {
 
     $errors = array();
 
     require_once 'api/api.php';
 
-    $apiRequest = array();
-    $apiRequest['entity']  = CRM_Utils_String::munge($fields['api_entity']);
-    $apiRequest['action']  = CRM_Utils_String::munge($fields['api_action']);
-    $apiRequest['version'] = 3;
-    $apiRequest += _civicrm_api_resolve($apiRequest);    // look up function, file, is_generic
-
-    if( !$apiRequest['function'] ) {
+    /** @var \Civi\API\Kernel $apiKernel */
+    $apiKernel = \Civi\Core\Container::singleton()->get('civi_api_kernel');
+    $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], array('version' => 3), NULL);
+    try {
+      $apiKernel->resolve($apiRequest);
+    } catch (\Civi\API\Exception\NotImplementedException $e) {
       $errors['api_action'] = ts('Given API command is not defined.');
     }
 
@@ -129,6 +136,9 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
 

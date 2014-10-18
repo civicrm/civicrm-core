@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -79,7 +79,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     $this->assign('isCurrentEmployer', FALSE);
 
     $relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
-    
+
     if ($viewRelationship[$this->_id]['employer_id'] == $this->_contactId) {
       $this->assign('isCurrentEmployer', TRUE);
     }
@@ -143,36 +143,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    * @access public
    */
   function browse() {
-    $links = self::links();
-
-    //CRM-4418, handling edit and delete separately.
-    $permissions = array($this->_permission);
-    if ($this->_permission == CRM_Core_Permission::EDIT) {
-      //previously delete was subset of edit
-      //so for consistency lets grant delete also.
-      $permissions[] = CRM_Core_Permission::DELETE;
-    }
-    $mask = CRM_Core_Action::mask($permissions);
-
-    $currentRelationships = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId,
-      CRM_Contact_BAO_Relationship::CURRENT,
-      0, 0, 0,
-      $links, $mask
-    );
-
-    $inactiveRelationships = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId,
-      CRM_Contact_BAO_Relationship::INACTIVE,
-      0, 0, 0,
-      $links, $mask
-    );
-
-    $this->assign('currentRelationships', $currentRelationships);
-    // to show the 'Current Relationships' title and links only when viewed
-    // from relationship tab, not from dashboard
-    $this->assign('relationshipTabContext', TRUE);
-    $this->assign('inactiveRelationships', $inactiveRelationships);
-
-    $this->ajaxResponse['tabCount'] = count($currentRelationships);
+    // do nothing :) we are using datatable for rendering relationship selectors
   }
 
   /**
@@ -226,9 +197,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
 
     // check logged in url permission
     CRM_Contact_Page_View::checkUserPermission($this);
-
-    // set page title
-    CRM_Contact_Page_View::setTitle($this->_contactId);
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->assign('action', $this->_action);

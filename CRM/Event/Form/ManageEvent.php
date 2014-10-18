@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -84,6 +84,11 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * the participant records
    */
   protected $_campaignID = NULL;
+  
+  /**
+   * Check if repeating event
+   */
+  protected $_isRepeatingEvent;
 
   /**
    * Function to set variables up before form is built
@@ -96,15 +101,16 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     if (in_array('CiviEvent', $config->enableComponents)) {
       $this->assign('CiviEvent', TRUE);
     }
-
+      
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add', 'REQUEST');
 
     $this->assign('action', $this->_action);
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
     if ($this->_id) {
+      $this->_isRepeatingEvent = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
       $this->assign('eventId', $this->_id);
-      if (empty($this->_addProfileBottom) && empty($this->_addProfileBottomAdd)) {
+      if (!empty($this->_addBlockName) && empty($this->_addProfileBottom) && empty($this->_addProfileBottomAdd)) {
         $this->add('hidden', 'id', $this->_id);
       }
       $this->_single = TRUE;
@@ -148,8 +154,13 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
         CRM_Utils_System::setTitle(ts('Edit Event Template') . " - $title");
       }
       else {
+        $configureText = ts('Configure Event');
         $title = CRM_Utils_Array::value('title', $eventInfo);
-        CRM_Utils_System::setTitle(ts('Configure Event') . " - $title");
+        //If it is a repeating event change title
+        if ($this->_isRepeatingEvent) {
+          $configureText = 'Configure Repeating Event';
+        }
+        CRM_Utils_System::setTitle($configureText . " - $title");
       }
       $this->assign('title', $title);
     }
@@ -176,6 +187,12 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     }
 
     $this->_templateId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
+    
+    //Is a repeating event
+    if ($this->_isRepeatingEvent) {
+      $isRepeat = 'repeat';
+      $this->assign('isRepeat', $isRepeat);
+    }
 
     // also set up tabs
     CRM_Event_Form_ManageEvent_TabHeader::build($this);
@@ -367,6 +384,9 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if ($this->controller->getPrint() || $this->getVar('_id') <= 0 || $this->_action & CRM_Core_Action::DELETE) {
       return parent::getTemplateFileName();
@@ -376,6 +396,14 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       self::$_template->assign('isForm', FALSE);
       return 'CRM/Event/Form/ManageEvent/Tab.tpl';
     }
+  }
+
+  /**
+   * Pre-load libraries required by Online Registration Profile fields
+   */
+  static function addProfileEditScripts() {
+    CRM_UF_Page_ProfileEditor::registerProfileScripts();
+    CRM_UF_Page_ProfileEditor::registerSchemas(array('IndividualModel', 'ParticipantModel'));
   }
 }
 

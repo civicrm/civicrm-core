@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,8 @@ class CRM_Contribute_Form_AdditionalInfo {
    * Function to build the form for Premium Information.
    *
    * @access public
+   *
+   * @param $form
    *
    * @return void
    */
@@ -88,6 +90,8 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function buildAdditionalDetail(&$form) {
@@ -135,6 +139,19 @@ class CRM_Contribute_Form_AdditionalInfo {
         array('CRM_Contribute_DAO_Contribution', $form->_id, 'invoice_id')
       );
     }
+    $element = $form->add('text', 'creditnote_id', ts('Credit Note ID'),
+      $attributes['creditnote_id']
+    );
+    if ($form->_online) {
+      $element->freeze();
+    }
+    else {
+      $form->addRule('creditnote_id',
+        ts('This Credit Note ID already exists in the database.'),
+        'objectExists',
+        array('CRM_Contribute_DAO_Contribution', $form->_id, 'creditnote_id')
+      );
+    }
 
     $form->add('select', 'contribution_page_id',
       ts('Online Contribution Page'),
@@ -161,8 +178,9 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
-   * @return void
+   * @param $form
    *
+   * @return void
    */
   static function buildPaymentReminders(&$form) {
     //PaymentReminders section
@@ -180,6 +198,10 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
+   * @param $params
+   * @param $contributionID
+   * @param null $premiumID
+   * @param null $options
    * @return void
    */
   static function processPremium(&$params, $contributionID, $premiumID = NULL, &$options = NULL) {
@@ -236,6 +258,11 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
+   * @param $params
+   * @param $contactID
+   * @param $contributionID
+   * @param null $contributionNoteID
+   *
    * @return void
    */
   static function processNote(&$params, $contactID, $contributionID, $contributionNoteID = NULL) {
@@ -259,6 +286,9 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
+   * @param $params
+   * @param $formatted
+   * @param $form
    * @return void
    */
   static function postProcessCommon(&$params, &$formatted, &$form) {
@@ -269,6 +299,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       'net_amount',
       'trxn_id',
       'invoice_id',
+      'creditnote_id',
       'campaign_id',
       'contribution_page_id',
     );
@@ -307,11 +338,13 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @form object  of Contribution form.
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs.
+   * @param $form
+   * @param array $params (reference ) an assoc array of name/value pairs.
    * @$ccContribution boolen,  is it credit card contribution.
+   * @param bool $ccContribution
    * @access public.
    *
-   * @return void.
+   * @return array
    */
   static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
     $form->assign('receiptType', 'contribution');
@@ -454,6 +487,18 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
     }
 
+     $template = CRM_Core_Smarty::singleton( );
+     $taxAmt = $template->get_template_vars('dataArray');
+     $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
+     $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+     $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+     if ((!empty($taxAmt) || isset($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+       $isEmailPdf = True;
+     }
+     else {
+       $isEmailPdf = False;
+     }
+     
     list($sendReceipt, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       array(
         'groupName' => 'msg_tpl_workflow_contribution',
@@ -465,6 +510,7 @@ class CRM_Contribute_Form_AdditionalInfo {
         'toEmail' => $contributorEmail,
         'isTest' => $form->_mode == 'test',
         'PDFFilename' => ts('receipt').'.pdf',
+        'isEmailPdf' => $isEmailPdf,
       )
     );
 

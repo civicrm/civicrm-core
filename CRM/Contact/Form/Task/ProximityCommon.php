@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -77,6 +77,9 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    *
    * @access public
    *
+   * @param CRM_Core_Form $form
+   * @param $proxSearch
+   *
    * @return void
    */
   function buildQuickForm($form, $proxSearch) {
@@ -90,14 +93,7 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
 
     $form->add('text', 'prox_postal_code', ts('Postal Code'), NULL, FALSE);
 
-    $defaults = self::setDefaultValues($form);
-    if (!empty($defaults['prox_country_id'])) {
-      $stateProvince = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($defaults['prox_country_id']);
-    }
-    else {
-      $stateProvince = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvince();
-    }
-    $form->add('select', 'prox_state_province_id', ts('State/Province'), $stateProvince, $proxRequired);
+    $form->addChainSelect('prox_state_province_id', array('required' => $proxRequired));
 
     $country = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
     $form->add('select', 'prox_country_id', ts('Country'), $country, $proxRequired);
@@ -108,23 +104,17 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
     $form->add('select', 'prox_distance_unit', ts('Units'), $proxUnits, $proxRequired);
     // prox_distance_unit
 
-    // state country js, CRM-5233
-    $stateCountryMap = array();
-    $stateCountryMap[] = array(
-      'state_province' => 'prox_state_province_id',
-      'country' => 'prox_country_id',
-    );
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
     $form->addFormRule(array('CRM_Contact_Form_Task_ProximityCommon', 'formRule'), $form);
   }
 
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $form
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -151,6 +141,8 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    * Set the default form values
    *
    * @access protected
+   *
+   * @param $form
    *
    * @return array the default array reference
    */

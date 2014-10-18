@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -59,7 +59,9 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_Realex
    */
   function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
@@ -80,9 +82,10 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
+   *
    * @return object
    * @static
-   *
    */
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
@@ -92,18 +95,38 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     return self::$_singleton[$processorName];
   }
 
+  /**
+   * @param $params
+   *
+   * @throws Exception
+   */
   function setExpressCheckOut(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
+  /**
+   * @param $token
+   *
+   * @throws Exception
+   */
   function getExpressCheckoutDetails($token) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
+  /**
+   * @param $params
+   *
+   * @throws Exception
+   */
   function doExpressCheckout(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
+  /**
+   * @param $params
+   *
+   * @throws Exception
+   */
   function doTransferCheckout(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
@@ -258,11 +281,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @param $xml
    *   an XML string.
    *
-   * @return
-   *   An array of the result with following keys:
-   *   - error  : false, if no error. Otherwise, it is the error message
-   *   - return : a multi-dimension associative array represent the value
-   *               of the XML input string.
+   * @return array An array of the result with following keys:
    */
   function xml_parse_into_assoc($xml) {
     $input = array();
@@ -297,6 +316,12 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   // private helper for  xml_parse_into_assoc, to recusively parsing the result
+  /**
+   * @param $input
+   * @param int $depth
+   *
+   * @return array
+   */
   function _xml_parse($input, $depth = 1) {
     $output = array();
     $children = array();
@@ -468,6 +493,12 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * @param null $errorCode
+   * @param null $errorMessage
+   *
+   * @return object
+   */
   function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
 

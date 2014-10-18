@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class ExportCiviSeleniumTestCase
+ */
 class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
   /**
@@ -33,6 +37,10 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @params string $selector element selector(download button in most of the cases).
    * @params sting  $fileName file name to be download.
    * @params string $downloadDir download dir.
+   *
+   * @param $selector
+   * @param string $fileName
+   * @param string $downloadDir
    *
    * @return string downloaded file path.
    */
@@ -45,19 +53,17 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
       @unlink($file);
     }
 
-    // Download file.
-    // File will automatically download without confirmation.
     $this->click($selector);
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // FIXME: consider doing the following assertion in a while loop
-    // with a more reasonable sleep time of 2 seconds per loop iteration
-    sleep(20);
 
-    // File was downloaded?
-    $this->assertTrue(file_exists($file), "CSV {$file} was not downloaded.");
-
-    return $file;
+    // Wait for file to be downloaded
+    for ($i=1; $i<15; ++$i) {
+      sleep(2);
+      if (file_exists($file)) {
+        return $file;
+      }
+    }
+    // Timeout
+    $this->fail("CSV {$file} was not downloaded.");
   }
 
   /**

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * for a component to introduce itself to the system.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -107,12 +107,27 @@ abstract class CRM_Core_Component_Info {
    * @access public
    *
    */
+  /**
+   * @param $name
+   * @param $namespace
+   * @param $componentID
+   */
   public function __construct($name, $namespace, $componentID) {
     $this->name        = $name;
     $this->namespace   = $namespace;
     $this->componentID = $componentID;
     $this->info        = $this->getInfo();
     $this->info['url'] = $this->getKeyword();
+  }
+
+  /**
+   * EXPERIMENTAL: Get a list of AngularJS modules
+   *
+   * @return array list of modules; same format as CRM_Utils_Hook::angularModules(&$angularModules)
+   * @see CRM_Utils_Hook::angularModules
+   */
+  public function getAngularModules() {
+    return array();
   }
 
   /**
@@ -137,17 +152,42 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
+   * Provides permissions that are unwise for Anonymous Roles to have
+   *
+   * @return array list of permissions
+   * @see CRM_Component_Info::getPermissions
+   */
+  public function getAnonymousPermissionWarnings() {
+    return array();
+  }
+
+  /**
    * Provides permissions that are used by component.
    * Needs to be implemented in component's information
    * class.
    *
    * NOTE: if using conditionally permission return,
    * implementation of $getAllUnconditionally is required.
+   *
+   * @param bool $getAllUnconditionally
+   *
    * @return array|null collection of permissions, null if none
    * @access public
-   *
    */
   abstract public function getPermissions($getAllUnconditionally = FALSE);
+
+  /**
+   * Determine how many other records refer to a given record
+   *
+   * @param CRM_Core_DAO $dao the item for which we want a reference count
+   * @return array each item in the array is an array with keys:
+   *   - name: string, eg "sql:civicrm_email:contact_id"
+   *   - type: string, eg "sql"
+   *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
+   */
+  public function getReferenceCounts($dao) {
+    return array();
+  }
 
   /**
    * Provides information about user dashboard element
@@ -350,9 +390,10 @@ abstract class CRM_Core_Component_Info {
   /**
    * Helper for instantiating component's elements.
    *
+   * @param $cl
+   *
    * @return mixed component's element as class instance
    * @access private
-   *
    */
   private function _instantiate($cl) {
     $className = $this->namespace . '_' . $cl;

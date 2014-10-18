@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,6 +26,10 @@
 
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_UpdateContributionTest
+ */
 class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
  protected function setUp() {
@@ -34,26 +38,24 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
  function testChangeContributionAmount() {
    $this->webtestLogin();
-   $firstName = substr(sha1(rand()), 0, 7);
-   $lastName  = 'Contributor';
-   $email     = $firstName . "@example.com";
    $amount = 100;
    //Offline Pay Later Contribution
-   $this->_testOfflineContribution($firstName, $lastName, $email, $amount, "Pending");
+   $contact = $this->_testOfflineContribution($amount, "Pending");
 
    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
-   $this->type("sort_name", "$lastName, $firstName");
-   $this->clickLink("_qf_Search_refresh");
+   $this->type("sort_name", $contact['sort_name']);
+   $this->click("_qf_Search_refresh");
 
-   $contriIDOff = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a@href"));
+   $this->waitForElementPresent("xpath=//*[@id='Search']//div[@id='contributionSearch']");
+   $contriIDOff = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']//table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[1]@href"));
    if (!empty($contriIDOff)) {
      $contriIDOff = substr($contriIDOff[1], (strrpos($contriIDOff[1], '=') + 1));
    }
 
-   $this->clickLink("xpath=//tr[@id='rowid{$contriIDOff}']/td[11]/span/a[2]", "total_amount");
+   $this->clickLink("xpath=//tr[@id='rowid{$contriIDOff}']/td[11]/span/a[2]", "total_amount", FALSE);
    $this->type("total_amount", "90");
-   $this->clickLink('_qf_Contribution_upload');
+   $this->clickLink('_qf_Contribution_upload','',FALSE);
 
    // Is status message correct?
    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
@@ -83,16 +85,15 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
  function testPayLater() {
    $this->webtestLogin();
-   $firstName = substr(sha1(rand()), 0, 7);
-   $lastName  = 'Contributor';
-   $email     = $firstName . "@example.com";
    $amount = 100.00;
    //Offline Pay Later Contribution
-   $this->_testOfflineContribution($firstName, $lastName, $email, $amount, "Pending");
-   $this->clickLink("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='Edit']");
-   $contId = $this->urlArg('id');
+   $this->_testOfflineContribution($amount, "Pending");
+   $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']");
+   $contId = $this->urlArg('id', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
+   $this->clickAjaxLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom');
    $this->select("contribution_status_id", "label=Completed");
-   $this->clickLink("_qf_Contribution_upload");
+   $this->clickAjaxLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']");
+   $this->checkCRMAlert("The contribution record has been saved.");
 
    //Assertions
    $search = array('id' => $contId);
@@ -110,9 +111,6 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
  function testChangePremium() {
    $this->webtestLogin();
-   $firstName = substr(sha1(rand()), 0, 7);
-   $lastName  = 'Contributor';
-   $email     = $firstName . "@example.com";
    $from = 'Premiums';
    $to = 'Premiums inventory';
    $financialType = array(
@@ -121,11 +119,15 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
      'is_deductible' => 1,
    );
    $this->addeditFinancialType($financialType);
-   $this->clickLink("xpath=//a[@id='newfinancialTypeAccount']");
+   $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
+   $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
+   $this->waitForElementPresent("xpath=//a[@id='newfinancialTypeAccount']");
+   $this->clickAjaxLink("xpath=//a[@id='newfinancialTypeAccount']", "_qf_FinancialTypeAccount_cancel-botttom");
    $this->select("account_relationship", "label=Premiums Inventory Account is");
+   $this->waitForElementPresent("xpath=//select[@id='financial_account_id']/option[3][text()='Deposit Bank Account']");
    $this->select("financial_account_id", "label=$to");
-   $this->clickLink("_qf_FinancialTypeAccount_next-botttom");
-   
+   $this->clickAjaxLink("_qf_FinancialTypeAccount_next-botttom", "xpath=//a[@id='newfinancialTypeAccount']");
+
    $premiumName = 'Premium'.substr(sha1(rand()), 0, 7);
    $amount = 500;
    $sku = 'SKU';
@@ -148,27 +150,27 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone");
 
    // create new contact using dialog
-   $this->webtestNewDialogContact($firstName, $lastName, $email);
+   $this->createDialogContact();
    // select financial type
    $this->select( "financial_type_id", "value=1" );
    // total amount
    $this->type("total_amount", "100");
    // fill Premium information
-   $this->clickLink("xpath=//div[@id='Premium']", "product_name_0", FALSE);
+   $this->clickAjaxLink("xpath=//div[@id='Premium']", "product_name_0");
    $this->select('product_name_0', "label=$premiumName ( $sku )");
    // Clicking save.
-   $this->clickLink("_qf_Contribution_upload");
+   $this->clickAjaxLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
    // Is status message correct?
-   $this->waitForText('crm-notification-container', "The contribution record has been saved.");
-   // verify if Membership is created
-   $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+   $this->checkCRMAlert("The contribution record has been saved.");
+   // verify if Contribution is created
    //click through to the Contribution edit screen
-   $this->clickLink("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='Edit']", "_qf_Contribution_upload-bottom");
-   $contId = $this->urlArg('id');
-   $this->waitForElementPresent("product_name_0");
+   $contId = $this->urlArg('id', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
+   $this->clickAjaxLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", "product_name_0");
+   
    $this->select('product_name_0', "label=$premiumName2 ( $sku2 )");
    // Clicking save.
-   $this->clickLink("_qf_Contribution_upload");
+   $this->clickAjaxLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[7][text()='$premiumName2']");
+   $this->checkCRMAlert("The contribution record has been saved.");
 
    //Assertions
    $actualAmount = $this->_getPremiumActualCost($contId, $to, $from, $cost2, "'civicrm_contribution'");
@@ -180,9 +182,6 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
  function testDeletePremium() {
    $this->webtestLogin();
-   $firstName = substr(sha1(rand()), 0, 7);
-   $lastName  = 'Contributor';
-   $email     = $firstName . "@example.com";
    $from = 'Premiums';
    $to = 'Premiums inventory';
    $financialType = array(
@@ -191,11 +190,15 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
      'is_deductible' => 1,
    );
    $this->addeditFinancialType($financialType);
-   $this->clickLink("xpath=//a[@id='newfinancialTypeAccount']");
-   
+   $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
+   $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
+   $this->waitForElementPresent("xpath=//a[@id='newfinancialTypeAccount']");
+   $this->clickLink("xpath=//a[@id='newfinancialTypeAccount']", "_qf_FinancialTypeAccount_cancel-botttom", FALSE);
+
    $this->select("account_relationship", "label=Premiums Inventory Account is");
+   $this->waitForElementPresent("xpath=//select[@id='financial_account_id']/option[3][text()='Deposit Bank Account']");
    $this->select("financial_account_id", "label=$to");
-   $this->clickLink("_qf_FinancialTypeAccount_next-botttom");
+   $this->clickLink("_qf_FinancialTypeAccount_next-botttom", "xpath=//a[@id='newfinancialTypeAccount']", FALSE);
    $premiumName = 'Premium' . substr(sha1(rand()), 0, 7);
    $amount = 500;
    $sku = 'SKU';
@@ -209,7 +212,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone");
 
    // create new contact using dialog
-   $this->webtestNewDialogContact($firstName, $lastName, $email);
+   $this->createDialogContact();
    // select financial type
    $this->select("financial_type_id", "value=1");
    // total amount
@@ -222,15 +225,17 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->clickLink("_qf_Contribution_upload");
    // Is status message correct?
    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
-   // verify if Membership is created
-   $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+   // verify if Contribution is created
+   $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
    //click through to the Contribution edit screen
-   $this->clickLink("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='Edit']", "_qf_Contribution_upload-bottom");
-   $contId = $this->urlArg('id');
+   $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
+   $contId = explode('&', $contId[1]);
+   $contId = $contId[0];
+   $this->clickLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", "_qf_Contribution_upload-bottom", FALSE);
    $this->waitForElementPresent("product_name_0");
    $this->select('product_name_0', "value=0");
    // Clicking save.
-   $this->clickLink("_qf_Contribution_upload");
+   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[7][not(text())]", FALSE);
 
    //Assertions
    $actualAmount = $this->_getPremiumActualCost($contId, $from, $to, NULL, "'civicrm_contribution'");
@@ -239,39 +244,41 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
  function testChangePaymentInstrument() {
    $this->webtestLogin();
-   $firstName = substr(sha1(rand()), 0, 7);
-   $lastName  = 'Contributor';
-   $email     = $firstName . "@example.com";
    $label = 'TEST'.substr(sha1(rand()), 0, 7);
    $amount = 100.00;
    $financialAccount = CRM_Contribute_PseudoConstant::financialAccount();
    $to = array_search('Accounts Receivable', $financialAccount);
    $from = array_search('Deposit Bank Account', $financialAccount);
    $this->addPaymentInstrument($label, $to);
-   $this->_testOfflineContribution($firstName, $lastName, $email, $amount);
-   $this->clickLink("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='Edit']");
-   $contId = $this->urlArg('id');
+   $this->_testOfflineContribution($amount);
+   $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']");
+   $this->clickLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom', FALSE);
+   $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
+   $contId = explode('&', $contId[1]);
+   $contId = $contId[0];
    //change payment processor to newly created value
    $this->select("payment_instrument_id", "label=$label");
-   $this->clickLink("_qf_Contribution_upload");
+   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
+   $this->waitForAjaxContent();
    //Assertions
-   $totalAmount = $this->_getPremiumActualCost($contId, 'Payment Processor Account', 'Accounts Receivable');
+   $subtractedTotal = $this->_getPremiumActualCost($contId, NULL, 'Payment Processor Account');
+   $this->assertEquals($subtractedTotal, -$amount, "Verify amount deleted from old account");
+   $totalAmount = $this->_getPremiumActualCost($contId, NULL, 'Accounts Receivable');
    $this->assertEquals($totalAmount, $amount, "Verify amount for newly inserted values");
  }
 
  function testRefundContribution() {
    $this->webtestLogin();
-   $firstName = substr(sha1(rand()), 0, 7);
-   $lastName  = 'Contributor';
-   $email     = $firstName . "@example.com";
-   $label = 'TEST'.substr(sha1(rand()), 0, 7);
    $amount = 100.00;
-   $this->_testOfflineContribution($firstName, $lastName, $email, $amount);
-   $this->clickLink("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='Edit']");
+   $this->_testOfflineContribution($amount);
+   $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']");
+   $this->clickAjaxLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom');
    //Contribution status
    $this->select("contribution_status_id", "label=Refunded");
-   $contId = $this->urlArg('id');
-   $this->clickLink("_qf_Contribution_upload");
+   $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
+   $contId = explode('&', $contId[1]);
+   $contId = $contId[0];
+   $this->clickAjaxLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[6][text()='Refunded']");
 
    //Assertions
    $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
@@ -287,17 +294,17 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
  function testCancelPayLater() {
    $this->webtestLogin();
-   $firstName = substr(sha1(rand()), 0, 7);
-   $lastName  = 'Contributor';
-   $email     = $firstName . "@example.com";
-   $label = 'TEST'.substr(sha1(rand()), 0, 7);
    $amount = 100.00;
-   $this->_testOfflineContribution($firstName, $lastName, $email, $amount, "Pending");
-   $this->clickLink("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='Edit']");
+   $this->_testOfflineContribution($amount, "Pending");
+   $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']");
+   $this->clickLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom', FALSE);
    //Contribution status
    $this->select("contribution_status_id", "label=Cancelled");
-   $contId = $this->urlArg('id');
-   $this->clickLink("_qf_Contribution_upload");
+   $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
+   $contId = explode('&', $contId[1]);
+   $contId = $contId[0];
+   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
+   $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
    //Assertions
    $search = array('id' => $contId);
@@ -319,17 +326,17 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
  function testChangeFinancialType() {
    $this->webtestLogin();
-   $firstName = substr(sha1(rand()), 0, 7);
-   $lastName  = 'Contributor';
-   $email     = $firstName . "@example.com";
-   $label = 'TEST'.substr(sha1(rand()), 0, 7);
    $amount = 100.00;
-   $this->_testOfflineContribution($firstName, $lastName, $email, $amount);
-   $this->clickLink("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='Edit']");
+   $this->_testOfflineContribution($amount);
+   $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']");
+   $this->clickLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom', FALSE);
    //Contribution status
    $this->select("financial_type_id", "value=3");
-   $contId = $this->urlArg('id');
-   $this->clickLink("_qf_Contribution_upload");
+   $contId = explode('&id=', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
+   $contId = explode('&', $contId[1]);
+   $contId = $contId[0];
+   $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
+   $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
    //Assertions
    $search = array( 'id' => $contId );
@@ -358,7 +365,16 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->assertEquals($fValue2, "100.00", "Verify Amount");
  }
 
- function _getPremiumActualCost($entityId, $from = NULL, $to = NULL, $cost = NULL, $entityTable = NULL, $select = "ft.total_amount AS amount") {
+  /**
+   * @param $entityId
+   * @param null $from
+   * @param null $to
+   * @param null $cost
+   * @param null $entityTable
+   * @param string $select
+   *
+   * @return null|string
+   */function _getPremiumActualCost($entityId, $from = NULL, $to = NULL, $cost = NULL, $entityTable = NULL, $select = "ft.total_amount AS amount") {
    $financialAccount = CRM_Contribute_PseudoConstant::financialAccount();
    $query = "SELECT
      {$select}
@@ -378,11 +394,16 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    if (!empty($cost)) {
      $query .= " AND eft.amount = {$cost}";
    }
+   $query .= " ORDER BY ft.id DESC LIMIT 1";
    $result = CRM_Core_DAO::singleValueQuery($query);
    return $result;
  }
 
- function _getFinancialTrxnAmount($contId) {
+  /**
+   * @param $contId
+   *
+   * @return null|string
+   */function _getFinancialTrxnAmount($contId) {
    $query = "SELECT
      SUM( ft.total_amount ) AS total
      FROM civicrm_financial_trxn AS ft
@@ -393,7 +414,11 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    return $result;
  }
 
- function _getFinancialItemAmount($contId) {
+  /**
+   * @param $contId
+   *
+   * @return null|string
+   */function _getFinancialItemAmount($contId) {
    $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
    $query = "SELECT
      SUM(amount)
@@ -404,7 +429,11 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    return $result;
  }
 
- function _getTotalContributedAmount($contId) {
+  /**
+   * @param $contId
+   *
+   * @return null|string
+   */function _getTotalContributedAmount($contId) {
    $query = "SELECT
      SUM(amount)
      FROM civicrm_entity_financial_trxn
@@ -414,12 +443,17 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    return $result;
  }
 
- function _testOfflineContribution($firstName, $lastName, $email, $amount, $status="Completed") {
+  /**
+   * @param $amount
+   * @param string $status
+   * @return array
+   */
+  function _testOfflineContribution($amount, $status="Completed") {
 
    $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
    // create new contact using dialog
-   $this->webtestNewDialogContact($firstName, $lastName, $email);
+   $contact = $this->createDialogContact();
 
    // select financial type
    $this->select( "financial_type_id", "value=1" );
@@ -444,13 +478,13 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->clickLink("_qf_Contribution_upload");
 
    // Is status message correct?
-   $this->waitForText('crm-notification-container', "The contribution record has been saved.");
+   $this->checkCRMAlert("The contribution record has been saved.");
 
+   $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
    // verify if Membership is created
-   $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
 
    //click through to the Membership view screen
-   $this->clickLink("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+   $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
 
    $expected = array(
      'Financial Type' => 'Donation',
@@ -458,11 +492,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
      'Contribution Status' => $status,
    );
    $this->webtestVerifyTabularData($expected);
-   $this->clickLink("_qf_ContributionView_cancel-top");
-   // Because it tends to cause problems, all uses of sleep() must be justified in comments
-   // Sleep should never be used for wait for anything to load from the server
-   // Justification for this instance: FIXME
-   sleep(4);
+   $this->click("_qf_ContributionView_cancel-bottom");
+
+    return $contact;
  }
 }
-

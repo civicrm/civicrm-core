@@ -39,6 +39,9 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_entity = 'Mailing';
 
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Mailer',

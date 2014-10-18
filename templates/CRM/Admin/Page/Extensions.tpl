@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -84,9 +84,9 @@
     {* Expand/Collapse *}
     {literal}
     <script type="text/javascript">
-      cj( function( ) {
-          cj('.collapsed').click( function( ) {
-              var currentObj = cj( this );
+      CRM.$(function($) {
+          $('.collapsed').click( function( ) {
+              var currentObj = $( this );
               if ( currentObj.hasClass( 'expanded') ) {
                   currentObj.removeClass( 'expanded' );
                   currentObj.parent( ).parent( ).next( ).hide( );
@@ -108,10 +108,10 @@
 
     {literal}
 
-    cj( function() {
-      var tabIndex = cj('#tab_' + selectedTab).prevAll().length;
-      cj("#mainTabContainer").tabs({active: tabIndex});
-      cj(".crm-tab-button").addClass("ui-corner-bottom");
+    CRM.$(function($) {
+      var tabIndex = $('#tab_' + selectedTab).prevAll().length;
+      $("#mainTabContainer").tabs({active: tabIndex});
+      $(".crm-tab-button").addClass("ui-corner-bottom");
     });
     {/literal}
     </script>
@@ -119,8 +119,8 @@
     {* Refresh buttons *}
     {literal}
     <script type="text/javascript">
-    cj(function() {
-      cj('.crm-extensions-refresh').click(function(event){
+    CRM.$(function($) {
+      $('.crm-extensions-refresh').click(function(event){
         event.stopPropagation();
         CRM.alert('', '{/literal}{ts escape="js"}Refreshing...{/ts}{literal}', 'crm-msg-loading', {expires: 0});
         CRM.api('Extension', 'refresh', {}, {

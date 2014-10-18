@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People http:tttp.eu (c) 2008                 |
  +--------------------------------------------------------------------+
@@ -59,6 +59,9 @@ class civicrm_cli {
 
   var $_errors = array();
 
+  /**
+   * @return bool
+   */
   public function initialize() {
     if (!$this->_accessing_from_cli()) {
       return FALSE;
@@ -84,6 +87,9 @@ class civicrm_cli {
     }
   }
 
+  /**
+   * @return bool
+   */
   public function callApi() {
     require_once 'api/api.php';
 
@@ -110,6 +116,9 @@ class civicrm_cli {
     return TRUE;
   }
 
+  /**
+   * @return bool
+   */
   private function _parseOptions() {
     $args = $_SERVER['argv'];
     // remove the first argument, which is the name
@@ -181,6 +190,9 @@ class civicrm_cli {
     return TRUE;
   }
 
+  /**
+   * @return bool
+   */
   private function _bootstrap() {
     // so the configuration works with php-cli
     $_SERVER['PHP_SELF'] = "/index.php";
@@ -207,12 +219,12 @@ class civicrm_cli {
     CRM_Core_ClassLoader::singleton()->register();
 
     $this->_config = CRM_Core_Config::singleton();
-    
+
     // HTTP_HOST will be 'localhost' unless overwritten with the -s argument.
     // Now we have a Config object, we can set it from the Base URL.
     if ($_SERVER['HTTP_HOST'] == 'localhost') {
         $_SERVER['HTTP_HOST'] = preg_replace(
-                '!^https?://([^/]+)/$!i', 
+                '!^https?://([^/]+)/$!i',
                 '$1',
                 $this->_config->userFrameworkBaseURL);
     }
@@ -246,6 +258,9 @@ class civicrm_cli {
     return TRUE;
   }
 
+  /**
+   * @return bool
+   */
   private function _validateOptions() {
     $required = $this->_required_arguments;
     while (list(, $var) = each($required)) {
@@ -260,12 +275,20 @@ class civicrm_cli {
     return TRUE;
   }
 
+  /**
+   * @param $value
+   *
+   * @return string
+   */
   private function _sanitize($value) {
     // restrict user input - we should not be needing anything
     // other than normal alpha numeric plus - and _.
     return trim(preg_replace('#^[^a-zA-Z0-9\-_=/]$#', '', $value));
   }
 
+  /**
+   * @return string
+   */
   private function _getUsage() {
     $out = "Usage: cli.php -e entity -a action [-u user] [-s site] [--output] [PARAMS]\n";
     $out .= "  entity is the name of the entity, e.g. Contact, Event, etc.\n";
@@ -277,6 +300,9 @@ class civicrm_cli {
     return ts($out);
   }
 
+  /**
+   * @param $error
+   */
   private function _log($error) {
     // fixme, this should call some CRM_Core_Error:: function
     // that properly logs
@@ -292,6 +318,9 @@ class civicrm_cli {
 class civicrm_cli_csv_exporter extends civicrm_cli {
   var $separator = ',';
 
+  /**
+   *
+   */
   function __construct() {
     $this->_required_arguments = array('entity');
     parent::initialize();
@@ -335,6 +364,9 @@ class civicrm_cli_csv_file extends civicrm_cli {
   var $header;
   var $separator = ',';
 
+  /**
+   *
+   */
   function __construct() {
     $this->_required_arguments = array('entity','file');
     $this->_additional_arguments = array('f' => 'file');
@@ -375,6 +407,11 @@ class civicrm_cli_csv_file extends civicrm_cli {
   }
 
   /* return a params as expected */
+  /**
+   * @param $data
+   *
+   * @return array
+   */
   function convertLine($data) {
     $params = array();
     foreach ($this->header as $i => $field) {
@@ -397,6 +434,9 @@ class civicrm_cli_csv_file extends civicrm_cli {
  **/
 
 class civicrm_cli_csv_importer extends civicrm_cli_csv_file {
+  /**
+   * @param $params
+   */
   function processline($params) {
     $result = civicrm_api($this->_entity, 'Create', $params);
     if ($result['is_error']) {
@@ -415,6 +455,9 @@ class civicrm_cli_csv_importer extends civicrm_cli_csv_file {
  **/
 
 class civicrm_cli_csv_deleter extends civicrm_cli_csv_file {
+  /**
+   * @param $params
+   */
   function processline($params) {
     $result = civicrm_api($this->_entity, 'Delete', $params);
     if ($result['is_error']) {

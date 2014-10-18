@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,13 +25,13 @@
 *}
 <div class="crm-block crm-form-block crm-debugging-form-block">
 <div id="help">
-    {ts}In addition to the settings on this screen, there are a number of settings you can add to your sites's settings file (civicrm.settings.php) to provide additional debugging information.{/ts} {docURL page="developer/development-environment/debugging"}
+    {ts}In addition to the settings on this screen, there are a number of settings you can add to your sites's settings file (civicrm.settings.php) to provide additional debugging information.{/ts} {docURL page="Debugging for developers" resource="wiki"}
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
          <table class="form-layout">
             <tr class="crm-debugging-form-block-debug">
-                <td class="label">{$form.debug.label}</td>
-                <td>{$form.debug.html}<br />
+                <td class="label">{$form.debug_enabled.label}</td>
+                <td>{$form.debug_enabled.html}<br />
                 <span class="description">{ts}Set this value to <strong>Yes</strong> if you want to use one of CiviCRM's debugging tools. <strong>This feature should NOT be enabled for production sites</strong>{/ts} {help id='debug'}</span></td>
             </tr>
             {if $form.userFrameworkLogging}

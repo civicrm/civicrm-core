@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for updating pledge payment*}
-<h3>{ts}Edit Scheduled Pledge Payment{/ts}</h3>
 <div class="crm-block crm-form-block crm-pledge-payment-form-block">
       <table class="form-layout-compressed">
         <tr><td class="label">{ts}Status{/ts}</td><td class="form-layout">{$status}</td></tr>
@@ -45,13 +44,12 @@
 </div>
 {literal}
 <script type="text/javascript">
-cj(document).ready( function() {
-    cj('#adjust-option-type').hide();
-});
-function adjustPayment( ) {
-cj('#adjust-option-type').show();
-cj("#scheduled_amount").removeAttr("READONLY");
-cj("#scheduled_amount").css('background-color', '#ffffff');
-}
+  CRM.$(function($) {
+    $('#adjust-option-type').hide();
+  });
+  function adjustPayment( ) {
+    cj('#adjust-option-type').show();
+    cj("#scheduled_amount").removeAttr("READONLY").css('background-color', '#ffffff');
+  }
 </script>
 {/literal}

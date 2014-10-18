@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -140,6 +140,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
   protected $_defaults = NULL;
 
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
     // this property used by civicrm_fb module and if true, forces thank you email to be sent
@@ -148,6 +151,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     $this->forceEmailConfirmed['email'] = '';
   }
 
+  /**
+   * @return mixed
+   */
   function getContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
@@ -283,9 +289,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     }
 
     $this->setDefaults($this->_defaults);
-
-    // add in all state country selectors for enabled countries
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
   }
 
   public function buildQuickForm() {
@@ -321,6 +324,10 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   /**
    * This function is used to add the rules (mainly global rules) for form.
    * All local rules are added near the element
+   *
+   * @param $fields
+   * @param $files
+   * @param $errors
    *
    * @return void
    * @access public
@@ -584,14 +591,14 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   /**
    * Function to build the petition profile form
    *
+   * @param $id
+   * @param $name
+   * @param bool $viewOnly
+   *
    * @return void
    * @access public
    */
   function buildCustom($id, $name, $viewOnly = FALSE) {
-
-    // create state country map array to hold selectors
-    $stateCountryMap = array();
-
     if ($id) {
       $session = CRM_Core_Session::singleton();
       $this->assign("petition", $this->petition);
@@ -635,12 +642,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
           // if state or country in the profile, create map
           list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
-          if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
-            if (!array_key_exists($index, $stateCountryMap)) {
-              $stateCountryMap[$index] = array();
-            }
-            $stateCountryMap[$index][$prefixName] = $key;
-          }
 
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, $contactID, TRUE);
           $this->_fields[$key] = $field;
@@ -649,9 +650,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
             $addCaptcha = TRUE;
           }
         }
-
-        // initialize the state country map
-        CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
         if ($addCaptcha && !$viewOnly) {
           $captcha = CRM_Utils_ReCAPTCHA::singleton();
@@ -662,6 +660,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if (isset($this->thankyou)) {
       return ('CRM/Campaign/Page/Petition/ThankYou.tpl');
@@ -671,6 +672,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   }
 
   // check if user has already signed this petition
+  /**
+   * @param $params
+   */
   function redirectIfSigned($params) {
     $signature = $this->bao->checkSignature($this->_surveyId, $this->_contactId);
     //TODO: error case when more than one signature found for this petition and this contact

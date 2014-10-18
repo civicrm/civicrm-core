@@ -10,15 +10,14 @@
 -- * Case Types
 -- *
 -- *******************************************************/
-SELECT @option_group_id_case_type        := max(id) from civicrm_option_group where name = 'case_type';
 SELECT @caseCompId := id FROM `civicrm_component` where `name` like 'CiviCase';
 
 INSERT INTO
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`)
+   `civicrm_case_type` (`title`, `name`, `weight`, `is_reserved`, `is_active`)
 VALUES
-(@option_group_id_case_type, 'Civil and Political'          ,  1, 'Civil and Political'          , NULL, 0, 1,  1, NULL, 0, 1, 1),
-(@option_group_id_case_type, 'Economic, Social and Cultural',  2, 'Economic, Social and Cultural', NULL, 0, 0,  2, NULL, 0, 1, 1),
-(@option_group_id_case_type, 'Gender Issues'                ,  3, 'Gender Issues'                , NULL, 0, 0,  3, NULL, 0, 1, 1);
+('Civil and Political'          , 'Civil and Political'          ,  1, NULL, 1, 1),
+('Economic, Social and Cultural', 'Economic, Social and Cultural',  2, NULL, 1, 1),
+('Gender Issues'                , 'Gender Issues'                ,  3, NULL, 1, 1);
 
 
 -- /*******************************************************

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -54,8 +54,14 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   protected $_caseDetailExtra = array(
     );
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
-    $this->case_statuses = CRM_Case_PseudoConstant::caseStatus();
+    $this->case_statuses = CRM_Core_OptionGroup::values('case_status');
     $this->case_types    = CRM_Case_PseudoConstant::caseType();
     $rels                = CRM_Core_PseudoConstant::relationshipType();
     foreach ($rels as $relid => $v) {
@@ -458,6 +464,11 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_case']}.id";
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -562,6 +573,9 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     $entryFound = FALSE;
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
@@ -614,7 +628,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_activity_last_completed_last_completed_activity_subject', $row) && empty($row['civicrm_activity_last_completed_last_completed_activity_subject'])) {
-        $rows[$rowNum]['civicrm_activity_last_completed_last_completed_activity_subject'] = ts('(No Subject)');
+        $rows[$rowNum]['civicrm_activity_last_completed_last_completed_activity_subject'] = ts('(no subject)');
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_contact_client_sort_name', $row) &&

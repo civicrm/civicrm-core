@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+  <table name="civicrm_case_type">
+    <column>id</column>
+    <column>name</column>
+    <column>title</column>
+    <column>description</column>
+    <column>is_active</column>
+    <column>is_reserved</column>
+    <column>weight</column>
+    <row>
+      <value>1</value> <!-- id -->
+      <value>housing_support</value> <!-- name -->
+      <value>Housing Support</value> <!-- title -->
+      <value>Help homeless individuals obtain temporary and long-term housing</value> <!-- description -->
+      <value>1</value> <!-- is_active -->
+      <value>0</value> <!-- is_reserved -->
+      <value>1</value> <!-- weight -->
+    </row>
+  </table>
+</dataset>

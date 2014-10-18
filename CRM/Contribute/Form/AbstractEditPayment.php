@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -66,6 +66,10 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * @public
    */
   public $_premiumID = NULL;
+
+  /**
+   * @var CRM_Contribute_DAO_ContributionProduct
+   */
   public $_productDAO = NULL;
 
   /**
@@ -156,6 +160,25 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   protected $_formType;
   protected $_cdType;
 
+  /**
+   * @param $id
+   */
+  public function showRecordLinkMesssage($id) {
+    $statusId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $id, 'contribution_status_id');
+    if (CRM_Contribute_PseudoConstant::contributionStatus($statusId, 'name') == 'Partially paid') {
+      if ($pid = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $id, 'participant_id', 'contribution_id')) {
+        $recordPaymentLink = CRM_Utils_System::url('civicrm/payment',
+          "reset=1&id={$pid}&cid={$this->_contactID}&action=add&component=event"
+        );
+        CRM_Core_Session::setStatus(ts('Please use the <a href="%1">Record Payment</a> form if you have received an additional payment for this Partially paid contribution record.', array(1 => $recordPaymentLink)), ts('Notice'), 'alert');
+      }
+    }
+  }
+
+  /**
+   * @param $id
+   * @param $values
+   */
   public function buildValuesAndAssignOnline_Note_Type($id, &$values) {
     $ids = array();
     $params = array('id' => $id);
@@ -201,6 +224,10 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
     CRM_Custom_Form_CustomData::setDefaultValues($this);
   }
 
+  /**
+   * @param $id
+   * @todo - this function is a long way, non standard of saying $dao = new CRM_Contribute_DAO_ContributionProduct(); $dao->id = $id; $dao->find();
+   */
   public function assignPremiumProduct($id) { //to get Premium id
     $sql = "
 SELECT *
@@ -312,7 +339,8 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    */
   public function getValidProcessorsAndAssignFutureStartDate() {
     $validProcessors = array();
-    $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 )");
+    // restrict to payment_type = 1 (credit card only) and billing mode 1 and 3
+    $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 ) AND payment_type = 1");
 
     foreach ($processors as $ppID => $label) {
       $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
@@ -382,6 +410,11 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     $this->assign('hidePayPalExpress', TRUE);
   }
 
+  /**
+   * @param $submittedValues
+   *
+   * @return mixed
+   */
   public function getCurrency($submittedValues) { // get current currency from DB or use default currency
     $config = CRM_Core_Config::singleton();
 
@@ -398,6 +431,11 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     return $result;
   }
 
+  /**
+   * @param $financialTypeId
+   *
+   * @return array
+   */
   public function getFinancialAccounts($financialTypeId) {
     $financialAccounts = array();
     CRM_Core_PseudoConstant::populate($financialAccounts,
@@ -409,6 +447,12 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     return $financialAccounts;
   }
 
+  /**
+   * @param $financialTypeId
+   * @param $relationTypeId
+   *
+   * @return mixed
+   */
   public function getFinancialAccount($financialTypeId, $relationTypeId) {
     $financialAccounts = $this->getFinancialAccounts($financialTypeId);
     return CRM_Utils_Array::value($relationTypeId, $financialAccounts);
@@ -490,6 +534,11 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
   }
 
+  /**
+   * @param $submittedValues
+   *
+   * @return mixed
+   */
   public function unsetCreditCardFields($submittedValues) {
     //Offline Contribution.
     $unsetParams = array(

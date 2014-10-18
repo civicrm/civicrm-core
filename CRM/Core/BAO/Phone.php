@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -43,6 +43,12 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * has more business logic
    *
    * @param array $params input parameters
+   */
+  /**
+   * @param $params
+   *
+   * @return object
+   * @throws API_Exception
    */
   static function create($params) {
     // Ensure mysql phone function exists
@@ -102,6 +108,10 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * Get all the phone numbers for a specified contact_id, with the primary being first
    *
    * @param int $id the contact id
+   *
+   * @param bool $updateBlankLocInfo
+   * @param null $type
+   * @param array $filters
    *
    * @return array  the array of phone ids which are potential numbers
    * @access public
@@ -173,6 +183,8 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
    *
    * @param array $entityElements the array containing entity_id and
    * entity_table name
+   *
+   * @param null $type
    *
    * @return array  the array of phone ids which are potential numbers
    * @access public

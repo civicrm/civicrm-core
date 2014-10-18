@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,19 +41,23 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
   protected $_add2groupSupported = FALSE;
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     $this->_columns = array(
-      'civicrm_event' =>
-      array(
+      'civicrm_event' => array(
         'dao' => 'CRM_Event_DAO_Event',
-        'filters' =>
-        array(
-          'id' =>
-          array('title' => ts('Event Title'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+        'filters' => array(
+          'id' => array(
+            'title' => ts('Event'),
+            'operatorType' => CRM_Report_Form::OP_ENTITYREF,
             'type' => CRM_Utils_Type::T_INT,
-            'options' => $this->getEventFilterOptions(),
+            'attributes' => array('select' => array('minimumInputLength' => 0)),
           ),
         ),
       ),
@@ -67,6 +71,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     parent::preProcess();
   }
 
+  /**
+   * @param $eventIDs
+   */
   function buildEventReport($eventIDs) {
 
     $this->assign('events', $eventIDs);
@@ -178,13 +185,15 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         $roleRows[$roleDAO->event_id][$participantRole[$roleId]]['total'] += $roleDAO->participant;
         $roleRows[$roleDAO->event_id][$participantRole[$roleId]]['amount'] += $roleDAO->amount;
       }
-      $roleRows[$roleDAO->event_id][$participantRole[$roleId]]['amount'] = CRM_Utils_Money::format($roleRows[$roleDAO->event_id][$participantRole[$roleId]]['amount'], $currency[$roleDAO->event_id]);
     }
 
     foreach ($roleRows as $eventId => $roleInfo) {
       foreach ($participantRole as $roleName) {
         if (isset($roleInfo[$roleName])) {
           $roleRows[$eventId][$roleName]['round'] = round(($roleRows[$eventId][$roleName]['total'] / $count[$eventId]) * 100, 2);
+        }
+        if (!empty($roleRows[$eventId][$roleName])) {
+          $roleRows[$eventId][$roleName]['amount'] = CRM_Utils_Money::format($roleRows[$eventId][$roleName]['amount'], $currency[$eventId]);
         }
       }
     }
@@ -255,6 +264,11 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $this->assign('statistics', $this->statistics($eventIDs));
   }
 
+  /**
+   * @param $eventIDs
+   *
+   * @return array
+   */
   function statistics(&$eventIDs) {
     $statistics = array();
     $count = count($eventIDs);
@@ -266,6 +280,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     return $statistics;
   }
 
+  /**
+   * @param int $rowCount
+   */
   function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
 
@@ -280,6 +297,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $this->_limit = ($pageId - 1) * self::ROW_COUNT_LIMIT;
   }
 
+  /**
+   * @param int $rowCount
+   */
   function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     $params = array(
       'total' => $this->_rowsFound,
@@ -299,12 +319,12 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $this->_setVariable = TRUE;
 
     $noSelection = FALSE;
-    if (empty($this->_params['id_value'][0])) {
+    if (empty($this->_params['id_value'])) {
       $this->_params['id_value'] = array();
       $this->_setVariable = FALSE;
 
       $events = CRM_Event_PseudoConstant::event(NULL, NULL,
-        "is_template IS NULL OR is_template = 0"
+        "is_template = 0"
       );
       if (empty($events)) {
         return FALSE;
@@ -313,6 +333,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         $this->_params['id_value'][] = $key;
       }
       $noSelection = TRUE;
+    }
+    elseif (!is_array($this->_params['id_value'])) {
+      $this->_params['id_value'] = explode(',', $this->_params['id_value']);
     }
 
     $this->_rowsFound = count($this->_params['id_value']);
@@ -338,7 +361,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         }
       } elseif ($this->_params['id_op'] == 'notin') {
         $events = CRM_Event_PseudoConstant::event(NULL, NULL,
-          "is_template IS NULL OR is_template = 0"
+          "is_template = 0"
         );
 
         $showEvents = array_diff(array_keys($events), $this->_params['id_value']);

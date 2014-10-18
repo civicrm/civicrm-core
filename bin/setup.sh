@@ -51,7 +51,12 @@ fi
 # checkout, not packaged code
 if [ -d "$CALLEDPATH/../xml" ]; then
   cd "$CALLEDPATH/../xml"
-  "$PHP5PATH"php GenCode.php $SCHEMA '' $GENCODE_CMS
+  if [ -z "$DBPORT" ]; then
+    PHP_MYSQL_HOSTPORT="$DBHOST"
+  else
+    PHP_MYSQL_HOSTPORT="$DBHOST:$DBPORT"
+  fi
+  "$PHP5PATH"php -d mysql.default_host="$PHP_MYSQL_HOSTPORT" -d mysql.default_user=$DBUSER -d mysql.default_password=$DBPASS GenCode.php $SCHEMA '' $GENCODE_CMS
 fi
 
 # someone might want to use empty password for development,

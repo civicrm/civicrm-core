@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,38 +28,16 @@
 
 {* Profile forms when embedded in CMS account create (mode=1) or
     cms account edit (mode=8) or civicrm/profile (mode=4) pages *}
-{if ($context eq 'multiProfileDialog')}
-{literal}
-<script type="text/javascript">
-cj(function($) {
-  $('#profile-dialog .crm-container-snippet #Edit').validate(CRM.validate.params);
-  var formOptions = {
-    success:       checkResponse  // post-submit callback 
-  };
-
-  //binding the callback to snippet profile form
-  $('.crm-container-snippet #Edit').ajaxForm(formOptions);
-});
-
-// post-submit callback 
-function checkResponse(responseText, statusText, xhr, $form) { 
-  //if there is any form error show the dialog
-  //else redirect to post url
-  if (!cj(responseText).find('.crm-error').html()) {
-    window.location = '{/literal}{$postUrl}{literal}';
-  }
-} 
-</script>
-{/literal}
-{include file="CRM/Form/validate.tpl"}
-{/if}
 {if $deleteRecord}
 <div class="messages status no-popup">
   <div class="icon inform-icon"></div>&nbsp;
         {ts}Are you sure you want to delete this record?{/ts}
   </div>
-  <span class="crm-button">{$form._qf_Edit_upload_delete.html}</span>
-  <div class="crm-submit-buttons" style='display:inline'>{include file="CRM/common/formButtons.tpl"}</div>
+
+  <div class="crm-submit-buttons">
+    <span class="crm-button">{$form._qf_Edit_upload_delete.html}</span>
+    <a class="button cancel" href="{$cancelURL}">{ts}Cancel{/ts}</a>
+  </div>
 {else}
 {if ! empty( $fields )}
 {* Wrap in crm-container div so crm styles are used.*}
@@ -205,8 +183,6 @@ function checkResponse(responseText, statusText, xhr, $form) {
                 {if $field.html_type eq 'Autocomplete-Select'}
                   {if $field.data_type eq 'ContactReference'}
                     {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
-                  {else}
-                    {include file="CRM/Custom/Form/AutoComplete.tpl" element_name = $n}
                   {/if}
                 {/if}
               {/if}
@@ -249,7 +225,8 @@ function checkResponse(responseText, statusText, xhr, $form) {
         {assign var=floatStyle value='float:right'}
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
-      {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
+        {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
+        <a class="button cancel" href="{$cancelURL}">{ts}Cancel{/ts}</a>
       </div>
     {/if}
     {if $help_post && $action neq 4}<br /><div class="messages help">{$help_post}</div>{/if}
@@ -292,63 +269,12 @@ invert              = 0
 {literal}
 <script type="text/javascript">
 
-cj(document).ready(function(){
+CRM.$(function($) {
   cj('#selector tr:even').addClass('odd-row ');
   cj('#selector tr:odd ').addClass('even-row');
 });
 {/literal}
-{if $context eq 'dialog'}
-{literal}
-  var options = {
-      beforeSubmit:  showRequest
-  };
-
-  // bind form using 'ajaxForm'
-  cj('#Edit').ajaxForm( options );
-
-   // FIXME - this is improper use of jquery.form
-   // Do not use this code as an example
-  function showRequest(formData, jqForm, options) {
-    // formData is an array; here we use $.param to convert it to a string to display it
-    // but the form plugin does this for you automatically when it submits the data
-    var queryString = cj.param(formData);
-    queryString = queryString + '&snippet=5&gid=' + {/literal}"{$profileID}"{literal};
-    var postUrl = {/literal}"{crmURL p='civicrm/profile/create' h=0 }"{literal};
-    var blockNo = {/literal}{if $blockNo}{$blockNo}{else}null{/if}{literal};
-    var prefix  = {/literal}"{$prefix}"{literal};
-    var response = cj.ajax({
-      type: "POST",
-      url: postUrl,
-      async: false, // FIXME
-      data: queryString,
-      dataType: "json",
-      success: function( response ) {
-        if ( response.newContactSuccess ) {
-          cj('#' + prefix + 'contact_' + blockNo ).val( response.sortName ).focus( );
-          if ( typeof(allowMultiClient) != "undefined" ) {
-            if ( allowMultiClient ) {
-              cj('#' + prefix + 'contact_' + blockNo).tokenInput("add", {id: response.contactID, name: response.sortName });
-            }
-          }
-          cj('input[name="' + prefix + 'contact_select_id[' + blockNo +']"]').val( response.contactID );
-          CRM.alert(response.displayName + {/literal}'{ts escape="js"} has been created.{/ts}', '{ts escape="js"}Contact Saved{/ts}'{literal}, 'success');
-          cj('#contact-dialog-' + prefix + blockNo ).dialog('close');
-        }
-      }
-    }).responseText;
-
-    cj('#contact-dialog-' + prefix + blockNo).html( response );
-
-    // FIXME - we have used jquery.form very incorrectly
-    // and are now preventing it from doing what it's supposed to do
-    return false;
-  }
-
-{/literal}
-{/if}
-{literal}
 </script>
-{/literal}
 
 {/crmRegion}
 </div> {* end crm-profile-NAME *}

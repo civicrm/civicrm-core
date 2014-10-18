@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -39,9 +39,17 @@
  */
 class CRM_Case_Form_Activity_ChangeCaseStartDate {
 
+  /**
+   * @param $form
+   *
+   * @throws Exception
+   */
   static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
+    }
+    if (count($form->_caseId) != 1) {
+      CRM_Core_Resources::fatal(ts('Expected one case-type'));
     }
   }
 
@@ -50,6 +58,8 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    * the default values are retrieved from the database
    *
    * @access public
+   *
+   * @param $form
    *
    * @return void
    */
@@ -60,8 +70,9 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
       'Open Case',
       'name'
     );
+    $caseId = CRM_Utils_Array::first($form->_caseId);
     $openCaseParams = array('activity_type_id' => $openCaseActivityType);
-    $openCaseInfo = CRM_Case_BAO_Case::getCaseActivityDates($form->_caseId, $openCaseParams, TRUE);
+    $openCaseInfo = CRM_Case_BAO_Case::getCaseActivityDates($caseId, $openCaseParams, TRUE);
     if (empty($openCaseInfo)) {
       list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults();
     }
@@ -77,11 +88,15 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
     return $defaults;
   }
 
+  /**
+   * @param $form
+   */
   static function buildQuickForm(&$form) {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
+    $caseId = CRM_Utils_Array::first($form->_caseId);
 
-    $currentStartDate = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $form->_caseId, 'start_date');
+    $currentStartDate = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $caseId, 'start_date');
     $form->assign('current_start_date', $currentStartDate);
     $form->addDate('start_date', ts('New Start Date'), FALSE, array('formatType' => 'activityDateTime'));
   }
@@ -90,6 +105,9 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    * global validation rules for the form
    *
    * @param array $values posted values of the form
+   *
+   * @param $files
+   * @param $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -104,6 +122,9 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @access public
    *
+   * @param $form
+   * @param $params
+   *
    * @return void
    */
   static function beginPostProcess(&$form, &$params) {
@@ -117,6 +138,10 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @access public
    *
+   * @param $form
+   * @param $params
+   * @param $activity
+   *
    * @return void
    */
   static function endPostProcess(&$form, &$params, $activity) {
@@ -124,24 +149,16 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
       $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
     }
 
-    $caseType = $form->_caseType;
+    $caseType = CRM_Utils_Array::first($form->_caseType);
+    $caseId = CRM_Utils_Array::first($form->_caseId);
 
-    if (!$caseType && $form->_caseId) {
-
-      $query = "
-SELECT  cov_type.label as case_type FROM civicrm_case
-LEFT JOIN  civicrm_option_group cog_type ON cog_type.name = 'case_type'
-LEFT JOIN civicrm_option_value cov_type ON
-( civicrm_case.case_type_id = cov_type.value AND cog_type.id = cov_type.option_group_id )
-WHERE civicrm_case.id=  %1";
-
-      $queryParams = array(1 => array($form->_caseId, 'Integer'));
-      $caseType = CRM_Core_DAO::singleValueQuery($query, $queryParams);
+    if (!$caseType && $caseId) {
+      $caseType = CRM_Case_BAO_Case::getCaseType($caseId, 'title');
     }
 
     if (!$form->_currentlyViewedContactId ||
       !$form->_currentUserId ||
-      !$form->_caseId ||
+      !$caseId ||
       !$caseType
     ) {
       CRM_Core_Error::fatal('Required parameter missing for ChangeCaseType - end post processing');
@@ -156,7 +173,7 @@ WHERE civicrm_case.id=  %1";
 
     // 1. save activity subject with new start date
     $currentStartDate = CRM_Utils_Date::customFormat(CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
-        $form->_caseId, 'start_date'
+        $caseId, 'start_date'
       ), $config->dateformatFull);
     $newStartDate      = CRM_Utils_Date::customFormat(CRM_Utils_Date::mysqlToIso($params['start_date']), $config->dateformatFull);
     $subject           = 'Change Case Start Date from ' . $currentStartDate . ' to ' . $newStartDate;
@@ -169,7 +186,7 @@ WHERE civicrm_case.id=  %1";
       'creatorID' => $form->_currentUserId,
       'standardTimeline' => 0,
       'activity_date_time' => $params['start_date'],
-      'caseID' => $form->_caseId,
+      'caseID' => $caseId,
       'caseType' => $caseType,
       'activityTypeName' => 'Change Case Start Date',
       'activitySetName' => 'standard_timeline',
@@ -221,7 +238,7 @@ WHERE civicrm_case.id=  %1";
         // Create linkage to case
         $caseActivityParams = array(
           'activity_id' => $newActivity->id,
-          'case_id' => $form->_caseId,
+          'case_id' => $caseId,
         );
 
         CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);

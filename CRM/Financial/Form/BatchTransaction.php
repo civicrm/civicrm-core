@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -101,7 +101,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
       )
     );
 
-    $this->_group = CRM_Core_PseudoConstant::group();
+    $this->_group = CRM_Core_PseudoConstant::nestedGroup();
 
     // multiselect for groups
     if ($this->_group) {
@@ -126,7 +126,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
 
     $this->add('submit','rSubmit', ts('Go'),
       array(
-        'class' => 'form-submit',
+        'class' => 'crm-form-submit',
         'id' => 'GoRemove',
       ));
 
@@ -149,7 +149,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
 
     $this->add('submit','submit', ts('Go'),
       array(
-        'class' => 'form-submit',
+        'class' => 'crm-form-submit',
         'id' => 'Go',
       ));
     $this->applyFilter('__ALL__', 'trim');
@@ -172,6 +172,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     return $defaults;
   }
 
+  /**
+   * @return array|null
+   */
   function &links() {
     if (!(self::$_links)) {
       self::$_links = array(

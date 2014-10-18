@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,7 @@
     
    {if $unMatchCount }
         <p class="error">
-        {ts count=$unMatchCount plural='CiviCRM has detected mismatched contribution IDs. These records have not been Updated.'}CiviCRM has detected mismatched contribution ID. This record have not been updated.{/ts}
+        {ts count=$unMatchCount plural='CiviCRM has detected mismatched contribution IDs. These records have not been Updated.'}CiviCRM has detected mismatched contribution ID. This record has not been updated.{/ts}
         </p>
         <p class="error">
         {ts 1=$downloadMismatchRecordsUrl}You can <a href='%1'>Download Mismatched Contributions</a>. You may then correct them, and import the new file with the corrected data.{/ts}
@@ -54,7 +54,7 @@
 
     {if $conflictRowCount}
         <p class="error">
-        {ts count=$conflictRowCount plural='CiviCRM has detected %count records with conflicting transaction IDs within this data file or relative to existing contribution records. These records have not been imported.'}CiviCRM has detected one record with conflicting transaction ID within this data file or relative to existing contribution records. This record have not been imported.{/ts}
+        {ts count=$conflictRowCount plural='CiviCRM has detected %count records with conflicting transaction IDs within this data file or relative to existing contribution records. These records have not been imported.'}CiviCRM has detected one record with conflicting transaction ID within this data file or relative to existing contribution records. This record has not been imported.{/ts}
         </p>
         <p class="error">
         {ts 1=$downloadConflictRecordsUrl}You can <a href="%1">Download Conflicts</a>. You may then review these records to determine if they are actually conflicts, and correct the transaction IDs for those that are not.{/ts}

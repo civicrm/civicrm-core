@@ -1,7 +1,7 @@
 -- CRM-5628
 SELECT @country_id := id from civicrm_country where name = 'Haiti';
 
-INSERT INTO civicrm_state_province ( country_id, abbreviation, name ) VALUES
+INSERT IGNORE INTO civicrm_state_province ( country_id, abbreviation, name ) VALUES
 ( @country_id,  'AR',  'Artibonite' ),
 ( @country_id,  'CE',  'Centre'     ),
 ( @country_id,  'NI',  'Nippes'     ),

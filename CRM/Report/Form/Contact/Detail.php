@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,6 +40,12 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   protected $_customGroupExtends = array(
     'Contact', 'Individual', 'Household', 'Organization');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $this->_columns = array(
@@ -350,28 +356,12 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           ),
         'grouping' => 'activity-fields',
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_Group',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
       'civicrm_phone' =>
       array(
         'dao' => 'CRM_Core_DAO_Phone',
         'fields' =>
         array(
-          'phone' => NULL,   
+          'phone' => NULL,
           'phone_ext' =>
           array(
             'title' => ts('Phone Extension')
@@ -380,7 +370,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         'grouping' => 'contact-fields',
       ),
     );
-
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
@@ -443,6 +433,13 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = array();
     return $errors;
@@ -598,6 +595,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->_where .= " GROUP BY {$this->_aliases['civicrm_contact']}.id ";
   }
 
+  /**
+   * @return array
+   */
   function clauseComponent() {
     $selectedContacts = implode(',', $this->_contactSelected);
     $contribution     = $membership = $participant = NULL;
@@ -734,6 +734,11 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     return $rows;
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = array();
 
@@ -749,11 +754,17 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   }
 
   //Override to set limit is 10
+  /**
+   * @param int $rowCount
+   */
   function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
   }
 
   //Override to set pager with limit is 10
+  /**
+   * @param int $rowCount
+   */
   function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     parent::setPager($rowCount);
   }
@@ -800,6 +811,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->endPostProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
 
@@ -838,6 +852,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $componentRows
+   */
   function alterComponentDisplay(&$componentRows) {
     // custom code to alter rows
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);

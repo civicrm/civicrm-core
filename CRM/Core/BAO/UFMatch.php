@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -43,6 +43,11 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    *
    *
    * @param array $params input parameters
+   */
+  /**
+   * @param $params
+   *
+   * @return CRM_Core_DAO_UFMatch
    */
   static function create($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
@@ -63,9 +68,12 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * object for this user. If the user has new values, we need
    * to update the CRM DB with the new values
    *
-   * @param Object  $user    the drupal user object
-   * @param boolean $update  has the user object been edited
-   * @param         $uf
+   * @param Object $user the drupal user object
+   * @param boolean $update has the user object been edited
+   * @param $uf
+   *
+   * @param $ctype
+   * @param bool $isLogin
    *
    * @return void
    * @access public
@@ -164,11 +172,14 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * Synchronize the object with the UF Match entry. Can be called stand-alone from
    * the drupalUsers script
    *
-   * @param Object  $user    the drupal user object
-   * @param string  $userKey the id of the user from the uf object
-   * @param string  $uniqId    the OpenID of the user
-   * @param string  $uf      the name of the user framework
-   * @param integer $status  returns the status if user created or already exits (used for CMS sync)
+   * @param Object $user the drupal user object
+   * @param string $userKey the id of the user from the uf object
+   * @param string $uniqId the OpenID of the user
+   * @param string $uf the name of the user framework
+   * @param integer $status returns the status if user created or already exits (used for CMS sync)
+   *
+   * @param null $ctype
+   * @param bool $isLogin
    *
    * @return the ufmatch object that was found or created
    * @access public
@@ -403,7 +414,9 @@ AND    domain_id    = %4
    * Update the email value for the contact and user profile
    *
    * @param  $contactId  Int     Contact ID of the user
-   * @param  $email      String  email to be modified for the user
+   * @param $emailAddress
+   *
+   * @internal param String $email email to be modified for the user
    *
    * @return void
    * @access public
@@ -520,6 +533,9 @@ AND    domain_id    = %4
     return NULL;
   }
 
+  /**
+   * @return bool
+   */
   static function isEmptyTable() {
     $sql = "SELECT count(id) FROM civicrm_uf_match";
     return CRM_Core_DAO::singleValueQuery($sql) > 0 ? FALSE : TRUE;
@@ -546,6 +562,8 @@ AND    domain_id    = %4
   /**
    * see if this user exists, and if so, if they're allowed to login
    *
+   *
+   * @param $openId
    *
    * @return bool     true if allowed to login, false otherwise
    * @access public
@@ -583,6 +601,11 @@ AND    domain_id    = %4
     return $ufId;
   }
 
+  /**
+   * @param $email
+   *
+   * @return bool
+   */
   static function isDuplicateUser($email) {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
@@ -599,10 +622,13 @@ AND    domain_id    = %4
   /**
    * Get uf match values for given uf id or logged in user.
    *
-   * @param int    $ufID uf id.
+   * @param int $ufID uf id.
    *
    * return array  $ufValues uf values.
-   **/
+   **
+   *
+   * @return array
+   */
   static function getUFValues($ufID = NULL) {
     if (!$ufID) {
       //get logged in user uf id.

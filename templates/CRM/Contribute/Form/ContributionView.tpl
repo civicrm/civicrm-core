@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,8 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-content-block crm-contribution-view-form-block">
-<h3>{ts}View Contribution{/ts}</h3>
-
 <div class="action-link">
   <div class="crm-submit-buttons">
     {if call_user_func(array('CRM_Core_Permission','check'), 'edit contributions')}
@@ -47,6 +45,20 @@
       </a>
     {/if}
     {include file="CRM/common/formButtons.tpl" location="top"}
+    {assign var='pdfUrlParams' value="reset=1&id=$id&cid=$contact_id"}
+    {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
+    {if $invoicing && $cancelledStatus}
+      <div class="crm-printButton">
+        <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+        {if $contribution_status != 'Refunded'}
+          {ts}Print Invoice{/ts}</a>
+        {else}
+          {ts}Print Invoice and Credit Note{/ts}</a>
+        {/if}
+        <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
+          {ts}Email Invoice{/ts}</a>
+      </div>
+    {/if}
   </div>
 </div>
 <table class="crm-info-panel">
@@ -79,6 +91,12 @@
           {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
         {/if}
       </td>
+    </tr>
+  {/if}
+  {if $invoicing && $tax_amount}
+    <tr>
+      <td class="label">{ts}Total Tax Amount{/ts}</td>
+      <td>{$tax_amount|crmMoney:$currency}</td>
     </tr>
   {/if}
   {if $non_deductible_amount}
@@ -194,14 +212,14 @@
   {/if}
 </table>
 
-{if $softContributions and !$pcp_id} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
+{if count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
   <div class="crm-accordion-wrapper crm-soft-credit-pane">
     <div class="crm-accordion-header">
       {ts}Soft Credit{/ts}
     </div>
     <div class="crm-accordion-body">
       <table class="crm-info-panel crm-soft-credit-listing">
-        {foreach from=$softContributions.soft_credit item="softCont"}
+        {foreach from=$softContributions item="softCont"}
           <tr>
             <td>
               <a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$softCont.contact_id`"}"
@@ -247,14 +265,14 @@
       <table class="crm-info-panel">
         <tr>
           <td class="label">{ts}Personal Campaign Page{/ts}</td>
-          <td><a href="{crmURL p="civicrm/pcp/info" q="reset=1&id=`$pcp_id`"}">{$pcp}</a><br/>
+          <td><a href="{crmURL p="civicrm/pcp/info" q="reset=1&id=`$pcp_id`"}">{$pcp_title}</a><br/>
             <span class="description">{ts}Contribution was made through this personal campaign page.{/ts}</span>
           </td>
         </tr>
         <tr>
           <td class="label">{ts}Soft Credit To{/ts}</td>
-          <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$soft_credit_to`"}" id="view_contact"
-                 title="{ts}View contact record{/ts}">{$softCreditToName}</a></td>
+          <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$pcp_soft_credit_to_id`"}" id="view_contact"
+                 title="{ts}View contact record{/ts}">{$pcp_soft_credit_to_name}</a></td>
         </tr>
         <tr>
           <td class="label">{ts}In Public Honor Roll?{/ts}</td>
@@ -306,5 +324,17 @@
           class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
+  {if $invoicing && $cancelledStatus}
+    <div class="crm-printButton">
+      <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+      {if $contribution_status != 'Refunded'}
+        {ts}Print Invoice{/ts}</a>
+      {else}
+        {ts}Print Invoice and Credit Note{/ts}</a>
+      {/if}
+      <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
+        {ts}Email Invoice{/ts}</a>
+    </div>
+  {/if}
 </div>
 </div>

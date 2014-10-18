@@ -44,6 +44,7 @@ function line_item_create_expectedresult(){
           'id' => '1',
           'entity_table' => 'civicrm_contribution',
           'entity_id' => '1',
+          'contribution_id' => '',
           'price_field_id' => '1',
           'label' => 'line item',
           'qty' => '1',

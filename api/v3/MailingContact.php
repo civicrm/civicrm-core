@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_MailingContact
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id$
  *
  */
@@ -82,8 +82,10 @@ function _civicrm_api3_mailing_contact_getresults($params, $count){
  */
 function _civicrm_api3_mailing_contact_get_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
+  $params['contact_id']['title'] = 'Contact ID';
   $params['type'] = array(
     'api.default' => 'Delivered',
+    'title' => 'Type',// doesn't really explain the field - but not sure I understand it to explain it better
     'type' => CRM_Utils_Type::T_STRING,
     'options' => array(
       'Delivered' => 'Delivered',
@@ -92,6 +94,19 @@ function _civicrm_api3_mailing_contact_get_spec(&$params) {
   );
 }
 
+/**
+ * @param $type
+ * @param $contactID
+ * @param $offset
+ * @param $limit
+ * @param $selectFields
+ * @param $fromClause
+ * @param $whereClause
+ * @param $sort
+ * @param $getCount
+ *
+ * @return array
+ */
 function _civicrm_api3_mailing_contact_query(
   $type,
   $contactID,
@@ -194,6 +209,15 @@ LIMIT %2, %3
   return $results;
 }
 
+/**
+ * @param $contactID
+ * @param $offset
+ * @param $limit
+ * @param $sort
+ * @param $getCount
+ *
+ * @return array
+ */
 function _civicrm_api3_mailing_contact_get_delivered(
   $contactID,
   $offset,
@@ -225,6 +249,15 @@ AND        meb.id IS NULL
   );
 }
 
+/**
+ * @param $contactID
+ * @param $offset
+ * @param $limit
+ * @param $sort
+ * @param $getCount
+ *
+ * @return array
+ */
 function _civicrm_api3_mailing_contact_get_bounced(
   $contactID,
   $offset,

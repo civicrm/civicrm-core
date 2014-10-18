@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,14 +41,13 @@ class CRM_Member_Page_AJAX {
   /**
    * Function to setDefaults according to membership type
    */
-  function getMemberTypeDefaults($config) {
+  static function getMemberTypeDefaults() {
     if (!$_POST['mtype']) {
       $details['name'] = '';
       $details['auto_renew'] = '';
       $details['total_amount'] = '';
 
-      echo json_encode($details);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($details);
     }
     $memType = CRM_Utils_Type::escape($_POST['mtype'], 'Integer');
 
@@ -68,8 +67,7 @@ WHERE   id = %1";
     $details['total_amount'] = CRM_Utils_Money::format($details['total_amount'], NULL, '%a');
     $options = array(ts('No auto-renew option'), ts('Give option, but not required'), ts('Auto-renew required '));
     $details['auto_renew'] = CRM_Utils_Array::value('auto_renew', $options[$details]);
-    echo json_encode($details);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($details);
   }
 }
 

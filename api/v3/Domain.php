@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Domain
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Domain.php 30171 2010-10-14 09:11:27Z mover $
  *
  */
@@ -51,6 +51,9 @@ function civicrm_api3_domain_get($params) {
   if (!empty($params['current_domain'])) {
     $domainBAO = CRM_Core_Config::domainID();
     $params['id'] = $domainBAO;
+  }
+  if (!empty($params['options']) && !empty($params['options']['is_count'])) {
+    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
 
   _civicrm_api3_dao_set_filter($bao, $params, true, 'domain');

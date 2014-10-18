@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -66,9 +66,10 @@ class CRM_Core_BAO_CustomOption {
   /**
    * Returns all active options ordered by weight for a given field
    *
-   * @param  int      $fieldId         field whose options are needed
-   * @param  boolean  $inactiveNeeded  do we need inactive options ?
+   * @param $fieldID
+   * @param  boolean $inactiveNeeded do we need inactive options ?
    *
+   * @internal param int $fieldId field whose options are needed
    * @return array $customOption all active options for fieldId
    * @static
    */
@@ -113,6 +114,7 @@ class CRM_Core_BAO_CustomOption {
    *
    * @param $fieldId  int    the custom field ID
    * @pram  $value    string the value (typically from the DB) of this custom field
+   * @param $value
    * @param $htmlType string the html type of the field (optional)
    * @param $dataType string the data type of the field (optional)
    *
@@ -210,6 +212,11 @@ WHERE  id = %1";
     }
   }
 
+  /**
+   * @param $params
+   *
+   * @throws Exception
+   */
   static function updateCustomValues($params) {
     $optionDAO = new CRM_Core_DAO_OptionValue();
     $optionDAO->id = $params['optionId'];
@@ -277,7 +284,13 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
     }
   }
 
-  static function &valuesByID($customFieldID, $optionGroupID = NULL) {
+  /**
+   * @param $customFieldID
+   * @param null $optionGroupID
+   *
+   * @return array
+   */
+  static function valuesByID($customFieldID, $optionGroupID = NULL) {
     if (!$optionGroupID) {
       $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
         $customFieldID,
@@ -285,7 +298,7 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
       );
     }
 
-    $options = CRM_Core_OptionGroup::valuesByID($optionGroupID);
+    $options = $optionGroupID ? CRM_Core_OptionGroup::valuesByID($optionGroupID) : array();
 
     CRM_Utils_Hook::customFieldOptions($customFieldID, $options, FALSE);
 

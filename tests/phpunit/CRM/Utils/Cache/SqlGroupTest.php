@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Utils_Cache_SqlGroupTest
+ */
 class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();

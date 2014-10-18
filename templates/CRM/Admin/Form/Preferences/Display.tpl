@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -154,7 +154,7 @@
 
     <tr class="crm-preferences-display-form-block-user_dashboard_options">
       <td class="label">{$form.user_dashboard_options.label}</td>
-      <td>{$form.user_dashboard_options.html}</td>
+      <td>{$form.user_dashboard_options.html}<span id="invoice_help">  {help id="id-invoices_id"}</span></td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -172,11 +172,13 @@
         <td class="label">{$form.wysiwyg_input_format.label}</td>
         <td>
           {$form.wysiwyg_input_format.html}{literal}
-            <script type="text/javascript">cj(document).ready(function () {
-                if (cj('#editor_id').val() == 4) {
-                  cj('#crm-preferences-display-form-block-wysiwyg_input_format').show();
+            <script type="text/javascript">
+              CRM.$(function($) {
+                if ($('#editor_id').val() == 4) {
+                  $('#crm-preferences-display-form-block-wysiwyg_input_format').show();
                 }
-              });</script>
+              });
+            </script>
           {/literal}
           <br/>
           <span class="description">
@@ -193,6 +195,16 @@
         {ts}Select the HTML WYSIWYG Editor provided for fields that allow HTML formatting. Select 'Textarea'
           if you don't want to provide a WYSIWYG Editor (users will type text and / or HTML code into plain text
           fields).{/ts} {help id="id-editor_id"}
+      </td>
+    </tr>
+    <tr class="crm-preferences-display-form-block-ajaxPopupsEnabled">
+      <td class="label">{$form.ajaxPopupsEnabled.label}</td>
+      <td>{$form.ajaxPopupsEnabled.html}</td>
+    </tr>
+    <tr class="crm-preferences-display-form-block-description">
+      <td>&nbsp;</td>
+      <td class="description">
+        {ts}If you disable this option, the CiviCRM interface will be limited to traditional browsing. Opening a form will refresh the page rather than opening a popup dialog.{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-display_name_format">
@@ -217,37 +229,40 @@
 {if $form.contact_edit_options.html}
   {literal}
     <script type="text/javascript">
-      cj(function () {
-        cj("#contactEditBlocks").sortable({
-          placeholder: 'ui-state-highlight',
-          update: getSorting
-        });
-        cj("#contactEditOptions").sortable({
+      CRM.$(function($) {
+        function getSorting(e, ui) {
+          var params = [];
+          var y = 0;
+          var items = $("#contactEditBlocks li");
+          if (items.length > 0) {
+            for (var y = 0; y < items.length; y++) {
+              var idState = items[y].id.split('-');
+              params[y + 1] = idState[1];
+            }
+          }
+
+          items = $("#contactEditOptions li");
+          if (items.length > 0) {
+            for (var x = 0; x < items.length; x++) {
+              var idState = items[x].id.split('-');
+              params[x + y + 1] = idState[1];
+            }
+          }
+          $('#contact_edit_preferences').val(params.toString());
+        }
+
+        var invoicesKey = '{/literal}{$invoicesKey}{literal}';
+        var invoicing = '{/literal}{$invoicing}{literal}';
+        if (!invoicing) {
+          $('#user_dashboard_options_' + invoicesKey).attr("disabled", true);
+        }
+        $("#invoice_help").insertAfter("label[for='user_dashboard_options_" + invoicesKey + "']");
+        
+        $("#contactEditBlocks, #contactEditOptions").sortable({
           placeholder: 'ui-state-highlight',
           update: getSorting
         });
       });
-
-      function getSorting(e, ui) {
-        var params = new Array();
-        var y = 0;
-        var items = cj("#contactEditBlocks li");
-        if (items.length > 0) {
-          for (var y = 0; y < items.length; y++) {
-            var idState = items[y].id.split('-');
-            params[y + 1] = idState[1];
-          }
-        }
-
-        items = cj("#contactEditOptions li");
-        if (items.length > 0) {
-          for (var x = 0; x < items.length; x++) {
-            var idState = items[x].id.split('-');
-            params[x + y + 1] = idState[1];
-          }
-        }
-        cj('#contact_edit_preferences').val(params.toString());
-      }
     </script>
   {/literal}
 {/if}

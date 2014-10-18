@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -46,6 +46,15 @@ class CRM_Core_OptionGroup {
     'grant_type',
   );
 
+  /**
+   * @param $dao
+   * @param bool $flip
+   * @param bool $grouping
+   * @param bool $localize
+   * @param string $valueColumnName
+   *
+   * @return array
+   */
   static function &valuesCommon(
     $dao, $flip = FALSE, $grouping = FALSE,
     $localize = FALSE, $valueColumnName = 'label'
@@ -163,6 +172,7 @@ WHERE  v.option_group_id = g.id
    * @param $condition
    * @param $labelColumnName
    * @param $onlyActive
+   * @param string $keyColumnName
    */
   protected static function flushValues($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName = 'value') {
     $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
@@ -171,6 +181,9 @@ WHERE  v.option_group_id = g.id
     unset(self::$_cache[$cacheKey]);
   }
 
+  /**
+   * @return string
+   */
   protected static function createCacheKey() {
     $cacheKey = "CRM_OG_" . serialize(func_get_args());
     return $cacheKey;
@@ -188,6 +201,9 @@ WHERE  v.option_group_id = g.id
    * @param $grouping   boolean if true, return the value in 'grouping' column
    * @param $localize   boolean if true, localize the results before returning
    * @param $labelColumnName string the column to use for 'label'
+   *
+   * @param bool $onlyActive
+   * @param bool $fresh
    *
    * @return array      the values as specified by the above params
    * @static
@@ -301,6 +317,13 @@ WHERE  v.option_group_id = g.id
     }
   }
 
+  /**
+   * @param $groupName
+   * @param $value
+   * @param bool $onlyActiveValue
+   *
+   * @return null
+   */
   static function getLabel($groupName, $value, $onlyActiveValue = TRUE) {
     if (empty($groupName) ||
       empty($value)
@@ -330,6 +353,15 @@ WHERE  v.option_group_id = g.id
     return NULL;
   }
 
+  /**
+   * @param $groupName
+   * @param $label
+   * @param string $labelField
+   * @param string $labelType
+   * @param string $valueField
+   *
+   * @return null
+   */
   static function getValue($groupName,
     $label,
     $labelField = 'label',
@@ -401,7 +433,7 @@ WHERE  v.option_group_id = g.id
    * not messed up. Currently deletes the old group
    *
    * @param string $groupName the name of the option group - make sure there is no conflict
-   * @param array  $values    the associative array that has information on the option values
+   * @param array $values the associative array that has information on the option values
    *                          the keys of this array are:
    *                          string 'title'       (required)
    *                          string 'value'       (required)
@@ -410,14 +442,15 @@ WHERE  v.option_group_id = g.id
    *                          int    'weight'      (optional) - the order in which the value are displayed
    *                          bool   'is_default'  (optional) - is this the default one to display when rendered in form
    *                          bool   'is_active'   (optional) - should this element be rendered
-   * @param int    $defaultID (reference) - the option value ID of the default element (if set) is returned else 'null'
-   * @param string $groupLabel            - the optional label of the option group else set to group name
+   * @param int $defaultID (reference) - the option value ID of the default element (if set) is returned else 'null'
+   * @param null $groupTitle
+   *
+   * @internal param string $groupLabel - the optional label of the option group else set to group name
    *
    * @access public
    * @static
    *
    * @return int   the option group ID
-   *
    */
   static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
     self::deleteAssoc($groupName);
@@ -453,6 +486,12 @@ WHERE  v.option_group_id = g.id
     return $group->id;
   }
 
+  /**
+   * @param $groupName
+   * @param $values
+   * @param bool $flip
+   * @param string $field
+   */
   static function getAssoc($groupName, &$values, $flip = FALSE, $field = 'name') {
     $query = "
 SELECT v.id as amount_id, v.value, v.label, v.name, v.description, v.weight
@@ -493,6 +532,10 @@ ORDER BY v.weight
     }
   }
 
+  /**
+   * @param $groupName
+   * @param string $operator
+   */
   static function deleteAssoc($groupName, $operator = "=") {
     $query = "
 DELETE g, v
@@ -506,6 +549,12 @@ DELETE g, v
     $dao = CRM_Core_DAO::executeQuery($query, $params);
   }
 
+  /**
+   * @param $groupName
+   * @param $value
+   *
+   * @return null|string
+   */
   static function optionLabel($groupName, $value) {
     $query = "
 SELECT v.label
@@ -520,6 +569,15 @@ SELECT v.label
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
+  /**
+   * @param $groupName
+   * @param $fieldValue
+   * @param string $field
+   * @param string $fieldType
+   * @param bool $active
+   *
+   * @return array
+   */
   static function getRowValues($groupName, $fieldValue, $field = 'name',
     $fieldType = 'String', $active = TRUE
   ) {
@@ -560,6 +618,10 @@ WHERE  v.option_group_id = g.id
    * (for example CRM_Contribution_Pseudoconstant::paymentInstrument doesn't specify isActive
    * which is part of the cache key
    * will do a couple of variations & aspire to someone cleaning it up later
+   */
+  /**
+   * @param $name
+   * @param array $params
    */
   static function flush($name, $params = array()){
     $defaults = array(

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -43,6 +43,9 @@
  *
  */
 class CRM_Event_Badge {
+  /**
+   *
+   */
   function __construct() {
     $this->style        = array('width' => 0.1, 'cap' => 'round', 'join' => 'round', 'dash' => '2,2', 'color' => array(0, 0, 200));
     $this->format       = '5160';
@@ -52,6 +55,9 @@ class CRM_Event_Badge {
     $this->setDebug(FALSE);
   }
 
+  /**
+   * @param bool $debug
+   */
   function setDebug($debug = TRUE) {
     if (!$debug) {
       $this->debug = FALSE;
@@ -82,6 +88,11 @@ class CRM_Event_Badge {
     CRM_Utils_System::civiExit(1);
   }
 
+  /**
+   * @param $eventID
+   *
+   * @return CRM_Event_BAO_Event|null
+   */
   protected function retrieveEvent($eventID) {
     $bao = new CRM_Event_BAO_Event();
     if ($bao->get('id', $eventID)) {
@@ -90,6 +101,12 @@ class CRM_Event_Badge {
     return NULL;
   }
 
+  /**
+   * @param $eventID
+   * @param bool $img
+   *
+   * @return string
+   */
   function getImageFileName($eventID, $img = FALSE) {
     global $civicrm_root;
     $path = "CRM/Event/Badge";
@@ -119,6 +136,9 @@ class CRM_Event_Badge {
     return $imgFile;
   }
 
+  /**
+   * @param bool $img
+   */
   function printBackground($img = FALSE) {
     $x = $this->pdf->GetAbsX();
     $y = $this->pdf->GetY();
@@ -153,8 +173,10 @@ class CRM_Event_Badge {
   /**
    * function to create labels (pdf)
    *
-   * @param   array    $contactRows   assciated array of contact data
-   * @param   string   $format   format in which labels needs to be printed
+   * @param $participants
+   *
+   * @internal param array $contactRows assciated array of contact data
+   * @internal param string $format format in which labels needs to be printed
    *
    * @return  null
    * @access  public

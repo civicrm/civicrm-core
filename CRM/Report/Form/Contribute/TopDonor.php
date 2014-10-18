@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -45,6 +45,12 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     'pieChart' => 'Pie Chart',
   );
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -160,24 +166,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
         ),
         'grouping' => 'phone-fields',
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
     );
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
@@ -240,6 +231,13 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->_select = " SELECT * FROM ( SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = array();
 
@@ -274,7 +272,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
 
   function where() {
     $clauses = array();
-    $this->_tempClause = $this->_outerCluase = '';
+    $this->_tempClause = $this->_outerCluase = $this->_groupLimit = '';
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
@@ -304,6 +302,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             if ($fieldName == 'total_range') {
               $value = CRM_Utils_Array::value("total_range_value", $this->_params);
               $this->_outerCluase = " WHERE (( @rows := @rows + 1) <= {$value}) ";
+              $this->_groupLimit = " LIMIT {$value}";
             }
             else {
               $clauses[] = $clause;
@@ -373,13 +372,16 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $groupID
+   */
   function add2group($groupID) {
     if (is_numeric($groupID)) {
 
       $sql = "
 {$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy}
 ORDER BY civicrm_contribution_total_amount_sum DESC
-) as abc {$this->_outerCluase}";
+) as abc {$this->_groupLimit}";
       $dao = CRM_Core_DAO::executeQuery($sql);
 
       $contact_ids = array();
@@ -393,9 +395,17 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
     }
   }
 
+  /**
+   * @param int $rowCount
+   */
   function limit($rowCount = CRM_Report_Form::ROW_COUNT_LIMIT) {
     // lets do the pager if in html mode
     $this->_limit = NULL;
+
+    // CRM-14115, over-ride row count if rowCount is specified in URL
+    if ($this->_dashBoardRowCount) {
+      $rowCount = $this->_dashBoardRowCount;
+    }
     if ($this->_outputMode == 'html' || $this->_outputMode == 'group') {
       //replace only first occurence of SELECT
       $this->_select = preg_replace('/SELECT/', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select, 1);
@@ -421,6 +431,9 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
 

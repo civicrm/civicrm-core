@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,12 +40,15 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   function __construct() {
     parent::__construct();
   }
+
   /**
    * Create option value - note that the create function calls 'add' but
-  * has more business logic
-  *
-  * @param array $params input parameters
-  */
+   * has more business logic
+   *
+   * @param array $params input parameters
+   *
+   * @return object
+   */
   static function create($params) {
     if (empty($params['id'])){
       self::setDefaults($params);
@@ -55,7 +58,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $ids = array('optionValue' => $params['id']);
     }
     return  CRM_Core_BAO_OptionValue::add($params, $ids);
-    ;
   }
   /**
    * Set default Parameters
@@ -84,12 +86,16 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $params['value'] = self::getDefaultValue($params);
     }
   }
+
   /**
    * Get next available value
    * We will take the highest numeric value (or 0 if no numeric values exist)
    * and add one. The calling function is responsible for any
    * more complex decision making
+   *
    * @param array $params
+   *
+   * @return int
    */
   static function getDefaultWeight($params){
     return (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
@@ -161,7 +167,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @access public
    * @static
    *
-   * @return object
+   * @return CRM_Core_DAO_OptionValue
    */
   static function add(&$params, &$ids) {
     // CRM-10921: do not reset attributes to default if this is an update
@@ -222,7 +228,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * Function to delete Option Value
    *
-   * @param  int  $optionGroupId     Id of the Option Group to be deleted.
+   * @param $optionValueId
+   *
+   * @internal param int $optionGroupId Id of the Option Group to be deleted.
    *
    * @return boolean
    *
@@ -283,7 +291,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param Integer $optionValueId     the option value id.
    * @param int     $action            the action describing whether prefix/suffix was UPDATED or DELETED
    *
-   * @return void
+   * @return bool
    */
   static function updateRecords(&$optionValueId, $action) {
     //finding group name
@@ -409,9 +417,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * updates options values weights.
    *
-   * @param int   $opGroupIde option group id.
-   * @param array $opWeights  options value , weight pair
+   * @param $opGroupId
+   * @param array $opWeights options value , weight pair
    *
+   * @internal param int $opGroupIde option group id.
    * @return void
    * @access public
    * @static

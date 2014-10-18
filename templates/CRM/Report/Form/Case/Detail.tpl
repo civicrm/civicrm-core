@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -253,14 +253,6 @@
     {/if}
     {/if} {* settings section ends *}
 
-    {literal}
-    <script type="text/javascript">
-    cj(function() {
-      cj().crmAccordions();
-    });
-    </script>
-    {/literal}
-
     {/if} {* NO print section ends *}
 
 
@@ -293,13 +285,8 @@ function viewCase( caseId ,contactId ) {
    cj("#casedetails").dialog({
         title: "Case Details",
         modal: true,
-        bgiframe: true,
         width : 700,
   height: 400,
-        overlay: {
-                   opacity: 0.5,
-                 background: "black"
-               },
         open:function() {
        var dataUrl = {/literal}"{crmURL p='civicrm/case/ajax/details' h=0 q="snippet=4" }"{literal};
       dataUrl     = dataUrl + '&caseId=' +caseId + '&contactId=' +contactId ;
@@ -308,7 +295,7 @@ function viewCase( caseId ,contactId ) {
                          dataType: "html",
                          timeout : 5000, //Time in milliseconds
                          success : function( data ){
-                             cj( "#casedetails").html( data );
+                             cj( "#casedetails").html( data ).trigger('crmLoad');
                        },
                    });
     },

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -93,6 +93,7 @@
               {$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:big}
               {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
             </div>
+            <div class="compressed crm-grid-cell">{$form.soft_credit_type.$rowNumber.html}</div>
           {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}
             <div class="compressed crm-grid-cell">&nbsp;{$form.field.$rowNumber.$n.html}</div>
           {else}
@@ -106,18 +107,19 @@
 </div>
 {literal}
 <script type="text/javascript">
-cj(function () {
-  cj('.selector-rows').change(function () {
+CRM.$(function($) {
+  var $form = $('form.{/literal}{$form.formClass}{literal}');
+  $('.selector-rows').change(function () {
     var options = {
       'url': {/literal}"{crmURL p='civicrm/ajax/batch' h=0}"{literal}
     };
 
-    cj("#Entry").ajaxSubmit(options);
+    $($form).ajaxSubmit(options);
   });
 
-  cj('#crm-container').on('keyup change', '*.selector-rows', function () {
+  $('#crm-container').on('keyup change', '*.selector-rows', function () {
     // validate rows
-    checkColumns(cj(this));
+    checkColumns($(this));
   });
 
   // validate rows
@@ -126,7 +128,7 @@ cj(function () {
   //calculate the actual total for the batch
   calculateActualTotal();
 
-  cj('input[id*="_total_amount"]').bind('keyup change', function () {
+  $('input[id*="_total_amount"]').bind('keyup change', function () {
     calculateActualTotal();
   });
 
@@ -135,34 +137,34 @@ cj(function () {
   hideSendReceipt();
 
   // hide the receipt date if send receipt is checked
-  cj('input[id*="][send_receipt]"]').change(function () {
-    showHideReceipt(cj(this));
+  $('input[id*="][send_receipt]"]').change(function () {
+    showHideReceipt($(this));
   });
 
   {/literal}{else}{literal}
-  cj('select[id^="member_option_"]').each(function () {
-    if (cj(this).val() == 1) {
-      cj(this).prop('disabled', true);
+  $('select[id^="member_option_"]').each(function () {
+    if ($(this).val() == 1) {
+      $(this).prop('disabled', true);
     }
   });
 
   // set payment info accord to membership type
-  cj('select[id*="_membership_type_0"]').change(function () {
-    setPaymentBlock(cj(this), null);
+  $('select[id*="_membership_type_0"]').change(function () {
+    setPaymentBlock($(this), null);
   });
 
-  cj('select[id*="_membership_type_1"]').change(function () {
-    setPaymentBlock(cj(this), cj(this).val());
+  $('select[id*="_membership_type_1"]').change(function () {
+    setPaymentBlock($(this), $(this).val());
   });
 
   {/literal}{/if}{literal}
 
   // line breaks between radio buttons and checkboxes
-  cj('input.form-radio').next().after('<br />');
-  cj('input.form-checkbox').next().after('<br />');
+  $('input.form-radio').next().after('<br />');
+  $('input.form-checkbox').next().after('<br />');
 
   //set the focus on first element
-  cj('#primary_contact_1').focus();
+  $('#primary_contact_1').focus();
 
 });
 
@@ -290,7 +292,7 @@ function updateContactInfo(blockNo, prefix) {
   var contactId = cj(contactHiddenElement).val();
 
   var returnProperties = '';
-  var profileFields = new Array();
+  var profileFields = [];
   {/literal}
   {if $contactFields}
   {foreach from=$contactFields item=val key=fldName}

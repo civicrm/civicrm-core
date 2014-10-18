@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -114,6 +114,11 @@ class CRM_Contribute_Task {
           'class' => 'CRM_Contribute_Form_Task_PDFLetter',
           'result' => FALSE,
         ),
+        9 => array(
+          'title' => ts('Print or Email Contribution Invoices'),
+          'class' => 'CRM_Contribute_Form_Task_Invoice',
+          'result' => FALSE,
+        ),
       );
 
       //CRM-4418, check for delete
@@ -121,6 +126,12 @@ class CRM_Contribute_Task {
         unset(self::$_tasks[1]);
       }
 
+      // remove action "Print or Email Contribution Invoices" 
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+      if (!$invoicing) {
+        unset(self::$_tasks[9]);
+      }
       CRM_Utils_Hook::searchTasks('contribution', self::$_tasks);
       asort(self::$_tasks);
     }
@@ -151,10 +162,12 @@ class CRM_Contribute_Task {
    *
    * @param int $permission
    *
+   * @param bool $softCreditFiltering
+   *
    * @return array set of tasks that are valid for the user
    * @access public
    */
-  static function &permissionedTaskTitles($permission) {
+  static function &permissionedTaskTitles($permission, $softCreditFiltering = FALSE) {
     $tasks = array();
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit contributions')
@@ -172,6 +185,9 @@ class CRM_Contribute_Task {
       if (CRM_Core_Permission::check('delete in CiviContribute')) {
         $tasks[1] = self::$_tasks[1]['title'];
       }
+    }
+    if ($softCreditFiltering) {
+      unset($tasks[4], $tasks[7]);
     }
     return $tasks;
   }

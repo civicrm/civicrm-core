@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -68,13 +68,16 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
   /**
    * function to retrieve names of contact by activity_id
    *
-   * @param int    $id   ID of the activity
-   * @param string $type type of interaction
+   * @param $activityID
+   * @param $recordTypeID
+   * @param bool $alsoIDs
+   *
+   * @internal param int $id ID of the activity
+   * @internal param string $type type of interaction
    *
    * @return array
    *
    * @access public
-   *
    */
   static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
     $names = array();
@@ -109,12 +112,14 @@ AND        contact_a.is_deleted = 0
   /**
    * function to retrieve id of target contact by activity_id
    *
-   * @param int    $id  ID of the activity
+   * @param $activityID
+   * @param $recordTypeID
+   *
+   * @internal param int $id ID of the activity
    *
    * @return mixed
    *
    * @access public
-   *
    */
   static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
     $activityContact = array();
@@ -142,6 +147,25 @@ AND        civicrm_contact.is_deleted = 0
     return $activityContact;
   }
 
+  /**
+   * Get the links associate array  as defined by the links.ini file.
+   *
+   *
+   * Experimental... -
+   * Should look a bit like
+   *       [local_col_name] => "related_tablename:related_col_name"
+   *
+   *
+   * @return   array|null
+   *           array       = if there are links defined for this table.
+   *           empty array - if there is a links.ini file, but no links on this table
+   *           null        - if no links.ini exists for this database (hence try auto_links).
+   * @access   public
+   * @see      DB_DataObject::getLinks(), DB_DataObject::getLink()
+   */
+  /**
+   * @return array|null
+   */
   function links() {
     $link = array('activity_id' => 'civicrm_activity:id');
     return $link;

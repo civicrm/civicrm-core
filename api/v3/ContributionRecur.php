@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_ContributionRecur
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**
@@ -64,11 +64,11 @@ function _civicrm_api3_contribution_recur_create_spec(&$params) {
 /**
  * Returns array of contribution_recurs  matching a set of one or more group properties
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params  Array of one or more valid
  *                       property_name=>value pairs. If $params is set
  *                       as null, all contribution_recurs will be returned
  *
- * @return array  (referance) Array of matching contribution_recurs
+ * @return array  API result Array of matching contribution_recurs
  * {@getfields contribution_recur_get}
  * @access public
  */
@@ -77,15 +77,28 @@ function civicrm_api3_contribution_recur_get($params) {
 }
 
 /**
+ * Cancel a recurring contribution of existing contribution_recur.id
+ *
+ * @param array    $params (reference) array containing id of the recurring contribution
+ *
+ * @return boolean  returns true is successfully cancelled
+ */
+
+function civicrm_api3_contribution_recur_cancel($params) {
+  civicrm_api3_verify_one_mandatory($params, NULL, array('id'));
+  return CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($params['id'], CRM_Core_DAO::$_nullObject) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while cancelling recurring contribution'));
+}
+
+/**
  * delete an existing contribution_recur
  *
  * This method is used to delete any existing contribution_recur. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params  (reference) array containing id of the group
+ * @param array $params array containing id of the group
  *                       to be deleted
  *
- * @return array  (referance) returns flag true if successfull, error
+ * @return array API result array
  *                message otherwise
  * {@getfields contribution_recur_delete}
  * @access public
@@ -93,4 +106,3 @@ function civicrm_api3_contribution_recur_get($params) {
 function civicrm_api3_contribution_recur_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

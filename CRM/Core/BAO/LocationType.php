@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -109,6 +109,9 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * Get ID of billing location type
    * @return integer
    */
+  /**
+   * @return mixed|null
+   */
   static function getBilling() {
     if (self::$_billingLocationType == NULL) {
       $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
@@ -121,7 +124,8 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * Function to add a Location Type
    *
    * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   *
+   * @internal param array $ids reference array contains the id
    *
    * @access public
    * @static

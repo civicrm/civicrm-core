@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -135,15 +135,18 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * Class constructor
    *
-   * @param array   $queryParams array of parameters for query
-   * @param int     $action - action of search basic or advanced.
-   * @param string  $additionalClause if the caller wants to further restrict the search (used in participations)
+   * @param array $queryParams array of parameters for query
+   * @param \const|int $action - action of search basic or advanced.
+   * @param string $additionalClause if the caller wants to further restrict the search (used in participations)
    * @param boolean $single are we dealing only with one contact?
-   * @param int     $limit  how many signers do we want returned
+   * @param int $limit how many signers do we want returned
    *
-   * @return CRM_Contact_Selector
-   * @access public
-   */ function __construct(&$queryParams,
+   * @param string $context
+   *
+   * @return \CRM_Case_Selector_Search
+  @access public
+   */
+  function __construct(&$queryParams,
     $action           = CRM_Core_Action::NONE,
     $additionalClause = NULL,
     $single           = FALSE,
@@ -182,9 +185,11 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * - View
    * - Edit
    *
+   * @param bool $isDeleted
+   * @param null $key
+   *
    * @return array
    * @access public
-   *
    */
   static
   function &links($isDeleted = FALSE, $key = NULL) {
@@ -223,6 +228,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'url' => 'civicrm/contact/view/case/editClient',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'reassign',
+          'class' => 'medium-popup',
           'title' => ts('Assign to Another Client'),
         ),
       );
@@ -245,7 +251,10 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -480,10 +489,16 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
     return self::$_columnHeaders;
   }
 
+  /**
+   * @return mixed
+   */
   function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
+  /**
+   * @return string
+   */
   function &getQuery() {
     return $this->_query;
   }

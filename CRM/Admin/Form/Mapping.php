@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -55,6 +55,8 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
 
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('Field Mapping'));
+
     if ($this->_action == CRM_Core_Action::DELETE) {
       return;
     }
@@ -78,6 +80,9 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
     }
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     return $defaults;
@@ -107,6 +112,6 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
       CRM_Core_BAO_Mapping::add($params);
     }
   }
-  //end of function
+
 }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,6 +26,10 @@
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 require_once 'CRM/Utils/Array.php';
+
+/**
+ * Class ImportCiviSeleniumTestCase
+ */
 class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
   /*
@@ -46,6 +50,15 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      *                             saveMappingName    : to override mapping name
      *
      */
+  /**
+   * @param $component
+   * @param $headers
+   * @param $rows
+   * @param string $contactType
+   * @param string $mode
+   * @param array $fieldMapper
+   * @param array $other
+   */
   function importCSVComponent($component,
     $headers,
     $rows,
@@ -56,12 +69,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
   ) {
 
     // Go to contact import page.
-    $this->open($this->sboxPath . $this->_getImportComponentUrl($component));
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // check for upload field.
-    $this->waitForElementPresent("uploadFile");
+    $this->openCiviPage($this->_getImportComponentUrl($component), 'reset=1', "uploadFile");
 
     // Create csv file of sample data.
     $csvFile = $this->webtestCreateCSV($headers, $rows);
@@ -187,8 +195,16 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      *                             @todo:currently only supports csv, need to work on sql import
 
      */
-  function importContacts($headers, $rows, $contactType = 'Individual', $mode = 'Skip', $fieldMapper = array(
-    ), $other = array(), $type = 'csv') {
+  /**
+   * @param $headers
+   * @param $rows
+   * @param string $contactType
+   * @param string $mode
+   * @param array $fieldMapper
+   * @param array $other
+   * @param string $type
+   */
+  function importContacts($headers, $rows, $contactType = 'Individual', $mode = 'Skip', $fieldMapper = array(), $other = array(), $type = 'csv') {
 
     // Go to contact import page.
     $this->openCiviPage("import/contact", "reset=1", "uploadFile");
@@ -229,15 +245,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
     // Select contact subtype
     if (isset($other['contactSubtype'])) {
-      if ($contactType != 'Individual') {
-        // Because it tends to cause problems, all uses of sleep() must be justified in comments
-        // Sleep should never be used for wait for anything to load from the server
-        // FIXME: this is bad, using sleep to wait for AJAX
-        // Need to use a better way to wait for contact subtypes to repopulate
-        sleep(5);
-      }
-      $this->waitForElementPresent("subType");
-      $this->select('subType', 'label=' . $other['contactSubtype']);
+      $this->waitForElementPresent("css=#subType option[value={$other['contactSubtype']}]");
+      $this->select('subType', $other['contactSubtype']);
     }
 
     if (isset($other['dedupe'])) {
@@ -267,8 +276,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     }
 
     // Submit form.
-    $this->click('_qf_DataSource_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_DataSource_upload');
 
     if (isset($other['checkMapperHeaders'])) {
       $checkMapperHeaders = $other['checkMapperHeaders'];
@@ -434,13 +442,17 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      * @return string import url
 
      */
-  function _getImportComponentUrl($component) {
-
+  /**
+   * @param $component
+   *
+   * @return mixed
+   */
+  private function _getImportComponentUrl($component) {
     $importComponentUrl = array(
-      'Event' => 'civicrm/event/import?reset=1',
-      'Contribution' => 'civicrm/contribute/import?reset=1',
-      'Membership' => 'civicrm/member/import?reset=1',
-      'Activity' => 'civicrm/import/activity?reset=1',
+      'Event' => 'event/import',
+      'Contribution' => 'contribute/import',
+      'Membership' => 'member/import',
+      'Activity' => 'import/activity',
     );
 
     return $importComponentUrl[$component];
@@ -454,6 +466,12 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      * @return string import url
 
      */
+  /**
+   * @param $component
+   * @param $contactType
+   *
+   * @return mixed
+   */
   function _getImportComponentContactType($component, $contactType) {
     $importComponentMode = array(
       'Event' => array('Individual' => 'CIVICRM_QFID_1_8',
@@ -482,6 +500,13 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      * @params array  $rows               field rows
      * @params array  $checkMapperHeaders override default mapper headers
      */
+  /**
+   * @param $headers
+   * @param $rows
+   * @param null $existingMapping
+   * @param array $checkMapperHeaders
+   * @param string $headerSelector
+   */
   function _checkImportMapperData($headers, $rows, $existingMapping = NULL, $checkMapperHeaders = array(
     ), $headerSelector = 'th') {
 
@@ -525,6 +550,12 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      *
      * @return array  $contactIds  imported contact ids
      */
+  /**
+   * @param $rows
+   * @param string $contactType
+   *
+   * @return array
+   */
   function _getImportedContactIds($rows, $contactType = 'Individual') {
     $contactIds = array();
 
@@ -550,10 +581,11 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
       $this->typeKeys("css=input#sort_name_navigation", $searchName);
 
       // Wait for result list.
-      $this->waitForElementPresent("css=div.ac_results-inner li");
+      $this->waitForElementPresent("css=ul.ui-autocomplete li");
 
       // Visit contact summary page.
-      $this->clickLink("css=div.ac_results-inner li");
+      $this->click("css=ul.ui-autocomplete li");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
 
       // Get contact id from url.
       $contactIds[] = $this->urlArg('cid');
@@ -568,6 +600,10 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      * @params array  $headers data headers
      * @params string $rows    data rows
      */
+  /**
+   * @param $headers
+   * @param $rows
+   */
   function _formatContactCSVdata(&$headers, &$rows) {
     if (!isset($headers['contact_relationships'])) {
       return;

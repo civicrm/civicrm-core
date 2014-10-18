@@ -3,9 +3,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Activity
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Activity.php 30486 2010-11-02 16:12:09Z shot $
  *
  */
@@ -41,30 +41,21 @@
 /**
  * Creates or updates an Dashlet.
  *
- * @param array  $params       Associative array of property name/value
+ * @param array  $params array of property name/value
  *                             pairs for the Dashlet.
  *
  * @return array Array containing 'is_error' to denote success or failure and details of the created activity
  *
  */
 function civicrm_api3_dashboard_create($params) {
-  if (empty($params['id'])) {
-    civicrm_api3_verify_one_mandatory($params,
-      NULL,
-      array(
-        'name',
-        'label',
-        'url',
-        'fullscreen_url',
-      )
-    );
-  }
-  // create dashboard element
-  $dashboardBAO = CRM_Core_BAO_Dashboard::addDashlet($params);
-  if (isset($dashboardBAO->id)) {
-    _civicrm_api3_object_to_array($dashboardBAO, $dashboardArray[$dashboardBAO->id]);
-    return civicrm_api3_create_success($dashboardArray, $params, 'dashboard', 'create', $dashboardBAO);
-  }
+  civicrm_api3_verify_one_mandatory($params, NULL, array(
+      'name',
+      'label',
+      'url',
+      'fullscreen_url',
+    )
+  );
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Dashboard');
 }
 
 /**
