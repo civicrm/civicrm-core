@@ -223,21 +223,25 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $this->assertEquals($key, $actKey, "Check if both the keys are same");
     
     //Cross check event exists before we test deletion
-    $searchParamsEventBeforeDelete = array('entity_id' => $generatedEntities['civicrm_event'][$key],
+    $searchParamsEventBeforeDelete = array(
+      'entity_id'    => $generatedEntities['civicrm_event'][$key],
       'entity_table' => 'civicrm_event'
-      );
-    $expectedValuesEventBeforeDelete = array('entity_id' => $generatedEntities['civicrm_event'][$key],
+    );
+    $expectedValuesEventBeforeDelete = array(
+      'entity_id'    => $generatedEntities['civicrm_event'][$key],
       'entity_table' => 'civicrm_event'
-      );
+    );
     $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParamsEventBeforeDelete, $expectedValuesEventBeforeDelete);
     
     //Cross check event exists before we test deletion
-    $searchParamsTellAFriendBeforeDelete = array('entity_id' => $generatedEntities['civicrm_tell_friend'][$actKey],
+    $searchParamsTellAFriendBeforeDelete = array(
+      'entity_id'    => $generatedEntities['civicrm_tell_friend'][$actKey],
       'entity_table' => 'civicrm_tell_friend'
-      );
-    $expectedValuesTellAFriendBeforeDelete = array('entity_id' => $generatedEntities['civicrm_tell_friend'][$actKey],
+    );
+    $expectedValuesTellAFriendBeforeDelete = array(
+      'entity_id'    => $generatedEntities['civicrm_tell_friend'][$actKey],
       'entity_table' => 'civicrm_tell_friend'
-      );
+    );
     $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParamsTellAFriendBeforeDelete, $expectedValuesTellAFriendBeforeDelete);
     
     //Delete an event from recurring set and respective linked entity should be deleted from civicrm_recurring_entity_table
@@ -250,16 +254,18 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     
     //Check if this event_id was deleted
     $this->assertDBNull('CRM_Event_DAO_Event', $generatedEntities['civicrm_event'][$key], 'id', 'id', 'Check if event was deleted');
-    $searchParams = array('entity_id' => $generatedEntities['civicrm_event'][$key],
+    $searchParams = array(
+      'entity_id' => $generatedEntities['civicrm_event'][$key],
       'entity_table' => 'civicrm_event'
-      );
+    );
     $compareParams = array();
     $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParams, $compareParams);
-    
+
     //Find tell_a_friend id if that was deleted from civicrm
-    $searchActParams = array('entity_id' => $generatedEntities['civicrm_tell_friend'][$actKey],
+    $searchActParams = array(
+      'entity_id' => $generatedEntities['civicrm_tell_friend'][$actKey],
       'entity_table' => 'civicrm_tell_friend'
-      );
+    );
     $compareActParams = array();
     $this->assertDBCompareValues('CRM_Friend_DAO_Friend', $searchActParams, $compareActParams);
   }
