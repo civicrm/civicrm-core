@@ -112,7 +112,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       ),
       'civicrm_uf_join' => array(
         'entity_id_col'    => 'entity_id', 
-        'entity_table_col' => 'entity_table'
+        'entity_table_col' => 'entity_table',
+        'is_multirecord'   => TRUE,
       ),
       'civicrm_pcp_block' => array(
         'entity_id_col'    => 'entity_id', 
@@ -630,7 +631,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
     if (empty($hasaRecurringRecord)) {
       // check if its a linked entity
-      if (array_key_exists($obj->__table, self::$_linkedEntitiesInfo)) {
+      if (array_key_exists($obj->__table, self::$_linkedEntitiesInfo) && 
+        !CRM_Utils_Array::value('is_multirecord', self::$_linkedEntitiesInfo[$obj->__table])) {
         $linkedDAO = new self::$_tableDAOMapper[$obj->__table]();
         $linkedDAO->id = $obj->id;
         if ($linkedDAO->find(TRUE)) {
@@ -751,7 +753,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     $dao->entity_id = $entityId;
     $dao->entity_table = $entityTable;
     if ($dao->find(TRUE)) {
-      if ($isDelLinkedEntities) {
+      // make sure its not a linked entity thats being deleted
+      if ($isDelLinkedEntities && !array_key_exists($entityTable, self::$_linkedEntitiesInfo)) {
         // delete all linked entities from recurring entity table
         foreach (self::$_linkedEntitiesInfo as $linkedTable => $linfo) {
           $daoName = self::$_tableDAOMapper[$linkedTable];
