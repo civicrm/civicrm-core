@@ -57,14 +57,14 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   static $_recurringEntityHelper = 
     array(
       'civicrm_event' => array(
-      'helper_class' => 'CRM_Event_DAO_Event',
-      'delete_func' => 'delete',
-      'pre_delete_func' => 'CRM_Event_Form_ManageEvent_Repeat::checkRegistrationForEvents'
+        'helper_class' => 'CRM_Event_DAO_Event',
+        'delete_func' => 'delete',
+        'pre_delete_func' => 'CRM_Event_Form_ManageEvent_Repeat::checkRegistrationForEvents'
       ),
       'civicrm_activity' => array(
-      'helper_class' => 'CRM_Activity_DAO_Activity',
-      'delete_func' => 'delete',
-      'pre_delete_func' => ''
+        'helper_class' => 'CRM_Activity_DAO_Activity',
+        'delete_func' => 'delete',
+        'pre_delete_func' => ''
       ) 
     ); 
   
@@ -726,13 +726,52 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     // mark being processed
     $processedEntities[$key] = 1;
 
-    $parentID = self::getParentFor($obj->id, $obj->__table, FALSE);
+    $parentID = self::getParentFor($obj->id, $obj->__table);
     if ($parentID) {
-      $dao = new CRM_Core_DAO_RecurringEntity();
-      $dao->entity_id = $obj->id;
-      $dao->entity_table = $obj->__table;
-      $dao->delete();
+      CRM_Core_BAO_RecurringEntity::delEntity($obj->id, $obj->__table, TRUE);
     }
+  }
+
+  /**
+   * This function deletes main entity and related linked entities from recurring-entity table
+   * 
+   * @param int $entityId Entity id
+   * @param string $entityTable Name of the entity table
+   * 
+   * @access public
+   * @static
+   * 
+   * @return boolean|object Returns either boolean value or CRM_Core_DAO_RecurringEntity object
+   */
+  static public function delEntity($entityId, $entityTable, $isDelLinkedEntities = FALSE) {
+    if (empty($entityId) || empty($entityTable)) {
+      return FALSE;
+    }
+    $dao = new CRM_Core_DAO_RecurringEntity();
+    $dao->entity_id = $entityId;
+    $dao->entity_table = $entityTable;
+    if ($dao->find(TRUE)) {
+      if ($isDelLinkedEntities) {
+        // delete all linked entities from recurring entity table
+        foreach (self::$_linkedEntitiesInfo as $linkedTable => $linfo) {
+          $daoName = self::$_tableDAOMapper[$linkedTable];
+          if (!$daoName) {
+            CRM_Core_Error::fatal("DAO Mapper missing for $linkedTable.");
+          }
+
+          $linkedDao = new $daoName();
+          $linkedDao->$linfo['entity_id_col'] = $entityId;
+          $linkedDao->$linfo['entity_table_col'] = $entityTable;
+          $linkedDao->find();
+          while ($linkedDao->fetch()) {
+            CRM_Core_BAO_RecurringEntity::delEntity($linkedDao->id, $linkedTable, FALSE);
+          }
+        }
+      }
+      // delete main entity
+      return $dao->delete();
+    }
+    return FALSE;
   }
 
   /**
@@ -951,6 +990,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
     return $r;
   }
+
   
   /**
    * This function gets time difference between the two datetime object
@@ -971,29 +1011,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
   }
 
-  /**
-   * This function deletes all the other entities that are related to it
-   * 
-   * @param int $entityId Entity id
-   * @param string $entityTable Name of the entity table
-   * 
-   * @access public
-   * @static
-   * 
-   * @return boolean|object Returns either boolean value or CRM_Core_DAO_RecurringEntity object
-   */
-  static public function delEntityRelations($entityId, $entityTable) {
-    if (!$entityId && !$entityTable) {
-      return FALSE;
-    }
-    $parentID = self::getParentFor($entityId, $entityTable);
-    if ($parentID) {
-      $dao = new CRM_Core_DAO_RecurringEntity();
-      $dao->parent_id = $parentID;
-      return $dao->delete();
-    }
-  }
-  
   /**
    * This function gets all columns from civicrm_action_schedule on the basis of event id
    * 
