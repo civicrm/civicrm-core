@@ -863,6 +863,13 @@ class CiviCRM_For_WordPress {
     // get args
     $argdata = $this->get_request_args();
     
+    // set dashboard as default if args are empty
+   if ( empty( $argdata['args'] ) ) {
+      $_GET['q']      = 'civicrm/dashboard';
+      $_GET['reset']  = 1;
+      $argdata['args'] = array('civicrm', 'dashboard');
+    }
+    
     // do the business
     CRM_Core_Invoke::invoke($argdata['args']);
 
@@ -996,9 +1003,9 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Get arguments from $_GET
+   * Get arguments and request string from $_GET
    *
-   * @return array $args Request arguments
+   * @return array $argdata Array containing request arguments and request string
    */
   private function get_request_args() {
   
