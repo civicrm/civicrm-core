@@ -422,6 +422,9 @@ class CiviCRM_For_WordPress {
       return;
     }
     
+    // regardless of URL, load page template
+    add_filter( 'template_include', array( $this, 'basepage_template' ), 999 );
+        
     // merge CiviCRM's HTML header with the WordPress theme's header
     add_action( 'wp_head', array( $this, 'wp_head' ) );
       
@@ -434,7 +437,7 @@ class CiviCRM_For_WordPress {
 
     // cache CiviCRM base page markup
     add_action( 'wp', array( $this, 'handle_basepage' ), 10, 1 );
-        
+    
   }
 
 
@@ -1462,6 +1465,27 @@ class CiviCRM_For_WordPress {
     
     // hand back our base page markup
     return $this->basepage_markup;
+  
+  }
+
+
+  /**
+   * Get CiviCRM base page template
+   * Callback method for 'template_include' hook, always called from WP front-end
+   *
+   * @param str $template The path to the existing template
+   * @return str $template The modified path to the desired template
+   */
+  public function basepage_template( $template ) {
+    
+    // use the basic page template
+    $page_template = locate_template( array( 'page.php' ) );
+    if ( '' != $page_template ) {
+      return $page_template;
+    }
+    
+    // fallback
+    return $template;
   
   }
 
