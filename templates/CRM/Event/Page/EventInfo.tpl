@@ -35,7 +35,7 @@
 {if call_user_func(array('CRM_Core_Permission','check'), 'access CiviEvent')}
 <div class="crm-actions-ribbon crm-event-manage-tab-actions-ribbon">
   <ul id="actions">
-{if call_user_func(array('CRM_Core_Permission','check'), 'edit all events')}
+{if call_user_func(array('CRM_Core_Permission','check'), 'edit all events') && !empty($manageEventLinks)}
   <li>
     <div id="crm-event-links-wrapper">
       <div id="crm-event-configure-link"><span title="{ts}Configure this event.{/ts}"><div
@@ -43,34 +43,11 @@
       <div class="ac_results" id="crm-event-links-list" style="margin-left: -25px;">
         <div class="crm-event-links-list-inner">
           <ul>
-            <li><a title="{ts}Info and Settings{/ts}"
-                   href="{crmURL p='civicrm/event/manage/settings' q="reset=1&action=update&id=`$event.id`"}">{ts}Info and Settings{/ts}</a>
-            </li>
-            <li><a title="{ts}Location{/ts}"
-                   href="{crmURL p='civicrm/event/manage/location' q="reset=1&action=update&id=`$event.id`"}">{ts}Location{/ts}</a>
-            </li>
-            <li><a title="{ts}Fees{/ts}"
-                   href="{crmURL p='civicrm/event/manage/fee' q="reset=1&action=update&id=`$event.id`"}">{ts}Fees{/ts}</a>
-            </li>
-            <li><a title="{ts}Online Registration{/ts}"
-                   href="{crmURL p='civicrm/event/manage/registration' q="reset=1&action=update&id=`$event.id`"}">{ts}Online Registration{/ts}</a>
-            </li>
-            {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
-              <li><a title="{ts}Schedule Reminders{/ts}"
-                     href="{crmURL p='civicrm/event/manage/reminder' q="reset=1&action=update&id=`$event.id`"}">{ts}Schedule Reminders{/ts}</a>
+            {foreach from=$manageEventLinks item='link'}
+              <li>
+                <a href="{crmURL p=$link.url q="reset=1&action=update&id=`$event.id`" fb=1}">{$link.title}</a>
               </li>
-            {/if}
-            {if $eventCartEnabled}
-              <li><a title="{ts}Conference Slots{/ts}"
-                     href="{crmURL p='civicrm/event/manage/conference' q="reset=1&action=update&id=`$event.id`"}">{ts}Conference Slots{/ts}</a>
-              </li>
-            {/if}
-            <li><a title="{ts}Tell a Friend{/ts}"
-                   href="{crmURL p='civicrm/event/manage/friend' q="reset=1&action=update&id=`$event.id`"}">{ts}Tell a Friend{/ts}</a>
-            </li>
-            <li><a title="{ts}Personal Campaign Pages{/ts}"
-                   href="{crmURL p='civicrm/event/manage/pcp' q="reset=1&action=update&id=`$event.id`"}">{ts}Personal Campaign Pages{/ts}</a>
-            </li>
+            {/foreach}
           </ul>
         </div>
       </div>
@@ -83,11 +60,11 @@
              <div class="crm-participant-list-inner">
                <ul>
                     {if $findParticipants.statusCounted}
-                <li><a class="crm-participant-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=true"}"><b>{ts}List counted participants{/ts}</b> ({$findParticipants.statusCounted|replace:'/':', '})</a></li>
+                <li><a class="crm-participant-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=true" fb=1}"><b>{ts}List counted participants{/ts}</b> ({$findParticipants.statusCounted|replace:'/':', '})</a></li>
               {/if}
 
                 {if $findParticipants.statusNotCounted}
-            <li><a class="crm-participant-not-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=false"}"><b>{ts}List uncounted participants{/ts}</b> ({$findParticipants.statusNotCounted|replace:'/':', '})</a>
+            <li><a class="crm-participant-not-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=false" fb=1}"><b>{ts}List uncounted participants{/ts}</b> ({$findParticipants.statusNotCounted|replace:'/':', '})</a>
             </li>
               {/if}
                 {if $participantListingURL}
