@@ -1478,8 +1478,11 @@ class CiviCRM_For_WordPress {
    */
   public function basepage_template( $template ) {
     
-    // use the basic page template
-    $page_template = locate_template( array( 'page.php' ) );
+    // use the basic page template, but allow overrides
+    $page_template = locate_template( array(
+      apply_filters( 'civicrm_basepage_template', 'page.php' )
+    ) );
+    
     if ( '' != $page_template ) {
       return $page_template;
     }
