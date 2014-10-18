@@ -38,8 +38,9 @@
 {if call_user_func(array('CRM_Core_Permission','check'), 'edit all events') && !empty($manageEventLinks)}
   <li>
     <div id="crm-event-links-wrapper">
-      <div id="crm-event-configure-link"><span title="{ts}Configure this event.{/ts}"><div
-            class="icon settings-icon"></div></span></div>
+      <span id="crm-event-configure-link" class="crm-hover-button">
+        <span title="{ts}Configure this event.{/ts}" class="icon settings-icon"></span>
+      </span>
       <div class="ac_results" id="crm-event-links-list" style="margin-left: -25px;">
         <div class="crm-event-links-list-inner">
           <ul>
@@ -54,26 +55,30 @@
     </div>
   </li>
 {/if}
-<li><div id="crm-participant-wrapper">
-        <div id="crm-participant-links"><span title="{ts}Participant listing links.{/ts}"><div class="icon search-icon"></div></div>
-        <div class="ac_results" id="crm-participant-list" style="margin-left: -25px;">
-             <div class="crm-participant-list-inner">
-               <ul>
-                    {if $findParticipants.statusCounted}
-                <li><a class="crm-participant-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=true" fb=1}"><b>{ts}List counted participants{/ts}</b> ({$findParticipants.statusCounted|replace:'/':', '})</a></li>
-              {/if}
+  <li>
+    <div id="crm-participant-wrapper">
+      <span id="crm-participant-links" class="crm-hover-button">
+        <span title="{ts}Participant listing links.{/ts}" class="icon search-icon"></span>
+      </span>
+      <div class="ac_results" id="crm-participant-list" style="margin-left: -25px;">
+        <div class="crm-participant-list-inner">
+          <ul>
+            {if $findParticipants.statusCounted}
+              <li><a class="crm-participant-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=true" fb=1}"><b>{ts}List counted participants{/ts}</b> ({$findParticipants.statusCounted|replace:'/':', '})</a></li>
+            {/if}
 
-                {if $findParticipants.statusNotCounted}
-            <li><a class="crm-participant-not-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=false" fb=1}"><b>{ts}List uncounted participants{/ts}</b> ({$findParticipants.statusNotCounted|replace:'/':', '})</a>
-            </li>
-              {/if}
-                {if $participantListingURL}
-                <li><a class="crm-participant-listing" href="{$participantListingURL}">{ts}Public Participant Listing{/ts}</a></li>
-              {/if}
-            </ul>
-             </div>
+            {if $findParticipants.statusNotCounted}
+              <li><a class="crm-participant-not-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=false" fb=1}"><b>{ts}List uncounted participants{/ts}</b> ({$findParticipants.statusNotCounted|replace:'/':', '})</a>
+              </li>
+            {/if}
+            {if $participantListingURL}
+              <li><a class="crm-participant-listing" href="{$participantListingURL}">{ts}Public Participant Listing{/ts}</a></li>
+            {/if}
+          </ul>
         </div>
-      </div></li>
+      </div>
+    </div>
+  </li>
   </ul>
   <div class="clear"></div>
 </div>
@@ -216,7 +221,7 @@
         {/if}
       {/crmRegion}
     </div>
-    { if $event.is_public }
+    {if $event.is_public }
         <br />{include file="CRM/Event/Page/iCalLinks.tpl"}
     {/if}
 
