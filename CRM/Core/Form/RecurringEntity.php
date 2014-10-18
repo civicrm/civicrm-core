@@ -393,11 +393,15 @@ class CRM_Core_Form_RecurringEntity {
               CRM_Utils_Array::value('helper_class', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']])) {
               //Check if pre delete function has some ids to be deleted
               if (!empty(CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted)) {
-                foreach (CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted as $value) {
-                  $result = civicrm_api3(ucfirst(strtolower($apiType)), CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array(
-                            'sequential' => 1,
-                            'id' => $value,
-                            ));
+                foreach (CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted as $eid) {
+                  $result = civicrm_api3(
+                    ucfirst(strtolower($apiType)), 
+                    CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], 
+                    array(
+                      'sequential' => 1,
+                      'id' => $eid,
+                    )
+                  );
                   if ($result['error']) {
                     CRM_Core_Error::statusBounce('Error creating recurring list');
                   }
@@ -405,18 +409,22 @@ class CRM_Core_Form_RecurringEntity {
               }
               else {
                 $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['entity_id'], $params['entity_table'], FALSE);
+                CRM_Core_Error::debug_var('$getRelatedEntities', $getRelatedEntities);
                 foreach ($getRelatedEntities as $key => $value) {
-                  $result = civicrm_api3(ucfirst(strtolower($apiType)), CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], array(
-                            'sequential' => 1,
-                            'id' => $value['id'],
-                            ));
+                  $result = civicrm_api3(
+                    ucfirst(strtolower($apiType)), 
+                    CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'], 
+                    array(
+                      'sequential' => 1,
+                      'id' => $value['id'],
+                    )
+                  );
                   if ($result['error']) {
                     CRM_Core_Error::statusBounce('Error creating recurring list');
                   }
                 }
               }
           }
-          CRM_Core_BAO_RecurringEntity::delEntityRelations($params['entity_id'], $params['entity_table']);
         }
 
         $recursion = new CRM_Core_BAO_RecurringEntity();
