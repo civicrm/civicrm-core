@@ -864,7 +864,7 @@ class CiviCRM_For_WordPress {
     $argdata = $this->get_request_args();
     
     // set dashboard as default if args are empty
-   if ( empty( $argdata['args'] ) ) {
+   if ( !isset( $_GET['q'] ) ) {
       $_GET['q']      = 'civicrm/dashboard';
       $_GET['reset']  = 1;
       $argdata['args'] = array('civicrm', 'dashboard');
