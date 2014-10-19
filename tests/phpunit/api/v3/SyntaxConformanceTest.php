@@ -350,7 +350,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ParticipantPayment',
       'LineItem',
       'PriceField',
-      'PriceFieldValue',
       'PledgePayment',
       'ContributionPage',
       'Phone',
@@ -497,6 +496,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'break_return' => array(
         ),
         'cant_return' => array(
+        ),
+      ),
+      'PriceFieldValue' => array(
+        'cant_update' => array(
+          'weight', //won't update as there is no 1 in the same price set
         ),
       ),
     );

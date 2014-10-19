@@ -80,15 +80,15 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @static
    */
   static function create(&$params, $ids = array()) {
-
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
     if (!is_array($params) || empty($params)) {
       return;
     }
-    if(empty($params['id']) && empty($params['name'])) {
+    if(!$id && empty($params['name'])) {
       $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
     }
 
-    if ($id = CRM_Utils_Array::value('id', $ids) && !empty($params['weight'])) {
+    if ($id  && !empty($params['weight'])) {
       if (isset($params['name']))unset($params['name']);
 
       $oldWeight = NULL;
@@ -100,16 +100,38 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceFieldValue', $oldWeight, $params['weight'], $fieldValues);
     }
     else {
-      if (!$id && empty($params['name'])) {
-        $params['name'] = CRM_Utils_String::munge(CRM_Utils_Array::value('label', $params), '_', 64);
-      }
-      if (empty($params['weight'])) {
-        $params['weight'] = 1;
+      if (!$id) {
+        self::setDefaults($params);
+        if (empty($params['name'])) {
+          $params['name'] = CRM_Utils_String::munge(CRM_Utils_Array::value('label', $params), '_', 64);
+        }
       }
     }
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
-
     return self::add($params, $ids);
+  }
+
+  /**
+   * Get defaults for new entity
+   * @return array
+   */
+  static function getDefaults() {
+    return array(
+      'is_active' => 1,
+      'weight' => 1,
+    );
+
+  }
+
+  /**
+   * Set defaults when creating new entity
+   * @param $params
+   */
+  static function setDefaults(&$params) {
+    foreach (self::getDefaults() as $key => $value) {
+      if (empty($params[$key])) {
+        $params[$key] = $value;
+      }
+    }
   }
 
   /**
