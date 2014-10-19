@@ -238,7 +238,7 @@
         cj('#generated_dates').html('').html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Just a moment, generating dates{/ts}{literal}...</span></div>');
         cj('#preview-dialog').dialog('open');
         cj('#preview-dialog').dialog({
-          title: 'Confirm event dates',
+          title: 'Confirm dates',
           width: '650',
           position: 'center',
           //draggable: false,
@@ -268,7 +268,7 @@
             if (Object.keys(result).length > 0) {
               var errors = [];
               var participantData = [];
-              var html = 'Based on your repeat configuration here is the list of event dates, Do you wish to proceed creating events for these dates?<br/><table id="options" class="display"><thead><tr><th>Sr No</th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
+              var html = 'Based on your repeat configuration here is the list of dates, Do you wish to create repeating set of these dates?<br/><table id="options" class="display"><thead><tr><th>Sr No</th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
               var count = 1;
               for(var i in result) {
                 if (i != 'errors') {
