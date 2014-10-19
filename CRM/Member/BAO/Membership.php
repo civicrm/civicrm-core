@@ -1704,8 +1704,13 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @static
    * @access public
    */
-  static function createRelatedMemberships(&$params, &$dao) {
+  static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
     static $relatedContactIds = array();
+    if ($reset) {
+      // not sure why a static var is in use here - we need a way to reset it from the test suite
+      $relatedContactIds = array();
+      return;
+    }
 
     $membership = new CRM_Member_DAO_Membership();
     $membership->id = $dao->id;

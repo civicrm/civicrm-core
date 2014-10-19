@@ -115,12 +115,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = array(
       'contribution_id' => $this->_contribution['id'],
     );
+
     $contribution = $this->callAPIAndDocument('contribution', 'get', $params, __FUNCTION__, __FILE__);
     $financialParams['id'] = $this->_financialTypeId;
     $default = null;
     CRM_Financial_BAO_FinancialType::retrieve($financialParams, $default);
 
-    $this->assertEquals(1,$contribution['count']);
+    $this->assertEquals(1, $contribution['count']);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     // note there was an assertion converting financial_type_id to 'Donation' which wasn't working.
     // passing back a string rather than an id seems like an error / cruft - & if it is to be introduced we should discuss
@@ -707,11 +708,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 50.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 50.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1 );
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1);
+
     $lineItems = $this->callAPISuccess('line_item','get',array(
 
       'entity_id' => $contribution['id'],
@@ -848,6 +852,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2);
     $this->_checkFinancialRecords($contribution, 'pending');
+  }
+
+  /**
+   * test that BAO defaults work
+   */
+  function testCreateBAODefaults() {
+    unset($this->_params['contribution_source_id'], $this->_params['payment_instrument_id']);
+    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id'], 'api.contribution.delete' => 1));
+    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertEquals('Check', $contribution['payment_instrument']);
   }
 
   /*
@@ -1756,6 +1771,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'entity_id' => $params['id'],
      'entity_table' => 'civicrm_contribution',
    );
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $params['id']));
+    $this->assertEquals($contribution['total_amount'] - $contribution['fee_amount'], $contribution['net_amount']);
    if ($context == 'pending') {
      $trxn = CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams);
      $this->assertNull($trxn, 'No Trxn to be created until IPN callback');

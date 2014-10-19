@@ -323,7 +323,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Note',
       'OptionGroup',
       'Membership',
-      'MembershipType',
       'MembershipStatus',
       'Group',
       'GroupOrganization',
@@ -1068,7 +1067,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'id' => $entity['id'],
         $field => isset($entity[$field]) ? $entity[$field] : NULL,
       );
-      if(isset($updateParams['financial_type_id']) && $entityName != 'Product') {
+      if(isset($updateParams['financial_type_id']) && !in_array($entityName, array('Product', 'MembershipType'))) {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['contribution_type_id'] = $updateParams['financial_type_id'];
       }
