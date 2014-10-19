@@ -218,7 +218,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Set defautls when creating new entity
+   * Set defaults when creating new entity
    * @param $params
    */
   static function setDefaults(&$params) {
