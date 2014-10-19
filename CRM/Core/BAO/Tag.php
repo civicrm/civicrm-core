@@ -314,7 +314,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @static
    */
   static function add(&$params, $ids = array()) {
-    if (!self::dataExists($params)) {
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
+    if (!$id && !self::dataExists($params)) {
       return NULL;
     }
 
@@ -327,8 +328,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     }
 
     $tag->copyValues($params);
-    $tag->id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
-    $hook = empty($params['id']) ? 'create' : 'edit';
+    $tag->id = $id;
+    $hook = !$id ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Tag', $tag->id, $params);
 
     // save creator id and time
