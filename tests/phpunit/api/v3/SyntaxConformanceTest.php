@@ -346,12 +346,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Participant',
       'ParticipantPayment',
       'LineItem',
-      'PriceField',
       'PledgePayment',
       'ContributionPage',
       'Phone',
       'PaymentProcessor',
-      'MailSettings',
       'Setting',
       'MailingContact',
       'SystemLog' //skip this because it doesn't make sense to update logs
