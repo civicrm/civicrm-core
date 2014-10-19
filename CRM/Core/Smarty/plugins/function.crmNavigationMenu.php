@@ -63,7 +63,9 @@ function smarty_function_crmNavigationMenu($params, &$smarty) {
       $domain = CRM_Core_Config::domainID();
       $key = CRM_Core_BAO_Navigation::getCacheKey($contactID);
       $src = CRM_Utils_System::url("civicrm/ajax/menujs/$contactID/$lang/$domain/$key");
-      return '<script type="text/javascript" src="' . $src . '"></script>';
+      // CRM-15493 QFkey needed for quicksearch bar - must be unique on each page refresh so adding it directly to markup
+      $qfKey = CRM_Core_Key::get('CRM_Contact_Controller_Search', TRUE);
+      return '<script id="civicrm-navigation-menu" type="text/javascript" src="' . $src . '" data-qfkey=' . json_encode($qfKey) . '></script>';
     }
   }
   return '';
