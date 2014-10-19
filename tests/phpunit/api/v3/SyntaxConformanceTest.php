@@ -983,12 +983,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'limit' => 2,
       ),
     ));
+
     // lets use first rather than assume only one exists
     $entity = $getEntities['values'][0];
     $entity2 = $getEntities['values'][1];
     $this->deletableTestObjects[$baoString][] = $entity['id'];
     $this->deletableTestObjects[$baoString][] = $entity2['id'];
     foreach ($fields as $field => $specs) {
+      $resetFKTo = NULL;
       $fieldName = $field;
       if (!empty($specs['uniquename'])) {
         $fieldName = $specs['uniquename'];
@@ -1021,19 +1023,27 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
         case CRM_Utils_Type::T_INT:
           // probably created with a 1
-          $entity[$fieldName] = '6';
-          if (!empty($specs['FKClassName'])) {
+          if ($fieldName == 'weight') {
+            $entity[$fieldName] = 2;
+          }
+          elseif (!empty($specs['FKClassName'])) {
             if($specs['FKClassName'] == $baoString){
               $entity[$fieldName] = (string) $entity2['id'];
             }
             else{
               $uniqueName = CRM_Utils_Array::value('uniqueName', $specs);
+              if (!empty($entity[$fieldName])) {
+                $resetFKTo = array($fieldName => $entity[$fieldName]);
+              }
               $entity[$fieldName] = (string) empty($entity2[$field]) ? CRM_Utils_Array::value($uniqueName, $entity2) : $entity2[$field];
              //todo - there isn't always something set here - & our checking on unset values is limited
               if (empty($entity[$field])) {
                 unset($entity[$field]);
               }
             }
+          }
+          else {
+            $entity[$fieldName] = '6';
           }
           break;
 
@@ -1066,7 +1076,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'id' => $entity['id'],
         $field => isset($entity[$field]) ? $entity[$field] : NULL,
       );
-      if(isset($updateParams['financial_type_id']) && !in_array($entityName, array('Product', 'MembershipType', 'PriceSet'))) {
+      if(isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['contribution_type_id'] = $updateParams['financial_type_id'];
       }
@@ -1084,6 +1094,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
       $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
       $this->assertAPIArrayComparison($entity, $checkEntity, array(), "checking if $fieldName was correctly updated\n" . print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE));
+      if ($resetFKTo) {
+        //reset the foreign key fields because otherwise our cleanup routine fails & some other unexpected stuff can kick in
+        $entity = array_merge($entity, $resetFKTo);
+        $updateParams = array_merge($updateParams, $resetFKTo);
+        $this->callAPISuccess($entityName, 'create', $updateParams);
+        if(isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
+          //api has special handling on these 2 fields for backward compatibility reasons
+          $entity['contribution_type_id'] = $updateParams['financial_type_id'];
+        }
+      }
     }
     $baoObj->free();
   }
