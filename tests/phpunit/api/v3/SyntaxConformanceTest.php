@@ -321,7 +321,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Note',
       'OptionGroup',
       'Membership',
-      'MembershipStatus',
       'Group',
       'GroupOrganization',
       'GroupNesting',

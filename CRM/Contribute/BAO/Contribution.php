@@ -136,7 +136,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
    //set defaults in create mode
     if (!$contributionID) {
-      self::setDefaults($params);
+      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
       self::calculateMissingAmountParams($params);
     }
 
@@ -214,20 +214,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       ),
       'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name'),
     );
-
   }
 
-  /**
-   * Set defaults when creating new entity
-   * @param $params
-   */
-  static function setDefaults(&$params) {
-    foreach (self::getDefaults() as $key => $value) {
-      if (empty($params[$key])) {
-        $params[$key] = $value;
-      }
-    }
-  }
   /**
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
