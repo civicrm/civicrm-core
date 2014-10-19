@@ -101,7 +101,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     }
     else {
       if (!$id) {
-        self::setDefaults($params);
+        CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
         if (empty($params['name'])) {
           $params['name'] = CRM_Utils_String::munge(CRM_Utils_Array::value('label', $params), '_', 64);
         }
@@ -120,18 +120,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       'weight' => 1,
     );
 
-  }
-
-  /**
-   * Set defaults when creating new entity
-   * @param $params
-   */
-  static function setDefaults(&$params) {
-    foreach (self::getDefaults() as $key => $value) {
-      if (empty($params[$key])) {
-        $params[$key] = $value;
-      }
-    }
   }
 
   /**
