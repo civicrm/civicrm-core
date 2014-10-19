@@ -113,7 +113,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     $membershipType->copyValues($params);
     $membershipType->id = $id;
 
-    // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an oganization is changed.
+    // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an organization is changed.
     $previousID = NULL;
     if ($membershipType->id) {
       $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipType->id, 'member_of_contact_id');
@@ -121,7 +121,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
     $membershipType->save();
 
-    self::createMembershipPriceField($params, $ids, $previousID, $membershipType->id);
+    self::createMembershipPriceField($params, $previousID, $membershipType->id);
     // update all price field value for quick config when membership type is set CRM-11718
     if ($id) {
       self::updateAllPriceFieldValue($id, $params);
@@ -661,11 +661,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
   /**
    * @param $params
-   * @param $ids
    * @param $previousID
    * @param $membershipTypeId
    */
-  public static function createMembershipPriceField($params, $ids, $previousID, $membershipTypeId) {
+  public static function createMembershipPriceField($params, $previousID, $membershipTypeId) {
 
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
 
