@@ -2162,7 +2162,6 @@ class CiviCRM_For_WordPress {
     $params = array(
       'version' => 3,
       'is_active' => 1,
-      'activity_type_id' => 'Petition',
       'return' => array('id', 'title'),
 
     );
