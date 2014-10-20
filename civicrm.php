@@ -106,6 +106,9 @@ class CiviCRM_For_WordPress {
     
   // init property to store shortcode markup
   public $shortcode_markup = array();
+  
+  // count multiple passes of do_shortcode in a post
+  public $shortcode_in_post = array();
     
 
   // ---------------------------------------------------------------------------
@@ -1289,8 +1292,15 @@ class CiviCRM_For_WordPress {
       if ( !empty( $this->shortcode_markup ) ) {
         if ( isset( $this->shortcode_markup[$post->ID] ) ) {
           
-          // this shortcode must have been done
-          return $this->shortcode_markup[$post->ID][0];
+          // set counter flag
+          if ( ! isset( $this->shortcode_in_post[$post->ID] ) ) {
+            $this->shortcode_in_post[$post->ID] = 0;
+          } else {
+            $this->shortcode_in_post[$post->ID]++;
+          }
+          
+          // this shortcode must have been rendered
+          return $this->shortcode_markup[$post->ID][$this->shortcode_in_post[$post->ID]];
           
         }
       }
