@@ -1236,19 +1236,21 @@ class CiviCRM_For_WordPress {
     
     // provide an enticing link
     $markup .= '<p>' . sprintf(
-      __( '<a href="%s">Find out more...</a>', 'civicrm' ),
-      $link
+      '<a href="%s">%s</a>',
+      $link,
+      apply_filters( 'civicrm_shortcode_more_link', __( 'Find out more...', 'civicrm' ) )
     ) . '</p>';
     
     // let's have a footer
     $markup .= '<div class="crm-public-footer">';
     $civi = __( 'CiviCRM.org - Growing and Sustaining Relationships', 'civicrm' );
     $logo = '<div class="empowered-by-logo"><span>CiviCRM</span></div>';
-    $markup .= sprintf( 
+    $footer = sprintf( 
       __( 'Empowered by <a href="http://civicrm.org/" title="%s" target="_blank" class="empowered-by-link">%s</a>', 'civicrm' ),
       $civi,
       $logo
     );
+    $markup .= apply_filters( 'civicrm_shortcode_footer', $footer );
     $markup .= '</div>';
     
     // close container
