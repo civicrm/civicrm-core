@@ -1084,7 +1084,6 @@ class CiviCRM_For_WordPress {
             
             // check to see if a shortcode component has been repeated?
             $atts = $this->shortcode_get_atts( $shortcode );
-            //print_r( $atts );
             
             // test for hijacking
             if ( isset( $atts['hijack'] ) AND $atts['hijack'] == '1' ) {
@@ -1227,8 +1226,17 @@ class CiviCRM_For_WordPress {
       $markup .= '<h2>' . $title . '</h2>';
     }
     
+    // do we have some descriptive text?
+    if ( isset( $data['text'] ) AND ! empty( $data['text'] ) ) {
+      
+      // add it
+      $markup .= '<div class="civi-description">' . $data['text'] . '</div>';
+      
+    }
+    
+    // provide an enticing link
     $markup .= '<p>' . sprintf(
-      __( 'To view this content, <a href="%s">visit the entry</a>.', 'civicrm' ),
+      __( '<a href="%s">Find out more...</a>', 'civicrm' ),
       $link
     ) . '</p>';
     
@@ -1555,8 +1563,14 @@ class CiviCRM_For_WordPress {
         
         // call API
         $civi_entity = civicrm_api( 'contribution_page', 'getsingle', $params );
-    
+        
+        // set title
         $data['title'] = $civi_entity['title'];
+        
+        // set text, if present
+        $data['text'] = '';
+        if ( isset( $civi_entity['intro_text'] ) ) $data['text'] = $civi_entity['intro_text'];
+        
         break;
 
       case 'event':
@@ -1567,6 +1581,7 @@ class CiviCRM_For_WordPress {
         // call API
         $civi_entity = civicrm_api( 'event', 'getsingle', $params );
     
+        // set title
         switch ( $action ) {
           case 'register':
             $data['title'] = sprintf( 
@@ -1580,10 +1595,19 @@ class CiviCRM_For_WordPress {
             $data['title'] = $civi_entity['title'];
             break;
         }
+        
+        // set text, if present
+        $data['text'] = '';
+        if ( isset( $civi_entity['summary'] ) ) $data['text'] = $civi_entity['summary'];
+        if ( !isset( $civi_entity['summary'] ) AND isset( $civi_entity['description'] ) ) {
+          $data['text'] = $civi_entity['description'];
+        }
+        
         break;
 
       case 'user-dashboard':
 
+        // set title
         $data['title'] = __( 'Dashboard', 'civicrm' );
         break;
 
@@ -1595,7 +1619,11 @@ class CiviCRM_For_WordPress {
         // call API
         $civi_entity = civicrm_api( 'uf_group', 'getsingle', $params );
     
+        // set title
         $data['title'] = $civi_entity['title'];
+        
+        // set text to empty
+        $data['text'] = '';
         break;
 
 
@@ -1607,7 +1635,13 @@ class CiviCRM_For_WordPress {
         // call API
         $civi_entity = civicrm_api( 'survey', 'getsingle', $params );
     
+        // set title
         $data['title'] = $civi_entity['title'];
+        
+        // set text, if present
+        $data['text'] = '';
+        if ( isset( $civi_entity['instructions'] ) ) $data['text'] = $civi_entity['instructions'];
+        
         break;
 
       default:
