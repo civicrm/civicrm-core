@@ -905,110 +905,10 @@ class CiviCRM_For_WordPress {
     
     // do we have a shortcode?
     if ( ! $shortcode ) return '';
+    
+    // hand over to standalone method
+    return $this->shortcode_format( $post_id, $shortcode, $multiple );
       
-    // get attributes
-    $atts = $this->get_shortcodes_atts( $shortcode );
-    
-    // pre-process shortcode and retrieve args
-    $args = $this->shortcode_preprocess_atts( $atts );
-    
-    // get data for this shortcode
-    $data = $this->shortcode_get_data( $atts, $args );
-    
-    // did we get a title?
-    $title = __( 'Content via CiviCRM', 'civicrm' );
-    if ( ! empty( $data['title'] ) ) $title = $data['title'];
-    
-    // init title flag
-    $show_title = TRUE;
-    
-    // default link
-    $link = get_permalink( $post_id );
-    
-    // do we have multiple shortcodes?
-    if ( $multiple != 0 ) {
-      
-      $links = array();    
-      foreach( $args AS $var => $arg ) {
-        if ( ! empty( $arg ) AND $var != 'q' ) {
-          $links[] = $var . '=' . $arg;
-        }
-      }
-      $query = implode( '&', $links );
-      
-      $config = CRM_Core_Config::singleton();
-      
-      // $path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend
-      $link = $config->userSystem->url($args['q'], $query, FALSE, NULL, FALSE, FALSE, TRUE);
-      
-      // FIXME: unfortunately, there's a bug in $config->userSystem->url() that prevents
-      // it from returning the correct URL when on an archive...
-      $split = explode( '?', $link );
-      
-      // we should try and discover the wpBasePage, but anywhere with a Civi querystring will work
-      $link = get_permalink( $post_id ) . '?' . $split[1];
-      
-    }
-    
-    // test for hijacking
-    if ( !$multiple ) {
-      
-      if ( isset( $atts['hijack'] ) AND $atts['hijack'] == '1' ) {
-        
-        // add title to array
-        $this->post_titles[$post_id] = $data['title'];
-        
-        // override title
-        add_filter( 'the_title', array( $this, 'shortcode_title' ), 100, 2 );
-        
-        // overwrite content
-        add_filter( 'the_content', array( $this, 'shortcode_content' ) );
-        
-        // don't show title
-        $show_title = FALSE;
-        
-      }
-      
-    }
-  
-    /*
-    print_r( array(
-      'atts' => $atts,
-      'args' => $args,
-      'data' => $data,
-      'link' => $link,
-    ) );
-    */
-      
-    // init markup with a container
-    $markup = '<div class="crm-container crm-public">';
-    
-    if ( $show_title ) {
-      $markup .= '<h2>' . $title . '</h2>';
-    }
-    
-    $markup .= '<p>' . sprintf(
-      __( 'To view this content, <a href="%s">visit the entry</a>.', 'civicrm' ),
-      $link
-    ) . '</p>';
-    
-    // let's have a footer
-    $markup .= '<div class="crm-public-footer">';
-    $civi = __( 'CiviCRM.org - Growing and Sustaining Relationships', 'civicrm' );
-    $logo = '<div class="empowered-by-logo"><span>CiviCRM</span></div>';
-    $markup .= sprintf( 
-      __( 'Empowered by <a href="http://civicrm.org/" title="%s" target="_blank" class="empowered-by-link">%s</a>', 'civicrm' ),
-      $civi,
-      $logo
-    );
-    $markup .= '</div>';
-    
-    // close container
-    $markup .= '</div>';
-    
-    // allow plugins to override
-    return apply_filters( 'civicrm_invoke_multiple', $markup, $post_id, $shortcode );
-    
   }
 
 
@@ -1263,6 +1163,122 @@ class CiviCRM_For_WordPress {
     //print_r( 'shortcodes_present: ' . $shortcodes_present ."\n" );
     //print_r( $this->shortcodes );
     //print_r( $this->shortcode_markup ); die();
+    
+  }
+
+
+  /**
+   * Return a generic display for a shortcode instead of a CiviCRM invocation
+   *
+   * @param int $post_id The containing WordPress post ID
+   * @param str $shortcode The shortcode being parsed
+   * @param bool $multiple Boolean flag, TRUE if post has multiple shortcodes, FALSE otherwise
+   * @return str $markup Generic markup for multiple instances
+   */
+  private function shortcode_format( $post_id = FALSE, $shortcode = FALSE, $multiple = 0 ) {
+    
+    // get attributes
+    $atts = $this->get_shortcodes_atts( $shortcode );
+    
+    // pre-process shortcode and retrieve args
+    $args = $this->shortcode_preprocess_atts( $atts );
+    
+    // get data for this shortcode
+    $data = $this->shortcode_get_data( $atts, $args );
+    
+    // did we get a title?
+    $title = __( 'Content via CiviCRM', 'civicrm' );
+    if ( ! empty( $data['title'] ) ) $title = $data['title'];
+    
+    // init title flag
+    $show_title = TRUE;
+    
+    // default link
+    $link = get_permalink( $post_id );
+    
+    // do we have multiple shortcodes?
+    if ( $multiple != 0 ) {
+      
+      $links = array();    
+      foreach( $args AS $var => $arg ) {
+        if ( ! empty( $arg ) AND $var != 'q' ) {
+          $links[] = $var . '=' . $arg;
+        }
+      }
+      $query = implode( '&', $links );
+      
+      $config = CRM_Core_Config::singleton();
+      
+      // $path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend
+      $link = $config->userSystem->url($args['q'], $query, FALSE, NULL, FALSE, FALSE, TRUE);
+      
+      // FIXME: unfortunately, there's a bug in $config->userSystem->url() that prevents
+      // it from returning the correct URL when on an archive...
+      $split = explode( '?', $link );
+      
+      // we should try and discover the wpBasePage, but anywhere with a Civi querystring will work
+      $link = get_permalink( $post_id ) . '?' . $split[1];
+      
+    }
+    
+    // test for hijacking
+    if ( !$multiple ) {
+      
+      if ( isset( $atts['hijack'] ) AND $atts['hijack'] == '1' ) {
+        
+        // add title to array
+        $this->post_titles[$post_id] = $data['title'];
+        
+        // override title
+        add_filter( 'the_title', array( $this, 'shortcode_title' ), 100, 2 );
+        
+        // overwrite content
+        add_filter( 'the_content', array( $this, 'shortcode_content' ) );
+        
+        // don't show title
+        $show_title = FALSE;
+        
+      }
+      
+    }
+  
+    /*
+    print_r( array(
+      'atts' => $atts,
+      'args' => $args,
+      'data' => $data,
+      'link' => $link,
+    ) );
+    */
+      
+    // init markup with a container
+    $markup = '<div class="crm-container crm-public">';
+    
+    if ( $show_title ) {
+      $markup .= '<h2>' . $title . '</h2>';
+    }
+    
+    $markup .= '<p>' . sprintf(
+      __( 'To view this content, <a href="%s">visit the entry</a>.', 'civicrm' ),
+      $link
+    ) . '</p>';
+    
+    // let's have a footer
+    $markup .= '<div class="crm-public-footer">';
+    $civi = __( 'CiviCRM.org - Growing and Sustaining Relationships', 'civicrm' );
+    $logo = '<div class="empowered-by-logo"><span>CiviCRM</span></div>';
+    $markup .= sprintf( 
+      __( 'Empowered by <a href="http://civicrm.org/" title="%s" target="_blank" class="empowered-by-link">%s</a>', 'civicrm' ),
+      $civi,
+      $logo
+    );
+    $markup .= '</div>';
+    
+    // close container
+    $markup .= '</div>';
+    
+    // allow plugins to override
+    return apply_filters( 'civicrm_invoke_multiple', $markup, $post_id, $shortcode );
     
   }
 
