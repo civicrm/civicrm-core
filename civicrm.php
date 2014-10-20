@@ -891,9 +891,10 @@ class CiviCRM_For_WordPress {
    * Return a generic display instead of a CiviCRM invocation
    *
    * @param int $post_id The containing WordPress post ID
+   * @param str $shortcode The shortcode being parsed
    * @return str $markup Generic markup for multiple instances
    */
-  private function invoke_multiple( $post_id = FALSE ) {
+  private function invoke_multiple( $post_id = FALSE, $shortcode = FALSE ) {
     
     // sanity check
     if ( ! $post_id ) return '';
@@ -923,7 +924,7 @@ class CiviCRM_For_WordPress {
     $markup .= '</div>';
     
     // allow plugins to override
-    return apply_filters( 'civicrm_invoke_multiple', $markup, $post_id );
+    return apply_filters( 'civicrm_invoke_multiple', $markup, $post_id, $shortcode );
     
   }
 
@@ -1101,7 +1102,7 @@ class CiviCRM_For_WordPress {
         foreach( $this->shortcodes AS $post_id => $shortcode_array ) {
           foreach( $shortcode_array AS $shortcode ) {
             
-            $this->shortcode_markup[$post_id][] = $this->invoke_multiple( $post_id );
+            $this->shortcode_markup[$post_id][] = $this->invoke_multiple( $post_id, $shortcode );
             
           }
         }
