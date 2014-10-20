@@ -860,7 +860,7 @@ class CiviCRM_For_WordPress {
     if ( ! $shortcode ) return '';
     
     // hand over to standalone method
-    return $this->shortcode_format( $post_id, $shortcode, $multiple );
+    return $this->shortcode_render_multiple( $post_id, $shortcode, $multiple );
       
   }
 
@@ -1136,6 +1136,66 @@ class CiviCRM_For_WordPress {
 
 
   /**
+   * Handles CiviCRM-defined shortcodes
+   *
+   * @param array Shortcode attributes array
+   * @return string HTML for output
+   */
+  public function shortcode_render( $atts ) {
+    
+    // check if we've already parsed this shortcode
+    global $post;
+    if ( is_object($post) ) {
+      if ( !empty( $this->shortcode_markup ) ) {
+        if ( isset( $this->shortcode_markup[$post->ID] ) ) {
+          
+          // set counter flag
+          if ( ! isset( $this->shortcode_in_post[$post->ID] ) ) {
+            $this->shortcode_in_post[$post->ID] = 0;
+          } else {
+            $this->shortcode_in_post[$post->ID]++;
+          }
+          
+          // this shortcode must have been rendered
+          return $this->shortcode_markup[$post->ID][$this->shortcode_in_post[$post->ID]];
+          
+        }
+      }
+    }
+    
+    // preprocess shortcode attributes
+    $args = $this->shortcode_preprocess_atts( $atts );
+    
+    // invoke() requires environment variables to be set
+    foreach ( $args as $key => $value ) {
+      if ( $value !== NULL ) {
+        $_REQUEST[$key] = $_GET[$key] = $value;
+      }
+    }
+
+    // kick out if not CiviCRM
+    if (!$this->initialize()) {
+      return '';
+    }
+
+    // check permission
+    $argdata = $this->get_request_args();
+    if ( ! $this->check_permission( $argdata['args'] ) ) {
+      return $this->get_permission_denied();;
+    }
+
+    // CMW: why do we need this? Nothing that follows uses it...
+    require_once ABSPATH . WPINC . '/pluggable.php';
+    
+    ob_start(); // start buffering
+    $this->invoke(); // now, instead of echoing, shortcode output ends up in buffer
+    $content = ob_get_clean(); // save the output and flush the buffer
+    return $content;
+
+  }
+
+
+  /**
    * Return a generic display for a shortcode instead of a CiviCRM invocation
    *
    * @param int $post_id The containing WordPress post ID
@@ -1143,7 +1203,7 @@ class CiviCRM_For_WordPress {
    * @param bool $multiple Boolean flag, TRUE if post has multiple shortcodes, FALSE otherwise
    * @return str $markup Generic markup for multiple instances
    */
-  private function shortcode_format( $post_id = FALSE, $shortcode = FALSE, $multiple = 0 ) {
+  private function shortcode_render_multiple( $post_id = FALSE, $shortcode = FALSE, $multiple = 0 ) {
     
     // get attributes
     $atts = $this->shortcode_get_atts( $shortcode );
@@ -1372,66 +1432,6 @@ class CiviCRM_For_WordPress {
     
     return $shortcode_atts;
     
-  }
-
-
-  /**
-   * Handles CiviCRM-defined shortcodes
-   *
-   * @param array Shortcode attributes array
-   * @return string HTML for output
-   */
-  public function shortcode_render( $atts ) {
-    
-    // check if we've already parsed this shortcode
-    global $post;
-    if ( is_object($post) ) {
-      if ( !empty( $this->shortcode_markup ) ) {
-        if ( isset( $this->shortcode_markup[$post->ID] ) ) {
-          
-          // set counter flag
-          if ( ! isset( $this->shortcode_in_post[$post->ID] ) ) {
-            $this->shortcode_in_post[$post->ID] = 0;
-          } else {
-            $this->shortcode_in_post[$post->ID]++;
-          }
-          
-          // this shortcode must have been rendered
-          return $this->shortcode_markup[$post->ID][$this->shortcode_in_post[$post->ID]];
-          
-        }
-      }
-    }
-    
-    // preprocess shortcode attributes
-    $args = $this->shortcode_preprocess_atts( $atts );
-    
-    // invoke() requires environment variables to be set
-    foreach ( $args as $key => $value ) {
-      if ( $value !== NULL ) {
-        $_REQUEST[$key] = $_GET[$key] = $value;
-      }
-    }
-
-    // kick out if not CiviCRM
-    if (!$this->initialize()) {
-      return '';
-    }
-
-    // check permission
-    $argdata = $this->get_request_args();
-    if ( ! $this->check_permission( $argdata['args'] ) ) {
-      return $this->get_permission_denied();;
-    }
-
-    // CMW: why do we need this? Nothing that follows uses it...
-    require_once ABSPATH . WPINC . '/pluggable.php';
-    
-    ob_start(); // start buffering
-    $this->invoke(); // now, instead of echoing, shortcode output ends up in buffer
-    $content = ob_get_clean(); // save the output and flush the buffer
-    return $content;
-
   }
 
 
