@@ -401,7 +401,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
   }
 }
 
-function _civicrm_api3_contribution_completetransaction(&$params) {
+function _civicrm_api3_contribution_completetransaction_spec(&$params) {
   $params['id'] = array(
     'title' => 'Contribution ID',
     'type' => CRM_Utils_Type::T_INT,
