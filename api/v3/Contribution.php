@@ -394,7 +394,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     // @todo required for base ipn but problematic as api layer handles this
     $transaction = new CRM_Core_Transaction();
     $ipn = new CRM_Core_Payment_BaseIPN();
-    $ipn->completeTransaction($input, $ids, $objects, $transaction);
+    $ipn->completeTransaction($input, $ids, $objects, $transaction, !empty($contribution->contribution_recur_id));
   }
   catch(Exception $e) {
     throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
