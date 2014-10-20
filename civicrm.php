@@ -899,10 +899,28 @@ class CiviCRM_For_WordPress {
     // sanity check
     if ( ! $post_id ) return '';
     
+    // do we have a shortcode?
+    if ( $shortcode !== FALSE ) {
+      
+      // get attributes
+      $atts = $this->get_shortcodes_atts( $shortcode );
+      
+      // pre-process shortcode and retrieve args
+      $args = $this->shortcode_preprocess_atts( $atts );
+      
+      // get data for this shortcode
+      $data = $this->shortcode_get_data( $atts, $args );
+      
+    }
+    
+    // did we get a title?
+    $title = __( 'Content via CiviCRM', 'civicrm' );
+    if ( ! empty( $data['title'] ) ) $title = $data['title'];
+    
     // init markup with a container
     $markup = '<div class="crm-container crm-public">';
     
-    $markup .= '<h2>' . __( 'Content via CiviCRM', 'civicrm' ) . '</h2>';
+    $markup .= '<h2>' . $title . '</h2>';
     
     $markup .= '<p>' . sprintf(
       __( 'To view this content, <a href="%s">visit the entry</a>.', 'civicrm' ),
@@ -1125,9 +1143,7 @@ class CiviCRM_For_WordPress {
             $shortcode = $this->shortcodes[$post->ID][0];
             
             // check to see if a shortcode component has been repeated?
-            $text = str_replace( '[civicrm ', '', $shortcode );
-            $text = str_replace( ']', '', $text );
-            $atts = shortcode_parse_atts( $text );
+            $atts = $this->get_shortcodes_atts( $shortcode );
             //print_r( $atts );
             
             // test for hijacking
@@ -1240,6 +1256,26 @@ class CiviCRM_For_WordPress {
 
 
   /**
+   * Return attributes for a given CiviCRM shortcode
+   *
+   * @param $shortcode The shortcode to parse
+   * @return array $shortcode_atts Array of shortcode attributes
+   */
+  private function get_shortcodes_atts( $shortcode ) {
+    
+    // strip all but attributes definitions
+    $text = str_replace( '[civicrm ', '', $shortcode );
+    $text = str_replace( ']', '', $text );
+    
+    // extract attributes
+    $shortcode_atts = shortcode_parse_atts( $text );
+    
+    return $shortcode_atts;
+    
+  }
+
+
+  /**
    * Handles CiviCRM-defined shortcodes
    *
    * @param array Shortcode attributes array
@@ -1259,6 +1295,46 @@ class CiviCRM_For_WordPress {
         }
       }
     }
+    
+    // preprocess shortcode attributes
+    $args = $this->shortcode_preprocess_atts( $atts );
+    
+    // invoke() requires environment variables to be set
+    foreach ( $args as $key => $value ) {
+      if ( $value !== NULL ) {
+        $_REQUEST[$key] = $_GET[$key] = $value;
+      }
+    }
+
+    // kick out if not CiviCRM
+    if (!$this->initialize()) {
+      return '';
+    }
+
+    // check permission
+    $argdata = $this->get_request_args();
+    if ( ! $this->check_permission( $argdata['args'] ) ) {
+      return $this->get_permission_denied();;
+    }
+
+    // CMW: why do we need this? Nothing that follows uses it...
+    require_once ABSPATH . WPINC . '/pluggable.php';
+    
+    ob_start(); // start buffering
+    $this->invoke(); // now, instead of echoing, shortcode output ends up in buffer
+    $content = ob_get_clean(); // save the output and flush the buffer
+    return $content;
+
+  }
+
+
+  /**
+   * Preprocess CiviCRM-defined shortcodes
+   *
+   * @param array $atts Shortcode attributes array
+   * @return void
+   */
+  public function shortcode_preprocess_atts( $atts ) {
     
     extract( shortcode_atts( array(
       'component' => 'contribution',
@@ -1348,30 +1424,111 @@ class CiviCRM_For_WordPress {
 
     }
 
-    foreach ( $args as $key => $value ) {
-      if ( $value !== NULL ) {
-        $_REQUEST[$key] = $_GET[$key] = $value;
-      }
-    }
+    return $args;
 
-    // kick out if not CiviCRM
-    if (!$this->initialize()) {
-      return '';
-    }
+  }
 
-    // check permission
-    $argdata = $this->get_request_args();
-    if ( ! $this->check_permission( $argdata['args'] ) ) {
-      return $this->get_permission_denied();;
-    }
 
-    // CMW: why do we need this? Nothing that follows uses it...
-    require_once ABSPATH . WPINC . '/pluggable.php';
+  /**
+   * Post-process CiviCRM-defined shortcodes
+   *
+   * @param array $atts Shortcode attributes array
+   * @param array $args Shortcode arguments array
+   * @return void
+   */
+  public function shortcode_get_data( $atts, $args ) {
     
-    ob_start(); // start buffering
-    $this->invoke(); // now, instead of echoing, shortcode output ends up in buffer
-    $content = ob_get_clean(); // save the output and flush the buffer
-    return $content;
+    // init return array
+    $data = array();
+    
+    // get the Civi entity via the API
+    $params = array( 
+      'version' => 3,
+      'page' => 'CiviCRM',
+      'q' => 'civicrm/ajax/rest',
+      'sequential' => '1',
+    );
+    
+    switch ( $atts['component'] ) {
+
+      case 'contribution':
+
+        // add event ID
+        $params['id'] = $args['id'];
+        
+        // call API
+        $civi_entity = civicrm_api( 'contribution_page', 'getsingle', $params );
+    
+        $data['title'] = $civi_entity['title'];
+        break;
+
+      case 'event':
+
+        // add event ID
+        $params['id'] = $args['id'];
+        
+        // call API
+        $civi_entity = civicrm_api( 'event', 'getsingle', $params );
+    
+        switch ( $action ) {
+          case 'register':
+            $data['title'] = sprintf( 
+              __( 'Register for %s', 'civicrm' ),
+              $civi_entity['title']
+            );
+            break;
+
+          case 'info':
+          default:
+            $data['title'] = $civi_entity['title'];
+            break;
+        }
+        break;
+
+      case 'user-dashboard':
+
+        $data['title'] = __( 'Dashboard', 'civicrm' );
+        break;
+
+      case 'profile':
+
+        // add event ID
+        $params['id'] = $args['gid'];
+        
+        // call API
+        $civi_entity = civicrm_api( 'uf_group', 'getsingle', $params );
+    
+        $data['title'] = $civi_entity['title'];
+        break;
+
+
+      case 'petition':
+
+        // add event ID
+        $params['id'] = $args['gid'];
+        
+        // call API
+        $civi_entity = civicrm_api( 'survey', 'getsingle', $params );
+    
+        $data['title'] = $civi_entity['title'];
+        break;
+
+      default:
+
+        break;
+
+    }
+
+    /*
+    print_r( array(
+      'atts' => $atts,
+      'args' => $args,
+      'civi_entity' => $civi_entity,
+      'data' => $data,
+    ) );
+    */
+      
+    return $data;
 
   }
 
