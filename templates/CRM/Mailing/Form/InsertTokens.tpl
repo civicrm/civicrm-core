@@ -292,7 +292,7 @@ function tokenReplText(element) {
     ( isMailing ) ? text_message = "subject" : text_message = "msg_subject";
   }
   else if ( element.id == 'token1' ) {
-    ( isMailing ) ? text_message = "text_message" : text_message = "msg_text";
+    ( isMailing ) ? text_message = "text_message" : (text_message != null) ? text_message : text_message = "msg_text";
   }
 
   cj( "#"+ text_message ).replaceSelection( token );
