@@ -362,7 +362,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_PCP_refresh");
     $id = explode('id=', $this->getAttribute("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody//tr/td/a[text()='$pcpTitle']@href"));
     $pcpUrl = "civicrm/pcp/info?reset=1&id=$id[1]";
-    $this->click("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody//tr/td/a[text()='$pcpTitle']/../../td[7]/span/a[text()='Approve']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td/a[text()='$pcpTitle']/../../td[7]/span[1]/a[2][text()='Approve']");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

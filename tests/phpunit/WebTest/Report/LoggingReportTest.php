@@ -156,6 +156,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody/tr/td[7][text()='Completed']");
 
     //add a case
+    $this->waitForAjaxContent();
     $this->click("xpath=//li[@id='tab_case']/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//div[@class='action-link']/a");
     $this->click("xpath=//div[@class='view-content']//div[@class='action-link']/a");
