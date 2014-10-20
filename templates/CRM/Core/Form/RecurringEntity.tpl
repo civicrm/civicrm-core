@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 
-<div class="crm-block crm-form-block crm-core-form-recurringentity-block crm-accordion-wrapper">
+<div class="crm-block crm-form-block crm-core-form-recurringentity-block crm-accordion-wrapper" id="recurring-entity-block">
     <div class="crm-accordion-header">Repeat Configuration</div>
     <div class="crm-accordion-body">
         <div class="crm-submit-buttons">
@@ -268,7 +268,7 @@
             if (Object.keys(result).length > 0) {
               var errors = [];
               var participantData = [];
-              var html = 'Based on your repeat configuration here is the list of dates, Do you wish to create repeating set of these dates?<br/><table id="options" class="display"><thead><tr><th>Sr No</th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
+              var html = 'Based on your repeat configuration here is the list of dates, Do you wish to create recurring set of these dates?<br/><table id="options" class="display"><thead><tr><th>Sr No</th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
               var count = 1;
               for(var i in result) {
                 if (i != 'errors') {

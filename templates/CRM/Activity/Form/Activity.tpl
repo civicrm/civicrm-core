@@ -220,6 +220,7 @@
                 $('#repetition_start_date').val($('#activity_date_time').val());
                 $('#repetition_start_date_time').val($('#activity_date_time_time').val());
               });
+              $('#recurring-entity-block').addClass('collapsed');
             });
           </script>
         {/literal}
