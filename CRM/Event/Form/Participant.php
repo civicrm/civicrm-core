@@ -1368,8 +1368,13 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
         //build contribution params
         if (!$this->_onlinePendingContributionId) {
-          $contributionParams['source'] = "{$eventTitle}: Offline registration (by {$userName})";
-        }
+          if (empty($params['source'])) { 
+            $contributionParams['source'] = ts('%1 : Offline registration (by %2)', array(1 => $eventTitle, 2 => $userName));
+          }                                                           
+          else {                                                     
+            $contributionParams['source'] = $params['source'];                                                             
+          }                                                          
+        } 
 
         $contributionParams['currency'] = $config->defaultCurrency;
         $contributionParams['non_deductible_amount'] = 'null';
@@ -1425,6 +1430,10 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           }
         }
 
+        if (CRM_Utils_Array::value('tax_amount', $this->_params)) {
+          $contributionParams['tax_amount'] = $this->_params['tax_amount'];
+        }
+
         if ($this->_single) {
           if (empty($ids)) {
             $ids = array();
@@ -1478,6 +1487,10 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
                 ($params['status_id'] != array_search('Partially paid', $participantStatus))
               ) {
                 $line['unit_price'] = $line['line_total'] = $params['total_amount'];
+                if (!empty($params['tax_amount'])) {
+                  $line['unit_price'] = $line['unit_price'] - $params['tax_amount'];
+                  $line['line_total'] = $line['line_total'] - $params['tax_amount'];
+                }
               }
               $lineItem[$this->_priceSetId][$lineKey] = $line;
             }
@@ -1656,6 +1669,34 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
         if ($this->_isPaidEvent) {
           // fix amount for each of participants ( for bulk mode )
           $eventAmount = array();
+          $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+          $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+          $totalTaxAmount = 0;
+          
+          //add dataArray in the receipts in ADD and UPDATE condition
+          $dataArray = array();
+          if ($this->_action & CRM_Core_Action::ADD) {
+            $line = $lineItem[0];
+          }
+          elseif ($this->_action & CRM_Core_Action::UPDATE) {
+            $line = $this->_values['line_items'];
+          }
+          if ($invoicing) {
+            foreach ($line as $key => $value) {
+              if (isset($value['tax_amount'])) {
+                $totalTaxAmount += $value['tax_amount'];
+                if (isset($dataArray[(string) $value['tax_rate']])) {
+                  $dataArray[(string) $value['tax_rate']] = $dataArray[(string) $value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
+                }
+                else {
+                  $dataArray[(string) $value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
+                }
+              }
+            }
+            $this->assign('totalTaxAmount', $totalTaxAmount);
+            $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
+            $this->assign('dataArray', $dataArray);
+          }
           if (!empty($additionalParticipantDetails)) {
             $params['amount_level'] = preg_replace('//', '', $params['amount_level']) . ' - ' . $this->_contributorDisplayName;
           }
@@ -1688,6 +1729,18 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc', $this->_fromEmails);
         }
 
+        //send email with pdf invoice
+        $template = CRM_Core_Smarty::singleton( );
+        $taxAmt = $template->get_template_vars('dataArray');
+        $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+                                                      $this->_id, 'contribution_id', 'participant_id'
+                                                      );
+        $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+        $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+        if (count($taxAmt) > 0 && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+          $sendTemplateParams['isEmailPdf'] = True; 
+          $sendTemplateParams['contributionId'] = $contributionId; 
+        }
         list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         if ($mailSent) {
           $sent[] = $contactID;

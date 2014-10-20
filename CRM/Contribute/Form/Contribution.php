@@ -389,7 +389,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // fix the display of the monetary value, CRM-4038
     if (isset($defaults['total_amount'])) {
-      $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'], NULL, '%a');
+      if (!empty($defaults['tax_amount'])) {
+        $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
+        if (!(CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails))) {
+          $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'] - $defaults['tax_amount'], NULL, '%a');
+        }
+      }
+      else {
+        $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'], NULL, '%a');
+      }
     }
 
     if (isset($defaults['non_deductible_amount'])) {
@@ -493,9 +501,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
     $allPanes = array();
+    //tax rate from financialType
+    $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
+    $this->assign('currencies', json_encode(CRM_Core_OptionGroup::values('currencies_enabled')));
 
     // build price set form.
     $buildPriceSet = FALSE;
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $this->assign('invoicing', $invoicing);
+
+    // display tax amount on edit contribution page
+    if ($invoicing && $this->_action & CRM_Core_Action::UPDATE && isset($this->_values['tax_amount'])) {
+      $this->assign('totalTaxAmount', $this->_values['tax_amount']);
+    }
+
     if (empty($this->_lineItems) &&
       ($this->_priceSetId || !empty($_POST['price_set_id']))
     ) {
@@ -908,6 +928,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->addFormRule(array('CRM_Contribute_Form_Contribution', 'formRule'), $this);
 
+    // if contribution is related to membership or participant freeze Financial Type, Amount
+    if ($this->_id && isset($this->_values['tax_amount'])) {
+      $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
+      if (CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails)) {
+        $financialType->freeze();
+        $totalAmount->freeze();
+        $this->assign('freezeFinancialType', TRUE);
+      }
+    }
+
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
     }
@@ -1027,6 +1057,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $submittedValues, $lineItem[$priceSetId]);
 
+      // unset tax amount for offline 'is_quick_config' contribution
+      if ($this->_priceSet['is_quick_config'] && 
+        !array_key_exists($submittedValues['financial_type_id'], CRM_Core_PseudoConstant::getTaxRates())
+      ) {
+        unset($submittedValues['tax_amount']);
+      }
       $submittedValues['total_amount'] = CRM_Utils_Array::value('amount', $submittedValues);
     }
     if ($this->_id) {
@@ -1088,6 +1124,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
         $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('total_amount', $submittedValues));
+
+        // Update line total and total amount with tax on edit
+        $financialItemsId = CRM_Core_PseudoConstant::getTaxRates();
+        if (array_key_exists($submittedValues['financial_type_id'], $financialItemsId)) {
+          $lineItems[$itemId]['tax_rate'] = $financialItemsId[$submittedValues['financial_type_id']];
+        }
+        else {
+          $lineItems[$itemId]['tax_rate'] = $lineItems[$itemId]['tax_amount'] = "" ;
+          $submittedValues['tax_amount'] = 'null';
+        }
+        if ($lineItems[$itemId]['tax_rate']) {
+          $lineItems[$itemId]['tax_amount'] = ($lineItems[$itemId]['tax_rate']/100) * $lineItems[$itemId]['line_total'];
+          $submittedValues['total_amount'] = $lineItems[$itemId]['line_total'] + $lineItems[$itemId]['tax_amount'];
+          $submittedValues['tax_amount'] = $lineItems[$itemId]['tax_amount'];
+        }
       }
       // 10117 update th line items for participants
       if (!empty($lineItems[$itemId]['price_field_id'])) {
@@ -1239,6 +1290,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $params['line_item'] = $lineItem;
       $params['payment_processor_id'] = $params['payment_processor'] = CRM_Utils_Array::value('id', $this->_paymentProcessor);
+      if (isset($submittedValues['tax_amount'])) {
+        $params['tax_amount'] = $submittedValues['tax_amount'];
+      }
       //create contribution.
       if ($isQuickConfig) {
         $params['is_quick_config'] = 1;
@@ -1307,6 +1361,57 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         CRM_Contribute_Form_AdditionalInfo::processPremium($formValues, $contribution->id,
           $this->_premiumID, $this->_options
         );
+      }
+
+      // assign tax calculation for contribution receipts
+      $taxRate = array();
+      $getTaxDetails = FALSE;
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+      if ($invoicing) {
+        if ($this->_action & CRM_Core_Action::ADD) {
+          $line = $lineItem;
+        }
+        elseif ($this->_action & CRM_Core_Action::UPDATE) {
+          $line = $this->_lineItems;
+        }
+        foreach ($line as $key => $value) {
+          foreach ($value as $v) {
+            if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
+              $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
+            }
+            else {
+              if (isset($v['tax_rate'])) {
+                $taxRate[(string) $v['tax_rate']] = CRM_Utils_Array::value('tax_amount', $v);
+                $getTaxDetails = TRUE;
+              }
+            }
+          }
+        }
+      }
+       
+      if ($invoicing) {
+        if ($this->_action & CRM_Core_Action::UPDATE) {
+          if (isset($submittedValues['tax_amount'])) {
+            $totalTaxAmount = $submittedValues['tax_amount'];
+          }
+          else {
+            $totalTaxAmount = $this->_values['tax_amount'];
+          }
+          $this->assign('totalTaxAmount', $totalTaxAmount);
+          $this->assign('dataArray', $taxRate);
+        }
+        else {
+          if (CRM_Utils_Array::value('price_set_id', $submittedValues)) {
+            $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
+            $this->assign('getTaxDetails', $getTaxDetails);
+            $this->assign('dataArray', $taxRate);
+            $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
+          }
+          else {
+            $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
+          }
+        }
       }
 
       //send receipt mail.

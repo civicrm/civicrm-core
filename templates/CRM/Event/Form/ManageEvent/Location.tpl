@@ -61,10 +61,10 @@
         <td id="locUsedMsg" colspan="3">
         </td>
       </tr>
-
+     
     </table>
     {/if}
-
+    
 
 
     <div id="newLocation">

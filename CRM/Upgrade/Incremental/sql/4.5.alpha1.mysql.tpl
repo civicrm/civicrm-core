@@ -539,4 +539,3 @@ ADD UNIQUE INDEX `UI_line_item_value` (`entity_table`, `entity_id`, `contributio
 
 -- update case type menu
 UPDATE civicrm_navigation set url = 'civicrm/a/#/caseType' WHERE url LIKE 'civicrm/admin/options/case_type%';
-

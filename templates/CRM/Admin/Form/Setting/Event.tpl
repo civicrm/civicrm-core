@@ -28,7 +28,7 @@
 <div id="help">
     {ts 1=$docLink}These settings are used to configure properties for the CiviEvent component. Please read the %1 documentation, and make sure you understand it before modifying default values.{/ts}
 </div>
-<div class="crm-block crm-form-block>
+<div class="crm-block crm-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
       <table class="form-layout-compressed">
         <tr class="crm-mail-form-block-enable_cart">

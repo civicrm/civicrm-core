@@ -114,7 +114,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @return null|string
    */
   static function getLineTotal($entityId, $entityTable) {
-    $sqlLineItemTotal = "SELECT SUM(li.line_total)
+    $sqlLineItemTotal = "SELECT SUM(li.line_total + COALESCE(li.tax_amount,0))
 FROM civicrm_line_item li
 WHERE li.entity_table = '{$entityTable}'
 AND li.entity_id = {$entityId}
@@ -153,6 +153,7 @@ AND li.entity_id = {$entityId}
       li.participant_count,
       li.price_field_value_id,
       li.financial_type_id,
+      li.tax_amount,
       pfv.description";
 
     $condition = "li.entity_id = %2.id AND li.entity_table = 'civicrm_%2'";
@@ -190,6 +191,9 @@ AND li.entity_id = {$entityId}
       2 => array($entity, 'Text'),
     );
 
+    $getTaxDetails = FALSE;
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause $orderByClause", $params);
     while ($dao->fetch()) {
       if (!$dao->id) {
@@ -211,7 +215,19 @@ AND li.entity_id = {$entityId}
         'financial_type_id' => $dao->financial_type_id,
         'membership_type_id' => $dao->membership_type_id,
         'membership_num_terms' => $dao->membership_num_terms,
+        'tax_amount' => $dao->tax_amount,
       );
+      $lineItems[$dao->id]['tax_rate'] = CRM_Price_BAO_LineItem::calculateTaxRate($lineItems[$dao->id]);
+      $lineItems[$dao->id]['subTotal'] = $lineItems[$dao->id]['qty'] * $lineItems[$dao->id]['unit_price'];
+      if ($lineItems[$dao->id]['tax_amount'] != '') {
+        $getTaxDetails = TRUE;
+      }
+    }
+    if ($invoicing) {
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      $smarty = CRM_Core_Smarty::singleton();
+      $smarty->assign('taxTerm', $taxTerm);
+      $smarty->assign('getTaxDetails', $getTaxDetails);
     }
     return $lineItems;
   }
@@ -277,6 +293,7 @@ AND li.entity_id = {$entityId}
         'auto_renew' => CRM_Utils_Array::value('auto_renew', $options[$oid]),
         'html_type' => $fields['html_type'],
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $options[$oid]),
+        'tax_amount' => CRM_Utils_Array::value('tax_amount', $options[$oid]),
       );
 
       if ($values[$oid]['membership_type_id'] && empty($values[$oid]['auto_renew'])) {
@@ -358,6 +375,9 @@ AND li.entity_id = {$entityId}
         $lineItems = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
           CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails);
+          if (isset($line['tax_amount'])) {
+            CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails, TRUE);
+          }
         }
       }
     }
@@ -477,5 +497,25 @@ AND li.entity_id = {$entityId}
         }
       }
     }
+  }
+
+  /**
+   * Calculate tax rate in percentage
+   *
+   * @param $lineItemId an assoc array of lineItem
+   *
+   * @return tax rate
+   *
+   * @access public
+   * @static
+   */
+  public static function calculateTaxRate($lineItemId) {
+    if ($lineItemId['html_type'] == 'Text') {
+      $tax = $lineItemId['tax_amount']/($lineItemId['unit_price'] * $lineItemId['qty'])*100;
+    }
+    else {
+      $tax = ($lineItemId['tax_amount']/$lineItemId['unit_price']) * 100;
+    }
+    return $tax;
   }
 }

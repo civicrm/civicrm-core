@@ -1901,7 +1901,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
 
     //have a crack @ deleting it first in the hope this will prevent derailing our tests
-    $check = $this->callAPISuccess('custom_group', 'get', array('title' => $params['title'], array('api.custom_group.delete' => 1)));
+    $this->callAPISuccess('custom_group', 'get', array('title' => $params['title'], array('api.custom_group.delete' => 1)));
 
     return $this->callAPISuccess('custom_group', 'create', $params);
   }
@@ -2366,7 +2366,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   function quickCleanUpFinancialEntities() {
     $tablesToTruncate = array(
       'civicrm_contribution',
+      'civicrm_contribution_soft',
       'civicrm_financial_trxn',
+      'civicrm_financial_item',
       'civicrm_contribution_recur',
       'civicrm_line_item',
       'civicrm_contribution_page',
@@ -2388,6 +2390,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->quickCleanup($tablesToTruncate);
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_membership_status WHERE name NOT IN('New', 'Current', 'Grace', 'Expired', 'Pending', 'Cancelled', 'Deceased')");
     $this->restoreDefaultPriceSetConfig();
+    $var = TRUE;
+    CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
   }
 
   function restoreDefaultPriceSetConfig() {
@@ -2933,12 +2937,59 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    return $result['id'];
  }
 
+  /**
+   * Set up initial recurring payment allowing subsequent IPN payments
+   */
+  function setupRecurringPaymentProcessorTransaction() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+      'contact_id' => $this->_contactID,
+      'amount' => 1000,
+      'sequential' => 1,
+      'installments' => 5,
+      'frequency_unit' => 'Month',
+      'frequency_interval' => 1,
+      'invoice_id' => $this->_invoiceID,
+      'contribution_status_id' => 2,
+      'processor_id' => $this->_paymentProcessorID,
+      'api.contribution.create' => array(
+        'total_amount' => '200',
+        'invoice_id' => $this->_invoiceID,
+        'financial_type_id' => 1,
+        'contribution_status_id' => 'Pending',
+        'contact_id' => $this->_contactID,
+        'contribution_page_id' => $this->_contributionPageID,
+        'payment_processor_id' => $this->_paymentProcessorID,
+      )
+    ));
+    $this->_contributionRecurID = $contributionRecur['id'];
+    $this->_contributionID = $contributionRecur['values']['0']['api.contribution.create']['id'];
+  }
+
+  /**
+   * we don't have a good way to set up a recurring contribution with a membership so let's just do one then alter it
+   */
+  function setupMembershipRecurringPaymentProcessorTransaction() {
+    $this->setupRecurringPaymentProcessorTransaction();
+    $this->ids['membership_type'] = $this->membershipTypeCreate();
+    $this->ids['membership'] = $this->callAPISuccess('membership', 'create', array(
+      'contact_id' => $this->_contactID,
+      'membership_type_id' => $this->ids['membership_type'],
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'api.membership_payment.create' => array('contribution_id' => $this->_contributionID),
+      'format.only_id' => TRUE,
+    ));
+    CRM_Core_DAO::executeQuery(
+      "UPDATE civicrm_line_item SET entity_table = 'civicrm_membership', entity_id = {$this->ids['membership']}
+      WHERE entity_id = {$this->_contributionID} AND entity_table = 'civicrm_contribution'"
+    );
+  }
 
   /**
    * @param $message
    *
    * @throws Exception
-   */function CiviUnitTestCase_fatalErrorHandler($message) {
-  throw new Exception("{$message['message']}: {$message['code']}");
-}
+   */
+  function CiviUnitTestCase_fatalErrorHandler($message) {
+    throw new Exception("{$message['message']}: {$message['code']}");
+  }
 }

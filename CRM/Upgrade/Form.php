@@ -77,7 +77,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
     3 => 'Three',
     4 => 'Four',
     5 => 'Five',
-    6 => 'Fix',
+    6 => 'Six',
     7 => 'Seven',
     8 => 'Eight',
     9 => 'Nine',

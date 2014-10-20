@@ -1722,7 +1722,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @param int  $contributionId     Contribution Id
    * @param bool $excludeCancelled   Exclude cancelled additional participant
    *
-   * @return int $participantsId
+   * @return array $participantsId
    * @access public
    * @static
    */
@@ -1866,7 +1866,8 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
         unset($insertLines[$previousLineItem['price_field_value_id']]);
         // for updating the line items i.e. use-case - once deselect-option selecting again
         if ($previousLineItem['line_total'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total']) {
-          $updateLines[$previousLineItem['price_field_value_id']] =  $submittedLineItems[$previousLineItem['price_field_value_id']];;
+          $updateLines[$previousLineItem['price_field_value_id']] = $submittedLineItems[$previousLineItem['price_field_value_id']];
+          $updateLines[$previousLineItem['price_field_value_id']]['id'] = $id;
         }
       }
     }
@@ -1879,7 +1880,8 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
 INNER JOIN civicrm_financial_item fi
    ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
 SET li.qty = 0,
-    li.line_total = 0.00
+    li.line_total = 0.00,
+    li.tax_amount = NULL
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}) AND
        (price_field_value_id NOT IN ({$submittedFieldValues}))
 ";
@@ -1887,7 +1889,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 
       // gathering necessary info to record negative (deselected) financial_item
       $updateFinancialItem = "
-  SELECT fi.*, SUM(fi.amount) as differenceAmt, price_field_value_id
+  SELECT fi.*, SUM(fi.amount) as differenceAmt, price_field_value_id, financial_type_id, tax_amount
     FROM civicrm_financial_item fi LEFT JOIN civicrm_line_item li ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId})
 GROUP BY li.entity_table, li.entity_id, price_field_value_id
@@ -1895,6 +1897,8 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
       $updateFinancialItemInfoDAO = CRM_Core_DAO::executeQuery($updateFinancialItem);
       $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId, 'ASC', TRUE);
       $trxnId['id'] = $trxn['financialTrxnId'];
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $updateFinancialItemInfoValues = array();
 
       while ($updateFinancialItemInfoDAO->fetch()) {
@@ -1908,21 +1912,48 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
           // INSERT negative financial_items
           $updateFinancialItemInfoValues['amount'] = - $updateFinancialItemInfoValues['amount'];
           CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);
+          // INSERT negative financial_items for tax amount
+          if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
+            $updateFinancialItemInfoValues['amount'] = - ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']);
+            $updateFinancialItemInfoValues['description'] = $taxTerm;
+            if ($updateFinancialItemInfoValues['financial_type_id']) {
+              $updateFinancialItemInfoValues['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($updateFinancialItemInfoValues['financial_type_id']);
+            }
+            CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);
+          }
         }
         // if submitted and difference is 0 add a positive entry again
         elseif (in_array($updateFinancialItemInfoValues['price_field_value_id'], $submittedFieldValueIds) && $updateFinancialItemInfoValues['differenceAmt'] == 0) {
           $updateFinancialItemInfoValues['amount'] = $updateFinancialItemInfoValues['amount'];
           CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);
+          // INSERT financial_items for tax amount
+          if ($updateFinancialItemInfoValues['entity_id'] == $updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['id'] &&
+            isset($updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['tax_amount'])
+          ) {
+            $updateFinancialItemInfoValues['amount'] = $updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['tax_amount'];
+            $updateFinancialItemInfoValues['description'] = $taxTerm;
+            if ($updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']) {
+              $updateFinancialItemInfoValues['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']);
+            }
+            CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);
+          }
         }
       }
     }
 
     if (!empty($updateLines)) {
       foreach ($updateLines as $valueId => $vals) {
+        if (isset($vals['tax_amount'])) {
+          $taxAmount = $vals['tax_amount'];
+        }
+        else {
+          $taxAmount = "NULL";
+        }
         $updateLineItem = "
 UPDATE civicrm_line_item li
 SET li.qty = {$vals['qty']},
     li.line_total = {$vals['line_total']},
+    li.tax_amount = {$taxAmount},
     li.unit_price = {$vals['unit_price']},
     li.label = '{$vals['label']}'
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}) AND
@@ -1953,7 +1984,13 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     else {
       $updatedAmount = $params['amount'];
     }
-    self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId);
+    if (strlen($params['tax_amount']) != 0) {
+      $taxAmount = $params['tax_amount'];
+    }
+    else {
+      $taxAmount = "NULL";
+    }
+    self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount);
 
     $fetchCon = array('id' => $contributionId);
     $updatedContribution = CRM_Contribute_BAO_Contribution::retrieve($fetchCon, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
@@ -1965,6 +2002,9 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
       $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution);
+      if (isset($lineObj->tax_amount)) {
+        CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE);
+      }
     }
 
     // update participant fee_amount column
@@ -1981,7 +2021,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
    * @param $paidAmount
    * @param $contributionId
    */
-  static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId) {
+  static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount = NULL) {
     $balanceAmt = $updatedAmount - $paidAmount;
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
@@ -2010,6 +2050,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
         $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
       }
       $updatedContributionDAO->total_amount = $updatedAmount;
+      $updatedContributionDAO->tax_amount = $taxAmount;
       $updatedContributionDAO->save();
 
       $ftDetail = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);

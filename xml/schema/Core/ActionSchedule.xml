@@ -326,4 +326,11 @@
     <onDelete>SET NULL</onDelete>
     <add>4.5</add>
   </foreignKey>
+  <field>
+    <name>used_for</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Used for repeating entity</comment>
+    <add>4.6</add>
+  </field>
 </table>

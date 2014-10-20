@@ -141,6 +141,7 @@ SELECT id
       FALSE
     );
     $this->addWysiwyg('pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'pay_later_receipt'));
+    $this->addElement('checkbox', 'is_billing_required', ts('Is billing block required'));
 
     //add partial payment options
 
@@ -412,6 +413,12 @@ SELECT id
   public function postProcess() {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
+
+    //update 'is_billing_required' 
+    if (empty($params['is_pay_later'])) {
+      $params['is_billing_required'] = 0;
+    }
+
     if (array_key_exists('payment_processor', $params)) {
       if (array_key_exists(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor', 'AuthNet',
             'id', 'payment_processor_type_id'
@@ -433,6 +440,7 @@ SELECT id
       'max_amount' => "null",
       'is_monetary' => FALSE,
       'is_pay_later' => FALSE,
+      'is_billing_required' => FALSE,
       'is_recur_interval' => FALSE,
       'is_recur_installments' => FALSE,
       'recur_frequency_unit' => "null",
