@@ -1667,6 +1667,24 @@ SELECT contact_id
   }
 
   /**
+   * Set defaults when creating new entity
+   * (don't call this set defaults as already in use with different signature in some places)
+   *
+   * @param $params
+   * @param $defaults
+   */
+  static function setCreateDefaults(&$params, $defaults) {
+    if (isset($params['id'])) {
+      return;
+    }
+    foreach ($defaults as $key => $value) {
+      if (!array_key_exists($key, $params) || $params[$key] === NULL) {
+        $params[$key] = $value;
+      }
+    }
+  }
+
+  /**
    * @param string $prefix
    * @param bool $addRandomString
    * @param null $string
