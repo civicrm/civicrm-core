@@ -232,9 +232,38 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'month',
       'subject' => 'subject sched_membership_end_2month',
     );
+    $this->fixtures['sched_membership_end_2month_repeat_twice_4_weeks'] = array( // create()
+      'name' => 'sched_membership_end_2month',
+      'title' => 'sched_membership_end_2month',
+      'absolute_date' => '',
+      'body_html' => '<p>body sched_membership_end_2month</p>',
+      'body_text' => 'body sched_membership_end_2month',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '4',
+      'end_frequency_unit' => 'month',
+      'entity_status' => '',
+      'entity_value' => '',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '1',
+      'mapping_id' => 4,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '4',
+      'repetition_frequency_unit' => 'week',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'membership_end_date',
+      'start_action_offset' => '2',
+      'start_action_unit' => 'month',
+      'subject' => 'subject sched_membership_end_2month',
+    );
+
 
     $this->_setUp();
-    $this->quickCleanup(array('civicrm_action_log', 'civicrm_action_schedule'));
   }
 
   /**
@@ -249,7 +278,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->mut->clearMessages();
     $this->mut->stop();
     unset($this->mut);
-
+    $this->quickCleanup(array('civicrm_action_schedule', 'civicrm_action_log', 'civicrm_membership', 'civicrm_email'));
     $this->_tearDown();
   }
 
@@ -386,6 +415,71 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->assertCronRuns(array(
       array( // After the 2-week mark, don't send email because we have different membership type
         'time' => '2012-03-29 01:00:00',
+        'recipients' => array(),
+      ),
+    ));
+  }
+
+  /**
+   * Test that the first and SECOND notifications are sent out
+   *
+   */
+  function testMembershipEndDate_Repeat() {
+    // creates membership with end_date = 20120615
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
+    $result = $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $membership->contact_id,
+      'email' => 'test-member@example.com',
+    ));
+    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
+
+    $actionSchedule = $this->fixtures['sched_membership_end_2month_repeat_twice_4_weeks'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
+
+    // end_date=2012-06-15 ; schedule is 2 weeks before end_date
+    $this->assertCronRuns(array(
+      array( // After the 2-week mark, send an email
+        'time' => '2012-08-15 01:00:00',
+        'recipients' => array(array('test-member@example.com')),
+      ),
+      array( // After the 2-week mark, send an email
+        'time' => '2012-09-12 01:00:00',
+        'recipients' => array(array('test-member@example.com')),
+      ),
+    ));
+  }
+
+  /**
+   * Test that the first notification is sent but the second is NOT sent if the end date changes in
+   * between
+   *  see CRM-15376
+   */
+  function testMembershipEndDate_Repeat_ChangedEndDate_CRM_15376() {
+    // creates membership with end_date = 20120615
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
+    $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $membership->contact_id,
+      'email' => 'test-member@example.com',
+    ));
+    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
+
+    $actionSchedule = $this->fixtures['sched_membership_end_2month_repeat_twice_4_weeks'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
+    // end_date=2012-06-15 ; schedule is 2 weeks before end_date
+    $this->assertCronRuns(array(
+      array( // After the 2-week mark, send an email
+        'time' => '2012-08-15 01:00:00',
+        'recipients' => array(array('test-member@example.com')),
+      ),
+    ));
+
+    //extend membership - reminder should NOT go out
+    $this->callAPISuccess('membership', 'create', array('id' => $membership->id, 'end_date' => '2014-01-01'));
+    $this->assertCronRuns(array(
+      array( // After the 2-week mark, send an email
+        'time' => '2012-09-12 01:00:00',
         'recipients' => array(),
       ),
     ));
