@@ -297,7 +297,7 @@ class CiviCRM_For_WordPress {
   public function register_hooks() {
 
     // always add the common hooks
-    $this->register_common_hooks();
+    $this->register_hooks_common();
     
     // when in WordPress admin...
     if ( is_admin() ) {
@@ -306,7 +306,7 @@ class CiviCRM_For_WordPress {
       $this->civicrm_context_set( 'admin' );
       
       // handle WP admin context
-      $this->register_admin_hooks();
+      $this->register_hooks_admin();
       return;
       
     }
@@ -340,7 +340,7 @@ class CiviCRM_For_WordPress {
       $this->civicrm_context_set( 'basepage' );
       
       // if we get here, we must be in a wpBasePage context
-      $this->register_basepage_hooks();
+      $this->basepage_register_hooks();
       return;
     
     }
@@ -349,7 +349,7 @@ class CiviCRM_For_WordPress {
     $this->civicrm_context_set( 'shortcode' );
       
     // that leaves us with handling shortcodes, should they exist
-    $this->register_shortcode_hooks();
+    $this->shortcode_register_hooks();
 
   }
 
@@ -359,7 +359,7 @@ class CiviCRM_For_WordPress {
    *
    * @return void
    */
-  public function register_common_hooks() {
+  public function register_hooks_common() {
   
     // use translation files
     add_action( 'plugins_loaded', array( $this, 'enable_translation' ) );
@@ -375,7 +375,7 @@ class CiviCRM_For_WordPress {
     add_action( 'deleted_user', array( $this, 'delete_user_ufmatch' ), 10, 1 );
     
     // register the CiviCRM shortcode
-    add_shortcode( 'civicrm', array( $this, 'do_shortcode' ) );
+    add_shortcode( 'civicrm', array( $this, 'shortcode_render' ) );
     
   }
   
@@ -385,7 +385,7 @@ class CiviCRM_For_WordPress {
    *
    * @return void
    */
-  public function register_admin_hooks() {
+  public function register_hooks_admin() {
     
     // modify the admin menu
     add_action( 'admin_menu', array( $this, 'add_menu_items' ) );
@@ -410,53 +410,6 @@ class CiviCRM_For_WordPress {
       }
     }
     
-  }
-
-
-  /**
-   * Register hooks to handle CiviCRM in a WordPress wpBasePage context
-   *
-   * @return void
-   */
-  public function register_basepage_hooks() {
-    
-    // kick out if not CiviCRM
-    if (!$this->initialize()) {
-      return;
-    }
-    
-    // regardless of URL, load page template
-    add_filter( 'template_include', array( $this, 'basepage_template' ), 999 );
-        
-    // merge CiviCRM's HTML header with the WordPress theme's header
-    add_action( 'wp_head', array( $this, 'wp_head' ) );
-      
-    // check permission
-    $argdata = $this->get_request_args();
-    if ( ! $this->check_permission( $argdata['args'] ) ) {
-      add_filter( 'the_content', array( $this, 'get_permission_denied' ) );
-      return;
-    }
-
-    // cache CiviCRM base page markup
-    add_action( 'wp', array( $this, 'handle_basepage' ), 10, 1 );
-    
-  }
-
-
-  /**
-   * Register hooks to handle the presence of shortcodes in content
-   *
-   * @return void
-   */
-  public function register_shortcode_hooks() {
-
-    // add CiviCRM core resources when a shortcode is detected in the post content
-    add_action( 'wp', array( $this, 'handle_shortcodes' ), 10, 1 );
-        
-    // merge CiviCRM's HTML header with the WordPress theme's header
-    add_action( 'wp_head', array( $this, 'wp_head' ) );
-      
   }
 
 
@@ -807,7 +760,7 @@ class CiviCRM_For_WordPress {
    * Invoke CiviCRM in a WordPress context
    * Callback function from add_menu_page()
    * Callback from WordPress 'init' and 'the_content' hooks
-   * Also called by do_shortcode() and _civicrm_update_user()
+   * Also called by shortcode_render() and _civicrm_update_user()
    *
    * @return void
    */
@@ -1015,13 +968,29 @@ class CiviCRM_For_WordPress {
 
 
   /**
+   * Register hooks to handle the presence of shortcodes in content
+   *
+   * @return void
+   */
+  public function shortcode_register_hooks() {
+
+    // add CiviCRM core resources when a shortcode is detected in the post content
+    add_action( 'wp', array( $this, 'shortcode_handler' ), 10, 1 );
+        
+    // merge CiviCRM's HTML header with the WordPress theme's header
+    add_action( 'wp_head', array( $this, 'wp_head' ) );
+      
+  }
+
+
+  /**
    * Determine if a CiviCRM shortcode is present in any of the posts about to be displayed
    * Callback method for 'wp' hook, always called from WP front-end
    *
    * @param object $wp The WP object, present but not used
    * @return void
    */
-  public function handle_shortcodes( $wp ) {
+  public function shortcode_handler( $wp ) {
 
     /**
      * At this point, all conditional tags are available
@@ -1054,7 +1023,7 @@ class CiviCRM_For_WordPress {
           }
           
           // get CiviCRM shortcodes in this post
-          $shortcodes_array = $this->get_shortcodes( $post->post_content );
+          $shortcodes_array = $this->shortcode_get_for_post( $post->post_content );
           
           // sanity check
           if ( !empty( $shortcodes_array ) ) {
@@ -1114,7 +1083,7 @@ class CiviCRM_For_WordPress {
             $shortcode = $this->shortcodes[$post->ID][0];
             
             // check to see if a shortcode component has been repeated?
-            $atts = $this->get_shortcodes_atts( $shortcode );
+            $atts = $this->shortcode_get_atts( $shortcode );
             //print_r( $atts );
             
             // test for hijacking
@@ -1178,7 +1147,7 @@ class CiviCRM_For_WordPress {
   private function shortcode_format( $post_id = FALSE, $shortcode = FALSE, $multiple = 0 ) {
     
     // get attributes
-    $atts = $this->get_shortcodes_atts( $shortcode );
+    $atts = $this->shortcode_get_atts( $shortcode );
     
     // pre-process shortcode and retrieve args
     $args = $this->shortcode_preprocess_atts( $atts );
@@ -1348,7 +1317,7 @@ class CiviCRM_For_WordPress {
    * @param $content The content to parse
    * @return array $shortcodes Array of shortcodes
    */
-  private function get_shortcodes( $content ) {
+  private function shortcode_get_for_post( $content ) {
   
     // init return array
     $shortcodes = array();
@@ -1382,7 +1351,7 @@ class CiviCRM_For_WordPress {
    * @param $shortcode The shortcode to parse
    * @return array $shortcode_atts Array of shortcode attributes
    */
-  private function get_shortcodes_atts( $shortcode ) {
+  private function shortcode_get_atts( $shortcode ) {
     
     // strip all but attributes definitions
     $text = str_replace( '[civicrm ', '', $shortcode );
@@ -1402,7 +1371,7 @@ class CiviCRM_For_WordPress {
    * @param array Shortcode attributes array
    * @return string HTML for output
    */
-  public function do_shortcode( $atts ) {
+  public function shortcode_render( $atts ) {
     
     // check if we've already parsed this shortcode
     global $post;
@@ -1667,13 +1636,44 @@ class CiviCRM_For_WordPress {
 
 
   /**
+   * Register hooks to handle CiviCRM in a WordPress wpBasePage context
+   *
+   * @return void
+   */
+  public function basepage_register_hooks() {
+    
+    // kick out if not CiviCRM
+    if (!$this->initialize()) {
+      return;
+    }
+    
+    // regardless of URL, load page template
+    add_filter( 'template_include', array( $this, 'basepage_template' ), 999 );
+        
+    // merge CiviCRM's HTML header with the WordPress theme's header
+    add_action( 'wp_head', array( $this, 'wp_head' ) );
+      
+    // check permission
+    $argdata = $this->get_request_args();
+    if ( ! $this->check_permission( $argdata['args'] ) ) {
+      add_filter( 'the_content', array( $this, 'get_permission_denied' ) );
+      return;
+    }
+
+    // cache CiviCRM base page markup
+    add_action( 'wp', array( $this, 'basepage_handler' ), 10, 1 );
+    
+  }
+
+
+  /**
    * Build CiviCRM base page content
    * Callback method for 'wp' hook, always called from WP front-end
    *
    * @param object $wp The WP object, present but not used
    * @return void
    */
-  public function handle_basepage( $wp ) {
+  public function basepage_handler( $wp ) {
 
     /**
      * At this point, all conditional tags are available
@@ -1722,7 +1722,7 @@ class CiviCRM_For_WordPress {
     add_filter( 'wp_title', array( $this, 'override_page_title' ), 50, 3 );
     
     // include this content when base page is rendered
-    add_filter( 'the_content', array( $this, 'do_basepage' ) );
+    add_filter( 'the_content', array( $this, 'basepage_render' ) );
 
     // hide the edit link
     add_action( 'edit_post_link', array( $this, 'clear_edit_post_link' ) );
@@ -1739,7 +1739,7 @@ class CiviCRM_For_WordPress {
     
     /*
     // trace
-    print_r( 'handle_basepage' . "\n" ); //die();
+    print_r( 'basepage_handler' . "\n" ); //die();
     print_r( 'title: ' . $civicrm_wp_title ); //die();
     print_r( $this->basepage_markup ); die();
     */
@@ -1754,7 +1754,7 @@ class CiviCRM_For_WordPress {
    * @param object $wp The WP object, present but not used
    * @return void
    */
-  public function do_basepage() {
+  public function basepage_render() {
     
     // hand back our base page markup
     return $this->basepage_markup;
@@ -1827,7 +1827,7 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Authentication function used by register_basepage_hooks()
+   * Authentication function used by basepage_register_hooks()
    *
    * @return bool True if authenticated, false otherwise
    */
@@ -1857,7 +1857,7 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Called when authentication fails in register_basepage_hooks()
+   * Called when authentication fails in basepage_register_hooks()
    *
    * @return string Warning message
    */
