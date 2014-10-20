@@ -895,39 +895,101 @@ class CiviCRM_For_WordPress {
    *
    * @param int $post_id The containing WordPress post ID
    * @param str $shortcode The shortcode being parsed
+   * @param bool $multiple Boolean flag, TRUE if post has multiple shortcodes, FALSE otherwise
    * @return str $markup Generic markup for multiple instances
    */
-  private function invoke_multiple( $post_id = FALSE, $shortcode = FALSE ) {
+  private function invoke_multiple( $post_id = FALSE, $shortcode = FALSE, $multiple = 0 ) {
     
-    // sanity check
+    // sanity check - also bails if called from invoke()
     if ( ! $post_id ) return '';
     
     // do we have a shortcode?
-    if ( $shortcode !== FALSE ) {
+    if ( ! $shortcode ) return '';
       
-      // get attributes
-      $atts = $this->get_shortcodes_atts( $shortcode );
-      
-      // pre-process shortcode and retrieve args
-      $args = $this->shortcode_preprocess_atts( $atts );
-      
-      // get data for this shortcode
-      $data = $this->shortcode_get_data( $atts, $args );
-      
-    }
+    // get attributes
+    $atts = $this->get_shortcodes_atts( $shortcode );
+    
+    // pre-process shortcode and retrieve args
+    $args = $this->shortcode_preprocess_atts( $atts );
+    
+    // get data for this shortcode
+    $data = $this->shortcode_get_data( $atts, $args );
     
     // did we get a title?
     $title = __( 'Content via CiviCRM', 'civicrm' );
     if ( ! empty( $data['title'] ) ) $title = $data['title'];
     
+    // init title flag
+    $show_title = TRUE;
+    
+    // default link
+    $link = get_permalink( $post_id );
+    
+    // do we have multiple shortcodes?
+    if ( $multiple != 0 ) {
+      
+      $links = array();    
+      foreach( $args AS $var => $arg ) {
+        if ( ! empty( $arg ) AND $var != 'q' ) {
+          $links[] = $var . '=' . $arg;
+        }
+      }
+      $query = implode( '&', $links );
+      
+      $config = CRM_Core_Config::singleton();
+      
+      // $path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend
+      $link = $config->userSystem->url($args['q'], $query, FALSE, NULL, FALSE, FALSE, TRUE);
+      
+      // FIXME: unfortunately, there's a bug in $config->userSystem->url() that prevents
+      // it from returning the correct URL when on an archive...
+      $split = explode( '?', $link );
+      
+      // we should try and discover the wpBasePage, but anywhere with a Civi querystring will work
+      $link = get_permalink( $post_id ) . '?' . $split[1];
+      
+    }
+    
+    // test for hijacking
+    if ( !$multiple ) {
+      
+      if ( isset( $atts['hijack'] ) AND $atts['hijack'] == '1' ) {
+        
+        // add title to array
+        $this->post_titles[$post_id] = $data['title'];
+        
+        // override title
+        add_filter( 'the_title', array( $this, 'shortcode_title' ), 100, 2 );
+        
+        // overwrite content
+        add_filter( 'the_content', array( $this, 'shortcode_content' ) );
+        
+        // don't show title
+        $show_title = FALSE;
+        
+      }
+      
+    }
+  
+    /*
+    print_r( array(
+      'atts' => $atts,
+      'args' => $args,
+      'data' => $data,
+      'link' => $link,
+    ) );
+    */
+      
     // init markup with a container
     $markup = '<div class="crm-container crm-public">';
     
-    $markup .= '<h2>' . $title . '</h2>';
+    if ( $show_title ) {
+      $markup .= '<h2>' . $title . '</h2>';
+    }
     
     $markup .= '<p>' . sprintf(
       __( 'To view this content, <a href="%s">visit the entry</a>.', 'civicrm' ),
-      get_permalink( $post_id )
+      $link
     ) . '</p>';
     
     // let's have a footer
@@ -1121,11 +1183,17 @@ class CiviCRM_For_WordPress {
         
         // let's add dummy markup
         foreach( $this->shortcodes AS $post_id => $shortcode_array ) {
+        
+          // set flag if there are multple shortcodes in this post
+          $multiple = ( count( $shortcode_array ) > 1 ) ? 1 : 0;
+          
           foreach( $shortcode_array AS $shortcode ) {
             
-            $this->shortcode_markup[$post_id][] = $this->invoke_multiple( $post_id, $shortcode );
+            // invoke in multiple context
+            $this->shortcode_markup[$post_id][] = $this->invoke_multiple( $post_id, $shortcode, $multiple );
             
           }
+          
         }
         
       } else {
@@ -1215,12 +1283,46 @@ class CiviCRM_For_WordPress {
    * @return str Overridden context code
    */
   public function shortcode_content( $content ) {
-  	global $post;
+    
+    global $post;
+    
     // is this the post?
     if ( ! array_key_exists( $post->ID, $this->shortcode_markup ) ) {
       return $content;
     }
+    
+    // bail if it has multiple shortcodes
+    if ( count( $this->shortcode_markup[$post->ID] ) > 1 ) {
+      return $content;
+    }
+    
     return $this->shortcode_markup[$post->ID][0];
+    
+  }
+
+
+  /**
+   * In order to hijack the page, we need to override the content
+   *
+   * @return str Overridden context code
+   */
+  public function shortcode_title( $title, $post_id ) {
+    
+    // is this the post?
+    if ( ! array_key_exists( $post_id, $this->shortcode_markup ) ) {
+      return $title;
+    }
+    
+    // bail if it has multiple shortcodes
+    if ( count( $this->shortcode_markup[$post_id] ) > 1 ) {
+      return $title;
+    }
+    
+    $title = $this->post_titles[$post_id];
+    //print_r( $this->post_titles );
+    
+    return $title;
+    
   }
 
 
