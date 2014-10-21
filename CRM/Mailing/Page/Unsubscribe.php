@@ -35,6 +35,7 @@
 class CRM_Mailing_Page_Unsubscribe extends CRM_Mailing_Page_Common {
 
   function run() {
+    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
     $this->_type = 'unsubscribe';
     return parent::run();
   }
