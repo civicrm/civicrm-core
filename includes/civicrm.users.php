@@ -141,7 +141,7 @@ class CiviCRM_For_WordPress_Users {
     $user = get_userdata( $userID );
     if ( $user ) {
 
-      if (!$this->initialize()) {
+      if (!$this->civi->initialize()) {
         return;
       }
 
@@ -185,7 +185,7 @@ class CiviCRM_For_WordPress_Users {
    */
   public function delete_user_ufmatch( $userID ) {
 
-    if (!$this->initialize()) {
+    if (!$this->civi->initialize()) {
       return;
     }
 
