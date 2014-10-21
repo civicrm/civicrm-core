@@ -38,16 +38,16 @@ $title = __( 'Please select a CiviCRM front-end page type.', 'civicrm' );
       
 ?>
 
-<div id="civicrm_frontend_pages" style="display:none;">
+<div id="civicrm_frontend_pages" style="display: none;">
   <div class="wrap">
-    <div>
+    <div class="civicrm-wrap-inner">
     
-      <div style="padding:15px 15px 0 15px;">
-        <h3 style="color:#5A5A5A!important; font-family:Georgia,Times New Roman,Times,serif!important; font-size:1.8em!important; font-weight:normal!important;"><?php echo $title; ?></h3>
+      <div class="civicrm-modal-header">
+        <h3><?php echo $title; ?></h3>
         <span><?php echo $title; ?></span>
-      </div>
+      </div><!-- /.civicrm-modal-header -->
       
-      <div style="padding:15px 15px 0 15px;">
+      <div class="civicrm-modal-content">
       
         <select id="add_civicomponent_id">
           <option value=""><?php _e( 'Select a frontend element.', 'civicrm' ); ?></option>
@@ -58,7 +58,7 @@ $title = __( 'Please select a CiviCRM front-end page type.', 'civicrm' );
           <option value="petition"><?php _e( 'Petition', 'civicrm' ); ?></option>
         </select>
         
-        <span id="contribution-section" style="display:none;">
+        <span id="contribution-section" style="display: none;">
           <select id="add_contributepage_id">
           <?php
           $contributionPages = $this->get_contribution_pages();
@@ -70,7 +70,7 @@ $title = __( 'Please select a CiviCRM front-end page type.', 'civicrm' );
           </select>
         </span>
         
-        <span id="event-section" style="display:none;">
+        <span id="event-section" style="display: none;">
           <select id="add_eventpage_id">
             <?php
             $eventPages = $this->get_event();
@@ -81,25 +81,22 @@ $title = __( 'Please select a CiviCRM front-end page type.', 'civicrm' );
             ?>
           </select>
         </span>
-        <br>
         
-        <span id="action-section-event" style="display:none;">
-          <div style="padding:15px 15px 0 15px;">
+        <span id="action-section-event" style="display: none;">
+          <div class="civicrm-modal-action-section-event">
             <input type="radio" name="event_action" value="info" checked="checked" /> <?php _e( 'Event Info Page', 'civicrm' ); ?>
             <input type="radio" name="event_action" value="register" /> <?php _e( 'Event Registration Page', 'civicrm' ); ?>
           </div>
         </span>
-        <br/>
         
-        <span id="component-section" style="display:none;">
-          <div style="padding:15px 15px 0 15px;">
+        <span id="component-section" style="display: none;">
+          <div class="civicrm-modal-component-section">
             <input type="radio" name="component_mode" value="live" checked="checked"/> <?php _e( 'Live Page', 'civicrm' ); ?>
             <input type="radio" name="component_mode" value="test" /> <?php _e( 'Test Drive', 'civicrm' ); ?>
           </div>
         </span>
-        <br/>
         
-        <span id="profile-section" style="display:none;">
+        <span id="profile-section" style="display: none;">
           <select id="add_profilepage_id">
           <?php
           $profilePages = $this->get_profile_page();
@@ -110,10 +107,9 @@ $title = __( 'Please select a CiviCRM front-end page type.', 'civicrm' );
           ?>
           </select>
         </span>
-        <br/>
         
-        <span id="profile-mode-section" style="display:none;">
-          <div style="padding:15px 15px 0 15px;">
+        <span id="profile-mode-section" style="display: none;">
+          <div class="civicrm-modal-profile-mode-section">
             <input type="radio" name="profile_mode" value="create" checked="checked"/> <?php _e( 'Create', 'civicrm' ); ?>
             <input type="radio" name="profile_mode" value="edit" /> <?php _e( 'Edit', 'civicrm' ); ?>
             <input type="radio" name="profile_mode" value="edit" /> <?php _e( 'View', 'civicrm' ); ?>
@@ -121,7 +117,7 @@ $title = __( 'Please select a CiviCRM front-end page type.', 'civicrm' );
           </div>
         </span>
         
-        <span id="petition-section" style="display:none;">
+        <span id="petition-section" style="display: none;">
           <select id="add_petition_id">
           <?php
           $petitionPages = $this->get_petition();
@@ -133,23 +129,23 @@ $title = __( 'Please select a CiviCRM front-end page type.', 'civicrm' );
           </select>
         </span>
 
-        <div style="padding:8px 0 0 0; font-size:11px; font-style:italic; color:#5A5A5A">
+        <div class="civicrm-modal-hint">
         	<?php _e( "Can't find your form? Make sure it is active.", 'civicrm' ); ?>
         </div>
         
-        <div style="padding:8px 0 0 0; line-height: 1.6;">
+        <div class="hijack">
           <?php _e( 'If you only insert one shortcode, you can choose to override all page content with the content of the shortcode.', 'civicrm' ); ?><br/>
           <input type="radio" name="hijack-page" value="1" checked="checked"/> <?php _e( 'Override page content', 'civicrm' ); ?>
           <input type="radio" name="hijack-page" value="0" /> <?php _e( "Don't override", 'civicrm' ); ?>
         </div>
       
-      </div>
+      </div><!-- /.civicrm-modal-content -->
     
-      <div style="padding:15px;">
+      <div class="civicrm-modal-footer">
         <input type="button" class="button-primary" value="Insert Form" id="crm-wp-insert-shortcode"/>&nbsp;&nbsp;&nbsp;
         <a class="button" style="color:#bbb;" href="#" onclick="tb_remove(); return false;"><?php _e( 'Cancel', 'civicrm' ); ?></a>
-      </div>
+      </div><!-- /.civicrm-modal-footer -->
     
-    </div>
+    </div><!-- /.civicrm-wrap-inner -->
   </div><!-- /.wrap -->
 </div>

@@ -458,10 +458,12 @@ class CiviCRM_For_WordPress {
     // modify the admin menu
     add_action( 'admin_menu', array( $this, 'add_menu_items' ) );
     
-    // check if settings file exist, do not show configuration link on
-    // install / settings page
-    if ( isset( $_GET['page'] ) && $_GET['page'] != 'civicrm-install' ) {
-      if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
+    // if settings file does not exist, show notice with link to installer
+    if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
+      if ( isset( $_GET['page'] ) && $_GET['page'] == 'civicrm-install' ) {
+        // register hooks for installer page?
+      } else {
+        // show notice
         add_action( 'admin_notices', array( $this, 'show_setup_warning' ) );
       }
     }

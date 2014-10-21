@@ -80,7 +80,7 @@ class CiviCRM_For_WordPress_Shortcodes_Modal {
     // adds the HTML triggered by the button above
     add_action( 'admin_footer', array( $this, 'add_form_button_html' ) );
     
-    // add the javascript to make it all happen
+    // add the javascript and styles to make it all happen
     add_action( 'admin_enqueue_scripts', array( $this, 'add_form_button_js' ) );
     
   }
@@ -118,15 +118,12 @@ class CiviCRM_For_WordPress_Shortcodes_Modal {
    */
   public function add_form_button_js( $hook ) {
 
-    // are we on the page(s) we want?
+    // bail if not on the page(s) we want
     if ( !in_array(
       $hook,
       array( 'post.php', 'page.php', 'page-new.php', 'post-new.php' )
     ) ) {
-
-      // bail
       return;
-
     }
 
     // enqueue script in footer
@@ -139,6 +136,15 @@ class CiviCRM_For_WordPress_Shortcodes_Modal {
       array( 'jquery' ), // deps
       CIVICRM_PLUGIN_VERSION,
       $in_footer
+    );
+
+    // enqueue stylesheet
+    wp_enqueue_style(
+      'civicrm_form_button_css', // handle
+      CIVICRM_PLUGIN_URL . 'assets/css/civicrm.modal.css', // src
+      FALSE, // deps
+      CIVICRM_PLUGIN_VERSION,
+      'all' // media
     );
 
   }
