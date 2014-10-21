@@ -1571,7 +1571,9 @@ class CiviCRM_For_WordPress {
         
         // set text, if present
         $data['text'] = '';
-        if ( isset( $civi_entity['intro_text'] ) ) $data['text'] = $civi_entity['intro_text'];
+        if ( isset( $civi_entity['intro_text'] ) ) {
+          $data['text'] = $civi_entity['intro_text'];
+        }
         
         break;
 
@@ -1582,9 +1584,9 @@ class CiviCRM_For_WordPress {
         
         // call API
         $civi_entity = civicrm_api( 'event', 'getsingle', $params );
-    
+        
         // set title
-        switch ( $action ) {
+        switch ( $atts['action'] ) {
           case 'register':
             $data['title'] = sprintf( 
               __( 'Register for %s', 'civicrm' ),
@@ -1600,8 +1602,17 @@ class CiviCRM_For_WordPress {
         
         // set text, if present
         $data['text'] = '';
-        if ( isset( $civi_entity['summary'] ) ) $data['text'] = $civi_entity['summary'];
-        if ( !isset( $civi_entity['summary'] ) AND isset( $civi_entity['description'] ) ) {
+        if ( isset( $civi_entity['summary'] ) ) {
+          $data['text'] = $civi_entity['summary'];
+        }
+        if (
+          // summary is not present or is empty
+          ( !isset($civi_entity['summary']) OR empty($civi_entity['summary']) )
+          AND 
+          // we do have a description
+          isset( $civi_entity['description'] ) AND !empty( $civi_entity['description'] ) 
+        ) {
+          // override with description
           $data['text'] = $civi_entity['description'];
         }
         
@@ -1614,7 +1625,7 @@ class CiviCRM_For_WordPress {
         break;
 
       case 'profile':
-
+        
         // add event ID
         $params['id'] = $args['gid'];
         
@@ -1631,23 +1642,26 @@ class CiviCRM_For_WordPress {
 
       case 'petition':
 
-        // add event ID
-        $params['id'] = $args['gid'];
+        // add petition ID
+        $params['id'] = $atts['id'];
         
         // call API
         $civi_entity = civicrm_api( 'survey', 'getsingle', $params );
-    
+        
         // set title
         $data['title'] = $civi_entity['title'];
         
         // set text, if present
         $data['text'] = '';
-        if ( isset( $civi_entity['instructions'] ) ) $data['text'] = $civi_entity['instructions'];
+        if ( isset( $civi_entity['instructions'] ) ) {
+          $data['text'] = $civi_entity['instructions'];
+        }
         
         break;
 
       default:
-
+        
+        // do we need to protect against malformed shortcodes?
         break;
 
     }
