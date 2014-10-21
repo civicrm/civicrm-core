@@ -477,7 +477,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       self::$_columnHeaders = array(
         array(
           'name' => ts('Type'),
-          'sort' => 'membership_type_id',
+          'sort' => 'membership_type',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array('name' => ts('Member Since'),
@@ -501,7 +501,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         ),
         array(
           'name' => ts('Status'),
-          'sort' => 'status_id',
+          'sort' => 'membership_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(

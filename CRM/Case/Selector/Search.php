@@ -449,7 +449,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
         ),
         array(
           'name' => ts('Case Type'),
-          'sort' => 'case_type_id',
+          'sort' => 'case_type',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(

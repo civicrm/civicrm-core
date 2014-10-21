@@ -301,6 +301,9 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
           $this->_formValues['case_owner'] = 0;
         }
       }
+      if (array_key_exists('case_owner', $this->_formValues) && empty($this->_formValues['case_deleted'])) {
+        $this->_formValues['case_deleted'] = 0;
+      }
     }
 
     // we dont want to store the sortByCharacter in the formValue, it is more like

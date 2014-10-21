@@ -32,7 +32,7 @@
             <input type="text" class="form-text" id="sort_name_navigation" placeholder="{ts}Find Contacts{/ts}" name="sort_name" style="width: 12em;" />
             <input type="text" id="sort_contact_id" style="display: none" />
             <input type="hidden" name="hidden_location" value="1" />
-            <input type="hidden" name="qfKey" value="{crmKey name='CRM_Contact_Controller_Search' addSequence=1}" />
+            <input type="hidden" name="qfKey" value="" />
             <div style="height:1px; overflow:hidden;"><input type="submit" value="{ts}Go{/ts}" name="_qf_Advanced_refresh" class="crm-form-submit default" /></div>
           </div>
         </form>
@@ -80,6 +80,9 @@
     $("#crm-nav-menu-container").html(menuMarkup).css({'padding-bottom': '10px'});
   }
 {/literal}{/if}{literal}
+  // CRM-15493 get the current qfKey
+  $("input[name=qfKey]", "#quickSearch").val($('#civicrm-navigation-menu').data('qfkey'));
+
 $('#civicrm-menu').ready(function() {
   $('#root-menu-div .outerbox').css({'margin-top': '6px'});
   $('#root-menu-div .menu-ul li').css({'padding-bottom': '2px', 'margin-top': '2px'});

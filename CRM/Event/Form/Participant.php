@@ -953,13 +953,17 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     // (See above in formRule()). When adding more than one contact, the duplicates are
     // removed automatically and the user receives one notification.
     if ($this->_action & CRM_Core_Action::ADD) {
-      if(!$this->_single && !empty($this->_eventId)) {
+      $event_id = $this->_eventId;
+      if(empty($event_id) && !empty($params['event_id'])) {
+        $event_id = $params['event_id'];
+      }
+      if(!$this->_single && !empty($event_id)) {
         $duplicateContacts = 0;
         while(list($k,$dupeCheckContactId) = each($this->_contactIds)) {
           // Eliminate contacts that have already been assigned to this event.
           $dupeCheck = new CRM_Event_BAO_Participant;
           $dupeCheck->contact_id = $dupeCheckContactId;
-          $dupeCheck->event_id = $this->_eventId;
+          $dupeCheck->event_id = $event_id;
           $dupeCheck->find(TRUE);
           if(!empty($dupeCheck->id)) {
             $duplicateContacts++;

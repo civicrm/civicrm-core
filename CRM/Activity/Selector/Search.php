@@ -396,7 +396,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         ),
         array(
           'name' => ts('Status'),
-          'sort' => 'status_id',
+          'sort' => 'activity_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
