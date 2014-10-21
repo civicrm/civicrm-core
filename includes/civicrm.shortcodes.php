@@ -166,7 +166,7 @@ class CiviCRM_For_WordPress_Shortcodes {
           
           foreach( $shortcode_array AS $shortcode ) {
             
-            // invoke in multiple context
+            // mimic invoke in multiple shortcode context
             $this->shortcode_markup[$post_id][] = $this->render_multiple( $post_id, $shortcode, $multiple );
             
           }
@@ -235,11 +235,6 @@ class CiviCRM_For_WordPress_Shortcodes {
     // broadcast this as well
     do_action( 'civicrm_shortcodes_parsed' );
   
-    // trace
-    //print_r( 'shortcodes_present: ' . $shortcodes_present ."\n" );
-    //print_r( $this->shortcodes );
-    //print_r( $this->shortcode_markup ); die();
-    
   }
 
 
@@ -428,7 +423,7 @@ class CiviCRM_For_WordPress_Shortcodes {
     $markup .= '</div>';
     
     // allow plugins to override
-    return apply_filters( 'civicrm_invoke_multiple', $markup, $post_id, $shortcode );
+    return apply_filters( 'civicrm_shortcode_render_multiple', $markup, $post_id, $shortcode );
     
   }
 

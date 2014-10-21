@@ -849,7 +849,6 @@ class CiviCRM_For_WordPress {
 
     static $alreadyInvoked = FALSE;
     if ( $alreadyInvoked ) {
-      echo $this->invoke_multiple();
       return;
     }
 
@@ -859,7 +858,7 @@ class CiviCRM_For_WordPress {
     }
     
     if (!$this->initialize()) {
-      return '';
+      return;
     }
 
     // CRM-12523
@@ -921,28 +920,6 @@ class CiviCRM_For_WordPress {
     // notify plugins
     do_action( 'civicrm_invoked' );
 
-  }
-
-
-  /**
-   * Return a generic display instead of a CiviCRM invocation
-   *
-   * @param int $post_id The containing WordPress post ID
-   * @param str $shortcode The shortcode being parsed
-   * @param bool $multiple Boolean flag, TRUE if post has multiple shortcodes, FALSE otherwise
-   * @return str $markup Generic markup for multiple instances
-   */
-  private function invoke_multiple( $post_id = FALSE, $shortcode = FALSE, $multiple = 0 ) {
-    
-    // sanity check - also bails if called from invoke()
-    if ( ! $post_id ) return '';
-    
-    // do we have a shortcode?
-    if ( ! $shortcode ) return '';
-    
-    // hand over to standalone method
-    return $this->shortcodes->render_multiple( $post_id, $shortcode, $multiple );
-      
   }
 
 
