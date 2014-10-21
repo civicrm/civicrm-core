@@ -60,6 +60,7 @@
 
 .civicrm-modal-content label
 {
+	display: inline;
 	vertical-align: baseline;
 	margin-right: 18px;
 }
