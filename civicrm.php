@@ -2146,7 +2146,7 @@ class CiviCRM_For_WordPress {
 
     // construct path to file
     $src = plugins_url(
-      'civicrm.js',
+      'assets/js/civicrm.modal.js',
       __FILE__
     );
 
@@ -2354,7 +2354,7 @@ class CiviCRM_For_WordPress {
       }
       
       // include markup
-      include_once( CIVICRM_PLUGIN_DIR . 'civicrm.modal.php' );
+      include_once( CIVICRM_PLUGIN_DIR . 'assets/templates/civicrm.modal.php' );
       
     }
 
