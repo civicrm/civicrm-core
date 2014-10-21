@@ -33,15 +33,17 @@
 
 .civicrm-modal-header
 {
-	padding: 15px 15px 0 15px;
+	padding: 10px 15px 0 15px;
 }
 
 .civicrm-modal-header h3
 {
 	color: #5A5A5A !important;
-	font-family: Georgia,Times New Roman,Times,serif !important;
+	font-family: Georgia, Times New Roman, Times, serif !important;
 	font-size: 1.8em !important;
 	font-weight: normal !important;
+	line-height: 1.4;
+	margin: 0;
 }
 
 .civicrm-modal-content
@@ -49,9 +51,17 @@
 	padding: 15px 15px 0 15px;
 }
 
-.civicrm-modal-selector
+.civicrm-modal-hint
 {
 	padding: 0 0 15px 0;
+	font-style: italic;
+	color: #5A5A5A;
+}
+
+.civicrm-modal-content label
+{
+	vertical-align: baseline;
+	margin-right: 18px;
 }
 
 .civicrm-modal-component-section,
@@ -62,21 +72,21 @@
 	padding: 15px 15px 0 15px;
 }
 
-.civicrm-modal-hint
-{
-	padding: 8px 0 0 0;
-	font-style: italic;
-	color: #5A5A5A;
-}
-
 .civicrm-modal-content .hijack
 {
 	line-height: 1.6;
 }
 
+.civicrm-modal-content .hijack p
+{
+	margin: 0;
+	padding: 0 0 4px 0;
+}
+
 .civicrm-modal-footer
 {
 	padding: 15px;
+	padding-top: 20px;
 }
 
 

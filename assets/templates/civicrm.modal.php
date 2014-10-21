@@ -35,7 +35,13 @@
 
 // define title
 $title = __( 'Please select a CiviCRM front-end page type', 'civicrm' );
-      
+
+// get pages      
+$contribution_pages = $this->get_contribution_pages();
+$event_pages = $this->get_event();
+$profile_pages = $this->get_profile_page();
+$petition_pages = $this->get_petition();
+
 ?>
 
 <div id="civicrm_frontend_pages" style="display: none;">
@@ -48,98 +54,110 @@ $title = __( 'Please select a CiviCRM front-end page type', 'civicrm' );
       
       <div class="civicrm-modal-content">
       
-        <div class="civicrm-modal-selector">
+        <div class="civicrm-modal-hint">
+        	<span><?php _e( "Can't find your form? Make sure it is active.", 'civicrm' ); ?></span>
+        </div>
+        
+        <span class="civicrm-modal-selector">
           <select id="add_civicomponent_id">
-            <option value=""><?php _e( '-- Select a front-end element --', 'civicrm' ); ?></option>
+            <option value="">&mdash; <?php _e( 'Select Page Type', 'civicrm' ); ?> &mdash;</option>
+            <?php if ( !empty( $contribution_pages ) ) { ?>
             <option value="contribution"><?php _e( 'Contribution Page', 'civicrm' ); ?></option>
+            <?php } ?>
+            <?php if ( !empty( $event_pages ) ) { ?>
             <option value="event"><?php _e( 'Event Page', 'civicrm' ); ?></option>
+            <?php } ?>
+            <?php if ( !empty( $profile_pages ) ) { ?>
             <option value="profile"><?php _e( 'Profile', 'civicrm' ); ?></option>
+            <?php } ?>
             <option value="user-dashboard"><?php _e( 'User Dashboard', 'civicrm' ); ?></option>
+            <?php if ( !empty( $petition_pages ) ) { ?>
             <option value="petition"><?php _e( 'Petition', 'civicrm' ); ?></option>
+            <?php } ?>
           </select>
-        </div>
+        </span>
         
-        <div id="contribution-section" style="display: none;">
+        <span id="contribution-section" style="display: none;">
+          <?php if ( !empty( $contribution_pages ) ) { ?>
           <select id="add_contributepage_id">
-          <?php
-          $contributionPages = $this->get_contribution_pages();
-          foreach ($contributionPages as $key => $value) { ?>
+          <?php foreach ($contribution_pages AS $key => $value) { ?>
             <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
-          <?php
-          }
-          ?>
+          <?php } ?>
           </select>
-        </div>
+          <?php } ?>
+        </span>
         
-        <div id="event-section" style="display: none;">
+        <span id="event-section" style="display: none;">
+          <?php if ( !empty( $event_pages ) ) { ?>
           <select id="add_eventpage_id">
-            <?php
-            $eventPages = $this->get_event();
-            foreach ($eventPages as $key => $value) { ?>
+          <?php foreach ($event_pages AS $key => $value) { ?>
             <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
-            <?php
-            }
-            ?>
+          <?php } ?>
           </select>
-        </div>
+          <?php } ?>
+          </select>
+        </span>
         
+        <span id="profile-section" style="display: none;">
+          <?php if ( !empty( $profile_pages ) ) { ?>
+          <select id="add_profilepage_id">
+          <?php foreach ($profile_pages AS $key => $value) { ?>
+            <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
+          <?php } ?>
+          </select>
+          <?php } ?>
+          </select>
+        </span>
+        
+        <span id="petition-section" style="display: none;">
+          <?php if ( !empty( $petition_pages ) ) { ?>
+          <select id="add_petition_id">
+          <?php foreach ($petition_pages AS $key => $value) { ?>
+            <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
+          <?php } ?>
+          </select>
+          <?php } ?>
+        </span>
+
         <div id="action-section-event" style="display: none;">
           <div class="civicrm-modal-action-section-event">
-            <input type="radio" name="event_action" value="info" checked="checked" /> <?php _e( 'Event Info Page', 'civicrm' ); ?>
-            <input type="radio" name="event_action" value="register" /> <?php _e( 'Event Registration Page', 'civicrm' ); ?>
+            <input type="radio" name="event_action" value="info" checked="checked" id="civicrm-modal-event-info" />
+            <label for="civicrm-modal-event-info"><?php _e( 'Event Info Page', 'civicrm' ); ?></label>
+            <input type="radio" name="event_action" value="register" id="civicrm-modal-event-register" />
+            <label for="civicrm-modal-event-register"><?php _e( 'Event Registration Page', 'civicrm' ); ?></label>
           </div>
         </div>
         
         <div id="component-section" style="display: none;">
           <div class="civicrm-modal-component-section">
-            <input type="radio" name="component_mode" value="live" checked="checked"/> <?php _e( 'Live Page', 'civicrm' ); ?>
-            <input type="radio" name="component_mode" value="test" /> <?php _e( 'Test Drive', 'civicrm' ); ?>
+            <input type="radio" name="component_mode" value="live" checked="checked" id="civicrm-modal-live" />
+            <label for="civicrm-modal-live"><?php _e( 'Live Page', 'civicrm' ); ?></label>
+            <input type="radio" name="component_mode" value="test" id="civicrm-modal-test" />
+            <label for="civicrm-modal-test"><?php _e( 'Test Drive', 'civicrm' ); ?></label>
           </div>
-        </div>
-        
-        <div id="profile-section" style="display: none;">
-          <select id="add_profilepage_id">
-          <?php
-          $profilePages = $this->get_profile_page();
-          foreach ($profilePages as $key => $value) { ?>
-            <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
-            <?php
-          }
-          ?>
-          </select>
         </div>
         
         <div id="profile-mode-section" style="display: none;">
           <div class="civicrm-modal-profile-mode-section">
-            <input type="radio" name="profile_mode" value="create" checked="checked"/> <?php _e( 'Create', 'civicrm' ); ?>
-            <input type="radio" name="profile_mode" value="edit" /> <?php _e( 'Edit', 'civicrm' ); ?>
-            <input type="radio" name="profile_mode" value="edit" /> <?php _e( 'View', 'civicrm' ); ?>
-            <input type="radio" name="profile_mode" value="search" /> <?php _e( 'Search/Public Directory', 'civicrm' ); ?>
+            <input type="radio" name="profile_mode" value="create" checked="checked" id="civicrm-modal-create" />
+            <label for="civicrm-modal-create"><?php _e( 'Create', 'civicrm' ); ?></label>
+            <input type="radio" name="profile_mode" value="edit" id="civicrm-modal-edit" />
+            <label for="civicrm-modal-edit"><?php _e( 'Edit', 'civicrm' ); ?></label>
+            <input type="radio" name="profile_mode" value="view" id="civicrm-modal-view" />
+            <label for="civicrm-modal-view"><?php _e( 'View', 'civicrm' ); ?></label>
+            <input type="radio" name="profile_mode" value="search" id="civicrm-modal-search" />
+            <label for="civicrm-modal-search"><?php _e( 'Search/Public Directory', 'civicrm' ); ?></label>
           </div>
         </div>
         
-        <div id="petition-section" style="display: none;">
-          <select id="add_petition_id">
-          <?php
-          $petitionPages = $this->get_petition();
-          foreach ($petitionPages as $key => $value) { ?>
-            <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
-            <?php
-          }
-          ?>
-          </select>
-        </div>
-
         <div class="hijack" style="display: none;">
-          <?php _e( 'If you only insert one shortcode, you can choose to override all page content with the content of the shortcode.', 'civicrm' ); ?><br/>
-          <input type="radio" name="hijack-page" value="1" /> <?php _e( 'Override page content', 'civicrm' ); ?>
-          <input type="radio" name="hijack-page" value="0" checked="checked" /> <?php _e( "Don't override", 'civicrm' ); ?>
+          <p><?php _e( 'If you only insert one shortcode, you can choose to override all page content with the content of the shortcode.', 'civicrm' ); ?></p>
+          <input type="radio" name="hijack-page" value="1" id="civicrm-modal-override" />
+          <label for="civicrm-modal-override"><?php _e( 'Override page content', 'civicrm' ); ?></label>
+          <input type="radio" name="hijack-page" value="0" checked="checked" id="civicrm-modal-leave" />
+          <label for="civicrm-modal-leave"><?php _e( "Don't override", 'civicrm' ); ?></label>
         </div>
       
-        <div class="civicrm-modal-hint">
-        	<span><?php _e( "Can't find your form? Make sure it is active.", 'civicrm' ); ?></span>
-        </div>
-        
       </div><!-- /.civicrm-modal-content -->
     
       <div class="civicrm-modal-footer">
