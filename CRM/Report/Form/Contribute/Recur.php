@@ -131,6 +131,9 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           'cancel_date' => array(
             'title' => ts('Cancel Date'),
           ),
+          'end_date' => array(
+            'title' => ts('End Date'),
+          ),
           'next_sched_contribution_date' => array(
             'title' => ts('Next Scheduled Contribution Date'),
           ),
@@ -166,6 +169,36 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'title' => ts('Frequency Unit'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' =>  CRM_Core_OptionGroup::values('recur_frequency_units'),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+          'frequency_interval' => array(
+            'title' => ts('Frequency Interval'),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+          'installments' => array(
+            'title' => ts('Installments'),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+          'start_date' => array(
+            'title' => ts('Start Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_TIME,
+          ),
+          'next_sched_contribution_date' => array(
+            'title' => ts('Next Scheduled Contribution Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_TIME,
+          ),
+          'end_date' => array(
+            'title' => ts('End Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_TIME,
+          ),
+          'calculated_end_date' => array(
+            'title' => ts('Calculated end date (either end date or date all installments will be made)'),
+            'description' => "does this work?",
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'pseudofield' => TRUE
           ),
         ),
       )
@@ -198,6 +231,68 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
     $this->_groupBy = "GROUP BY " . $this->_aliases['civicrm_contribution_recur'] . ".id";
   }
 
+  function where() {
+    parent::where();
+    // Handle calculated end date. This can come from one of two sources:
+    // Either there is a specified end date for the end_date field
+    // Or, we calculate the end date based on the start date +
+    // installments * intervals using the mysql date_add function, along
+    // with the interval unit (e.g. DATE_ADD(start_date, INTERVAL 12 * 1 MONTH)
+    $date_suffixes = array('relative', 'from', 'to');
+    while(list(,$suffix) = each($date_suffixes)) {
+      // Check to see if the user wants to search by calculated date.
+      if(!empty($this->_params['calculated_end_date_' . $suffix])) {
+        // The calculated date field is in use - spring into action
+        // Gather values
+        $relative = CRM_Utils_Array::value("calculated_end_date_relative", $this->_params);
+        $from = CRM_Utils_Array::value("calculated_end_date_from", $this->_params);
+        $to = CRM_Utils_Array::value("calculated_end_date_to", $this->_params);
+        $end_date_db_alias = $this->_columns['civicrm_contribution_recur']['filters']['end_date']['dbAlias'];
+        $end_date_type = $this->_columns['civicrm_contribution_recur']['filters']['end_date']['type'];
+        $start_date_type = $this->_columns['civicrm_contribution_recur']['filters']['start_date']['type'];
+        $frequency_unit_db_alias = $this->_columns['civicrm_contribution_recur']['filters']['frequency_unit']['dbAlias'];
+        $frequency_interval_db_alias = $this->_columns['civicrm_contribution_recur']['filters']['frequency_interval']['dbAlias'];
+        $installments_db_alias = $this->_columns['civicrm_contribution_recur']['filters']['installments']['dbAlias'];
+        $start_date_db_alias = $this->_columns['civicrm_contribution_recur']['filters']['start_date']['dbAlias'];
+
+        // The end date clause is simple to construct
+        $end_date_clause   = $this->dateClause($end_date_db_alias, $relative, $from, $to, $end_date_type, NULL, NULL);
+
+        // NOTE: For the calculation based on installment, there doesn't
+        // seem to be a way to include the interval unit (e.g. month,
+        // date, etc) as a field name - so we have to build a complex
+        // OR statement instead.
+
+        $installment_clause = '(' .
+          $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias,1) month)",
+          $relative, $from, $to, $start_date_type, NULL, NULL);
+        $installment_clause .= " AND $frequency_unit_db_alias = 'month' ) OR \n";
+
+        $installment_clause .= '(' .
+          $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias,1) day)",
+          $relative, $from, $to, $start_date_type, NULL, NULL);
+        $installment_clause .= " AND $frequency_unit_db_alias = 'day' ) OR \n";
+
+        $installment_clause .= '(' .
+          $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias, 1) week)",
+          $relative, $from, $to, $start_date_type, NULL, NULL);
+        $installment_clause .= " AND $frequency_unit_db_alias = 'week' ) OR \n";
+
+        $installment_clause .= '(' .
+          $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias, 1) year)",
+          $relative, $from, $to, $start_date_type, NULL, NULL);
+        $installment_clause .= " AND $frequency_unit_db_alias = 'year' )\n";
+
+        $this->_where .= " AND ";
+        $this->_where .= "(";
+        $this->_where .= "($end_date_db_alias IS NOT NULL AND $end_date_clause)\n";
+        $this->_where .= " OR \n";
+        $this->_where .= "($installments_db_alias IS NOT NULL AND ($installment_clause))\n";
+        $this->_where .= ')';
+        break;
+      }
+    }
+  }
   function alterDisplay(&$rows) {
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     foreach ($rows as $rowNum => $row) {
