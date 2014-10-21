@@ -73,28 +73,39 @@ jQuery(function ($) {
         $('#profile-section, #profile-mode-section').hide();
         $('#event-section, #action-section-event').hide();
         $('#petition-section').hide();
+        $('.hijack').show();
         break;
       case 'event':
         $('#contribution-section').hide();
         $('#profile-section, #profile-mode-section').hide();
         $('#event-section, #component-section, #action-section-event').show();
         $('#petition-section').hide();
+        $('.hijack').show();
         break;
       case 'profile':
         $('#contribution-section, #component-section').hide();
         $('#profile-section, #profile-mode-section').show();
         $('#event-section, #action-section-event').hide();
         $('#petition-section').hide();
+        $('.hijack').show();
+        break;
+      case 'user-dashboard':
+        $('#contribution-section, #event-section, #component-section, #action-section-event').hide();
+        $('#profile-section, #profile-mode-section').hide();
+        $('#petition-section').hide();
+        $('.hijack').show();
         break;
       case 'petition':
         $('#contribution-section, #component-section').hide();
         $('#profile-section, #profile-mode-section').hide();
         $('#event-section, #action-section-event').hide();
         $('#petition-section').show();
+        $('.hijack').show();
         break;
       default:
         $('#contribution-section, #event-section, #component-section, #action-section-event').hide();
         $('#profile-section, #profile-mode-section').hide();
+        $('.hijack').hide();
         $('#petition-section').hide();
         break;
     }

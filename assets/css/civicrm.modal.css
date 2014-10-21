@@ -49,9 +49,15 @@
 	padding: 15px 15px 0 15px;
 }
 
+.civicrm-modal-selector
+{
+	padding: 0 0 15px 0;
+}
+
 .civicrm-modal-component-section,
 .civicrm-modal-action-section-event,
-.civicrm-modal-profile-mode-section
+.civicrm-modal-profile-mode-section,
+.civicrm-modal-content .hijack
 {
 	padding: 15px 15px 0 15px;
 }
@@ -59,14 +65,12 @@
 .civicrm-modal-hint
 {
 	padding: 8px 0 0 0;
-	font-size: 11px;
 	font-style: italic;
 	color: #5A5A5A;
 }
 
 .civicrm-modal-content .hijack
 {
-	padding: 8px 0 0 0;
 	line-height: 1.6;
 }
 
