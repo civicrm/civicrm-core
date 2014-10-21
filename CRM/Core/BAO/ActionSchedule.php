@@ -775,7 +775,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       $entityJoinClause .= $extraOn;
 
       $query = "
-SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.*, e.id as entityID, e.* {$extraSelect}
+SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.entity_table as entityTable, reminder.*, e.id as entityID, e.* {$extraSelect}
 FROM  civicrm_action_log reminder
 {$entityJoinClause}
 {$extraJoin}
@@ -808,9 +808,14 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Date::customFormat($dao->$field);
           }
           elseif ($field == 'balance') {
-            $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($dao->entityID, 'event');
-            $balancePay = CRM_Utils_Array::value('balance', $info);
-            $balancePay = CRM_Utils_Money::format($balancePay);
+            if ($dao->entityTable == 'civicrm_contact') {
+              $balancePay = 'N/A';
+            }
+            elseif (!empty($dao->entityID)) {
+              $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($dao->entityID, 'event');
+              $balancePay = CRM_Utils_Array::value('balance', $info);
+              $balancePay = CRM_Utils_Money::format($balancePay);
+            }
             $entityTokenParams["{$tokenEntity}." . $field] = $balancePay;
           }
           elseif ($field == 'fee_amount') {
