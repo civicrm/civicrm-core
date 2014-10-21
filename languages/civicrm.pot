@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the CiviCRM package.
 msgid ""
 msgstr ""
-"Project-Id-Version: CiviCRM 4.5\n"
+"Project-Id-Version: CiviCRM 4.5.2\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/civicrm\n"
-"POT-Creation-Date: 2014-10-16 11:47:05+00:00\n"
+"POT-Creation-Date: 2014-10-21 19:58:24+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -12,132 +12,168 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: civicrm.php:135 civicrm.php:164
-msgid "Only one instance of CiviCRM_For_WordPress please"
+#: assets/templates/civicrm.modal.php:37
+msgid "Please select a CiviCRM front-end page type"
 msgstr ""
 
-#: civicrm.php:142
-msgid "Please do not serialize CiviCRM_For_WordPress"
+#: assets/templates/civicrm.modal.php:53
+msgid "-- Select a front-end element --"
 msgstr ""
 
-#: civicrm.php:302
-msgid "CiviCRM requires PHP Version %s or greater. You are running PHP Version %s"
-msgstr ""
-
-#: civicrm.php:330
-msgid "Please review the <a href=\"%s\">WordPress Installation Guide</a> and the <a href=\"%s\">Trouble-shooting page</a> for assistance. If you still need help installing, you can often find solutions to your issue by searching for the error message in the <a href=\"%s\">installation support section of the community forum</a>."
-msgstr ""
-
-#: civicrm.php:338
-msgid "Click <a href=\"%s\">here</a> for fresh install."
-msgstr ""
-
-#: civicrm.php:367
-msgid "Oops! - The path for including CiviCRM code files is not set properly. Most likely there is an error in the <em>civicrm_root</em> setting in your CiviCRM settings file (%s)."
-msgstr ""
-
-#: civicrm.php:372
-msgid "civicrm_root is currently set to: <em>%s</em>."
-msgstr ""
-
-#: civicrm.php:562 civicrm.php:563 civicrm.php:1218
-msgid "CiviCRM"
-msgstr ""
-
-#: civicrm.php:575 civicrm.php:576
-msgid "CiviCRM Installer"
-msgstr ""
-
-#: civicrm.php:614
-msgid "CiviCRM is almost ready."
-msgstr ""
-
-#: civicrm.php:617
-msgid "You must <a href=\"%s\">configure CiviCRM</a> for it to work."
-msgstr ""
-
-#: civicrm.php:894
-msgid "You do not have permission to execute this url."
-msgstr ""
-
-#: civicrm.php:1024
-msgid "Anonymous User"
-msgstr ""
-
-#: civicrm.php:1146 civicrm.php:1184
-msgid "Do not know how to handle this shortcode"
-msgstr ""
-
-#: civicrm.php:1218
-msgid "Add CiviCRM Public Pages"
-msgstr ""
-
-#: civicrm.php:1424
-msgid "Please select a CiviCRM front-end page type."
-msgstr ""
-
-#: civicrm.php:1439
-msgid "Select a frontend element."
-msgstr ""
-
-#: civicrm.php:1440
+#: assets/templates/civicrm.modal.php:54
 msgid "Contribution Page"
 msgstr ""
 
-#: civicrm.php:1441
+#: assets/templates/civicrm.modal.php:55
 msgid "Event Page"
 msgstr ""
 
-#: civicrm.php:1442
+#: assets/templates/civicrm.modal.php:56
 msgid "Profile"
 msgstr ""
 
-#: civicrm.php:1443
+#: assets/templates/civicrm.modal.php:57
 msgid "User Dashboard"
 msgstr ""
 
-#: civicrm.php:1444
+#: assets/templates/civicrm.modal.php:58
 msgid "Petition"
 msgstr ""
 
-#: civicrm.php:1473
+#: assets/templates/civicrm.modal.php:88
 msgid "Event Info Page"
 msgstr ""
 
-#: civicrm.php:1474
+#: assets/templates/civicrm.modal.php:89
 msgid "Event Registration Page"
 msgstr ""
 
-#: civicrm.php:1480
+#: assets/templates/civicrm.modal.php:95
 msgid "Live Page"
 msgstr ""
 
-#: civicrm.php:1481
+#: assets/templates/civicrm.modal.php:96
 msgid "Test Drive"
 msgstr ""
 
-#: civicrm.php:1501
+#: assets/templates/civicrm.modal.php:114
 msgid "Create"
 msgstr ""
 
-#: civicrm.php:1502
+#: assets/templates/civicrm.modal.php:115
 msgid "Edit"
 msgstr ""
 
-#: civicrm.php:1503
+#: assets/templates/civicrm.modal.php:116
 msgid "View"
 msgstr ""
 
-#: civicrm.php:1504
+#: assets/templates/civicrm.modal.php:117
 msgid "Search/Public Directory"
 msgstr ""
 
-#: civicrm.php:1520
+#: assets/templates/civicrm.modal.php:134
+msgid "If you only insert one shortcode, you can choose to override all page content with the content of the shortcode."
+msgstr ""
+
+#: assets/templates/civicrm.modal.php:135
+msgid "Override page content"
+msgstr ""
+
+#: assets/templates/civicrm.modal.php:136
+msgid "Don't override"
+msgstr ""
+
+#: assets/templates/civicrm.modal.php:140
 msgid "Can't find your form? Make sure it is active."
 msgstr ""
 
-#: civicrm.php:1524
+#: assets/templates/civicrm.modal.php:147
 msgid "Cancel"
+msgstr ""
+
+#: civicrm.php:168 civicrm.php:224
+msgid "Only one instance of CiviCRM_For_WordPress please"
+msgstr ""
+
+#: civicrm.php:175
+msgid "Please do not serialize CiviCRM_For_WordPress"
+msgstr ""
+
+#: civicrm.php:503
+msgid "CiviCRM requires PHP Version %s or greater. You are running PHP Version %s"
+msgstr ""
+
+#: civicrm.php:531
+msgid "Please review the <a href=\"%s\">WordPress Installation Guide</a> and the <a href=\"%s\">Trouble-shooting page</a> for assistance. If you still need help installing, you can often find solutions to your issue by searching for the error message in the <a href=\"%s\">installation support section of the community forum</a>."
+msgstr ""
+
+#: civicrm.php:539
+msgid "Click <a href=\"%s\">here</a> for fresh install."
+msgstr ""
+
+#: civicrm.php:568
+msgid "Oops! - The path for including CiviCRM code files is not set properly. Most likely there is an error in the <em>civicrm_root</em> setting in your CiviCRM settings file (%s)."
+msgstr ""
+
+#: civicrm.php:573
+msgid "civicrm_root is currently set to: <em>%s</em>."
+msgstr ""
+
+#: civicrm.php:668 civicrm.php:669 includes/civicrm.shortcodes.modal.php:106
+msgid "CiviCRM"
+msgstr ""
+
+#: civicrm.php:687 civicrm.php:688
+msgid "CiviCRM Installer"
+msgstr ""
+
+#: civicrm.php:742
+msgid "CiviCRM is almost ready."
+msgstr ""
+
+#: civicrm.php:745
+msgid "You must <a href=\"%s\">configure CiviCRM</a> for it to work."
+msgstr ""
+
+#: includes/civicrm.shortcodes.modal.php:106
+msgid "Add CiviCRM Public Pages"
+msgstr ""
+
+#: includes/civicrm.shortcodes.php:324
+msgid "Content via CiviCRM"
+msgstr ""
+
+#: includes/civicrm.shortcodes.php:416
+msgid "Find out more..."
+msgstr ""
+
+#: includes/civicrm.shortcodes.php:421
+msgid "CiviCRM.org - Growing and Sustaining Relationships"
+msgstr ""
+
+#: includes/civicrm.shortcodes.php:424
+msgid "Empowered by <a href=\"http://civicrm.org/\" title=\"%s\" target=\"_blank\" class=\"empowered-by-link\">%s</a>"
+msgstr ""
+
+#: includes/civicrm.shortcodes.php:606 includes/civicrm.shortcodes.php:644
+msgid "Do not know how to handle this shortcode"
+msgstr ""
+
+#: includes/civicrm.shortcodes.php:711
+msgid "Register for %s"
+msgstr ""
+
+#: includes/civicrm.shortcodes.php:743
+msgid "Dashboard"
+msgstr ""
+
+#: includes/civicrm.users.php:125
+msgid "You do not have permission to access this content."
+msgstr ""
+
+#: includes/civicrm.users.php:262
+msgid "Anonymous User"
 msgstr ""
 #. Plugin Name of the plugin/theme
 msgid "CiviCRM"
