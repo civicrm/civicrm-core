@@ -100,7 +100,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
           $value = $individual->$dbName;
 
           // the db has name values
-          if ($value && CRM_Utils_Array::value('preserveDBName', $params)) {
+          if ($value && !empty($params['preserveDBName'])) {
             $useDBNames[] = $name;
           }
         }
@@ -108,7 +108,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         foreach (array('prefix', 'suffix') as $name) {
           $dbName = "{$name}_id";
           $value = $individual->$dbName;
-          if ($value && CRM_Utils_Array::value('preserveDBName', $params)) {
+          if ($value && !empty($params['preserveDBName'])) {
             $useDBNames[] = $name;
           }
         }
@@ -143,7 +143,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
             $params[$dbName] = $value;
             $contact->$dbName = $value;
             if ($value) {
-              $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $value);
+              $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $dbName, $value);
             }
             else {
               $$name = NULL;
@@ -156,7 +156,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
             }
           }
           elseif ($value) {
-            $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $value);
+            $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $dbName, $value);
           }
         }
       }
@@ -182,7 +182,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       );
       // make sure we have all the name fields.
       foreach ($nameParams as $name => $value) {
-        if (!CRM_Utils_Array::value($name, $formatted) && $value) {
+        if (empty($formatted[$name]) && $value) {
           $formatted[$name] = $value;
         }
       }
