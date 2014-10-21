@@ -204,8 +204,8 @@ class CiviCRM_For_WordPress {
       // assign minimum capabilities for all WP roles and create 'anonymous_user' role
       $this->users->set_wp_user_capabilities();
       
-      // delete option so this method never runs again
-      delete_option( 'civicrm_activation_in_progress' );
+      // change option so this method never runs again
+      update_option( 'civicrm_activation_in_progress', 'false' );
       
     }
 
