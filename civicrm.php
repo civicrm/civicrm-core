@@ -872,25 +872,21 @@ class CiviCRM_For_WordPress {
       CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     }
 
-    // Add our standard css & js
-    //CRM_Core_Resources::singleton()->addCoreResources();
-
     // CRM-95XX
     // At this point we are calling a CiviCRM function
     // WP always quotes the request, CiviCRM needs to reverse what it just did
     $this->remove_wp_magic_quotes();
     
+    // Code inside invoke() requires the current user to be set up
     global $current_user;
     get_currentuserinfo();
     
-    /*
-     * bypass synchronize if running upgrade
-     * to avoid any serious non-recoverable error
-     * which might hinder the upgrade process.
+    /**
+     * Bypass synchronize if running upgrade to avoid any serious non-recoverable 
+     * error which might hinder the upgrade process.
      */
     if ( CRM_Utils_Array::value('q', $_GET) != 'civicrm/upgrade' ) {
-      require_once 'CRM/Core/BAO/UFMatch.php';
-      CRM_Core_BAO_UFMatch::synchronize( $current_user, FALSE, 'WordPress', 'Individual', TRUE );
+      $this->users->sync_user( $current_user );
     }
     
     // set flag

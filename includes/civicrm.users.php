@@ -134,44 +134,61 @@ class CiviCRM_For_WordPress_Users {
    * CMW: seems to (wrongly) create new CiviCRM Contact every time a user changes their
    * first_name or last_name attributes in WordPress.
    *
+   * @param int $user_id The numeric ID of the WordPress user
    * @return void
    */
-  public function update_user( $userID ) {
+  public function update_user( $user_id ) {
 
-    $user = get_userdata( $userID );
+    $user = get_userdata( $user_id );
     if ( $user ) {
-
-      if (!$this->civi->initialize()) {
-        return;
-      }
-
-      require_once 'CRM/Core/BAO/UFMatch.php';
-
-      // this does not return anything, so if we want to do anything further
-      // to the CiviCRM Contact, we have to search for it all over again...
-      CRM_Core_BAO_UFMatch::synchronize(
-        $user, // user object
-        TRUE, // update = true
-        'WordPress', // CMS
-        'Individual' // contact type
-      );
-
-      /*
-      // IN progress: synchronizeUFMatch does return the contact object, however
-      $civi_contact = CRM_Core_BAO_UFMatch::synchronizeUFMatch(
-        $user, // user object
-        $user->ID, // ID
-        $user->user_mail, // unique identifier
-        null // unused
-        'WordPress' // CMS
-        'Individual' // contact type
-      );
-
-      // now we can allow other plugins to do their thing
-      do_action( 'civicrm_contact_synced', $user, $civi_contact );
-      */
-
+      $this->sync_user( $user );
     }
+
+  }
+
+
+  /**
+   * Keep WordPress user synced with CiviCRM Contact
+   *
+   * @param object $user The WordPress user object
+   * @return void
+   */
+  public function sync_user( $user = FALSE ) {
+    
+    // sanity check
+    if ( $user === FALSE OR !is_a($user, 'WP_User') ) {
+      return;
+    }
+    
+    if (!$this->civi->initialize()) {
+      return;
+    }
+    
+    require_once 'CRM/Core/BAO/UFMatch.php';
+    
+    // this does not return anything, so if we want to do anything further
+    // to the CiviCRM Contact, we have to search for it all over again...
+    CRM_Core_BAO_UFMatch::synchronize(
+      $user, // user object
+      TRUE, // update = true
+      'WordPress', // CMS
+      'Individual' // contact type
+    );
+    
+    /*
+    // IN progress: synchronizeUFMatch does return the contact object, however
+    $civi_contact = CRM_Core_BAO_UFMatch::synchronizeUFMatch(
+      $user, // user object
+      $user->ID, // ID
+      $user->user_mail, // unique identifier
+      null // unused
+      'WordPress' // CMS
+      'Individual' // contact type
+    );
+    
+    // now we can allow other plugins to do their thing
+    do_action( 'civicrm_contact_synced', $user, $civi_contact );
+    */
 
   }
 
@@ -180,10 +197,10 @@ class CiviCRM_For_WordPress_Users {
    * When a WordPress user is deleted, delete the ufMatch record
    * Callback function for 'delete_user' hook
    *
-   * @param $userID The numerical ID of the WordPress user
+   * @param $user_id The numerical ID of the WordPress user
    * @return void
    */
-  public function delete_user_ufmatch( $userID ) {
+  public function delete_user_ufmatch( $user_id ) {
 
     if (!$this->civi->initialize()) {
       return;
@@ -191,7 +208,7 @@ class CiviCRM_For_WordPress_Users {
 
     // delete the ufMatch record
     require_once 'CRM/Core/BAO/UFMatch.php';
-    CRM_Core_BAO_UFMatch::deleteUser($userID);
+    CRM_Core_BAO_UFMatch::deleteUser($user_id);
 
   }
 
