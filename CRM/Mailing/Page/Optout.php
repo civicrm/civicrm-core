@@ -34,6 +34,7 @@
  */
 class CRM_Mailing_Page_Optout extends CRM_Mailing_Page_Common {
   function run() {
+    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
     $this->_type = 'optout';
     return parent::run();
   }
