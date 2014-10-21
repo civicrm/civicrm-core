@@ -330,6 +330,9 @@ class CiviCRM_For_WordPress_Shortcodes {
     // default link
     $link = get_permalink( $post_id );
     
+    // default to no class
+    $class = '';
+    
     // do we have multiple shortcodes?
     if ( $multiple != 0 ) {
       
@@ -353,6 +356,9 @@ class CiviCRM_For_WordPress_Shortcodes {
       // we should try and discover the wpBasePage, but anywhere with a Civi querystring will work
       $link = get_permalink( $post_id ) . '?' . $split[1];
       
+      // add a class for styling purposes
+      $class = ' civicrm-shortcode-multiple';
+        
     }
     
     // test for hijacking
@@ -372,6 +378,9 @@ class CiviCRM_For_WordPress_Shortcodes {
         // don't show title
         $show_title = FALSE;
         
+        // add a class for styling purposes
+        $class = ' civicrm-shortcode-single';
+        
       }
       
     }
@@ -386,7 +395,7 @@ class CiviCRM_For_WordPress_Shortcodes {
     */
       
     // init markup with a container
-    $markup = '<div class="crm-container crm-public">';
+    $markup = '<div class="crm-container crm-public' . $class . '">';
     
     if ( $show_title ) {
       $markup .= '<h2>' . $title . '</h2>';
