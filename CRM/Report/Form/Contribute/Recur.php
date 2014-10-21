@@ -149,7 +149,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'title' => ts('Donation Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
-            'default' => array(1),
+            'default' => array(5),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'currency' => array(
