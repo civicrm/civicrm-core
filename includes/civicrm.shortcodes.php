@@ -393,44 +393,38 @@ class CiviCRM_For_WordPress_Shortcodes {
       'link' => $link,
     ) );
     */
-      
-    // init markup with a container
-    $markup = '<div class="crm-container crm-public' . $class . '">';
     
-    if ( $show_title ) {
-      $markup .= '<h2>' . $title . '</h2>';
-    }
+    // set some template variables
     
-    // do we have some descriptive text?
+    // description
+    $description = FALSE;
     if ( isset( $data['text'] ) AND ! empty( $data['text'] ) ) {
-      
-      // add it
-      $markup .= '<div class="civi-description">' . $data['text'] . '</div>';
-      
+      $description = $data['text'];
     }
     
     // provide an enticing link
-    $markup .= '<p>' . sprintf(
+    $more_link = sprintf(
       '<a href="%s">%s</a>',
       $link,
       apply_filters( 'civicrm_shortcode_more_link', __( 'Find out more...', 'civicrm' ) )
-    ) . '</p>';
+    );
     
     // let's have a footer
-    $markup .= '<div class="crm-public-footer">';
     $civi = __( 'CiviCRM.org - Growing and Sustaining Relationships', 'civicrm' );
-    $logo = '<div class="empowered-by-logo"><span>CiviCRM</span></div>';
-    $footer = sprintf( 
-      __( 'Empowered by <a href="http://civicrm.org/" title="%s" target="_blank" class="empowered-by-link">%s</a>', 'civicrm' ),
-      $civi,
-      $logo
-    );
-    $markup .= apply_filters( 'civicrm_shortcode_footer', $footer );
-    $markup .= '</div>';
+    $logo = '<div class="empowered-by-logo"><span>' . __( 'CiviCRM', 'civicrm' ) . '</span></div>';
+    $civi_link = '<a href="http://civicrm.org/" title="' . $civi . '" target="_blank" class="empowered-by-link">' . $logo . '</a>';
+    $empowered = sprintf( __( 'Empowered by %s', 'civicrm' ), $civi_link );
+    $footer = apply_filters( 'civicrm_shortcode_footer', $empowered );
     
-    // close container
-    $markup .= '</div>';
+    // start buffering
+    ob_start();
     
+    // include template
+    include( CIVICRM_PLUGIN_DIR . 'assets/templates/civicrm.shortcode.php' );
+    
+    // save the output and flush the buffer
+    $markup = ob_get_clean();
+
     // allow plugins to override
     return apply_filters( 'civicrm_shortcode_render_multiple', $markup, $post_id, $shortcode );
     
