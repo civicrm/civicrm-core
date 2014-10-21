@@ -341,6 +341,15 @@ class CiviCRM_For_WordPress_Shortcodes_Modal {
         return '';
       }
       
+      // define title
+      $title = __( 'Please select a CiviCRM front-end page type', 'civicrm' );
+      
+      // get pages
+      $contribution_pages = $this->get_contribution_pages();
+      $event_pages = $this->get_event();
+      $profile_pages = $this->get_profile_page();
+      $petition_pages = $this->get_petition();
+
       // include markup
       include_once( CIVICRM_PLUGIN_DIR . 'assets/templates/civicrm.modal.php' );
       

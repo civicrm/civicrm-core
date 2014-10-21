@@ -33,15 +33,6 @@
  *
  */
 
-// define title
-$title = __( 'Please select a CiviCRM front-end page type', 'civicrm' );
-
-// get pages      
-$contribution_pages = $this->get_contribution_pages();
-$event_pages = $this->get_event();
-$profile_pages = $this->get_profile_page();
-$petition_pages = $this->get_petition();
-
 ?>
 
 <div id="civicrm_frontend_pages" style="display: none;">
