@@ -332,8 +332,8 @@ class CRM_Core_Form_RecurringEntity {
         $excludeDateList = array();
         if (CRM_Utils_Array::value('copyExcludeDates', $params) && CRM_Utils_Array::value('parent_entity_id', $params)) {   
           //Since we get comma separated values lets get them in array
-          $exclude_date_list = array();
-          $exclude_date_list = explode(",", $params['copyExcludeDates']);
+          $excludeDates = array();
+          $excludeDates = explode(",", $params['copyExcludeDates']);
 
           //Check if there exists any values for this option group
           $optionGroupIdExists = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
@@ -355,7 +355,7 @@ class CRM_Core_Form_RecurringEntity {
           if ($opGroup->id) {
             $oldWeight= 0;
             $fieldValues = array('option_group_id' => $opGroup->id);
-            foreach($exclude_date_list as $val) {
+            foreach($excludeDates as $val) {
               $optionGroupValue = 
                   array(
                     'option_group_id' =>  $opGroup->id,
