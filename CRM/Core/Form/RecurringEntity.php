@@ -242,7 +242,7 @@ class CRM_Core_Form_RecurringEntity {
       //Ends
       if (CRM_Utils_Array::value('ends', $values)) {
         if ($values['ends'] == 1) {
-          if ($values['start_action_offset'] == "") {
+          if (empty($values['start_action_offset'])) {
             $errors['start_action_offset'] = ts('This is a required field');
           }
           else if ($values['start_action_offset'] > 30) {
@@ -250,7 +250,7 @@ class CRM_Core_Form_RecurringEntity {
           }
         }
         if ($values['ends'] == 2) {
-          if ($values['repeat_absolute_date'] != "") {
+          if (CRM_Utils_Array::value('repeat_absolute_date', $values)) {
             $entityStartDate = CRM_Utils_Date::processDate($values['repetition_start_date']);
             $end = CRM_Utils_Date::processDate($values['repeat_absolute_date']);
             if (($end < $entityStartDate) && ($end != 0)) {
@@ -269,7 +269,7 @@ class CRM_Core_Form_RecurringEntity {
       //Repeats BY
       if (CRM_Utils_Array::value('repeats_by', $values)) {
         if ($values['repeats_by'] == 1) {
-          if ($values['limit_to'] != "") {
+          if (CRM_Utils_Array::value('limit_to', $values)) {
             if ($values['limit_to'] < 1 && $values['limit_to'] > 31) {
               $errors['limit_to'] = ts('Invalid day of the month');
             }
@@ -279,7 +279,7 @@ class CRM_Core_Form_RecurringEntity {
           }
         }
         if ($values['repeats_by'] == 2) {
-          if ($values['entity_status_1'] != "" ) {
+          if (CRM_Utils_Array::value('entity_status_1', $values)) {
             $dayOfTheWeekNo = array(first, second, third, fourth, last);
             if (!in_array($values['entity_status_1'], $dayOfTheWeekNo)) {
                $errors['entity_status_1'] = ts('Invalid option');
@@ -288,7 +288,7 @@ class CRM_Core_Form_RecurringEntity {
           else {
             $errors['entity_status_1'] = ts('Invalid option');
           }
-          if ($values['entity_status_2'] != "" ) {
+          if (CRM_Utils_Array::value('entity_status_2', $values)) {
             if (!in_array($values['entity_status_2'], $dayOfTheWeek)) {
                $errors['entity_status_2'] = ts('Invalid day name');
             }
