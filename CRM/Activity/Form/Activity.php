@@ -567,6 +567,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $defaults['target_contact_id'] = $this->_contactIds;
     }
 
+    // CRM-15472 - 50 is around the practial limit of how many items a select2 entityRef can handle
+    if (!empty($defaults['target_contact_id'])) {
+      $count = count(is_array($defaults['target_contact_id']) ? $defaults['target_contact_id'] : explode(',', $defaults['target_contact_id']));
+      if ($count > 50) {
+        $this->freeze(array('target_contact_id'));
+      }
+    }
+
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::RENEW)) {
       $this->assign('delName', CRM_Utils_Array::value('subject', $defaults));
     }

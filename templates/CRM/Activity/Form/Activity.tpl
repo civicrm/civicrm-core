@@ -96,9 +96,11 @@
       <td>
         {$form.assignee_contact_id.html}
         {if $action neq 4}
-          <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
-            <span><div class="icon swap-icon"></div></span>
-          </a>
+          {if !$form.target_contact_id.frozen}
+            <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
+              <span class="icon ui-icon-shuffle"></span>
+            </a>
+          {/if}
           {if $activityAssigneeNotification}
             <br />
             <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
