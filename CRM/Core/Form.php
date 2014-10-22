@@ -1806,20 +1806,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   private function validateChainSelectFields() {
     foreach ($this->_chainSelectFields as $control => $target) {
-      $controlValue = (array) $this->getElementValue($control);
-      $targetField = $this->getElement($target);
-      $controlType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'stateProvince' : 'country';
-      $targetValue = array_filter((array) $targetField->getValue());
-      if ($targetValue || $this->getElementError($target)) {
-        $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
-        if ($targetValue) {
-          if (!array_intersect($targetValue, array_keys($options))) {
-            $this->setElementError($target, $controlType == 'country' ? ts('State/Province does not match the selected Country') : ts('County does not match the selected State/Province'));
+      if ($this->elementExists($control)) {
+        $controlValue = (array)$this->getElementValue($control);
+        $targetField = $this->getElement($target);
+        $controlType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'stateProvince' : 'country';
+        $targetValue = array_filter((array)$targetField->getValue());
+        if ($targetValue || $this->getElementError($target)) {
+          $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
+          if ($targetValue) {
+            if (!array_intersect($targetValue, array_keys($options))) {
+              $this->setElementError($target, $controlType == 'country' ? ts('State/Province does not match the selected Country') : ts('County does not match the selected State/Province'));
+            }
+          } // Suppress "required" error for field if it has no options
+          elseif (!$options) {
+            $this->setElementError($target, NULL);
           }
-        }
-        // Suppress "required" error for field if it has no options
-        elseif (!$options) {
-          $this->setElementError($target, NULL);
         }
       }
     }
