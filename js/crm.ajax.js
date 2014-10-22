@@ -257,7 +257,7 @@
           return;
         }
         data.url = url;
-        that.element.trigger('crmBeforeLoad', data);
+        that.element.trigger('crmUnload').trigger('crmBeforeLoad', data);
         that._beforeRemovingContent();
         that.element.html(data.content);
         that._handleOrderLinks();
