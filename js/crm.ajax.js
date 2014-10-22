@@ -280,7 +280,7 @@
       this.options.crmForm && $('form', this.element).ajaxFormUnbind();
     },
     _destroy: function() {
-      this.element.removeClass('crm-ajax-container');
+      this.element.removeClass('crm-ajax-container').trigger('crmUnload');
       this._beforeRemovingContent();
       if (this._originalContent !== null) {
         this.element.empty().append(this._originalContent);
