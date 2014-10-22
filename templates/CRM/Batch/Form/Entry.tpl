@@ -55,6 +55,9 @@
       {if $batchType eq 2 }
         <div class="crm-grid-cell">&nbsp;</div>
       {/if}
+      {if $batchType eq $batchoptionvalue }
+        <div class="crm-grid-cell">{$form.open_pledges.1.label}</div>
+      {/if}
       {foreach from=$fields item=field key=fieldName}
         <div class="crm-grid-cell">
           {if $field.name|substr:0:11 ne 'soft_credit'}
@@ -79,7 +82,9 @@
         {if $batchType eq 2 }
           {$form.member_option.$rowNumber.html}
         {/if}
-
+        {if $batchType eq $batchoptionvalue }
+          {$form.open_pledges.$rowNumber.html}
+        {/if}
         {foreach from=$fields item=field key=fieldName}
           {assign var=n value=$field.name}
           {if ( $fields.$n.data_type eq 'Date') or ( in_array( $n, array( 'thankyou_date', 'cancel_date', 'receipt_date', 'receive_date', 'join_date', 'membership_start_date', 'membership_end_date' ) ) ) }
@@ -96,6 +101,12 @@
             <div class="compressed crm-grid-cell">{$form.soft_credit_type.$rowNumber.html}</div>
           {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}
             <div class="compressed crm-grid-cell">&nbsp;{$form.field.$rowNumber.$n.html}</div>
+          {elseif $n eq 'total_amount'}
+             {if $batchType eq $batchoptionvalue }
+	      <div class="compressed crm-grid-cell">{$form.field.$rowNumber.$n.html}
+		{ts}<span id={$rowNumber} class="pledge-adjust-option"><a href='#'>adjust payment amount</a></span>{/ts}
+             <span id="adjust-select-{$rowNumber}" class="adjust-selectbox">{$form.option_type.$rowNumber.html}</span></div>
+             {/if}
           {else}
             <div class="compressed crm-grid-cell">{$form.field.$rowNumber.$n.html}</div>
           {/if}
@@ -115,6 +126,13 @@ CRM.$(function($) {
     };
 
     $($form).ajaxSubmit(options);
+  });
+
+ cj('select[id^="option_type_"]').each(function () {
+    if (cj(this).val() == 1) {
+      cj(this).attr('disabled', true);
+      cj(this).hide();
+    }
   });
 
   $('#crm-container').on('keyup change', '*.selector-rows', function () {
@@ -463,7 +481,21 @@ function setDateFieldValue(fname, fieldValue, blockNo) {
     cj('#field_' + blockNo + '_' + fname + '_time').val(dateValues[1].substr(0, 5));
   }
 }
+ if (CRM.batch.type_id == {/literal}{$batchoptionvalue}{literal}){
+	cj('select[id*="open_pledges_"]').change(function () {
+	    setPledgeAmount(cj(this), cj(this).val());
+	});
+    }
+ function setPledgeAmount(form, memType) {
+  var rowID = form.closest('div.crm-grid-row').attr('entity_id');
+  var dataUrl = CRM.url('civicrm/ajax/pledgeAmount');
+  cj.post(dataUrl, {mtype: memType}, function (data) {
+    cj('#field_' + rowID + '_total_amount').val(data.scheduled_amount).change();
+    cj('#field_' + rowID + '_total_amount').attr('readonly', true);
+  }, 'json');
+}
 
+//end for pledge amount
 </script>
 {/literal}
 

@@ -11,7 +11,12 @@ CRM.$(function($) {
     // validate rows
     checkColumns($(this));
   });
-
+   cj('.pledge-adjust-option').click(function(){
+	var blockNo = cj(this).attr('id');
+	cj('select[id="option_type_' + blockNo + '"]').show();
+	cj('select[id="option_type_' + blockNo + '"]').removeAttr('disabled');
+	cj('#field_' + blockNo + '_total_amount').removeAttr('readonly');
+    });
   $('input[name^="soft_credit_contact_"]').on('change', function(){
     var rowNum = $(this).attr('id').replace('soft_credit_contact_id_','');
     var totalAmount = $('#field_'+rowNum+'_total_amount').val();
@@ -41,12 +46,12 @@ CRM.$(function($) {
     });
 
   }
-  else{
-    $('select[id^="member_option_"]').each(function () {
-      if ($(this).val() == 1) {
-        $(this).prop('disabled', true);
-      }
-    });
+  else if (CRM.batch.type_id == 2){
+	cj('select[id^="member_option_"]').each(function () {
+	    if (cj(this).val() == 1) {
+		cj(this).attr('disabled', true);
+	    }
+	});
 
   // set payment info accord to membership type
   $('select[id*="_membership_type_0"]').change(function () {
@@ -118,9 +123,27 @@ function updateContactInfo(blockNo, prefix) {
         }
         });
       }
-    }
-    });
-}
+      if(CRM.batch.type_id == 3) {
+	    CRM.api('Pledge', 'get', {
+		'q': 'civicrm/ajax/rest',
+		'sequential': 1,
+		'contact_id': contactId
+	    },
+	    {success: function(data) {
+		cj.each(data['values'], function(key, value) {
+   		    if(value['pledge_status']!='Completed'){
+			cj('#open_pledges_'+ blockNo).append(cj('<option>', {
+			    value: value['pledge_id'],
+			    text: value['pledge_next_pay_date']+" "+value['pledge_next_pay_amount']
+			}));
+		    }
+		});
+	    }
+	    });
+	 }
+      }
+      });
+     }
 
 function setPaymentBlock(form, memType) {
   var rowID = form.closest('div.crm-grid-row').attr('entity_id');
