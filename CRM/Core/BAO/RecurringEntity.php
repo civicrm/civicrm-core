@@ -36,7 +36,8 @@
 require_once 'packages/When/When.php'; 
 
 class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
-
+  
+  CONST RUNNING = 1;
   public $schedule = array();
   public $scheduleId = NULL;
   public $scheduleFormValues = array();
@@ -123,6 +124,13 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       ),
     );
   
+  static function getStatus() {
+    return self::$status;
+  }
+  
+  static function setStatus($status) {
+    self::$status = $status;
+  }
   /**
    * Function to save records in civicrm_recujrring_entity table
    *
@@ -241,7 +249,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @return array
    */
   function generateEntities() {
-    self::$status = "Running"; 
+    self::setStatus(self::RUNNING);
 
     $newEntities  = array();
     $findCriteria = array();
@@ -628,7 +636,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       return NULL;
     }
 
-    if (self::$status == 'Running') {
+    if (self::getStatus() == self::RUNNING) {
       // if recursion->generate() is doing some work, lets not intercept
       return NULL;
     }
