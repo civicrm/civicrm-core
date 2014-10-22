@@ -1744,7 +1744,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'placeholder' => empty($settings['required']) ? ts('- none -') : ts('- select -'),
     );
     CRM_Utils_Array::remove($props, 'label', 'required', 'control_field');
-    $props['class'] = (empty($props['class']) ? '' : "{$props['class']} ") . 'crm-chain-select-target crm-select2';
+    $props['class'] = (empty($props['class']) ? '' : "{$props['class']} ") . 'crm-select2';
     $props['data-select-prompt'] = $props['placeholder'];
     $props['data-name'] = $elementName;
 
@@ -1762,26 +1762,35 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   private function preProcessChainSelectFields() {
     foreach ($this->_chainSelectFields as $control => $target) {
-      $controlField = $this->getElement($control);
       $targetField = $this->getElement($target);
-      $controlType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'stateProvince' : 'country';
-
-      $css = (string) $controlField->getAttribute('class');
-      $controlField->updateAttributes(array(
-        'class' => ($css ? "$css " : 'crm-select2 ') . 'crm-chain-select-control',
-        'data-target' => $target,
-      ));
-      $controlValue = $controlField->getValue();
+      $targetType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'county' : 'stateProvince';
       $options = array();
-      if ($controlValue) {
-        $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
-        if (!$options) {
-          $targetField->setAttribute('placeholder', $targetField->getAttribute('data-none-prompt'));
+      // If the control field is on the form, setup chain-select and dynamically populate options
+      if ($this->elementExists($control)) {
+        $controlField = $this->getElement($control);
+        $controlType = $targetType == 'county' ? 'stateProvince' : 'country';
+
+        $targetField->setAttribute('class', $targetField->getAttribute('class') . ' crm-chain-select-target');
+
+        $css = (string) $controlField->getAttribute('class');
+        $controlField->updateAttributes(array(
+          'class' => ($css ? "$css " : 'crm-select2 ') . 'crm-chain-select-control',
+          'data-target' => $target,
+        ));
+        $controlValue = $controlField->getValue();
+        if ($controlValue) {
+          $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
+          if (!$options) {
+            $targetField->setAttribute('placeholder', $targetField->getAttribute('data-none-prompt'));
+          }
+        } else {
+          $targetField->setAttribute('placeholder', $targetField->getAttribute('data-empty-prompt'));
+          $targetField->setAttribute('disabled', 'disabled');
         }
       }
+      // Control field not present - fall back to loading default options
       else {
-        $targetField->setAttribute('placeholder', $targetField->getAttribute('data-empty-prompt'));
-        $targetField->setAttribute('disabled', 'disabled');
+        $options = CRM_Core_PseudoConstant::$targetType();
       }
       if (!$targetField->getAttribute('multiple')) {
         $options = array('' => $targetField->getAttribute('placeholder')) + $options;
