@@ -4239,6 +4239,9 @@ div.m ul#civicrm-menu,
 .crm-status-icon.error {
   background-position: -72px 0px;
 }
+.crm-container div.ui-notify-message.none div.icon {
+  display: none;
+}
 
 span.crm-status-icon {
   display: inline-block;
