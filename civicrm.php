@@ -1027,13 +1027,25 @@ class CiviCRM_For_WordPress {
     // only on singular pages
     if ( ! is_singular() ) return $title;
 
-    global $civicrm_wp_title;
-    
-    // Determines position of the separator and direction of the breadcrumb
-    if ( 'right' == $seplocation ) { // sep on right, so reverse the order
-      $title = $civicrm_wp_title . " $sep ";
-    } else {
-      $title = " $sep " . $civicrm_wp_title;
+    /**
+     * Some themes handle page titles differently to others. We can't necessarily
+     * tell how they do this, so we need to allow themes/plugins to choose if the 
+     * title is overridden
+     *
+     * @param bool FALSE because overrides NOT allowed by default
+     * @return bool TRUE if overrides allowed, FALSE otherwise
+     */
+    if ( apply_filters( 'civicrm_override_page_title', FALSE ) ) {
+
+      global $civicrm_wp_title;
+      
+      // Determines position of the separator and direction of the breadcrumb
+      if ( 'right' == $seplocation ) { // sep on right, so reverse the order
+        $title = $civicrm_wp_title . " $sep ";
+      } else {
+        $title = " $sep " . $civicrm_wp_title;
+      }
+      
     }
     
     return $title;
