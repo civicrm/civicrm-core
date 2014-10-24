@@ -1078,8 +1078,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $allowCoreTypes only present a UFGroup if its group_type includes a subset of $allowCoreTypes; e.g. 'Individual', 'Activity'
    * @param string $allowSubTypes only present a UFGroup if its group_type is compatible with $allowSubypes
    * @param array $entities
+   * @param bool $default //CRM-15427
    */
-  function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities) {
+  function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE) {
     // Output widget
     // FIXME: Instead of adhoc serialization, use a single json_encode()
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
@@ -1089,6 +1090,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // Note: client treats ';;' as equivalent to \0, and ';;' works better in HTML
       'data-group-type' => CRM_Core_BAO_UFGroup::encodeGroupType($allowCoreTypes, $allowSubTypes, ';;'),
       'data-entities' => json_encode($entities),
+      //CRM-15427
+      'data-default' => $default,
     ));
   }
 
