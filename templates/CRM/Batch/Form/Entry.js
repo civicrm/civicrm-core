@@ -123,7 +123,7 @@ function updateContactInfo(blockNo, prefix) {
         }
         });
       }
-      if(CRM.batch.type_id == 3) {
+      if (CRM.batch.type_id == 3) {
 	 CRM.api('Pledge', 'get', {
 	  'q': 'civicrm/ajax/rest',
 	  'sequential': 1,
@@ -131,7 +131,7 @@ function updateContactInfo(blockNo, prefix) {
 	 },
 	{success: function(data) {
 	 cj.each(data['values'], function(key, value) {
-	  if(value['pledge_status']!='Completed'){
+	  if (value['pledge_status']!='Completed'){
 	    cj('#open_pledges_'+ blockNo).append(cj('<option>', {
 		value: value['pledge_id'],
 		text: value['pledge_next_pay_date']+" "+value['pledge_next_pay_amount']
