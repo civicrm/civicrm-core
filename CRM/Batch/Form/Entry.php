@@ -207,12 +207,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         );
         $this->add('select', "member_option[$rowNumber]", '', $options);
       }
-    $batchValue=CRM_Core_OptionGroup::values('batch_type',TRUE);
+    $batchValue = CRM_Core_OptionGroup::values('batch_type',TRUE);
       if($this->_batchInfo['type_id'] == $batchValue['Pledge']) {
         $openPledge = array(
           '' => ts('- select -'),
         );
-        $info=$this->getVar('_batchInfo');
+        $info = $this->getVar('_batchInfo');
         if(!empty($info['data'])) {
           $json_value=json_decode($info['data'],true);
           $primContactId = $json_value['values']['primary_contact_select_id'][$rowNumber] ;
@@ -225,8 +225,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             );
             $openDefaultPledge = civicrm_api('Pledge', 'get', $paramsForPledge);
             foreach($openDefaultPledge['values'] as $key => $value) {
-              $keyforopen=$value['id'];
-              $openPledge[$keyforopen]=$value['pledge_next_pay_date'].' '.$value['pledge_next_pay_amount'];
+              $keyforopen = $value['id'];
+              $openPledge[$keyforopen] = $value['pledge_next_pay_date'].' '.$value['pledge_next_pay_amount'];
             }
           }
         }
@@ -387,9 +387,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     else {
       if(!CRM_Utils_Array::value( 'open_pledges', $params )) {
-        $params['open_pledges']=$this->_submitValues['open_pledges'];
+        $params['open_pledges'] = $this->_submitValues['open_pledges'];
       }
-      $params['type_id']=$this->_batchInfo['type_id'];
+      $params['type_id'] = $this->_batchInfo['type_id'];
       $this->processContribution($params);
     }
     // update batch to close status
@@ -517,22 +517,22 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $batchValue = CRM_Core_OptionGroup::values('batch_type',TRUE);
         if($params['type_id'] == $batchValue['Pledge']) {
           $adjustTotalAmount = FALSE;
-          if($params['option_type'][$key]==2) {
+          if($params['option_type'][$key] == 2) {
             $adjustTotalAmount=TRUE;
           }
-          $pledgeId=$params['open_pledges'][$key];
+          $pledgeId = $params['open_pledges'][$key];
           //$contribution->id;
-          $result=CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
-          $ppid=0;
+          $result = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
+          $pledgePaymentId = 0;
           foreach($result as $key => $value ) {
             if($value['status'] != 'Completed') {
-              $ppid=$value['id'];
+              $pledgePaymentId = $value['id'];
               break;
             }
           }
-          CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $ppid, 'contribution_id', $contribution->id);
+          CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $pledgePaymentId, 'contribution_id', $contribution->id);
           CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId,
-            array($ppid),
+            array($pledgePaymentId),
             $contribution->contribution_status_id,
             NULL,
             $contribution->total_amount,

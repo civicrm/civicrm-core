@@ -99,7 +99,7 @@ WHERE {$whereClause}
     $memType = CRM_Utils_Type::escape($_POST['mtype'], 'Integer');
     $query = "SELECT min(id),scheduled_amount
   FROM civicrm_pledge_payment
-  WHERE pledge_id = %1 and status_id !=1";
+  WHERE pledge_id = %1 and status_id != 1";
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($memType, 'Positive')));
     $properties = array( 'scheduled_amount');
     while ($dao->fetch()) {
