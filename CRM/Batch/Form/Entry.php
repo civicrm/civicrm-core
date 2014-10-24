@@ -208,15 +208,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $this->add('select', "member_option[$rowNumber]", '', $options);
       }
     $batchValue = CRM_Core_OptionGroup::values('batch_type',TRUE);
-      if($this->_batchInfo['type_id'] == $batchValue['Pledge']) {
+      if ($this->_batchInfo['type_id'] == $batchValue['Pledge']) {
         $openPledge = array(
           '' => ts('- select -'),
         );
         $info = $this->getVar('_batchInfo');
-        if(!empty($info['data'])) {
+        if (!empty($info['data'])) {
           $json_value=json_decode($info['data'],true);
           $primContactId = $json_value['values']['primary_contact_select_id'][$rowNumber] ;
-          if(!empty($primContactId)) {
+          if (!empty($primContactId)) {
             $paramsForPledge = array(
               'version' => 3,
               'sequential' => 1,
@@ -224,7 +224,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
               'sort' => 'pledge_create_date desc',
             );
             $openDefaultPledge = civicrm_api('Pledge', 'get', $paramsForPledge);
-            foreach($openDefaultPledge['values'] as $key => $value) {
+            foreach ($openDefaultPledge['values'] as $key => $value) {
               $keyforopen = $value['id'];
               $openPledge[$keyforopen] = $value['pledge_next_pay_date'].' '.$value['pledge_next_pay_amount'];
             }
@@ -386,7 +386,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $this->processMembership($params);
     }
     else {
-      if(!CRM_Utils_Array::value( 'open_pledges', $params )) {
+      if (!CRM_Utils_Array::value( 'open_pledges', $params )) {
         $params['open_pledges'] = $this->_submitValues['open_pledges'];
       }
       $params['type_id'] = $this->_batchInfo['type_id'];
@@ -515,17 +515,17 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         //finally call contribution create for all the magic
         $contribution = CRM_Contribute_BAO_Contribution::create($value, CRM_Core_DAO::$_nullArray);
         $batchValue = CRM_Core_OptionGroup::values('batch_type',TRUE);
-        if($params['type_id'] == $batchValue['Pledge']) {
+        if ($params['type_id'] == $batchValue['Pledge']) {
           $adjustTotalAmount = FALSE;
-          if($params['option_type'][$key] == 2) {
+          if ($params['option_type'][$key] == 2) {
             $adjustTotalAmount=TRUE;
           }
           $pledgeId = $params['open_pledges'][$key];
           //$contribution->id;
           $result = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
           $pledgePaymentId = 0;
-          foreach($result as $key => $value ) {
-            if($value['status'] != 'Completed') {
+          foreach ($result as $key => $value ) {
+            if ($value['status'] != 'Completed') {
               $pledgePaymentId = $value['id'];
               break;
             }
