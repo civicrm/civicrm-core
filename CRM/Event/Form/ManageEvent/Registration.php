@@ -339,12 +339,12 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $form->addWysiwyg('footer_text', ts('Footer Text'), $footerAttribs);
 
     extract( self::getProfileSelectorTypes() );
+    //CRM-15427
+    $form->addProfileSelector( 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector( 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
 
-    $form->addProfileSelector( 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
-    $form->addProfileSelector( 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
-
-    $form->addProfileSelector( 'additional_custom_pre_id',  ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
-    $form->addProfileSelector( 'additional_custom_post_id',  ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
+    $form->addProfileSelector( 'additional_custom_pre_id',  ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector( 'additional_custom_post_id',  ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
   }
 
   /**
@@ -379,9 +379,15 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $configs['allowCoreTypes'][] = 'Contact';
     $configs['allowCoreTypes'][] = 'Individual';
     $configs['allowCoreTypes'][] = 'Participant';
+    //CRM-15427
+    $participantEventType = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $_GET['id'], 'event_type_id', 'id');
+    $participantRole  = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $_GET['id'], 'default_role_id');
+    $configs['allowSubTypes']['ParticipantEventName'] = array($_GET['id']);
+    $configs['allowSubTypes']['ParticipantEventType'] = array($participantEventType);
+    $configs['allowSubTypes']['ParticipantRole'] = array($participantRole);
 
     $configs['profileEntities'][] = array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel');
-    $configs['profileEntities'][] = array('entity_name' => 'participant_1', 'entity_type' => 'ParticipantModel');
+    $configs['profileEntities'][] = array('entity_name' => 'participant_1', 'entity_type' => 'ParticipantModel', 'entity_sub_type' => '*');
 
    return $configs;
   }
