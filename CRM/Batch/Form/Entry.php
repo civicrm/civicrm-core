@@ -133,11 +133,14 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Contributions'));
       $customFields = CRM_Core_BAO_CustomField::getFields('Contribution');
     }
-    else {
+   elseif ($this->_batchInfo['type_id'] == 2) {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Memberships'));
       $customFields = CRM_Core_BAO_CustomField::getFields('Membership');
     }
-
+   else {
+     CRM_Utils_System::setTitle(ts('Batch Data Entry for Pledges'));
+     $customFields = CRM_Core_BAO_CustomField::getFields('Contribution');
+   }
     $this->_fields = array();
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, CRM_Core_Action::VIEW);
 
@@ -204,7 +207,37 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         );
         $this->add('select', "member_option[$rowNumber]", '', $options);
       }
-
+    $batchValue=CRM_Core_OptionGroup::values('batch_type',TRUE);
+      if($this->_batchInfo['type_id'] == $batchValue['Pledge']) {
+        $openPledge = array(
+          '' => ts('- select -'),
+        );
+        $info=$this->getVar('_batchInfo');
+        if(!empty($info['data'])) {
+          $json_value=json_decode($info['data'],true);
+          $primContactId = $json_value['values']['primary_contact_select_id'][$rowNumber] ;
+          if(!empty($primContactId)) {
+            $paramsForPledge = array(
+              'version' => 3,
+              'sequential' => 1,
+              'contact_id' => $primContactId,
+              'sort' => 'pledge_create_date desc',
+            );
+            $openDefaultPledge = civicrm_api('Pledge', 'get', $paramsForPledge);
+            foreach($openDefaultPledge['values'] as $key => $value) {
+              $keyforopen=$value['id'];
+              $openPledge[$keyforopen]=$value['pledge_next_pay_date'].' '.$value['pledge_next_pay_amount'];
+            }
+          }
+        }
+        $this->add('select', "open_pledges[$rowNumber]", ts('Open Pledges'), $openPledge);
+        $optionTypes = array(
+          '1' => ts('Adjust Pledge Payment Schedule?'),
+          '2' => ts('Adjust Total Pledge Amount?'),
+        );
+        $this->add('select', "option_type[$rowNumber]",NULL, $optionTypes);
+        $this->assign('batchoptionvalue', $batchValue['Pledge']);
+      }
       foreach ($this->_fields as $name => $field) {
         if (in_array($field['field_type'], $contactTypes)) {
           $fld = explode('-', $field['name']);
@@ -344,17 +377,21 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-
     $params['actualBatchTotal'] = 0;
-
-    // get the profile information
+      // get the profile information
     if ($this->_batchInfo['type_id'] == 1) {
       $this->processContribution($params);
     }
-    else {
+    elseif ($this->_batchInfo['type_id'] == 2) {
       $this->processMembership($params);
     }
-
+    else {
+      if(!CRM_Utils_Array::value( 'open_pledges', $params )) {
+        $params['open_pledges']=$this->_submitValues['open_pledges'];
+      }
+      $params['type_id']=$this->_batchInfo['type_id'];
+      $this->processContribution($params);
+    }
     // update batch to close status
     $paramValues = array(
       'id' => $this->_batchId,
@@ -477,7 +514,31 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         //finally call contribution create for all the magic
         $contribution = CRM_Contribute_BAO_Contribution::create($value, CRM_Core_DAO::$_nullArray);
-
+        $batchValue = CRM_Core_OptionGroup::values('batch_type',TRUE);
+        if($params['type_id'] == $batchValue['Pledge']) {
+          $adjustTotalAmount = FALSE;
+          if($params['option_type'][$key]==2) {
+            $adjustTotalAmount=TRUE;
+          }
+          $pledgeId=$params['open_pledges'][$key];
+          //$contribution->id;
+          $result=CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
+          $ppid=0;
+          foreach($result as $key => $value ) {
+            if($value['status'] != 'Completed') {
+              $ppid=$value['id'];
+              break;
+            }
+          }
+          CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $ppid, 'contribution_id', $contribution->id);
+          CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId,
+            array($ppid),
+            $contribution->contribution_status_id,
+            NULL,
+            $contribution->total_amount,
+            $adjustTotalAmount
+          );
+        }
         //process premiums
         if (!empty($value['product_name'])) {
           if ($value['product_name'][0] > 0) {

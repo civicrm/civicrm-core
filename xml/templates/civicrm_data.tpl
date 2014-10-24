@@ -877,6 +877,7 @@ VALUES
 -- default batch type
    (@option_group_id_batch_type, '{ts escape="sql"}Contribution{/ts}', 1, 'Contribution', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_batch_type, '{ts escape="sql"}Membership{/ts}', 2, 'Membership', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_batch_type, '{ts escape="sql"}Pledge{/ts}', 3, 'Pledge', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
 
 -- default batch statuses
    (@option_group_id_batch_status, '{ts escape="sql"}Open{/ts}', 1, 'Open', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
