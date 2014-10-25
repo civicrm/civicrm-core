@@ -43,6 +43,9 @@ class CRM_Core_Payment_BaseIPN {
    */
   protected $_inputParameters = array();
 
+  protected $_isRecurring = FALSE;
+
+  protected $_isFirstOrLastRecurringPayment = FALSE;
   /**
    * Constructor
    */
@@ -647,6 +650,9 @@ LIMIT 1;";
     }
 
     CRM_Core_Error::debug_log_message("Success: Database updated");
+    if ($this->_isRecurring) {
+      $this->sendRecurringStartOrEndNotification($ids, $recur);
+    }
   }
 
   /**
@@ -703,6 +709,30 @@ LIMIT 1;";
       }
     }
     return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
+  }
+
+  /**
+   * Send start or end notification for recurring payments
+   * @param $ids
+   * @param $recur
+   */
+  function sendRecurringStartOrEndNotification($ids, $recur) {
+    if ($this->_isFirstOrLastRecurringPayment) {
+      $autoRenewMembership = FALSE;
+      if ($recur->id &&
+        isset($ids['membership']) && $ids['membership']
+      ) {
+        $autoRenewMembership = TRUE;
+      }
+
+      //send recurring Notification email for user
+      CRM_Contribute_BAO_ContributionPage::recurringNotify($this->_isFirstOrLastRecurringPayment,
+        $ids['contact'],
+        $ids['contributionPage'],
+        $recur,
+        $autoRenewMembership
+      );
+    }
   }
 
   /**
