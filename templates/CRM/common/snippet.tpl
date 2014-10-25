@@ -37,6 +37,8 @@
     {if $smarty.get.snippet eq 2}
       {include file="CRM/common/print.tpl"}
     {else}
+      {crmRegion name='page-header' allowCmsOverride=0}{/crmRegion}
+      
       {crmRegion name='page-body'}
 
         {* Add status messages and container-snippet div unless we are outputting json. *}
@@ -58,6 +60,8 @@
         {/if}
 
       {/crmRegion}
+
+      {crmRegion name='page-footer' allowCmsOverride=0}{/crmRegion}
     {/if}
   {/if}
 {/strip}
