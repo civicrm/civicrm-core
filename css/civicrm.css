@@ -3979,12 +3979,12 @@ span.crm-status-icon {
   color: #444444;
 }
 
-#crm-container.crm-public .price-set-row.highlight label {
+#crm-container.crm-public .price-set-row .highlight label {
   color: #000000;
   font-weight: bold;
 }
 
-#crm-container.crm-public .price-set-row.highlight .crm-price-amount-label {
+#crm-container.crm-public .price-set-row .highlight .crm-price-amount-label {
   color: #222222;
 }
 
