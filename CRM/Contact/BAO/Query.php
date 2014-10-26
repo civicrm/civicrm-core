@@ -1807,15 +1807,16 @@ class CRM_Contact_BAO_Query {
         if (empty($this->_params[$id][0])) {
           continue;
         }
+
         // check for both id and contact_id
         if ($this->_params[$id][0] == 'id' || $this->_params[$id][0] == 'contact_id') {
           if (
-            $this->_params[$id][1] == 'IS NULL' ||
-            $this->_params[$id][1] == 'IS NOT NULL'
+           ($this->_params[$id][1] == 'IS NULL' ||
+            $this->_params[$id][1] == 'IS NOT NULL')
           ) {
             $this->_where[0][] = "contact_a.id {$this->_params[$id][1]}";
           }
-          elseif (is_array($this->_params[$id][2])) {
+          elseif (is_array($this->_params[$id][2]) && !CRM_Core_DAO::createSqlFilter('contact_a.id', $this->_params[$id][2], 'Integer')) {
             $idList = implode("','", $this->_params[$id][2]);
             //why on earth do they put ' in the middle & not on the outside? We have to assume it's
             //to support 'something' so lets add them conditionally to support the api (which is a tested flow
@@ -1827,7 +1828,8 @@ class CRM_Contact_BAO_Query {
             $this->_where[0][] = "contact_a.id IN ({$idList})";
           }
           else {
-            $this->_where[0][] = self::buildClause("contact_a.id", "{$this->_params[$id][1]}", "{$this->_params[$id][2]}");
+            // all api style sql operators should be directed to this function which can handle them
+            $this->_where[0][] = self::buildClause("contact_a.id", $this->_params[$id][1], $this->_params[$id][2]);
           }
         }
         else {
@@ -4029,7 +4031,7 @@ WHERE  id IN ( $groupIDs )
        return;
     }
     // also get values array for relation_target_name
-    // for relatinship search we always do wildcard
+    // for relationship search we always do wildcard
     $relationType = $this->getWhereValues('relation_type_id', $grouping);
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
@@ -5182,6 +5184,9 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       case 'NOT IN':
         if (isset($dataType)) {
           if (is_array($value)) {
+            if (($queryString = CRM_Core_DAO::createSqlFilter($field, $value, $dataType)) != FALSE) {
+              return $queryString;
+            }
             $values = $value;
           }
           else {
