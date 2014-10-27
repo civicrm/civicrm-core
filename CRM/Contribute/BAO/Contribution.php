@@ -235,7 +235,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
       return $contribution;
     }
-    return NULL;
+    $null = NULL; // return by reference
+    return $null;
   }
 
   /**
