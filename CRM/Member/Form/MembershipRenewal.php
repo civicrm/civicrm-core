@@ -183,7 +183,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       // this required to show billing block
       $this->assign_by_ref('paymentProcessor', $paymentProcessor);
-      $this->assign('hidePayPalExpress', TRUE);
     }
     else {
       $this->assign('membershipMode', FALSE);
