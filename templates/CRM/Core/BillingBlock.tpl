@@ -24,14 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 {crmRegion name="billing-block"}
-  {* Add 'required' marker to billing fields in this template for front-end / online contribution and event registration forms only. *}
-{if $context EQ 'front-end'}
-  {assign var=reqMark value=' <span class="crm-marker" title="This field is required.">*</span>'}
-{else}
-  {assign var=reqMark value=''}
-{/if}
 
-{if $form.credit_card_number or $form.bank_account_number}
+{if $paymentFields}
   <div id="payment_information">
     <fieldset class="billing_mode-group {$paymentTypeName}_info-group">
       <legend>
@@ -52,120 +46,45 @@
           </div>
         </div>
       {/if}
-
-      {if $paymentProcessor.billing_mode & 1}
-      <div class="crm-section billing_mode-section {if $paymentProcessor.payment_type & 2}direct_debit_info-section{else}credit_card_info-section{/if}">
-        {if $paymentProcessor.payment_type & 2}
-          <div class="crm-section {$form.account_holder.name}-section">
-            <div class="label">{$form.account_holder.label}</div>
-            <div class="content">{$form.account_holder.html}</div>
-            <div class="clear"></div>
-          </div>
-          <div class="crm-section {$form.bank_account_number.name}-section">
-            <div class="label">{$form.bank_account_number.label}</div>
-            <div class="content">{$form.bank_account_number.html}</div>
-            <div class="clear"></div>
-          </div>
-          <div class="crm-section {$form.bank_identification_number.name}-section">
-            <div class="label">{$form.bank_identification_number.label}</div>
-            <div class="content">{$form.bank_identification_number.html}</div>
-            <div class="clear"></div>
-          </div>
-          <div class="crm-section {$form.bank_name.name}-section">
-            <div class="label">{$form.bank_name.label}</div>
-            <div class="content">{$form.bank_name.html}</div>
-            <div class="clear"></div>
-          </div>
-        {else}
-          <div class="crm-section {$form.credit_card_type.name}-section">
-            <div class="label">{$form.credit_card_type.label} {$reqMark}</div>
-            <div class="content">
-              {$form.credit_card_type.html}
-              <div class="crm-credit_card_type-icons"></div>
+      <div class="crm-section billing_mode-section {$paymentTypeName}_info-section">
+        {foreach from=$paymentFields item=paymentField}
+          <div class="crm-section {$form.$paymentField.name}-section">
+            <div class="label">{$form.$paymentField.label}</div>
+            <div class="content">{$form.$paymentField.html}
+              {if $paymentField == 'cvv2'}{* @todo move to form assignment*}
+                <span class="cvv2-icon" title="{ts}Usually the last 3-4 digits in the signature area on the back of the card.{/ts}"> </span>
+              {/if}
+              {if $paymentField == 'credit_card_type'}
+                <div class="crm-credit_card_type-icons"></div>
+              {/if}
             </div>
             <div class="clear"></div>
           </div>
-          <div class="crm-section {$form.credit_card_number.name}-section">
-            <div class="label">{$form.credit_card_number.label} {$reqMark}</div>
-            <div class="content">{$form.credit_card_number.html|crmAddClass:creditcard}</div>
-            <div class="clear"></div>
-          </div>
-          <div class="crm-section {$form.cvv2.name}-section">
-            <div class="label">{$form.cvv2.label} {$reqMark}</div>
-            <div class="content">
-              {$form.cvv2.html}
-              <span class="cvv2-icon"
-                    title="{ts}Usually the last 3-4 digits in the signature area on the back of the card.{/ts}"> </span>
+        {/foreach}
+      </div>
+    {/if}
+    {if $billingDetailsFields}
+      {if $profileAddressFields}
+        <input type="checkbox" id="billingcheckbox" value="0">
+        <label for="billingcheckbox">{ts}My billing address is the same as above{/ts}</label>
+      {/if}
+      <fieldset class="billing_name_address-group">
+        <legend>{ts}Billing Name and Address{/ts}</legend>
+        <div class="crm-section billing_name_address-section">
+          {foreach from=$billingDetailsFields item=billingField}
+            <div class="crm-section {$form.$billingField.name}-section">
+              <div class="label">{$form.$billingField.label}</div>
+              {if $form.$billingField.type == 'text'}
+                <div class="content">{$form.$billingField.html}</div>
+              {else}
+                <div class="content">{$form.$billingField.html|crmAddClass:big}</div>
+              {/if}
+              <div class="clear"></div>
             </div>
-            <div class="clear"></div>
-          </div>
-          <div class="crm-section {$form.credit_card_exp_date.name}-section">
-            <div class="label">{$form.credit_card_exp_date.label} {$reqMark}</div>
-            <div class="content">{$form.credit_card_exp_date.html}</div>
-            <div class="clear"></div>
-          </div>
-        {/if}
-      </div>
-    </fieldset>
-    {else}
-    </fieldset>
+          {/foreach}
+        </div>
+      </fieldset>
     {/if}
-    {/if}
-    {if $profileAddressFields}
-      <input type="checkbox" id="billingcheckbox" value="0">
-      <label for="billingcheckbox">{ts}My billing address is the same as above{/ts}</label>
-    {/if}
-    <fieldset class="billing_name_address-group">
-      <legend>{ts}Billing Name and Address{/ts}</legend>
-      <div class="crm-section billing_name_address-section">
-        <div class="crm-section {$form.billing_first_name.name}-section">
-          <div class="label">{$form.billing_first_name.label} {$reqMark}</div>
-          <div class="content">{$form.billing_first_name.html}</div>
-          <div class="clear"></div>
-        </div>
-        <div class="crm-section {$form.billing_middle_name.name}-section">
-          <div class="label">{$form.billing_middle_name.label}</div>
-          <div class="content">{$form.billing_middle_name.html}</div>
-          <div class="clear"></div>
-        </div>
-        <div class="crm-section {$form.billing_last_name.name}-section">
-          <div class="label">{$form.billing_last_name.label} {$reqMark}</div>
-          <div class="content">{$form.billing_last_name.html}</div>
-          <div class="clear"></div>
-        </div>
-        {assign var=n value=billing_street_address-$bltID}
-        <div class="crm-section {$form.$n.name}-section">
-          <div class="label">{$form.$n.label} {$reqMark}</div>
-          <div class="content">{$form.$n.html}</div>
-          <div class="clear"></div>
-        </div>
-        {assign var=n value=billing_city-$bltID}
-        <div class="crm-section {$form.$n.name}-section">
-          <div class="label">{$form.$n.label} {$reqMark}</div>
-          <div class="content">{$form.$n.html}</div>
-          <div class="clear"></div>
-        </div>
-        {assign var=n value=billing_country_id-$bltID}
-        <div class="crm-section {$form.$n.name}-section">
-          <div class="label">{$form.$n.label} {$reqMark}</div>
-          <div class="content">{$form.$n.html|crmAddClass:big}</div>
-          <div class="clear"></div>
-        </div>
-        {assign var=n value=billing_state_province_id-$bltID}
-        <div class="crm-section {$form.$n.name}-section">
-          <div class="label">{$form.$n.label} {$reqMark}</div>
-          <div class="content">{$form.$n.html|crmAddClass:big}</div>
-          <div class="clear"></div>
-        </div>
-        {assign var=n value=billing_postal_code-$bltID}
-        <div class="crm-section {$form.$n.name}-section">
-          <div class="label">{$form.$n.label} {$reqMark}</div>
-          <div class="content">{$form.$n.html}</div>
-          <div class="clear"></div>
-        </div>
-      </div>
-    </fieldset>
-
   </div>
 {if $profileAddressFields}
   <script type="text/javascript">

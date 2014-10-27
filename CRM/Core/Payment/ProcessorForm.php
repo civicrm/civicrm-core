@@ -134,10 +134,10 @@ class CRM_Core_Payment_ProcessorForm {
     }
 
     if (($form->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT)) {
-      CRM_Core_Payment_Form::buildDirectDebit($form);
+      CRM_Core_Payment_Form::buildDirectDebit($form, TRUE);
     }
     elseif (($form->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_CREDIT_CARD)) {
-      CRM_Core_Payment_Form::buildCreditCard($form);
+      CRM_Core_Payment_Form::buildCreditCard($form, TRUE);
     }
   }
 }
