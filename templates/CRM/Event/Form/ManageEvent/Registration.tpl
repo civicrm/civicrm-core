@@ -438,9 +438,8 @@ invert              = 0
     function removeBottomProfile( e ) {
         e.preventDefault();
 
-        $(e.target).parents('tr').find('.crm-profile-selector').val('');
-        $(e.target).parents('tr').hide();
-        $(e.target).parents('tbody').find('tr:visible:last .profile_bottom_link_main, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
+        $(e.target).closest('tr').hide().find('.crm-profile-selector').val('');
+        $(e.target).closest('tbody').find('tr:visible:last .profile_bottom_link_main, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
     }
 
     var strSameAs = ' - '+ts('same as for main contact')+' - ';
