@@ -185,6 +185,11 @@ class CRM_Core_Payment_Form {
       'attributes' => $creditCardType,
       'is_required' => FALSE,
     );
+    //CRM-15509 this is probably a temporary resting place for these form assignments but we are working towards putting this
+    // in an option group & having php / payment processors define the billing form rather than the tpl
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('paymentTypeName', 'credit_card');
+    $smarty->assign('paymentTypeLabel', ts('Credit Card Information'));
   }
 
   /**
@@ -256,6 +261,12 @@ class CRM_Core_Payment_Form {
       'attributes' => array('size' => 20, 'maxlength' => 64, 'autocomplete' => 'off'),
       'is_required' => TRUE,
     );
+    //CRM-15509 this is probably a temporary resting place for these form assignments but we are working towards putting this
+    // in an option group & having php / payment processors define the billing form rather than the tpl
+    $smarty = CRM_Core_Smarty::singleton();
+    // replace these payment type names with an option group - moving name & label assumptions out of the tpl is a step towards that
+    $smarty->assign('paymentTypeName', 'direct_debit');
+    $smarty->assign('paymentTypeLabel', ts('Direct Debit Information'));
   }
 
   /**
