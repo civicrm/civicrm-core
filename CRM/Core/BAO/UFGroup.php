@@ -3103,9 +3103,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $groupTypeExpr .= implode(',', $coreTypes);
     }
     if ($subTypes) {
-      if (count($subTypes) > 1) {
-        throw new CRM_Core_Exception("Multiple subtype filtering is not currently supported by widget.");
-      }
+      //CRM-15427 Allow Multiple subtype filtering
+      //if (count($subTypes) > 1) {
+        //throw new CRM_Core_Exception("Multiple subtype filtering is not currently supported by widget.");
+      //}
       foreach ($subTypes as $subType => $subTypeIds) {
         $groupTypeExpr .= $delim . $subType . ':' . implode(':', $subTypeIds);
       }
