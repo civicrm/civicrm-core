@@ -15,7 +15,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
   function definitionProvider() {
     $fixtures['empty-defn'] = array(
       'json' => json_encode(array()),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
+      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
 <CaseType>
   <name>Housing Support</name>
 </CaseType>
@@ -28,7 +28,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
         'activityTypes' => array(),
         'caseRoles' => array(),
       )),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
+      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
 <CaseType>
   <name>Housing Support</name>
   <ActivityTypes></ActivityTypes>
@@ -41,7 +41,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
     $fixtures['one-item-in-each'] = array(
       'json' => json_encode(array(
         'activityTypes' => array(
-          array('name' => 'First act'),
+          array('name' => 'First act (foréign éxamplé)'),
         ),
         'activitySets' => array(
           array(
@@ -57,12 +57,12 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
           array('name' => 'First role', 'creator' => 1, 'manager' => 1),
         ),
       )),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
+      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
 <CaseType>
   <name>Housing Support</name>
   <ActivityTypes>
     <ActivityType>
-      <name>First act</name>
+      <name>First act (foréign éxamplé)</name>
     </ActivityType>
   </ActivityTypes>
   <ActivitySets>
@@ -125,7 +125,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
           array('name' => 'Second role'),
         ),
       )),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
+      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
 <CaseType>
   <name>Housing Support</name>
   <ActivityTypes>
@@ -186,7 +186,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
       'json' => json_encode(array(
         'forkable' => 0,
       )),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
+      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
 <CaseType>
   <name>Housing Support</name>
   <forkable>0</forkable>
@@ -198,7 +198,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
       'json' => json_encode(array(
         'forkable' => 1,
       )),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
+      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
 <CaseType>
   <name>Housing Support</name>
   <forkable>1</forkable>
