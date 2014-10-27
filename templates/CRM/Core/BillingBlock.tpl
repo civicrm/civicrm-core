@@ -33,13 +33,9 @@
 
 {if $form.credit_card_number or $form.bank_account_number}
   <div id="payment_information">
-    <fieldset class="billing_mode-group {if $paymentProcessor.payment_type & 2}direct_debit_info-group{else}credit_card_info-group{/if}">
+    <fieldset class="billing_mode-group {$paymentTypeName}_info-group">
       <legend>
-        {if $paymentProcessor.payment_type & 2}
-          {ts}Direct Debit Information{/ts}
-        {else}
-          {ts}Credit Card Information{/ts}
-        {/if}
+        {$paymentTypeLabel}
       </legend>
       {if $paymentProcessor.billing_mode & 2 and !$hidePayPalExpress }
         <div class="crm-section no-label paypal_button_info-section">
