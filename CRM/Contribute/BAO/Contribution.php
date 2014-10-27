@@ -270,21 +270,19 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * based on querying the line item table and relevant price field values
    * Note that any one contribution should only be able to have one line item relating to a particular membership
    * type
+   *
    * @param int $membershipTypeID
+   *
+   * @param int $contributionID
    *
    * @return int
    */
-  public function getNumTermsByContributionAndMembershipType($membershipTypeID) {
-    if (!is_numeric($membershipTypeID)) {
-      //precautionary measure - this is being introduced to a mature release hence adding extra checks that
-      // might be removed later
-      return 1;
-    }
-    $numTerms = CRM_Core_DAO::singleValueQuery("
+  public function getNumTermsByContributionAndMembershipType($membershipTypeID, $contributionID) {
+     $numTerms = CRM_Core_DAO::singleValueQuery("
       SELECT membership_num_terms FROM civicrm_line_item li
       LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
       WHERE contribution_id = %1 AND membership_type_id = %2",
-      array(1 => array($this->id, 'Integer') , 2 => array($membershipTypeID, 'Integer'))
+      array(1 => array($contributionID, 'Integer') , 2 => array($membershipTypeID, 'Integer'))
     );
     // default of 1 is precautionary
     return empty($numTerms) ? 1 : $numTerms;
@@ -2071,7 +2069,6 @@ WHERE  contribution_id = %1 ";
       }
     }
 
-    $loadObjectSuccess = TRUE;
     if ($paymentProcessorID) {
       $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID,
         $this->is_test ? 'test' : 'live'
@@ -2080,11 +2077,10 @@ WHERE  contribution_id = %1 ";
       $this->_relatedObjects['paymentProcessor'] = &$paymentProcessor;
     }
     elseif ($required) {
-      $loadObjectSuccess = FALSE;
       throw new Exception("Could not find payment processor for contribution record: " . $this->id);
     }
 
-    return $loadObjectSuccess;
+    return TRUE;
   }
 
   /*
@@ -2136,9 +2132,13 @@ WHERE  contribution_id = %1 ";
         $entity = 'contribution';
         $entityID = $ids['contribution'];
       }
-      if (isset($ids['membership']) && $ids['membership']) {
+      if (!empty($ids['membership'])) {
+        //not sure whether is is possible for this not to be an array - load related contacts loads an array but this code was expecting a string
+        // the addition of the casting is in case it could get here & be a string. Added in 4.6 - maybe remove later? This AuthorizeNetIPN & PaypalIPN tests hit this
+        // line having loaded an array
+        $ids['membership'] = (array) $ids['membership'];
         $entity = 'membership';
-        $entityID = $ids['membership'];
+        $entityID = $ids['membership'][0];
       }
 
       $url = $paymentObject->subscriptionURL($entityID, $entity);

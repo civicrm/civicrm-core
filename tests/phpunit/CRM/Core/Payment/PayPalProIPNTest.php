@@ -90,6 +90,31 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
+   * test IPN response updates contribution_recur & contribution for first & second contribution
+   */
+  function testIPNPaymentMembershipRecurSuccess() {
+    $this->setupMembershipRecurringPaymentProcessorTransaction();
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
+    $paypalIPN->main();
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
+    $membershipEndDate = $this->callAPISuccessGetValue('membership', array('return' => 'end_date'));
+    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertEquals('8XA571746W2698126', $contribution['trxn_id']);
+    // source gets set by processor
+    $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
+    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
+    $paypalIPN = new CRM_Core_Payment_PaypalProIPN($this->getPaypalProRecurSubsequentTransaction());
+    $paypalIPN->main();
+    $this->assertEquals(strtotime('+ 1 year', strtotime($membershipEndDate)), strtotime($this->callAPISuccessGetValue('membership', array('return' => 'end_date'))));
+    $contribution = $this->callAPISuccess('contribution', 'get', array('contribution_recur_id' => $this->_contributionRecurID, 'sequential' => 1));
+    $this->assertEquals(2, $contribution['count']);
+    $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
+    $this->markTestIncomplete('This is a test for CRM-15203 but that is currently NOT working (however, getting this far indicates CRM-15527 is fixed');
+    $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id'],));
+    $this->callAPISuccessGetSingle('line_item', array('contribution_id' => $contribution['values'][1]['id'], 'entity_table' => 'civicrm_membership'));
+  }
+  /**
    * CRM-13743 test IPN edge case where the first transaction fails and the second succeeds
    * We are checking that the created contribution has the same date as IPN says it should
    * Note that only one contribution will be created (no evidence of the failed contribution is left)
