@@ -3354,6 +3354,7 @@ div.crm-container form {
 /* skin */
 
 #crm-container .crm-title {
+  line-height: 1.1;
   margin-bottom: 8px;
 }
 
