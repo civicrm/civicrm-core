@@ -24,9 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 {crmRegion name="billing-block"}
-
-{if $paymentFields}
-  <div id="payment_information">
+<div id="payment_information">
+  {if $paymentFields}
     <fieldset class="billing_mode-group {$paymentTypeName}_info-group">
       <legend>
         {$paymentTypeLabel}
@@ -50,30 +49,31 @@
           </div>
         {/foreach}
       </div>
+    </fieldset>
+  {/if}
+  {if $billingDetailsFields}
+    {if $profileAddressFields}
+      <input type="checkbox" id="billingcheckbox" value="0">
+      <label for="billingcheckbox">{ts}My billing address is the same as above{/ts}</label>
     {/if}
-    {if $billingDetailsFields}
-      {if $profileAddressFields}
-        <input type="checkbox" id="billingcheckbox" value="0">
-        <label for="billingcheckbox">{ts}My billing address is the same as above{/ts}</label>
-      {/if}
-      <fieldset class="billing_name_address-group">
-        <legend>{ts}Billing Name and Address{/ts}</legend>
-        <div class="crm-section billing_name_address-section">
-          {foreach from=$billingDetailsFields item=billingField}
-            <div class="crm-section {$form.$billingField.name}-section">
-              <div class="label">{$form.$billingField.label}</div>
-              {if $form.$billingField.type == 'text'}
-                <div class="content">{$form.$billingField.html}</div>
-              {else}
-                <div class="content">{$form.$billingField.html|crmAddClass:big}</div>
-              {/if}
-              <div class="clear"></div>
-            </div>
-          {/foreach}
-        </div>
-      </fieldset>
-    {/if}
-  </div>
+    <fieldset class="billing_name_address-group">
+      <legend>{ts}Billing Name and Address{/ts}</legend>
+      <div class="crm-section billing_name_address-section">
+        {foreach from=$billingDetailsFields item=billingField}
+          <div class="crm-section {$form.$billingField.name}-section">
+            <div class="label">{$form.$billingField.label}</div>
+            {if $form.$billingField.type == 'text'}
+              <div class="content">{$form.$billingField.html}</div>
+            {else}
+              <div class="content">{$form.$billingField.html|crmAddClass:big}</div>
+            {/if}
+            <div class="clear"></div>
+          </div>
+        {/foreach}
+      </div>
+    </fieldset>
+  {/if}
+</div>
 {if $profileAddressFields}
   <script type="text/javascript">
     {literal}
