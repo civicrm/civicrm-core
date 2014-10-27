@@ -141,7 +141,7 @@ class CRM_Core_Payment_Form {
       "billing_street_address-{$bltID}",
       "billing_city-{$bltID}",
       "billing_country_id-{$bltID}",
-      "billing_state_province_id-{$bltID}".
+      "billing_state_province_id-{$bltID}",
       "billing_postal_code-{$bltID}",
     ));
   }
