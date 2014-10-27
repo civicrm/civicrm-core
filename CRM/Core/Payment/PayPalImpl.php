@@ -110,6 +110,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['paymentAction'] = $params['payment_action'];
     $args['amt'] = $params['amount'];
     $args['currencyCode'] = $params['currencyID'];
+    $args['desc'] = $params['description'];
     $args['invnum'] = $params['invoiceID'];
     $args['returnURL'] = $params['returnURL'];
     $args['cancelURL'] = $params['cancelURL'];
@@ -201,6 +202,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['invnum'] = $params['invoiceID'];
     $args['returnURL'] = $params['returnURL'];
     $args['cancelURL'] = $params['cancelURL'];
+    $args['desc'] = $params['description'];
 
     $result = $this->invokeAPI($args);
 
