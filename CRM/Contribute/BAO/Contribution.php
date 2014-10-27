@@ -2069,7 +2069,6 @@ WHERE  contribution_id = %1 ";
       }
     }
 
-    $loadObjectSuccess = TRUE;
     if ($paymentProcessorID) {
       $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID,
         $this->is_test ? 'test' : 'live'
@@ -2078,11 +2077,10 @@ WHERE  contribution_id = %1 ";
       $this->_relatedObjects['paymentProcessor'] = &$paymentProcessor;
     }
     elseif ($required) {
-      $loadObjectSuccess = FALSE;
       throw new Exception("Could not find payment processor for contribution record: " . $this->id);
     }
 
-    return $loadObjectSuccess;
+    return TRUE;
   }
 
   /*
