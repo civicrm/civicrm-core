@@ -407,7 +407,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
 
     // this required to show billing block
     $this->assign_by_ref('paymentProcessor', $paymentProcessor);
-    $this->assign('hidePayPalExpress', TRUE);
   }
 
   /**

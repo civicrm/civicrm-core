@@ -648,7 +648,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       if ($this->_paymentProcessor &&
         $this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
       ) {
-        $this->assign('payment_type', $this->_paymentProcessor['payment_type']);
         $this->assign('account_holder', $this->_params['account_holder']);
         $this->assign('bank_identification_number', $this->_params['bank_identification_number']);
         $this->assign('bank_name', $this->_params['bank_name']);

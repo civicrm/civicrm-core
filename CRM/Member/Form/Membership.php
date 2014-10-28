@@ -193,7 +193,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       // this required to show billing block
       $this->assign_by_ref('paymentProcessor', $paymentProcessor);
-      $this->assign('hidePayPalExpress', TRUE);
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
@@ -1281,9 +1280,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', array(1 => $membershipType, 2 => $userName));
         }
         else {
-          $params['contribution_source'] = $formValues['source'];	
+          $params['contribution_source'] = $formValues['source'];
         }
-      }	
+      }
 
       if (empty($params['is_override']) &&
         CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
@@ -1678,7 +1677,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             } else {
               $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
             }
-          } 
+          }
         }
         if ($taxAmount) {
           $this->assign('totalTaxAmount', $totalTaxAmount);
