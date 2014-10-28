@@ -12,52 +12,52 @@
  * @author Priyanka
  */
 class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
-  
+
   /**
    * Schedule Reminder Id
    */
   protected $_scheduleReminderId = NULL;
-  
+
   /**
    * Schedule Reminder data
    */
   protected $_scheduleReminderDetails = array();
-  
+
   /**
    *  Parent Event ID
    */
   protected $_parentEventId = NULL;
-  
+
   /**
    * Parent Event Start Date
    */
   protected $_parentEventStartDate = NULL;
-  
+
   /**
    * Parent Event End Date
    */
   protected $_parentEventEndDate = NULL;
-  
+
   /**
-   * Exclude date information 
+   * Exclude date information
    */
   public $_excludeDateInfo = array();
-  
+
   protected $_pager = NULL;
-  
-  
-  
+
+
+
   function preProcess() {
     parent::preProcess();
     $this->assign('currentEventId', $this->_id);
-    
+
     $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
     $checkParentExistsForThisId;
     //If this ID has parent, send parent id
     if ($checkParentExistsForThisId) {
       $this->_scheduleReminderDetails = self::getReminderDetailsByEventId($checkParentExistsForThisId, 'event');
       $this->_parentEventId = $checkParentExistsForThisId;
-      
+
       /**
      * Get connected event information list
      */
@@ -86,7 +86,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
               CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
             }
           }
-        }  
+        }
         $this->assign('rows', $manageEvent);
       }
     }
@@ -107,7 +107,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     $parentEventAttributes = CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Event', $parentEventParams, $parentEventValues, $parentEventReturnProperties);
     $this->_parentEventStartDate = $parentEventAttributes->start_date;
     $this->_parentEventEndDate = $parentEventAttributes->end_date;
-    
+
     //Get option exclude date information
     //$groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'event_repeat_exclude_dates_'.$this->_parentEventId, 'id', 'name');
     CRM_Core_OptionValue::getValues(array('name' => 'event_repeat_exclude_dates_'.$this->_parentEventId), $optionValue);
@@ -117,9 +117,9 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         $excludeOptionValues[$val['value']] = date('m/d/Y', strtotime($val['value']));
       }
       $this->_excludeDateInfo = $excludeOptionValues;
-    } 
+    }
   }
-  
+
   /**
    * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
@@ -130,7 +130,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    */
   function setDefaultValues() {
     $defaults = array();
-    
+
     //Set Schedule Reminder Id
     if (property_exists($this->_scheduleReminderDetails, 'id')) {
       $this->_scheduleReminderId = $this->_scheduleReminderDetails->id;
@@ -138,7 +138,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     //Always pass current event's start date by default
     $currentEventStartDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'start_date', 'id');
     list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($currentEventStartDate, 'activityDateTime');
-    
+
     // Check if there is id for this event in Reminder table
     if ($this->_scheduleReminderId) {
       $defaults['repetition_frequency_unit'] = $this->_scheduleReminderDetails->repetition_frequency_unit;
@@ -170,45 +170,45 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       if ($this->_scheduleReminderDetails->entity_status) {
         $defaults['repeats_by'] = 2;
       }
-    } 
+    }
     return $defaults;
   }
-  
+
   public function buildQuickForm() {
     CRM_Core_Form_RecurringEntity::buildQuickForm($this);
   }
-   
+
   public function postProcess() {
     if ($this->_id) {
-      $params = $this->controller->exportValues($this->_name); 
+      $params = $this->controller->exportValues($this->_name);
       $params['event_id'] = $this->_id;
       $params['parent_event_id']  = $this->_parentEventId;
       $params['parent_event_start_date'] = $this->_parentEventStartDate;
       $params['parent_event_end_date'] = $this->_parentEventEndDate;
       //Unset event id
       unset($params['id']);
-      
+
       //Set Schedule Reminder id
       $params['id'] = $this->_scheduleReminderId;
       $url = 'civicrm/event/manage/repeat';
       $urlParams = "action=update&reset=1&id={$this->_id}";
-      
+
       CRM_Core_Form_RecurringEntity::postProcess($params, 'event');
       CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
     }
     else {
         CRM_Core_Error::fatal("Could not find Event ID");
-    }  
+    }
   }
-  
+
    /**
    * This function gets the number of participant count for the list of related event ids
-   * 
+   *
    * @param array $listOfRelatedEntities list of related event ids
-   * 
+   *
    * @access public
    * @static
-   * 
+   *
    * @return array
    */
   static public function getParticipantCountforEvent($listOfRelatedEntities = array()) {
@@ -217,10 +217,10 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         return $entity['id'];
       }, $listOfRelatedEntities));
       if ($implodeRelatedEntities) {
-        $query = "SELECT p.event_id as event_id, 
-          concat_ws(' ', e.title, concat_ws(' - ', DATE_FORMAT(e.start_date, '%b %d %Y %h:%i %p'), DATE_FORMAT(e.end_date, '%b %d %Y %h:%i %p'))) as event_data, 
+        $query = "SELECT p.event_id as event_id,
+          concat_ws(' ', e.title, concat_ws(' - ', DATE_FORMAT(e.start_date, '%b %d %Y %h:%i %p'), DATE_FORMAT(e.end_date, '%b %d %Y %h:%i %p'))) as event_data,
           count(p.id) as participant_count
-          FROM civicrm_participant p, civicrm_event e 
+          FROM civicrm_participant p, civicrm_event e
           WHERE p.event_id = e.id AND p.event_id IN ({$implodeRelatedEntities})
           GROUP BY p.event_id";
         $dao = CRM_Core_DAO::executeQuery($query);
@@ -233,23 +233,23 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     }
     return $participantDetails;
   }
-  
+
   /**
    * This function gets all columns from civicrm_action_schedule on the basis of event id
-   * 
+   *
    * @param int $eventId Event ID
    * @param string $used_for Specifies for which entity type it's used for
-   * 
+   *
    * @access public
    * @static
-   * 
+   *
    * @return object
    */
   static public function getReminderDetailsByEventId($eventId, $used_for) {
     if ($eventId) {
       $query = "
         SELECT *
-        FROM   civicrm_action_schedule 
+        FROM   civicrm_action_schedule
         WHERE  entity_value = %1";
       if ($used_for) {
         $query .= " AND used_for = %2";
@@ -263,10 +263,10 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     }
     return $dao;
   }
-  
+
    /**
    * Update mode column in civicrm_recurring_entity table for event related tabs
-   * 
+   *
    * @params int $entityId event id
    * @params string $linkedEntityTable Linked entity table name for this event
    * @return array
@@ -305,7 +305,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
           $result['entityId'] = $defaults['id'];
           $result['entityTable'] = $entityTable;
         }
-    } 
+    }
     return $result;
-  }  
+  }
 }

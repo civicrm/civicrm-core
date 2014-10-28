@@ -206,7 +206,7 @@ class CRM_Event_BAO_Query {
       }
     }
   }
-  
+
 
   /**
    * @param $query
@@ -249,14 +249,14 @@ class CRM_Event_BAO_Query {
           'civicrm_event', 'event_end_date', 'end_date', 'End Date'
         );
         return;
-        
+
       case 'event_id':
         $query->_where[$grouping][] = "civicrm_event.id $op {$value}";
         $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $value, 'title');
         $query->_qill[$grouping][] = ts('Event') . " $op {$eventTitle}";
         $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
         return;
-        
+
       case 'event_include_repeating_events':
         /**
          * Include Repeating Events
@@ -292,7 +292,7 @@ class CRM_Event_BAO_Query {
         $query->_qill[$grouping][] = ts('Include Repeating Events (If Any) ') . " = TRUE";
         $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
         return;
-       
+
       case 'event_type_id':
 
         $eventTypes = CRM_Core_OptionGroup::values("event_type");
@@ -300,7 +300,7 @@ class CRM_Event_BAO_Query {
         $query->_qill[$grouping][] = ts('Event Type - %1', array(1 => $eventTypes[$value]));
         $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
         return;
-        
+
       case 'participant_test':
         // We dont want to include all tests for sql OR CRM-7827
         if (!$value || $query->getOperator() != 'OR') {
@@ -676,7 +676,7 @@ class CRM_Event_BAO_Query {
     }
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'participant_campaign_id');
-    
+
     $form->assign('validCiviEvent', TRUE);
     $form->setDefaults(array('participant_test' => 0));
   }
