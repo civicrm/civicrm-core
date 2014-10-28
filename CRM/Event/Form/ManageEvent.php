@@ -84,7 +84,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * the participant records
    */
   protected $_campaignID = NULL;
-  
+
   /**
    * Check if repeating event
    */
@@ -101,7 +101,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     if (in_array('CiviEvent', $config->enableComponents)) {
       $this->assign('CiviEvent', TRUE);
     }
-      
+
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add', 'REQUEST');
 
     $this->assign('action', $this->_action);
@@ -187,7 +187,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     }
 
     $this->_templateId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
-    
+
     //Is a repeating event
     if ($this->_isRepeatingEvent) {
       $isRepeat = 'repeat';

@@ -269,18 +269,19 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
     if (empty($fields['campaign_id'])) {
       $where[] = 'campaign_id IS NULL';
-    } else {
+    }
+    else {
       $where[] = 'campaign_id = %3';
-      $params[3] = array($fields['campaign_id'], 'Integer');        
+      $params[3] = array($fields['campaign_id'], 'Integer');
       $uniqueRuleErrorMessage = ts('This title is already associated with the selected campaign and activity type. Please specify a unique title.');
     }
 
     // Exclude current Petition row if UPDATE.
     if ($form->_surveyId) {
       $where[] = 'id != %4';
-      $params[4] = array($form->_surveyId, 'Integer');              
+      $params[4] = array($form->_surveyId, 'Integer');
     }
-    
+
     $whereClause = implode(' AND ', $where);
 
     $query = "

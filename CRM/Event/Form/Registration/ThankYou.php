@@ -141,7 +141,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
       $this->assign('taxTerm', $taxTerm);
     }
     $this->assign('totalAmount', $this->_totalAmount);
-    
+
     $hookDiscount = $this->get('hookDiscount');
     if ($hookDiscount) {
       $this->assign('hookDiscount', $hookDiscount);

@@ -498,7 +498,7 @@ class CRM_Contribute_Form_AdditionalInfo {
      else {
        $isEmailPdf = False;
      }
-     
+
     list($sendReceipt, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       array(
         'groupName' => 'msg_tpl_workflow_contribution',

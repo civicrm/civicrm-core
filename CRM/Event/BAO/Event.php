@@ -1227,7 +1227,7 @@ WHERE civicrm_event.is_active = 1
           $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
           if ($taxAmt && (isset($invoicing) && isset($prefixValue['is_email_pdf'])) ) {
             $sendTemplateParams['isEmailPdf'] = True;
-            $sendTemplateParams['contributionId'] = $values['contributionId'];    
+            $sendTemplateParams['contributionId'] = $values['contributionId'];
           }
           CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         }
@@ -2200,5 +2200,5 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
-  
+
 }
