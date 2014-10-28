@@ -309,7 +309,7 @@ class CRM_Core_Payment_Form {
    * @return None
    * @access public
    */
-  function buildDirectDebit(&$form, $useRequired = FALSE) {
+  static function buildDirectDebit(&$form, $useRequired = FALSE) {
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) {
       self::setDirectDebitFields($form);
       foreach ($form->_paymentFields as $name => $field) {
