@@ -42,15 +42,16 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
 
     $res->addScriptFile('civicrm', 'packages/bower_components/angular/angular.min.js', 100, 'html-header', FALSE);
     $res->addScriptFile('civicrm', 'packages/bower_components/angular-route/angular-route.min.js', 110, 'html-header', FALSE);
+    $headOffset = 0;
     foreach ($modules as $module) {
       if (!empty($module['css'])) {
         foreach ($module['css'] as $file) {
-          $res->addStyleFile($module['ext'], $file, self::DEFAULT_MODULE_WEIGHT, 'html-header', TRUE);
+          $res->addStyleFile($module['ext'], $file, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header', TRUE);
         }
       }
       if (!empty($module['js'])) {
         foreach ($module['js'] as $file) {
-          $res->addScriptFile($module['ext'], $file, self::DEFAULT_MODULE_WEIGHT, 'html-header', TRUE);
+          $res->addScriptFile($module['ext'], $file, self::DEFAULT_MODULE_WEIGHT  + (++$headOffset), 'html-header', TRUE);
         }
       }
     }

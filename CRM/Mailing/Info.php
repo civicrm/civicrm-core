@@ -55,6 +55,53 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     );
   }
 
+  public function getAngularModules() {
+    $result = array();
+    $result['crmMailingAB'] = array(
+      'ext' => 'civicrm',
+      'js' => array(
+        'js/angular-crmMailingAB.js',
+        'js/angular-crmMailingAB-ReportCtrl.js',
+        'js/d3.min.js',
+        'js/angular-sanitize.js',
+        'packages/ckeditor/ckeditor.js',
+      ),
+      'css' => array('css/angular-crmMailingAB.css'),
+    );
+
+    $civiMails = civicrm_api3('Mailing', 'get', array());
+    $campNames = civicrm_api3('Campaign', 'get', array());
+    $mailingabNames = civicrm_api3('MailingAB','get',array());
+    $mailStatus = civicrm_api3('MailingJob', 'get', array());
+    $groupNames = civicrm_api3('Group', 'get', array());
+    $headerfooterList = civicrm_api3('MailingComponent', 'get', array());
+    $emailAdd = civicrm_api3('Email', 'get', array());
+    $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
+      'sequential' => 1,
+      'return' => array("msg_html", "id", "msg_title","msg_subject"),
+      'id' => array('>' => 58),
+    ));
+    $mailTokens = civicrm_api3('Mailing', 'get_token', array( 'usage' => 'Mailing'));
+    $mailGrp = civicrm_api3('MailingGroup','get', array());
+    CRM_Core_Resources::singleton()->addSetting(array(
+      'crmMailing' => array(
+        'mailingabNames'=>array_values($mailingabNames['values']),
+        'civiMails' => array_values($civiMails['values']),
+        'campNames' => array_values($campNames['values']),
+        'mailStatus' => array_values($mailStatus['values']),
+        'groupNames' => array_values($groupNames['values']),
+        'headerfooterList' => array_values($headerfooterList['values']),
+        'mesTemplate' => array_values($mesTemplate['values']),
+        'emailAdd' => array_values($emailAdd['values']),
+        'mailTokens' => array_values($mailTokens),
+        'mailGrp' => array_values($mailGrp['values'])
+      ),
+    ));
+
+    return $result;
+  }
+
+
   /**
    * @return bool
    */
