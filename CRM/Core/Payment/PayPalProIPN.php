@@ -114,6 +114,9 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         $mapping['p'] = 'contribution_page_id';
       }
     }
+    if(empty($this->_inputParameters['component'])) {
+      $this->_isPaymentExpress = TRUE;
+    }
   }
 
   /**
@@ -372,7 +375,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     }
     $objects = $ids = $input = array();
     $this->_component  = $input['component'] = self::getValue('m');
-
+    $input['invoice'] = self::getValue('i', TRUE);
     // get the contribution and contact ids from the GET params
     $ids['contact'] = self::getValue('c', TRUE);
     $ids['contribution'] = self::getValue('b', TRUE);
@@ -448,7 +451,6 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
 
     $input['txnType'] = self::retrieve('txn_type', 'String', 'POST', FALSE);
     $input['paymentStatus'] = self::retrieve('payment_status', 'String', 'POST', FALSE);
-    $input['invoice'] = self::getValue('i', TRUE);
 
     $input['amount'] = self::retrieve('mc_gross', 'Money', 'POST', FALSE);
     $input['reasonCode'] = self::retrieve('ReasonCode', 'String', 'POST', FALSE);
@@ -479,9 +481,70 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * Handle payment express IPNs
    * For one off IPNS no actual response is required
    * Recurring is more difficult as we have limited confirmation material
+   * lets look up invoice id in recur_contribution & rely on the unique transaction id to ensure no
+   * duplicated
+   * this may not be acceptable to all sites - e.g. if they are shipping or delivering something in return
+   * then the quasi security of the ids array might be required - although better to
+   * http://stackoverflow.com/questions/4848227/validate-that-ipn-call-is-from-paypal
+   * but let's assume knowledge on invoice id & schedule is enough for now esp for donations
+   * only contribute is handled
    */
   function handlePaymentExpress() {
-    throw new CRM_Core_Exception('Payment Express IPNS not currently handled');
+   //@todo - loads of copy & paste / code duplication but as this not going into core need to try to
+   // keep discreet
+   // also note that a lot of the complexity above could be removed if we used
+   // http://stackoverflow.com/questions/4848227/validate-that-ipn-call-is-from-paypal
+   // as membership id etc can be derived by the load objects fn
+    $objects = $ids = $input = array();
+    $isFirst = FALSE;
+    $input['txnType']  = $this->retrieve('txn_type', 'String');
+    if($input['txnType']  != 'recurring_payment') {
+      throw new CRM_Core_Exception('Paypal IPNS not handled other than recurring_payments');
+    }
+    $input['invoice'] = self::getValue('i', FALSE);
+    $this->getInput($input, $ids);
+    if($this-> transactionExists($input['trxn_id'])) {
+      throw new CRM_Core_Exception('This transaction has already been processed');
+    }
+
+    $contributionRecur = civicrm_api3('contribution_recur', 'getsingle', array('return' => 'contact_id, id', 'invoice_id' => $input['invoice']));
+    $ids['contact'] = $contributionRecur['contact_id'];
+    $ids['contributionRecur'] = $contributionRecur['id'];
+    $result = civicrm_api3('contribution', 'getsingle', array('invoice_id' => $input['invoice'], ));
+
+    $ids['contribution'] = $result['id'];
+    //@todo hard - coding 'pending' for now
+    if($result['contribution_status_id'] == 2) {
+      $isFirst = True;
+    }
+    // arg api won't get this - fix it
+    $ids['contributionPage'] = CRM_Core_DAO::singleValueQuery("SELECT contribution_page_id FROM civicrm_contribution WHERE invoice_id = %1", array(1 => array($ids['contribution'], 'Integer')));
+    // only handle component at this stage - not terribly sure how a recurring event payment would arise
+    // & suspec main function may be a victom of copy & paste
+    // membership would be an easy add - but not relevant to my customer...
+    $this->_component  = $input['component'] = 'contribute';
+    $input['trxn_date'] = date('Y-m-d', strtotime(self::retrieve('time_created', 'String')));
+    $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
+      'PayPal', 'id', 'name'
+    );
+
+    if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
+      throw new CRM_Core_Exception('Data did not validate');
+    }
+    return $this->recur($input, $ids, $objects, $isFirst);
+  }
+
+  /**
+   * Function check if transaction already exists
+   * @param string $trxn_id
+   */
+  function transactionExists($trxn_id) {
+    if(CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_contribution WHERE trxn_id = %1",
+      array(
+        1 => array($trxn_id, 'String')
+      ))) {
+      return TRUE;
+    }
   }
 }
 
