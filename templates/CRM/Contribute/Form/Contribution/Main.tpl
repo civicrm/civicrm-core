@@ -29,7 +29,7 @@
 
 {* Callback snippet: Load payment processor *}
 {elseif $snippet}
-{include file="CRM/Core/BillingBlock.tpl" context="front-end"}
+{include file="CRM/Core/BillingBlock.tpl"}
   {if $is_monetary}
   {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
     {if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
@@ -356,9 +356,9 @@
 	cj('input[name="soft_credit_type_id"]').on('change', function() {
 		enableHonorType();
 	});
-	
+
   function enableHonorType( ) {
-    var selectedValue = cj('input[name="soft_credit_type_id"]:checked'); 
+    var selectedValue = cj('input[name="soft_credit_type_id"]:checked');
     if ( selectedValue.val() > 0) {
       cj('#honorType').show();
     }
@@ -372,7 +372,7 @@
 	});
 
   function showRecurHelp( ) {
-    var showHelp = cj('input[id="is_recur"]:checked'); 
+    var showHelp = cj('input[id="is_recur"]:checked');
     if ( showHelp.val() > 0) {
       cj('#recurHelp').show();
     }
@@ -380,7 +380,7 @@
       cj('#recurHelp').hide();
     }
   }
-	
+
   function pcpAnonymous( ) {
     // clear nickname field if anonymous is true
     if (document.getElementsByName("pcp_is_anonymous")[1].checked) {
@@ -460,15 +460,15 @@
     updatePriceSetHighlight();
 
     function toggleBillingBlockIfFree(){
-      var total_amount_tmp =  $(this).data('raw-total'); 
+      var total_amount_tmp =  $(this).data('raw-total');
       // Hide billing questions if this is free
       if (total_amount_tmp == 0){
         cj("#billing-payment-block").hide();
-        cj(".payment_options-group").hide();  
-      } 
+        cj(".payment_options-group").hide();
+      }
       else {
         cj("#billing-payment-block").show();
-        cj(".payment_options-group").show(); 
+        cj(".payment_options-group").show();
       }
     }
 

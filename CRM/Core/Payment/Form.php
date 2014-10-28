@@ -132,6 +132,18 @@ class CRM_Core_Payment_Form {
       CRM_Core_PseudoConstant::country(),
       'is_required' => TRUE,
     );
+    //CRM-15509 working towards giving control over billing fields to payment processors. For now removing tpl hard-coding
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('billingDetailsFields', array(
+      'billing_first_name',
+      'billing_middle_name',
+      'billing_last_name',
+      "billing_street_address-{$bltID}",
+      "billing_city-{$bltID}",
+      "billing_country_id-{$bltID}",
+      "billing_state_province_id-{$bltID}",
+      "billing_postal_code-{$bltID}",
+    ));
   }
 
   /**
@@ -185,10 +197,22 @@ class CRM_Core_Payment_Form {
       'attributes' => $creditCardType,
       'is_required' => FALSE,
     );
+    //CRM-15509 this is probably a temporary resting place for these form assignments but we are working towards putting this
+    // in an option group & having php / payment processors define the billing form rather than the tpl
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('paymentTypeName', 'credit_card');
+    $smarty->assign('paymentTypeLabel', ts('Credit Card Information'));
+    $smarty->assign('paymentFields', array(
+      'credit_card_type',
+      'credit_card_number',
+      'cvv2',
+      'credit_card_exp_date',
+    ));
   }
 
   /**
    * @param CRM_Core_Form $form
+   * @param bool $useRequired
    */
   static function addCommonFields(&$form, $useRequired) {
     foreach ($form->_paymentFields as $name => $field) {
@@ -256,6 +280,18 @@ class CRM_Core_Payment_Form {
       'attributes' => array('size' => 20, 'maxlength' => 64, 'autocomplete' => 'off'),
       'is_required' => TRUE,
     );
+    //CRM-15509 this is probably a temporary resting place for these form assignments but we are working towards putting this
+    // in an option group & having php / payment processors define the billing form rather than the tpl
+    $smarty = CRM_Core_Smarty::singleton();
+    // replace these payment type names with an option group - moving name & label assumptions out of the tpl is a step towards that
+    $smarty->assign('paymentTypeName', 'direct_debit');
+    $smarty->assign('paymentTypeLabel', ts('Direct Debit Information'));
+    $smarty->assign('paymentFields', array(
+      'account_holder',
+      'bank_account_number',
+      'bank_identification_number',
+      'bank_name',
+    ));
   }
 
   /**
