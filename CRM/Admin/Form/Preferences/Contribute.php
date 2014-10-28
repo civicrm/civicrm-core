@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * This class generates form components for the display preferences
@@ -88,7 +88,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     );
     parent::preProcess();
   }
-  
+
   /**
    * Function to build the form
    *

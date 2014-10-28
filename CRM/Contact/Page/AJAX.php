@@ -647,15 +647,15 @@ ORDER BY sort_name ";
         }
       }
       else {
-      	$cid = CRM_Utils_Array::value('cid', $_GET);
-      	if ($cid) {
+        $cid = CRM_Utils_Array::value('cid', $_GET);
+        if ($cid) {
           //check cid for interger
           $contIDS = explode(',', $cid);
           foreach ($contIDS as $contID) {
             CRM_Utils_Type::escape($contID, 'Integer');
           }
           $queryString = " cc.id IN ( $cid )";
-      	}
+        }
       }
 
       if ($queryString) {
@@ -743,8 +743,8 @@ LIMIT {$offset}, {$rowCount}
       $queryString = " ( cc.sort_name LIKE '%$name%' OR cp.phone LIKE '%$name%' ) ";
     }
     else {
-    	$cid = CRM_Utils_Array::value('cid', $_GET);
-    	if ($cid) {
+      $cid = CRM_Utils_Array::value('cid', $_GET);
+      if ($cid) {
         //check cid for interger
         $contIDS = explode(',', $cid);
         foreach ($contIDS as $contID) {

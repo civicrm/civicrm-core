@@ -959,7 +959,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             ));
             $tmp_statuses = $result['values'];
             $status_ids = array();
-      	    foreach($tmp_statuses as $cur_stat) {
+            foreach($tmp_statuses as $cur_stat) {
               $status_ids[] = $cur_stat['id'];
             }
             if (empty($params['status_id']) || in_array( $params['status_id'] , $status_ids) == false) {
@@ -1281,9 +1281,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', array(1 => $membershipType, 2 => $userName));
         }
         else {
-          $params['contribution_source'] = $formValues['source'];	
+          $params['contribution_source'] = $formValues['source'];
         }
-      }	
+      }
 
       if (empty($params['is_override']) &&
         CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
@@ -1678,7 +1678,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             } else {
               $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
             }
-          } 
+          }
         }
         if ($taxAmount) {
           $this->assign('totalTaxAmount', $totalTaxAmount);

@@ -54,6 +54,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
    *
    * @param array $params reference array contains the values submitted by the form
    * @param bool $pcpBlock if true, create or update PCPBlock, else PCP
+   *
    * @access public
    * @static
    *
@@ -428,8 +429,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * Add PCP form elements to a form
    */
   /**
-   * @param $pcpId
-   * @param $page
+   * @param integer $pcpId
+   * @param CRM_Core_Page $page
    * @param null $elements
    */
   function buildPcp($pcpId, &$page, &$elements = NULL) {

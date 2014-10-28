@@ -1291,7 +1291,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           $this->_params['role_id']
         );
       }
-      
+
       //CRM-15372 patch to fix fee amount replacing amount
       $this->_params['fee_amount'] =  $this->_params['amount'];
 
@@ -1368,13 +1368,13 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
         //build contribution params
         if (!$this->_onlinePendingContributionId) {
-          if (empty($params['source'])) { 
+          if (empty($params['source'])) {
             $contributionParams['source'] = ts('%1 : Offline registration (by %2)', array(1 => $eventTitle, 2 => $userName));
-          }                                                           
-          else {                                                     
-            $contributionParams['source'] = $params['source'];                                                             
-          }                                                          
-        } 
+          }
+          else {
+            $contributionParams['source'] = $params['source'];
+          }
+        }
 
         $contributionParams['currency'] = $config->defaultCurrency;
         $contributionParams['non_deductible_amount'] = 'null';
@@ -1405,8 +1405,8 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           $contributionParams['is_pay_later'] = 1;
         }
         elseif ($contributionParams['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
-	        $contributionParams['is_pay_later'] = 0;
-	      }
+          $contributionParams['is_pay_later'] = 0;
+        }
 
         if ($params['status_id'] == array_search('Partially paid', $participantStatus)) {
           if (!$amountOwed && $this->_action & CRM_Core_Action::UPDATE) {
@@ -1672,7 +1672,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
           $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
           $totalTaxAmount = 0;
-          
+
           //add dataArray in the receipts in ADD and UPDATE condition
           $dataArray = array();
           if ($this->_action & CRM_Core_Action::ADD) {
@@ -1738,8 +1738,8 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
         $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
         $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
         if (count($taxAmt) > 0 && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
-          $sendTemplateParams['isEmailPdf'] = True; 
-          $sendTemplateParams['contributionId'] = $contributionId; 
+          $sendTemplateParams['isEmailPdf'] = True;
+          $sendTemplateParams['contributionId'] = $contributionId;
         }
         list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         if ($mailSent) {
