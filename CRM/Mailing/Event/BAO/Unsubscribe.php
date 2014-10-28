@@ -418,7 +418,7 @@ WHERE  email = %2
    * @static
    */
   public static function getTotalCount($mailing_id, $job_id = NULL,
-    $is_distinct = FALSE, $org_unsubscribe = NULL
+    $is_distinct = FALSE, $org_unsubscribe = NULL, $toDate = NULL
   ) {
     $dao = new CRM_Core_DAO();
 
@@ -441,6 +441,10 @@ WHERE  email = %2
                     ON  $job.mailing_id = $mailing.id
                     AND $job.is_test = 0
             WHERE       $mailing.id = " . CRM_Utils_Type::escape($mailing_id, 'Integer');
+
+    if (!empty($toDate)) {
+      $query .= " AND $unsub.time_stamp <= $toDate";
+    }
 
     if (!empty($job_id)) {
       $query .= " AND $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer');
@@ -595,4 +599,3 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
     return array($displayName, $email);
   }
 }
-

@@ -1,0 +1,34 @@
+<form name="tab1Form" unsaved-warning-form>
+  <div class="crm-block crm-form-block crmABTesting">
+    <br><h3> What would you like to name the test?</h3><p>
+    &nbsp&nbsp<input type="text" ng-model="currentABTest.name" name="abname" class="big crm-form-text" required>
+    <span ng-show="(!currentABTest.name.length && !tab1Form.abname.$pristine)">  *This field is required</span>
+    <br>
+
+    <h3> What would you like to test?</h3>
+    <label for="radio-option-subject-lines">
+      &nbsp <input id="radio-option-subject-lines" type="radio" ng-model="sparestuff.template" ng-value="templates[0]" ng-click="init(2)"
+                 ng-checked="currentABTest.testing_criteria_id==1" >
+      Subject lines <br/><br>
+    </label>
+    <label>
+      &nbsp <input type="radio" ng-model="sparestuff.template" ng-value="templates[1]" ng-click="init(3)"
+                 ng-checked="currentABTest.testing_criteria_id==2" >
+      From names <br/><br>
+    </label>
+    <label>
+      &nbsp <input type="radio" ng-model="sparestuff.template" ng-value="templates[2]" ng-click="init(1)"
+                 ng-checked="currentABTest.testing_criteria_id==3" >
+      Two different emails <br/><br>
+    </label>
+
+    <div class="crm-submit-buttons">
+    <span class="crm-button">
+      <input type="submit"   ng-click=" tab1Form.$setPristine();  " ng-disabled="tab1Form.$invalid"  value="Next" nexttab="{{tab_val}}"/>
+    </span>
+    <span class="crm-button">
+      <input type="submit" ng-click="tab1Form.$setPristine(); goto('mailing/abtesting');" value="Cancel"/>
+    </span>
+    </div>
+  </div>
+</form>
