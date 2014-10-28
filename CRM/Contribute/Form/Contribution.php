@@ -1058,7 +1058,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $submittedValues, $lineItem[$priceSetId]);
 
       // unset tax amount for offline 'is_quick_config' contribution
-      if ($this->_priceSet['is_quick_config'] && 
+      if ($this->_priceSet['is_quick_config'] &&
         !array_key_exists($submittedValues['financial_type_id'], CRM_Core_PseudoConstant::getTaxRates())
       ) {
         unset($submittedValues['tax_amount']);
@@ -1389,7 +1389,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           }
         }
       }
-       
+
       if ($invoicing) {
         if ($this->_action & CRM_Core_Action::UPDATE) {
           if (isset($submittedValues['tax_amount'])) {

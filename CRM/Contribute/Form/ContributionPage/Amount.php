@@ -414,7 +414,7 @@ SELECT id
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
 
-    //update 'is_billing_required' 
+    //update 'is_billing_required'
     if (empty($params['is_pay_later'])) {
       $params['is_billing_required'] = 0;
     }

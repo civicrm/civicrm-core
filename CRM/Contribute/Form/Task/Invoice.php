@@ -317,7 +317,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $addressParams = array('contact_id' => $contribution->contact_id);
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams);
 
-      // to get billing address if present 
+      // to get billing address if present
       $billingAddress = array();
       foreach ($addressDetails as $key => $address) {
         if ((isset($address['is_billing']) && $address['is_billing'] == 1) && (isset($address['is_primary']) && $address['is_primary'] == 1) && $address['contact_id'] == $contribution->contact_id) {
@@ -357,10 +357,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $lineItem = CRM_Price_BAO_LineItem::getLineItems($eid, $etable);
       }
 
-      //TO DO: Need to do changes for partially paid to display amount due on PDF invoice 
+      //TO DO: Need to do changes for partially paid to display amount due on PDF invoice
       $amountDue = ($input['amount'] - $input['amount']);
 
-      // retreiving the subtotal and sum of same tax_rate 
+      // retreiving the subtotal and sum of same tax_rate
       $dataArray = array();
       $subTotal = 0;
       foreach ($lineItem as $entity_id => $taxRate) {
@@ -482,7 +482,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       if (isset($creditNoteId)) {
         $tplParams['creditnote_id'] = $creditNoteId;
       }
-      
+
       $sendTemplateParams = array(
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'contribution_invoice_receipt',

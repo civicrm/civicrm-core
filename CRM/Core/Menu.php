@@ -322,7 +322,7 @@ class CRM_Core_Menu {
             ',' => '_', '/' => '_',
           )
         ),
-        'url' => CRM_Utils_System::url($path, $query, 
+        'url' => CRM_Utils_System::url($path, $query,
             FALSE, // absolute
             NULL, // fragment
             TRUE, // htmlize
