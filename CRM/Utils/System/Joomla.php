@@ -540,9 +540,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
         //include additional files required by Joomla 3.2.1+
         if ( version_compare(JVERSION, '3.2.1', 'ge') ) {
-          require $joomlaBase . '/libraries/cms/application/helper.php';
-          require $joomlaBase . '/libraries/cms/application/cms.php';
-          require $joomlaBase . '/libraries/cms/application/administrator.php';
+          require_once $joomlaBase . '/libraries/cms/application/helper.php';
+          require_once $joomlaBase . '/libraries/cms/application/cms.php';
+          require_once $joomlaBase . '/libraries/cms/application/administrator.php';
         }
       }
 

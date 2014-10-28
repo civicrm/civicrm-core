@@ -54,13 +54,27 @@
       });
     }
 
+    //CRM-15427 Allow Multiple subtype filtering
     if (subTypesExpr && subTypesExpr != '') {
-      var subTypes = subTypesExpr.split(':');
-      var subTypeKey = subTypes.shift();
-      typeList.subTypes[subTypeKey] = {};
-      _.each(subTypes, function(subTypeId){
-        typeList.subTypes[subTypeKey][subTypeId] = true;
-      });
+      if (subTypesExpr.indexOf(';;') !== -1) {
+        var subTypeparts = subTypesExpr.replace(/;;/g,'\0').split('\0');
+        _.each(subTypeparts, function(subTypepart) {
+          var subTypes = subTypepart.split(':');
+          var subTypeKey = subTypes.shift();
+          typeList.subTypes[subTypeKey] = {};
+          _.each(subTypes, function(subTypeId) {
+            typeList.subTypes[subTypeKey][subTypeId] = true;
+          });
+        });
+      }
+      else {
+        var subTypes = subTypesExpr.split(':');
+        var subTypeKey = subTypes.shift();
+        typeList.subTypes[subTypeKey] = {};
+        _.each(subTypes, function(subTypeId) {
+          typeList.subTypes[subTypeKey][subTypeId] = true;
+        });
+      }
     }
     return typeList;
   };
@@ -379,7 +393,8 @@
       return result;
     },
     isSectionEnabled: function(section) {
-      return (!section || !section.extends_entity_column_value || _.contains(section.extends_entity_column_value, this.get('entity_sub_type')));
+      //CRM-15427
+      return (!section || !section.extends_entity_column_value || _.contains(section.extends_entity_column_value, this.get('entity_sub_type')) || this.get('entity_sub_type') == '*');
     },
     getSections: function() {
       var ufEntityModel = this;
@@ -647,9 +662,11 @@
      * Check that the group_type contains *only* the types listed in validTypes
      *
      * @param string validTypesExpr
+     * @param bool allowAllSubtypes
      * @return {Boolean}
      */
-    checkGroupType: function(validTypesExpr) {
+    //CRM-15427
+    checkGroupType: function(validTypesExpr, allowAllSubtypes = false) {
       var allMatched = true;
       if (! this.get('group_type') || this.get('group_type') == '') {
         return true;
@@ -665,22 +682,25 @@
         }
       });
 
-      // Every actual.subType is a valid.subType
-      _.each(actualTypes.subTypes, function(actualSubTypeIds, actualSubTypeKey) {
-        if (!validTypes.subTypes[actualSubTypeKey]) {
-          allMatched = false;
-          return;
-        }
-        // actualSubTypeIds is a list of all subtypes which can be used by group,
-        // so it's sufficient to match any one of them
-        var subTypeMatched = false;
-        _.each(actualSubTypeIds, function(ignore, actualSubTypeId) {
-          if (validTypes.subTypes[actualSubTypeKey][actualSubTypeId]) {
-            subTypeMatched = true;
+      //CRM-15427 allow all subtypes
+      if (!$.isEmptyObject(validTypes.subTypes) && !allowAllSubtypes) {
+        // Every actual.subType is a valid.subType
+        _.each(actualTypes.subTypes, function(actualSubTypeIds, actualSubTypeKey) {
+          if (!validTypes.subTypes[actualSubTypeKey]) {
+            allMatched = false;
+            return;
           }
+          // actualSubTypeIds is a list of all subtypes which can be used by group,
+          // so it's sufficient to match any one of them
+          var subTypeMatched = false;
+          _.each(actualSubTypeIds, function(ignore, actualSubTypeId) {
+            if (validTypes.subTypes[actualSubTypeKey][actualSubTypeId]) {
+              subTypeMatched = true;
+            }
+          });
+          allMatched = allMatched && subTypeMatched;
         });
-        allMatched = allMatched && subTypeMatched;
-      });
+      }
       return allMatched;
     },
     calculateContactEntityType: function() {
