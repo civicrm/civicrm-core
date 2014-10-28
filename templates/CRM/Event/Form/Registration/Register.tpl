@@ -200,14 +200,24 @@
       toggleConfirmButton();
     });
 
+    cj("#additional_participants").change(function () {
+      skipPaymentMethod();
+    });
+
     CRM.$(function($) {
       toggleConfirmButton();
       skipPaymentMethod();
     });
 
-    // Called from display() in Calculate.tpl, depends on display() having been called
+    // Hides billing and payment options block - but only if a price set is used.
+    // Called from display() in Calculate.tpl, depends on display() having been called.
     function skipPaymentMethod() {
-      var symbol = '{/literal}{$currencySymbol}{literal}';
+      // If we're in quick-config price set, we do not have the pricevalue hidden element, so just return.
+      if (cj('#pricevalue').length == 0) {
+        return;
+      }
+      // CRM-15433 Remove currency symbol, decimal separator so we can check for zero numeric total regardless of localization.
+      currentTotal = cj('#pricevalue').text().replace(/[^\/\d]/g,'');
       var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
 
       var flag = 1;
@@ -215,11 +225,12 @@
       var payment_processor = cj("div.payment_processor-section");
       var payment_information = cj("div#payment_information");
 
-      if (isMultiple && cj("#additional_participants").val() && cj('#pricevalue').text() !== symbol + " 0.00") {
+      // Do not hide billing and payment blocks if user is registering additional participants, since we do not know total owing.
+      if (isMultiple && cj("#additional_participants").val() && currentTotal == 0) {
         flag = 0;
       }
 
-      if ((cj('#pricevalue').text() == symbol + " 0.00") && flag) {
+      if (currentTotal == 0 && flag) {
         payment_options.hide();
         payment_processor.hide();
         payment_information.hide();
