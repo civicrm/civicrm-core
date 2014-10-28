@@ -1097,7 +1097,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
                 $fileURL = CRM_Core_BAO_CustomField::getFileURL($entityId,
                   $cfID,
                   NULL,
-                  $absolute
+                  $absolute,
+                  $additionalWhereClause
                 );
                 $params[$index] = $values[$index] = $fileURL['file_url'];
               }
