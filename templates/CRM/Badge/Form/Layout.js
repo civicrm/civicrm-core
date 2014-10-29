@@ -5,7 +5,7 @@ CRM.$(function($) {
     window.KCFinder = {
       callBack: function(url) {
         field.val(url).change();
-        // calculate the image default width, height 
+        // calculate the image default width, height
         // and assign to respective fields
          var ajaxUrl = CRM.url('civicrm/ajax/rest', 'className=CRM_Badge_Page_AJAX&fnName=getImageProp&json=1&img=' + url);
          $.getJSON(ajaxUrl).done(function ( response ) {

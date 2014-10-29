@@ -60,10 +60,10 @@
 
      @media only screen and (max-device-width: 800px)
      {td[class="padding-top-right15"]{padding:15px 15px 0 0 !important;}
-     td[class="padding-right15"]{padding-right:15px !important;}}		 
+     td[class="padding-right15"]{padding-right:15px !important;}}
      @media only screen and (max-device-width: 769px) {.devicewidthmob {font-size:14px;}}
 
-     @media only screen and (max-width: 640px) {.desktop-spacer {display:none !important;} 
+     @media only screen and (max-width: 640px) {.desktop-spacer {display:none !important;}
 	   }
      {/literal}
   </style>
