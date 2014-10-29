@@ -126,15 +126,15 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     );
     $halfFinancialAccount = CRM_Financial_BAO_FinancialAccount::add($financialAccHalftax);
     $this->halfFinancialAccId = $halfFinancialAccount->id;
-    $halfFinancialtypeHalftax = array( 
+    $halfFinancialtypeHalftax = array(
       'name' => 'grassvariety2'.substr(sha1(rand()), 0, 7),
       'is_reserved' => 0,
       'is_active' => 1,
     );
-     
+
     $halfFinancialType = CRM_Financial_BAO_FinancialType::add($halfFinancialtypeHalftax);
     $this->halfFinancialTypeId = $halfFinancialType->id ;
-    $financialRelationHalftax = array( 
+    $financialRelationHalftax = array(
       'entity_table' => 'civicrm_financial_type',
       'entity_id' => $this->halfFinancialTypeId,
       'account_relationship' => 10,
@@ -254,8 +254,8 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 1
     );
-                      
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__); 
+
+    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->_ids['contributionId'] = $contribution['id'];
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
@@ -363,7 +363,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /*
-   * Updation of contrbution 
+   * Updation of contrbution
    * Function tests that line items, financial records are updated when contribution amount is changed
    */
   function testCreateUpdateContributionChangeTotal() {
@@ -372,7 +372,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id'   => $this->financialtypeID,                                    
+      'financial_type_id'   => $this->financialtypeID,
       'source' => 'SSF',
       'contribution_status_id' => 1,
     );

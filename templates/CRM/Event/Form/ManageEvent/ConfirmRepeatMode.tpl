@@ -60,7 +60,7 @@
                 'CRM_Friend_Form_Event': 'civicrm_tell_friend',
                 'CRM_PCP_Form_Event': 'civicrm_pcp_block'
                 };
-    
+
     var form = '';
     $('#crm-main-content-wrapper').on('click', 'div.crm-submit-buttons span.crm-button input[value="Save"], div.crm-submit-buttons span.crm-button input[value="Save and Done"]', function() {
         form = $(this).parents('form:first').attr('class');
@@ -77,20 +77,20 @@
           }).dialog('open');
           return false;
         }
-    }); 
+    });
 
     $(".only-this-event").click(function() {
       updateMode(1);
     });
-  
+
     cj(".this-and-all-following-event").click(function() {
       updateMode(2);
     });
-  
+
     cj(".all-events").click(function() {
       updateMode(3);
     });
-    
+
     function updateMode(mode) {
       var eventID = {/literal}{$id}{literal};
       if (eventID != "" && mode && form != "") {

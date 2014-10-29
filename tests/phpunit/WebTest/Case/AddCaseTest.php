@@ -269,16 +269,16 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Advanced_refresh");
     $this->assertElementContainsText('Advanced', "$lastName, $firstName");
   }
-  
+
   /**
    * @param $firstName
    * @param $lastName
    * @param $caseTypeLabel
-   * 
-   * test for assign case to another client 
+   *
+   * test for assign case to another client
    */
    function _testAssignToClient($firstName, $lastName, $caseTypeLabel) {
-    $this->openCiviPage('case/search', 'reset=1', '_qf_Search_refresh-bottom'); 
+    $this->openCiviPage('case/search', 'reset=1', '_qf_Search_refresh-bottom');
     $this->type('sort_name', $firstName);
     $this->clickLink('_qf_Search_refresh-bottom');
     $this->waitForElementPresent("xpath=//table[@class='caseSelector']/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']");
