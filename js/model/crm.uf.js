@@ -666,8 +666,9 @@
      * @return {Boolean}
      */
     //CRM-15427
-    checkGroupType: function(validTypesExpr, allowAllSubtypes = false) {
+    checkGroupType: function(validTypesExpr, allowAllSubtypes) {
       var allMatched = true;
+      allowAllSubtypes = allowAllSubtypes || false;
       if (! this.get('group_type') || this.get('group_type') == '') {
         return true;
       }
