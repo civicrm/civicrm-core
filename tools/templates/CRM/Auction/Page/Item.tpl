@@ -31,7 +31,7 @@
     <div id=item_status_id>
         {strip}
         {include file="CRM/common/pager.tpl" location="top"}
-        {include file="CRM/common/pagerAToZ.tpl}    
+        {include file="CRM/common/pagerAToZ.tpl}
         <table class="selector">
          <tr class="columnheader">
             <th></th>
@@ -50,11 +50,11 @@
             <td>{$row.retail_value|crmMoney}</td>
             <td>{$row.bid_end_date|crmDate}</td>
           </tr>
-        {/foreach}    
+        {/foreach}
         </table>
         {include file="CRM/common/pager.tpl" location="bottom"}
         {/strip}
-      
+
     </div>
 {else}
    {if $isSearch eq 1}
@@ -80,6 +80,6 @@
         <dt><div class="icon inform-icon"></div></dt>
         <dd>{ts 1=$newAuctionURL}There are no auctions created yet. You can <a href='%1'>add one</a>.{/ts}</dd>
         </dl>
-    </div>    
+    </div>
    {/if}
 {/if}

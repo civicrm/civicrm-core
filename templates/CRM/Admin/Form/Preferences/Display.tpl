@@ -257,7 +257,7 @@
           $('#user_dashboard_options_' + invoicesKey).attr("disabled", true);
         }
         $("#invoice_help").insertAfter("label[for='user_dashboard_options_" + invoicesKey + "']");
-        
+
         $("#contactEditBlocks, #contactEditOptions").sortable({
           placeholder: 'ui-state-highlight',
           update: getSorting

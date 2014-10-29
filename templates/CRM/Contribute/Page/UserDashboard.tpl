@@ -34,9 +34,9 @@
                 <th>{ts}Received date{/ts}</th>
                 <th>{ts}Receipt Sent{/ts}</th>
                 <th>{ts}Status{/ts}</th>
-		{if $invoicing && $invoices}
+    {if $invoicing && $invoices}
                   <th></th>
-		{/if}
+    {/if}
             </tr>
 
             {foreach from=$contribute_rows item=row}
@@ -53,21 +53,21 @@
                     {if $invoicing && $invoices}
                       {if $row.contribution_status_name != 'Cancelled'}
                         <td>
-		          {assign var='id' value=$row.contribution_id}
-			  {assign var='contact_id' value=$row.contact_id}
-                      	  {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id"}
-			  <a class="crm-invoiceButton" href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
-		      	  {if $row.contribution_status != 'Refunded'}
+              {assign var='id' value=$row.contribution_id}
+        {assign var='contact_id' value=$row.contact_id}
+                          {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id"}
+        <a class="crm-invoiceButton" href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
+              {if $row.contribution_status != 'Refunded'}
                             <span>{ts}Print Invoice{/ts}</span>
-		          {else}
-			    <span>{ts}Print Invoice and Credit Note{/ts}</span>
-		          {/if}
+              {else}
+          <span>{ts}Print Invoice and Credit Note{/ts}</span>
+              {/if}
                           </a>
                         </td>
                       {else}
-		        <td></td>
-		      {/if}
-		    {/if}
+            <td></td>
+          {/if}
+        {/if}
                 </tr>
             {/foreach}
         </table>
