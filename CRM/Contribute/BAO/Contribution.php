@@ -3359,12 +3359,11 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
 
       if (!$contributionId) {
         if ($primaryParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $id, 'registered_by_id')) {
-          if ($contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $primaryParticipantId, 'contribution_id', 'participant_id')) {
-            $id = $primaryParticipantId;
-          }
-          else {
-            return;
-          }
+          $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $primaryParticipantId, 'contribution_id', 'participant_id');
+          $id = $primaryParticipantId;
+        }
+        if (!$contributionId) {
+          return;
         }
       }
     }
