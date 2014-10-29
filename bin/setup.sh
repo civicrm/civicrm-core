@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+set -x
 
 CALLEDPATH=`dirname $0`
 
@@ -17,6 +18,7 @@ if [ ! -f "$CALLEDPATH/setup.conf" ]; then
 fi
 
 source "$CALLEDPATH/setup.conf"
+source "$CALLEDPATH/setup.lib.sh"
 
 if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
   echo; echo Usage: setup.sh [schema file] [database data file] [database name] [database user] [database password] [database host] [database port] [additional args]; echo
@@ -56,31 +58,13 @@ if [ -d "$CALLEDPATH/../xml" ]; then
   else
     PHP_MYSQL_HOSTPORT="$DBHOST:$DBPORT"
   fi
-  "$PHP5PATH"php -d mysql.default_host="$PHP_MYSQL_HOSTPORT" -d mysql.default_user=$DBUSER -d mysql.default_password=$DBPASS GenCode.php $SCHEMA '' $GENCODE_CMS
-fi
-
-# someone might want to use empty password for development,
-# let's make it possible - we asked before.
-if [ -z $DBPASS ]; then # password still empty
-  PASSWDSECTION=""
-else
-  PASSWDSECTION="-p$DBPASS"
-fi
-
-HOSTSECTTION=""
-if [ ! -z "$DBHOST" ]; then
-  HOSTSECTION="-h $DBHOST"
-fi
-
-PORTSECTION=""
-if [ ! -z "$DBPORT" ]; then
-  PORTSECTION="-P $DBPORT"
+  "$PHP5PATH"php -d mysql.default_host="$PHP_MYSQL_HOSTPORT" -d mysql.default_user=$DBUSER -d mysql.default_password=$DBPASS GenCode.php $SCHEMA '' ${GENCODE_CMS}
 fi
 
 cd "$CALLEDPATH/../sql"
 echo; echo "Dropping civicrm_* tables from database $DBNAME"
 # mysqladmin -f -u $DBUSER $PASSWDSECTION $DBARGS drop $DBNAME
-MYSQLCMD="mysql -u$DBUSER $PASSWDSECTION $HOSTSECTION $PORTSECTION $DBARGS $DBNAME"
+MYSQLCMD=$(mysql_cmd)
 echo "SELECT table_name FROM information_schema.TABLES  WHERE TABLE_SCHEMA='${DBNAME}' AND TABLE_TYPE = 'VIEW'" \
   | $MYSQLCMD \
   | grep '^\(civicrm_\|log_civicrm_\)' \
