@@ -206,7 +206,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     //fill in first name
     $firstName = "Anderson".substr(sha1(rand()), 0, 4);
     $this->type('first_name', $firstName);
-    
+
     //fill in last name
     $lastName = substr(sha1(rand()), 0, 4);
     $this->type('last_name', $lastName);

@@ -62,7 +62,7 @@
     <div class="float-left" id="contribution_soft_credit_type_wrapper">
       {$form.contribution_soft_credit_type_id.label} <br />
       {$form.contribution_soft_credit_type_id.html|crmAddClass:twenty}
-    </div>  
+    </div>
   </td>
 </tr>
 <tr>
