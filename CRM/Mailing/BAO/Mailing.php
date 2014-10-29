@@ -1633,7 +1633,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $mg->search_args  = $params['search_args'];
       $mg->group_type   = 'Include';
       $mg->save();
-		}
+    }
 
     // check and attach and files as needed
     CRM_Core_BAO_File::processAttachment($params, 'civicrm_mailing', $mailing->id);
@@ -1658,8 +1658,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       // Populate the recipients.
       $mailing->getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, FALSE);
     }
-		//print_r($params);
-		//exit;
+    //print_r($params);
+    //exit;
     return $mailing;
   }
 
