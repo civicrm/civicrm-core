@@ -382,9 +382,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     //CRM-15427
     $id = CRM_Utils_Request::retrieve( 'id' , 'Integer' );
     if ($id) {
-      $participantEventType = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $_GET['id'], 'event_type_id', 'id');
-      $participantRole  = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $_GET['id'], 'default_role_id');
-      $configs['allowSubTypes']['ParticipantEventName'] = array($_GET['id']);
+      $participantEventType = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $id, 'event_type_id', 'id');
+      $participantRole  = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'default_role_id');
+      $configs['allowSubTypes']['ParticipantEventName'] = array($id);
       $configs['allowSubTypes']['ParticipantEventType'] = array($participantEventType);
       $configs['allowSubTypes']['ParticipantRole'] = array($participantRole);
     }
