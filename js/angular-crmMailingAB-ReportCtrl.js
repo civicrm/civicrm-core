@@ -1,7 +1,7 @@
 (function (angular, $, _) {
 
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/abtesting/' + relPath;
+    return CRM.resourceUrls['civicrm'] + '/partials/crmMailingAB/' + relPath;
   };
   var crmMailingAB = angular.module('crmMailingAB');
 
@@ -38,7 +38,7 @@
         mail.id = selectedABTest.mailing_id_c;
         crmApi('Mailing', 'create', mail);
       });
-      $location.path('mailing/abtesting');
+      $location.path('abtest');
     };
 
     $scope.sendc = function () {
@@ -50,7 +50,7 @@
         mail.id = selectedABTest.mailing_id_c;
         crmApi('Mailing', 'create', mail);
       });
-      $location.path('mailing/abtesting');
+      $location.path('abtest');
     };
     var result = crmApi('Mailing', 'stats', {mailing_id: selectedABTest.mailing_id_a});
     $scope.r = [];
