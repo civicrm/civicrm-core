@@ -59,8 +59,8 @@
             <td>{$row.buy_now_value}</td>
             <td>{$row.min_bid_value}</td>
             <td>{$row.min_bid_increment}</td>
-	    <td>{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-	    <td>{$row.action}</td>
+      <td>{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+      <td>{$row.action}</td>
           </tr>
         {/foreach}
         </table>
