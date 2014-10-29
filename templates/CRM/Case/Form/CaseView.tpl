@@ -230,7 +230,7 @@
             "success": fnCallback
           });
         }
-      });   
+      });
     }
 
     function setCaseRolesSelectorClass( ) {
@@ -321,7 +321,7 @@
            "success": fnCallback
          });
        }
-     });   
+     });
    }
 
    function setClientRelationshipsSelectorClass( ) {

@@ -5,7 +5,7 @@
   /**
    * Handle user input - field or operator selection.
    *
-   * Decide whether to display select drop down, regular text or date 
+   * Decide whether to display select drop down, regular text or date
    * field for the given field and row.
    */
   function handleUserInputField() {
@@ -63,7 +63,7 @@
     $('input[id^=value]', row)
       .hide()
       .after('<select class="crm-form-' + multiSelect.substr(0, 5) + 'select required" ' + multiSelect + '><option value="">' + ts('Loading') + '...</option></select>');
-    
+
     fetchOptions(row, field);
   }
 

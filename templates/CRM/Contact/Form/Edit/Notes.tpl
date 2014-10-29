@@ -25,7 +25,7 @@
 *}
 <div class="crm-accordion-wrapper crm-notesBlock-accordion collapsed">
  <div class="crm-accordion-header">
-   
+
     {$title}
   </div><!-- /.crm-accordion-header -->
   <div class="crm-accordion-body" id="notesBlock">

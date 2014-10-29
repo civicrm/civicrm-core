@@ -545,7 +545,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select('task', "Record Survey Responses");
     $this->waitForElementPresent('_qf_Interview_cancel_interview');
 
-    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[6]/input[@type='text']");    
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[@id='row_{$id1}']/td[6]/input[@type='text']");
 
     $this->type("field_{$id1}_phone-Primary-1", 9876543210);
 
