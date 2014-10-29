@@ -57,6 +57,10 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
   public function getAngularModules() {
     $result = array();
+    $result['crmMailing'] = array(
+      'ext' => 'civicrm',
+      'js' => array('js/angular-Mailing.js' , 'js/angularsanitize.js' , 'packages/ckeditor/ckeditor.js'),
+    );
     $result['crmMailingAB'] = array(
       'ext' => 'civicrm',
       'js' => array(
@@ -69,20 +73,43 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'css' => array('css/angular-crmMailingAB.css'),
     );
 
+    $session = CRM_Core_Session::singleton();
+    $contactID = $session->get('userID');
     $civiMails = civicrm_api3('Mailing', 'get', array());
     $campNames = civicrm_api3('Campaign', 'get', array());
     $mailingabNames = civicrm_api3('MailingAB','get',array());
     $mailStatus = civicrm_api3('MailingJob', 'get', array());
     $groupNames = civicrm_api3('Group', 'get', array());
     $headerfooterList = civicrm_api3('MailingComponent', 'get', array());
-    $emailAdd = civicrm_api3('Email', 'get', array());
-    $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
-      'sequential' => 1,
-      'return' => array("msg_html", "id", "msg_title","msg_subject"),
-      'id' => array('>' => 58),
-    ));
-    $mailTokens = civicrm_api3('Mailing', 'get_token', array( 'usage' => 'Mailing'));
+
+    // FIXME: The following two items differ between GSOC CiviMail and ABTest branches
+    if (FALSE) {
+      // AB Test
+      $emailAdd = civicrm_api3('Email', 'get', array());
+      $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
+        'sequential' => 1,
+        'return' => array("msg_html", "id", "msg_title","msg_subject"),
+        'id' => array('>' => 58),
+      ));
+    } else {
+      // CiviMail UI
+      $emailAdd = civicrm_api3('Email', 'get', array(
+        'sequential' => 1,
+        'return' => "email",
+        'contact_id' => $contactID,
+      ));
+      $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(  'sequential' => 1,
+        'return' => array("msg_html", "id", "msg_title", "msg_subject"),
+        'workflow_id' => array('IS NULL' => ""),
+      ));
+    }
     $mailGrp = civicrm_api3('MailingGroup','get', array());
+    $mailTokens = civicrm_api3('Mailing', 'get_token', array( 'usage' => 'Mailing'));
+    $fromAddress = civicrm_api3('OptionGroup', 'get', array(
+      'sequential' => 1,
+      'name' => "from_email_address",
+      'api.OptionValue.get' => array(),
+    ));
     CRM_Core_Resources::singleton()->addSetting(array(
       'crmMailing' => array(
         'mailingabNames'=>array_values($mailingabNames['values']),
@@ -93,14 +120,15 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'headerfooterList' => array_values($headerfooterList['values']),
         'mesTemplate' => array_values($mesTemplate['values']),
         'emailAdd' => array_values($emailAdd['values']),
+        'mailGrp' => array_values($mailGrp['values']),
         'mailTokens' => array_values($mailTokens),
-        'mailGrp' => array_values($mailGrp['values'])
+        'contactid' => $contactID,
+        'fromAddress' => array_values($fromAddress['values'][0]['api.OptionValue.get']['values']),
       ),
     ));
 
     return $result;
   }
-
 
   /**
    * @return bool

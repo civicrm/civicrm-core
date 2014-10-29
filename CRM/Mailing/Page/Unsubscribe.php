@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,33 +27,16 @@
 
 /**
  *
- * APIv3 functions for registering/processing mailing events.
- *
- * @package CiviCRM_APIv3
- * @subpackage API_Mailing
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
+class CRM_Mailing_Page_Unsubscribe extends CRM_Mailing_Page_Common {
 
-/**
- * Files required for this package
- */
-
-
-/**
- * Returns array of Mailing Recipients
- *
- * @param array $params Array of one or more valid
- * @param array $ids
- *
- * @return array API return Array of matching mailing jobs
- * {@getfields mailing_recipient_get}
- * @access public
- */
-function civicrm_api3_mailing_recipients_get($params, $ids = array()) {
-	return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  function run() {
+    $this->_type = 'unsubscribe';
+    return parent::run();
+  }
 }
-
-
 
