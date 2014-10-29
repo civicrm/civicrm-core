@@ -156,10 +156,10 @@
         </span>
       {/if}
       <div id="recurHelp" class="description">
-				{ts}Your recurring contribution will be processed automatically.{/ts}
-				{if $is_recur_installments}
-					{ts}You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.{/ts}
-				{/if}
+        {ts}Your recurring contribution will be processed automatically.{/ts}
+        {if $is_recur_installments}
+          {ts}You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.{/ts}
+        {/if}
         {if $is_email_receipt}
           {ts}You will receive an email receipt for each recurring contribution.{/ts}
         {/if}
@@ -353,9 +353,9 @@
   {/if}
   {literal}
 
-	cj('input[name="soft_credit_type_id"]').on('change', function() {
-		enableHonorType();
-	});
+  cj('input[name="soft_credit_type_id"]').on('change', function() {
+    enableHonorType();
+  });
 
   function enableHonorType( ) {
     var selectedValue = cj('input[name="soft_credit_type_id"]:checked');
@@ -367,9 +367,9 @@
     }
   }
 
-	cj('input[id="is_recur"]').on('change', function() {
-		showRecurHelp();
-	});
+  cj('input[id="is_recur"]').on('change', function() {
+    showRecurHelp();
+  });
 
   function showRecurHelp( ) {
     var showHelp = cj('input[id="is_recur"]:checked');
@@ -435,8 +435,8 @@
 
   CRM.$(function($) {
     toggleConfirmButton();
-		enableHonorType();
-		showRecurHelp();
+    enableHonorType();
+    showRecurHelp();
   });
 
   function showHidePayPalExpressOption() {

@@ -34,7 +34,7 @@
     {/if}
 
     <div id="help">
-        <p>{ts 1=$displayName}This page lists all grants for %1 since inception.{/ts} 
+        <p>{ts 1=$displayName}This page lists all grants for %1 since inception.{/ts}
         {if $permission EQ 'edit'}
           {capture assign=link}accesskey='N' href='{$newGrantURL}' class='action-item'{/capture}
             {ts 1=$link}Click <a %1>Add Grant</a> to record a Grant for this contact.{/ts}
@@ -47,7 +47,7 @@
             </div>
         {/if}
     {if $rows}
-        
+
         {include file="CRM/Grant/Form/Selector.tpl"}
     {else}
         <div class="messages status">
