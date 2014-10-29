@@ -52,7 +52,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   protected function setUp() {
     parent::setUp();
   }
-  
+
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
@@ -86,13 +86,13 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       'used_for'            => 'activity'
     );
 
-    $generatedEntities = $recursion->generate(); 
+    $generatedEntities = $recursion->generate();
     $this->assertEquals(5, count($generatedEntities['civicrm_activity']), "Cehck if number of iterations are 5");
     $expectedDates = array(
-      '20141025103000', 
-      '20141227103000', 
-      '20150328103000', 
-      '20150627103000', 
+      '20141025103000',
+      '20141227103000',
+      '20150328103000',
+      '20150627103000',
       '20150926103000'
     );
     foreach ($generatedEntities['civicrm_activity'] as $entityID) {
@@ -117,9 +117,9 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     }
     $resultDates = array_diff($actualDates, $expectedDates);
     $this->assertEquals(0, count($resultDates), "Check if all the value in expected array matches actual array");
-    
+
   }
-  
+
   /**
    * Testing Event Generation through Entity Recursion
    */
@@ -135,7 +135,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $daoEvent->is_active = 1;
     $daoEvent->save();
     $this->assertDBNotNull('CRM_Event_DAO_Event', $daoEvent->id, 'id', 'id', 'Check DB if event was created');
-    
+
     //Create tell a friend for event
     $daoTellAFriend = new CRM_Friend_DAO_Friend();
     $daoTellAFriend->entity_table = 'civicrm_event';
@@ -164,17 +164,17 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       array(
         'table'         => 'civicrm_tell_friend',
         'findCriteria'  => array(
-          'entity_id'    => $recursion->entity_id, 
+          'entity_id'    => $recursion->entity_id,
           'entity_table' => 'civicrm_event'
         ),
         'linkedColumns' => array('entity_id'),
         'isRecurringEntityRecord' => TRUE,
       ),
     );
-    
+
     $interval = $recursion->getInterval($daoEvent->start_date, $daoEvent->end_date);
     $recursion->intervalDateColumns = array('end_date' => $interval);
-    $generatedEntities = $recursion->generate(); 
+    $generatedEntities = $recursion->generate();
     $this->assertArrayHasKey('civicrm_event', $generatedEntities, 'Check if generatedEntities has civicrm_event as required key');
     $expectedDates = array(
       '20141027103000' => '20141029103000',
@@ -182,7 +182,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       '20141110103000' => '20141112103000',
       '20141117103000' => '20141119103000'
     );
-    
+
     $this->assertCount($recursion->schedule['start_action_offset'], $generatedEntities['civicrm_event'], 'Check if the number of events created are right');
     $actualDates = array();
     foreach($generatedEntities['civicrm_event'] as $key => $val) {
@@ -191,16 +191,16 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       $endDate = date('YmdHis', strtotime(CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $val, 'end_date', 'id')));
       $actualDates[$startDate] = $endDate;
     }
-    
+
     $resultDates = array_diff($actualDates, $expectedDates);
     $this->assertEquals(0, count($resultDates), "Check if all the value in expected array matches actual array");
-    
+
     foreach($generatedEntities['civicrm_tell_friend'] as $key => $val) {
       $this->assertDBNotNull('CRM_Friend_DAO_Friend', $val, 'id', 'id', 'Check if friends were created in loop');
       $this->assertDBCompareValue('CRM_Friend_DAO_Friend', $val, 'entity_id', 'id', $generatedEntities['civicrm_event'][$key], 'Check DB if correct FK was maintained with event for Friend');
     }
     $this->assertCount($recursion->schedule['start_action_offset'], $generatedEntities['civicrm_tell_friend'], 'Check if the number of tell a friend records are right');
-    
+
     // set mode to ALL, i.e any change to changing event affects all related recurring activities
     $recursion->mode(3);
 
