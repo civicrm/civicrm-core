@@ -632,23 +632,23 @@ CRM.$(function($) {
         for(m = re.exec(currencySymbol); m; m = re.exec(currencySymbol)){
           currencySymbol = m[1];
         }
-        var taxRate = taxRates[financialType]; 
+        var taxRate = taxRates[financialType];
         if (!taxRate) {
           taxRate = 0;
-        }  
+        }
         var totalAmount = $('#total_amount').val();
         var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
         var seperator = '{/literal}{$config->monetaryDecimalPoint}{literal}';
         // replace all thousandMarker and change the seperator to a dot
-	totalAmount = totalAmount.replace(thousandMarker,'').replace(seperator,'.');
+  totalAmount = totalAmount.replace(thousandMarker,'').replace(seperator,'.');
 
-      	var totalTaxAmount = '{/literal}{$totalTaxAmount}{literal}';
-      	var taxAmount = (taxRate/100)*totalAmount;
-      	taxAmount = isNaN (taxAmount) ? 0:taxAmount;
-      	var totalTaxAmount = taxAmount + Number(totalAmount);
-	totalTaxAmount = formatMoney( totalTaxAmount, 2, seperator, thousandMarker );
+        var totalTaxAmount = '{/literal}{$totalTaxAmount}{literal}';
+        var taxAmount = (taxRate/100)*totalAmount;
+        taxAmount = isNaN (taxAmount) ? 0:taxAmount;
+        var totalTaxAmount = taxAmount + Number(totalAmount);
+  totalTaxAmount = formatMoney( totalTaxAmount, 2, seperator, thousandMarker );
 
-      	$("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
+        $("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
       }
       event.handled = true;
     }
@@ -661,7 +661,7 @@ CRM.$(function($) {
 
 CRM.$(function($) {
   $('#price_set_id').click(function() {
-    if( $('#price_set_id').val() ) { 
+    if( $('#price_set_id').val() ) {
       $('#totalAmountBlock').hide();
     }
     else {
