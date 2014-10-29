@@ -69,7 +69,7 @@ function civicrm_api3_contribution_create(&$params) {
 
   // make sure tax calculation is handled via api
   $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
-  
+
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
 }
 
