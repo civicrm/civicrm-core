@@ -1475,7 +1475,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('mailing_id', $ids, CRM_Utils_Array::value('id', $params));
 
-
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'Mailing', $id, $params);
     }
@@ -1658,8 +1657,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       // Populate the recipients.
       $mailing->getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, FALSE);
     }
-    //print_r($params);
-    //exit;
+
     return $mailing;
   }
 

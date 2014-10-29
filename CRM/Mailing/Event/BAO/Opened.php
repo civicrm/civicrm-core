@@ -226,9 +226,6 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
   public static function &getRows($mailing_id, $job_id = NULL,
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $contact_id= NULL
   ) {
-    CRM_Core_Error::debug_var('3',$offset);
-    CRM_Core_Error::debug_var('4',$rowCount);
-
     $dao = new CRM_Core_Dao();
 
     $open    = self::getTableName();
@@ -272,10 +269,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     $orderBy = "sort_name ASC, {$open}.time_stamp DESC";
     if ($sort) {
       if (is_string($sort)) {
-
         $sort = CRM_Utils_Type::escape($sort, 'String');
-        CRM_Core_Error::debug_var('2',$sort);
-
         $orderBy = $sort;
       }
       else {
@@ -289,7 +283,6 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
       //Added "||$rowCount" to avoid displaying all records on first page
       $query .= ' LIMIT ' . CRM_Utils_Type::escape($offset, 'Integer') . ', ' . CRM_Utils_Type::escape($rowCount, 'Integer');
     }
-    CRM_Core_Error::debug_var('1',$query);
     $dao->query($query);
 
     $results = array();
