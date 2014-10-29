@@ -994,14 +994,14 @@
     return {
       restrict : 'AE',
       link: function(scope, element, attrs){
-          
-        function format(item){ 
+
+        function format(item){
             return item.label.replace(/&/g, '&amp;')
             .replace(/"/g, '&quot;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
         }
-          
+
         CRM.api3('OptionGroup', 'get', {
           "sequential": 1,
           "name": "from_email_address"
@@ -1011,21 +1011,18 @@
             "sequential": 1,
             "option_group_id": result.id
           }).done(function(orgEmails) {
-              
+
               //$sce.trustAsHtml(
-          
+
             $(element).select2({
               class: "abtesting-form-element",
               data: orgEmails.values,
               formatResult: format,
               formatSelection: format,
               placeholder:"Select reply to address"});
-          
-          });
-          
-        });  
-                    
 
+          });
+        });
       }
     };
   });

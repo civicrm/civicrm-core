@@ -344,7 +344,8 @@
           $scope.mailid.push(c);
         });
         for(var a in chck)
-        {	var b ={}
+        {
+          var b ={}
           b.id = chck[a];
           var splt = chck[a].split(" ");
 
@@ -431,9 +432,9 @@
           resubscribe_id: $scope.currentMailing.resubscribe_id,
           body_html: $scope.currentMailing.body_html,
           body_text: $scope.currentMailing.body_text,
-          campaign_id:	$scope.currentMailing.campaign_id==null ? "" : $scope.currentMailing.campaign_id,
-          header_id:	$scope.currentMailing.header_id,
-          footer_id:	$scope.currentMailing.footer_id,
+          campaign_id: $scope.currentMailing.campaign_id==null ? "" : $scope.currentMailing.campaign_id,
+          header_id: $scope.currentMailing.header_id,
+          footer_id: $scope.currentMailing.footer_id,
           groups: {include: $scope.incGrp,
             exclude: $scope.excGrp
           },
@@ -473,9 +474,9 @@
           resubscribe_id: $scope.currentMailing.resubscribe_id,
           body_html: $scope.currentMailing.body_html,
           body_text: $scope.currentMailing.body_text,
-          campaign_id:	$scope.currentMailing.campaign_id==null ? "" : $scope.currentMailing.campaign_id,
-          header_id:	$scope.currentMailing.header_id,
-          footer_id:	$scope.currentMailing.footer_id,
+          campaign_id: $scope.currentMailing.campaign_id==null ? "" : $scope.currentMailing.campaign_id,
+          header_id: $scope.currentMailing.header_id,
+          footer_id: $scope.currentMailing.footer_id,
           is_completed: $scope.currentMailing.is_completed,
           dedupe_email: $scope.currentMailing.dedupe_email
         },
@@ -522,9 +523,9 @@
           body_text: $scope.currentMailing.body_text,
           scheduled_date: $scope.currentMailing.scheduled_date==null ? "" : $scope.currentMailing.scheduled_date,
           scheduled_id: $scope.currentMailing.scheduled_id==null ? "" : $scope.currentMailing.scheduled_id,
-          campaign_id:	$scope.currentMailing.campaign_id==null ? "" : $scope.currentMailing.campaign_id,
-          header_id:	$scope.currentMailing.header_id,
-          footer_id:	$scope.currentMailing.footer_id,
+          campaign_id: $scope.currentMailing.campaign_id==null ? "" : $scope.currentMailing.campaign_id,
+          header_id: $scope.currentMailing.header_id,
+          footer_id: $scope.currentMailing.footer_id,
           is_completed: $scope.currentMailing.is_completed,
           approver_id: $scope.currentMailing.approver_id,
           approval_status_id: $scope.currentMailing.approval_status_id,
@@ -612,7 +613,7 @@
   });
 
 
-// Directive to go to the next tab    
+// Directive to go to the next tab
   crmMailing.directive('nexttab', function() {
     return {
       restrict: 'A',

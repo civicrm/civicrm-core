@@ -1,15 +1,15 @@
 <!--
 Controller: MailCtrl
-Required vars: groupNamesList 
+Required vars: groupNamesList
 MailingGroup api needs to be improved to bind the chosen groups
 -->
 
 <br>
 <select chsgroup multiple ng-model="incGroup">
-	<option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} civicrm_group include" > {{grp.title}} </option>
-	<option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} civicrm_group exclude" > {{grp.title}} </option>
-	<option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} civicrm_mailing include" > {{ml.name}} </option>
-	<option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} civicrm_mailing exclude" > {{ml.name}} </option>
+  <option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} civicrm_group include" > {{grp.title}} </option>
+  <option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} civicrm_group exclude" > {{grp.title}} </option>
+  <option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} civicrm_mailing include" > {{ml.name}} </option>
+  <option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} civicrm_mailing exclude" > {{ml.name}} </option>
 </select>
 <br> <br>
 
