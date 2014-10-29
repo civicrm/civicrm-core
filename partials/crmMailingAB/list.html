@@ -23,8 +23,8 @@ Required vars: mailingABList
       <td>{{mailingAB.name}}</td>
       <td>{{mailingAB.id}}</td>
       <td>{{testing_criteria[mailingAB.testing_criteria_id]}}</td>
-      <td><a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/{{mailingAB.id}}">Edit</a>&nbsp
-      <a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/report/{{mailingAB.id}}">Results</a></td>
+      <td><a class="action-item crm-hover-button" ng-href="#/abtest/{{mailingAB.id}}">Edit</a>&nbsp
+      <a class="action-item crm-hover-button" ng-href="#/abtest/report/{{mailingAB.id}}">Results</a></td>
 
     </tr>
     </tbody>
@@ -39,5 +39,5 @@ Required vars: mailingABList
 
 <div class="crm-submit-buttons">
   <br>
-  <a ng-href="#/mailing/abtesting/new" class="button"><span><div class="icon add-icon"></div>New A/B Test</span></a>
+  <a ng-href="#/abtest/new" class="button"><span><div class="icon add-icon"></div>New A/B Test</span></a>
 </div>

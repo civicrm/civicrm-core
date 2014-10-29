@@ -4,7 +4,7 @@
 (function (angular, $, _) {
 
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/abtesting/' + relPath;
+    return CRM.resourceUrls['civicrm'] + '/partials/crmMailingAB/' + relPath;
   };
   var crmMailingAB = angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'ngSanitize']);
 
@@ -16,7 +16,7 @@
   crmMailingAB.config([
     '$routeProvider',
     function ($routeProvider) {
-      $routeProvider.when('/mailing/abtesting', {
+      $routeProvider.when('/abtest', {
         templateUrl: partialUrl('list.html'),
         controller: 'ABListingCtrl',
         resolve: {
@@ -25,7 +25,7 @@
           }
         }
       });
-      $routeProvider.when('/mailing/abtesting/report/:id', {
+      $routeProvider.when('/abtest/report/:id', {
         templateUrl: partialUrl('report.html'),
         controller: 'ReportCtrl',
         resolve: {
@@ -34,7 +34,7 @@
           }
         }
       });
-      $routeProvider.when('/mailing/abtesting/:id', {
+      $routeProvider.when('/abtest/:id', {
         templateUrl: partialUrl('main.html'),
         controller: 'crmABTestingTabsCtrl',
         resolve: {
@@ -59,7 +59,7 @@
   // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
   /**
    * This controler lists the existing ABtests
-   * used on /partials/abtesting/list.html
+   * used on /partials/abtest/list.html
    * @returns mailingABList - object that contains the existing AB mailings
    * @returns testing_criteria - array that has the name of the different test types
    */
