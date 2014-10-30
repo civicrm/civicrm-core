@@ -310,13 +310,23 @@ class CRM_Core_Form_RecurringEntity {
    * @return None
    */
   static function postProcess($params = array(), $type, $linkedEntities = array()) {
-    $params['entity_id'] = self::$_entityId;
+    //Check entity_id not present in params take it from class variable
+    if (!CRM_Utils_Array::value('entity_id', $params)) {
+      $params['entity_id'] = self::$_entityId;
+    }
     //Process this function only when you get this variable
     if ($params['allowRepeatConfigToSubmit'] == 1) {
       if (CRM_Utils_Array::value('entity_table', $params) && CRM_Utils_Array::value('entity_id', $params) && $type) {
         $params['used_for'] = $type;
-        $params['parent_entity_id'] = self::$_parentEntityId;
-        $params['id'] = self::$_scheduleReminderID;
+        if (!CRM_Utils_Array::value('parent_entity_id', $params)) {
+          $params['parent_entity_id'] = self::$_parentEntityId;
+        }
+        if (CRM_Utils_Array::value('schedule_reminder_id', $params)) {
+          $params['id'] = $params['schedule_reminder_id'];
+        }
+        else {
+          $params['id'] = self::$_scheduleReminderID;
+        }
 
         //Save post params to the schedule reminder table
         $dbParams = CRM_Core_BAO_RecurringEntity::mapFormValuesToDB($params);
@@ -330,7 +340,7 @@ class CRM_Core_Form_RecurringEntity {
 
         //exclude dates 
         $excludeDateList = array();
-        if (CRM_Utils_Array::value('copyExcludeDates', $params) && CRM_Utils_Array::value('parent_entity_id', $params)) {   
+        if (CRM_Utils_Array::value('copyExcludeDates', $params) && CRM_Utils_Array::value('parent_entity_id', $params) && $actionScheduleObj->entity_value) {   
           //Since we get comma separated values lets get them in array
           $excludeDates = array();
           $excludeDates = explode(",", $params['copyExcludeDates']);
@@ -346,7 +356,7 @@ class CRM_Core_Form_RecurringEntity {
           }
           $optionGroupParams = 
               array(
-                'name'        => $type.'_repeat_exclude_dates_'.$params['parent_entity_id'],
+                'name'        => $type.'_repeat_exclude_dates_'.$actionScheduleObj->entity_value,
                 'title'       => $type.' recursion',
                 'is_reserved' => 0,
                 'is_active'   => 1

@@ -255,8 +255,11 @@
         var ajaxurl = CRM.url("civicrm/ajax/recurringentity/generate-preview");
         var entityID = parseInt('{/literal}{$currentEntityId}{literal}');
         var entityTable = '{/literal}{$entityTable}{literal}';
-        if (entityID != "" && entityTable != "") {
-            ajaxurl += "?entity_id="+entityID+"&entity_table="+entityTable;
+        if (entityTable != "") {
+          ajaxurl += "?entity_table="+entityTable;
+        }
+        if (entityID != "") {
+          ajaxurl += "&entity_id="+entityID;
         }
         var formData = cj('form').serializeArray();
         cj.ajax({
