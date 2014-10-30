@@ -53,7 +53,21 @@
   crmMailing2.controller('EditMailingCtrl', function ($scope, selectedMail) {
     $scope.partialUrl = partialUrl;
     $scope.ts = CRM.ts('CiviMail');
-    $scope.deleteMe = 'deleteMe';
+    $scope.send = function() {
+      CRM.alert('Send!');
+    };
+    $scope.save = function() {
+      CRM.alert('Save!');
+    };
+    $scope.cancel = function() {
+      CRM.alert('Cancel!');
+    };
+    $scope.leave = function() {
+      window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
+        reset: 1,
+        scheduled: 'false'
+      });
+    };
   });
 
 })(angular, CRM.$, CRM._);
