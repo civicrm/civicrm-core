@@ -1,0 +1,47 @@
+<div crm-ui-wizard>
+  <div crm-ui-wizard-step crm-title="ts('Define Mailing')">
+    <div crm-ui-accordion crm-title="ts('Summary')">
+      <div ng-include="partialUrl('summary.html')" />
+    </div>
+    <div crm-ui-tabset>
+      <div crm-ui-tab crm-title="ts('Mailing')">
+        <div ng-include="partialUrl('mailing.html')" />
+      </div>
+      <div crm-ui-tab crm-title="ts('Attachments')">
+        <div ng-include="partialUrl('attachments.html')" />
+      </div>
+      <div crm-ui-tab crm-title="ts('Header and Footer')">
+        <div ng-include="partialUrl('headerFooter.html')" />
+      </div>
+      <div crm-ui-tab crm-title="ts('Publication')">
+        <div ng-include="partialUrl('publication.html')" />
+      </div>
+      <div crm-ui-tab crm-title="ts('Responses')">
+        <div ng-include="partialUrl('responses.html')" />
+      </div>
+      <div crm-ui-tab crm-title="ts('Tracking')">
+        <div ng-include="partialUrl('tracking.html')" />
+      </div>
+    </div>
+    <div crm-ui-accordion crm-title="ts('Preview')">
+      <div ng-include="partialUrl('preview.html')" />
+    </div>
+  </div>
+  <div crm-ui-wizard-step crm-title="ts('Review and Schedule')">
+    <div crm-ui-accordion crm-title="ts('Review')">
+      <div ng-include="partialUrl('review.html')" />
+    </div>
+    <div crm-ui-accordion crm-title="ts('Schedule')">
+      <div ng-include="partialUrl('schedule.html')" />
+      <button ng-click="mailing.send();
+                gotoListing();">Schedule</button>
+    </div>
+  </div>
+  <div crm-ui-wizard-footer>
+    <button ng-click="mailing.save();
+              gotoListing();">Save Draft</button>
+    <button ng-click="mailing.destroy();
+              gotoListing();">Abort</button>
+  </div>
+
+</div>

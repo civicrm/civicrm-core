@@ -3,6 +3,19 @@
   var idCount = 0;
 
   angular.module('crmUi', [])
+
+    // example <div crm-ui-accordion crm-title="ts('My Title')">...content...</div>
+    .directive('crmUiAccordion', function() {
+      return {
+        scope: {
+          crmTitle: '@'
+        },
+        template: '<div><b>(Accordion: {{$parent.$eval(crmTitle)}})</b><span ng-transclude/></div>',
+        transclude: true,
+        link: function (scope, element, attrs) {}
+      };
+    })
+
     // example: <form name="myForm">...<label crm-ui-label crm-for="myField">My Field</span>...<input name="myField"/>...</form>
     //
     // Label adapts based on <input required>, <input ng-required>, or any other validation.
@@ -127,6 +140,57 @@
         }
       };
     })
+
+    // example <div crm-ui-tab crm-title="ts('My Title')">...content...</div>
+    .directive('crmUiTab', function($parse) {
+      return {
+        scope: {
+          crmTitle: '@'
+        },
+        template: '<div><b>(Tab: {{$parent.$eval(crmTitle)}})</b><span ng-transclude/></div>',
+        transclude: true,
+        link: function (scope, element, attrs) {}
+      };
+    })
+
+    // example: <div crm-ui-tab-set><div crm-ui-tab crm-title="Tab 1">...</div><div crm-ui-tab crm-title="Tab 2">...</div></div>
+    .directive('crmUiTabSet', function() {
+      return {
+        template: '<div><span ng-transclude/></div>',
+        transclude: true,
+        link: function (scope, element, attrs) {}
+      };
+    })
+
+    // example: <div crm-ui-wizard><div crm-ui-wizard-step crm-title="Step 1">...</div><div crm-ui-wizard-step crm-title="Step 2">...</div></div>
+    .directive('crmUiWizard', function() {
+      return {
+        template: '<div><span ng-transclude/></div>',
+        transclude: true,
+        link: function (scope, element, attrs) {}
+      };
+    })
+
+    .directive('crmUiWizardFooter', function() {
+      return {
+        template: '<div><span ng-transclude/></div>',
+        transclude: true,
+        link: function (scope, element, attrs) {}
+      };
+    })
+
+    // example <div crm-ui-wizard-step crm-title="ts('My Title')">...content...</div>
+    .directive('crmUiWizardStep', function() {
+      return {
+        scope: {
+          crmTitle: '@'
+        },
+        template: '<div><b>(Step: {{$parent.$eval(crmTitle)}})</b><span ng-transclude/></div>',
+        transclude: true,
+        link: function (scope, element, attrs) {}
+      };
+    })
+
     // Example: <button crm-confirm="{message: ts('Are you sure you want to continue?')}" on-yes="frobnicate(123)">Frobincate</button>
     // Example: <button crm-confirm="{type: 'disable', obj: myObject}" on-yes="myObject.is_active=0; myObject.save()">Disable</button>
     .directive('crmConfirm', function () {
