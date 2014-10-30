@@ -20,22 +20,42 @@
     };
   };
 
+  var getMailing = function ($route, crmApi) {
+    return ($route.current.params.id == 'new') ? createMailing() : crmApi('Mailing', 'getsingle', {id: $route.current.params.id});
+  };
+
   crmMailing2.config(['$routeProvider',
     function ($routeProvider) {
       $routeProvider.when('/mailing2', {
         template: '<div></div>',
         controller: 'ListMailingsCtrl'
       });
-
       $routeProvider.when('/mailing2/:id', {
         templateUrl: partialUrl('edit.html'),
         controller: 'EditMailingCtrl',
         resolve: {
-          selectedMail: function ($route, crmApi) {
-            return ($route.current.params.id == 'new')
-                    ? createMailing()
-                    : crmApi('Mailing', 'getsingle', {id: $route.current.params.id});
-          }
+          selectedMail: getMailing
+        }
+      });
+      $routeProvider.when('/mailing2/:id/unified', {
+        templateUrl: partialUrl('edit-unified.html'),
+        controller: 'EditMailingCtrl',
+        resolve: {
+          selectedMail: getMailing
+        }
+      });
+      $routeProvider.when('/mailing2/:id/unified2', {
+        templateUrl: partialUrl('edit-unified2.html'),
+        controller: 'EditMailingCtrl',
+        resolve: {
+          selectedMail: getMailing
+        }
+      });
+      $routeProvider.when('/mailing2/:id/wizard', {
+        templateUrl: partialUrl('edit-wizard.html'),
+        controller: 'EditMailingCtrl',
+        resolve: {
+          selectedMail: getMailing
         }
       });
     }
