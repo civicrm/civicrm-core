@@ -54,8 +54,7 @@ class CRM_Core_Page_AJAX_RecurringEntity {
     $params = $formValues = $genericResult = array();
     $formValues = $_REQUEST;
     if (!empty($formValues) &&
-        CRM_Utils_Array::value('entity_table', $formValues) &&
-        CRM_Utils_Array::value('entity_id', $formValues)) {
+        CRM_Utils_Array::value('entity_table', $formValues)) {
         $startDateColumnName = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['dateColumns'][0];
         $endDateColumnName = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['intervalDateColumns'][0];
       
@@ -71,16 +70,17 @@ class CRM_Core_Page_AJAX_RecurringEntity {
           $recursion->excludeDateRangeColumns = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['excludeDateRangeColumns'];
         }
         
-        $parentEventId = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['entity_id'], $formValues['entity_table']);
-        if (!$parentEventId) {
-          $parentEventId = $formValues['entity_id'];
+        if (CRM_Utils_Array::value('entity_id', $formValues)) {
+          $parentEventId = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['entity_id'], $formValues['entity_table']);
         }
 
         //Check if there is any enddate column defined to find out the interval between the two range
         if (CRM_Utils_Array::value('intervalDateColumns', CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']])) {
           $daoName = CRM_Core_BAO_RecurringEntity::$_tableDAOMapper[$formValues['entity_table']];
-          $startDate = CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $startDateColumnName);
-          $endDate = CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $endDateColumnName);
+          if ($parentEventId) {
+            $startDate = CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $startDateColumnName);
+            $endDate = CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $endDateColumnName);
+          }
           if ($endDate) {
               $interval  = $recursion->getInterval($startDate, $endDate);
               $recursion->intervalDateColumns = array($endDateColumnName => $interval);
@@ -101,7 +101,7 @@ class CRM_Core_Page_AJAX_RecurringEntity {
         }
         
         //Show the list of participants registered for the events if any
-        if ($formValues['entity_table']) {
+        if ($formValues['entity_table'] == "civicrm_event") {
           $getConnectedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($parentEventId, 'civicrm_event', TRUE);
           if ($getConnectedEntities) {
             $participantDetails = CRM_Event_Form_ManageEvent_Repeat::getParticipantCountforEvent($getConnectedEntities);

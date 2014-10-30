@@ -205,7 +205,7 @@
     </tr>
   {/if}
   
-  {if $action eq 2}
+  {if $action eq 2 OR $action eq 1}
     <tr class="crm-activity-form-block-recurring_activity">
       <td colspan="2">
         {include file="CRM/Core/Form/RecurringEntity.tpl"}
@@ -213,14 +213,16 @@
           <script type="text/javascript">
             CRM.$(function($) {
               if ($('#activity_date_time').val() !== "" && $('#activity_date_time_time').val() !== "") {
-                $('#repetition_start_date').val($('#activity_date_time').val());
+                $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
                 $('#repetition_start_date_time').val($('#activity_date_time_time').val());
               }
               $('#activity_date_time_display').blur(function() {
-                $('#repetition_start_date').val($('#activity_date_time').val());
+                $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
                 $('#repetition_start_date_time').val($('#activity_date_time_time').val());
               });
-              $('#recurring-entity-block').addClass('collapsed');
+              if ($('#start_action_offset').val() == "" && $('#repeat_absolute_date_display').val() == "") {
+                $('#recurring-entity-block').addClass('collapsed');
+              }
             });
           </script>
         {/literal}
