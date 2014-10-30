@@ -1651,7 +1651,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
   $customfields = CRM_Core_BAO_CustomField::getFields($entity,
     FALSE,
     FALSE,
-    CRM_Utils_Array::value('contact_sub_type', $params, FALSE),
+    CRM_Utils_Array::value('contact_sub_type', $params),
     NULL,
     $retrieveOnlyParent,
     FALSE,
