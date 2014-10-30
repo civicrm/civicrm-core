@@ -37,11 +37,10 @@
                 gotoListing();">Schedule</button>
     </div>
   </div>
-  <div crm-ui-wizard-footer>
-    <button ng-click="mailing.save();
-              gotoListing();">Save Draft</button>
+  <span crm-ui-wizard-buttons style="float:right;">
     <button ng-click="mailing.destroy();
               gotoListing();">Abort</button>
-  </div>
-
+    <button ng-click="mailing.save();
+              gotoListing();">Save Draft</button>
+  </span>
 </div>

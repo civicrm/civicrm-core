@@ -2,6 +2,11 @@
 (function (angular, $, _) {
   var idCount = 0;
 
+  var partialUrl = function (relPath) {
+    return CRM.resourceUrls['civicrm'] + '/partials/crmUi/' + relPath;
+  };
+
+
   angular.module('crmUi', [])
 
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
@@ -168,32 +173,113 @@
       };
     })
 
-    // example: <div crm-ui-wizard><div crm-ui-wizard-step crm-title="Step 1">...</div><div crm-ui-wizard-step crm-title="Step 2">...</div></div>
+    // example: <div crm-ui-wizard="myWizardCtrl"><div crm-ui-wizard-step crm-title="ts('Step 1')">...</div><div crm-ui-wizard-step crm-title="ts('Step 2')">...</div></div>
+    // Note: "myWizardCtrl" has various actions/properties like next() and $first().
+    // WISHLIST: Allow each step to determine if it is "complete" / "valid" / "selectable"
+    // WISHLIST: Allow each step to enable/disable (show/hide) itself
     .directive('crmUiWizard', function() {
       return {
-        template: '<div><span ng-transclude/></div>',
+        restrict: 'EA',
+        scope: {
+          crmUiWizard: '@'
+        },
+        templateUrl: partialUrl('wizard.html'),
         transclude: true,
+        controllerAs: 'crmUiWizardCtrl',
+        controller: function($scope, $parse) {
+          var steps = $scope.steps = []; // array<$scope>
+          var crmUiWizardCtrl = this;
+          var maxVisited = 0;
+          var selectedIndex = null;
+
+          var findIndex = function() {
+            var found = null;
+            angular.forEach(steps, function(step, stepKey) {
+              if (step.selected) found = stepKey;
+            });
+            return found;
+          };
+
+          /// @return int the index of the current step
+          this.$index = function() { return selectedIndex; };
+          /// @return bool whether the currentstep is first
+          this.$first = function() { return this.$index() === 0; };
+          /// @return bool whether the current step is last
+          this.$last = function() { return this.$index() === steps.length -1; };
+          this.$maxVisit = function() { return maxVisited; }
+          this.iconFor = function(index) {
+            if (index < this.$index()) return '√';
+            if (index === this.$index()) return '»';
+            return ' ';
+          }
+          this.isSelectable = function(step) {
+            if (step.selected) return false;
+            var result = false;
+            angular.forEach(steps, function(otherStep, otherKey) {
+              if (step === otherStep && otherKey <= maxVisited) result = true;
+            });
+            return result;
+          };
+
+          /*** @param Object step the $scope of the step */
+          this.select = function(step) {
+            angular.forEach(steps, function(otherStep, otherKey) {
+              otherStep.selected = (otherStep === step);
+              if (otherStep === step && maxVisited < otherKey) maxVisited = otherKey;
+            });
+            selectedIndex = findIndex();
+          };
+          /*** @param Object step the $scope of the step */
+          this.add = function(step) {
+            if (steps.length === 0) {
+              step.selected = true;
+              selectedIndex = 0;
+            }
+            steps.push(step);
+          };
+          this.goto = function(index) {
+            if (index < 0) index = 0;
+            if (index >= steps.length) index = steps.length-1;
+            this.select(steps[index]);
+          };
+          this.previous = function() { this.goto(this.$index()-1); };
+          this.next = function() { this.goto(this.$index()+1); };
+          if ($scope.crmUiWizard) {
+            $parse($scope.crmUiWizard).assign($scope.$parent, this)
+          }
+        },
         link: function (scope, element, attrs) {}
       };
     })
 
-    .directive('crmUiWizardFooter', function() {
+    // Use this to add extra markup to wizard
+    .directive('crmUiWizardButtons', function() {
       return {
-        template: '<div><span ng-transclude/></div>',
+        require: '^crmUiWizard',
+        restrict: 'EA',
+        scope: {},
+        template: '<span ng-transclude></span>',
         transclude: true,
-        link: function (scope, element, attrs) {}
+        link: function (scope, element, attrs, crmUiWizardCtrl) {
+          var realButtonsEl = $(element).closest('.crm-wizard').find('.crm-wizard-buttons');
+          $(element).appendTo(realButtonsEl);
+        }
       };
     })
 
     // example <div crm-ui-wizard-step crm-title="ts('My Title')">...content...</div>
     .directive('crmUiWizardStep', function() {
       return {
+        require: '^crmUiWizard',
+        restrict: 'EA',
         scope: {
           crmTitle: '@'
         },
-        template: '<div><b>(Step: {{$parent.$eval(crmTitle)}})</b><span ng-transclude/></div>',
+        template: '<div class="crm-wizard-step" ng-show="selected" ng-transclude/></div>',
         transclude: true,
-        link: function (scope, element, attrs) {}
+        link: function (scope, element, attrs, crmUiWizardCtrl) {
+          crmUiWizardCtrl.add(scope);
+        }
       };
     })
 
