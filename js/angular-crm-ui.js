@@ -4,15 +4,21 @@
 
   angular.module('crmUi', [])
 
-    // example <div crm-ui-accordion crm-title="ts('My Title')">...content...</div>
+    // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
+    // WISHLIST: crmCollapsed should support two-way/continous binding
     .directive('crmUiAccordion', function() {
       return {
         scope: {
-          crmTitle: '@'
+          crmTitle: '@',
+          crmCollapsed: '@'
         },
-        template: '<div><b>(Accordion: {{$parent.$eval(crmTitle)}})</b><span ng-transclude/></div>',
+        template: '<div class="crm-accordion-wrapper" ng-class="cssClasses"><div class="crm-accordion-header">{{$parent.$eval(crmTitle)}}</div><div class="crm-accordion-body" ng-transclude></div></div>',
         transclude: true,
-        link: function (scope, element, attrs) {}
+        link: function (scope, element, attrs) {
+          scope.cssClasses = {
+            collapsed: scope.$parent.$eval(attrs.crmCollapsed)
+          };
+        }
       };
     })
 
