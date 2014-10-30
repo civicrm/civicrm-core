@@ -153,22 +153,40 @@
     })
 
     // example <div crm-ui-tab crm-title="ts('My Title')">...content...</div>
+    // WISHLIST: use a full Angular component instead of an incomplete jQuery wrapper
     .directive('crmUiTab', function($parse) {
       return {
+        require: '^crmUiTabSet',
+        restrict: 'EA',
         scope: {
-          crmTitle: '@'
+          crmTitle: '@',
+          id: '@'
         },
-        template: '<div><b>(Tab: {{$parent.$eval(crmTitle)}})</b><span ng-transclude/></div>',
+        template: '<div ng-transclude></div>',
         transclude: true,
-        link: function (scope, element, attrs) {}
+        link: function (scope, element, attrs, crmUiTabSetCtrl) {
+          crmUiTabSetCtrl.add(scope);
+        }
       };
     })
 
     // example: <div crm-ui-tab-set><div crm-ui-tab crm-title="Tab 1">...</div><div crm-ui-tab crm-title="Tab 2">...</div></div>
     .directive('crmUiTabSet', function() {
       return {
-        template: '<div><span ng-transclude/></div>',
+        restrict: 'EA',
+        scope: {
+          crmUiTabSet: '@'
+        },
+        templateUrl: partialUrl('tabset.html'),
         transclude: true,
+        controllerAs: 'crmUiTabSetCtrl',
+        controller: function($scope, $parse) {
+          var tabs = $scope.tabs = []; // array<$scope>
+          this.add = function(tab) {
+            if (!tab.id) throw "Tab is missing 'id'";
+            tabs.push(tab);
+          };
+        },
         link: function (scope, element, attrs) {}
       };
     })

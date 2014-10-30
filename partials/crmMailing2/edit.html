@@ -3,23 +3,23 @@
     <div crm-ui-accordion crm-title="ts('Summary')">
       <div ng-include="partialUrl('summary.html')" />
     </div>
-    <div crm-ui-tabset>
-      <div crm-ui-tab crm-title="ts('Mailing')">
+    <div crm-ui-tab-set>
+      <div crm-ui-tab id="tab-mailing" crm-title="ts('Mailing')">
         <div ng-include="partialUrl('mailing.html')" />
       </div>
-      <div crm-ui-tab crm-title="ts('Attachments')">
+      <div crm-ui-tab id="tab-attachment" crm-title="ts('Attachments')">
         <div ng-include="partialUrl('attachments.html')" />
       </div>
-      <div crm-ui-tab crm-title="ts('Header and Footer')">
+      <div crm-ui-tab id="tab-header" crm-title="ts('Header and Footer')">
         <div ng-include="partialUrl('headerFooter.html')" />
       </div>
-      <div crm-ui-tab crm-title="ts('Publication')">
+      <div crm-ui-tab id="tab-pub" crm-title="ts('Publication')">
         <div ng-include="partialUrl('publication.html')" />
       </div>
-      <div crm-ui-tab crm-title="ts('Responses')">
+      <div crm-ui-tab id="tab-response" crm-title="ts('Responses')">
         <div ng-include="partialUrl('responses.html')" />
       </div>
-      <div crm-ui-tab crm-title="ts('Tracking')">
+      <div crm-ui-tab id="tab-tracking" crm-title="ts('Tracking')">
         <div ng-include="partialUrl('tracking.html')" />
       </div>
     </div>
