@@ -50,7 +50,7 @@
 {if $hasParent || $isRepeatingEntity}
 {literal}
   <script type="text/javascript">
-    CRM.$(function($) {  
+    CRM.$(function($) {
       /** Add your linked entity mapper here **/
       var mapper = {'CRM_Event_Form_ManageEvent_EventInfo': '',
                 'CRM_Event_Form_ManageEvent_Location': '',
@@ -79,8 +79,8 @@
             cascadeChangesDialog();
             return false;
           }
-      }); 
-      
+      });
+
       $("#_qf_Activity_upload-top, #_qf_Activity_upload-bottom").click(function() {
           form = $(this).parents('form:first').attr('class');
           if( form != "" && mapper.hasOwnProperty(form) ){
@@ -91,7 +91,7 @@
             return false;
           }
       });
-      
+
       $(".only-this-event").click(function() {
         updateMode(1);
       });
@@ -103,7 +103,7 @@
       $(".all-events").click(function() {
         updateMode(3);
       });
-      
+
       function updateMode(mode) {
         var entityID = parseInt('{/literal}{$entityID}{literal}');
         var entityTable = '{/literal}{$entityTable}{literal}';
@@ -131,7 +131,7 @@
             }
           });
         }
-      }  
+      }
     });
   </script>
 {/literal}

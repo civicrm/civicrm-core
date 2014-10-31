@@ -12,24 +12,24 @@
  * @author Priyanka
  */
 class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
-  
+
   /**
    * Parent Event Start Date
    */
   protected $_parentEventStartDate = NULL;
-  
+
   /**
    * Parent Event End Date
    */
   protected $_parentEventEndDate = NULL;
-  
-  
+
+
   function preProcess() {
     parent::preProcess();
     CRM_Core_Form_RecurringEntity::preProcess('civicrm_event');
     $this->assign('currentEventId', $this->_id);
-    
-    $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');    
+
+    $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
     //If this ID has parent, send parent id
     if ($checkParentExistsForThisId) {
       /**
@@ -59,7 +59,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
               CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
             }
           }
-        }  
+        }
         $this->assign('rows', $manageEvent);
       }
     }
@@ -71,7 +71,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     $this->_parentEventStartDate = $parentEventAttributes->start_date;
     $this->_parentEventEndDate = $parentEventAttributes->end_date;
   }
-  
+
   /**
    * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
@@ -82,7 +82,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    */
   function setDefaultValues() {
     $defaults = array();
-    
+
     //Always pass current event's start date by default
     $currentEventStartDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'start_date', 'id');
     list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($currentEventStartDate, 'activityDateTime');
@@ -92,14 +92,14 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     $defaults = array_merge($defaults, $recurringEntityDefaults);
     return $defaults;
   }
-  
+
   public function buildQuickForm() {
     CRM_Core_Form_RecurringEntity::buildQuickForm($this);
   }
-   
+
   public function postProcess() {
     if ($this->_id) {
-      $params = $this->controller->exportValues($this->_name); 
+      $params = $this->controller->exportValues($this->_name);
       if ($this->_parentEventStartDate && $this->_parentEventEndDate) {
         $interval = CRM_Core_BAO_RecurringEntity::getInterval($this->_parentEventStartDate, $this->_parentEventEndDate);
         $params['intervalDateColumns'] = array('end_date' => $interval);
@@ -112,12 +112,12 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
 
       $url = 'civicrm/event/manage/repeat';
       $urlParams = "action=update&reset=1&id={$this->_id}";
-      
+
       $linkedEntities = array(
         array(
           'table'         => 'civicrm_price_set_entity',
           'findCriteria'  => array(
-            'entity_id'    => $this->_id, 
+            'entity_id'    => $this->_id,
             'entity_table' => 'civicrm_event'
           ),
           'linkedColumns' => array('entity_id'),
@@ -126,7 +126,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         array(
           'table'         => 'civicrm_uf_join',
           'findCriteria'  => array(
-            'entity_id'    => $this->_id, 
+            'entity_id'    => $this->_id,
             'entity_table' => 'civicrm_event'
           ),
           'linkedColumns' => array('entity_id'),
@@ -135,7 +135,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         array(
           'table'         => 'civicrm_tell_friend',
           'findCriteria'  => array(
-            'entity_id'    => $this->_id, 
+            'entity_id'    => $this->_id,
             'entity_table' => 'civicrm_event'
           ),
           'linkedColumns' => array('entity_id'),
@@ -144,7 +144,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         array(
           'table'         => 'civicrm_pcp_block',
           'findCriteria'  => array(
-            'entity_id'    => $this->_id, 
+            'entity_id'    => $this->_id,
             'entity_table' => 'civicrm_event'
           ),
           'linkedColumns' => array('entity_id'),
@@ -156,17 +156,17 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     }
     else {
         CRM_Core_Error::fatal("Could not find Event ID");
-    }  
+    }
   }
-  
+
    /**
    * This function gets the number of participant count for the list of related event ids
-   * 
+   *
    * @param array $listOfRelatedEntities list of related event ids
-   * 
+   *
    * @access public
    * @static
-   * 
+   *
    * @return array
    */
   static public function getParticipantCountforEvent($listOfRelatedEntities = array()) {
@@ -175,10 +175,10 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         return $entity['id'];
       }, $listOfRelatedEntities));
       if ($implodeRelatedEntities) {
-        $query = "SELECT p.event_id as event_id, 
-          concat_ws(' ', e.title, concat_ws(' - ', DATE_FORMAT(e.start_date, '%b %d %Y %h:%i %p'), DATE_FORMAT(e.end_date, '%b %d %Y %h:%i %p'))) as event_data, 
+        $query = "SELECT p.event_id as event_id,
+          concat_ws(' ', e.title, concat_ws(' - ', DATE_FORMAT(e.start_date, '%b %d %Y %h:%i %p'), DATE_FORMAT(e.end_date, '%b %d %Y %h:%i %p'))) as event_data,
           count(p.id) as participant_count
-          FROM civicrm_participant p, civicrm_event e 
+          FROM civicrm_participant p, civicrm_event e
           WHERE p.event_id = e.id AND p.event_id IN ({$implodeRelatedEntities})
           GROUP BY p.event_id";
         $dao = CRM_Core_DAO::executeQuery($query);
@@ -191,7 +191,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     }
     return $participantDetails;
   }
-  
+
   /**
    * This function checks if there was any registraion for related event ids,
    * and returns array of ids with no regsitrations

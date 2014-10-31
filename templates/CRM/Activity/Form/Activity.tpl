@@ -204,7 +204,7 @@
       </td>
     </tr>
   {/if}
-  
+
   {if $action eq 2 OR $action eq 1}
     <tr class="crm-activity-form-block-recurring_activity">
       <td colspan="2">
@@ -229,7 +229,7 @@
       </td>
     </tr>
   {/if}
-  
+
   {if $action neq 4} {* Don't include "Schedule Follow-up" section in View mode. *}
   <tr class="crm-activity-form-block-schedule_followup">
     <td colspan="2">
