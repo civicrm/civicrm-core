@@ -202,12 +202,7 @@ class CRM_Core_Payment_Form {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('paymentTypeName', 'credit_card');
     $smarty->assign('paymentTypeLabel', ts('Credit Card Information'));
-    $smarty->assign('paymentFields', array(
-      'credit_card_type',
-      'credit_card_number',
-      'cvv2',
-      'credit_card_exp_date',
-    ));
+    $smarty->assign('paymentFields', self::getPaymentFields($form->_paymentProcessor));
   }
 
   /**
@@ -286,12 +281,36 @@ class CRM_Core_Payment_Form {
     // replace these payment type names with an option group - moving name & label assumptions out of the tpl is a step towards that
     $smarty->assign('paymentTypeName', 'direct_debit');
     $smarty->assign('paymentTypeLabel', ts('Direct Debit Information'));
-    $smarty->assign('paymentFields', array(
-      'account_holder',
-      'bank_account_number',
-      'bank_identification_number',
-      'bank_name',
-    ));
+    $smarty->assign('paymentFields', self::getPaymentFields($form->_paymentProcessor));
+  }
+
+  /**
+   * @param array $paymentProcessor
+   * @todo it may be necessary to set details that affect it - mostly likely take Country as a param
+   *
+   * @return mixed
+   */
+  static function getPaymentFields($paymentProcessor) {
+    return array();
+    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
+    return $paymentProcessorObject->getPaymentFields();
+  }
+
+  /**
+   * @param $form
+   *
+   * @param array $paymentProcessor
+   * @todo it may be necessary to set details that affect it - mostly likely take Country as a param
+   *
+   * @return mixed
+   */
+  protected static function setPaymentFields(&$form, $paymentProcessor) {
+    $fields = self::getPaymentFields($paymentProcessor);
+
+  }
+
+  static function buildPaymentForm(&$form, $useRequired = FALSE) {
+
   }
 
   /**

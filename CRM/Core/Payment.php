@@ -212,6 +212,46 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * get array of fields that should be displayed on the payment form
+   * @todo make payment type an option value & use it in the function name - currently on debit & credit card work
+   * @return array
+   * @throws CiviCRM_API3_Exception
+   */
+  public function getPaymentFormFields() {
+    if ($this->_paymentProcessor['payment_type'] == 4) {
+      return array();
+    }
+    return $this->_paymentProcessor['payment_type'] == 1 ? $this->getCreditCardFormFields() : $this->getDirectDebitFormFields();
+  }
+
+  /**
+   * get array of fields that should be displayed on the payment form for credit cards
+   * @return array
+   */
+  protected function getCreditCardFormFields() {
+    return array(
+      'credit_card_type',
+      'credit_card_number',
+      'cvv2',
+      'credit_card_exp_date',
+    );
+  }
+
+  /**
+   * get array of fields that should be displayed on the payment form for direct debits
+   * @return array
+   */
+  protected function getDirectDebitFormFields() {
+    return array(
+      'account_holder',
+      'bank_account_number',
+      'bank_identification_number',
+      'bank_name',
+    );
+  }
+
+
+  /**
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
