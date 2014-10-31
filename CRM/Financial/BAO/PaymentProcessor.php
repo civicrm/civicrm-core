@@ -284,6 +284,79 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
+   * get all payment processors as an array of objects.
+   *
+   * @param $isExcludeTest
+   * @param bool $reset
+   *
+   * @throws CiviCRM_API3_Exception
+   * @return array
+   */
+  static function getAllPaymentProcessors($isExcludeTest, $reset = FALSE) {
+    /**
+     * $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($isExcludeTest ? 'test' : 'all');
+    if (!$reset) {
+      $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
+      if (!empty($processors)) {
+        return $processors;
+      }
+    }
+     * */
+    $retrievalParameters = array('is_active' => TRUE, 'options' => array('sort' => 'is_default, name'));
+    if ($isExcludeTest) {
+      $retrievalParameters['is_test'] = 0;
+    }
+    $processors = civicrm_api3('payment_processor', 'get', $retrievalParameters);
+    foreach ($processors['values'] as $processor) {
+      $processors['values'][$processor['id']]['object'] = CRM_Core_Payment::singleton(empty($processor['is_test']) ? 'live' : 'test', $processor);
+    }
+    /*
+     CRM_Utils_Cache::singleton()->set($cacheKey, $processors);
+     */
+    return $processors['values'];
+  }
+
+  /**
+   * get Payment processors with specified capabilities.
+   * Note that both the singleton & the pseudoconstant function have caching so we don't add
+   * arguably this could go on the pseudoconstant class
+   *
+   * @param array $capabilities
+   * @param bool $isIncludeTest
+   *
+   * @return array available processors
+   */
+  static function getPaymentProcessors($capabilities = array(), $isIncludeTest = FALSE, $reset = FALSE) {
+    $processors = self::getAllPaymentProcessors(!$isIncludeTest);
+    if ($capabilities) {
+      foreach ($processors as $index => $processor) {
+        if (($error = $processor['object']->checkConfig()) != NULL) {
+          unset ($processors[$index]);
+          continue;
+        }
+        foreach ($capabilities as $capability) {
+          if ($capability && !$processor['object']->supports($capability)) {
+            unset ($processors[$index]);
+          }
+        }
+      }
+    }
+    return $processors;
+  }
+
+  /**
+   * Is there a processor on this site with the specified capability
+   * @param array $capabilities
+   * @param bool $isIncludeTest
+   *
+   * @return bool
+   */
+  static function hasPaymentProcessorSupporting($capabilities = array(), $isIncludeTest = FALSE) {
+    $result = self::getPaymentProcessors($capabilities, $isIncludeTest);
+    return (!empty($result)) ? TRUE : FALSE;
+  }
+
+  /**
    * Function to retrieve payment processor id / info/ object based on component-id.
    *
    * @param $entityID

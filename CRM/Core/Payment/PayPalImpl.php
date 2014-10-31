@@ -95,6 +95,16 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * @return bool
+   */
+  private function supportsBackOffice() {
+    if ($this->_processorName == ts('PayPal Pro')) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+  /**
    * express checkout code. Check PayPal documentation for more information
    *
    * @param  array $params assoc array of input parameters for this transaction

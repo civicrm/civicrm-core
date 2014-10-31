@@ -146,6 +146,45 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * check if capability is supported
+   * @param string $capability e.g BackOffice, LiveMode, FutureRecurStartDate
+   *
+   * @return bool
+   */
+  public function supports($capability) {
+    $function = 'supports' . ucfirst($capability);
+    if (method_exists($this, $function)) {
+      return $this->$function();
+    }
+    return FALSE;
+  }
+
+  /**
+   * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * @return bool
+   */
+  private function supportsBackOffice() {
+    return TRUE;
+  }
+
+  /**
+   * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * @return bool
+   */
+  private function supportsLiveMode() {
+    return TRUE;
+  }
+
+  /**
+   * should the first payment date be configurable when setting up back office recurring payments
+   * We set this to false for historical consistency but in fact most new processors use tokens for recurring and can support this
+   * @return bool
+   */
+  private function supportsFutureRecurStartDate() {
+    return FALSE;
+  }
+
+  /**
    * Setter for the payment form that wants to use the processor
    *
    * @param CRM_Core_Form $paymentForm
