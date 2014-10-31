@@ -228,8 +228,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
     }
 
+    //@todo - if anyone ever figures out what this cdtype subroutine is about (or even if it still applies) please add comments
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-
     $this->assign('cdType', FALSE);
     if ($this->_cdType) {
       $this->assign('cdType', TRUE);
@@ -277,21 +277,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('showCheckNumber', TRUE);
 
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
-    $this->assignProcessors();
+    try {
+      $this->assignProcessors();
+      if ($this->_contactID) {
+        list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+        $this->assign('displayName', $this->userDisplayName);
+      }
 
-    if ($this->_contactID) {
-      list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-      $this->assign('displayName', $this->userDisplayName);
+      $this->assignBillingType();
+
+      $this->_fields = array();
+      CRM_Core_Payment_Form::setPaymentFieldsByType(CRM_Utils_Array::value('payment_type', $this->_processors), $this);
     }
-
-    // also check for billing information
-    // get the billing location type
-    $this->assignBillingType();
-
-    $this->_fields = array();
-
-    CRM_Core_Payment_Form::setPaymentFieldsByType(CRM_Utils_Array::value('payment_type', $this->_processors), $this);
-
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Error::fatal($e->getMessage());
+    }
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }

@@ -355,30 +355,21 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       $capabilities[] = 'LiveMode';
     }
     $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors($capabilities);
-    foreach ($processors as $id => $processor) {
-       if ($processor['is_default']) {
-         $defaultID = $id;
-       }
-       $validProcessors[$id] = ts($processor['name']);
-    }
-    if (empty($validProcessors)) {
-      throw new CRM_Core_Exception(ts('You will need to configure the %1 settings for your Payment Processor before you can submit a credit card transactions.', array(1 => $this->_mode)));
-    }
-    else {
-      return array($validProcessors, $processors[$defaultID]['object']);
-    }
+    return $processors;
+
   }
 
   /**
    * Assign billing type id to bltID
    *
+   * @throws CRM_Core_Exception
    * @return void
    */
   public function assignBillingType() {
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
     $this->_bltID = array_search('Billing', $locationTypes);
     if (!$this->_bltID) {
-      CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));
+      throw new CRM_Core_Exception(ts('Please set a location type of %1', array(1 => 'Billing')));
     }
     $this->set('bltID', $this->_bltID);
     $this->assign('bltID', $this->_bltID);
@@ -390,10 +381,17 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   public function assignProcessors() {
     //ensure that processor has a valid config
     //only valid processors get display to user
+
     if ($this->_mode) {
       $this->assign(CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('supportsFutureRecurStartDate')), TRUE);
-      list($this->_processors, $paymentProcessor) = $this->getValidProcessors();
-
+      $processors = $this->getValidProcessors();
+      if (empty($processors)) {
+        throw new CRM_Core_Exception(ts('You will need to configure the %1 settings for your Payment Processor before you can submit a credit card transactions.', array(1 => $this->_mode)));
+      }
+      $this->_processors  = array();
+      foreach ($processors as $id => $processor) {
+        $this->_processors[$id] = ts($processor['name']);
+      }
       //get the valid recurring processors.
       $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
       $this->_recurPaymentProcessors = array_intersect_assoc($this->_processors, $recurring);
@@ -404,7 +402,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
 
     // this required to show billing block
     // @todo remove this assignment the billing block is now designed to be always included but will not show fieldsets unless those sets of fields are assigned
-    $this->assign_by_ref('paymentProcessor', $paymentProcessor);
+    $this->assign_by_ref('paymentProcessor', $processor);
   }
 
   /**
