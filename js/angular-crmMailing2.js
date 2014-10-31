@@ -11,6 +11,8 @@
    */
   var createMailing = function () {
     return {
+      name: "",
+      campaign_id: null,
       visibility: "Public Pages",
       url_tracking: "1",
       dedupe_email: "1",
@@ -71,8 +73,12 @@
   });
 
   crmMailing2.controller('EditMailingCtrl', function ($scope, selectedMail) {
+    $scope.mailing = selectedMail;
+    $scope.crmMailingConst = CRM.crmMailing;
+
     $scope.partialUrl = partialUrl;
     $scope.ts = CRM.ts('CiviMail');
+
     $scope.send = function() {
       CRM.alert('Send!');
     };
