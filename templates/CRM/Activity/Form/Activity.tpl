@@ -226,6 +226,15 @@
             });
           </script>
         {/literal}
+        {if $action eq 1}
+          {literal}
+            <script type="text/javascript">
+              CRM.$(function($) {
+                $('#recurring-entity-block div.crm-submit-buttons').css('display', 'none');
+              });
+            </script>
+          {/literal}
+        {/if}
       </td>
     </tr>
   {/if}
