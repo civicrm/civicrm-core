@@ -436,7 +436,8 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $params[$entity . '_id'] = $params['id'];
   }
   unset($params['id']);
-
+  // Call the alterAPIPermission hook to check if check_permission been modified
+  CRM_Utils_Hook::alterAPIPermissions($entity, 'get', $params);
   $options = _civicrm_api3_get_options_from_params($params, TRUE);
 
   $inputParams = array_merge(
@@ -523,6 +524,9 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
  * @return CRM_Core_DAO query object
  */
 function _civicrm_api3_get_query_object($params, $mode, $entity) {
+  // Call the alterAPIPermission hook to check if check_permission been modified
+  CRM_Utils_Hook::alterAPIPermissions($entity, 'get', $params);
+
   $options          = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');
   $sort             = CRM_Utils_Array::value('sort', $options, NULL);
   $offset           = CRM_Utils_Array::value('offset', $options);
