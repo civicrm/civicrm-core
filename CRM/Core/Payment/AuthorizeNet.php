@@ -88,7 +88,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * In the case of Authorize.net this is an option
    * @return bool
    */
-  private function supportsFutureRecurStartDate() {
+  protected function supportsFutureRecurStartDate() {
     return TRUE;
   }
 

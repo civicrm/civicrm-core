@@ -335,7 +335,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
           continue;
         }
         foreach ($capabilities as $capability) {
-          if ($capability && !$processor['object']->supports($capability)) {
+          if (($processor['object']->supports($capability)) == FALSE) {
             unset ($processors[$index]);
           }
         }

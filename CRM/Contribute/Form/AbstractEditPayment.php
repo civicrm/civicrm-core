@@ -348,7 +348,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * @throws Exception
    */
   public function getValidProcessors() {
-    $validProcessors = array();
     $defaultID = NULL;
     $capabilities = array('BackOffice');
     if ($this->_mode == 'live') {

@@ -163,7 +163,7 @@ abstract class CRM_Core_Payment {
    * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
    * @return bool
    */
-  private function supportsBackOffice() {
+  protected function supportsBackOffice() {
     return TRUE;
   }
 
@@ -171,7 +171,7 @@ abstract class CRM_Core_Payment {
    * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
    * @return bool
    */
-  private function supportsLiveMode() {
+  protected function supportsLiveMode() {
     return TRUE;
   }
 
@@ -180,7 +180,7 @@ abstract class CRM_Core_Payment {
    * We set this to false for historical consistency but in fact most new processors use tokens for recurring and can support this
    * @return bool
    */
-  private function supportsFutureRecurStartDate() {
+  protected function supportsFutureRecurStartDate() {
     return FALSE;
   }
 
