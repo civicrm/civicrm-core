@@ -70,12 +70,7 @@ class CRM_Core_Payment_ProcessorForm {
     // saving the country/state list in the session (which could be huge)
 
     if (($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) && !empty($form->_values['is_monetary'])) {
-      if ($form->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT) {
-        CRM_Core_Payment_Form::setDirectDebitFields($form);
-      }
-      else {
-        CRM_Core_Payment_Form::setCreditCardFields($form);
-      }
+      CRM_Core_Payment_Form::setPaymentFieldsByType($form->_paymentProcessor['payment_type'], $form);
     }
 
     $form->assign_by_ref('paymentProcessor', $form->_paymentProcessor);
