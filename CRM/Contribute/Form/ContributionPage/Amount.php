@@ -190,7 +190,7 @@ SELECT id
    *
    * @access public
    *
-   * @return void
+   * @return array
    */
   function setDefaultValues() {
     $defaults = parent::setDefaultValues();
@@ -361,7 +361,7 @@ SELECT id
       }
 
       // If Contribution amount section is enabled, then
-      // Allow other amounts must be enabeld OR the Fixed Contribution
+      // Allow other amounts must be enabled OR the Fixed Contribution
       // Contribution options must contain at least one set of values.
       if (!empty($fields['amount_block_is_active'])) {
         if (empty($fields['is_allow_other_amount']) &&
