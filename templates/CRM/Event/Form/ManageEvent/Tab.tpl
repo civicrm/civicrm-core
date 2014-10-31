@@ -86,7 +86,7 @@ CRM.$(function($) {
     event.stopPropagation();
     return false;
   });
-  
+
   $('#crm-participant-link').click(function(event) {
     $('#crm-participant-list').toggle();
     $('#crm-event-links-list').hide();

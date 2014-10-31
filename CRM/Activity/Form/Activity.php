@@ -122,7 +122,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   protected $_values = array();
 
   protected $unsavedWarn = TRUE;
-  
+
   /**
    * The _fields var can be used by sub class to set/unset/edit the
    * form fields based on their requirement
@@ -503,12 +503,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
       $this->set('values', $this->_values);
     }
-    
+
     if ($this->_action & CRM_Core_Action::UPDATE) {
       CRM_Core_Form_RecurringEntity::preProcess('civicrm_activity');
     }
   }
-      
+
   /**
    * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
@@ -960,7 +960,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $params['entity_table'] = 'civicrm_activity';
     $scheduleReminderDetails = array();
     if (!empty($params['entity_id']) && !empty($params['entity_table'])) {
-      $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($params['entity_id'], $params['entity_table']);    
+      $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($params['entity_id'], $params['entity_table']);
       if ($checkParentExistsForThisId) {
         $params['parent_entity_id'] = $checkParentExistsForThisId;
         $scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($checkParentExistsForThisId, $params['entity_table']);
