@@ -343,39 +343,29 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   /**
    * @return array (0 => array(int $ppId => string $label), 1 => array(...payproc details...))
    */
-  public function getValidProcessorsAndAssignFutureStartDate() {
+  /**
+   * @return array of valid processors
+   * @throws Exception
+   */
+  public function getValidProcessors() {
     $validProcessors = array();
-    // restrict to payment_type = 1 (credit card only) and billing mode 1 and 3
-    $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 ) AND payment_type = 1");
-
-    foreach ($processors as $ppID => $label) {
-      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
-      // at this stage only Authorize.net has been tested to support future start dates so if it's enabled let the template know
-      // to show receive date
-      $processorsSupportingFutureStartDate = array('AuthNet');
-      if (in_array($paymentProcessor['payment_processor_type'], $processorsSupportingFutureStartDate)) {
-        $this->assign('processorSupportsFutureStartDate', TRUE);
-      }
-      if ($paymentProcessor['payment_processor_type'] == 'PayPal' && !$paymentProcessor['user_name']) {
-        continue;
-      }
-      elseif ($paymentProcessor['payment_processor_type'] == 'Dummy' && $this->_mode == 'live') {
-        continue;
-      }
-      else {
-        $paymentObject = CRM_Core_Payment::singleton($this->_mode, $paymentProcessor, $this);
-        $error = $paymentObject->checkConfig();
-        if (empty($error)) {
-          $validProcessors[$ppID] = $label;
-        }
-        $paymentObject = NULL;
-      }
+    $defaultID = NULL;
+    $capabilities = array('BackOffice');
+    if ($this->_mode == 'live') {
+      $capabilities[] = 'LiveMode';
+    }
+    $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors($capabilities);
+    foreach ($processors as $id => $processor) {
+       if ($processor['is_default']) {
+         $defaultID = $id;
+       }
+       $validProcessors[$id] = ts($processor['name']);
     }
     if (empty($validProcessors)) {
-      CRM_Core_Error::fatal(ts('You will need to configure the %1 settings for your Payment Processor before you can submit credit card transactions.', array(1 => $this->_mode)));
+      throw new CRM_Core_Exception(ts('You will need to configure the %1 settings for your Payment Processor before you can submit a credit card transactions.', array(1 => $this->_mode)));
     }
     else {
-      return array($validProcessors, $paymentProcessor);
+      return array($validProcessors, $processors[$defaultID]['object']);
     }
   }
 
@@ -401,7 +391,8 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     //ensure that processor has a valid config
     //only valid processors get display to user
     if ($this->_mode) {
-      list($this->_processors, $paymentProcessor) = $this->getValidProcessorsAndAssignFutureStartDate();
+      $this->assign(CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('supportsFutureRecurStartDate')), TRUE);
+      list($this->_processors, $paymentProcessor) = $this->getValidProcessors();
 
       //get the valid recurring processors.
       $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
