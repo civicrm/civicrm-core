@@ -1531,14 +1531,13 @@ ORDER BY civicrm_custom_group.weight,
    * @param CRM_Core_Form $form the form object
    * @param string        $type the type of custom group we are using
    *
-   * @return void
+   * @return array
    * @access public
    * @static
    */
   static function extractGetParams(&$form, $type) {
-    // if not GET params return
     if (empty($_GET)) {
-      return;
+      return array();
     }
 
     $groupTree   = CRM_Core_BAO_CustomGroup::getTree($type, $form);

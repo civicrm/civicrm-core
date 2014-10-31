@@ -655,6 +655,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *
    * return $fileName of file which is in pdf format
    *
+   * @return string
    */
   static public function putFile($html) {
     require_once("packages/dompdf/dompdf_config.inc.php");
