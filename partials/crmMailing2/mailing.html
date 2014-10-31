@@ -1,1 +1,58 @@
-mailing.html
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing, crmMailingConst
+FIXME: Don't hardcode table-based layout!
+-->
+<table class="form-layout-compressed">
+  <tbody>
+    <tr>
+      <td class="label">
+        <label crm-ui-label crm-for="fromAddress">{{ts('From')}}</label>
+      </td>
+      <td>
+        <select
+          name="fromAddress"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
+          ng-model="mailing.from"
+          ng-options="frm.label as frm.label for frm in crmMailingConst.fromAddress"
+          required>
+          <option value=""></option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">
+        <label crm-ui-label crm-for="replyTo">{{ts('Reply-To')}}</label>
+      </td>
+      <td>
+        <select
+          name="replyTo"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
+          ng-model="mailing.replyto_email"
+          ng-options="frm.label as frm.label for frm in crmMailingConst.fromAddress"
+          >
+          <option value=""></option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">
+        <label crm-ui-label crm-for="subject">{{ts('Subject')}}</label>
+      </td>
+      <td>
+        <div style="float: right;">
+          <input crm-mailing-token crm-for="subject" />
+        </div>
+        <input
+          type="text"
+          class="crm-form-text"
+          ng-model="mailing.subject"
+          required
+          placeholder="Subject"
+          name="subject" />
+      </td>
+    </tr>
+  </tbody>
+</table>
