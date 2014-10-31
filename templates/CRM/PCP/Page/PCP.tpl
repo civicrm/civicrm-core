@@ -58,7 +58,7 @@
     <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.supporter_id`"}" title="{ts}View contact record{/ts}">{$row.supporter}</a></td>
     <td><a href="{$row.page_url}" title="{ts}View page{/ts}" target="_blank">{$row.page_title}</td>
     <td>{$row.start_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
-    <td>{if $row.end_date}{$row.end_date|crmDate:"%b %d, %Y %l:%M %P"}{else}({ts}ongoing{/ts}){/if}</td>
+    <td>{if $row.end_date}{$row.end_date|crmDate}{else}({ts}ongoing{/ts}){/if}</td>
     <td>{$row.status_id}</td>
     <td id={$row.id}>{$row.action|replace:'xx':$row.id}</td>
   </tr>
