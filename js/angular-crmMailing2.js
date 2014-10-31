@@ -16,6 +16,8 @@
       from: _.where(CRM.crmMailing.fromAddress, {is_default: "1"})[0].label,
       replyto_email: "",
       subject: "",
+      body_html: "",
+      body_text: "",
       visibility: "Public Pages",
       url_tracking: "1",
       dedupe_email: "1",

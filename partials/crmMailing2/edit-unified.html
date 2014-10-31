@@ -4,6 +4,13 @@
     <div ng-include="partialUrl('summary.html')"/>
     <div ng-include="partialUrl('mailing.html')" />
 
+    <div crm-ui-accordion crm-title="ts('HTML')">
+      <div ng-include="partialUrl('field/body_html.html')" />
+    </div>
+    <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='true'>
+      <div ng-include="partialUrl('field/body_text.html')" />
+    </div>
+
     <div crm-ui-tab-set>
       <div crm-ui-tab id="tab-schedule" crm-title="ts('Schedule')">
         <div ng-include="partialUrl('schedule.html')" />
