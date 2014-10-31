@@ -68,10 +68,11 @@
         $(this).crmError(data.error_message, ts('Error'));
         $(this).removeClass('crm-editable-saving');
       },
-      success: function(entity, field, value, data) {
+      success: function(entity, field, value, data, settings) {
         var $i = $(this);
         CRM.status(ts('Saved'));
         $i.removeClass('crm-editable-saving crm-error');
+        value = value === '' ? settings.placeholder : value;
         $i.html(value);
       }
     };
@@ -146,7 +147,7 @@
               value = $i.data('options')[value];
             }
             $i.trigger('crmFormSuccess');
-            editableSettings.success.call(this, info.entity, info.field, value, data);
+            editableSettings.success.call(this, info.entity, info.field, value, data, settings);
           }
         });
       }, settings);
