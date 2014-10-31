@@ -83,6 +83,16 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     $contactDetails = CRM_Contact_BAO_Contact_Utils::contactDetails($this->_activityHolderIds,
       'Activity', $returnProperties
     );
+    $readOnlyFields['assignee_display_name'] = ts('Assigned To');
+    if(!empty($contactDetails)) {
+      foreach($contactDetails as $key => $value){
+        $assignee = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($key);
+        foreach($assignee as $keys => $values) {
+          $assigneeContact[] = CRM_Contact_BAO_Contact::displayname($values);
+        }
+        $contactDetails[$key]['assignee_display_name'] = !empty($assigneeContact) ? implode(';', $assigneeContact) : NULL;
+      }
+    }
     $this->assign('contactDetails', $contactDetails);
     $this->assign('readOnlyFields', $readOnlyFields);
   }
@@ -119,7 +129,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
       }
 
       //fix to reduce size as we are using this field in grid
-      if (is_array($field['attributes']) && $this->_fields[$name]['attributes']['size'] > 19) {
+      if (is_array($field['attributes']) && !empty($this->_fields[$name]['attributes']['size']) && $this->_fields[$name]['attributes']['size'] > 19) {
         //shrink class to "form-text-medium"
         $this->_fields[$name]['attributes']['size'] = 19;
       }
@@ -232,7 +242,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
         );
         $value['id'] = $key;
 
-        if ($value['activity_date_time']) {
+        if (!empty($value['activity_date_time'])) {
           $value['activity_date_time'] = CRM_Utils_Date::processDate($value['activity_date_time'], $value['activity_date_time_time']);
         }
 
