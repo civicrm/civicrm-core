@@ -1,0 +1,12 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing, crmMailingConst
+-->
+<select crm-mailing-recipients
+        crm-mailing="mailing"
+        crm-avail-groups="crmMailingConst.groupNames | filter:{visibility:'Public pages'}"
+        crm-avail-mailings="crmMailingConst.civiMails | filter:{is_completed:1}"
+        name="recipients"
+        required
+        multiple>
+</select>

@@ -16,6 +16,8 @@
       from: _.where(CRM.crmMailing.fromAddress, {is_default: "1"})[0].label,
       replyto_email: "",
       subject: "",
+      groups: {include: [], exclude: [4]}, // fixme
+      mailings: {include: [], exclude: []},
       body_html: "",
       body_text: "",
       visibility: "Public Pages",
