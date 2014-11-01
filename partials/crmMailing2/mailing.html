@@ -39,6 +39,13 @@ FIXME: Don't hardcode table-based layout!
     </tr>
     <tr>
       <td class="label">
+        <label crm-ui-label crm-for="recipients">{{ts('Recipients')}}</label>
+      </td>
+      <td ng-include="partialUrl('field/recipients.html')">
+      </td>
+    </tr>
+    <tr>
+      <td class="label">
         <label crm-ui-label crm-for="subject">{{ts('Subject')}}</label>
       </td>
       <td>
