@@ -37,8 +37,10 @@
     {if $smarty.get.snippet eq 2}
       {include file="CRM/common/print.tpl"}
     {else}
+      {crmRegion name='ajax-snippet'}{/crmRegion}
+
       {crmRegion name='page-header' allowCmsOverride=0}{/crmRegion}
-      
+
       {crmRegion name='page-body'}
 
         {* Add status messages and container-snippet div unless we are outputting json. *}

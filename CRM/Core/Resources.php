@@ -226,7 +226,7 @@ class CRM_Core_Resources {
   public function addSetting($settings) {
     $this->settings = $this->mergeSettings($this->settings, $settings);
     if (!$this->addedSettings) {
-      $region = self::isAjaxMode() ? 'page-body' : 'html-header';
+      $region = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
       $resources = $this;
       CRM_Core_Region::instance($region)->add(array(
         'callback' => function(&$snippet, &$html) use ($resources) {
