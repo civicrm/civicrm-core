@@ -142,9 +142,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     if (!empty($params['payment_instrument_id'])) {
       $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument('name');
-      if ($params['payment_instrument_id'] != array_search('Check', $paymentInstruments)) {
-        $params['check_number'] = 'null';
-      }
+     
     }
 
     // contribution status is missing, choose Completed as default status
