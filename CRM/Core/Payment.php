@@ -421,6 +421,28 @@ abstract class CRM_Core_Payment {
   abstract function doDirectPayment(&$params);
 
   /**
+   * process payment - this function wraps around both doTransferPayment and doDirectPayment
+   * it ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms more agnostic
+   *
+   * @param array $params
+   *
+   * @param $component
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function doPayment(&$params, $component) {
+    if ($this->_paymentProcessor['billing_mode'] == 4) {
+      $result = $this->doTransferCheckout($params, $component);
+    }
+    else {
+      $result = $this->doDirectPayment($params, $component);
+    }
+    if (is_a($result, 'CRM_Core_Error')) {
+      throw new CRM_Core_Exception(CRM_Core_Error::getMessages($result));
+    }
+  }
+
+  /**
    * This function checks to see if we have the right config values
    *
    * @internal param string $mode the mode we are operating in (live or test)
