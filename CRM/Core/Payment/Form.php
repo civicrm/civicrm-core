@@ -62,7 +62,6 @@ class CRM_Core_Payment_Form {
   static public function setPaymentFieldsByProcessor(&$form, $processor) {
     $form->billingFieldSets = array();
     $paymentFields = self::getPaymentFields($processor);
-    dpm($paymentFields);
     $paymentTypeName = self::getPaymentTypeName($processor);
     $paymentTypeLabel = self::getPaymentTypeLabel($processor);
     //@todo if we switch to iterating through the fieldsets we won't need to assign these directly
