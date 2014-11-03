@@ -132,6 +132,10 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'mailTokens' => array_values($mailTokens),
         'contactid' => $contactID,
         'fromAddress' => array_values($fromAddress['values'][0]['api.OptionValue.get']['values']),
+        'visibility' => array(
+            array('value' => 'Public Pages', 'label' => ts('Public Pages')),
+            array('value' => 'User and User Admin Only', 'label' => ts('User and User Admin Only')),
+        ),
       ),
     ));
 
