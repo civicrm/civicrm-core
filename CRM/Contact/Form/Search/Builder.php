@@ -105,7 +105,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     }
     // Add javascript
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Search/Builder.js')
+      ->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Search/Builder.js', 1, 'html-header')
       ->addSetting(array(
         'searchBuilder' => array(
           // Index of newly added/expanded block (1-based index)

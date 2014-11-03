@@ -218,8 +218,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     }
 
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'js/crm.livePage.js')
-      ->addScriptFile('civicrm', 'templates/CRM/Case/Form/CaseView.js');
+      ->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header')
+      ->addScriptFile('civicrm', 'templates/CRM/Case/Form/CaseView.js', 2, 'html-header');
 
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles    = $xmlProcessor->get($this->_caseType, 'CaseRoles');

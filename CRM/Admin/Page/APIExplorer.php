@@ -44,9 +44,9 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
   function run() {
     CRM_Utils_System::setTitle(ts('API explorer and generator'));
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/Admin/Page/APIExplorer.js')
-      ->addScriptUrl('//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js', 99)
-      ->addStyleUrl('//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css', 99);
+      ->addScriptFile('civicrm', 'templates/CRM/Admin/Page/APIExplorer.js', 1, 'html-header')
+      ->addScriptUrl('//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js', 99, 'html-header')
+      ->addStyleUrl('//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css', 99, 'html-header');
     $this->assign('operators', CRM_Core_DAO::acceptedSQLOperators());
     return parent::run();
   }
