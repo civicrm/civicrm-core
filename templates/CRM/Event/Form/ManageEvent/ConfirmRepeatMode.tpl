@@ -116,13 +116,13 @@
             url:  ajaxurl,
             success: function (result) {
               if (result.status != "" && result.status == 'Done') {
-                $("#recurring-dialog").dialog('close');
                 $('#mainTabContainer div:visible Form, form.'+form).submit();
+                $("#recurring-dialog").dialog('close');
               } else if (result.status != "" && result.status == 'Error') {
                 var errorBox = confirm(ts("Mode could not be updated, save only this event?"));
                 if (errorBox == true) {
-                  $("#recurring-dialog").dialog('close');
                   $('#mainTabContainer div:visible Form, form.'+form).submit();
+                  $("#recurring-dialog").dialog('close');
                 } else {
                   $("#recurring-dialog").dialog('close');
                   return false;
