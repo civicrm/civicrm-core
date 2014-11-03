@@ -1486,6 +1486,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Create the recurring contribution record
    *
+   * @param CRM_Core_Form $form
+   * @param array $params
+   * @param integer $contactID
+   * @param string $contributionType
+   * @param bool $online
+   *
+   * @return mixed
    */
   static function processRecurringContribution(&$form, &$params, $contactID, $contributionType, $online = TRUE) {
     // return if this page is not set for recurring
@@ -1870,6 +1877,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
   }
 
+  /**
+   * @param array $params
+   *
+   * @throws CiviCRM_API3_Exception
+   */
   static function submit($params) {
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_id = $params['id'];

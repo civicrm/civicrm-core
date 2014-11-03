@@ -205,7 +205,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @param null $domainID
    *
-   * @return object The data if present in the setting table, else null
+   * @return mixed The data if present in the setting table, else null
    * @static
    * @access public
    */

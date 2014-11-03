@@ -304,9 +304,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // to process Custom data that are appended to URL
     $getDefaults = CRM_Core_BAO_CustomGroup::extractGetParams($this, "'Contact', 'Individual', 'Contribution'");
-    if (!empty($getDefaults)) {
-      $this->_defaults = array_merge($this->_defaults, $getDefaults);
-    }
+    $this->_defaults = array_merge($this->_defaults, $getDefaults);
 
     $config = CRM_Core_Config::singleton();
     // set default country from config if no country set
@@ -648,6 +646,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * build elements to collect information for recurring contributions
    *
    * @access public
+   *
+   * @param CRM_Core_Form $form
    */
   public static function buildRecur(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur');
@@ -1380,6 +1380,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Handle Payment Processor switching
    * For contribution and event registration forms
+   * @param CRM_Core_Form $form
+   * @param bool $noFees
    */
   static function preProcessPaymentOptions(&$form, $noFees = FALSE) {
     $form->_snippet = CRM_Utils_Array::value('snippet', $_GET);
