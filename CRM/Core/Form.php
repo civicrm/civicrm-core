@@ -1620,7 +1620,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->assign('selectable', $autoCompleteField['id_field']);
       $this->addEntityRef($autoCompleteField['id_field'], NULL, array('placeholder' => $autoCompleteField['placeholder'], 'api' => $autoCompleteField['api']));
 
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js')
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js', 1, 'html-header')
       ->addSetting(array(
       'form' => array('autocompletes' => $autoCompleteField),
       'ids' => array('profile' => $profiles),
