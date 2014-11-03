@@ -34,22 +34,6 @@
  */
 class CRM_Core_Payment_Form {
 
-  /**
-   * Add payment fields are depending on payment type
-   * @deprecated  - use the setPaymentFieldsByProcessor which leverages the processor to determine the fields
-   *
-   * @param int $type eg CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
-   * @param CRM_Core_Form $form
-   */
-  static public function setPaymentFieldsByType($type, &$form) {
-    if ($type & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT) {
-      CRM_Core_Payment_Form::setDirectDebitFields($form);
-    }
-    else {
-      CRM_Core_Payment_Form::setCreditCardFields($form);
-    }
-  }
-
 
   /**
    * Add payment fields are depending on payment processor
