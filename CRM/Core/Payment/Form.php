@@ -36,7 +36,8 @@ class CRM_Core_Payment_Form {
 
   /**
    * Add payment fields are depending on payment type
-   * @deprecated  - use the setPaymentFieldsByPaymentType which leverages the processor to determine the fields
+   * @deprecated  - use the setPaymentFieldsByProcessor which leverages the processor to determine the fields
+   *
    * @param int $type eg CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
    * @param CRM_Core_Form $form
    */
@@ -51,7 +52,7 @@ class CRM_Core_Payment_Form {
 
 
   /**
-   * Add payment fields are depending on payment type
+   * Add payment fields are depending on payment processor
    *
    * @param CRM_Contribute_Form_Contribution $form
    * @todo - add other forms specifically to the definition - since we don't have for $form - since we aren't adding the property to
@@ -80,8 +81,11 @@ class CRM_Core_Payment_Form {
       $form->billingFieldSets['billing_name_address-group']['fields'] = array();
     }
   }
+
   /**
-   * create all common fields needed for a credit card or direct debit transaction
+   * add general billing fields
+   * @todo set these like processor fields & let payment processors alter them
+   *
    *
    * @param $form
    *
@@ -179,7 +183,7 @@ class CRM_Core_Payment_Form {
 
   /**
    * create all fields needed for a credit card transaction
-   * @deprecated  - use the setPaymentFieldsByPaymentType which leverages the processor to determine the fields
+   * @deprecated  - use the setPaymentFieldsByProcessor which leverages the processor to determine the fields
    * @param CRM_Core_Form $form
    *
    * @return void
@@ -241,7 +245,7 @@ class CRM_Core_Payment_Form {
    * @param bool $useRequired
    * @param array $paymentFields
    */
-  static function addCommonFields(&$form, $useRequired, $paymentFields) {
+  protected static function addCommonFields(&$form, $useRequired, $paymentFields) {
     foreach ($paymentFields as $name => $field) {
       if (!empty($field['cc_field'])) {
         if ($field['htmlType'] == 'chainSelect') {
@@ -261,7 +265,7 @@ class CRM_Core_Payment_Form {
 
   /**
    * create all fields needed for direct debit transaction
-   * @deprecated  - use the setPaymentFieldsByPaymentType which leverages the processor to determine the fields
+   * @deprecated  - use the setPaymentFieldsByProcessor which leverages the processor to determine the fields
    * @param $form
    *
    * @return void
@@ -379,7 +383,7 @@ class CRM_Core_Payment_Form {
 
    * @param $paymentFields
    */
-  static function addRules(&$form, $paymentFields) {
+  protected static function addRules(&$form, $paymentFields) {
     foreach ($paymentFields as $paymentField => $fieldSpecs) {
       if (!empty($fieldSpecs['rules'])) {
         foreach ($fieldSpecs['rules'] as $rule) {
@@ -399,7 +403,7 @@ class CRM_Core_Payment_Form {
    *
    * @param $form
    */
-  static function addPaypalExpressCode(&$form) {
+  protected static function addPaypalExpressCode(&$form) {
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
       $form->_expressButtonName = $form->getButtonName('upload', 'express');
       $form->assign('expressButtonName', $form->_expressButtonName);
@@ -468,6 +472,7 @@ class CRM_Core_Payment_Form {
 
   /**
    * Function to add all the direct debit fields
+   * @deprecated use buildPaymentForm
    *
    * @param $form
    * @param bool $useRequired

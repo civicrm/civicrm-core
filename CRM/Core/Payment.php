@@ -165,10 +165,16 @@ abstract class CRM_Core_Payment {
 
   /**
    * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * The intention is to support off-site (other than paypal) & direct debit but that is not all working yet so to reach a 'stable' point we disable
    * @return bool
    */
   protected function supportsBackOffice() {
-    return TRUE;
+    if ($this->_paymentProcessor['billing_mode'] == 4 || $this->_paymentProcessor['payment_type'] != 1) {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
   }
 
   /**
