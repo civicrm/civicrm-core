@@ -633,6 +633,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     //for checkbox 1
     $this->waitForElementPresent("label");
     $checkLabel1 = 'Custom Check One Text_' . substr(sha1(rand()), 0, 4);
+    $this->waitForAjaxContent();
     $this->type('label', $checkLabel1);
     $this->click('data_type[0]');
     $this->select('data_type[0]', "label=Alphanumeric");
@@ -664,6 +665,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     // create another custom field - Integer Radio
     //for checkbox 2
     $checkLabel2 = 'Custom Check Two Text_' . substr(sha1(rand()), 0, 4);
+    $this->waitForAjaxContent();
     $this->type('label', $checkLabel2);
     $this->click('data_type[0]');
     $this->select('data_type[0]', "label=Alphanumeric");
@@ -691,6 +693,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     // create another custom field - Date
     $this->waitForElementPresent("label");
     $dateFieldLabel = 'Custom Date Field' . substr(sha1(rand()), 0, 4);
+    $this->waitForAjaxContent();
     $this->type('label', $dateFieldLabel);
     $this->click('data_type[0]');
     $this->select('data_type[0]', "label=Date");
@@ -715,6 +718,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     //create rich text editor field
     $this->waitForElementPresent("label");
     $richTextField = 'Custom Rich TextField_' . substr(sha1(rand()), 0, 4);
+    $this->waitForAjaxContent();
     $this->type('label', $richTextField);
     $this->click('data_type[0]');
     $this->select('data_type[0]', "label=Note");
@@ -731,6 +735,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     //for radio 1
     $this->waitForElementPresent("label");
     $radioLabel1 = 'Custom Radio One Text_' . substr(sha1(rand()), 0, 4);
+    $this->waitForAjaxContent();
     $this->type('label', $radioLabel1);
     $this->click('data_type[0]');
     $this->select('data_type[0]', "label=Alphanumeric");
@@ -759,6 +764,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     //for radio 2
     $this->waitForElementPresent("label");
     $radioLabel2 = 'Custom Radio Two Text_' . substr(sha1(rand()), 0, 4);
+    $this->waitForAjaxContent();
     $this->type('label', $radioLabel2);
     $this->click('data_type[0]');
     $this->select('data_type[0]', "label=Alphanumeric");

@@ -1209,7 +1209,7 @@ LEFT JOIN {$reminderJoinClause}
 ";
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
-      if ($limitTo == 0) {
+      if ($limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) {
         $additionWhere = ' WHERE ';
         if ($actionSchedule->start_action_date) {
           $additionWhere = $whereClause . ' AND ';

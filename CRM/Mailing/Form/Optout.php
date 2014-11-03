@@ -64,7 +64,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
   }
 
   function buildQuickForm() {
-
+    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
     CRM_Utils_System::setTitle(ts('Please Confirm Your Opt Out'));
 
     $this->add('text', 'email_confirm', ts('Verify email address to opt out:'));
@@ -91,7 +91,6 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
 
     // check if EmailTyped matches Email address
     $result = CRM_Utils_String::compareStr($this->_email, $values['email_confirm'], TRUE);
-
 
     $job_id = $this->_job_id;
     $queue_id = $this->_queue_id;
@@ -121,8 +120,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
         array(1 => $values['email_confirm'])
       );
 
-    CRM_Core_Session::setStatus( $statusMsg, '', 'fail' );
-
+      CRM_Core_Session::setStatus( $statusMsg, '', 'fail' );
     }
 
   }
