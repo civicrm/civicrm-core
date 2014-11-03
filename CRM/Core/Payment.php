@@ -88,7 +88,7 @@ abstract class CRM_Core_Payment {
    *
    * @param string  $mode the mode of operation: live or test
    * @param array  $paymentProcessor the details of the payment processor being invoked
-   * @param object  $paymentForm      reference to the form object if available
+   * @param object $paymentForm deprecated - avoid referring to this if possible. If you have to use it document why as this is scary interaction
    * @param boolean $force            should we force a reload of this payment object
    *
    * @return CRM_Core_Payment
@@ -103,6 +103,7 @@ abstract class CRM_Core_Payment {
     }
 
     $cacheKey = "{$mode}_{$paymentProcessor['id']}_" . (int)isset($paymentForm);
+
     if (!isset(self::$_singleton[$cacheKey]) || $force) {
       $config = CRM_Core_Config::singleton();
       $ext = CRM_Extension_System::singleton()->getMapper();
@@ -112,6 +113,9 @@ abstract class CRM_Core_Payment {
       }
       else {
         $paymentClass = 'CRM_Core_' . $paymentProcessor['class_name'];
+        if (empty($paymentClass)) {
+          throw new CRM_Core_Exception('no class provided');
+        }
         require_once (str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php');
       }
 
@@ -220,7 +224,7 @@ abstract class CRM_Core_Payment {
    * @return string
    */
   public function getPaymentTypeName() {
-    return $this->_paymentProcessor['payment_type'] == 1 ? 'credit_card' : 'debit_card';
+    return $this->_paymentProcessor['payment_type'] == 1 ? 'credit_card' : 'direct_debit';
   }
 
   /**
@@ -229,7 +233,7 @@ abstract class CRM_Core_Payment {
    * @return string
    */
   public function getPaymentTypeLabel() {
-    return $this->_paymentProcessor['payment_type'] == 1 ? 'Credit Card' : 'Debit Card';
+    return $this->_paymentProcessor['payment_type'] == 1 ? 'Credit Card' : 'Direct Debit';
   }
 
   /**
