@@ -294,23 +294,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('showCheckNumber', TRUE);
 
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
-    try {
-      if ($this->_mode) {
-        $this->assignProcessors();
-        if ($this->_contactID) {
-          list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-          $this->assign('displayName', $this->userDisplayName);
-        }
-
-        $this->assignBillingType();
-
-        $this->_fields = array();
-        CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
-      }
-    }
-    catch (CRM_Core_Exception $e) {
-      CRM_Core_Error::fatal($e->getMessage());
-    }
+    $this->assignPaymentRelatedVariables();
 
     if (in_array('CiviPledge', CRM_Core_Config::singleton()->enableComponents) && !$this->_formType) {
       $this->preProcessPledge();

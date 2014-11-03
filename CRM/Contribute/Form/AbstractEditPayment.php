@@ -574,4 +574,27 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     return $submittedValues;
   }
 
+  /**
+   * common block for setting up the parts of a form that relate to credit / debit card
+   * @throws Exception
+   */
+  protected function assignPaymentRelatedVariables() {
+    try {
+      if ($this->_mode) {
+        $this->assignProcessors();
+        if ($this->_contactID) {
+          list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+          $this->assign('displayName', $this->userDisplayName);
+        }
+
+        $this->assignBillingType();
+
+        $this->_fields = array();
+        CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
+      }
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Error::fatal($e->getMessage());
+    }
+  }
 }

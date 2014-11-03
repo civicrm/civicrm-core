@@ -37,14 +37,14 @@
  * Base class for offline membership / membership type / membership renewal and membership status forms
  *
  */
-class CRM_Member_Form extends CRM_Core_Form {
+class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
   /**
    * The id of the object being edited / created
    *
    * @var int
    */
-  protected $_id;
+  public $_id;
 
   /**
    * The name of the BAO object for this form

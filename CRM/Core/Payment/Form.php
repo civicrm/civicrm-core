@@ -362,7 +362,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Contribute_Form_Contribution| CRM_Contribute_Form_Contribution_Main|CRM_Member_Form_Membership $form
    * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
    * @param bool $isBillingDataOptional
    *
