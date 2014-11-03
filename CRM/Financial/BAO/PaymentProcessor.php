@@ -302,7 +302,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       }
     }
      * */
-    $retrievalParameters = array('is_active' => TRUE, 'options' => array('sort' => 'is_default, name'));
+    $retrievalParameters = array('is_active' => TRUE, 'options' => array('sort' => 'is_default DESC, name'));
     if ($isExcludeTest) {
       $retrievalParameters['is_test'] = 0;
     }
@@ -324,12 +324,18 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param array $capabilities
    * @param bool $isIncludeTest
    *
+   * @param array $ids
+   *
    * @return array available processors
    */
-  static function getPaymentProcessors($capabilities = array(), $isIncludeTest = FALSE, $reset = FALSE) {
+  static function getPaymentProcessors($capabilities = array(), $isIncludeTest = FALSE, $ids = array()) {
     $processors = self::getAllPaymentProcessors(!$isIncludeTest);
     if ($capabilities) {
       foreach ($processors as $index => $processor) {
+        if (!empty($ids) && !in_array($processor['id'], $ids)) {
+          unset ($processors[$index]);
+          continue;
+        }
         if (($error = $processor['object']->checkConfig()) != NULL) {
           unset ($processors[$index]);
           continue;

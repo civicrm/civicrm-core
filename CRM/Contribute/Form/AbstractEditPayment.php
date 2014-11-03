@@ -49,10 +49,22 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_paymentProcessor;
   public $_recurPaymentProcessors;
 
+  /**
+   * array of processor options in the format id => array($id => $label)
+   * WARNING it appears that the format used to differ to this and there are places in the code that
+   * expect the old format. $this->_paymentProcessors provides the additional data which this
+   * array seems to have provided in the past
+   * @var array
+   */
   public $_processors;
 
   /**
-   * the id of the contribution that we are proceessing
+   * available payment processors with full details including the key 'object' indexed by their id
+   * @var array
+   */
+  protected $_paymentProcessors = array();
+  /**
+   * the id of the contribution that we are processing
    *
    * @var int
    * @public
@@ -341,10 +353,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * @return array (0 => array(int $ppId => string $label), 1 => array(...payproc details...))
-   */
-  /**
-   * @return array of valid processors
+   * @return array of valid processors. The array resembles the DB table but also has 'object' as a key
    * @throws Exception
    */
   public function getValidProcessors() {
@@ -383,12 +392,16 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
 
     if ($this->_mode) {
       $this->assign(CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('supportsFutureRecurStartDate')), TRUE);
-      $processors = $this->getValidProcessors();
-      if (empty($processors)) {
+      $this->_paymentProcessors = $this->getValidProcessors();
+      if (!isset($this->_paymentProcessor['id'])) {
+        // if the payment processor isn't set yet (as indicated by the presence of an id,) we'll grab the first one which should be the default
+        $this->_paymentProcessor = reset($this->_paymentProcessors);
+      }
+      if (empty($this->_paymentProcessors)) {
         throw new CRM_Core_Exception(ts('You will need to configure the %1 settings for your Payment Processor before you can submit a credit card transactions.', array(1 => $this->_mode)));
       }
       $this->_processors  = array();
-      foreach ($processors as $id => $processor) {
+      foreach ($this->_paymentProcessors as $id => $processor) {
         $this->_processors[$id] = ts($processor['name']);
       }
       //get the valid recurring processors.

@@ -287,7 +287,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assignBillingType();
 
       $this->_fields = array();
-      CRM_Core_Payment_Form::setPaymentFieldsByType(CRM_Utils_Array::value('payment_type', $this->_processors), $this);
+      CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
     }
     catch (CRM_Core_Exception $e) {
       CRM_Core_Error::fatal($e->getMessage());
@@ -496,6 +496,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @access public
    */
   public function buildQuickForm() {
+    //@todo document the purpose of cdType (if still in use)
     if ($this->_cdType) {
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       return;
@@ -579,21 +580,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paneNames[ts('Premium Information')] = 'Premium';
     }
 
-    $ccPane = NULL;
     if ($this->_mode) {
-      if (CRM_Utils_Array::value('payment_type', $this->_processors) & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
-      ) {
-        $ccPane = array(ts('Direct Debit Information') => 'DirectDebit');
+      if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE) == TRUE) {
+        $buildRecurBlock = TRUE;
+        foreach ($this->billingPane as $name => $label) {
+          //@todo reduce variation so we don't have to convert 'credit_card' to 'CreditCard'
+          $paneNames[$label] = CRM_Utils_String::convertStringToCamel($name);
+        }
       }
-      else {
-        $ccPane = array(ts('Credit Card Information') => 'CreditCard');
-      }
-    }
-    if (is_array($ccPane)) {
-      $paneNames = array_merge($ccPane, $paneNames);
     }
 
-    $buildRecurBlock = FALSE;
     foreach ($paneNames as $name => $type) {
       $urlParams = "snippet=4&formType={$type}";
       if ($this->_mode) {
@@ -621,15 +617,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $allPanes[$name]['open'] = 'true';
       }
 
-      if ($type == 'CreditCard') {
-        $buildRecurBlock = TRUE;
-        $this->add('hidden', 'hidden_CreditCard', 1);
-        CRM_Core_Payment_Form::buildCreditCard($this, TRUE);
-      }
-      elseif ($type == 'DirectDebit') {
-        $buildRecurBlock = TRUE;
-        $this->add('hidden', 'hidden_DirectDebit', 1);
-        CRM_Core_Payment_Form::buildDirectDebit($this, TRUE);
+      if ($type == 'CreditCard' || $type == 'DirectDebit') {
+        //@todo would be good to align tpl name with form name...
+        $this->add('hidden', 'hidden_' . $type, 1);
       }
       else {
         $additionalInfoFormFunction = 'build' . $type;
