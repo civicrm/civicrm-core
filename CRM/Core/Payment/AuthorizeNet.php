@@ -726,7 +726,11 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $template->assign('paymentKey', $this->_getParam('paymentKey'));
 
     $template->assign('subscriptionId', $params['subscriptionId']);
-    $template->assign('totalOccurrences', $params['installments']);
+
+    // for open ended subscription totalOccurrences has to be 9999
+    $installments = empty($params['installments']) ? 9999 : $params['installments'];
+    $template->assign('totalOccurrences', $installments);
+
     $template->assign('amount', $params['amount']);
 
     $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');
