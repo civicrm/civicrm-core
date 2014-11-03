@@ -269,7 +269,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $fields = array(
       'id', 'name', 'payment_processor_type_id', 'user_name', 'password',
       'signature', 'url_site', 'url_api', 'url_recur', 'url_button',
-      'subject', 'class_name', 'is_recur', 'billing_mode',
+      'subject', 'class_name', 'is_recur', 'billing_mode', 'is_test',
       'payment_type', 'is_default',
     );
     $result = array();
@@ -278,7 +278,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
     $result['payment_processor_type'] = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $dao->payment_processor_type_id, 'name');
 
-    $result['instance'] =& CRM_Core_Payment::singleton($mode, $result);
+    $result['instance'] = $result['object'] =& CRM_Core_Payment::singleton($mode, $result);
 
     return $result;
   }
