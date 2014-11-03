@@ -36,7 +36,7 @@ class CRM_Core_Payment_Form {
 
   /**
    * Add payment fields are depending on payment type
-   *
+   * @deprecated  - use the setPaymentFieldsByPaymentType which leverages the processor to determine the fields
    * @param int $type eg CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
    * @param CRM_Core_Form $form
    */
@@ -49,6 +49,34 @@ class CRM_Core_Payment_Form {
     }
   }
 
+
+  /**
+   * Add payment fields are depending on payment type
+   *
+   * @param CRM_Core_Form $form
+   * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
+   */
+  static public function setPaymentFieldsByProcessor(&$form, $processor) {
+    $form->billingFieldSets = array();
+    $paymentFields = self::getPaymentFields($processor);
+    dpm($paymentFields);
+    $paymentTypeName = self::getPaymentTypeName($processor);
+    $paymentTypeLabel = self::getPaymentTypeLabel($processor);
+    //@todo if we switch to iterating through the fieldsets we won't need to assign these directly
+    $form->assign('paymentTypeName', $paymentTypeName);
+    $form->assign('paymentTypeLabel', $paymentTypeLabel);
+
+    $form->billingFieldSets[$paymentTypeName]['fields'] = $form->_paymentFields = array_intersect_key(self::getPaymentFieldMetadata($processor), array_flip($paymentFields));
+    $form->billingPane = array($paymentTypeName => $paymentTypeLabel);
+    $form->assign('paymentFields', $paymentFields);
+    if ($processor['billing_mode'] != 4) {
+      //@todo setPaymentFields defines the billing fields - this should be moved to the processor class & renamed getBillingFields
+      //also set the billingFieldSet to hold all the details required to render the fieldset so we can iterate through the fieldset - making
+      // it easier to re-order. For not the billingFieldSets param is used to determine whether to show the billing pane
+      CRM_Core_Payment_Form::_setPaymentFields($form);
+      $form->billingFieldSets['billing_name_address-group']['fields'] = array();
+    }
+  }
   /**
    * create all common fields needed for a credit card or direct debit transaction
    *
@@ -148,7 +176,7 @@ class CRM_Core_Payment_Form {
 
   /**
    * create all fields needed for a credit card transaction
-   *
+   * @deprecated  - use the setPaymentFieldsByPaymentType which leverages the processor to determine the fields
    * @param CRM_Core_Form $form
    *
    * @return void
@@ -208,9 +236,10 @@ class CRM_Core_Payment_Form {
   /**
    * @param CRM_Core_Form $form
    * @param bool $useRequired
+   * @param array $paymentFields
    */
-  static function addCommonFields(&$form, $useRequired) {
-    foreach ($form->_paymentFields as $name => $field) {
+  static function addCommonFields(&$form, $useRequired, $paymentFields) {
+    foreach ($paymentFields as $name => $field) {
       if (!empty($field['cc_field'])) {
         if ($field['htmlType'] == 'chainSelect') {
           $form->addChainSelect($field['name'], array('required' => $useRequired && $field['is_required']));
@@ -229,7 +258,7 @@ class CRM_Core_Payment_Form {
 
   /**
    * create all fields needed for direct debit transaction
-   *
+   * @deprecated  - use the setPaymentFieldsByPaymentType which leverages the processor to determine the fields
    * @param $form
    *
    * @return void
@@ -286,36 +315,101 @@ class CRM_Core_Payment_Form {
 
   /**
    * @param array $paymentProcessor
-   * @todo it may be necessary to set details that affect it - mostly likely take Country as a param
+   * @todo it will be necessary to set details that affect it - mostly likely take Country as a param. Should we add generic
+   * setParams on processor class or just setCountry which we know we need?
    *
-   * @return mixed
+   * @return array
    */
   static function getPaymentFields($paymentProcessor) {
-    return array();
     $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
-    return $paymentProcessorObject->getPaymentFields();
+    return $paymentProcessorObject->getPaymentFormFields();
   }
 
   /**
-   * @param $form
-   *
    * @param array $paymentProcessor
-   * @todo it may be necessary to set details that affect it - mostly likely take Country as a param
    *
-   * @return mixed
+   * @return array
    */
-  protected static function setPaymentFields(&$form, $paymentProcessor) {
-    $fields = self::getPaymentFields($paymentProcessor);
-
+  static function getPaymentFieldMetadata($paymentProcessor) {
+    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
+    return $paymentProcessorObject->getPaymentFormFieldsMetadata();
   }
 
-  static function buildPaymentForm(&$form, $useRequired = FALSE) {
-
+  /**
+   * @param array $paymentProcessor
+   *
+   * @return string
+   */
+  static function getPaymentTypeName($paymentProcessor) {
+    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
+    return $paymentProcessorObject->getPaymentTypeName();
   }
 
+  /**
+   * @param array $paymentProcessor
+   *
+   * @return string
+   */
+  static function getPaymentTypeLabel($paymentProcessor) {
+    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
+    return ts(($paymentProcessorObject->getPaymentTypeLabel()) . ' Information');
+  }
+
+  /**
+   * @param CRM_Core_Form $form
+   * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
+   * @param bool $isBillingDataOptional
+   *
+   * @return bool
+   */
+  static function buildPaymentForm($form, $processor, $isBillingDataOptional){
+    self::setPaymentFieldsByProcessor($form, $processor);
+    self::addCommonFields($form, !$isBillingDataOptional, $form->_paymentFields);
+    self::addRules($form, $form->_paymentFields);
+    self::addPaypalExpressCode($form);
+    return (!empty($form->_paymentFields));
+  }
+
+  /**
+   * @param CRM_Core_Form $form
+   * @param array $paymentFields array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
+
+   * @param $paymentFields
+   */
+  static function addRules(&$form, $paymentFields) {
+    foreach ($paymentFields as $paymentField => $fieldSpecs) {
+      if (!empty($fieldSpecs['rules'])) {
+        foreach ($fieldSpecs['rules'] as $rule) {
+          $form->addRule($paymentField,
+            $rule['rule_message'],
+            $rule['rule_name'],
+            $rule['rule_parameters']
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
+   * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
+   *
+   * @param $form
+   */
+  static function addPaypalExpressCode(&$form) {
+    if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
+      $form->_expressButtonName = $form->getButtonName('upload', 'express');
+      $form->assign('expressButtonName', $form->_expressButtonName);
+      $form->add('image',
+        $form->_expressButtonName,
+        $form->_paymentProcessor['url_button'],
+        array('class' => 'crm-form-submit')
+      );
+    }
+  }
   /**
    * Function to add all the credit card fields
-   *
+   * @deprecated Use BuildPaymentForm
    * @param $form
    * @param bool $useRequired
    *
@@ -325,7 +419,7 @@ class CRM_Core_Payment_Form {
   static function buildCreditCard(&$form, $useRequired = FALSE) {
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) {
       self::setCreditCardFields($form);
-      self::addCommonFields($form, $useRequired);
+      self::addCommonFields($form, $useRequired, $form->_paymentFields);
 
       $form->addRule('cvv2',
         ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),
@@ -338,6 +432,7 @@ class CRM_Core_Payment_Form {
       );
 
     }
+
 
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
       $form->_expressButtonName = $form->getButtonName('upload', 'express');
@@ -379,7 +474,7 @@ class CRM_Core_Payment_Form {
   static function buildDirectDebit(&$form, $useRequired = FALSE) {
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) {
       self::setDirectDebitFields($form);
-      self::addCommonFields($form, $useRequired);
+      self::addCommonFields($form, $useRequired, $form->_paymentFields);
 
       $form->addRule('bank_identification_number',
         ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
@@ -389,15 +484,6 @@ class CRM_Core_Payment_Form {
       $form->addRule('bank_account_number',
         ts('Please enter a valid Bank Account Number (value must not contain punctuation characters).'),
         'nopunctuation'
-      );
-    }
-
-    if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
-      $form->_expressButtonName = $form->getButtonName($form->buttonType(), 'express');
-      $form->add('image',
-        $form->_expressButtonName,
-        $form->_paymentProcessor['url_button'],
-        array('class' => 'crm-form-submit')
       );
     }
   }

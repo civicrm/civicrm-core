@@ -206,9 +206,30 @@ abstract class CRM_Core_Payment {
   /**
    * Getter for accessing member vars
    *
+   * @param $name
+   *
+   * @return null
    */
   function getVar($name) {
     return isset($this->$name) ? $this->$name : NULL;
+  }
+
+  /**
+   * get name for the payment information type
+   *
+   * @return string
+   */
+  public function getPaymentTypeName() {
+    return $this->_paymentProcessor['payment_type'] == 1 ? 'credit_card' : 'debit_card';
+  }
+
+  /**
+   * get label for the payment information type
+   *
+   * @return string
+   */
+  public function getPaymentTypeLabel() {
+    return $this->_paymentProcessor['payment_type'] == 1 ? 'Credit Card' : 'Debit Card';
   }
 
   /**
@@ -218,7 +239,7 @@ abstract class CRM_Core_Payment {
    * @throws CiviCRM_API3_Exception
    */
   public function getPaymentFormFields() {
-    if ($this->_paymentProcessor['payment_type'] == 4) {
+    if ($this->_paymentProcessor['billing_mode'] == 4) {
       return array();
     }
     return $this->_paymentProcessor['payment_type'] == 1 ? $this->getCreditCardFormFields() : $this->getDirectDebitFormFields();
@@ -226,6 +247,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * get array of fields that should be displayed on the payment form for credit cards
+   *
    * @return array
    */
   protected function getCreditCardFormFields() {
@@ -239,6 +261,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * get array of fields that should be displayed on the payment form for direct debits
+   *
    * @return array
    */
   protected function getDirectDebitFormFields() {
@@ -250,6 +273,137 @@ abstract class CRM_Core_Payment {
     );
   }
 
+  /**
+   * return an array of all the details about the fields potentially required for payment fields
+   * Only those determined by getPaymentFormFields will actually be assigned to the form
+   *
+   * @return array field metadata
+   */
+  public function getPaymentFormFieldsMetadata() {
+    //@todo convert credit card type into an option value
+    $creditCardType = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::creditCard();
+    return array(
+      'credit_card_number' => array(
+        'htmlType' => 'text',
+        'name' => 'credit_card_number',
+        'title' => ts('Card Number'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 20,
+          'autocomplete' => 'off'
+        ),
+        'is_required' => TRUE,
+      ),
+      'cvv2' => array(
+        'htmlType' => 'text',
+        'name' => 'cvv2',
+        'title' => ts('Security Code'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 5,
+          'maxlength' => 10,
+          'autocomplete' => 'off'
+        ),
+        'is_required' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
+          'cvv_backoffice_required',
+          NULL,
+          1
+        ),
+        'rules' => array(
+          array(
+            'rule_message' => ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),
+            'rule_name' => 'integer',
+            'rule_parameters' => NULL,
+        )),
+      ),
+      'credit_card_exp_date' => array(
+        'htmlType' => 'date',
+        'name' => 'credit_card_exp_date',
+        'title' => ts('Expiration Date'),
+        'cc_field' => TRUE,
+        'attributes' => CRM_Core_SelectValues::date('creditCard'),
+        'is_required' => TRUE,
+        'rules' => array(
+          array(
+            'rule_message' => ts('Card expiration date cannot be a past date.'),
+            'rule_name' => 'currentDate',
+            'rule_parameters' => TRUE,
+          )),
+      ),
+      'credit_card_type' => array(
+        'htmlType' => 'select',
+        'name' => 'credit_card_type',
+        'title' => ts('Card Type'),
+        'cc_field' => TRUE,
+        'attributes' => $creditCardType,
+        'is_required' => FALSE,
+      ),
+      'account_holder' => array(
+        'htmlType' => 'text',
+        'name' => 'account_holder',
+        'title' => ts('Account Holder'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 34,
+          'autocomplete' => 'on'
+        ),
+        'is_required' => TRUE,
+      ),
+      //e.g. IBAN can have maxlength of 34 digits
+      'bank_account_number' => array(
+        'htmlType' => 'text',
+        'name' => 'bank_account_number',
+        'title' => ts('Bank Account Number'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 34,
+          'autocomplete' => 'off'
+        ),
+        'rules' => array(
+          array(
+            'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
+            'rule_name' => 'nopunctuation',
+            'rule_parameters' => NULL,
+        )),
+        'is_required' => TRUE,
+      ),
+      //e.g. SWIFT-BIC can have maxlength of 11 digits
+      'bank_identification_number' => array(
+        'htmlType' => 'text',
+        'name' => 'bank_identification_number',
+        'title' => ts('Bank Identification Number'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 11,
+          'autocomplete' => 'off'
+        ),
+        'is_required' => TRUE,
+        'rules' => array(
+          array(
+            'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
+            'rule_name' => 'nopunctuation',
+            'rule_parameters' => NULL,
+        )),
+      ),
+      'bank_name' => array(
+        'htmlType' => 'text',
+        'name' => 'bank_name',
+        'title' => ts('Bank Name'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 64,
+          'autocomplete' => 'off'
+        ),
+        'is_required' => TRUE,
+
+      )
+    );
+  }
 
   /**
    * This function collects all the information from a web/api form and invokes
