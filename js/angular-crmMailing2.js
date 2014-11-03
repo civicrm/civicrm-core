@@ -28,6 +28,8 @@
       mailings: {include: [], exclude: []},
       body_html: "",
       body_text: "",
+      footer_id: null, // pickDefaultMailComponent('Footer'),
+      header_id: null, // pickDefaultMailComponent('Header'),
       visibility: "Public Pages",
       url_tracking: "1",
       dedupe_email: "1",
