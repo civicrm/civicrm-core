@@ -51,7 +51,7 @@
           var formCtrl = scope.$parent.$eval(form.attr('name'));
           var input = $('input[name="' + attrs.crmFor + '"],select[name="' + attrs.crmFor + '"],textarea[name="' + attrs.crmFor + '"]', form);
           if (form.length != 1 || input.length != 1) {
-            if (console.log) console.log('Label cannot be matched to input element. Expected to find one form and one input.', form.length, input.length);
+            if (console.log) console.log('Label cannot be matched to input element. Expected to find one form and one input[name='+attrs.crmFor+'].', form.length, input.length);
             return;
           }
 
