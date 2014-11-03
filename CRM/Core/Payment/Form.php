@@ -54,7 +54,7 @@ class CRM_Core_Payment_Form {
   /**
    * Add payment fields are depending on payment processor
    *
-   * @param CRM_Contribute_Form_Contribution $form
+   * @param CRM_Contribute_Form_Contribution| CRM_Contribute_Form_Contribution_Main $form
    * @todo - add other forms specifically to the definition - since we don't have for $form - since we aren't adding the property to
    * CRM_Core_Form (don't suppose we should?)
    * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
