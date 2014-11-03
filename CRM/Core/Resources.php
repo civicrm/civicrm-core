@@ -226,8 +226,9 @@ class CRM_Core_Resources {
   public function addSetting($settings) {
     $this->settings = $this->mergeSettings($this->settings, $settings);
     if (!$this->addedSettings) {
+      $region = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
       $resources = $this;
-      CRM_Core_Region::instance('html-header')->add(array(
+      CRM_Core_Region::instance($region)->add(array(
         'callback' => function(&$snippet, &$html) use ($resources) {
           $html .= "\n" . $resources->renderSetting();
         },
@@ -284,7 +285,14 @@ class CRM_Core_Resources {
    * @return string
    */
   public function renderSetting() {
-    $js = 'var CRM = ' . json_encode($this->getSettings()) . ';';
+    // On a standard page request we construct the CRM object from scratch
+    if (!self::isAjaxMode()) {
+      $js = 'var CRM = ' . json_encode($this->getSettings()) . ';';
+    }
+    // For an ajax request we append to it
+    else {
+      $js = 'CRM.$.extend(true, CRM, ' . json_encode($this->getSettings()) . ');';
+    }
     return sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $js);
   }
 
@@ -458,7 +466,7 @@ class CRM_Core_Resources {
    * @access public
    */
   public function addCoreResources($region = 'html-header') {
-    if (!isset($this->addedCoreResources[$region])) {
+    if (!isset($this->addedCoreResources[$region]) && !self::isAjaxMode()) {
       $this->addedCoreResources[$region] = TRUE;
       $config = CRM_Core_Config::singleton();
 
@@ -657,5 +665,12 @@ class CRM_Core_Resources {
     $config->userSystem->appendCoreResources($items);
 
     return $items;
+  }
+
+  /**
+   * @return bool - is this page request an ajax snippet?
+   */
+  static function isAjaxMode() {
+    return in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(CRM_Core_Smarty::PRINT_SNIPPET, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON));
   }
 }
