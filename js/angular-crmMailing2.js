@@ -10,6 +10,14 @@
    * TODO Move to separate file or service
    */
   var createMailing = function () {
+    var pickDefaultMailComponent = function(type) {
+      var mcs = _.where(CRM.crmMailing.headerfooterList, {
+        component_type:type,
+        is_default: "1"
+      });
+      return (mcs.length >= 1) ? mcs[0].id : null;
+    };
+
     return {
       name: "",
       campaign_id: null,
@@ -25,7 +33,12 @@
       dedupe_email: "1",
       forward_replies: "0",
       auto_responder: "0",
-      open_tracking: "1"
+      open_tracking: "1",
+      override_verp: "1",
+      optout_id: pickDefaultMailComponent('OptOut'),
+      reply_id: pickDefaultMailComponent('Reply'),
+      resubscribe_id: pickDefaultMailComponent('Resubscribe'),
+      unsubscribe_id: pickDefaultMailComponent('Unsubscribe')
     };
   };
 
