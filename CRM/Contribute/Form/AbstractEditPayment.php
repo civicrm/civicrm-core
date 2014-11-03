@@ -246,6 +246,12 @@ WHERE  contribution_id = {$id}
 
   /**
    * This function process contribution related objects.
+   *
+   * @param integer $contributionId
+   * @param integer $statusId
+   * @param integer|null $previousStatusId
+   *
+   * @return null|string
    */
   protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL) {
     $statusMsg = NULL;
@@ -406,6 +412,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     );
 
     // this required to show billing block
+    // @todo remove this assignment the billing block is now designed to be always included but will not show fieldsets unless those sets of fields are assigned
     $this->assign_by_ref('paymentProcessor', $paymentProcessor);
   }
 
