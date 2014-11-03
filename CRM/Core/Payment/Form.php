@@ -53,7 +53,9 @@ class CRM_Core_Payment_Form {
   /**
    * Add payment fields are depending on payment type
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Contribute_Form_Contribution $form
+   * @todo - add other forms specifically to the definition - since we don't have for $form - since we aren't adding the property to
+   * CRM_Core_Form (don't suppose we should?)
    * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
    */
   static public function setPaymentFieldsByProcessor(&$form, $processor) {
@@ -71,6 +73,7 @@ class CRM_Core_Payment_Form {
     $form->assign('paymentFields', $paymentFields);
     if ($processor['billing_mode'] != 4) {
       //@todo setPaymentFields defines the billing fields - this should be moved to the processor class & renamed getBillingFields
+      // currently we just add the standard lot unless it's an off-site processor (& then add none)
       //also set the billingFieldSet to hold all the details required to render the fieldset so we can iterate through the fieldset - making
       // it easier to re-order. For not the billingFieldSets param is used to determine whether to show the billing pane
       CRM_Core_Payment_Form::_setPaymentFields($form);

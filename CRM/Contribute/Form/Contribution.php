@@ -184,6 +184,22 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_honoreeProfileType;
 
   /**
+   * array of billing panes to be displayed by billingBlock.tpl - currently this is likely to look like
+   * array('Credit Card' => ts('Credit Card') or array('Direct Debit => ts('Direct Debit')
+   * @todo billing details (address stuff) to be added when we stop hard coding the panes in billingBlock.tpl
+   *
+   * @var array
+   */
+  public $billingPane = array();
+
+  /**
+   * array of the payment fields to be displayed in the payment fieldset (pane) in billingBlock.tpl
+   * this contains all the information to describe these fields from quickform. See CRM_Core_Form_Payment getPaymentFormFieldsMetadata
+   *
+   * @var array
+   */
+   public $_paymentFields = array();
+  /**
    * logged in user's email
    * @var string
    */
@@ -271,29 +287,29 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
 
     $this->assign('contributionMode', $this->_mode);
-
-    $this->_paymentProcessor = array('billing_mode' => 1);
+    if ($this->_action & CRM_Core_Action::DELETE) {
+      return;
+    }
 
     $this->assign('showCheckNumber', TRUE);
 
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
     try {
-      $this->assignProcessors();
-      if ($this->_contactID) {
-        list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-        $this->assign('displayName', $this->userDisplayName);
+      if ($this->_mode) {
+        $this->assignProcessors();
+        if ($this->_contactID) {
+          list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+          $this->assign('displayName', $this->userDisplayName);
+        }
+
+        $this->assignBillingType();
+
+        $this->_fields = array();
+        CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
       }
-
-      $this->assignBillingType();
-
-      $this->_fields = array();
-      CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
     }
     catch (CRM_Core_Exception $e) {
       CRM_Core_Error::fatal($e->getMessage());
-    }
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      return;
     }
 
     if (in_array('CiviPledge', CRM_Core_Config::singleton()->enableComponents) && !$this->_formType) {
@@ -584,8 +600,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE) == TRUE) {
         $buildRecurBlock = TRUE;
         foreach ($this->billingPane as $name => $label) {
-          //@todo reduce variation so we don't have to convert 'credit_card' to 'CreditCard'
-          $paneNames[$label] = CRM_Utils_String::convertStringToCamel($name);
+          if (!empty($this->billingFieldSets[$name]['fields'])) {
+            //@todo reduce variation so we don't have to convert 'credit_card' to 'CreditCard'
+            $paneNames[$label] = CRM_Utils_String::convertStringToCamel($name);
+          }
         }
       }
     }
