@@ -157,6 +157,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     else {
         CRM_Core_Error::fatal("Could not find Event ID");
     }
+    parent::endPostProcess();
   }
 
    /**
