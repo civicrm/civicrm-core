@@ -380,12 +380,14 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $configs['allowCoreTypes'][] = 'Individual';
     $configs['allowCoreTypes'][] = 'Participant';
     //CRM-15427
-    $participantEventType = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $_GET['id'], 'event_type_id', 'id');
-    $participantRole  = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $_GET['id'], 'default_role_id');
-    $configs['allowSubTypes']['ParticipantEventName'] = array($_GET['id']);
-    $configs['allowSubTypes']['ParticipantEventType'] = array($participantEventType);
-    $configs['allowSubTypes']['ParticipantRole'] = array($participantRole);
-
+    $id = CRM_Utils_Request::retrieve( 'id' , 'Integer' );
+    if ($id) {
+      $participantEventType = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $id, 'event_type_id', 'id');
+      $participantRole  = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'default_role_id');
+      $configs['allowSubTypes']['ParticipantEventName'] = array($id);
+      $configs['allowSubTypes']['ParticipantEventType'] = array($participantEventType);
+      $configs['allowSubTypes']['ParticipantRole'] = array($participantRole);
+    }
     $configs['profileEntities'][] = array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel');
     $configs['profileEntities'][] = array('entity_name' => 'participant_1', 'entity_type' => 'ParticipantModel', 'entity_sub_type' => '*');
 
