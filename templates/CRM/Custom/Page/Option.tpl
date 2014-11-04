@@ -25,9 +25,8 @@
 *}
 {if $action eq 1 or $action eq 2 or $action eq 4 or $action eq 8}
     {include file="CRM/Custom/Form/Option.tpl"}
-{/if}
-
-{if $customOption}
+{else}
+  {if $customOption}
     {if $reusedNames}
         <div class="message status">
             <div class="icon inform-icon"></div> &nbsp; {ts 1=$reusedNames}These Multiple Choice Options are shared by the following custom fields: %1{/ts}
@@ -70,11 +69,12 @@
       </div>
     </div>
 
-{else}
+  {else}
     {if $action eq 16}
         <div class="messages status no-popup">
            <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
-           {capture assign=crmURL}{crmURL p='civicrm/admin/custom/group/field/option' q="action=add&fid=$fid&gid=$gid"}{/capture}{ts 1=$fieldTitle 2=$crmURL}There are no multiple choice options for the custom field '%1', <a href='%2' class="action-item">add one</a>.{/ts}
+           {ts}None found.{/ts}
         </div>
     {/if}
+  {/if}
 {/if}
