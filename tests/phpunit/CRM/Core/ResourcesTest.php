@@ -127,6 +127,17 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
+  function testAddVars() {
+    $this->res
+      ->addVars('food', array('fruit' => array('mine' => 'apple', 'ours' => 'banana')))
+      ->addVars('food', array('fruit' => array('mine' => 'new apple', 'yours' => 'orange')))
+    ;
+    $this->assertTreeEquals(
+      array('vars' => array('food' => array('fruit' => array('yours' => 'orange', 'mine' => 'new apple', 'ours' => 'banana')))),
+      $this->res->getSettings()
+    );
+  }
+
   function testAddSetting() {
     $this->res
       ->addSetting(array('fruit' => array('mine' => 'apple')))
