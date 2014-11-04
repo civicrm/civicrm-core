@@ -51,6 +51,7 @@
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
+      var $dialog;
       /** Add your linked entity mapper here **/
       var mapper = {'CRM_Event_Form_ManageEvent_EventInfo': '',
                 'CRM_Event_Form_ManageEvent_Location': '',
@@ -61,7 +62,7 @@
                 'CRM_Activity_Form_Activity': ''
                 };
       function cascadeChangesDialog() {
-        $("#recurring-dialog").dialog({
+        $dialog =  $("#recurring-dialog").dialog({
           title: 'How does this change affect other repeating entities in the set?',
           modal: true,
           width: '650',
@@ -117,14 +118,14 @@
             success: function (result) {
               if (result.status != "" && result.status == 'Done') {
                 $('#mainTabContainer div:visible Form, form.'+form).submit();
-                $("#recurring-dialog").dialog('close');
+                $dialog.dialog('close');
               } else if (result.status != "" && result.status == 'Error') {
                 var errorBox = confirm(ts("Mode could not be updated, save only this event?"));
                 if (errorBox == true) {
                   $('#mainTabContainer div:visible Form, form.'+form).submit();
-                  $("#recurring-dialog").dialog('close');
+                  $dialog.dialog('close');
                 } else {
-                  $("#recurring-dialog").dialog('close');
+                  $dialog.dialog('close');
                   return false;
                 }
               }
