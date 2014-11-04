@@ -183,4 +183,4 @@
     $('#selector tr:odd ').addClass('even-row');
   });
 </script>
-{/literal}{debug}
+{/literal}
