@@ -127,7 +127,11 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       // NOTE : group id is not stored in session from within CRM_Custom_Form_CustomData::preProcess func
       // this is due to some condition inside it which restricts it from saving in session
       // so doing this for multi record edit action
-      CRM_Custom_Form_CustomData::preProcess($this);
+      $entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $this);
+      if(!empty($entityId)) {
+        $subType = CRM_Contact_BAO_Contact::getContactSubType($entityId, ',');
+      }
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, NULL, NULL, $entityId);
       if ($this->_multiRecordDisplay) {
         $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
         $this->_tableID = $this->_entityId;
