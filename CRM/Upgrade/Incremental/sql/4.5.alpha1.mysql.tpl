@@ -213,7 +213,7 @@ ALTER TABLE  `civicrm_mailing_job` CHANGE  `status`  `status` VARCHAR( 12 ) CHAR
 ALTER TABLE  `civicrm_mailing_group` CHANGE  `group_type`  `group_type` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Are the members of the group included or excluded?.';
 ALTER TABLE  `civicrm_mailing` CHANGE  `visibility`  `visibility` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'User and User Admin Only' COMMENT  'In what context(s) is the mailing contents visible (online viewing)';
 ALTER TABLE  `civicrm_mailing_component` CHANGE  `component_type`  `component_type` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Type of Component.';
-ALTER TABLE  `civicrm_mailing_bounce_type` CHANGE  `name`  `name` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'Type of bounce';
+ALTER TABLE  `civicrm_mailing_bounce_type` CHANGE  `name`  `name` VARCHAR( 24 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'Type of bounce';
 ALTER TABLE  `civicrm_participant_status_type` CHANGE  `class`  `class` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'the general group of status type this one belongs to';
 ALTER TABLE  `civicrm_dedupe_rule_group` CHANGE  `contact_type`  `contact_type` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'The type of contacts this group applies to';
 ALTER TABLE  `civicrm_dedupe_rule_group` CHANGE  `used`  `used` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Whether the rule should be used for cases where usage is Unsupervised, Supervised OR General(programatically)';
