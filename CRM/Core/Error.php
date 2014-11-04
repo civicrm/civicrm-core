@@ -361,6 +361,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
     }
 
+    if ($config->backtrace) {
+      self::backtrace();
+    }
+
+    CRM_Core_Error::debug_var('Fatal Error Details', $vars);
+    CRM_Core_Error::backtrace('backTrace', TRUE);
+
     // If we are in an ajax callback, format output appropriately
     if (CRM_Utils_Array::value('snippet', $_REQUEST) === CRM_Core_Smarty::PRINT_JSON) {
       $out = array(
@@ -376,15 +383,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       CRM_Core_Page_AJAX::returnJsonResponse($out);
     }
 
-    if ($config->backtrace) {
-      self::backtrace();
-    }
-
     $template = CRM_Core_Smarty::singleton();
     $template->assign($vars);
 
-    CRM_Core_Error::debug_var('Fatal Error Details', $vars);
-    CRM_Core_Error::backtrace('backTrace', TRUE);
     $config->userSystem->outputError($template->fetch($config->fatalErrorTemplate));
 
     self::abend(CRM_Core_Error::FATAL_ERROR);
