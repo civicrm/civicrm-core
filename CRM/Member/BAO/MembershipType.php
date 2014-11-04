@@ -89,24 +89,29 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * function to add the membership types
    *
    * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $ids array contains the id (deprecated)
    *
    * @access public
    * @static
    *
    * @return object
    */
-  static function add(&$params, &$ids) {
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+  static function add(&$params, $ids = array()) {
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipType', $ids));
+    if (!$id) {
+      if (!isset($params['is_active'])) {
+        // do we need this?
+        $params['is_active'] = FALSE;
+      }
+      if (!isset($params['domain_id'])) {
+        $params['domain_id'] = CRM_Core_Config::domainID();
+      }
+    }
 
     // action is taken depending upon the mode
     $membershipType = new CRM_Member_DAO_MembershipType();
-
     $membershipType->copyValues($params);
-
-    $membershipType->domain_id = CRM_Core_Config::domainID();
-
-    $membershipType->id = CRM_Utils_Array::value('membershipType', $ids);
+    $membershipType->id = $id;
 
     // $previousID is the old organization id for memberhip type i.e 'member_of_contact_id'. This is used when an oganization is changed.
     $previousID = NULL;
@@ -118,8 +123,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
     self::createMembershipPriceField($params, $ids, $previousID, $membershipType->id);
     // update all price field value for quick config when membership type is set CRM-11718
-    if (CRM_Utils_Array::value('membershipType', $ids)) {
-      self::updateAllPriceFieldValue($ids['membershipType'], $params);
+    if ($id) {
+      self::updateAllPriceFieldValue($id, $params);
     }
 
     return $membershipType;
