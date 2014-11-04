@@ -586,7 +586,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // Recursively set defaults for nested fields
       if (isset($contact[$name]) && is_array($contact[$name]) && ($name == 'onbehalf' || $name == 'honor')) {
         foreach ($contact[$name] as $fieldName => $fieldValue) {
-          if (is_array($fieldValue)) {
+          if (is_array($fieldValue) && !in_array($this->_fields[$name][$fieldName]['html_type'], array('Multi-Select','AdvMulti-Select'))) {
             foreach ($fieldValue as $key => $value) {
               $defaults["{$name}[{$fieldName}][{$key}]"] = $value;
             }
