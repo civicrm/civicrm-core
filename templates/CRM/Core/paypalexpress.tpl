@@ -23,22 +23,17 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* this template is used for adding/editing/deleting case *}
-<div class="form-item">
-<fieldset>
-    <legend>{ts}View Case Record Details{/ts}</legend>
-      <dl class="html-adjust">
-            <dt class="font-size12pt">{ts}Name{/ts}</dt><dd class="font-size12pt"><strong>{$contactNames}</strong>&nbsp;</dd>
-            <dt>{$form.subject.label}</dt><dd>{$form.subject.html}</dd>
-            <dt>{$form.status_id.label}</dt><dd>{$form.status_id.html}</dd>
-            <dt>{$form.case_type_id.label}</dt><dd>{$form.case_type_id.html}</dd>
-            <dt>{$form.start_date.label}</dt><dd>{$form.start_date.html}</dd>
-            <dt>{$form.end_date.label}</dt><dd>{$form.end_date.html}</dd>
-            <dt>{$form.details.label}</dt><dd>{$form.details.html}</dd>
-            <dt></dt><dd>{$form.buttons.html}
-              </dd>
-      </dl>
-      <div class="spacer"> </div>
-      <dl><dd>{include file="CRM/Activity/Selector/Activity.tpl" caseview=1}</dd></dl>
-</fieldset>
+
+<div class="crm-section no-label paypal_button_info-section">
+  <div class="content description">
+    {ts}If you have a PayPal account, you can click the PayPal button to continue. Otherwise, fill in the credit card and billing information on this form and click
+      <strong>Continue</strong>
+      at the bottom of the page.{/ts}
+  </div>
+</div>
+<div class="crm-section no-label {$form.$expressButtonName.name}-section">
+  <div class="content description">
+    {$form.$expressButtonName.html}
+    <div class="description">Save time. Checkout securely. Pay without sharing your financial information.</div>
+  </div>
 </div>

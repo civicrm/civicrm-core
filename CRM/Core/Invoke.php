@@ -404,7 +404,7 @@ class CRM_Core_Invoke {
 
     CRM_Core_BAO_Setting::updateSettingsFromMetaData();
     // Clear js caches
-    CRM_Core_Resources::singleton()->flushStrings()->rebuildDynamicResources();
+    CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
     CRM_Case_XMLRepository::singleton(TRUE);
 
     // also rebuild triggers if requested explicitly

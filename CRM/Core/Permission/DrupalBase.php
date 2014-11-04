@@ -247,4 +247,82 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
 
     return implode(', ', $emails);
   }
+
+  /**
+   * Given a roles array, check for access requirements
+   *
+   * @param array $array the roles to check
+   *
+   * @return boolean true if yes, else false
+   * @access public
+   *
+   */
+  function checkGroupRole($array) {
+    if (function_exists('user_load') && isset($array)) {
+      $user = user_load( $GLOBALS['user']->uid);
+      //if giver roles found in user roles - return true
+      foreach ($array as $key => $value) {
+        if (in_array($value, $user->roles)) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public function isModulePermissionSupported() {
+    return TRUE;
+  }
+
+  /**
+   * Get all the contact emails for users that have a specific permission
+   *
+   * @param string $permissionName name of the permission we are interested in
+   *
+   * @return string a comma separated list of email addresses
+   */
+  public function permissionEmails($permissionName) {
+    static $_cache = array();
+
+    if (isset($_cache[$permissionName])) {
+      return $_cache[$permissionName];
+    }
+
+    $uids = array();
+    $sql = "
+      SELECT {users}.uid, {role_permission}.permission
+      FROM {users}
+      JOIN {users_roles}
+        ON {users}.uid = {users_roles}.uid
+      JOIN {role_permission}
+        ON {role_permission}.rid = {users_roles}.rid
+      WHERE {role_permission}.permission = '{$permissionName}'
+        AND {users}.status = 1
+    ";
+
+    $result = db_query($sql);
+    foreach ( $result as $record ) {
+      $uids[] = $record->uid;
+    }
+
+    $_cache[$permissionName] = self::getContactEmails($uids);
+    return $_cache[$permissionName];
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   */
+  function upgradePermissions($permissions) {
+    if (empty($permissions)) {
+      throw new CRM_Core_Exception("Cannot upgrade permissions: permission list missing");
+    }
+    $query = db_delete('role_permission')
+      ->condition('module', 'civicrm')
+      ->condition('permission', array_keys($permissions), 'NOT IN');
+    $query->execute();
+  }
 }

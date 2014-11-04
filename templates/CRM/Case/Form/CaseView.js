@@ -216,6 +216,7 @@
           title: $(this).attr('title') || $(this).text(),
           message: detached[target],
           resizable: true,
+          options: {yes: ts('Save'), no: ts('Cancel')},
           open: function() {
             miniForms[target].pre && miniForms[target].pre.call(this, $el.data());
           }

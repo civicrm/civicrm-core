@@ -148,7 +148,7 @@
         <td>{$form.custom_post_id.html}
           <div
             class="description">{ts}Include additional fields on this registration form by selecting and configuring a CiviCRM Profile to be included at the bottom of the page.{/ts}</div>
-          &nbsp;<span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'>&nbsp;<a href="#" 
+          &nbsp;<span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'>&nbsp;<a href="#"
 class="crm-hover-button crm-button-add-profile"><span
                 class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
           <br/>
@@ -189,7 +189,7 @@ class="crm-hover-button crm-button-add-profile"><span
         <td>{$form.additional_custom_post_id.html}
           <div
             class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}
-					</div>
+          </div>
           &nbsp;<span class='profile_bottom_add_link_main{if $profilePostMultipleAdd} hiddenElement{/if}'><a
               href="#" class="crm-hover-button crm-button-add-profile"><span
                 class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
@@ -438,9 +438,8 @@ invert              = 0
     function removeBottomProfile( e ) {
         e.preventDefault();
 
-        $(e.target).parents('tr').find('.crm-profile-selector').val('');
-        $(e.target).parents('tr').hide();
-        $(e.target).parents('tbody').find('tr:visible:last .profile_bottom_link_main, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
+        $(e.target).closest('tr').hide().find('.crm-profile-selector').val('');
+        $(e.target).closest('tbody').find('tr:visible:last .profile_bottom_link_main, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
     }
 
     var strSameAs = ' - '+ts('same as for main contact')+' - ';

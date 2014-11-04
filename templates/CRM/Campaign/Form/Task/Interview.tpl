@@ -318,7 +318,7 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
   //post data to create interview.
   CRM.$.post(dataUrl, data, function(interview) {
     if ( interview.status == 'success' ) {
-      CRM.$("#row_"+voterId+' td.name').attr('class', 'name survey-completed' );
+      CRM.$("#row_"+voterId+' td.name').attr('class', 'name strikethrough' );
       CRM.$('#restmsg_vote_' + voterId).fadeIn("slow").fadeOut("slow");
       CRM.$('#interview_voter_button_' + voterId).html(updateVote);
       CRM.$('#release_voter_button_' + voterId).hide( );

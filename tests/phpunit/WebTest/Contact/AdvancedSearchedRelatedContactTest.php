@@ -299,7 +299,6 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->waitForElementPresent("event_type_id");
     $this->select2("event_type_id", "Conference");
     $this->click("_qf_Advanced_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('search-status');
     $this->assertElementContainsText('search-status', '2 Contacts');
   }

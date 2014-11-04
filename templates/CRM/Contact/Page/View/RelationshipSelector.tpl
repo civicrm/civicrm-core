@@ -118,7 +118,7 @@
             $(nRow).addClass('crm-entity');
           }
         }
-      });    
+      });
     }
   });
 </script>

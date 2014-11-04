@@ -342,19 +342,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @access public
    */
   public function addScriptUrl($url, $region) {
-    switch ($region) {
-      case 'html-header':
-      case 'page-footer':
-        $scope = substr($region, 5);
-        break;
-      default:
-        return FALSE;
-    }
-    // If the path is within the drupal directory we can add in the normal way
-    if ($this->formatResourceUrl($url)) {
-      drupal_add_js($url, 'module', $scope);
-      return TRUE;
-    }
+    // CRM-15450 - D6 doesn't order internal/external links correctly so we can't use drupal_add_js
     return FALSE;
   }
 
@@ -371,16 +359,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @access public
    */
   public function addScript($code, $region) {
-    switch ($region) {
-      case 'html-header':
-      case 'page-footer':
-        $scope = substr($region, 5);
-        break;
-      default:
-        return FALSE;
-    }
-    drupal_add_js($code, 'inline', $scope);
-    return TRUE;
+    // CRM-15450 - ensure scripts are in correct order
+    return FALSE;
   }
 
   /**

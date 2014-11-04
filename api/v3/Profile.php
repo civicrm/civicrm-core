@@ -732,3 +732,14 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
   }
   return $values;
 }
+
+/**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_profile_deprecation() {
+  return array(
+    'set' => 'Profile api "set" action is deprecated in favor of "submit".',
+    'apply' => 'Profile api "apply" action is deprecated in favor of "submit".',
+  );
+}

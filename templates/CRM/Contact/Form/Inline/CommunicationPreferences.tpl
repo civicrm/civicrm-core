@@ -101,7 +101,7 @@
          </div>
        </div>
       {/if}
-      
+
 
       {if !empty($form.postal_greeting_id)}
       <div class="crm-summary-row">
@@ -140,7 +140,7 @@
          </div>
        </div>
       {/if}
- 
+
     </div>
  </div>
 

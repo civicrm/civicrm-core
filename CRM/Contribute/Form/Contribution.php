@@ -1058,7 +1058,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $submittedValues, $lineItem[$priceSetId]);
 
       // unset tax amount for offline 'is_quick_config' contribution
-      if ($this->_priceSet['is_quick_config'] && 
+      if ($this->_priceSet['is_quick_config'] &&
         !array_key_exists($submittedValues['financial_type_id'], CRM_Core_PseudoConstant::getTaxRates())
       ) {
         unset($submittedValues['tax_amount']);
@@ -1073,6 +1073,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         elseif ($this->_context == 'membership') {
           $isRelatedId = TRUE;
         }
+        else {
+          $pId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'participant_id', 'contribution_id');
+        }
       }
       else {
         $contributionDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
@@ -1081,14 +1084,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
         elseif (array_key_exists('participant', $contributionDetails)) {
           $pId = current($contributionDetails['participant']);
-        }        
+        }
       }
     }
+
+    $isQuickConfig = 0;
+    if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
+      $isQuickConfig = 1;
+    }
+
     if (!$priceSetId && !empty($submittedValues['total_amount']) && $this->_id) {
       // 10117 update th line items for participants
       if ($pId) {
         $entityTable = 'participant';
         $entityID = $pId;
+        $isRelatedId = FALSE;
         $participantParams = array(
           'fee_amount' => $submittedValues['total_amount'],
           'id' => $entityID
@@ -1103,7 +1113,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $entityID = $this->_id;
       }
 
-      $lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, NULL, TRUE, $isRelatedId);
+      $lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, $entityTable, $isQuickConfig, $isRelatedId);
       foreach (array_keys($lineItems) as $id) {
         $lineItems[$id]['id'] = $id;
       }
@@ -1135,10 +1145,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $lineItem[$this->_priceSetId] = $lineItems;
       }
     }
-    $isQuickConfig = 0;
-    if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $isQuickConfig = 1;
-    }
+
     //CRM-11529 for quick config back office transactions
     //when financial_type_id is passed in form, update the
     //line items with the financial type selected in form
@@ -1382,7 +1389,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           }
         }
       }
-       
+
       if ($invoicing) {
         if ($this->_action & CRM_Core_Action::UPDATE) {
           if (isset($submittedValues['tax_amount'])) {

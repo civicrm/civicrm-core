@@ -207,7 +207,7 @@
     <script type="text/javascript">
     {literal}
       CRM.$(function($) {
-        var tabId = $.fn.dataTableSettings[0].sInstance;
+        var tabId = $('.dataTable').attr('id');
 
         $('table#'+ tabId).dataTable().fnSettings().aoDrawCallback.push( {
           "fn": function () {

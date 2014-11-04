@@ -304,9 +304,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // to process Custom data that are appended to URL
     $getDefaults = CRM_Core_BAO_CustomGroup::extractGetParams($this, "'Contact', 'Individual', 'Contribution'");
-    if (!empty($getDefaults)) {
-      $this->_defaults = array_merge($this->_defaults, $getDefaults);
-    }
+    $this->_defaults = array_merge($this->_defaults, $getDefaults);
 
     $config = CRM_Core_Config::singleton();
     // set default country from config if no country set
@@ -648,6 +646,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * build elements to collect information for recurring contributions
    *
    * @access public
+   *
+   * @param CRM_Core_Form $form
    */
   public static function buildRecur(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur');
@@ -798,8 +798,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       if ($membershipIsActive) {
         $is_test = $self->_mode != 'live' ? 1 : 0;
         $memContactID = $self->_membershipContactID;
-       
-        // For anonymous user check using dedupe rule 
+
+        // For anonymous user check using dedupe rule
         // if user has Cancelled Membership
         if (!$memContactID) {
           $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
@@ -811,19 +811,19 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $currentMemberships = CRM_Member_BAO_Membership::getContactsCancelledMembership($memContactID,
           $is_test
         );
-        
+
         $errorText = 'Your %1 membership was previously cancelled and can not be renewed online. Please contact the site administrator for assistance.';
         foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
           if ($fieldValue['html_type'] != 'Text' && CRM_Utils_Array::value('price_' . $fieldKey, $fields)) {
             if (!is_array($fields['price_' . $fieldKey])) {
-              if (array_key_exists('membership_type_id', $fieldValue['options'][$fields['price_' . $fieldKey]]) 
+              if (array_key_exists('membership_type_id', $fieldValue['options'][$fields['price_' . $fieldKey]])
                 && in_array($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'], $currentMemberships)) {
                 $errors['price_' . $fieldKey] = ts($errorText, array(1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'])));
               }
             }
             else {
               foreach ($fields['price_' . $fieldKey] as $key => $ignore) {
-                if (array_key_exists('membership_type_id', $fieldValue['options'][$key]) 
+                if (array_key_exists('membership_type_id', $fieldValue['options'][$key])
                   && in_array($fieldValue['options'][$key]['membership_type_id'], $currentMemberships)) {
                   $errors['price_' . $fieldKey] = ts($errorText, array(1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$key]['membership_type_id'])));
                 }
@@ -832,7 +832,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
       }
- 
+
       // CRM-12233
       if ($membershipIsActive && !$self->_membershipBlock['is_required']
         && $self->_values['amount_block_is_active']) {
@@ -1188,7 +1188,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (($this->_values['is_pay_later'] &&
         empty($this->_paymentProcessor) &&
         !array_key_exists('hidden_processor', $params)) ||
-      CRM_Utils_Array::value('payment_processor', $params) == 0) {
+      (!empty($params['payment_processor']) && $params['payment_processor'] == 0)) {
       $params['is_pay_later'] = 1;
     }
     else {
@@ -1328,6 +1328,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $params['cancelURL'] = CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=1&qfKey={$params['qfKey']}", TRUE, NULL, FALSE);
           $params['returnURL'] = CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Confirm_display=1&rfp=1&qfKey={$params['qfKey']}", TRUE, NULL, FALSE);
           $params['invoiceID'] = $invoiceID;
+          $params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
 
           //default action is Sale
           $params['payment_action'] = 'Sale';
@@ -1379,6 +1380,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Handle Payment Processor switching
    * For contribution and event registration forms
+   * @param CRM_Core_Form $form
+   * @param bool $noFees
    */
   static function preProcessPaymentOptions(&$form, $noFees = FALSE) {
     $form->_snippet = CRM_Utils_Array::value('snippet', $_GET);

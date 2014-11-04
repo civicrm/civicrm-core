@@ -30,7 +30,7 @@
             <td>{$form.dst_group_id.html}<br />
                 <span class="description">{ts}Select a different Custom Data Set for this field.{/ts}
             </td>
-        </tr> 
+        </tr>
         <tr><td class="label">{$form.is_copy.label}</td><td>{$form.is_copy.html}</td></tr>
     </table>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>

@@ -164,7 +164,7 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
   $result = array();
   $result['is_error'] = 0;
   //lets set the ['id'] field if it's not set & we know what the entity is
-  if (is_array($values) && !empty($entity)) {
+  if (is_array($values) && !empty($entity) && $action != 'getfields') {
     foreach ($values as $key => $item) {
       if (empty($item['id']) && !empty($item[$entity . "_id"])) {
         $values[$key]['id'] = $item[$entity . "_id"];
@@ -233,9 +233,25 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
   }
   if(!empty($params['options']['metadata'])) {
     // we've made metadata an array but only supporting 'fields' atm
-    if(in_array('fields', (array) $params['options']['metadata'])) {
+    if(in_array('fields', (array) $params['options']['metadata']) && $action !== 'getfields') {
       $fields = civicrm_api3($entity, 'getfields', array('action' => substr($action, 0, 3) == 'get' ? 'get' : 'create'));
       $result['metadata']['fields'] = $fields['values'];
+    }
+  }
+  // Report deprecations
+  $deprecated = _civicrm_api3_deprecation_check($entity, $result);
+  // Always report "update" action as deprecated
+  if (!is_string($deprecated) && ($action == 'getactions' || $action == 'update')) {
+    $deprecated = ((array) $deprecated) + array('update' => 'The "update" action is deprecated. Use "create" with an id instead.');
+  }
+  if ($deprecated) {
+    // Metadata-level deprecations or wholesale entity deprecations
+    if ($entity == 'entity' || $action == 'getactions' || is_string($deprecated)) {
+      $result['deprecated'] = $deprecated;
+    }
+    // Action-specific deprecations
+    elseif (!empty($deprecated[$action])) {
+      $result['deprecated'] = $deprecated[$action];
     }
   }
   return array_merge($result, $extraReturnValues);
@@ -1583,7 +1599,7 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
   $fields = $d->fields();
   // replace uniqueNames by the normal names as the key
   if (empty($unique)) {
-    foreach ($fields as $name => & $field) {
+    foreach ($fields as $name => &$field) {
       //getting rid of unused attributes
       foreach ($unsetIfEmpty as $attr) {
         if (empty($field[$attr])) {
@@ -1603,6 +1619,15 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
       unset($fields[$name]);
     }
   }
+  // Translate FKClassName to the corresponding api
+  foreach ($fields as $name => &$field) {
+    if (!empty($field['FKClassName'])) {
+      $FKApi = CRM_Core_DAO_AllCoreTables::getBriefName($field['FKClassName']);
+      if ($FKApi) {
+        $field['FKApiName'] = $FKApi;
+      }
+    }
+  }
   $fields += _civicrm_api_get_custom_fields($entity, $params);
   return $fields;
 }
@@ -1612,23 +1637,18 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
  * fields are prefixed with 'custom_' to represent api params
  */
 function _civicrm_api_get_custom_fields($entity, &$params) {
-  $customfields = array();
   $entity = _civicrm_api_get_camel_name($entity);
-  if (strtolower($entity) == 'contact') {
-    // Use sub-type if available, otherwise stick with 'Contact'
+  if ($entity == 'Contact') {
+    // Use sub-type if available, otherwise "NULL" to fetch from all contact types
     $entity = CRM_Utils_Array::value('contact_type', $params);
-  }
-  $retrieveOnlyParent = FALSE;
-  // we could / should probably test for other subtypes here - e.g. activity_type_id
-  if($entity == 'Contact'){
-    empty($params['contact_sub_type']);
   }
   $customfields = CRM_Core_BAO_CustomField::getFields($entity,
     FALSE,
     FALSE,
-    CRM_Utils_Array::value('contact_sub_type', $params, FALSE),
+    // we could / should probably test for other subtypes here - e.g. activity_type_id
+    CRM_Utils_Array::value('contact_sub_type', $params),
     NULL,
-    $retrieveOnlyParent,
+    FALSE,
     FALSE,
     FALSE
   );
@@ -1944,4 +1964,23 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
     }
   }
   return FALSE;
+}
+
+/**
+ * @param string $entity
+ * @param array $result
+ * @return string|array|null
+ */
+function _civicrm_api3_deprecation_check($entity, $result = array()) {
+  if ($entity) {
+    $apiFile = 'api/v3/' . _civicrm_api_get_camel_name($entity) . '.php';
+    if (CRM_Utils_File::isIncludable($apiFile)) {
+      require_once $apiFile;
+    }
+    $entity = _civicrm_api_get_entity_name_from_camel($entity);
+    $fnName = "_civicrm_api3_{$entity}_deprecation";
+    if (function_exists($fnName)) {
+      return $fnName($result);
+    }
+  }
 }

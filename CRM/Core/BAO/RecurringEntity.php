@@ -396,6 +396,9 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    */
   static public function getEntitiesForParent($parentId, $entityTable, $includeParent = TRUE, $mode = 3, $initiatorId = NULL) {
     $entities = array();
+    if (empty($parentId) || empty($entityTable)) {
+      return $entities;
+    }
 
     if (!$initiatorId) {
       $initiatorId = $parentId;
@@ -477,6 +480,10 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @return int unsigned $parentId Parent ID
    */
   static public function getParentFor($entityId, $entityTable, $includeParent = TRUE) {
+    if (empty($entityId) || empty($entityTable)) {
+      return NULL;
+    }
+
     $query = "
       SELECT parent_id
       FROM civicrm_recurring_entity

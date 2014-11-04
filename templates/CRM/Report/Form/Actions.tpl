@@ -66,10 +66,14 @@
                                         CRM.confirm({
                                           message: ts({/literal}'{ts escape='js' 1='<em>%1</em>'}Add all contacts to %1 group?{/ts}'{literal}, {1: $('option:selected', '#groups').text()})
                                         })
-                                          .on('crmConfirm:yes', function() {
-                                            $('#groups').siblings(':submit').click();
+                                          .on({
+                                            'crmConfirm:yes': function() {
+                                              $('#groups').siblings(':submit').click();
+                                            },
+                                            'crmConfirm:no dialogclose': function() {
+                                              $('#groups').select2('val', '');
+                                            }
                                           });
-                                        $('#groups').select2('val', '');
                                       });
                                     })(CRM.$);
                                     {/literal}

@@ -487,7 +487,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals(2, $lineItems['count']);
 
     // Check quantity, label and unit price of lines.
-    // TODO: These assertions depend on the order of the line items, which is 
+    // TODO: These assertions depend on the order of the line items, which is
     // technically incorrect.
 
     $lineItem = array_pop($lineItems['values']);

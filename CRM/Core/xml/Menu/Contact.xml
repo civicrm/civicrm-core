@@ -47,7 +47,7 @@
      <title>Get Image File</title>
      <page_callback>CRM_Contact_Page_ImageFile</page_callback>
      <access_arguments>*always allow*</access_arguments>
-  </item>  
+  </item>
   <item>
      <path>civicrm/contact/search/basic</path>
      <title>Find Contacts</title>

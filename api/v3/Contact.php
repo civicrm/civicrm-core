@@ -835,7 +835,15 @@ LIMIT    0, {$limit}
     }
   }
 
-  return civicrm_api3_create_success($contactList, $params);
+  return civicrm_api3_create_success($contactList, $params, 'contact', 'getquick');
+}
+
+/**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_contact_deprecation() {
+  return array('getquick' => 'The "getquick" action is deprecated in favor of "getlist".');
 }
 
 /**
@@ -974,7 +982,8 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   $request['params']['options']['sort'] = 'sort_name';
   // Contact api doesn't support array(LIKE => 'foo') syntax
   if (!empty($request['input'])) {
-    $request['params'][$request['search_field']] = $request['input'];
+    // CRM-15442 - change spaces to % wildcards when searching by name
+    $request['params'][$request['search_field']] = strpos($request['search_field'], 'name') ? str_replace(' ', '%', $request['input']) : $request['input'];
   }
 }
 

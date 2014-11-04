@@ -2018,7 +2018,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $financialType
    */
   function addPremium($name, $sku, $amount, $price, $cost, $financialType) {
-    $this->waitForElementPresent("_qf_ManagePremiums_next-bottom");
+    $this->waitForElementPresent("_qf_ManagePremiums_upload-bottom");
     $this->type("name", $name);
     $this->type("sku", $sku);
     $this->click("CIVICRM_QFID_noImage_16");
@@ -2028,7 +2028,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if ($financialType) {
       $this->select("financial_type_id", "label={$financialType}");
     }
-    $this->click("_qf_ManagePremiums_next-bottom");
+    $this->click("_qf_ManagePremiums_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 

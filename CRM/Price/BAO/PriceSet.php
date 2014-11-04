@@ -39,7 +39,6 @@
  */
 class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
 
-  
   /**
    * static field for default price set details
    *

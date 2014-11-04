@@ -38,6 +38,14 @@
  */
 
 /**
+ * @deprecated api notice
+ * @return string to indicate this entire api entity is deprecated
+ */
+function _civicrm_api3_mailing_group_deprecation() {
+  return 'The mailing_group api is deprecated. Use the mailing_event apis instead.';
+}
+
+/**
  * Handle an unsubscribe event
  * @deprecated
  *
@@ -108,6 +116,6 @@ function civicrm_api3_mailing_group_getfields($params) {
     unset($field['pseudoconstant']);
   }
 
-  return civicrm_api3_create_success($fields);
+  return civicrm_api3_create_success($fields, $params, 'mailing_group', 'getfields');
 }
 

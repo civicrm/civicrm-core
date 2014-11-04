@@ -437,3 +437,50 @@ SELECT  count(*)
   return NULL;
 }
 
+/**
+ * @see _civicrm_api3_generic_getlist_params.
+ *
+ * @param $request array
+ */
+function _civicrm_api3_activity_getlist_params(&$request) {
+  $fieldsToReturn = array('activity_date_time', 'activity_type_id', 'subject', 'source_contact_id');
+  $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
+  $request['params']['options']['sort'] = 'activity_date_time DESC';
+  $request['params'] += array(
+    'is_current_revision' => 1,
+    'is_deleted' => 0,
+  );
+}
+
+/**
+ * @see _civicrm_api3_generic_getlist_output
+ *
+ * @param $result array
+ * @param $request array
+ *
+ * @return array
+ */
+function _civicrm_api3_activity_getlist_output($result, $request) {
+  $output = array();
+  if (!empty($result['values'])) {
+    foreach ($result['values'] as $row) {
+      $data = array(
+        'id' => $row[$request['id_field']],
+        'label' => $row[$request['label_field']] ? $row[$request['label_field']] : ts('(no subject)'),
+        'description' => array(CRM_Core_Pseudoconstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $row['activity_type_id'])),
+      );
+      if (!empty($row['activity_date_time'])) {
+        $data['description'][0] .= ': ' . CRM_Utils_Date::customFormat($row['activity_date_time']);
+      }
+      if (!empty($row['source_contact_id'])) {
+        $data['description'][] = ts('By %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $row['source_contact_id'], 'display_name')));
+      }
+      foreach ($request['extra'] as $field) {
+        $data['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
+      }
+      $output[] = $data;
+    }
+  }
+  return $output;
+}
+
