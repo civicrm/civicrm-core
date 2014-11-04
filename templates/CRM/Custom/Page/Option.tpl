@@ -50,7 +50,7 @@
             <th>&nbsp;</th>
           </tr>
           {foreach from=$customOption item=row key=id}
-            <tr id="OptionValue-{$id}"class="crm-entity {cycle values="odd-row,even-row"} {$row.class} crm-custom_option {if NOT $row.is_active} disabled{/if}">
+            <tr id="OptionValue-{$id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class} crm-custom_option {if NOT $row.is_active} disabled{/if}">
               <td><span class="crm-custom_option-label crm-editable crmf-label">{$row.label}</span></td>
               <td><span class="crm-custom_option-value disabled-crm-editable" data-field="value" data-action="update">{$row.value}</span></td>
               <td class="crm-custom_option-default_value crmf-value">{$row.default_value}</td>
