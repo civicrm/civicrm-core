@@ -400,8 +400,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                        ON temp1_civireport.civicrm_contribution_contribution_id = {$this->_aliases['civicrm_contribution']}.id
                INNER JOIN civicrm_contribution_soft contribution_soft_civireport
                        ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id
-               INNER JOIN civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-                       ON {$this->_aliases['civicrm_contact']}.id = contribution_soft_civireport.contact_id";
+               INNER JOIN civicrm_contact      {$this->_aliases['civicrm_contact']}
+                       ON {$this->_aliases['civicrm_contact']}.id = contribution_soft_civireport.contact_id
+               {$this->_aclFrom}";
     }
 
     if (!empty($this->_params['ordinality_value'])) {

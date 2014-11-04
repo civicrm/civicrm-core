@@ -204,7 +204,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       );
 
 
-      if ($params['option_type'] == 1) {
+      if ($params['option_type'] == 1 && empty($params['option_group_id'])) {
         // first create an option group for this custom group
         $optionGroup = new CRM_Core_DAO_OptionGroup();
         $optionGroup->name = "{$columnName}_" . date('YmdHis');
@@ -1447,7 +1447,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return array
    */
-  static function getFileURL($contactID, $cfID, $fileID = NULL, $absolute = FALSE) {
+  static function getFileURL($contactID, $cfID, $fileID = NULL, $absolute = FALSE, $multiRecordWhereClause = NULL) {
     if ($contactID) {
       if (!$fileID) {
         $params = array('id' => $cfID);
@@ -1462,7 +1462,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         );
 
         //query to fetch id from civicrm_file
-        $query = "SELECT {$columnName} FROM {$tableName} where entity_id = {$contactID}";
+        if ($multiRecordWhereClause) {
+          $query = "SELECT {$columnName} FROM {$tableName} where entity_id = {$contactID} AND {$multiRecordWhereClause}";
+        }
+        else {
+          $query = "SELECT {$columnName} FROM {$tableName} where entity_id = {$contactID}";
+        }
         $fileID = CRM_Core_DAO::singleValueQuery($query);
       }
 

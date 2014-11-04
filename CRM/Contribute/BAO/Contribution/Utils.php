@@ -141,7 +141,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->set('params', $form->_params);
       $form->postProcessPremium($premiumParams, $contribution);
 
-      if ($form->_values['is_monetary'] && $form->_amount > 0.0) {
+      if ($form->_values['is_monetary'] && $form->_amount >= 0.0) {
         // add qfKey so we can send to paypal
         $form->_params['qfKey'] = $form->controller->_key;
         if ($component == 'membership') {
@@ -330,7 +330,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
         );
       }
       $form->postProcessPremium($premiumParams, $contribution);
-
+      if (is_array($result) && !empty($result['trxn_id'])) {
+        $contribution->trxn_id = $result['trxn_id'];
+      }
       $membershipResult[1] = $contribution;
     }
 

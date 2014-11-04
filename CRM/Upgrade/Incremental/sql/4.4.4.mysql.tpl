@@ -7,11 +7,11 @@ ALTER TABLE civicrm_report_instance MODIFY grouprole varchar(1024) COLLATE utf8_
 UPDATE civicrm_navigation SET url = 'http://civicrm.org/what/whatiscivicrm' WHERE name = 'About';
 
 -- CRM-13968
-SELECT @inprogressstatus := value FROM civicrm_option_value cov 
+SELECT @inprogressstatus := value FROM civicrm_option_value cov
 LEFT JOIN civicrm_option_group cg ON cov.option_group_id = cg.id
 WHERE cg.name = 'contribution_status'  AND cov.name = 'In Progress';
 
-SELECT @financialstatus := value FROM civicrm_option_value cov 
+SELECT @financialstatus := value FROM civicrm_option_value cov
 LEFT JOIN civicrm_option_group cg ON cov.option_group_id = cg.id
 WHERE cg.name = 'financial_item_status'  AND cov.name = 'Unpaid';
 

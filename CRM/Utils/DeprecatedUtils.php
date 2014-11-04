@@ -871,7 +871,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
     return TRUE;
   }
 
-  if (isset($values['preferred_communication_method'])) {
+  if (!empty($values['preferred_communication_method'])) {
     $comm = array();
     $pcm = array_change_key_case(array_flip(CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method')), CASE_LOWER);
 

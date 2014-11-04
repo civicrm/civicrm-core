@@ -122,7 +122,7 @@
         }
       );
     }
-    
+
     CRM.confirm({
       title: dialogTitle,
       width: '600',
@@ -130,7 +130,7 @@
       options: {yes: "{/literal}{ts escape='js'}Save{/ts}{literal}", no: "{/literal}{ts escape='js'}Cancel{/ts}{literal}"},
       url: dataUrl
     }).on('crmConfirm:yes', save);
-    
+
   }
 })(CRM.$);
 </script>

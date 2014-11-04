@@ -193,7 +193,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       // this required to show billing block
       $this->assign_by_ref('paymentProcessor', $paymentProcessor);
-      $this->assign('hidePayPalExpress', TRUE);
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
@@ -959,7 +958,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             ));
             $tmp_statuses = $result['values'];
             $status_ids = array();
-      	    foreach($tmp_statuses as $cur_stat) {
+            foreach($tmp_statuses as $cur_stat) {
               $status_ids[] = $cur_stat['id'];
             }
             if (empty($params['status_id']) || in_array( $params['status_id'] , $status_ids) == false) {
@@ -1281,9 +1280,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', array(1 => $membershipType, 2 => $userName));
         }
         else {
-          $params['contribution_source'] = $formValues['source'];	
+          $params['contribution_source'] = $formValues['source'];
         }
-      }	
+      }
 
       if (empty($params['is_override']) &&
         CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
@@ -1532,6 +1531,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         }
 
         $membershipParams = array_merge($membershipTypeValues[$memType], $params);
+        //CRM-15366
+        if (!empty($softParams) && empty($paymentParams['is_recur'])) {
+          $membershipParams['soft_credit'] = $softParams;
+        }
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
         unset($params['lineItems']);
@@ -1552,7 +1555,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $result = CRM_Contribute_BAO_Contribution::transitionComponents($params, TRUE);
         if (!empty($result) && !empty($params['contribution_id'])) {
           $lineItem = array();
-          $lineItems = CRM_Price_BAO_LineItem::getLineItems($params['contribution_id'], 'contribution');
+          $lineItems = CRM_Price_BAO_LineItem::getLineItems($params['contribution_id'], 'contribution', NULL, TRUE, TRUE);
           $itemId = key($lineItems);
           $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
           $fieldType = NULL;
@@ -1565,6 +1568,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $lineItem[$priceSetId] = $lineItems;
           $contributionBAO = new CRM_Contribute_BAO_Contribution();
           $contributionBAO->id = $params['contribution_id'];
+          $contributionBAO->contact_id = $params['contact_id'];
           $contributionBAO->find();
           CRM_Price_BAO_LineItem::processPriceSet($params['contribution_id'], $lineItem, $contributionBAO, 'civicrm_membership');
 
@@ -1673,7 +1677,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             } else {
               $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
             }
-          } 
+          }
         }
         if ($taxAmount) {
           $this->assign('totalTaxAmount', $totalTaxAmount);

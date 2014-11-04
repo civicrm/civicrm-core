@@ -62,9 +62,9 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
-    
+
     $gid = $this->urlArg('gid');
-    
+
     //add custom field - alphanumeric text
     $this->openCiviPage('admin/custom/group/field/add', "reset=1&action=add&gid=$gid");
     $textFieldLabel = 'test_text_field';

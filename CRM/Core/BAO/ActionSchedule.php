@@ -774,7 +774,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       $entityJoinClause .= $extraOn;
 
       $query = "
-SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.*, e.id as entityID, e.* {$extraSelect}
+SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.entity_table as entityTable, reminder.*, e.id as entityID, e.* {$extraSelect}
 FROM  civicrm_action_log reminder
 {$entityJoinClause}
 {$extraJoin}
@@ -807,9 +807,14 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Date::customFormat($dao->$field);
           }
           elseif ($field == 'balance') {
-            $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($dao->entityID, 'event');
-            $balancePay = CRM_Utils_Array::value('balance', $info);
-            $balancePay = CRM_Utils_Money::format($balancePay);
+            if ($dao->entityTable == 'civicrm_contact') {
+              $balancePay = 'N/A';
+            }
+            elseif (!empty($dao->entityID)) {
+              $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($dao->entityID, 'event');
+              $balancePay = CRM_Utils_Array::value('balance', $info);
+              $balancePay = CRM_Utils_Money::format($balancePay);
+            }
             $entityTokenParams["{$tokenEntity}." . $field] = $balancePay;
           }
           elseif ($field == 'fee_amount') {
@@ -1204,7 +1209,7 @@ LEFT JOIN {$reminderJoinClause}
 ";
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
-      if ($limitTo == 0) {
+      if ($limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) {
         $additionWhere = ' WHERE ';
         if ($actionSchedule->start_action_date) {
           $additionWhere = $whereClause . ' AND ';
@@ -1264,11 +1269,16 @@ GROUP BY c.id
         $havingClause = "HAVING TIMEDIFF({$now}, latest_log_time) >= TIME('{$hrs}:00:00')";
         $groupByClause = 'GROUP BY reminder.contact_id, reminder.entity_id, reminder.entity_table';
         $selectClause .= ', MAX(reminder.action_date_time) as latest_log_time';
+        //CRM-15376 - do not send our reminders if original criteria no longer applies
+        // the first part of the startDateClause array is the earliest the reminder can be sent. If the
+        // event (e.g membership_end_date) has changed then the reminder may no longer apply
+        // @todo - this only handles events that get moved later. Potentially they might get moved earlier
+        $originalEventStartDateClause = empty($startDateClause) ? '' : 'AND' . $startDateClause[0];
         $sqlInsertValues = "{$selectClause}
 {$fromClause}
 {$joinClause}
 INNER JOIN {$reminderJoinClause}
-{$whereClause} {$limitWhereClause} AND {$repeatEventClause}
+{$whereClause} {$limitWhereClause} AND {$repeatEventClause} {$originalEventStartDateClause} {$notINClause}
 {$groupByClause}
 {$havingClause}";
 
@@ -1342,10 +1352,10 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     $excludeIds = array();
     $dao = CRM_Core_DAO::executeQuery($query, array());
     while ($dao->fetch()) {
-      if ($dao->slave_contact == $dao->contact_id_a && $dao->is_permission_b_a == 0) {
+      if ($dao->slave_contact == $dao->contact_id_a && $dao->is_permission_a_b == 0) {
         $excludeIds[] = $dao->slave_contact;
       }
-      elseif ($dao->slave_contact == $dao->contact_id_b && $dao->is_permission_a_b == 0) {
+      elseif ($dao->slave_contact == $dao->contact_id_b && $dao->is_permission_b_a == 0) {
         $excludeIds[] = $dao->slave_contact;
       }
     }

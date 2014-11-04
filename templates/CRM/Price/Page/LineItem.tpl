@@ -63,23 +63,23 @@
           {if $context NEQ "Membership"}
             <td class="right">{$line.qty}</td>
             <td class="right">{$line.unit_price|crmMoney}</td>
-	  {else}
+    {else}
             <td class="right">{$line.line_total|crmMoney}</td>
           {/if}
-	  {if !$getTaxDetails && $context NEQ "Membership"}
-	    <td class="right">{$line.line_total|crmMoney}</td>
-	  {/if}
-	  {if $getTaxDetails}
-	    <td class="right">{$line.line_total|crmMoney}</td>
-	    {if $line.tax_rate != "" || $line.tax_amount != ""}
-	      <td class="right">{$taxTerm} ({$line.tax_rate|string_format:"%.2f"}%)</td>
-	      <td class="right">{$line.tax_amount|crmMoney}</td>
-	    {else}
-	      <td></td>
-	      <td></td>
-	    {/if}
-	    <td class="right">{$line.line_total+$line.tax_amount|crmMoney}</td>
-	  {/if}
+    {if !$getTaxDetails && $context NEQ "Membership"}
+      <td class="right">{$line.line_total|crmMoney}</td>
+    {/if}
+    {if $getTaxDetails}
+      <td class="right">{$line.line_total|crmMoney}</td>
+      {if $line.tax_rate != "" || $line.tax_amount != ""}
+        <td class="right">{$taxTerm} ({$line.tax_rate|string_format:"%.2f"}%)</td>
+        <td class="right">{$line.tax_amount|crmMoney}</td>
+      {else}
+        <td></td>
+        <td></td>
+      {/if}
+      <td class="right">{$line.line_total+$line.tax_amount|crmMoney}</td>
+    {/if}
           {if $pricesetFieldsCount}
             <td class="right">{$line.participant_count}</td>
           {/if}

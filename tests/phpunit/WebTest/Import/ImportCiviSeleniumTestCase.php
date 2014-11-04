@@ -245,7 +245,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
     // Select contact subtype
     if (isset($other['contactSubtype'])) {
-      $this->waitForElementPresent("css=#subType option[value={$other['contactSubtype']}]");
+      $this->waitForElementPresent("xpath=//div[@id='common-form-controls']/table/tbody/tr[1]/td[2]/span");
       $this->select('subType', $other['contactSubtype']);
     }
 

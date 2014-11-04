@@ -180,8 +180,9 @@
             <td>
               <table class="compressed">
                 <tr class="crm-membership-form-block-soft-credit-type">
-                  <td class="label">{$form.soft_credit_type.label}</td>
-                  <td>{$form.soft_credit_type.html}</td>
+                {*CRM-15366*}
+                  <td class="label">{$form.soft_credit_type_id.label}</td>
+                  <td>{$form.soft_credit_type_id.html}</td>
                 </tr>
                 <tr class="crm-membership-form-block-soft-credit-contact-id">
                   <td class="label">{$form.soft_credit_contact_id.label}</td>
@@ -382,17 +383,17 @@
             var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
           }
           else {
-	    var feeTotal = Number((taxRate/100) * (allMemberships[memType]['total_amount_numeric'] * term))+Number(allMemberships[memType]['total_amount_numeric'] * term );
+      var feeTotal = Number((taxRate/100) * (allMemberships[memType]['total_amount_numeric'] * term))+Number(allMemberships[memType]['total_amount_numeric'] * term );
           }
           cj("#total_amount").val( feeTotal.toFixed(2) );
         }
         else {
-	  if (taxRate) {
+    if (taxRate) {
             var feeTotal = parseFloat(Number((taxRate/100) * allMemberships[memType]['total_amount'])+Number(allMemberships[memType]['total_amount_numeric'])).toFixed(2);
-	    cj("#total_amount").val( feeTotal );
+      cj("#total_amount").val( feeTotal );
           }
           else {
-	    cj("#total_amount").val( allMemberships[memType]['total_amount'] );
+      cj("#total_amount").val( allMemberships[memType]['total_amount'] );
           }
         }
       }

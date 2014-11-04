@@ -236,3 +236,15 @@ function civicrm_api3_group_contact_update_status($params) {
   return TRUE;
 }
 
+/**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_group_contact_deprecation() {
+  return array(
+    'delete' => 'GroupContact "delete" action is deprecated in favor of "create".',
+    'pending' => 'GroupContact "pending" action is deprecated in favor of "create".',
+    'update_status' => 'GroupContact "update_status" action is deprecated in favor of "create".',
+  );
+}
+

@@ -261,6 +261,35 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals(0, $optionValueCount);
   }
 
+  /**
+   * Test custom field with existing option group
+   */
+  function testCustomFieldExistingOptionGroup() {
+    $customGroup = $this->customGroupCreate(array('extends' => 'Organization', 'title' => 'test_group'));
+    $params = array(
+      'custom_group_id' => $customGroup['id'],
+      // Just to say something:
+      'label' => 'Organization Gender',
+      'html_type' => 'Select',
+      'data_type' => 'Int',
+      'weight' => 4,
+      'is_required' => 1,
+      'is_searchable' => 0,
+      'is_active' => 1,
+      // Option group id 3: gender
+      'option_group_id' => 3,
+    );
+
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $this->assertNotNull($customField['id']);
+    $optionGroupID = $this->callAPISuccess('custom_field', 'getvalue', array(
+      'id' => $customField['id'],
+      'return' => 'option_group_id',
+    ));
+
+    $this->assertEquals($optionGroupID,3);
+  }
+
 
   /**
    * Test custom field get works & return param works

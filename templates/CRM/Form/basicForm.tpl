@@ -74,7 +74,7 @@
           cj("#invoicing_blocks").hide();
         }
       });
-      cj(function () {   
+      cj(function () {
         cj("input[type=checkbox]").click(function() {
           if (cj("#invoicing").is(":checked")) {
             cj("#invoicing_blocks").show();

@@ -37,9 +37,9 @@
     <p>{ts}If you think you may be importing additional data from the same data source, check 'Save this field mapping' at the bottom of the page before continuing. The saved mapping can then be easily reused the next time data is imported.{/ts}</p>
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
- {* Table for mapping data to CRM fields *}
+{* Table for mapping data to CRM fields *}
  {include file="CRM/Contribute/Import/Form/MapTable.tpl}
- 
+
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
  {$initHideBoxes}
 </div>
@@ -48,6 +48,6 @@
 if ( document.getElementsByName("saveMapping")[0].checked ) {
     document.getElementsByName("updateMapping")[0].checked = true;
     document.getElementsByName("saveMapping")[0].checked = false;
-} 
+}
 </script>
 {/literal}

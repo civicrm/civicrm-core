@@ -42,7 +42,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->click("add");
     $this->click("_qf_Localization_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     // Disable pop-ups for this test. Running test w/ pop-ups causes a spurious failure. dgg
     $this->enableDisablePopups(FALSE);
 

@@ -400,6 +400,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       FALSE, TRUE, TRUE, NULL, $queryOperator
     );
 
+    //sort by state
+    //CRM-15301
+    $query->_sort = $order;
     list($select, $from, $where, $having) = $query->query();
 
     if ($mergeSameHousehold == 1) {
@@ -590,11 +593,20 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       $groupBy = " GROUP BY civicrm_activity.id ";
     }
     $queryString .= $groupBy;
+
+    // always add contact_a.id to the ORDER clause
+    // so the order is deterministic
+    //CRM-15301
+    if (strpos('contact_a.id', $order) === FALSE) {
+      $order .= ", contact_a.id";
+    }
+
     if ($order) {
       list($field, $dir) = explode(' ', $order, 2);
       $field = trim($field);
       if (!empty($returnProperties[$field])) {
-        // $queryString .= " ORDER BY $order";
+        //CRM-15301
+        $queryString .= " ORDER BY $order";
       }
     }
 

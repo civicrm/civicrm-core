@@ -67,7 +67,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       );
     }
 
-    if (!$instanceID) {
+    if (!$instanceID || !isset($params['id'])) {
       $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
       $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
     }

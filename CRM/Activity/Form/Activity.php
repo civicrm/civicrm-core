@@ -180,12 +180,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'assignee_contact_id' => array(
         'type' => 'entityRef',
         'label' => ts('Assigned To'),
-        'attributes' => array('multiple' => TRUE, 'create' => TRUE),
+        'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
       ),
       'followup_assignee_contact_id' => array(
         'type' => 'entityRef',
         'label' => ts('Assigned To'),
-        'attributes' => array('multiple' => TRUE, 'create' => TRUE),
+        'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
       ),
       'followup_activity_type_id' => array(
         'type' => 'select',
@@ -573,6 +573,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if (!$this->_single && !empty($this->_contactIds)) {
       $defaults['target_contact_id'] = $this->_contactIds;
+    }
+
+    // CRM-15472 - 50 is around the practial limit of how many items a select2 entityRef can handle
+    if (!empty($defaults['target_contact_id'])) {
+      $count = count(is_array($defaults['target_contact_id']) ? $defaults['target_contact_id'] : explode(',', $defaults['target_contact_id']));
+      if ($count > 50) {
+        $this->freeze(array('target_contact_id'));
+      }
     }
 
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::RENEW)) {

@@ -362,7 +362,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_PCP_refresh");
     $id = explode('id=', $this->getAttribute("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody//tr/td/a[text()='$pcpTitle']@href"));
     $pcpUrl = "civicrm/pcp/info?reset=1&id=$id[1]";
-    $this->click("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody//tr/td/a[text()='$pcpTitle']/../../td[7]/span/a[text()='Approve']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td/a[text()='$pcpTitle']/../../td[7]/span[1]/a[2][text()='Approve']");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -493,8 +493,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Search_refresh");
 
     $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody/tr[1]/td[@class='crm-participant-sort_name']/a[text()='{$sortName}']/../../td[11]/span/a[text()='View']", "xpath=//table[@class='selector row-highlight']/tbody/tr/td[8]/span/a[text()='View']", FALSE);
-    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr/td[8]/span/a[text()='View']");
-    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']", "_qf_ParticipantView_cancel-bottom", false);
 
     $this->webtestVerifyTabularData(
       array(

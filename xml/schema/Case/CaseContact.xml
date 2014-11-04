@@ -39,7 +39,7 @@
       <comment>Contact ID of contact record given case belongs to.</comment>
       <html>
         <type>Autocomplete-Select</type>
-      </html>      
+      </html>
       <add>2.1</add>
   </field>
   <foreignKey>

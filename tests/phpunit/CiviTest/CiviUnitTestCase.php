@@ -325,6 +325,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *  Common setup functions for all unit tests
    */
   protected function setUp() {
+    $session = CRM_Core_Session::singleton();
+    $session->set('userID', NULL);
+
     CRM_Utils_Hook::singleton(TRUE);
     $this->errorScope = CRM_Core_TemporaryErrorScope::useException(); // REVERT
     //  Use a temporary file for STDIN
@@ -1901,7 +1904,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
 
     //have a crack @ deleting it first in the hope this will prevent derailing our tests
-    $check = $this->callAPISuccess('custom_group', 'get', array('title' => $params['title'], array('api.custom_group.delete' => 1)));
+    $this->callAPISuccess('custom_group', 'get', array('title' => $params['title'], array('api.custom_group.delete' => 1)));
 
     return $this->callAPISuccess('custom_group', 'create', $params);
   }
@@ -2105,6 +2108,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       elseif (strstr($function, 'GetList')) {
         $action = empty($action) ? 'getlist' : $action;
         $entityAction = 'GetList';
+      }
+      elseif (strstr($function, 'GetActions')) {
+        $action = empty($action) ? 'getactions' : $action;
+        $entityAction = 'GetActions';
       }
       elseif (strstr($function, 'Get')) {
         $action = empty($action) ? 'get' : $action;
@@ -2362,7 +2369,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   function quickCleanUpFinancialEntities() {
     $tablesToTruncate = array(
       'civicrm_contribution',
+      'civicrm_contribution_soft',
       'civicrm_financial_trxn',
+      'civicrm_financial_item',
       'civicrm_contribution_recur',
       'civicrm_line_item',
       'civicrm_contribution_page',
@@ -2384,6 +2393,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->quickCleanup($tablesToTruncate);
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_membership_status WHERE name NOT IN('New', 'Current', 'Grace', 'Expired', 'Pending', 'Cancelled', 'Deceased')");
     $this->restoreDefaultPriceSetConfig();
+    $var = TRUE;
+    CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
   }
 
   function restoreDefaultPriceSetConfig() {
@@ -2929,12 +2940,73 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    return $result['id'];
  }
 
+  /**
+   * Set up initial recurring payment allowing subsequent IPN payments
+   */
+  function setupRecurringPaymentProcessorTransaction() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+      'contact_id' => $this->_contactID,
+      'amount' => 1000,
+      'sequential' => 1,
+      'installments' => 5,
+      'frequency_unit' => 'Month',
+      'frequency_interval' => 1,
+      'invoice_id' => $this->_invoiceID,
+      'contribution_status_id' => 2,
+      'processor_id' => $this->_paymentProcessorID,
+      'api.contribution.create' => array(
+        'total_amount' => '200',
+        'invoice_id' => $this->_invoiceID,
+        'financial_type_id' => 1,
+        'contribution_status_id' => 'Pending',
+        'contact_id' => $this->_contactID,
+        'contribution_page_id' => $this->_contributionPageID,
+        'payment_processor_id' => $this->_paymentProcessorID,
+      )
+    ));
+    $this->_contributionRecurID = $contributionRecur['id'];
+    $this->_contributionID = $contributionRecur['values']['0']['api.contribution.create']['id'];
+  }
+
+  /**
+   * we don't have a good way to set up a recurring contribution with a membership so let's just do one then alter it
+   */
+  function setupMembershipRecurringPaymentProcessorTransaction() {
+    $this->ids['membership_type'] = $this->membershipTypeCreate();
+    //create a contribution so our membership & contribution don't both have id = 1
+    $this->contributionCreate($this->_contactID, 1, 'abcd', '345j');
+    $this->setupRecurringPaymentProcessorTransaction();
+
+    $this->ids['membership'] = $this->callAPISuccess('membership', 'create', array(
+      'contact_id' => $this->_contactID,
+      'membership_type_id' => $this->ids['membership_type'],
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'format.only_id' => TRUE,
+    ));
+    //CRM-15055 creates line items we don't want so get rid of them so we can set up our own line items
+    CRM_Core_DAO::executeQuery("TRUNCATE civicrm_line_item");
+
+    $this->callAPISuccess('line_item', 'create', array(
+      'entity_table' => 'civicrm_membership',
+      'entity_id' => $this->ids['membership'],
+      'contribution_id' => $this->_contributionID,
+      'label' => 'General',
+      'qty' => 1,
+      'unit_price' => 200,
+      'line_total' => 200,
+      'financial_type_id' => 1,
+      'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', array('return' => 'id', 'label' => 'Membership Amount')),
+      'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', array('return' => 'id', 'label' => 'General')),
+    ));
+    $this->callAPISuccess('membership_payment', 'create', array('contribution_id' => $this->_contributionID, 'membership_id' => $this->ids['membership']));
+  }
 
   /**
    * @param $message
    *
    * @throws Exception
-   */function CiviUnitTestCase_fatalErrorHandler($message) {
-  throw new Exception("{$message['message']}: {$message['code']}");
-}
+   */
+  function CiviUnitTestCase_fatalErrorHandler($message) {
+    throw new Exception("{$message['message']}: {$message['code']}");
+  }
 }

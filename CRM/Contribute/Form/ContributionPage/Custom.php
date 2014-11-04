@@ -55,19 +55,21 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
     // Register 'contribution_1'
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'financial_type_id');
     $allowCoreTypes[] = 'Contribution';
-    // $allowSubTypes['ContributionType'] = array($financialTypeId);
-    $entities[] = array('entity_name' => 'contribution_1', 'entity_type' => 'ContributionModel', 'entity_sub_type' => $financialTypeId);
+    //CRM-15427
+    $allowSubTypes['ContributionType'] = array($financialTypeId);
+    $entities[] = array('entity_name' => 'contribution_1', 'entity_type' => 'ContributionModel', 'entity_sub_type' => '*');
 
     // If applicable, register 'membership_1'
     $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
     if ($member && $member['is_active']) {
-      $entities[] = array('entity_name' => 'membership_1', 'entity_type' => 'MembershipModel', 'entity_sub_type' => $member['membership_type_default']);
+      //CRM-15427
+      $entities[] = array('entity_name' => 'membership_1', 'entity_type' => 'MembershipModel', 'entity_sub_type' => '*');
       $allowCoreTypes[] = 'Membership';
       $allowSubTypes['MembershipType'] = explode(',', $member['membership_types']);
     }
-
-    $this->addProfileSelector('custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $entities);
-    $this->addProfileSelector('custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $entities);
+    //CRM-15427
+    $this->addProfileSelector('custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
+    $this->addProfileSelector('custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
 
     $this->addFormRule(array('CRM_Contribute_Form_ContributionPage_Custom', 'formRule'), $this->_id);
 

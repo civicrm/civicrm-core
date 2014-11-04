@@ -122,38 +122,50 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return object
    */
   static function add(&$params, $ids = array()) {
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['is_current_member'] = CRM_Utils_Array::value('is_current_member', $params, FALSE);
-    $params['is_admin'] = CRM_Utils_Array::value('is_admin', $params, FALSE);
-    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipStatus', $ids));
+    if (!$id) {
+      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
+      //copy name to label when not passed.
+      if (empty($params['label']) && !empty($params['name'])) {
+        $params['label'] = $params['name'];
+      }
+
+      if (empty($params['name']) && !empty($params['label'])) {
+        $params['name'] = $params['label'];
+      }
+    }
 
     // set all other defaults to false.
-    if ($params['is_default']) {
+    if (!empty($params['is_default'])) {
       $query = "UPDATE civicrm_membership_status SET is_default = 0";
       CRM_Core_DAO::executeQuery($query,
         CRM_Core_DAO::$_nullArray
       );
     }
 
-    //copy name to label when not passed.
-    if (empty($params['label']) && !empty($params['name'])) {
-      $params['label'] = $params['name'];
-    }
 
-    //for add mode, copy label to name.
-    $statusId = !empty($params['id']) ? $params['id'] : CRM_Utils_Array::value('membershipStatus', $ids);
-    if (!$statusId && !empty($params['label']) && empty($params['name'])) {
-      $params['name'] = $params['label'];
-    }
 
     // action is taken depending upon the mode
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
     $membershipStatus->copyValues($params);
 
-    $membershipStatus->id = $statusId;
+    $membershipStatus->id = $id;
 
     $membershipStatus->save();
     return $membershipStatus;
+  }
+
+  /**
+   * Get defaults for new entity
+   * @return array
+   */
+  static function getDefaults() {
+    return array(
+      'is_active' => FALSE,
+      'is_current_member' => FALSE,
+      'is_admin' => FALSE,
+      'is_default' => FALSE,
+    );
   }
 
   /**

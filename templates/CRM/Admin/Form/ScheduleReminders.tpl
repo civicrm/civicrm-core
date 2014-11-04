@@ -177,7 +177,6 @@
           $('#relativeDate, #relativeDateRepeat', $form).show();
         }
       });
-      
       if ($('#absolute_date_display', $form).val()) {
         $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
       }

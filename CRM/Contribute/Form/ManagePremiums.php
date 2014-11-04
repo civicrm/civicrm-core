@@ -189,6 +189,18 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->addFormRule(array('CRM_Contribute_Form_ManagePremiums', 'formRule'));
 
+    $this->addButtons(array(
+        array(
+          'type' => 'upload',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      )
+    );
     $this->assign('productId', $this->_id);
   }
 
