@@ -122,14 +122,6 @@ class CiviCRM_For_WordPress_Shortcodes {
         // check for existence of shortcode in content
         if ( has_shortcode( $post->post_content, 'civicrm' ) ) {
           
-          // if on first instance...
-          if ( !isset( $this->shortcode_present ) ) {
-          
-            // add core resources for front end
-            add_action( 'wp', array( $this->civi, 'front_end_page_load' ), 100 );
-            
-          }
-          
           // get CiviCRM shortcodes in this post
           $shortcodes_array = $this->get_for_post( $post->post_content );
           
@@ -175,6 +167,9 @@ class CiviCRM_For_WordPress_Shortcodes {
         
       } else {
         
+        // add core resources for front end
+        add_action( 'wp', array( $this->civi, 'front_end_page_load' ), 100 );
+          
         // since we have only one shortcode, run the_loop again
         // the DB query has already been done, so this has no significant impact
         if ( have_posts() ) {
