@@ -580,12 +580,12 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    */
   protected function assignPaymentRelatedVariables() {
     try {
+      if ($this->_contactID) {
+        list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+        $this->assign('displayName', $this->userDisplayName);
+      }
       if ($this->_mode) {
         $this->assignProcessors();
-        if ($this->_contactID) {
-          list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-          $this->assign('displayName', $this->userDisplayName);
-        }
 
         $this->assignBillingType();
 
