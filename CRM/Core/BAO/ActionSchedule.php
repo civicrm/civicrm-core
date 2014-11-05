@@ -1299,7 +1299,7 @@ INNER JOIN {$reminderJoinClause}
           CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
         }
 
-        if (!empty($limitTo) && $limitTo == 0) {
+        if (!is_null($limitTo) && $limitTo == 0) {
           $addSelect .= ', MAX(reminder.action_date_time) as latest_log_time';
           $sqlEndEventCheck = "
 SELECT * FROM {$table}
