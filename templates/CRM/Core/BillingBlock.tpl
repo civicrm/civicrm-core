@@ -25,7 +25,7 @@
 *}
 {crmRegion name="billing-block"}
 <div id="payment_information">
-  {if $paymentFields}
+  {if $paymentFields|@count}
     <fieldset class="billing_mode-group {$paymentTypeName}_info-group">
       <legend>
         {$paymentTypeLabel}
@@ -51,7 +51,7 @@
       </div>
     </fieldset>
   {/if}
-  {if $billingDetailsFields}
+  {if $billingDetailsFields|@count}
     {if $profileAddressFields}
       <input type="checkbox" id="billingcheckbox" value="0">
       <label for="billingcheckbox">{ts}My billing address is the same as above{/ts}</label>

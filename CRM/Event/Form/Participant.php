@@ -38,7 +38,7 @@
  * This class generates form components for processing a participation
  * in an event
  */
-class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
+class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment {
 
   public $useLivePageJS = TRUE;
 
@@ -270,53 +270,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
     if ($this->_mode) {
       $this->assign('participantMode', $this->_mode);
-
-      $this->_paymentProcessor = array('billing_mode' => 1);
-
-      $validProcessors = array();
-      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 )");
-
-      foreach ($processors as $ppID => $label) {
-        $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
-        if ($paymentProcessor['payment_processor_type'] == 'PayPal' && !$paymentProcessor['user_name']) {
-          continue;
-        }
-        elseif ($paymentProcessor['payment_processor_type'] == 'Dummy' && $this->_mode == 'live') {
-          continue;
-        }
-        else {
-          $paymentObject = CRM_Core_Payment::singleton($this->_mode, $paymentProcessor, $this);
-          $error = $paymentObject->checkConfig();
-          if (empty($error)) {
-            $validProcessors[$ppID] = $label;
-          }
-          $paymentObject = NULL;
-        }
-      }
-      if (empty($validProcessors)) {
-        CRM_Core_Error::fatal(ts('Could not find valid payment processor for this page'));
-      }
-      else {
-        $this->_processors = $validProcessors;
-      }
-      // also check for billing information
-      // get the billing location type
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-      // CRM-8108 remove ts around Billing location type
-      //$this->_bltID = array_search( ts('Billing'),  $locationTypes );
-      $this->_bltID = array_search('Billing', $locationTypes);
-      if (!$this->_bltID) {
-        CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));
-      }
-      $this->set('bltID', $this->_bltID);
-      $this->assign('bltID', $this->_bltID);
-
-      $this->_fields = array();
-
-      CRM_Core_Payment_Form::setCreditCardFields($this);
-
-      // this required to show billing block
-      $this->assign_by_ref('paymentProcessor', $paymentProcessor);
+      $this->assignPaymentRelatedVariables();
     }
 
     if ($this->_showFeeBlock) {
