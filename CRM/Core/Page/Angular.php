@@ -67,6 +67,8 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
     $angularModules['ui.utils'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-ui-utils/ui-utils.min.js'));
     $angularModules['ui.sortable'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-ui-sortable/sortable.min.js'));
     $angularModules['unsavedChanges'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-unsavedChanges/dist/unsavedChanges.min.js'));
+    // https://github.com/jwstadler/angular-jquery-dialog-service
+    $angularModules['dialogService'] = array('ext' => 'civicrm' , 'js' => array('packages/bower_components/angular-jquery-dialog-service/dialog-service.js'));
     $angularModules['crmUi'] = array('ext' => 'civicrm', 'js' => array('js/angular-crm-ui.js'));
 
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {
