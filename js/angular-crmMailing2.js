@@ -3,7 +3,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/crmMailing2/' + relPath;
   };
 
-  var crmMailing2 = angular.module('crmMailing2', ['ngRoute', 'ui.utils', 'crmUi']); // TODO ngSanitize, unsavedChanges
+  var crmMailing2 = angular.module('crmMailing2', ['ngRoute', 'ui.utils', 'crmUi', 'dialogService']); // TODO ngSanitize, unsavedChanges
 
   /**
    * Initialize a new mailing
