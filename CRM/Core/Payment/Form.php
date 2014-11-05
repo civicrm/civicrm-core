@@ -387,14 +387,18 @@ class CRM_Core_Payment_Form {
    * @param $form
    */
   protected static function addPaypalExpressCode(&$form) {
-    if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
-      $form->_expressButtonName = $form->getButtonName('upload', 'express');
-      $form->assign('expressButtonName', $form->_expressButtonName);
-      $form->add('image',
-        $form->_expressButtonName,
-        $form->_paymentProcessor['url_button'],
-        array('class' => 'crm-form-submit')
-      );
+    if (empty($form->isBackOffice)) {
+      if ($form->_paymentProcessor['billing_mode'] &
+        CRM_Core_Payment::BILLING_MODE_BUTTON
+      ) {
+        $form->_expressButtonName = $form->getButtonName('upload', 'express');
+        $form->assign('expressButtonName', $form->_expressButtonName);
+        $form->add('image',
+          $form->_expressButtonName,
+          $form->_paymentProcessor['url_button'],
+          array('class' => 'crm-form-submit')
+        );
+      }
     }
   }
   /**

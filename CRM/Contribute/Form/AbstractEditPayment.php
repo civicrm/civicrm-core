@@ -169,6 +169,13 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    */
   public $_lineItems;
 
+  /**
+   * Is this a backoffice form
+   * (this will affect whether paypal express code is displayed)
+   * @var bool
+   */
+  public $isBackOffice = TRUE;
+
   protected $_formType;
   protected $_cdType;
 
