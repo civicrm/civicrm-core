@@ -165,7 +165,7 @@ class="crm-hover-button crm-button-add-profile"><span
                                                                 class="crm-hover-button crm-button-rem-profile"><span
                     class="icon ui-icon-trash"></span>{ts}remove profile{/ts}</a></span>
                               &nbsp;&nbsp;
-                <span class='profile_bottom_link' {if !$smarty.foreach.profilePostIdName.last}style="display: none"{/if}><a href="#" class="crm-hover-button crm-button-add-profile"><span
+                <span class='profile_bottom_link'{if !$smarty.foreach.profilePostIdName.last} style="display: none"{/if}><a href="#" class="crm-hover-button crm-button-add-profile"><span
                       class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
               <br/><span class="profile-links"></span>
             </td>
