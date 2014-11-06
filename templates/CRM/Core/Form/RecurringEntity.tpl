@@ -25,7 +25,9 @@
 *}
 
 <div class="crm-block crm-form-block crm-core-form-recurringentity-block crm-accordion-wrapper" id="recurring-entity-block">
-    <div class="crm-accordion-header">Repeat Configuration</div>
+    <div class="crm-accordion-header">
+      Repeat {if $entityType}{$entityType}{/if}
+    </div>
     <div class="crm-accordion-body">
         <div class="crm-submit-buttons">
             {include file="CRM/common/formButtons.tpl" location="top"}
