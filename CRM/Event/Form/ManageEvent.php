@@ -190,8 +190,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     //Is a repeating event
     if ($this->_isRepeatingEvent) {
-      $isRepeat = 'repeat';
-      $this->assign('isRepeat', $isRepeat);
+      $isRepeatingEntity = TRUE;
+      $this->assign('isRepeatingEntity', $isRepeatingEntity);
     }
 
     // also set up tabs

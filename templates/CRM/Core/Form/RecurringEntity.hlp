@@ -34,7 +34,7 @@
         <li>Daily:&nbsp;&nbsp;your event repeats daily or after every few days</li>
         <li>Weekly:&nbsp;&nbsp;your event repeats on one or more days every week</li>
         <li>Monthly:&nbsp;&nbsp;your event repeats on one or more days every month</li>
-        <li>Yearly:&nbsp;&nbsp;your event repeats yearly or after every few years</li> 
+        <li>Yearly:&nbsp;&nbsp;your event repeats yearly or after every few years</li>
     </ul>
     For eg - You would select option "monthly", if your event occurs every month.
   {/ts}

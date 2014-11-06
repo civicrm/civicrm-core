@@ -830,9 +830,11 @@ SELECT     {$activityTempTable}.*,
            {$activityContactTempTable}.record_type_id,
            {$activityContactTempTable}.contact_name,
            {$activityContactTempTable}.is_deleted,
-           {$activityContactTempTable}.counter
+           {$activityContactTempTable}.counter,
+           re.parent_id as is_recurring_activity
 FROM       {$activityTempTable}
 INNER JOIN {$activityContactTempTable} on {$activityTempTable}.activity_id = {$activityContactTempTable}.activity_id
+LEFT JOIN civicrm_recurring_entity re on {$activityContactTempTable}.activity_id = re.entity_id
 ORDER BY    fixed_sort_order
         ";
 
@@ -859,6 +861,7 @@ ORDER BY    fixed_sort_order
       $values[$activityID]['status_id'] = $dao->status_id;
       $values[$activityID]['subject'] = $dao->subject;
       $values[$activityID]['campaign_id'] = $dao->campaign_id;
+      $values[$activityID]['is_recurring_activity'] = $dao->is_recurring_activity;
 
       if ($dao->campaign_id) {
         $values[$activityID]['campaign'] = $allCampaigns[$dao->campaign_id];
@@ -2598,6 +2601,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           'Activity',
           $values['activity_id']
         );
+
+        $contactActivities[$activityId]['is_recurring_activity'] = $values['is_recurring_activity'];
       }
     }
 
