@@ -146,6 +146,12 @@ class CRM_Core_Form_RecurringEntity {
   }
 
   static function buildQuickForm(&$form) {
+    if (self::$_entityTable) {
+      $entityType = explode("_", self::$_entityTable);
+      if ($entityType[1]) {
+        $form->assign('entityType', ucwords($entityType[1]));
+      }
+    }
     $form->assign('currentEntityId', self::$_entityId);
     $form->assign('entityTable', self::$_entityTable);
     $form->assign('scheduleReminderId', self::$_scheduleReminderID);
