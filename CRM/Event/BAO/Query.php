@@ -417,7 +417,7 @@ class CRM_Event_BAO_Query {
         return;
 
       case 'participant_id':
-        $query->_where[$grouping][] = "civicrm_participant.id $op $value";
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_participant.id", $op, $value, "Integer");
         $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         return;
 
