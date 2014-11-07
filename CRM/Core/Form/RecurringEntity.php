@@ -88,7 +88,9 @@ class CRM_Core_Form_RecurringEntity {
         self::$_parentEntityId = self::$_entityId;
         self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId(self::$_entityId, $entityTable);
       }
-      self::$_scheduleReminderID = self::$_scheduleReminderDetails->id;
+      if (property_exists(self::$_scheduleReminderDetails, 'id')) {
+        self::$_scheduleReminderID = self::$_scheduleReminderDetails->id;
+      }
     }
     if ($entityTable) {
       CRM_Core_OptionValue::getValues(array('name' => $entityTable.'_repeat_exclude_dates_'.self::$_parentEntityId), $optionValue);
