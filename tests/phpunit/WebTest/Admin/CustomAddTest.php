@@ -142,7 +142,7 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
 
     //expand all tabs
     $this->click("expand");
-    $this->waitForElementPresent("address_1_street_address");
+    $this->waitForElementPresent("_qf_Contact_cancel-bottom");
 
     //verify custom group fields are present on new Individual Contact Form
     $this->assertElementContainsText('customData', $textFieldLabel);
