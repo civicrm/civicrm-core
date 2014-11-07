@@ -83,7 +83,7 @@
 {htxt id="id-ends-after"}
   {ts}
     Use this field to limit/end the repetition of the event.<br/>
-    Example: You want to repeat an event which is now a six month course(i.e it repeats 6 times), then you give 6 as a value to this field.
+    Example: You want to repeat an event which is now a six month course (i.e it repeats 6 times), then set 6 as a value for this field.
   {/ts}
 {/htxt}
 
@@ -102,7 +102,8 @@
 {/htxt}
 {htxt id="id-exclude-date"}
     {ts}
-        Add dates here, if you don't want to repeat your event on those dates.<br/>
-        This field enables you to alter certain session, skip a holiday in the middle of a term or a public holiday on which you are close.
+        Add dates here, if you don't want to repeat your event on those dates.
+        This list enables you to skip days.<br/>
+        Example: Public holidays
     {/ts}
 {/htxt}
