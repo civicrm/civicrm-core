@@ -820,7 +820,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
 
     if (CRM_Utils_Array::value('repetition_start_date', $formParams)) {
-      $repetitionStartDate = $formParams['repetition_start_date'];
+      if (CRM_Utils_Array::value('repetition_start_date_display', $formParams)) {
+        $repetitionStartDate = $formParams['repetition_start_date_display'];
+      }
+      else {
+        $repetitionStartDate = $formParams['repetition_start_date'];
+      }
       if (CRM_Utils_Array::value('repetition_start_date_time', $formParams)) {
         $repetitionStartDate = $repetitionStartDate . " " . $formParams['repetition_start_date_time'];
       }
