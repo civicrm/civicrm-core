@@ -101,7 +101,7 @@
       }
     },
     disableForm: function() {
-      this.$(':input', '.crm-profile-selector-preview-pane').prop('readOnly', true);
+      this.$(':input', '.crm-profile-selector-preview-pane').not('.select2-input').prop('readOnly', true);
     },
     doEdit: function(e) {
       e.preventDefault();
