@@ -36,7 +36,7 @@
         <li>Monthly:&nbsp;&nbsp;your event repeats on one or more days every month</li>
         <li>Yearly:&nbsp;&nbsp;your event repeats yearly or after every few years</li>
     </ul>
-    For eg - You would select option "monthly", if your event occurs every month.
+    Example: You would select option "monthly", if your event occurs every month.
   {/ts}
 {/htxt}
 
@@ -45,7 +45,7 @@
 {/htxt}
 {htxt id="id-repeats-every"}
   {ts}Option you select here decides the repetition interval.<br/>
-      For eg - If your event repeats every 5 months, then you would select option 5.{/ts}
+      Example: If your event repeats every 5 months, then you would select option 5.{/ts}
 {/htxt}
 
 {htxt id="id-repeats-on-title"}
@@ -54,7 +54,7 @@
 {htxt id="id-repeats-on"}
   {ts}
     You can choose to select your event to repeat on weekdays, weekends or any combination of day of the week.<br/>
-    For eg - You can select Monday, Wednesday and Friday for your event to occur on alternate weekdays.
+    Example: You can select Monday, Wednesday and Friday for your event to occur on alternate weekdays.
   {/ts}
 {/htxt}
 
@@ -64,7 +64,7 @@
 {htxt id="id-repeats-by-month"}
   {ts}
     Options given here are days of a month from 1 - 31<br/>
-    For eg - If your event repeats 8th of every month then you would select 8.
+    Example: If your event repeats 8th of every month then you would select 8.
   {/ts}
 {/htxt}
 
@@ -83,7 +83,7 @@
 {htxt id="id-ends-after"}
   {ts}
     Use this field to limit/end the repetition of the event.<br/>
-    For eg - You want to repeat an event which is now a six month course(i.e it repeats 6 times), then you give 6 as a value to this field.
+    Example: You want to repeat an event which is now a six month course(i.e it repeats 6 times), then you give 6 as a value to this field.
   {/ts}
 {/htxt}
 
@@ -93,7 +93,7 @@
 {htxt id="id-ends-on"}
     {ts}
         Choose a specific date here to limit/end the repetition<br/>
-        For eg - Your event ends on 26th of September 2014
+        Example: Your event ends on 26th of September 2014
     {/ts}
 {/htxt}
 
