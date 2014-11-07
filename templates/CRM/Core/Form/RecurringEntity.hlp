@@ -103,7 +103,6 @@
 {htxt id="id-exclude-date"}
     {ts}
         Add dates here, if you don't want to repeat your {$params.entityType|lower} on those dates.
-        This list enables you to skip days.<br/>
-        Example: Public holidays
+        This field enables you to alter certain sessions, skip holidays, or create gaps in the sequence for other reasons.<br/>
     {/ts}
 {/htxt}
