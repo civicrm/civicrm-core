@@ -358,7 +358,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * @param CRM_Contribute_Form_Contribution| CRM_Contribute_Form_Contribution_Main|CRM_Core_Payment_ProcessorForm $form
+   * @param CRM_Contribute_Form_AbstractEditPayment|CRM_Contribute_Form_Contribution_Main|CRM_Core_Payment_ProcessorForm $form
    * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
    * @param bool $isBillingDataOptional This manifests for 'NULL' (pay later) payment processor as the addition of billing fields to the form and
    *   for payment processors that gather payment data on site as rendering the fields as not being required. (not entirely sure why but this
