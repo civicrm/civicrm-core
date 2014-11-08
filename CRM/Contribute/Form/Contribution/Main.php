@@ -56,6 +56,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   public $_useForMember;
 
+  /**
+   * array of payment related fields to potentially display on this form (generally credit card or debit card fields). Th
+   * @var array
+   */
+  public $_paymentFields = array();
+
   protected $_ppType;
   protected $_snippet;
 
