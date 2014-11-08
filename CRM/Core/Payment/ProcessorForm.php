@@ -74,6 +74,7 @@ class CRM_Core_Payment_ProcessorForm {
     $form->assign_by_ref('paymentProcessor', $form->_paymentProcessor);
 
     // check if this is a paypal auto return and redirect accordingly
+    //@todo - determine if this is legacy and remove
     if (CRM_Core_Payment::paypalRedirect($form->_paymentProcessor)) {
       $url = CRM_Utils_System::url('civicrm/contribute/transact',
         "_qf_ThankYou_display=1&qfKey={$form->controller->_key}"
@@ -104,34 +105,9 @@ class CRM_Core_Payment_ProcessorForm {
    * @param $form
    */
   static function buildQuickform(&$form) {
+    //@todo document why this addHidden is here
     $form->addElement('hidden', 'hidden_processor', 1);
-
-    $profileAddressFields = $form->get('profileAddressFields');
-    if (!empty($profileAddressFields)) {
-      $form->assign('profileAddressFields', $profileAddressFields);
-    }
-
-    // check if show billing setting is enabled
-    if ($form->getVar( '_ppType' ) == 0 && $form->_isBillingAddressRequiredForPayLater) {
-      CRM_Core_Payment_Form::buildAddressBlock($form);
-      return;
-    }
-
-    // before we do this lets see if the payment processor has implemented a buildForm method
-    if (method_exists($form->_paymentProcessor['instance'], 'buildForm') &&
-      is_callable(array($form->_paymentProcessor['instance'], 'buildForm'))) {
-      // the payment processor implements the buildForm function, let the payment
-      // processor do the work
-      $form->_paymentProcessor['instance']->buildForm($form);
-      return;
-    }
-
-    if (($form->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT)) {
-      CRM_Core_Payment_Form::buildDirectDebit($form, TRUE);
-    }
-    elseif (($form->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_CREDIT_CARD)) {
-      CRM_Core_Payment_Form::buildCreditCard($form, TRUE);
-    }
+    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, empty($form->_isBillingAddressRequiredForPayLater));
   }
 }
 

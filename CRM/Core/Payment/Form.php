@@ -36,46 +36,58 @@ class CRM_Core_Payment_Form {
 
 
   /**
-   * Add payment fields are depending on payment processor
+   * Add payment fields depending on payment processor. The payment processor can implement the following functions to override the built in fields.
    *
-   * @param CRM_Contribute_Form_Contribution| CRM_Contribute_Form_Contribution_Main $form
-   * @todo - add other forms specifically to the definition - since we don't have for $form - since we aren't adding the property to
-   * CRM_Core_Form (don't suppose we should?)
+   *  - getPaymentFormFields()
+   *  - getPaymentFormFieldsMetadata()
+   *  (planned - getBillingDetailsFormFields(), getBillingDetailsFormFieldsMetadata()
+   *
+   *  Note that this code is written to accommodate the possibility CiviCRM will switch to implementing pay later as a manual processor in future
+   *
+   * @param CRM_Contribute_Form_AbstractEditPayment|CRM_Contribute_Form_Contribution_Main $form
    * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
+   * @param bool $forceBillingFieldsForPayLater display billing fields even for pay later
    */
-  static public function setPaymentFieldsByProcessor(&$form, $processor) {
+  static public function setPaymentFieldsByProcessor(&$form, $processor, $forceBillingFieldsForPayLater = FALSE) {
     $form->billingFieldSets = array();
-    $paymentFields = self::getPaymentFields($processor);
-    $paymentTypeName = self::getPaymentTypeName($processor);
-    $paymentTypeLabel = self::getPaymentTypeLabel($processor);
-    //@todo if we switch to iterating through the fieldsets we won't need to assign these directly
-    $form->assign('paymentTypeName', $paymentTypeName);
-    $form->assign('paymentTypeLabel', $paymentTypeLabel);
+    if ($processor != NULL) {
+      // ie it is pay later
+      $paymentFields = self::getPaymentFields($processor);
+      $paymentTypeName = self::getPaymentTypeName($processor);
+      $paymentTypeLabel = self::getPaymentTypeLabel($processor);
+      //@todo if we switch to iterating through $form->billingFieldSets we won't need to assign these directly
+      $form->assign('paymentTypeName', $paymentTypeName);
+      $form->assign('paymentTypeLabel', $paymentTypeLabel);
 
-    $form->billingFieldSets[$paymentTypeName]['fields'] = $form->_paymentFields = array_intersect_key(self::getPaymentFieldMetadata($processor), array_flip($paymentFields));
-    $form->billingPane = array($paymentTypeName => $paymentTypeLabel);
-    $form->assign('paymentFields', $paymentFields);
-    if ($processor['billing_mode'] != 4) {
-      //@todo setPaymentFields defines the billing fields - this should be moved to the processor class & renamed getBillingFields
-      // currently we just add the standard lot unless it's an off-site processor (& then add none)
-      //also set the billingFieldSet to hold all the details required to render the fieldset so we can iterate through the fieldset - making
-      // it easier to re-order. For not the billingFieldSets param is used to determine whether to show the billing pane
-      CRM_Core_Payment_Form::_setPaymentFields($form);
-      $form->billingFieldSets['billing_name_address-group']['fields'] = array();
+      $form->billingFieldSets[$paymentTypeName]['fields'] = $form->_paymentFields = array_intersect_key(self::getPaymentFieldMetadata($processor), array_flip($paymentFields));
+      $form->billingPane = array($paymentTypeName => $paymentTypeLabel);
+      $form->assign('paymentFields', $paymentFields);
     }
+
+    // @todo - replace this section with one similar to above per discussion - probably use a manual processor shell class to stand in for that capability
+    //return without adding billing fields if billing_mode = 4 (@todo - more the ability to set that to the payment processor)
+    // or payment processor is NULL (pay later)
+    if (($processor == NULL && !$forceBillingFieldsForPayLater) ||  $processor['billing_mode'] == 4) {
+      return;
+    }
+    //@todo setPaymentFields defines the billing fields - this should be moved to the processor class & renamed getBillingFields
+    // potentially pay later would also be a payment processor
+    //also set the billingFieldSet to hold all the details required to render the fieldset so we can iterate through the fieldset - making
+    // it easier to re-order in hooks etc. The billingFieldSets param is used to determine whether to show the billing pane
+    CRM_Core_Payment_Form::setBillingDetailsFields($form);
+    $form->billingFieldSets['billing_name_address-group']['fields'] = array();
   }
 
   /**
    * add general billing fields
    * @todo set these like processor fields & let payment processors alter them
    *
-   *
    * @param $form
    *
    * @return void
    * @access protected
    */
-  static protected function _setPaymentFields(&$form) {
+  static protected function setBillingDetailsFields(&$form) {
     $bltID = $form->_bltID;
 
     $form->_paymentFields['billing_first_name'] = array(
@@ -173,7 +185,7 @@ class CRM_Core_Payment_Form {
    * @access public
    */
   static function setCreditCardFields(&$form) {
-    CRM_Core_Payment_Form::_setPaymentFields($form);
+    CRM_Core_Payment_Form::setBillingDetailsFields($form);
 
     $form->_paymentFields['credit_card_number'] = array(
       'htmlType' => 'text',
@@ -255,7 +267,7 @@ class CRM_Core_Payment_Form {
    * @access public
    */
   static function setDirectDebitFields(&$form) {
-    CRM_Core_Payment_Form::_setPaymentFields($form);
+    CRM_Core_Payment_Form::setBillingDetailsFields($form);
 
     $form->_paymentFields['account_holder'] = array(
       'htmlType' => 'text',
@@ -346,14 +358,29 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * @param CRM_Contribute_Form_Contribution| CRM_Contribute_Form_Contribution_Main|CRM_Member_Form_Membership $form
+   * @param CRM_Contribute_Form_Contribution| CRM_Contribute_Form_Contribution_Main|CRM_Core_Payment_ProcessorForm $form
    * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
-   * @param bool $isBillingDataOptional
+   * @param bool $isBillingDataOptional This manifests for 'NULL' (pay later) payment processor as the addition of billing fields to the form and
+   *   for payment processors that gather payment data on site as rendering the fields as not being required. (not entirely sure why but this
+   *   is implemented for back office forms)
    *
    * @return bool
    */
   static function buildPaymentForm($form, $processor, $isBillingDataOptional){
-    self::setPaymentFieldsByProcessor($form, $processor);
+    //if the form has address fields assign to the template so the js can decide what billing fields to show
+    $profileAddressFields = $form->get('profileAddressFields');
+    if (!empty($profileAddressFields)) {
+      $form->assign('profileAddressFields', $profileAddressFields);
+    }
+
+    // $processor->buildForm appears to be an undocumented (possibly unused) option for payment processors
+    // which was previously available only in some form flows
+    if (!empty($form->_paymentProcessor) && !empty($form->_paymentProcessor['object']) && $form->_paymentProcessor['object']->isSupported('buildForm')) {
+      $form->_paymentProcessor['object']->buildForm($form);
+      return;
+    }
+
+    self::setPaymentFieldsByProcessor($form, $processor, empty($isBillingDataOptional));
     self::addCommonFields($form, !$isBillingDataOptional, $form->_paymentFields);
     self::addRules($form, $form->_paymentFields);
     self::addPaypalExpressCode($form);
@@ -481,40 +508,6 @@ class CRM_Core_Payment_Form {
         'nopunctuation'
       );
     }
-  }
-
-  /**
-   * Function to add address block
-   *
-   * @param $form
-   * @param bool $useRequired
-   *
-   * @return void
-   * @access public
-   */
-  static function buildAddressBlock(&$form, $useRequired = FALSE) {
-    CRM_Core_Payment_Form::_setPaymentFields($form);
-    foreach ($form->_paymentFields as $name => $field) {
-      if (isset($field['cc_field']) &&
-        $field['cc_field']
-      ) {
-        $form->add($field['htmlType'],
-          $field['name'],
-          $field['title'],
-          $field['attributes'],
-          $useRequired ? $field['is_required'] : FALSE
-        );
-      }
-    }
-
-    // also take care of state country widget
-    $stateCountryMap = array(
-      1 => array(
-        'country' => "billing_country_id-{$form->_bltID}",
-        'state_province' => "billing_state_province_id-{$form->_bltID}",
-      )
-    );
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
   }
 
   /**
