@@ -609,9 +609,9 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @return null
    * @access public
    * @static
-   *
    */
   static function sendStatusUpdate($pcpId, $newStatus, $isInitial = FALSE, $component = 'contribute') {
+    $pcpStatusName = CRM_Core_OptionGroup::values("pcp_status", FALSE, FALSE, FALSE, NULL, 'name');
     $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
     $config = CRM_Core_Config::singleton();
 
@@ -654,7 +654,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $pcpBlockInfo);
 
     // assign urls required in email template
-    if ($pcpStatus[$newStatus] == 'Approved') {
+    if ($pcpStatusName[$newStatus] == 'Approved') {
       $tplParams['isTellFriendEnabled'] = $pcpBlockInfo['is_tellfriend_enabled'];
       if ($pcpBlockInfo['is_tellfriend_enabled']) {
         $pcpTellFriendURL = CRM_Utils_System::url('civicrm/friend',
