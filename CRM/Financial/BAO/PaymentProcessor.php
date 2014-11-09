@@ -308,8 +308,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
     $processors = civicrm_api3('payment_processor', 'get', $retrievalParameters);
     foreach ($processors['values'] as $processor) {
+      $processors['values'][$processor['id']]['payment_processor_type'] = $processor['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
       $processors['values'][$processor['id']]['object'] = CRM_Core_Payment::singleton(empty($processor['is_test']) ? 'live' : 'test', $processor);
-      $processors['values'][$processor['id']]['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
     }
     /*
      CRM_Utils_Cache::singleton()->set($cacheKey, $processors);

@@ -138,9 +138,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
 
-    if (!$this->_refund) {
-      $this->assignPaymentRelatedVariables();
-    }
+    $this->assignPaymentRelatedVariables();
 
     $this->assign('contributionMode', $this->_mode);
     $this->assign('contactId', $this->_contactId);
@@ -430,13 +428,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     //Get the rquire fields value only.
     $params = $this->_params = $submittedValues;
 
-    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id'],
-      $this->_mode
-    );
-
     //get the payment processor id as per mode.
+    //@todo unclear relevance of mode - seems like a lot of duplicated params here!
     $this->_params['payment_processor'] = $params['payment_processor_id'] =
-      $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
+    $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
 
     $now = date('YmdHis');
     $fields = array();
