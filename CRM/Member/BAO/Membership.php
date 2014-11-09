@@ -251,7 +251,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       }
 
       $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($start_date, $end_date, $join_date,
-        'today', $excludeIsAdmin
+        'today', $excludeIsAdmin, CRM_Utils_Array::value('membership_type_id', $params), $params
       );
       if (empty($calcStatus)) {
         // Redirect the form in case of error
@@ -1728,7 +1728,10 @@ AND civicrm_membership.is_test = %2";
           CRM_Utils_Date::customFormat($dates['join_date'],
             $statusFormat
           ),
-          'today', TRUE
+          'today',
+          TRUE,
+          $membershipTypeID,
+          $memParams
         );
         $updateStatusId = CRM_Utils_Array::value('id', $status);
       }
@@ -1825,7 +1828,9 @@ AND civicrm_membership.is_test = %2";
       CRM_Utils_Array::value('end_date', $currentMembership),
       CRM_Utils_Array::value('join_date', $currentMembership),
       $today,
-      TRUE
+      TRUE,
+      $currentMembership['membership_type_id'],
+      $currentMembership
     );
 
     if (empty($status) ||
@@ -1989,8 +1994,13 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @static
    * @access public
    */
-  static function createRelatedMemberships(&$params, &$dao) {
+  static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
     static $relatedContactIds = array();
+    if ($reset) {
+      // not sure why a static var is in use here - we need a way to reset it from the test suite
+      $relatedContactIds = array();
+      return;
+    }
 
     $membership = new CRM_Member_DAO_Membership();
     $membership->id = $dao->id;

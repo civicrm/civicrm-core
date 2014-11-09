@@ -54,6 +54,9 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   function tearDown() {
   }
 
+  /**
+   *
+   */
   public function testCreatePriceSet() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
@@ -61,6 +64,18 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
   }
 
+  /**
+   * Check that no name doesn't cause failure
+   */
+  public function testCreatePriceSetNoName() {
+    $params = $this->_params;
+    unset($params['name']);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+  }
+
+  /**
+   *
+   */
   public function testGetBasicPriceSet() {
     $getParams = array(
       'name' => 'default_contribution_amount',

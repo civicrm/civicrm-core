@@ -219,6 +219,29 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
+   * Get the number of terms for this contribution for a given membership type
+   * based on querying the line item table and relevant price field values
+   * Note that any one contribution should only be able to have one line item relating to a particular membership
+   * type
+   *
+   * @param int $membershipTypeID
+   *
+   * @param int $contributionID
+   *
+   * @return int
+   */
+  public function getNumTermsByContributionAndMembershipType($membershipTypeID, $contributionID) {
+     $numTerms = CRM_Core_DAO::singleValueQuery("
+      SELECT membership_num_terms FROM civicrm_line_item li
+      LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
+      WHERE entity_id = %1 AND entity_table = 'civicrm_contribution' AND membership_type_id = %2",
+      array(1 => array($contributionID, 'Integer') , 2 => array($membershipTypeID, 'Integer'))
+    );
+    // default of 1 is precautionary
+    return empty($numTerms) ? 1 : $numTerms;
+  }
+
+  /**
    * takes an associative array and creates a contribution object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
@@ -1546,7 +1569,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               $dates['end_date'],
               $dates['join_date'],
               'today',
-              TRUE
+              TRUE,
+              $membership->membership_type_id,
+              (array) $membership
             );
 
             $formattedParams = array(
@@ -2045,9 +2070,13 @@ WHERE  contribution_id = %1 ";
         $entity = 'contribution';
         $entityID = $ids['contribution'];
       }
-      if (isset($ids['membership']) && $ids['membership']) {
+      if (!empty($ids['membership'])) {
+        //not sure whether is is possible for this not to be an array - load related contacts loads an array but this code was expecting a string
+        // the addition of the casting is in case it could get here & be a string. Added in 4.6 - maybe remove later? This AuthorizeNetIPN & PaypalIPN tests hit this
+        // line having loaded an array
+        $ids['membership'] = (array) $ids['membership'];
         $entity = 'membership';
-        $entityID = $ids['membership'];
+        $entityID = $ids['membership'][0];
       }
 
       $url = $paymentObject->subscriptionURL($entityID, $entity);
