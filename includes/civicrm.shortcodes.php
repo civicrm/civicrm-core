@@ -404,12 +404,23 @@ class CiviCRM_For_WordPress_Shortcodes {
       apply_filters( 'civicrm_shortcode_more_link', __( 'Find out more...', 'civicrm' ) )
     );
     
-    // let's have a footer
-    $civi = __( 'CiviCRM.org - Growing and Sustaining Relationships', 'civicrm' );
-    $logo = '<div class="empowered-by-logo"><span>' . __( 'CiviCRM', 'civicrm' ) . '</span></div>';
-    $civi_link = '<a href="http://civicrm.org/" title="' . $civi . '" target="_blank" class="empowered-by-link">' . $logo . '</a>';
-    $empowered = sprintf( __( 'Empowered by %s', 'civicrm' ), $civi_link );
-    $footer = apply_filters( 'civicrm_shortcode_footer', $empowered );
+    // assume CiviCRM footer is not enabled
+    $empowered_enabled = FALSE;
+    $footer = '';
+    
+    // test config object for setting
+    if ( $config->empoweredBy == 1 ) {
+    
+      // footer enabled - define it
+      $civi = __( 'CiviCRM.org - Growing and Sustaining Relationships', 'civicrm' );
+      $logo = '<div class="empowered-by-logo"><span>' . __( 'CiviCRM', 'civicrm' ) . '</span></div>';
+      $civi_link = '<a href="http://civicrm.org/" title="' . $civi . '" target="_blank" class="empowered-by-link">' . $logo . '</a>';
+      $empowered = sprintf( __( 'Empowered by %s', 'civicrm' ), $civi_link );
+      $footer = apply_filters( 'civicrm_shortcode_footer', $empowered );
+      
+      $empowered_enabled = TRUE;
+      
+    }
     
     // start buffering
     ob_start();
@@ -419,7 +430,7 @@ class CiviCRM_For_WordPress_Shortcodes {
     
     // save the output and flush the buffer
     $markup = ob_get_clean();
-
+    
     // allow plugins to override
     return apply_filters( 'civicrm_shortcode_render_multiple', $markup, $post_id, $shortcode );
     

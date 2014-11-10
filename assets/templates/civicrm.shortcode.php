@@ -47,8 +47,10 @@
   
   <p><?php echo $more_link; ?></p>
   
+  <?php if ( $empowered_enabled ) { ?>
   <div class="crm-public-footer">
     <?php echo $footer; ?>
   </div>
+  <?php } ?>
   
 </div>

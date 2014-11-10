@@ -586,7 +586,7 @@ class CiviCRM_For_WordPress {
 
       // initialize the system by creating a config object
       $config = CRM_Core_Config::singleton();
-      print_r( $config ); die();
+      //print_r( $config ); die();
 
       // sync the logged in user with WP
       global $current_user;
