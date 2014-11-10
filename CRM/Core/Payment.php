@@ -124,9 +124,9 @@ abstract class CRM_Core_Payment {
     }
 
     //load the payment form for required processor.
-    if ($paymentForm !== NULL) {
-      self::$_singleton[$cacheKey]->setForm($paymentForm);
-    }
+    //if ($paymentForm !== NULL) {
+      //self::$_singleton[$cacheKey]->setForm($paymentForm);
+    //}
 
     return self::$_singleton[$cacheKey];
   }
