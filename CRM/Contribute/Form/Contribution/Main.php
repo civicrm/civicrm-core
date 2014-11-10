@@ -773,7 +773,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             $otherAmount = $priceField->id;
           }
           elseif (!empty($fields["price_{$priceField->id}"])) {
-            $otherAmountVal = $fields["price_{$priceField->id}"];
+            $otherAmountVal = CRM_Utils_Rule::cleanMoney($fields["price_{$priceField->id}"]);
             $min            = CRM_Utils_Array::value('min_amount', $self->_values);
             $max            = CRM_Utils_Array::value('max_amount', $self->_values);
             if ($min && $otherAmountVal < $min) {
@@ -1222,7 +1222,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $params['amount'] = $memFee ? $memFee : 0;
       }
     }
-
     //If the membership & contribution is used in contribution page & not separate payment
     $fieldId = $memPresent = $membershipLabel = $fieldOption = $is_quick_config = NULL;
     $proceFieldAmount = 0;
@@ -1252,7 +1251,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
     }
-
+  
     if (!isset($params['amount_other'])) {
       $this->set('amount_level', CRM_Utils_Array::value('amount_level', $params));
     }
@@ -1261,22 +1260,25 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $lineItem = array();
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config' );
       if ( $is_quick_config ) {
-        foreach ( $this->_values['fee'] as $key => & $val ) {
-          if ( $val['name'] == 'other_amount' && $val['html_type'] == 'Text' && array_key_exists( 'price_'.$key, $params ) && $params['price_'.$key] != 0 ) {
-            foreach ( $val['options'] as $optionKey => & $options ) {
-              $options['amount'] = CRM_Utils_Array::value( 'price_'.$key, $params );
-              break;
+        foreach ( $this->_values['fee'] as $key => & $val ) {  
+          if ( $val['name'] == 'other_amount' && $val['html_type'] == 'Text' && array_key_exists( 'price_'.$key, $params )  ) {
+            $params['price_'.$key] = CRM_Utils_Rule::cleanMoney($params['price_'.$key]); //Clean out any currency symbols
+            if ( $params['price_'.$key] != 0 ) {
+              foreach ( $val['options'] as $optionKey => & $options ) {
+                $options['amount'] = CRM_Utils_Array::value( 'price_'.$key, $params );
+                break;
+              }
             }
             $params['price_'.$key] = 1;
             break;
           }
         }
       }
-
       $component = '';
       if ($this->_membershipBlock) {
         $component = 'membership';
       }
+
       CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetId], $component);
       if ($params['tax_amount']) {
         $this->set('tax_amount', $params['tax_amount']);
@@ -1375,6 +1377,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // redirect to thank you page
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
     }
+   
   }
 
   /**
