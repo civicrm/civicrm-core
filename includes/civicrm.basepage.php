@@ -168,13 +168,6 @@ class CiviCRM_For_WordPress_Basepage {
     // broadcast this as well
     do_action( 'civicrm_basepage_parsed' );
     
-    /*
-    // trace
-    print_r( 'basepage_handler' . "\n" ); //die();
-    print_r( 'title: ' . $civicrm_wp_title ); //die();
-    print_r( $this->basepage_markup ); die();
-    */
-    
   }
 
 

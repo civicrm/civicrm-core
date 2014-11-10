@@ -384,15 +384,6 @@ class CiviCRM_For_WordPress_Shortcodes {
       
     }
   
-    /*
-    print_r( array(
-      'atts' => $atts,
-      'args' => $args,
-      'data' => $data,
-      'link' => $link,
-    ) );
-    */
-    
     // set some template variables
     
     // description
@@ -493,7 +484,6 @@ class CiviCRM_For_WordPress_Shortcodes {
     }
     
     $title = $this->post_titles[$post_id];
-    //print_r( $this->post_titles );
     
     return $title;
     
@@ -789,15 +779,6 @@ class CiviCRM_For_WordPress_Shortcodes {
 
     }
 
-    /*
-    print_r( array(
-      'atts' => $atts,
-      'args' => $args,
-      'civi_entity' => $civi_entity,
-      'data' => $data,
-    ) );
-    */
-      
     return $data;
 
   }
