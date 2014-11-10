@@ -328,6 +328,9 @@ class CiviCRM_For_WordPress_Shortcodes {
     // default to no class
     $class = '';
     
+    // access CIvi config object
+    $config = CRM_Core_Config::singleton();
+      
     // do we have multiple shortcodes?
     if ( $multiple != 0 ) {
       
@@ -338,8 +341,6 @@ class CiviCRM_For_WordPress_Shortcodes {
         }
       }
       $query = implode( '&', $links );
-      
-      $config = CRM_Core_Config::singleton();
       
       // $path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend
       $link = $config->userSystem->url($args['q'], $query, FALSE, NULL, FALSE, FALSE, TRUE);
