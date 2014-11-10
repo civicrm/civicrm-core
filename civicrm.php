@@ -586,6 +586,7 @@ class CiviCRM_For_WordPress {
 
       // initialize the system by creating a config object
       $config = CRM_Core_Config::singleton();
+      print_r( $config ); die();
 
       // sync the logged in user with WP
       global $current_user;
@@ -1060,6 +1061,45 @@ class CiviCRM_For_WordPress {
    */
   public function clear_edit_post_link() {
     return '';
+  }
+
+
+  /**
+   * Clone of CRM_Utils_System_WordPress::getBaseUrl() whose access is set to
+   * private. Until it is public, we cannot access the URL of the basepage since
+   * CRM_Utils_System_WordPress::url() 
+   *
+   * @param $absolute
+   * @param $frontend
+   * @param $forceBackend
+   *
+   * @return mixed|null|string
+   */
+  public function get_base_url($absolute, $frontend, $forceBackend) {
+    $config    = CRM_Core_Config::singleton();
+
+    if (!isset($config->useFrameworkRelativeBase)) {
+      $base = parse_url($config->userFrameworkBaseURL);
+      $config->useFrameworkRelativeBase = $base['path'];
+    }
+    
+    print_r( $config ); die();
+
+    $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
+
+    if ((is_admin() && !$frontend) || $forceBackend) {
+      $base .= admin_url( 'admin.php' );
+      return $base;
+    }
+    elseif (defined('CIVICRM_UF_WP_BASEPAGE')) {
+      $base .= CIVICRM_UF_WP_BASEPAGE;
+      return $base;
+    }
+    elseif (isset($config->wpBasePage)) {
+      $base .= $config->wpBasePage;
+      return $base;
+    }
+    return $base;
   }
 
 
