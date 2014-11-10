@@ -394,7 +394,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     // Build payment processor form
-    if (($this->_paymentProcessorID || $this->_isBillingAddressRequiredForPayLater) && empty($_GET['onbehalf'])) {
+    if (empty($_GET['onbehalf'])) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
       // Return if we are in an ajax callback
       if ($this->_snippet) {
@@ -420,6 +420,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     );
     $this->addRule("email-{$this->_bltID}", ts('Email is not valid.'), 'email');
     $pps = array();
+    //@todo - this should be replaced by a check as to whether billing fields are set
     $onlinePaymentProcessorEnabled = FALSE;
     if (!empty($this->_paymentProcessors)) {
       foreach ($this->_paymentProcessors as $key => $name) {
@@ -1400,7 +1401,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if ($form->_paymentProcessors) {
       // Fetch type during ajax request
       if (isset($_GET['type']) && $form->_snippet) {
-        $form->_paymentProcessorID = $_GET['type'];
+        $form->_paymentProcessorID = CRM_Utils_Request::retrieve('type', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, 0);
       }
       // Remember type during form post
       elseif (!empty($form->_submitValues)) {
@@ -1421,6 +1422,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
       if ($form->_paymentProcessorID) {
         CRM_Core_Payment_ProcessorForm::preProcess($form);
+      }
+      else {
+        $form->_paymentProcessor = array();
       }
 
       //get payPal express id and make it available to template
