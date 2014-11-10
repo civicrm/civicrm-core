@@ -62,7 +62,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   public $_paymentFields = array();
 
-  protected $_ppType;
+  protected $_paymentProcessorID;
   protected $_snippet;
 
   /**
@@ -394,7 +394,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     // Build payment processor form
-    if (($this->_ppType || $this->_isBillingAddressRequiredForPayLater) && empty($_GET['onbehalf'])) {
+    if (($this->_paymentProcessorID || $this->_isBillingAddressRequiredForPayLater) && empty($_GET['onbehalf'])) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
       // Return if we are in an ajax callback
       if ($this->_snippet) {
@@ -1389,24 +1389,24 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Handle Payment Processor switching
    * For contribution and event registration forms
-   * @param CRM_Core_Form $form
+   * @param CRM_Contribute_Form_Contribution_Main $form
    * @param bool $noFees
    */
   static function preProcessPaymentOptions(&$form, $noFees = FALSE) {
     $form->_snippet = CRM_Utils_Array::value('snippet', $_GET);
 
     $form->_paymentProcessors = $noFees ? array() : $form->get('paymentProcessors');
-    $form->_ppType = NULL;
+    $form->_paymentProcessorID = NULL;
     if ($form->_paymentProcessors) {
       // Fetch type during ajax request
       if (isset($_GET['type']) && $form->_snippet) {
-        $form->_ppType = $_GET['type'];
+        $form->_paymentProcessorID = $_GET['type'];
       }
       // Remember type during form post
       elseif (!empty($form->_submitValues)) {
-        $form->_ppType = CRM_Utils_Array::value('payment_processor', $form->_submitValues);
-        $form->_paymentProcessor = CRM_Utils_Array::value($form->_ppType, $form->_paymentProcessors);
-        $form->set('type', $form->_ppType);
+        $form->_paymentProcessorID = CRM_Utils_Array::value('payment_processor', $form->_submitValues);
+        $form->_paymentProcessor = CRM_Utils_Array::value($form->_paymentProcessorID, $form->_paymentProcessors);
+        $form->set('type', $form->_paymentProcessorID);
         $form->set('mode', $form->_mode);
         $form->set('paymentProcessor', $form->_paymentProcessor);
       }
@@ -1414,12 +1414,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       else {
         foreach ($form->_paymentProcessors as $values) {
           if (!empty($values['is_default']) || count($form->_paymentProcessors) == 1) {
-            $form->_ppType = $values['id'];
+            $form->_paymentProcessorID = $values['id'];
             break;
           }
         }
       }
-      if ($form->_ppType) {
+      if ($form->_paymentProcessorID) {
         CRM_Core_Payment_ProcessorForm::preProcess($form);
       }
 
@@ -1441,7 +1441,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';');
       }
     }
-    $form->assign('ppType', $form->_ppType);
+    $form->assign('paymentProcessorID', $form->_paymentProcessorID);
   }
 }
 
