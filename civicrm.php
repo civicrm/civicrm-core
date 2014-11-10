@@ -198,9 +198,6 @@ class CiviCRM_For_WordPress {
    */
   public function activation() {
     
-    //update_option( 'civicrm_activation_in_progress', 'true' );
-    //return;
-    
     // if activating...
     if ( is_admin() && get_option( 'civicrm_activation_in_progress' ) == 'true' ) {
     
@@ -214,6 +211,21 @@ class CiviCRM_For_WordPress {
       update_option( 'civicrm_activation_in_progress', 'false' );
       
     }
+
+  }
+
+
+  /**
+   * Method that is called only when CiviCRM plugin is deactivated
+   * In order for other plugins to be able to interact with Civi's activation,
+   * we need to remove the option that is set in activate() above
+   *
+   * @return void
+   */
+  public function deactivate() {
+    
+    // delete option
+    delete_option( 'civicrm_activation_in_progress' );
 
   }
 
@@ -1204,7 +1216,8 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * Callback from 'edit_post_link' hook to remove edit link in set_post_blank()
+   * Remove edit link from page content
+   * Callback from 'edit_post_link' hook
    *
    * @return string Always empty
    */
@@ -1295,6 +1308,7 @@ function civi_wp() {
   return CiviCRM_For_WordPress::singleton();
 }
 
+
 /**
  * Hook CiviCRM_For_WordPress early onto the 'plugins_loaded' action.
  *
@@ -1310,11 +1324,23 @@ if ( defined( 'CIVICRM_LATE_LOAD' ) ) {
 }
 
 
-// tell WordPress to call plugin activation method, although it's still directed
-// at the legacy callback, in case there are situations where the function is
-// called from elsewhere. Should perhaps be:
-// register_activation_hook( 'CiviCRM_For_WordPress, 'civicrm_activate' );
-register_activation_hook( __FILE__, 'civicrm_activate' );
+/**
+ * Tell WordPress to call plugin activation method - no longer calls legacy 
+ * global scope function
+ */
+register_activation_hook( CIVICRM_PLUGIN_FILE, array( civi_wp(), 'activate' ) );
+
+
+/**
+ * Tell WordPress to call plugin deactivation method - needed in order to reset
+ * the option that is set on activation.
+ */
+register_deactivation_hook( CIVICRM_PLUGIN_FILE, array( civi_wp(), 'deactivate' ) );
+
+
+// uninstall uses the 'uninstall.php' method
+// see: http://codex.wordpress.org/Function_Reference/register_uninstall_hook
+
 
 
 /*
