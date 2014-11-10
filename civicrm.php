@@ -204,14 +204,28 @@ class CiviCRM_For_WordPress {
       // assign minimum capabilities for all WP roles and create 'anonymous_user' role
       $this->users->set_wp_user_capabilities();
       
-      // create basepage
-      add_action( 'wp_loaded', array( $this, 'create_wp_basepage' ) );
-      
+      // set a one-time-only option to flag that we need to create a basepage -
+      // it will not update the option once it has been set to another value nor
+      // create a new option with the same name
+      add_option( 'civicrm_activation_create_basepage', 'true' );
+
       // change option so this method never runs again
       update_option( 'civicrm_activation_in_progress', 'false' );
       
     }
 
+    // if activating and we still haven't created the basepage...
+    if ( 
+      is_admin() && 
+      get_option( 'civicrm_activation_create_basepage' ) == 'true' &&
+      file_exists( CIVICRM_SETTINGS_PATH )
+    ) {
+    
+      // create basepage
+      add_action( 'wp_loaded', array( $this, 'create_wp_basepage' ) );
+      
+    }
+    
   }
 
 
@@ -803,6 +817,9 @@ class CiviCRM_For_WordPress {
       
       // save the setting
       civicrm_api3('setting', 'create', $params);
+      
+      // change option so this method never runs again
+      update_option( 'civicrm_activation_create_basepage', 'done' );
       
     }
       
