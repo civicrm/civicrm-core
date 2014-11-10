@@ -300,9 +300,9 @@ class CiviCRM_For_WordPress_Shortcodes {
    * Return a generic display for a shortcode instead of a CiviCRM invocation
    *
    * @param int $post_id The containing WordPress post ID
-   * @param str $shortcode The shortcode being parsed
+   * @param string $shortcode The shortcode being parsed
    * @param bool $multiple Boolean flag, TRUE if post has multiple shortcodes, FALSE otherwise
-   * @return str $markup Generic markup for multiple instances
+   * @return string $markup Generic markup for multiple instances
    */
   private function render_multiple( $post_id = FALSE, $shortcode = FALSE, $multiple = 0 ) {
     
@@ -435,7 +435,7 @@ class CiviCRM_For_WordPress_Shortcodes {
   /**
    * In order to hijack the page, we need to override the context
    *
-   * @return str Overridden context code
+   * @return string Overridden context code
    */
   public function get_context() {
     return 'nonpage';
@@ -445,7 +445,7 @@ class CiviCRM_For_WordPress_Shortcodes {
   /**
    * In order to hijack the page, we need to override the content
    *
-   * @return str Overridden content
+   * @return string Overridden content
    */
   public function get_content( $content ) {
     
@@ -469,7 +469,7 @@ class CiviCRM_For_WordPress_Shortcodes {
   /**
    * In order to hijack the page, we need to override the title
    *
-   * @return str Overridden title
+   * @return string Overridden title
    */
   public function get_title( $title, $post_id ) {
     

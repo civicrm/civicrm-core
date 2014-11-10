@@ -327,7 +327,7 @@ class CiviCRM_For_WordPress {
    *
    * @see $this->civicrm_context_set()
    *
-   * @return str $context The context in which Civi is displayed in WordPress
+   * @return string $context The context in which Civi is displayed in WordPress
    */
   public function civicrm_context_get() {
 
@@ -1170,7 +1170,7 @@ class CiviCRM_For_WordPress {
    * Override a WordPress page title with the CiviCRM entity title
    * Callback method for 'wp_title' hook, always called from WP front-end
    *
-   * @return str $title The title of the CiviCRM entity
+   * @return string $title The title of the CiviCRM entity
    */
   public function override_page_title( $title, $sep, $seplocation ) {
     

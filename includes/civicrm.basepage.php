@@ -190,8 +190,8 @@ class CiviCRM_For_WordPress_Basepage {
    * Get CiviCRM base page template
    * Callback method for 'template_include' hook, always called from WP front-end
    *
-   * @param str $template The path to the existing template
-   * @return str $template The modified path to the desired template
+   * @param string $template The path to the existing template
+   * @return string $template The modified path to the desired template
    */
   public function basepage_template( $template ) {
     
