@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_recurring_entity` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=87 ;
 
 --CRM-12281: To update name of Latvian provinces.
-UPDATE `civicrm_state_province` SET `name`='Jūrmala' WHERE `id` = 3552;
-UPDATE `civicrm_state_province` SET `name`='Liepāja' WHERE `id` = 3553;
-UPDATE `civicrm_state_province` SET `name`='Rēzekne' WHERE `id` = 3554;
-UPDATE `civicrm_state_province` SET `name`='Rīga' WHERE `id` = 3555;
+UPDATE `civicrm_state_province` SET `name` = (N'Jūrmala') WHERE `id` = 3552;
+UPDATE `civicrm_state_province` SET `name` = (N'Liepāja') WHERE `id` = 3553;
+UPDATE `civicrm_state_province` SET `name` = (N'Rēzekne') WHERE `id` = 3554;
+UPDATE `civicrm_state_province` SET `name` = (N'Rīga') WHERE `id` = 3555;
