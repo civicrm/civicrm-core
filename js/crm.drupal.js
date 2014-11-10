@@ -6,7 +6,10 @@ CRM.$(function($) {
       Drupal.attachBehaviors(e.target);
     })
     .on('crmUnload', function(e) {
-      Drupal.detachBehaviors(e.target);
+      // This function doesn't exist in D6 so call conditionally
+      if (typeof Drupal.detachBehaviors === 'function') {
+        Drupal.detachBehaviors(e.target);
+      }
     })
     .on('dialogopen', function(e) {
       // D7 hack to get the toolbar out of the way (CRM-15341)
