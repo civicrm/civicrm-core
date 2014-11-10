@@ -224,6 +224,9 @@ class CiviCRM_For_WordPress {
       // create basepage
       add_action( 'wp_loaded', array( $this, 'create_wp_basepage' ) );
       
+      // change option so this method never runs again
+      update_option( 'civicrm_activation_create_basepage', 'done' );
+      
     }
     
   }
@@ -238,8 +241,9 @@ class CiviCRM_For_WordPress {
    */
   public function deactivate() {
     
-    // delete option
+    // delete options
     delete_option( 'civicrm_activation_in_progress' );
+    delete_option( 'civicrm_activation_create_basepage' );
 
   }
 
@@ -796,13 +800,29 @@ class CiviCRM_For_WordPress {
     
     $config = CRM_Core_Config::singleton();
     
-    // bail if we already have a basepage
-    if ( !empty($config->wpBasePage) ) {
+    // bail if we already have a basepage setting
+    if ( !empty( $config->wpBasePage ) ) {
       return;
     }
     
-    // create the basepage
-    $result = $this->create_basepage();
+    // default page slug, but allow overrides
+    $slug = apply_filters( 'civicrm_basepage_slug', 'civicrm' );
+    
+    // get existing page with that slug
+    $page = get_page_by_path( $slug );
+    
+    // does it exist?
+    if ( $page ) {
+      
+      // we already have a basepage
+      $result = $page->ID;
+      
+    } else {
+      
+      // create the basepage
+      $result = $this->create_basepage( $slug );
+      
+    }
     
     // were we successful?
     if ( $result !== 0 AND !is_wp_error($result) ) {
@@ -818,9 +838,6 @@ class CiviCRM_For_WordPress {
       // save the setting
       civicrm_api3('setting', 'create', $params);
       
-      // change option so this method never runs again
-      update_option( 'civicrm_activation_create_basepage', 'done' );
-      
     }
       
   }
@@ -829,9 +846,10 @@ class CiviCRM_For_WordPress {
   /**
    * Create a WordPress page to act as the CiviCRM base page. 
    *
+   * @param string $slug The unique slug for the page - same as wpBasePage setting
    * @return int|WP_Error The page ID on success. The value 0 or WP_Error on failure
    */
-  private function create_basepage() {
+  private function create_basepage( $slug ) {
     
     // if multisite, switch to main site
     if ( is_multisite() && !is_main_site() ) {
@@ -856,7 +874,8 @@ class CiviCRM_For_WordPress {
       'pinged' => '', // quick fix for Windows
       'post_content_filtered' => '', // quick fix for Windows
       'post_excerpt' => '', // quick fix for Windows
-      'menu_order' => 0
+      'menu_order' => 0,
+      'post_name' => $slug,
     );
     
     // default page title, but allow overrides
