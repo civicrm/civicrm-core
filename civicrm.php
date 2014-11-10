@@ -790,6 +790,55 @@ class CiviCRM_For_WordPress {
 
 
   /**
+   * Load only the CiviCRM CSS. This is needed because $this->front_end_page_load()
+   * is only called when there is a single Civi entity present on a page or archive
+   * and, whilst we don't want all the Javascript to load, we do want stylesheets
+   *
+   * @return void
+   */
+  public function front_end_css_load() {
+    
+    if (!$this->initialize()) {
+      return;
+    }
+    
+    $config = CRM_Core_Config::singleton();
+    
+    // default custom CSS to standalone
+    $dependent = NULL;
+        
+    // Load core CSS
+    if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'disable_core_css')) {
+      
+      // enqueue stylesheet
+      wp_enqueue_style(
+        'civicrm_css',
+        $config->resourceBase . 'css/civicrm.css',
+        NULL, // dependencies
+        CIVICRM_PLUGIN_VERSION, // version
+        'all' // media
+      );
+      
+      // custom CSS is dependent
+      $dependent = array( 'civicrm_css' );
+      
+    }
+      
+    // Load custom CSS
+    if (!empty($config->customCSSURL)) {
+      wp_enqueue_style(
+        'civicrm_custom_css',
+        $config->customCSSURL,
+        $dependent, // dependencies
+        CIVICRM_PLUGIN_VERSION, // version
+        'all' // media
+      );
+    }
+    
+  }
+
+
+  /**
    * Add CiviCRM core resources
    *
    * @param bool $front_end True if on WP front end, false otherwise

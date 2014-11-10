@@ -150,6 +150,9 @@ class CiviCRM_For_WordPress_Shortcodes {
       // how should we handle multiple shortcodes?
       if ( $shortcodes_present > 1 ) {
         
+        // add CSS resources for front end
+        add_action( 'wp_enqueue_scripts', array( $this->civi, 'front_end_css_load' ), 100 );
+          
         // let's add dummy markup
         foreach( $this->shortcodes AS $post_id => $shortcode_array ) {
         
