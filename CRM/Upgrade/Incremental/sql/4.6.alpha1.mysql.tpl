@@ -68,3 +68,9 @@ CREATE TABLE IF NOT EXISTS `civicrm_recurring_entity` (
   `mode` tinyint(4) NOT NULL DEFAULT '1' COMMENT '1-this entity, 2-this and the following entities, 3-all the entities',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=87 ;
+
+--CRM-12281: To update name of Latvian provinces.
+UPDATE `civicrm_state_province` SET `name` = (N'Jūrmala') where `id` = 3552;
+UPDATE `civicrm_state_province` SET `name` = (N'Liepāja') WHERE `id` = 3553;
+UPDATE `civicrm_state_province` SET `name` = (N'Rēzekne') WHERE `id` = 3554;
+UPDATE `civicrm_state_province` SET `name` = (N'Rīga') WHERE `id` = 3555;
