@@ -49,7 +49,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   /*
   * Contact ID of the member
   */
-  protected $_contactID = null;
+  public $_contactID = null;
   /*
   * Display name of the person paying for the membership (used for receipts)
   */
@@ -70,7 +70,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * context would be set to standalone if the contact is use is being selected from
    * the form rather than in the URL
    */
-  protected $_context;
+  public $_context;
 
   /**
    * An array to hold a list of datefields on the form
