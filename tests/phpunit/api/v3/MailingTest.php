@@ -37,7 +37,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params = array();
   protected $_entity = 'Mailing';
-
+  protected $_groupIDs; // array(string $pseudonym => int $id)
+  protected $_contactIDs; // array(string $pseudonym => int $id)
 
   /**
    * @return array
@@ -52,7 +53,9 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->_contactIDs = array();
     $this->_groupID = $this->groupCreate();
+    $this->_groupIDs = array();
     $this->_email = 'test@test.test';
     $this->_params = array(
       'subject' => 'maild',
@@ -63,7 +66,13 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   function tearDown() {
+    foreach ($this->_contactIDs as $contactID) {
+      $this->contactDelete($contactID);
+    }
     $this->groupDelete($this->_groupID);
+    foreach ($this->_groupIDs as $groupID) {
+      $this->groupDelete($groupID);
+    }
   }
 
   /**
@@ -89,6 +98,37 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $text = $result['values']['text'];
     $this->assertEquals("This is $displayName", $text); // verify the text returned is correct, with replaced token
     $this->deleteMailing($result['id']);
+  }
+
+  public function testMailerPreviewRecipients() {
+    // BEGIN SAMPLE DATA
+    $this->groupIDs['inc'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
+    $this->groupIDs['exc'] = $this->groupCreate(array('name' => 'Example exclude group', 'title' => 'Example exclude group'));
+    $this->contactIDs['includeme'] = $this->individualCreate(array('include.me@example.org'));
+    $this->contactIDs['excludeme'] = $this->individualCreate(array('exclude.me@example.org'));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['includeme']));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['excludeme']));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['exc'], 'contact_id' => $this->contactIDs['excludeme']));
+
+    $params = $this->_params;
+    $params['groups']['include'] = array($this->groupIDs['inc']);
+    $params['groups']['exclude'] = array($this->groupIDs['exc']);
+    $params['mailings']['include'] = array();
+    $params['mailings']['exclude'] = array();
+    // END SAMPLE DATA
+
+    $maxIDs =  array(
+      'mailing' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing'),
+      'job' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_job'),
+      'group' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_group'),
+    );
+    $preview = $this->callAPIAndDocument('Mailing', 'preview_recipients', $params, __FUNCTION__, __FILE__);
+    $this->assertDBQuery($maxIDs['mailing'], 'SELECT MAX(id) FROM civicrm_mailing'); // 'Preview should not create any mailing records'
+    $this->assertDBQuery($maxIDs['job'], 'SELECT MAX(id) FROM civicrm_mailing_job'); // 'Preview should not create any mailing_job record'
+    $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group'); // 'Preview should not create any mailing_group records'
+
+    $previewIds = array_values(CRM_Utils_Array::collect('contact_id', $preview['values']));
+    $this->assertEquals(array((string)$this->contactIDs['includeme']), $previewIds);
   }
 
   public function testMailerSendTestMail() {

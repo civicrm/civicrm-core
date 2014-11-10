@@ -1655,7 +1655,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       }
 
       // Populate the recipients.
-      $mailing->getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, FALSE);
+      self::getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, FALSE);
     }
 
     return $mailing;
