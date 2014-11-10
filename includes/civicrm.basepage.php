@@ -162,6 +162,9 @@ class CiviCRM_For_WordPress_Basepage {
     // hide the edit link
     add_action( 'edit_post_link', array( $this->civi, 'clear_edit_post_link' ) );
     
+    // tweak admin bar
+    add_action( 'wp_before_admin_bar_render', array( $this->civi, 'clear_edit_post_menu_item' ) );
+    
     // flag that we have parsed the base page
     $this->basepage_parsed = TRUE;
     

@@ -1214,6 +1214,26 @@ class CiviCRM_For_WordPress {
 
 
   /**
+   * Remove edit link in WP Admin Bar
+   * Callback from 'wp_before_admin_bar_render' hook
+   *
+   * @return void
+   */
+  public function clear_edit_post_menu_item() {
+  
+    // access object
+    global $wp_admin_bar;
+    
+    // bail if in admin
+    if ( is_admin() ) return;
+    
+    // remove the menu item from front end
+    $wp_admin_bar->remove_menu( 'edit' );
+    
+  }
+
+
+  /**
    * Clone of CRM_Utils_System_WordPress::getBaseUrl() whose access is set to
    * private. Until it is public, we cannot access the URL of the basepage since
    * CRM_Utils_System_WordPress::url() 
