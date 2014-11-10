@@ -345,15 +345,21 @@ class CiviCRM_For_WordPress_Shortcodes {
       }
       $query = implode( '&', $links );
       
-      // $path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend
-      $link = $config->userSystem->url($args['q'], $query, FALSE, NULL, FALSE, FALSE, TRUE);
+      // $absolute, $frontend, $forceBackend
+      $base_url = $this->civi->get_base_url(TRUE, FALSE, FALSE);
       
-      // FIXME: unfortunately, there's a bug in $config->userSystem->url() that prevents
-      // it from returning the correct URL when on an archive...
-      $split = explode( '?', $link );
-      
-      // we should try and discover the wpBasePage, but anywhere with a Civi querystring will work
-      $link = get_permalink( $post_id ) . '?' . $split[1];
+      // construct query parts
+      $queryParts = array();
+      $queryParts[] = 'page=CiviCRM';
+      if (isset($args['q'])) {
+        $queryParts[] = 'q=' . $args['q'];
+      }
+      if (isset($query)) {
+        $queryParts[] = $query;
+      }
+
+      // construct link
+      $link = trailingslashit( $base_url ) . '?' . implode('&', $queryParts);
       
       // add a class for styling purposes
       $class = ' civicrm-shortcode-multiple';

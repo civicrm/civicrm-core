@@ -1218,10 +1218,9 @@ class CiviCRM_For_WordPress {
    * private. Until it is public, we cannot access the URL of the basepage since
    * CRM_Utils_System_WordPress::url() 
    *
-   * @param $absolute
-   * @param $frontend
-   * @param $forceBackend
-   *
+   * @param bool $absolute Passing TRUE prepends the scheme and domain, FALSE doesn't
+   * @param bool $frontend Passing FALSE returns the admin URL
+   * @param $forceBackend Passing TRUE overrides $frontend and returns the admin URL
    * @return mixed|null|string
    */
   public function get_base_url($absolute, $frontend, $forceBackend) {
@@ -1246,6 +1245,7 @@ class CiviCRM_For_WordPress {
       $base .= $config->wpBasePage;
       return $base;
     }
+    
     return $base;
   }
 
