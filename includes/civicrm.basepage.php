@@ -154,7 +154,7 @@ class CiviCRM_For_WordPress_Basepage {
     rewind_posts();
     
     // override page title
-    add_filter( 'wp_title', array( $this->civi, 'override_page_title' ), 50, 3 );
+    add_filter( 'single_post_title', array( $this->civi, 'single_page_title' ), 50, 2 );
     
     // include this content when base page is rendered
     add_filter( 'the_content', array( $this, 'basepage_render' ) );

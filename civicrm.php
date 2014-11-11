@@ -1250,6 +1250,17 @@ class CiviCRM_For_WordPress {
   
   }
 
+  /**
+   * Override a WordPress page title with the CiviCRM entity title
+   * Callback method for 'single_page_title' hook, always called from WP front-end
+   *
+   * @return string $title The title of the CiviCRM entity
+   */
+  public function single_page_title( $post_title, $post ) {
+    global $civicrm_wp_title;
+    return $civicrm_wp_title;
+  }
+
 
   /**
    * Remove edit link from page content
