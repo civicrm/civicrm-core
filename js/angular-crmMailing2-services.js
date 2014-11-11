@@ -64,6 +64,21 @@
       },
 
       // @param mailing Object (per APIv3)
+      // @return Promise an object with "subject", "body_text", "body_html"
+      preview: function preview(mailing) {
+        var params = _.extend({}, mailing, {
+          options:  {force_rollback: 1},
+          'api.Mailing.preview': {
+            id: '$value.id',
+          }
+        });
+        return crmApi('Mailing', 'create', params).then(function(result){
+          console.log('preview', params, result);
+          return result.values[result.id]['api.Mailing.preview'].values;
+        });
+      },
+
+      // @param mailing Object (per APIv3)
       // @param int previewLimit
       // @return Promise for a list of recipients (mailing_id, contact_id, api.contact.getvalue, api.email.getvalue)
       previewRecipients: function(mailing, previewLimit) {

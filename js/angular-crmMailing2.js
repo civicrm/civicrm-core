@@ -143,4 +143,56 @@
   crmMailing2.controller('PreviewRecipCtrl', function ($scope) {
     $scope.ts = CRM.ts('CiviMail');
   });
+
+  // Controller for the "Preview Mailing" segment
+  // Note: Expects $scope.model to be an object with properties:
+  //   - mailing: object
+  crmMailing2.controller('PreviewMailingCtrl', function ($scope, dialogService, crmMailingMgr) {
+    $scope.ts = CRM.ts('CiviMail');
+    $scope.testContact = {email: ''};
+    $scope.testGroup = {gid: null};
+
+    $scope.previewHtml = function() {
+      $scope.previewDialog(partialUrl('dialog/previewHtml.html'));
+    };
+    $scope.previewText = function() {
+      $scope.previewDialog(partialUrl('dialog/previewText.html'));
+    };
+    $scope.previewFull = function() {
+      $scope.previewDialog(partialUrl('dialog/previewFull.html'));
+    };
+    // Open a dialog with a preview of the current mailing
+    // @param template string URL of the template to use in the preview dialog
+    $scope.previewDialog = function(template) {
+      CRM.status(ts('Previewing'));
+      crmMailingMgr
+        .preview($scope.mailing)
+        .then(function(content){
+          var options = {
+            autoOpen: false,
+            modal: true,
+            title: ts('Subject: %1', {
+              1: content.subject
+            }),
+          };
+          dialogService.open('previewDialog', template, content, options);
+        });
+    };
+    $scope.sendTestToContact = function() {
+      CRM.alert('Send test to contact, ' + $scope.testContact.email);
+    };
+    $scope.sendTestToGroup = function() {
+      CRM.alert('Send test to group, ' + $scope.testGroup.gid);
+    };
+  });
+
+  // Controller for the "Preview Mailing" dialog
+  // Note: Expects $scope.model to be an object with properties:
+  //   - "subject"
+  //   - "body_html"
+  //   - "body_text"
+  crmMailing2.controller('PreviewMailingDialogCtrl', function ($scope, crmMailingMgr) {
+    $scope.ts = CRM.ts('CiviMail');
+  });
+
 })(angular, CRM.$, CRM._);
