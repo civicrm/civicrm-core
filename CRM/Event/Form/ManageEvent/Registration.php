@@ -931,7 +931,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       if (!empty($params['additional_custom_post_id_multiple'])) {
         $additionalPostMultiple = array();
         foreach ($params['additional_custom_post_id_multiple'] as $key => $value) {
-          if (!$value && !empty($params['custom_post_id'])) {
+          if (is_null($value) && !empty($params['custom_post_id'])) {
             $additionalPostMultiple[$key] = $params['custom_post_id'];
           }
           elseif ($value == 'none') {
