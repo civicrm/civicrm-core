@@ -210,8 +210,8 @@ class CiviCRM_For_WordPress_Shortcodes {
               $post->post_title = $civicrm_wp_title;
               
               // override page title
-              add_filter( 'wp_title', array( $this->civi, 'override_page_title' ), 50, 3 );
-    
+              add_filter( 'single_post_title', array( $this->civi, 'single_page_title' ), 50, 2 );
+              
               // overwrite content
               add_filter( 'the_content', array( $this, 'get_content' ) );
               
