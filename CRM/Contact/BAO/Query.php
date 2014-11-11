@@ -1000,7 +1000,7 @@ class CRM_Contact_BAO_Query {
           // CRM-13011 : If location type is primary, do not restrict search to the phone
           // type id - we want the primary phone, regardless of what type it is.
           // Otherwise, restrict to the specified phone type for the given field.
-          if ((!$cond) && ($elementName == 'phone') && $elements['location_type'] != 'Primary') {
+          if ((!$cond) && ($elementName == 'phone')) {
             $cond = "phone_type_id = '$elementType'";
           }
           elseif ((!$cond) && ($elementName == 'im')) {
@@ -1130,7 +1130,14 @@ class CRM_Contact_BAO_Query {
                 case 'civicrm_im':
                 case 'civicrm_openid':
 
-                  $this->_tables[$tName] = "\nLEFT JOIN $tableName `$tName` ON contact_a.id = `$tName`.contact_id AND `$tName`.$lCond";
+                  $this->_tables[$tName] = "\nLEFT JOIN $tableName `$tName` ON contact_a.id = `$tName`.contact_id";
+                  if ($tableName != 'civicrm_phone') {
+                    $this->_tables[$tName] .= " AND `$tName`.$lCond";
+                  }
+                  elseif (is_numeric($name)) {
+                    $this->_select[$tName] = "IF (`$tName`.is_primary = $name, `$tName`.phone, NULL) as `$tName`";
+                  }
+
                   // this special case to add phone type
                   if ($cond) {
                     $phoneTypeCondition = " AND `$tName`.$cond ";
