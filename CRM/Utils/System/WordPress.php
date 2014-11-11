@@ -52,12 +52,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * sets the title of the page
+   * Sets the title of the page
    *
    * @param string $title
    * @param null $pageTitle
-   *
-   * @paqram string $pageTitle
    *
    * @return void
    * @access public
