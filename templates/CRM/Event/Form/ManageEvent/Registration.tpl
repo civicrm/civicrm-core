@@ -161,12 +161,19 @@ class="crm-hover-button crm-button-add-profile"><span
               class='crm-event-manage-registration-form-block-custom_post_multiple'>
             <td scope="row" class="label" width="20%">{$form.custom_post_id_multiple.$profilePostNum.label}</td>
             <td>{$form.custom_post_id_multiple.$profilePostNum.html}
-              &nbsp;<span class='profile_bottom_link_remove'><a href="#"
-                                                                class="crm-hover-button crm-button-rem-profile"><span
-                    class="icon ui-icon-trash"></span>{ts}remove profile{/ts}</a></span>
-                              &nbsp;&nbsp;
-                <span class='profile_bottom_link'{if !$smarty.foreach.profilePostIdName.last} style="display: none"{/if}><a href="#" class="crm-hover-button crm-button-add-profile"><span
-                      class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
+              &nbsp;
+              <span class='profile_bottom_link_remove'>
+                <a href="#" class="crm-hover-button crm-button-rem-profile">
+                  <span class="icon ui-icon-trash"></span>{ts}remove profile{/ts}
+                </a>
+              </span>
+              &nbsp;&nbsp;
+              <span class='profile_bottom_link' {if !$smarty.foreach.profilePostIdName.last} style="display: none"{/if}>
+                <a href="#" class="crm-hover-button crm-button-add-profile">
+                  <span class="icon ui-icon-plus"></span>
+                  {ts}add another profile (bottom of page){/ts}
+                </a>
+              </span>
               <br/><span class="profile-links"></span>
             </td>
           </tr>
@@ -201,15 +208,18 @@ class="crm-hover-button crm-button-add-profile"><span
             <td scope="row" class="label"
                 width="20%">{$form.additional_custom_post_id_multiple.$profilePostNumA.label}</td>
             <td>{$form.additional_custom_post_id_multiple.$profilePostNumA.html}
-              &nbsp;<span class='profile_bottom_add_link_remove'><a href="#"
-                                                                    class="crm-hover-button crm-button-rem-profile"><span
-                    class="icon ui-icon-trash"></span>{ts}remove profile{/ts}</a></span>
-              {if $smarty.foreach.profilePostIdAName.last}
-                &nbsp;&nbsp;
-                <span class='profile_bottom_add_link'><a href="#"
-                                                         class="crm-hover-button crm-button-add-profile"><span
-                      class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
-              {/if}
+              &nbsp;
+              <span class='profile_bottom_add_link_remove'>
+                <a href="#" class="crm-hover-button crm-button-rem-profile">
+                  <span class="icon ui-icon-trash"></span>{ts}remove profile{/ts}
+                </a>
+              </span>
+              <span class='profile_bottom_add_link' {if !$smarty.foreach.profilePostIdAName.last} style="display: none"{/if}>
+                <a href="#" class="crm-hover-button crm-button-add-profile">
+                  <span class="icon ui-icon-plus"></span>
+                  {ts}add another profile (bottom of page){/ts}
+                </a>
+              </span>
               <br/><span class="profile-links"></span>
             </td>
           </tr>
@@ -437,7 +447,7 @@ invert              = 0
         e.preventDefault();
 
         $(e.target).closest('tr').hide().find('.crm-profile-selector').val('');
-        $(e.target).closest('tbody').find('tr:visible:last .profile_bottom_link_main, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
+        $(e.target).closest('tbody').find('tr:visible:last .profile_bottom_link_main,tr:visible:last .profile_bottom_add_link, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
     }
 
     var strSameAs = ' - '+ts('same as for main contact')+' - ';
