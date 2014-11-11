@@ -57,12 +57,12 @@ class CiviCRM_For_WordPress_Basepage {
    * @return object $this The object instance
    */
   function __construct() {
-    
+
     // store reference to Civi object
     $this->civi = civi_wp();
-    
+
     return $this;
-    
+
   }
 
 
@@ -72,15 +72,15 @@ class CiviCRM_For_WordPress_Basepage {
    * @return void
    */
   public function register_hooks() {
-    
+
     // kick out if not CiviCRM
     if (!$this->civi->initialize()) {
       return;
     }
-    
+
     // regardless of URL, load page template
     add_filter( 'template_include', array( $this, 'basepage_template' ), 999 );
-        
+
     // check permission
     $argdata = $this->civi->get_request_args();
     if ( ! $this->civi->users->check_permission( $argdata['args'] ) ) {
@@ -90,7 +90,7 @@ class CiviCRM_For_WordPress_Basepage {
 
     // cache CiviCRM base page markup
     add_action( 'wp', array( $this, 'basepage_handler' ), 10, 1 );
-    
+
   }
 
 
@@ -107,18 +107,18 @@ class CiviCRM_For_WordPress_Basepage {
      * At this point, all conditional tags are available
      * @see http://codex.wordpress.org/Conditional_Tags
      */
-    
+
     // bail if this is a 404
     if ( is_404() ) return;
-    
+
     // kick out if not CiviCRM
     if (!$this->civi->initialize()) {
       return '';
     }
-    
+
     // add core resources for front end
     add_action( 'wp', array( $this->civi, 'front_end_page_load' ), 100 );
-    
+
     // CMW: why do we need this? Nothing that follows uses it...
     require_once ABSPATH . WPINC . '/pluggable.php';
 
@@ -127,50 +127,50 @@ class CiviCRM_For_WordPress_Basepage {
     // https://github.com/civicrm/civicrm-wordpress/pull/36
     if ( have_posts() ) {
       while ( have_posts() ) : the_post();
-        
+
         global $post;
-        
+
         ob_start(); // start buffering
         $this->civi->invoke(); // now, instead of echoing, base page output ends up in buffer
         $this->basepage_markup = ob_get_clean(); // save the output and flush the buffer
-        
+
         /**
          * CMW: the following only works if the loop is not run again before the
          * page is rendered. It is probably better to store the title and use a
          * filter when the page is rendered.
          */
-         
+
         // override post title
         global $civicrm_wp_title;
         $post->post_title = $civicrm_wp_title;
-        
+
         // disallow commenting
         $post->comment_status = 'closed';
-        
+
       endwhile;
     }
-    
+
     // reset loop
     rewind_posts();
-    
+
     // override page title
     add_filter( 'single_post_title', array( $this->civi, 'single_page_title' ), 50, 2 );
-    
+
     // include this content when base page is rendered
     add_filter( 'the_content', array( $this, 'basepage_render' ) );
 
     // hide the edit link
     add_action( 'edit_post_link', array( $this->civi, 'clear_edit_post_link' ) );
-    
+
     // tweak admin bar
     add_action( 'wp_before_admin_bar_render', array( $this->civi, 'clear_edit_post_menu_item' ) );
-    
+
     // flag that we have parsed the base page
     $this->basepage_parsed = TRUE;
-    
+
     // broadcast this as well
     do_action( 'civicrm_basepage_parsed' );
-    
+
   }
 
 
@@ -182,10 +182,10 @@ class CiviCRM_For_WordPress_Basepage {
    * @return void
    */
   public function basepage_render() {
-    
+
     // hand back our base page markup
     return $this->basepage_markup;
-  
+
   }
 
 
@@ -197,19 +197,19 @@ class CiviCRM_For_WordPress_Basepage {
    * @return string $template The modified path to the desired template
    */
   public function basepage_template( $template ) {
-    
+
     // use the basic page template, but allow overrides
     $page_template = locate_template( array(
       apply_filters( 'civicrm_basepage_template', 'page.php' )
     ) );
-    
+
     if ( '' != $page_template ) {
       return $page_template;
     }
-    
+
     // fallback
     return $template;
-  
+
   }
 
 

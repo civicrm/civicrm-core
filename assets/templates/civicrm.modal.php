@@ -38,17 +38,17 @@
 <div id="civicrm_frontend_pages" style="display: none;">
   <div class="wrap">
     <div>
-    
+
       <div class="civicrm-modal-header">
         <h3><?php echo $title; ?></h3>
       </div><!-- /.civicrm-modal-header -->
-      
+
       <div class="civicrm-modal-content">
-      
+
         <div class="civicrm-modal-hint">
         	<span><?php _e( "Can't find your form? Make sure it is active.", 'civicrm' ); ?></span>
         </div>
-        
+
         <span class="civicrm-modal-selector">
           <select id="add_civicomponent_id">
             <option value="">&mdash; <?php _e( 'Select Page Type', 'civicrm' ); ?> &mdash;</option>
@@ -67,7 +67,7 @@
             <?php } ?>
           </select>
         </span>
-        
+
         <span id="contribution-section" style="display: none;">
           <?php if ( !empty( $contribution_pages ) ) { ?>
           <select id="add_contributepage_id">
@@ -77,7 +77,7 @@
           </select>
           <?php } ?>
         </span>
-        
+
         <span id="event-section" style="display: none;">
           <?php if ( !empty( $event_pages ) ) { ?>
           <select id="add_eventpage_id">
@@ -88,7 +88,7 @@
           <?php } ?>
           </select>
         </span>
-        
+
         <span id="profile-section" style="display: none;">
           <?php if ( !empty( $profile_pages ) ) { ?>
           <select id="add_profilepage_id">
@@ -99,7 +99,7 @@
           <?php } ?>
           </select>
         </span>
-        
+
         <span id="petition-section" style="display: none;">
           <?php if ( !empty( $petition_pages ) ) { ?>
           <select id="add_petition_id">
@@ -118,7 +118,7 @@
             <label for="civicrm-modal-event-register"><?php _e( 'Event Registration Page', 'civicrm' ); ?></label>
           </div>
         </div>
-        
+
         <div id="component-section" style="display: none;">
           <div class="civicrm-modal-component-section">
             <input type="radio" name="component_mode" value="live" checked="checked" id="civicrm-modal-live" />
@@ -127,7 +127,7 @@
             <label for="civicrm-modal-test"><?php _e( 'Test Drive', 'civicrm' ); ?></label>
           </div>
         </div>
-        
+
         <div id="profile-mode-section" style="display: none;">
           <div class="civicrm-modal-profile-mode-section">
             <input type="radio" name="profile_mode" value="create" checked="checked" id="civicrm-modal-create" />
@@ -140,7 +140,7 @@
             <label for="civicrm-modal-search"><?php _e( 'Search/Public Directory', 'civicrm' ); ?></label>
           </div>
         </div>
-        
+
         <div class="hijack" style="display: none;">
           <p><?php _e( 'If you only insert one shortcode, you can choose to override all page content with the content of the shortcode.', 'civicrm' ); ?></p>
           <input type="radio" name="hijack-page" value="1" id="civicrm-modal-override" />
@@ -148,14 +148,14 @@
           <input type="radio" name="hijack-page" value="0" checked="checked" id="civicrm-modal-leave" />
           <label for="civicrm-modal-leave"><?php _e( "Don't override", 'civicrm' ); ?></label>
         </div>
-      
+
       </div><!-- /.civicrm-modal-content -->
-    
+
       <div class="civicrm-modal-footer">
         <input type="button" class="button-primary" value="Insert Form" id="crm-wp-insert-shortcode"/>&nbsp;&nbsp;&nbsp;
         <a class="button" style="color:#bbb;" href="#" onclick="tb_remove(); return false;"><?php _e( 'Cancel', 'civicrm' ); ?></a>
       </div><!-- /.civicrm-modal-footer -->
-    
+
     </div>
   </div><!-- /.wrap -->
 </div>

@@ -49,7 +49,7 @@ class CiviCRM_For_WordPress_Users {
 
   // init property to store reference to Civi
   public $civi;
-    
+
 
   /**
    * Instance constructor
@@ -57,12 +57,12 @@ class CiviCRM_For_WordPress_Users {
    * @return object $this The object instance
    */
   function __construct() {
-    
+
     // store reference to Civi object
     $this->civi = civi_wp();
-    
+
     return $this;
-    
+
   }
 
 
@@ -72,7 +72,7 @@ class CiviCRM_For_WordPress_Users {
    * @return void
    */
   public function register_hooks() {
-    
+
     // add CiviCRM access capabilities to WordPress roles
     add_action( 'init', array( $this, 'set_access_capabilities' ) );
 
@@ -82,7 +82,7 @@ class CiviCRM_For_WordPress_Users {
 
     // delete ufMatch record when a WordPress user is deleted
     add_action( 'deleted_user', array( $this, 'delete_user_ufmatch' ), 10, 1 );
-    
+
   }
 
 
@@ -92,7 +92,7 @@ class CiviCRM_For_WordPress_Users {
    * @return bool True if authenticated, false otherwise
    */
   public function check_permission( $args ) {
-  
+
     if ( $args[0] != 'civicrm' ) {
       return FALSE;
     }
@@ -103,7 +103,7 @@ class CiviCRM_For_WordPress_Users {
     $config->userFrameworkFrontend = TRUE;
 
     require_once 'CRM/Utils/Array.php';
-    
+
     // all profile and file urls, as well as user dashboard and tell-a-friend are valid
     $arg1 = CRM_Utils_Array::value(1, $args);
     $invalidPaths = array('admin');
@@ -112,7 +112,7 @@ class CiviCRM_For_WordPress_Users {
     }
 
     return TRUE;
-    
+
   }
 
 
@@ -154,18 +154,18 @@ class CiviCRM_For_WordPress_Users {
    * @return void
    */
   public function sync_user( $user = FALSE ) {
-    
+
     // sanity check
     if ( $user === FALSE OR !is_a($user, 'WP_User') ) {
       return;
     }
-    
+
     if (!$this->civi->initialize()) {
       return;
     }
-    
+
     require_once 'CRM/Core/BAO/UFMatch.php';
-    
+
     // this does not return anything, so if we want to do anything further
     // to the CiviCRM Contact, we have to search for it all over again...
     CRM_Core_BAO_UFMatch::synchronize(
@@ -174,7 +174,7 @@ class CiviCRM_For_WordPress_Users {
       'WordPress', // CMS
       'Individual' // contact type
     );
-    
+
     /*
     // IN progress: synchronizeUFMatch does return the contact object, however
     $civi_contact = CRM_Core_BAO_UFMatch::synchronizeUFMatch(
@@ -185,7 +185,7 @@ class CiviCRM_For_WordPress_Users {
       'WordPress' // CMS
       'Individual' // contact type
     );
-    
+
     // now we can allow other plugins to do their thing
     do_action( 'civicrm_contact_synced', $user, $civi_contact );
     */
@@ -214,7 +214,7 @@ class CiviCRM_For_WordPress_Users {
 
 
   /**
-   * Function to create 'anonymous_user' role, if 'anonymous_user' role is not in 
+   * Function to create 'anonymous_user' role, if 'anonymous_user' role is not in
    * the WordPress installation and assign minimum capabilities for all WordPress roles
    *
    * The legacy global scope function civicrm_wp_set_capabilities() is called from
