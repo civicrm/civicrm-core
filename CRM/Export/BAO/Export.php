@@ -896,6 +896,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           }
           elseif (array_key_exists($field, $contactRelationshipTypes)) {
             $relDAO = CRM_Utils_Array::value($iterationDAO->contact_id, $allRelContactArray[$field]);
+            $relationQuery[$field]->convertToPseudoNames($relDAO);
             foreach ($value as $relationField => $relationValue) {
               if (is_object($relDAO) && property_exists($relDAO, $relationField)) {
                 $fieldValue = $relDAO->$relationField;
@@ -924,6 +925,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               }
               $field = $field . '_';
 
+              if (array_key_exists($relationField, $multipleSelectFields)) {
+                $param = array($relationField => $fieldValue);
+                $names = array($relationField => array('newName' => $relationField, 'groupName' => $relationField));
+                CRM_Core_OptionGroup::lookupValues($param, $names, FALSE);
+                $fieldValue = $param[$relationField];
+              }
               if (is_object($relDAO) && $relationField == 'id') {
                 $row[$field . $relationField] = $relDAO->contact_id;
               }
