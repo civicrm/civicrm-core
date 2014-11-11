@@ -1087,14 +1087,14 @@ class CRM_Report_Form extends CRM_Core_Form {
   function buildInstanceAndButtons() {
     CRM_Report_Form_Instance::buildForm($this);
 
-    $label = $this->_id ? ts('Update Report') : ts('Create Report');
+    $label = $this->_id ? ts('Update Existing Report') : ts('Create Report');
 
     $this->addElement('submit', $this->_instanceButtonName, $label);
     $this->addElement('submit', $this->_printButtonName, ts('Print Report'));
     $this->addElement('submit', $this->_pdfButtonName, ts('PDF'));
 
     if ($this->_id) {
-      $this->addElement('submit', $this->_createNewButtonName, ts('Save a Copy') . '...');
+      $this->addElement('submit', $this->_createNewButtonName, ts('Save as New Report') . '...');
     }
     if ($this->_instanceForm) {
       $this->assign('instanceForm', TRUE);

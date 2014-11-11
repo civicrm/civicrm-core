@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+<div id="settings" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
 <h3>{ts}General Settings{/ts}</h3>
 <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-title">
@@ -42,10 +43,11 @@
         <td>{$form.report_footer.html}</td>
     </tr>
 </table>
-<br/>
+</div>
 
-<h3>{ts}Email Delivery Settings{/ts} {help id="id-email_settings" file="CRM/Report/Form/Settings.hlp"}</h3>
-<table class="form-layout">
+<div id="email" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+  <h3 class="email-delivery-settings-title">{ts}Email Delivery Settings{/ts} {help id="id-email_settings" file="CRM/Report/Form/Settings.hlp"}</h3>
+  <table class="form-layout email-delivery-settings-fields">
     <tr class="crm-report-instanceForm-form-block-email_subject">
         <td class="report-label" width="20%">{$form.email_subject.label}</td>
         <td>{$form.email_subject.html|crmAddClass:huge}</td>
@@ -59,8 +61,9 @@
         <td>{$form.email_cc.html|crmAddClass:huge}</td>
     </tr>
 </table>
-<br/>
+</div>
 
+<div id="other" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
 <h3>{ts}Other Settings{/ts}</h3>
 <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-is_navigation">
@@ -104,6 +107,7 @@
       <td>{$form.row_count.html}</td>
     </tr>
 </table>
+</div>
 
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="is_navigation"

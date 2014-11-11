@@ -28,37 +28,45 @@
     {* build the print pdf buttons *}
     {if $rows}
         <div class="crm-tasks">
+
+      {*top buttons*}
+      {assign var=save value="_qf_"|cat:$form.formName|cat:"_submit_save"}
+      {assign var=next value="_qf_"|cat:$form.formName|cat:"_submit_next"}
+      <div class="crm-submit-buttons-top">
+        {$form.buttons.html}&nbsp;&nbsp;&nbsp;&nbsp;
+        {$form.$save.html}
+        {if $mode neq 'template' && $form.$next}
+          {$form.$next.html}
+        {/if}
+      </div>
+
         {assign var=print value="_qf_"|cat:$form.formName|cat:"_submit_print"}
         {assign var=pdf   value="_qf_"|cat:$form.formName|cat:"_submit_pdf"}
         {assign var=csv   value="_qf_"|cat:$form.formName|cat:"_submit_csv"}
         {assign var=group value="_qf_"|cat:$form.formName|cat:"_submit_group"}
         {assign var=chart value="_qf_"|cat:$form.formName|cat:"_submit_chart"}
-        <table style="border:0;">
-            <tr>
-                <td>
-                    <table class="form-layout-compressed">
-                        <tr>
-                            <td>{$form.$print.html}&nbsp;&nbsp;</td>
-                            <td>{$form.$pdf.html}&nbsp;&nbsp;</td>
-                            <td>{$form.$csv.html}&nbsp;&nbsp;</td>
+      <div class="crm-buttons-actions">
+        <div class="left">
+        {$form.$csv.html}
+
                             {if $instanceUrl}
-                                <td>&nbsp;&nbsp;&raquo;&nbsp;<a href="{$instanceUrl}">{ts}Existing report(s) from this template{/ts}</a></td>
+          <a href="{$instanceUrl}">{ts}Existing report(s) from this template{/ts}</a>
                             {/if}
-                        </tr>
-                    </table>
-                </td>
-                <td>
-                    <table class="form-layout-compressed" align="right">
+        </div>
+
+        <div class="right">
                         {if $chartSupported}
-                            <tr>
-                                <td>{$form.charts.html|crmAddClass:big}</td>
-                                <td align="right">{$form.$chart.html}</td>
-                            </tr>
+          {$form.charts.html|crmReplace:class:big}
+          {$form.$chart.html}
                         {/if}
                         {if $form.groups}
-                            <tr>
-                                <td>
-                                  {$form.groups.html}{$form.$group.html}
+          {$form.groups.html|crmReplace:class:big}
+          {$form.$group.html}
+        {/if}
+        </div>
+      </div>
+      <div class="clear"></div>
+    </div>
                                   <script type="text/javascript">
                                     {literal}
                                     (function($) {
@@ -78,13 +86,18 @@
                                     })(CRM.$);
                                     {/literal}
                                   </script>
-                                </td>
-                            </tr>
+  {else}
+    <div class="crm-tasks">
+      {*top buttons*}
+      {assign var=save value="_qf_"|cat:$form.formName|cat:"_submit_save"}
+      {assign var=next value="_qf_"|cat:$form.formName|cat:"_submit_next"}
+      <div class="crm-submit-buttons-top">
+        {$form.buttons.html}&nbsp;&nbsp;&nbsp;&nbsp;
+        {$form.$save.html}
+        {if $mode neq 'template' && $form.$next}
+          {$form.$next.html}
                         {/if}
-                    </table>
-                </td>
-            </tr>
-        </table>
+      </div>
         </div>
     {/if}
 
@@ -93,11 +106,11 @@
     var flashChartType = {/literal}{if $chartType}'{$chartType}'{else}''{/if}{literal};
     function disablePrintPDFButtons( viewtype ) {
       if (viewtype && flashChartType != viewtype) {
-        cj('#_qf_Summary_submit_pdf').prop('disabled', true).addClass('button-disabled');
-  cj('#_qf_Summary_submit_print').prop('disabled', true).addClass('button-disabled');
+        cj('#_qf_Summary_submit_pdf').attr('disabled', true).addClass('button-disabled');
+	cj('#_qf_Summary_submit_print').attr('disabled', true).addClass('button-disabled');
       } else {
-        cj('#_qf_Summary_submit_pdf').prop('disabled', false).removeClass('button-disabled');
-  cj('#_qf_Summary_submit_print').prop('disabled', false).removeClass('button-disabled');
+        cj('#_qf_Summary_submit_pdf').removeAttr('disabled').removeClass('button-disabled');
+	cj('#_qf_Summary_submit_print').removeAttr('disabled').removeClass('button-disabled');
       }
     }
     </script>
