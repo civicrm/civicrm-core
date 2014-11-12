@@ -92,7 +92,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
           $priceFieldOptions = CRM_Price_BAO_PriceFieldValue::getValues($defaults['mem_price_field_id'], $options, 'id', 1);
           foreach ($options as $k => $v) {
             $newMembershipType[$v['membership_type_id']] = 1;
-            if ( !empty($defaults['auto_renew']) ) {
+            if (!empty($defaults['auto_renew'])) {
               $defaults["auto_renew_".$v['membership_type_id']] = $defaults['auto_renew'][$v['membership_type_id']];
             }
           }
@@ -141,21 +141,33 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         }
       }
 
-      $membership = $membershipDefault = array();
+      $membership = $membershipDefault = $params = array();
       foreach ($membershipTypes as $k => $v) {
         $membership[] = $this->createElement('advcheckbox', $k, NULL, $v);
         $membershipDefault[] = $this->createElement('radio', NULL, NULL, NULL, $k);
+        $membershipRequired[$k] = NULL;
         if ($isRecur) {
           $autoRenew        = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $k, 'auto_renew');
+          $membershipRequired[$k] = $autoRenew;
           $autoRenewOptions = array();
           if ($autoRenew) {
             $autoRenewOptions = array(ts('Not offered'), ts('Give option'), ts('Required'));
             $this->addElement('select', "auto_renew_$k", ts('Auto-renew'), $autoRenewOptions);
+            //CRM-15573
+            if($autoRenew == 2) {
+              $this->freeze("auto_renew_$k");
+              $params['id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipBlock', $this->_id , 'id', 'entity_id');
+            }
             $this->_renewOption[$k] = $autoRenew;
           }
         }
       }
 
+      //CRM-15573
+      if (!empty($params['id'])) {
+        $params['membership_types'] = serialize($membershipRequired);
+        CRM_Member_BAO_MembershipBlock::create($params);
+      }
       $this->add('hidden', "mem_price_field_id", '', array('id' => "mem_price_field_id"));
       $this->assign('is_recur', $isRecur);
       if (isset($this->_renewOption)) {
