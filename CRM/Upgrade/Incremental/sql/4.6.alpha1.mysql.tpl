@@ -74,3 +74,7 @@ UPDATE `civicrm_state_province` SET `name` = (N'Jūrmala') where `id` = 3552;
 UPDATE `civicrm_state_province` SET `name` = (N'Liepāja') WHERE `id` = 3553;
 UPDATE `civicrm_state_province` SET `name` = (N'Rēzekne') WHERE `id` = 3554;
 UPDATE `civicrm_state_province` SET `name` = (N'Rīga') WHERE `id` = 3555;
+
+--CRM-15361: Allow selection of location type when sending bulk email
+ALTER TABLE civicrm_mailing ADD COLUMN location_type_id INT(10) unsigned DEFAULT 0 COMMENT 'With email_selection_method, determines which email address to use';
+ALTER TABLE civicrm_mailing ADD COLUMN email_selection_method varchar(20) DEFAULT 'automatic' COMMENT 'With location_type_id, determine how to choose the email address to use.';
