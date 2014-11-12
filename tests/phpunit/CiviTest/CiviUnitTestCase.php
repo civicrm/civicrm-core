@@ -446,6 +446,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->quickCleanup($tablesToTruncate);
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
+    CRM_Core_Transaction::forceRollbackIfEnabled();
+    \Civi\Core\Transaction\Manager::singleton(TRUE);
   }
 
   /**
@@ -623,11 +625,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Example: $this->assertSql(2, 'select count(*) from foo where foo.bar like "%1"',
    * array(1 => array("Whiz", "String")));
    */
-  function assertDBQuery($expected, $query, $params = array()) {
+  function assertDBQuery($expected, $query, $params = array(), $message = '') {
+    if ($message) $message .= ': ';
     $actual = CRM_Core_DAO::singleValueQuery($query, $params);
     $this->assertEquals($expected, $actual,
-      sprintf('expected=[%s] actual=[%s] query=[%s]',
-        $expected, $actual, CRM_Core_DAO::composeQuery($query, $params, FALSE)
+      sprintf('%sexpected=[%s] actual=[%s] query=[%s]',
+        $message, $expected, $actual, CRM_Core_DAO::composeQuery($query, $params, FALSE)
       )
     );
   }
