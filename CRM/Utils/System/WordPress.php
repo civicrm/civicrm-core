@@ -64,16 +64,16 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (!$pageTitle) {
       $pageTitle = $title;
     }
-    
+
     // get civi-wordpress instance
     $civi = civi_wp();
-    
+
     // do we have functionality provided by plugin version 4.6+ present?
     if (method_exists($civi, 'civicrm_context_get')) {
-      
+
       global $civicrm_wp_title;
       $civicrm_wp_title = $pageTitle;
-      
+
       // yes, set page title, depending on context
       $context = civi_wp()->civicrm_context_get();
       switch ( $context ) {
@@ -82,15 +82,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
           $template = CRM_Core_Smarty::singleton();
           $template->assign('pageTitle', $pageTitle);
       }
-      
+
     } elseif (civicrm_wp_in_civicrm()) {
-      
+
       // legacy pre-4.6 behaviour
       global $civicrm_wp_title;
       $civicrm_wp_title = $pageTitle;
       $template = CRM_Core_Smarty::singleton();
       $template->assign('pageTitle', $pageTitle);
-      
+
     }
   }
 
