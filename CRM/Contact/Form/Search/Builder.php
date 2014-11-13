@@ -443,7 +443,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       'member_is_pay_later' => 'yesno',
       'is_override' => 'yesno',
     );
-    $entities = array('contact', 'address', 'activity', 'participant', 'pledge', 'member', 'contribution');
+    $entities = array('contact', 'address', 'activity', 'participant', 'pledge', 'member', 'contribution', 'case', 'grant');
     CRM_Contact_BAO_Query_Hook::singleton()->alterSearchBuilderOptions($entities, $options);
     foreach ($entities as $entity) {
       $fields = civicrm_api3($entity, 'getfields');
