@@ -62,19 +62,25 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_quickConfig = NULL;
 
   /**
-   * Allow deveopera to use hook_civicrm_buildForm()
+   * Allow developer to use hook_civicrm_buildForm()
    * to override the registration dupe check
    * CRM-7604
    */
   public $_skipDupeRegistrationCheck = FALSE;
 
-  public $_ppType;
+  public $_paymentProcessorID;
   public $_snippet;
 
   /**
    * @var boolean determines if fee block should be shown or hidden
    */
   public $_noFees;
+
+  /**
+   * array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
+   * @var array
+   */
+  public $_paymentFields = array();
 
   /**
    * Function to set variables up before form is built
@@ -87,7 +93,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     //CRM-4320.
     //here we can't use parent $this->_allowWaitlist as user might
-    //walk back and we maight set this value in this postProcess.
+    //walk back and we might set this value in this postProcess.
     //(we set when spaces < group count and want to allow become part of waiting )
     $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE, CRM_Utils_Array::value('has_waitlist', $this->_values['event']));
 
@@ -139,8 +145,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    */
   function setDefaultValues() {
-    if ($this->_ppType && $this->_snippet && !($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)) {
-      // see function comment block for explanation of this
+    if ($this->_paymentProcessorID && $this->_snippet && !($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)) {
+      // see function comment block for explanation of this. Note that CRM-15555 will require this to look at the billing form fields not the
+      // billing_mode which
       return;
     }
     $this->_defaults = array();
@@ -168,7 +175,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     if ($contactID) {
-      $options = array();
       $fields = array();
 
       if (!empty($this->_fields)) {
@@ -327,13 +333,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->set('profileAddressFields', $profileAddressFields);
     }
 
-    // Build payment processor form
-    if ($this->_ppType || $this->_isBillingAddressRequiredForPayLater) {
-      CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-      // Return if we are in an ajax callback
-      if ($this->_snippet) {
-        return;
-      }
+    CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+    // Return if we are in an ajax callback
+    if ($this->_snippet) {
+      return;
     }
 
     $contactID = $this->getContactID();

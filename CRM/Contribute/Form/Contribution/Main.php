@@ -57,7 +57,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public $_useForMember;
 
   /**
-   * array of payment related fields to potentially display on this form (generally credit card or debit card fields). Th
+   * array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
    * @var array
    */
   public $_paymentFields = array();
@@ -1390,7 +1390,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Handle Payment Processor switching
    * For contribution and event registration forms
-   * @param CRM_Contribute_Form_Contribution_Main $form
+   * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register $form
    * @param bool $noFees
    */
   static function preProcessPaymentOptions(&$form, $noFees = FALSE) {

@@ -1271,10 +1271,19 @@ AND civicrm_membership.is_test = %2";
    */
   public static function postProcessMembership($membershipParams, $contactID, &$form, $premiumParams,
     $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
-    $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems) {
+    $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems, $isPayLater) {
     $result      = $membershipContribution = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = array();
+
+    //@todo move this into the calling function & pass in the correct financialTypeID
+    if (isset($paymentParams['financial_type'])) {
+      $financialTypeID = $paymentParams['financial_type'];
+    }
+    else {
+      $financialTypeID = $defaultContributionTypeID;
+    }
+
 
     if (CRM_Utils_Array::value('membership_source', $form->_params)) {
       $membershipParams['contribution_source'] = $form->_params['membership_source'];
@@ -1283,8 +1292,11 @@ AND civicrm_membership.is_test = %2";
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $premiumParams, $contactID,
-        $defaultContributionTypeID,
-        'membership'
+        $financialTypeID,
+        'membership',
+        array(),
+        $isTest,
+        $isPayLater
       );
       if (is_a($result[1], 'CRM_Core_Error')) {
         $errors[1] = CRM_Core_Error::getMessages($result[1]);
