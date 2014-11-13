@@ -207,7 +207,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       FALSE, array('onchange' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
 
-    if (!empty($_POST['is_recipient_listing'])) {
+    if (!empty($this->_submitValues['recipient_listing'])) {
       $recipientListingOptions = CRM_Core_BAO_ActionSchedule::getRecipientListing($_POST['entity'][0], $_POST['recipient']);
     }
     elseif (!empty($this->_values['recipient_listing'])) {
@@ -215,7 +215,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
     $this->add('select', 'recipient_listing', ts('Recipient Roles'), $recipientListingOptions, FALSE,
       array('multiple' => TRUE, 'class' => 'crm-select2 huge', 'placeholder' => TRUE));
-    $this->add('hidden', 'is_recipient_listing', (int) !empty($recipientListingOptions));
 
     $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), array('multiple' => TRUE, 'create' => TRUE));
 
@@ -287,8 +286,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         'target_id' => 'recipient_manual_id'
       )
     );
-    if (!empty($fields['limit_to']) && array_key_exists($fields['recipient'], $recipientKind)) {
-      $errors[$recipientKind[$fields['recipient']]['target_id']] = ts('If "Also include" or "Limit to" are selected, you must specify atleast one %1', array(1 => $recipientKind[$fields['recipient']]['name']));
+    if (!empty($fields['limit_to']) && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
+      $errors[$recipientKind[$fields['recipient']]['target_id']] = ts('If "Also include" or "Limit to" are selected, you must specify at least one %1', array(1 => $recipientKind[$fields['recipient']]['name']));
     }
 
     if (!empty($errors)) {
