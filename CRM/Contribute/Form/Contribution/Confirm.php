@@ -1940,6 +1940,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $form->_contributeMode = 'notify';
       }
     }
+    else {
+      $form->_params['payment_processor'] = 0;
+    }
     $priceFields = $priceFields[$priceSetID]['fields'];
     CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
     $form->_lineItem = array($priceSetID => $lineItems);
