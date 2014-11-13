@@ -112,6 +112,19 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * various pre defined email selection methods
+   * @static
+   */
+  static function emailSelectMethods() {
+    return array(
+      'automatic' => ts("Automatic"),
+      'location-only' => ts("Only send to email addresses assigned to the specified location"),
+      'location-prefer' => ts("Prefer email addresses assigned to the specified location"),
+      'location-exclude' => ts("Exclude email addresses assigned to the specified location")
+    );
+  }
+
+  /**
    * various pre defined member visibility options
    * @static
    */
@@ -900,4 +913,3 @@ class CRM_Core_SelectValues {
     return $scheduleReminderFrequencyUnits;
   }
 }
-
