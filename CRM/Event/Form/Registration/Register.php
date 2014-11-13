@@ -886,13 +886,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if (empty($self->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 && !isset($fields['payment_processor'])) {
         $errors['payment_processor'] = ts('Please select a Payment Method');
       }
-      if (is_array($self->_paymentProcessor)) {
-        $payment = CRM_Core_Payment::singleton($self->_mode, $self->_paymentProcessor);
-        $error = $payment->checkConfig($self->_mode);
-        if ($error) {
-          $errors['_qf_default'] = $error;
-        }
-      }
       // return if this is express mode
       if ($self->_paymentProcessor &&
         $self->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON
