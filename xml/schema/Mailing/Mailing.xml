@@ -401,7 +401,7 @@
     <type>int unsigned</type>
     <default>0</default>
     <comment>With email_selection_method, determines which email address to use</comment>
-    <add>4.5</add>
+    <add>4.6</add>
   </field>
 <field>
     <name>email_selection_method</name>
@@ -409,6 +409,6 @@
     <length>20</length>
     <default>'automatic'</default>
     <comment>With location_type_id, determine how to choose the email address to use.</comment>
-    <add>4.4</add>
+    <add>4.6</add>
   </field>
 </table>
