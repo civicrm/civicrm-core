@@ -461,6 +461,9 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       if (CRM_Core_Permission::access('CiviGrant')) {
         $fields['Grant'] = CRM_Grant_BAO_Grant::exportableFields();
         unset($fields['Grant']['grant_contact_id']);
+        if ($mappingType == 'Search Builder') {
+          unset($fields['Grant']['grant_type_id']);
+        }
         $compArray['Grant'] = ts('Grant');
       }
     }
