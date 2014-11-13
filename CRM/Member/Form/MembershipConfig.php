@@ -37,7 +37,7 @@
  * Base class for offline membership / membership type / membership renewal and membership status forms
  *
  */
-class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
+class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
 
   /**
    * The id of the object being edited / created
@@ -46,8 +46,16 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   public $_id;
 
-  function preProcess() {
+  /**
+   * The name of the BAO object for this form
+   *
+   * @var string
+   */
+  protected $_BAOName;
 
+  function preProcess() {
+    $this->_id = $this->get('id');
+    $this->_BAOName = $this->get('BAOName');
   }
 
   /**
@@ -60,6 +68,12 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   function setDefaultValues() {
     $defaults = array();
+
+    if (isset($this->_id)) {
+      $params = array('id' => $this->_id);
+      $baoName = $this->_BAOName;
+      $baoName::retrieve($params, $defaults);
+    }
 
     if (isset($defaults['minimum_fee'])) {
       $defaults['minimum_fee'] = CRM_Utils_Money::format($defaults['minimum_fee'], NULL, '%a');
@@ -136,48 +150,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
           )
         )
       );
-    }
-  }
-
-  /**
-   * Function to extract values from the contact create boxes on the form and assign appropriately  to
-   *
-   *  - $this->_contributorEmail,
-   *  - $this->_memberEmail &
-   *  - $this->_contributionName
-   *  - $this->_memberName
-   *  - $this->_contactID (effectively memberContactId but changing might have spin-off effects)
-   *  - $this->_contributorContactId - id of the contributor
-   *  - $this->_receiptContactId
-   *
-   * If the member & contributor are the same then the values will be the same. But if different people paid
-   * then they weill differ
-   *
-   * @param $formValues array values from form. The important values we are looking for are
-   *  - contact_id
-   *  - soft_credit_contact_id
-   */
-  function storeContactFields($formValues){
-    // in a 'standalone form' (contact id not in the url) the contact will be in the form values
-    if (!empty($formValues['contact_id'])) {
-      $this->_contactID = $formValues['contact_id'];
-    }
-
-    list($this->_memberDisplayName,
-         $this->_memberEmail
-    ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-
-    //CRM-10375 Where the payer differs to the member the payer should get the email.
-    // here we store details in order to do that
-    if (!empty($formValues['soft_credit_contact_id'])) {
-      $this->_receiptContactId = $this->_contributorContactID = $formValues['soft_credit_contact_id'];
-       list( $this->_contributorDisplayName,
-         $this->_contributorEmail ) = CRM_Contact_BAO_Contact_Location::getEmailDetails( $this->_contributorContactID );
-    }
-    else {
-      $this->_receiptContactId = $this->_contributorContactID = $this->_contactID;
-      $this->_contributorDisplayName = $this->_memberDisplayName;
-      $this->_contributorEmail = $this->_memberEmail;
     }
   }
 }
