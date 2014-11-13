@@ -67,7 +67,7 @@ class CRM_Core_Payment_Form {
     // @todo - replace this section with one similar to above per discussion - probably use a manual processor shell class to stand in for that capability
     //return without adding billing fields if billing_mode = 4 (@todo - more the ability to set that to the payment processor)
     // or payment processor is NULL (pay later)
-    if (($processor == NULL && !$forceBillingFieldsForPayLater) ||  $processor['billing_mode'] == 4) {
+    if (($processor == NULL && !$forceBillingFieldsForPayLater) ||  CRM_Utils_Array::value('billing_mode', $processor) == 4) {
       return;
     }
     //@todo setPaymentFields defines the billing fields - this should be moved to the processor class & renamed getBillingFields
@@ -415,8 +415,7 @@ class CRM_Core_Payment_Form {
    */
   protected static function addPaypalExpressCode(&$form) {
     if (empty($form->isBackOffice)) {
-      if ($form->_paymentProcessor['billing_mode'] &
-        CRM_Core_Payment::BILLING_MODE_BUTTON
+      if (CRM_Utils_Array::value('billing_mode', $form->_paymentProcessor) ==4
       ) {
         $form->_expressButtonName = $form->getButtonName('upload', 'express');
         $form->assign('expressButtonName', $form->_expressButtonName);
