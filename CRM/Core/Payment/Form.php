@@ -177,65 +177,6 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * create all fields needed for a credit card transaction
-   * @deprecated  - use the setPaymentFieldsByProcessor which leverages the processor to determine the fields
-   * @param CRM_Core_Form $form
-   *
-   * @return void
-   * @access public
-   */
-  static function setCreditCardFields(&$form) {
-    CRM_Core_Payment_Form::setBillingDetailsFields($form);
-
-    $form->_paymentFields['credit_card_number'] = array(
-      'htmlType' => 'text',
-      'name' => 'credit_card_number',
-      'title' => ts('Card Number'),
-      'cc_field' => TRUE,
-      'attributes' => array('size' => 20, 'maxlength' => 20, 'autocomplete' => 'off'),
-      'is_required' => TRUE,
-    );
-
-    $form->_paymentFields['cvv2'] = array(
-      'htmlType' => 'text',
-      'name' => 'cvv2',
-      'title' => ts('Security Code'),
-      'cc_field' => TRUE,
-      'attributes' => array('size' => 5, 'maxlength' => 10, 'autocomplete' => 'off'),
-      'is_required' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-        'cvv_backoffice_required',
-        NULL
-        ,1
-      ),
-    );
-
-    $form->_paymentFields['credit_card_exp_date'] = array(
-      'htmlType' => 'date',
-      'name' => 'credit_card_exp_date',
-      'title' => ts('Expiration Date'),
-      'cc_field' => TRUE,
-      'attributes' => CRM_Core_SelectValues::date('creditCard'),
-      'is_required' => TRUE,
-    );
-
-    $creditCardType = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::creditCard();
-    $form->_paymentFields['credit_card_type'] = array(
-      'htmlType' => 'select',
-      'name' => 'credit_card_type',
-      'title' => ts('Card Type'),
-      'cc_field' => TRUE,
-      'attributes' => $creditCardType,
-      'is_required' => FALSE,
-    );
-    //CRM-15509 this is probably a temporary resting place for these form assignments but we are working towards putting this
-    // in an option group & having php / payment processors define the billing form rather than the tpl
-    $smarty = CRM_Core_Smarty::singleton();
-    $smarty->assign('paymentTypeName', 'credit_card');
-    $smarty->assign('paymentTypeLabel', ts('Credit Card Information'));
-    $smarty->assign('paymentFields', self::getPaymentFields($form->_paymentProcessor));
-  }
-
-  /**
    * @param CRM_Core_Form $form
    * @param bool $useRequired
    * @param array $paymentFields
@@ -256,63 +197,6 @@ class CRM_Core_Payment_Form {
         }
       }
     }
-  }
-
-  /**
-   * create all fields needed for direct debit transaction
-   * @deprecated  - use the setPaymentFieldsByProcessor which leverages the processor to determine the fields
-   * @param $form
-   *
-   * @return void
-   * @access public
-   */
-  static function setDirectDebitFields(&$form) {
-    CRM_Core_Payment_Form::setBillingDetailsFields($form);
-
-    $form->_paymentFields['account_holder'] = array(
-      'htmlType' => 'text',
-      'name' => 'account_holder',
-      'title' => ts('Account Holder'),
-      'cc_field' => TRUE,
-      'attributes' => array('size' => 20, 'maxlength' => 34, 'autocomplete' => 'on'),
-      'is_required' => TRUE,
-    );
-
-    //e.g. IBAN can have maxlength of 34 digits
-    $form->_paymentFields['bank_account_number'] = array(
-      'htmlType' => 'text',
-      'name' => 'bank_account_number',
-      'title' => ts('Bank Account Number'),
-      'cc_field' => TRUE,
-      'attributes' => array('size' => 20, 'maxlength' => 34, 'autocomplete' => 'off'),
-      'is_required' => TRUE,
-    );
-
-    //e.g. SWIFT-BIC can have maxlength of 11 digits
-    $form->_paymentFields['bank_identification_number'] = array(
-      'htmlType' => 'text',
-      'name' => 'bank_identification_number',
-      'title' => ts('Bank Identification Number'),
-      'cc_field' => TRUE,
-      'attributes' => array('size' => 20, 'maxlength' => 11, 'autocomplete' => 'off'),
-      'is_required' => TRUE,
-    );
-
-    $form->_paymentFields['bank_name'] = array(
-      'htmlType' => 'text',
-      'name' => 'bank_name',
-      'title' => ts('Bank Name'),
-      'cc_field' => TRUE,
-      'attributes' => array('size' => 20, 'maxlength' => 64, 'autocomplete' => 'off'),
-      'is_required' => TRUE,
-    );
-    //CRM-15509 this is probably a temporary resting place for these form assignments but we are working towards putting this
-    // in an option group & having php / payment processors define the billing form rather than the tpl
-    $smarty = CRM_Core_Smarty::singleton();
-    // replace these payment type names with an option group - moving name & label assumptions out of the tpl is a step towards that
-    $smarty->assign('paymentTypeName', 'direct_debit');
-    $smarty->assign('paymentTypeLabel', ts('Direct Debit Information'));
-    $smarty->assign('paymentFields', self::getPaymentFields($form->_paymentProcessor));
   }
 
   /**
@@ -358,7 +242,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * @param CRM_Contribute_Form_AbstractEditPayment|CRM_Contribute_Form_Contribution_Main|CRM_Core_Payment_ProcessorForm $form
+   * @param CRM_Contribute_Form_AbstractEditPayment|CRM_Contribute_Form_Contribution_Main|CRM_Core_Payment_ProcessorForm|CRM_Contribute_Form_UpdateBilling $form
    * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
    * @param bool $isBillingDataOptional This manifests for 'NULL' (pay later) payment processor as the addition of billing fields to the form and
    *   for payment processors that gather payment data on site as rendering the fields as not being required. (not entirely sure why but this
@@ -427,43 +311,6 @@ class CRM_Core_Payment_Form {
       }
     }
   }
-  /**
-   * Function to add all the credit card fields
-   * @deprecated Use BuildPaymentForm
-   * @param $form
-   * @param bool $useRequired
-   *
-   * @return void
-   * @access public
-   */
-  static function buildCreditCard(&$form, $useRequired = FALSE) {
-    if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) {
-      self::setCreditCardFields($form);
-      self::addCommonFields($form, $useRequired, $form->_paymentFields);
-
-      $form->addRule('cvv2',
-        ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),
-        'integer'
-      );
-
-      $form->addRule('credit_card_exp_date',
-        ts('Card expiration date cannot be a past date.'),
-        'currentDate', TRUE
-      );
-
-    }
-
-
-    if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
-      $form->_expressButtonName = $form->getButtonName('upload', 'express');
-      $form->assign('expressButtonName', $form->_expressButtonName);
-      $form->add('image',
-        $form->_expressButtonName,
-        $form->_paymentProcessor['url_button'],
-        array('class' => 'crm-form-submit')
-      );
-    }
-  }
 
   /**
    * The credit card pseudo constant results only the CC label, not the key ID
@@ -481,32 +328,6 @@ class CRM_Core_Payment_Form {
       $creditCardTypes[$key] = $name;
     }
     return $creditCardTypes;
-  }
-
-  /**
-   * Function to add all the direct debit fields
-   * @deprecated use buildPaymentForm
-   *
-   * @param $form
-   * @param bool $useRequired
-   * @return void
-   * @access public
-   */
-  static function buildDirectDebit(&$form, $useRequired = FALSE) {
-    if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) {
-      self::setDirectDebitFields($form);
-      self::addCommonFields($form, $useRequired, $form->_paymentFields);
-
-      $form->addRule('bank_identification_number',
-        ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
-        'nopunctuation'
-      );
-
-      $form->addRule('bank_account_number',
-        ts('Please enter a valid Bank Account Number (value must not contain punctuation characters).'),
-        'nopunctuation'
-      );
-    }
   }
 
   /**
