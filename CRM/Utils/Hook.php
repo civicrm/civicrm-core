@@ -303,6 +303,18 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is invoked during the CiviCRM form preProcess phase.
+   *
+   * @param string $formName the name of the form
+   * @param object $form     reference to the form object
+   *
+   * @return null the return value is ignored
+   */
+  static function preProcess($formName, &$form) {
+    return self::singleton()->invoke(2, $formName, $form, $formName, $formName,
+  }
+
+  /**
    * This hook is invoked when building a CiviCRM form. This hook should also
    * be used to set the default values of a form element
    *
