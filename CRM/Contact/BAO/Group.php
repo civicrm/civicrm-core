@@ -974,7 +974,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     // Get group counts
     foreach ($groupsToCount as $table => $groups) {
-      $dao = CRM_Core_DAO::executeQuery("SELECT group_id, COUNT(id) as `count` FROM $table WHERE group_id IN (" . implode(',', $groups) . ") GROUP BY group_id");
+      $where = "group_id IN (" . implode(',', $groups) . ")";
+      if ($table == 'civicrm_group_contact') {
+        $where .= " AND status = 'Added'";
+      }
+      $dao = CRM_Core_DAO::executeQuery("SELECT group_id, COUNT(id) as `count` FROM $table WHERE $where GROUP BY group_id");
       while($dao->fetch()) {
         $values[$dao->group_id]['count'] = $dao->count;
       }
