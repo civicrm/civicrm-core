@@ -45,7 +45,7 @@
 
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>
-        <td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong>{ts}OR{/ts}</strong><br /></td>
+        <td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong id='OR'>OR</strong><br /></td>
     </tr>
 
     <tr id="relativeDate" class="crm-scheduleReminder-form-block-description">
@@ -172,9 +172,9 @@
 
       $('#absolute_date_display', $form).change(function() {
         if($(this).val()) {
-          $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
+          $('#relativeDate, #relativeDateRepeat, #repeatFields, #OR', $form).hide();
         } else {
-          $('#relativeDate, #relativeDateRepeat', $form).show();
+          $('#relativeDate, #relativeDateRepeat, #OR', $form).show();
         }
       });
       if ($('#absolute_date_display', $form).val()) {
@@ -203,7 +203,6 @@
       function buildSelects() {
         var mappingID = $('#entity_0', $form).val();
 
-        $('#is_recipient_listing').val('');
         $.getJSON(CRM.url('civicrm/ajax/mapping'), {mappingID: mappingID},
           function (result) {
             CRM.utils.setOptions($('#start_action_date', $form), result.sel4);
@@ -222,10 +221,8 @@
               CRM.utils.setOptions($('#recipient_listing', $form), result.values);
             });
           $("#recipientList", $form).show();
-          $('#is_recipient_listing', $form).val(1);
         } else {
           $("#recipientList", $form).hide();
-          $('#is_recipient_listing', $form).val('');
           if ($('#entity_0', $form).val() !== '1' && $('#limit_to').val() == '') {
             $('tr.recipient:visible').hide();
           }
@@ -241,6 +238,7 @@
           $("label[for='recipient']").text('{/literal}{$recipientLabels.other}{literal}');
         }
         else {
+          $('#recipient').show();
           $("label[for='recipient']").text('{/literal}{$recipientLabels.activity}{literal}');
         }
       }
