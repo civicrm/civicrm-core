@@ -105,6 +105,7 @@ function _civicrm_api3_address_create_spec(&$params) {
   $params['world_region'] = array(
     'title' => ts('World Region'),
     'name' => 'world_region',
+    'type' => CRM_Utils_Type::T_TEXT,
   );
 }
 /**
@@ -116,6 +117,7 @@ function _civicrm_api3_address_get_spec(&$params) {
   $params['world_region'] = array(
     'title' => ts('World Region'),
     'name' => 'world_region',
+    'type' => CRM_Utils_Type::T_TEXT,
   );
 }
 
