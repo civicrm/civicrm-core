@@ -73,6 +73,9 @@ class CiviCRM_For_WordPress_Shortcodes_Modal {
    */
   public function register_hooks() {
 
+    // bail if Civi not installed yet
+    if ( ! CIVICRM_INSTALLED ) return;
+
     // adds the CiviCRM button to post and page edit screens
     // use priority 100 to position button to the farright
     add_action( 'media_buttons', array( $this, 'add_form_button' ), 100 );

@@ -76,6 +76,9 @@ class CiviCRM_For_WordPress_Users {
     // add CiviCRM access capabilities to WordPress roles
     add_action( 'init', array( $this, 'set_access_capabilities' ) );
 
+    // do not hook into user updates if Civi not installed yet
+    if ( ! CIVICRM_INSTALLED ) return;
+
     // synchronise users on insert and update
     add_action( 'user_register', array( $this, 'update_user' ) );
     add_action( 'profile_update', array( $this, 'update_user' ) );
