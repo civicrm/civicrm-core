@@ -103,7 +103,6 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     $defaults['dedupe_email'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
       'dedupe_email_default', NULL, FALSE
     );
-
     if ($this->_mailingID) {
       // check that the user has permission to access mailing id
       CRM_Mailing_BAO_Mailing::checkPermission($this->_mailingID);
@@ -124,6 +123,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
       $defaults['campaign_id'] = $mailing->campaign_id;
       $defaults['dedupe_email'] = $mailing->dedupe_email;
+      $defaults['location_type_id'] = $mailing->location_type_id;
+      $defaults['email_selection_method'] = $mailing->email_selection_method;
 
       $dao = new CRM_Mailing_DAO_MailingGroup();
 
@@ -212,6 +213,13 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
     //dedupe on email option
     $this->addElement('checkbox', 'dedupe_email', ts('Remove duplicate emails?'));
+
+    // location types
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('id' => 'display_name'));
+    $this->addElement('select', 'location_type_id', ts("Location Type"), array('' => '-select-') + $locationTypes);
+
+    $methods = CRM_Core_SelectValues::emailSelectMethods();
+    $this->addElement('select', 'email_selection_method', ts("Email Selection Method"), $methods);
 
     //get the mailing groups.
     $groups = CRM_Core_PseudoConstant::nestedGroup('Mailing');
@@ -373,7 +381,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     }
 
     foreach (
-      array('name', 'group_id', 'search_id', 'search_args', 'campaign_id', 'dedupe_email') as $n
+      array('name', 'group_id', 'search_id', 'search_args', 'campaign_id', 'dedupe_email', 'location_type_id', 'email_selection_method') as $n
     ) {
       if (!empty($values[$n])) {
         $params[$n] = $values[$n];
@@ -449,7 +457,6 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       $params['created_id'] = $session->get('userID');
       $params['created_date'] = date('YmdHis');
     }
-
     $mailing = CRM_Mailing_BAO_Mailing::create($params, $ids);
     $this->set('mailing_id', $mailing->id);
 
@@ -580,7 +587,15 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       $errors['search_id'] = ts('You must select a search to filter');
     }
 
+    if (!empty($fields['location_type_id'])) {
+      if ($fields['email_selection_method'] == 'automatic') {
+        $errors['location_type_id'] = ts("If 'Email Selection Method' is automatic, you are not allowed to choose any 'Location Type'");
+      }
+    }
+    elseif ($fields['email_selection_method'] != 'automatic') {
+      $errors['email_selection_method'] = ts("If 'Location Type' is not selected, you must set the 'Email Selection Method' to automatic as well.");
+    }
+
     return empty($errors) ? TRUE : $errors;
   }
 }
-
