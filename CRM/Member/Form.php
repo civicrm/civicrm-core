@@ -46,8 +46,38 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   public $_id;
 
-  function preProcess() {
+  /**
+   * Membership Type ID
+   * @var
+   */
+  protected $_memType;
 
+  /**
+   * Array of from email ids
+   * @var array
+   */
+  protected $_fromEmails = array();
+
+  function preProcess() {
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String',$this, FALSE, 'add');
+    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+
+    $this->assign('context', $this->_context);
+    $this->assign('membershipMode', $this->_mode);
+    $this->assign('contactID', $this->_contactID);
+
+    if ($this->_mode) {
+      $this->assignPaymentRelatedVariables();
+    }
+
+    if ($this->_id) {
+      $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
+      $this->_membershipIDs[] = $this->_id;
+    }
+    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
   }
 
   /**
@@ -60,6 +90,10 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   function setDefaultValues() {
     $defaults = array();
+    if (isset($this->_id)) {
+      $params = array('id' => $this->_id);
+      CRM_Member_BAO_Membership::retrieve($params, $defaults);
+    }
 
     if (isset($defaults['minimum_fee'])) {
       $defaults['minimum_fee'] = CRM_Utils_Money::format($defaults['minimum_fee'], NULL, '%a');
@@ -90,6 +124,14 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @access public
    */
   public function buildQuickForm() {
+    if ($this->_mode) {
+      $this->add('select', 'payment_processor_id',
+        ts('Payment Processor'),
+        $this->_processors, TRUE,
+        array('onChange' => "buildAutoRenew( null, this.value );")
+      );
+      CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, TRUE);
+    }
     if ($this->_action & CRM_Core_Action::RENEW) {
       $this->addButtons(array(
           array(

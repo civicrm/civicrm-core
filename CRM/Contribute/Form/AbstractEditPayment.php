@@ -46,6 +46,9 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
 
   public $_fields;
 
+  /**
+   * @var array current payment processor including a copy of the object in 'object' key
+   */
   public $_paymentProcessor;
   public $_recurPaymentProcessors;
 
