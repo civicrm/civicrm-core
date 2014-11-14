@@ -81,3 +81,15 @@ ALTER TABLE civicrm_mailing ADD COLUMN email_selection_method varchar(20) DEFAUL
 
 -- CRM-15500 fix
 ALTER TABLE `civicrm_action_schedule` CHANGE `limit_to` `limit_to` TINYINT( 4 ) NULL DEFAULT NULL;
+
+-- CRM-15453 Recurring Contributions report template AND instance
+SELECT @option_group_id_report := MAX(id) FROM civicrm_option_group WHERE name = 'report_template';
+SELECT @weight := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_report;
+SELECT @contribCompId := MAX(id) FROM civicrm_component where name = 'CiviContribute';
+INSERT INTO civicrm_option_value
+(option_group_id, {localize field='label'}label{/localize}, value, name, weight, {localize field='description'}description{/localize}, is_active, component_id) VALUES
+(@option_group_id_report, {localize}'Recurring Contributions Report'{/localize}, 'contribute/recur', 'CRM_Report_Form_Contribute_Recur', @weight := @weight + 1, {localize}'Shows information about the status of recurring contributions'{/localize}, 1, @contribCompId);
+INSERT INTO `civicrm_report_instance`
+( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
+VALUES
+( {$domainID}, 'Pending Recurring Contributions', 'contribute/recur', 'Shows all pending recurring contributions', 'access CiviContribute', '{literal}a:39:{s:6:"fields";a:7:{s:9:"sort_name";s:1:"1";s:6:"amount";s:1:"1";s:22:"contribution_status_id";s:1:"1";s:18:"frequency_interval";s:1:"1";s:14:"frequency_unit";s:1:"1";s:12:"installments";s:1:"1";s:8:"end_date";s:1:"1";}s:25:"contribution_status_id_op";s:2:"in";s:28:"contribution_status_id_value";a:1:{i:0;s:1:"5";}s:11:"currency_op";s:2:"in";s:14:"currency_value";a:0:{}s:20:"financial_type_id_op";s:2:"in";s:23:"financial_type_id_value";a:0:{}s:17:"frequency_unit_op";s:2:"in";s:20:"frequency_unit_value";a:0:{}s:22:"frequency_interval_min";s:0:"";s:22:"frequency_interval_max";s:0:"";s:21:"frequency_interval_op";s:3:"lte";s:24:"frequency_interval_value";s:0:"";s:16:"installments_min";s:0:"";s:16:"installments_max";s:0:"";s:15:"installments_op";s:3:"lte";s:18:"installments_value";s:0:"";s:19:"start_date_relative";s:0:"";s:15:"start_date_from";s:0:"";s:13:"start_date_to";s:0:"";s:37:"next_sched_contribution_date_relative";s:0:"";s:33:"next_sched_contribution_date_from";s:0:"";s:31:"next_sched_contribution_date_to";s:0:"";s:17:"end_date_relative";s:0:"";s:13:"end_date_from";s:0:"";s:11:"end_date_to";s:0:"";s:28:"calculated_end_date_relative";s:0:"";s:24:"calculated_end_date_from";s:0:"";s:22:"calculated_end_date_to";s:0:"";s:9:"order_bys";a:1:{i:1;a:1:{s:6:"column";s:1:"-";}}s:11:"description";s:41:"Shows all pending recurring contributions";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:9:"row_count";s:0:"";s:14:"addToDashboard";s:1:"1";s:10:"permission";s:21:"access CiviContribute";s:9:"parent_id";s:0:"";s:11:"instance_id";N;}{/literal}');
