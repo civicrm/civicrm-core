@@ -46,6 +46,9 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
 
   public $_fields;
 
+  /**
+   * @var array current payment processor including a copy of the object in 'object' key
+   */
   public $_paymentProcessor;
   public $_recurPaymentProcessors;
 
@@ -142,7 +145,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_honorID = NULL;
 
   /**
-   * Store the contribution Type ID
+   * Store the financial Type ID
    *
    * @var array
    */
@@ -177,7 +180,22 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $isBackOffice = TRUE;
 
   protected $_formType;
+
+  /**
+   * @var mystery variable screaming out for documentation
+   */
   protected $_cdType;
+
+  /**
+   * array of fields to display on billingBlock.tpl - this is not fully implemented but basically intent is the panes/fieldsets on this page should
+   * be all in this array in order like
+   *  'credit_card' => array('credit_card_number' ...
+   *  'billing_details' => array('first_name' ...
+   *
+   * such that both the fields and the order can be more easily altered by payment processors & other extensions
+   * @var array
+   */
+  public $billingFieldSets = array();
 
   /**
    * @param $id

@@ -111,17 +111,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       return CRM_Custom_Form_CustomData::preProcess($this);
     }
 
+    parent::preProcess();
     // get price set id.
     $this->_priceSetId = CRM_Utils_Array::value('priceSetId', $_GET);
     $this->set('priceSetId', $this->_priceSetId);
     $this->assign('priceSetId', $this->_priceSetId);
 
-    // action
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    $this->_processors = array();
-    $this->assign('contactID', $this->_contactID);
 
     // check for edit permission
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
@@ -134,21 +129,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       if ($this->_id && $contributionID && !CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
         CRM_Core_Error::fatal(ts("This Membership is linked to a contribution. You must have 'delete in CiviContribute' permission in order to delete this record."));
       }
-    }
-
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
-    $this->assign('context', $this->_context);
-
-    if ($this->_id) {
-      $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
-      $this->_membershipIDs[] = $this->_id;
-    }
-
-    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
-    $this->assign('membershipMode', $this->_mode);
-
-    if ($this->_mode) {
-      $this->assignPaymentRelatedVariables();
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
@@ -222,12 +202,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       );
     }
     $this->assign('onlinePendingContributionId', $this->_onlinePendingContributionId);
-    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
     $this->setPageTitle(ts('Membership'));
-
-
-    parent::preProcess();
   }
 
   /**
@@ -715,15 +691,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
 
     $this->add('textarea', 'receipt_text_signup', ts('Receipt Message'));
-    if ($this->_mode) {
-
-      $this->add('select', 'payment_processor_id',
-        ts('Payment Processor'),
-        $this->_processors, TRUE,
-        array('onChange' => "buildAutoRenew( null, this.value );")
-      );
-      CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, TRUE);
-    }
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     if ($this->_contactID) {

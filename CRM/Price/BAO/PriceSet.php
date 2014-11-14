@@ -1059,7 +1059,7 @@ WHERE  id = %1";
         // past price sets discounts are made inaccessible by this as the discount_id is set to NULL
         // on the participant record
         if (CRM_Price_BAO_PriceSet::removeFrom('civicrm_' . $entityName, $entity->id)) {
-          CRM_Core_BAO_Discount::del($this->_id,'civicrm_' . $entityName);
+          CRM_Core_BAO_Discount::del($entity->id,'civicrm_' . $entityName);
         }
       }
     }

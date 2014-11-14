@@ -37,7 +37,7 @@
  * This class generates form components for Membership Type
  *
  */
-class CRM_Member_Form_MembershipType extends CRM_Member_Form {
+class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
   /**
    * max number of contacts we will display for membership-organisation

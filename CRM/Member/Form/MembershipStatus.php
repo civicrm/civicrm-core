@@ -37,7 +37,7 @@
  * This class generates form components for Membership Type
  *
  */
-class CRM_Member_Form_MembershipStatus extends CRM_Member_Form {
+class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig {
 
   /**
    * This function sets the default values for the form. MobileProvider that in edit/view mode

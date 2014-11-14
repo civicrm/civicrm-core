@@ -400,10 +400,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
       $this->set('bltID', $this->_bltID);
 
-      if ($this->_values['event']['is_monetary'] &&
-        ($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)
-      ) {
-        CRM_Core_Payment_Form::setCreditCardFields($this);
+      if ($this->_values['event']['is_monetary']) {
+        CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
       }
       $params = array('entity_id' => $this->_eventId, 'entity_table' => 'civicrm_event');
       $this->_values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
