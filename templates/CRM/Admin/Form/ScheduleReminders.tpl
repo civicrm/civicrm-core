@@ -80,7 +80,7 @@
       <td>{$form.from_email.html}&nbsp;&nbsp;</td>
     </tr>
     <tr class="crm-scheduleReminder-form-block-recipient">
-      <td id="recipientLabel" class="right">{$form.recipient.label}</td><td colspan="3">{$form.limit_to.html}&nbsp;&nbsp;{$form.recipient.html}&nbsp;&nbsp;{help id="recipient" title=$form.recipient.label}</td>
+      <td id="recipientLabel" class="right">{$form.recipient.label}</td><td colspan="3">{$form.limit_to.html}&nbsp;{help id="limit_to" class="limit_to" title=$form.recipient.label}{$form.recipient.html}&nbsp;{help id="recipient" class="recipient" title=$recipientLabels.activity}</td>
     </tr>
     <tr id="recipientList" class="crm-scheduleReminder-form-block-recipientListing recipient">
         <td class="right">{$form.recipient_listing.label}</td><td colspan="3">{$form.recipient_listing.html}</td>
@@ -178,7 +178,7 @@
         }
       });
       if ($('#absolute_date_display', $form).val()) {
-        $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
+        $('#relativeDate, #relativeDateRepeat, #repeatFields, #OR', $form).hide();
       }
 
       $('#entity_0', $form).change(buildSelects).change(showHideLimitTo);
@@ -220,11 +220,12 @@
             .done(function(result) {
               CRM.utils.setOptions($('#recipient_listing', $form), result.values);
             });
-          $("#recipientList", $form).show();
+          $("#recipientList, a.limit_to", $form).show();
+          $("#recipient").css("margin-left", "12px");
         } else {
           $("#recipientList", $form).hide();
           if ($('#entity_0', $form).val() !== '1' && $('#limit_to').val() == '') {
-            $('tr.recipient:visible').hide();
+            $('tr.recipient:visible, a.limit_to').hide();
           }
         }
       }
@@ -233,12 +234,16 @@
         $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
         if ($('#entity_0', $form).val() != '1') {
           if ($('#limit_to', $form).val() == '') {
-            $('#recipient').hide();
+            $('#recipient, a.limit_to').hide();
+          }
+          else {
+            $('a.limit_to').show();
           }
           $("label[for='recipient']").text('{/literal}{$recipientLabels.other}{literal}');
         }
         else {
-          $('#recipient').show();
+          $('#recipient').show().css("margin-left", "-2px");
+          $('a.limit_to').hide();
           $("label[for='recipient']").text('{/literal}{$recipientLabels.activity}{literal}');
         }
       }
