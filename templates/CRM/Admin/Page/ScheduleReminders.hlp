@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2010                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,9 @@
 {/htxt}
 
 {htxt id="recipient"}
-  {ts} ... {/ts}
+  <p>{ts}For Activities, the reminder recipients can be contacts Assigned to the activity, contacts who created the activity (Activity Source), OR contacts whom the activity is with (Activity Targets). Alternatively you can direct the reminder to specific contacts (Choose Recipients), or to a group of contacts.{/ts}</p>
+  <p>{ts}For Events, you can limit or additionally include recipients by participant role (e.g. Volunteer, Speaker, etc.), choose specific contacts, or choose a group.{/ts}</p>
+  <p>{ts}For Membership and Contact reminders, you can limit or additionally include recipients by choosing specific contacts, or choosing a group.{/ts}</p>
 {/htxt}
 
 {htxt id="id-from_name_email-title"}
