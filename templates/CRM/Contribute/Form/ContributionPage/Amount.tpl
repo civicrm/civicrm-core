@@ -66,7 +66,9 @@
                   <span class="description">{ts}Instructions added to Confirmation and Thank-you pages, as well as the confirmation email, when the user selects the 'pay later' option (e.g. 'Mail your check to ... within 3 business days.').{/ts}</span></td></tr>
 
                 <tr><th scope="row" class="label">{$form.is_billing_required.label}</th>
-                <td>{$form.is_billing_required.html}</td></tr>
+                <td>{$form.is_billing_required.html}<br />
+                    <span class="description">{ts}Check this box to require users who select the pay later option to provide billing name and address.{/ts}</span>
+                </td></tr>
             </table>
             </td>
         </tr>
