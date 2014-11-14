@@ -9,6 +9,7 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
+    <title>MailingAB ID</title>
     <required>true</required>
   </field>
   <primaryKey>
@@ -19,36 +20,42 @@
     <name>name</name>
     <type>varchar</type>
     <length>25</length>
+    <title>Name</title>
     <comment>name of abtesting</comment>
     <add>4.5</add>
   </field>
   <field>
     <name>mailing_id_a</name>
     <type>int unsigned</type>
-    <comment>Id of mailing A</comment>
+    <title>Mailing ID (A)</title>
+    <comment>The first experimental mailing ("A" condition)</comment>
     <add>4.5</add>
   </field>
   <field>
     <name>mailing_id_b</name>
     <type>int unsigned</type>
-    <comment>Id of mailing B</comment>
+    <title>Mailing ID (B)</title>
+    <comment>The second experimental mailing ("B" condition)</comment>
     <add>4.5</add>
   </field>
   <field>
     <name>mailing_id_c</name>
     <type>int unsigned</type>
-    <comment>temporary mailing which is created during a/b testing</comment>
+    <title>Mailing ID (C)</title>
+    <comment>The final, general mailing (derived from A or B)</comment>
     <add>4.5</add>
   </field>
   <field>
     <name>domain_id</name>
     <type>int unsigned</type>
+    <title>Domain ID</title>
     <comment>Which site is this mailing for</comment>
     <add>4.5</add>
   </field>
   <field>
     <name>testing_criteria_id</name>
     <type>int unsigned</type>
+    <title>Testing Criteria ID</title>
     <pseudoconstant>
       <optionGroupName>mailing_ab_testing_criteria</optionGroupName>
     </pseudoconstant>
@@ -57,6 +64,7 @@
   <field>
     <name>winner_criteria_id</name>
     <type>int unsigned</type>
+    <title>Winner Criteria ID</title>
     <pseudoconstant>
       <optionGroupName>mailing_ab_winner_criteria</optionGroupName>
     </pseudoconstant>
@@ -65,6 +73,7 @@
   <field>
     <name>specific_url</name>
     <type>varchar</type>
+    <title>URL for Winner Criteria</title>
     <length>255</length>
     <comment>What specific url to track</comment>
     <add>4.5</add>
@@ -72,12 +81,14 @@
   <field>
     <name>declare_winning_time</name>
     <type>datetime</type>
+    <title>Declaration Time</title>
     <comment>In how much time to declare winner</comment>
     <add>4.5</add>
   </field>
   <field>
     <name>group_percentage</name>
     <type>int unsigned</type>
+    <title>Group Percentage</title>
     <add>4.5</add>
   </field>
 
