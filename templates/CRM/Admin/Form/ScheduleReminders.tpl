@@ -45,7 +45,7 @@
 
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>
-        <td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong>{ts}OR{/ts}</strong><br /></td>
+        <td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong id='OR'>OR</strong><br /></td>
     </tr>
 
     <tr id="relativeDate" class="crm-scheduleReminder-form-block-description">
@@ -82,15 +82,15 @@
     <tr class="crm-scheduleReminder-form-block-recipient">
       <td id="recipientLabel" class="right">{$form.recipient.label}</td><td colspan="3">{$form.limit_to.html}&nbsp;&nbsp;{$form.recipient.html}&nbsp;&nbsp;{help id="recipient" title=$form.recipient.label}</td>
     </tr>
-    <tr id="recipientList" class="crm-scheduleReminder-form-block-recipientListing">
+    <tr id="recipientList" class="crm-scheduleReminder-form-block-recipientListing recipient">
         <td class="right">{$form.recipient_listing.label}</td><td colspan="3">{$form.recipient_listing.html}</td>
     </tr>
-    <tr id="recipientManual" class="crm-scheduleReminder-form-block-recipient_manual_id">
+    <tr id="recipientManual" class="crm-scheduleReminder-form-block-recipient_manual_id recipient">
         <td class="label">{$form.recipient_manual_id.label}</td>
         <td>{$form.recipient_manual_id.html}{edit}<div class="description">{ts}You can manually send out the reminders to these recipients.{/ts}</div>{/edit}</td>
     </tr>
 
-    <tr id="recipientGroup" class="crm-scheduleReminder-form-block-recipient_group_id">
+    <tr id="recipientGroup" class="crm-scheduleReminder-form-block-recipient_group_id recipient">
         <td class="label">{$form.group_id.label}</td>
         <td>{$form.group_id.html}</td>
     </tr>
@@ -172,9 +172,9 @@
 
       $('#absolute_date_display', $form).change(function() {
         if($(this).val()) {
-          $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
+          $('#relativeDate, #relativeDateRepeat, #repeatFields, #OR', $form).hide();
         } else {
-          $('#relativeDate, #relativeDateRepeat', $form).show();
+          $('#relativeDate, #relativeDateRepeat, #OR', $form).show();
         }
       });
       if ($('#absolute_date_display', $form).val()) {
@@ -187,18 +187,22 @@
       $('#mode', $form).change(loadMsgBox);
 
       showHideLimitTo();
+      buildSelects();
 
       $('#recipient', $form).change(populateRecipient);
+      $('#limit_to', $form).change(populateRecipient).change(buildSelects);
 
       var entity = $('#entity_0', $form).val();
       if (!(entity === '2' || entity === '3') || $('#recipient', $form).val() !== '1') {
         $('#recipientList', $form).hide();
       }
+      else if (entity === '1') {
+        $('#recipient', $form).change(buildSelects);
+      }
 
       function buildSelects() {
         var mappingID = $('#entity_0', $form).val();
 
-        $('#is_recipient_listing').val('');
         $.getJSON(CRM.url('civicrm/ajax/mapping'), {mappingID: mappingID},
           function (result) {
             CRM.utils.setOptions($('#start_action_date', $form), result.sel4);
@@ -211,22 +215,32 @@
       }
       function populateRecipient() {
         var recipient = $("#recipient", $form).val();
-
-        if (recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') {
+        if ((recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') && $('#limit_to').val() != '') {
           CRM.api3('participant', 'getoptions', {field: recipientMapping[recipient] == 'participant_role' ? 'role_id' : 'status_id', sequential: 1})
             .done(function(result) {
               CRM.utils.setOptions($('#recipient_listing', $form), result.values);
             });
           $("#recipientList", $form).show();
-          $('#is_recipient_listing', $form).val(1);
         } else {
           $("#recipientList", $form).hide();
-          $('#is_recipient_listing', $form).val('');
+          if ($('#entity_0', $form).val() !== '1' && $('#limit_to').val() == '') {
+            $('tr.recipient:visible').hide();
+          }
         }
       }
       // CRM-14070 Hide limit-to when entity is activity
       function showHideLimitTo() {
         $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
+        if ($('#entity_0', $form).val() != '1') {
+          if ($('#limit_to', $form).val() == '') {
+            $('#recipient').hide();
+          }
+          $("label[for='recipient']").text('{/literal}{$recipientLabels.other}{literal}');
+        }
+        else {
+          $('#recipient').show();
+          $("label[for='recipient']").text('{/literal}{$recipientLabels.activity}{literal}');
+        }
       }
     });
 

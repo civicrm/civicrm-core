@@ -196,14 +196,18 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       );
     }
 
-    $limitOptions = array(1 => ts('Limit to'), 0 => ts('Also include'));
-    $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions);
+    $limitOptions = array('' => '-neither-', 1 => ts('Limit to'), 0 => ts('Also include'));
 
-    $this->add('select', 'recipient', ts('Recipients'), $sel5[$recipient],
+    $recipientLabels = array('activity' => ts('Recipients'), 'other' => ts('Limit or Add Recipients'));
+    $this->assign('recipientLabels', $recipientLabels);
+
+    $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions, FALSE, array('onChange' => "showHideByValue('limit_to','','recipient', 'select','select',true);"));
+
+    $this->add('select', 'recipient', $recipientLabels['other'], $sel5[$recipient],
       FALSE, array('onchange' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
 
-    if (!empty($_POST['is_recipient_listing'])) {
+    if (!empty($this->_submitValues['recipient_listing'])) {
       $recipientListingOptions = CRM_Core_BAO_ActionSchedule::getRecipientListing($_POST['entity'][0], $_POST['recipient']);
     }
     elseif (!empty($this->_values['recipient_listing'])) {
@@ -211,7 +215,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
     $this->add('select', 'recipient_listing', ts('Recipient Roles'), $recipientListingOptions, FALSE,
       array('multiple' => TRUE, 'class' => 'crm-select2 huge', 'placeholder' => TRUE));
-    $this->add('hidden', 'is_recipient_listing', (int) !empty($recipientListingOptions));
 
     $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), array('multiple' => TRUE, 'create' => TRUE));
 
@@ -271,6 +274,20 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       if (CRM_Utils_Date::format(CRM_Utils_Date::processDate($fields['absolute_date'], NULL)) < CRM_Utils_Date::format(date('Ymd'))) {
         $errors['absolute_date'] = ts('Absolute date cannot be earlier than the current time.');
       }
+    }
+
+    $recipientKind = array(
+      'participant_role' => array(
+        'name' => 'participant role',
+        'target_id' => 'recipient_listing'
+      ),
+      'manual' => array(
+        'name' => 'recipient',
+        'target_id' => 'recipient_manual_id'
+      )
+    );
+    if (!empty($fields['limit_to']) && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
+      $errors[$recipientKind[$fields['recipient']]['target_id']] = ts('If "Also include" or "Limit to" are selected, you must specify at least one %1', array(1 => $recipientKind[$fields['recipient']]['name']));
     }
 
     if (!empty($errors)) {
@@ -420,6 +437,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $entity_value = $values['entity'][1];
     $entity_status = $values['entity'][2];
 
+    if ($entity_value == 1) {
+      $params['limit_to'] = 1;
+    }
+
     foreach (array(
       'entity_value', 'entity_status') as $key) {
       $params[$key] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $$key);
@@ -554,4 +575,3 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
   }
 }
-
