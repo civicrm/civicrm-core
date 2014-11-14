@@ -154,7 +154,7 @@
 
     <div id="billing-payment-block">
       {* If we have a payment processor, load it - otherwise it happens via ajax *}
-      {if $ppType or $isBillingAddressRequiredForPayLater}
+      {if $paymentProcessorID or $isBillingAddressRequiredForPayLater}
         {include file="CRM/Event/Form/Registration/Register.tpl" snippet=4}
       {/if}
     </div>

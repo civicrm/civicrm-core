@@ -141,7 +141,7 @@ SELECT id
       FALSE
     );
     $this->addWysiwyg('pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'pay_later_receipt'));
-    $this->addElement('checkbox', 'is_billing_required', ts('Is billing block required'));
+    $this->addElement('checkbox', 'is_billing_required', ts('Billing address required'));
 
     //add partial payment options
 
