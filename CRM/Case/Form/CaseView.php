@@ -328,7 +328,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     }
 
     //call activity form
-    self::activityForm($this);
+    self::activityForm($this, $aTypes);
 
     //get case related relationships (Case Role)
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($this->_contactID, $this->_caseID);
@@ -501,8 +501,9 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   /**
    * Build the activity selector/datatable
    * @param CRM_Core_Form $form
+   * @param array $aTypes to include acivities related to current case id $form->_caseID
    */
-  static function activityForm($form) {
+  static function activityForm($form, $aTypes = array()) {
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($form->_contactID, $form->_caseID);
     //build reporter select
     $reporters = array("" => ts(' - any reporter - '));
@@ -519,6 +520,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         $aTypesFilter[$typeDetails['id']] = CRM_Utils_Array::value('label', $typeDetails);
       }
     }
+    $aTypesFilter = $aTypesFilter + $aTypes;
     asort($aTypesFilter);
     $form->add('select', 'activity_type_filter_id', ts('Activity Type'), array('' => ts('- select activity type -')) + $aTypesFilter, FALSE, array('id' => 'activity_type_filter_id_'.$form->_caseID));
 
