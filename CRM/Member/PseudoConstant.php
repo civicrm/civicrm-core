@@ -96,7 +96,7 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return array - array reference of all membership statuss if any
    * @static
    */
-  public static function &membershipStatus($id = NULL, $cond = NULL, $column = 'name', $force = FALSE) {
+  public static function &membershipStatus($id = NULL, $cond = NULL, $column = 'name', $force = FALSE, $allStatus = FALSE) {
     if (self::$membershipStatus === NULL) {
       self::$membershipStatus = array();
     }
@@ -108,7 +108,7 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
     if (!isset(self::$membershipStatus[$cacheKey]) || $force) {
       CRM_Core_PseudoConstant::populate(self::$membershipStatus[$cacheKey],
         'CRM_Member_DAO_MembershipStatus',
-        FALSE, $column, 'is_active', $cond, 'weight'
+        $allStatus, $column, 'is_active', $cond, 'weight'
       );
     }
 

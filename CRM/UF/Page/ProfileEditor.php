@@ -13,7 +13,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
 
   static function registerProfileScripts() {
     static $loaded = FALSE;
-    if ($loaded) {
+    if ($loaded || CRM_Core_Resources::isAjaxMode()) {
       return;
     }
     $loaded = TRUE;
