@@ -54,7 +54,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  *  @package CiviCRM
  */
 class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
-  static $_tablesToTruncate = array(
+  protected $_tablesToTruncate = array(
     'civicrm_group_contact',
     'civicrm_group',
     'civicrm_saved_search',
