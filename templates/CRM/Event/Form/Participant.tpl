@@ -341,7 +341,7 @@
         var $form = $('form.{/literal}{$form.formClass}{literal}');
 
         // don't show cart related statuses if it's disabled
-        {/literal}{if !$enableCart}{literal}
+        {/literal}{if !$enableCart && $pendingInCartStatusId}{literal}
           var pendingInCartStatusId = {/literal}{$pendingInCartStatusId}{literal};
           $("#status_id option[value='" + pendingInCartStatusId + "']").remove();
         {/literal}{/if}{literal}

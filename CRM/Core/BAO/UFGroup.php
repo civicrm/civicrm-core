@@ -1405,6 +1405,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $params['limit_listings_group_id'] = CRM_Utils_Array::value('group', $params);
     $params['add_to_group_id'] = CRM_Utils_Array::value('add_contact_to_group', $params);
 
+    //CRM-15427
+    if (!empty($params['group_type']) && is_array($params['group_type'])) {
+      $params['group_type'] = implode(',', $params['group_type']);
+    }
     $ufGroup = new CRM_Core_DAO_UFGroup();
     $ufGroup->copyValues($params);
 
