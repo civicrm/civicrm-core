@@ -79,6 +79,9 @@ UPDATE `civicrm_state_province` SET `name` = (N'Rīga') WHERE `id` = 3555;
 ALTER TABLE civicrm_mailing ADD COLUMN location_type_id INT(10) unsigned DEFAULT 0 COMMENT 'With email_selection_method, determines which email address to use';
 ALTER TABLE civicrm_mailing ADD COLUMN email_selection_method varchar(20) DEFAULT 'automatic' COMMENT 'With location_type_id, determine how to choose the email address to use.';
 
+-- CRM-15500 fix
+ALTER TABLE `civicrm_action_schedule` CHANGE `limit_to` `limit_to` TINYINT( 4 ) NULL DEFAULT NULL;
+
 -- CRM-15453 Recurring Contributions report template AND instance
 SELECT @option_group_id_report := MAX(id) FROM civicrm_option_group WHERE name = 'report_template';
 SELECT @weight := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_report;
