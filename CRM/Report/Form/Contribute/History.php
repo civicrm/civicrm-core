@@ -61,7 +61,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $yearsInPast = 4;
     $date        = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, 0);
     $count       = $date['maxYear'];
-    $optionYear  = array('' => ts('-- select --'));
+    $optionYear  = array('' => ts('- select -'));
 
     $this->_yearStatisticsFrom = $date['minYear'];
     $this->_yearStatisticsTo = $date['maxYear'];

@@ -289,7 +289,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $elements = array();
     $elements[] = &$this->createElement('select', 'case_activity_all_dates', NULL,
       array(
-        '' => ts('-- select --')) + $this->caseActivityTypes
+        '' => ts('- select -')) + $this->caseActivityTypes
     );
     $this->addGroup($elements, 'case_detail_extra');
 
