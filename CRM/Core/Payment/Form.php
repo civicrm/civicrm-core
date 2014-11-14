@@ -299,7 +299,7 @@ class CRM_Core_Payment_Form {
    */
   protected static function addPaypalExpressCode(&$form) {
     if (empty($form->isBackOffice)) {
-      if (CRM_Utils_Array::value('billing_mode', $form->_paymentProcessor) ==4
+      if (CRM_Utils_Array::value('billing_mode', $form->_paymentProcessor) == 3
       ) {
         $form->_expressButtonName = $form->getButtonName('upload', 'express');
         $form->assign('expressButtonName', $form->_expressButtonName);

@@ -288,7 +288,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     );
     $this->addWysiwyg('pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_receipt'));
 
-    $this->addElement('checkbox', 'is_billing_required', ts('Is billing block required'));
+    $this->addElement('checkbox', 'is_billing_required', ts('Billing address required'));
     $this->add('text', 'fee_label', ts('Fee Label'));
 
     $price = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviEvent');
