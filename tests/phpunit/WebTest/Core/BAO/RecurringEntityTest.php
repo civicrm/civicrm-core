@@ -42,7 +42,7 @@ class WebTest_Core_BAO_RecurringEntityTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     //Add repeat configuration for an event
-    $this->openCiviPage("event/manage/repeat", "reset=1&action=update&id=148", '_qf_Repeat_cancel-bottom');
+    $this->openCiviPage("event/manage/repeat", "reset=1&action=update&id=1", '_qf_Repeat_cancel-bottom');
 
     $this->click('repetition_frequency_unit');
     $this->select('repetition_frequency_unit', 'label=weekly');
@@ -57,9 +57,9 @@ class WebTest_Core_BAO_RecurringEntityTest extends CiviSeleniumTestCase {
       $occurrences = 3;
     }
     $this->type('start_action_offset', $occurrences);
-    $this->webtestFillDate("exclude_date", "05/12/2015");
+    $this->webtestFillDate("exclude_date", "11/05/2015");
     $this->click('add_to_exclude_list');
-    $this->webtestFillDate("exclude_date", "06/12/2015");
+    $this->webtestFillDate("exclude_date", "12/05/2015");
     $this->click('add_to_exclude_list');
     $this->click('_qf_Repeat_submit-bottom');
     $this->waitForTextPresent('Based on your repeat configuration here is the list of dates, Do you wish to create recurring set of these dates?');
@@ -75,6 +75,14 @@ class WebTest_Core_BAO_RecurringEntityTest extends CiviSeleniumTestCase {
     $count = $this->getXpathCount("xpath=//div[@id='event_status_id']/div[@class='crm-accordion-body']/div/table/tbody/tr");
     $count = $count - 1;
     $this->assertEquals($occurrences, $count);
+
+    //Lets go to find participant page and see our repetitive events there
+    $this->openCiviPage("event/manage", "reset=1");
+    $eventTitle = "Fall Fundraiser Dinner";
+    $this->type("title", $eventTitle);
+    $this->click("_qf_SearchEvent_refresh");
+    $this->assertTrue($this->isTextPresent("Recurring Event - (Child)"));
+    $this->assertTrue($this->isTextPresent("Recurring Event - (Parent)"));
   }
 
   function testRecurringActivity() {
