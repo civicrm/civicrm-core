@@ -102,7 +102,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
     //per http://wiki.civicrm.org/confluence/display/CRM/Database+layer we are moving away from $ids array
     $contributionID = CRM_Utils_Array::value('contribution', $ids, CRM_Utils_Array::value('id', $params));
-
     $duplicates = array();
     if (self::checkDuplicate($params, $duplicates, $contributionID)) {
       $error = CRM_Core_Error::singleton();
