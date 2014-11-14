@@ -397,7 +397,13 @@ function civicrm_api3_mailing_preview($params) {
     TRUE, $details[0][$contactID], $attachments
   );
 
-  return civicrm_api3_create_success(array('subject' => $mime->_headers['Subject'], 'html' => $mime->getHTMLBody(), 'text' => $mime->getTXTBody()));
+  return civicrm_api3_create_success(array(
+    'id' => $params['id'],
+    'contact_id' => $contactID,
+    'subject' => $mime->_headers['Subject'],
+    'html' => $mime->getHTMLBody(),
+    'text' => $mime->getTXTBody(),
+  ));
 }
 
 function civicrm_api3_mailing_send_test($params) {
@@ -484,6 +490,7 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
  */
 function _civicrm_api3_mailing_stats_spec(&$params) {
   $params['date']['api.default'] = 'now';
+  $params['date']['title'] = 'Date';
 }
 
 function civicrm_api3_mailing_stats($params) {

@@ -205,7 +205,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   public static function toBeSkipped_get($sequential = FALSE) {
-    $entitiesWithoutGet = array('MailingEventSubscribe', 'MailingEventConfirm', 'MailingEventResubscribe', 'MailingEventUnsubscribe', 'MailingGroup', 'Location');
+    $entitiesWithoutGet = array('MailingEventSubscribe', 'MailingEventConfirm', 'MailingEventResubscribe', 'MailingEventUnsubscribe', 'Location');
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
     }
@@ -252,7 +252,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   public static function toBeSkipped_delete($sequential = FALSE) {
-    $entitiesWithout = array('MailingContact', 'MailingEventConfirm', 'MailingEventResubscribe', 'MailingEventSubscribe', 'MailingEventUnsubscribe', 'MailingGroup', 'MailingRecipients', 'Constant', 'Entity', 'Location', 'Domain', 'Profile', 'CustomValue', 'Setting');
+    $entitiesWithout = array('MailingContact', 'MailingEventConfirm', 'MailingEventResubscribe', 'MailingEventSubscribe', 'MailingEventUnsubscribe', 'MailingRecipients', 'Constant', 'Entity', 'Location', 'Domain', 'Profile', 'CustomValue', 'Setting');
     if ($sequential === TRUE) {
       return $entitiesWithout;
     }
@@ -379,7 +379,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'EntityTag', // non-standard api - has inappropriate mandatory fields & doesn't implement limit
       'Event', // failed 'check that a 5 limit returns 5' - probably is_template field is wrong or something, or could be limit doesn't work right
       'Extension', // can't handle creating 25
-      'MailingGroup', // no get call on MailingGroup
       'Note', // fails on 5 limit - probably a set up problem
       'Setting', //a bit of a pseudoapi - keys by domain
     );
@@ -396,7 +395,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'EntityTag', // non-standard api - has inappropriate mandatory fields & doesn't implement limit
       'Extension', // can't handle creating 25
       'Note', // note has a default get that isn't implemented in createTestObject -meaning you don't 'get' them
-      'MailingGroup', // no get call on MailingGroup
       'Setting', //a bit of a pseudoapi - keys by domain
     );
     return $entitiesWithout;
@@ -530,7 +528,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @dataProvider entities
    */
   public function testGetFields($Entity) {
-    if (in_array($Entity, $this->deprecatedAPI) || $Entity == 'Entity' || $Entity == 'CustomValue' || $Entity == 'MailingGroup') {
+    if (in_array($Entity, $this->deprecatedAPI) || $Entity == 'Entity' || $Entity == 'CustomValue') {
       return;
     }
 

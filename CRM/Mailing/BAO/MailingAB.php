@@ -93,7 +93,9 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
 
     $mailingab = new CRM_Mailing_DAO_MailingAB();
     $mailingab->id = $id;
-    $mailingab->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
+    if (!$id) {
+      $mailingab->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
+    }
 
     $mailingab->copyValues($params);
 
