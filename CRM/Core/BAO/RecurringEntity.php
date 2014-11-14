@@ -52,6 +52,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   public $isRecurringEntityRecord = TRUE;
 
   protected $recursion = NULL;
+  protected $recursion_start_date = NULL;
 
   public static $_entitiesToBeDeleted = array();
 
@@ -329,6 +330,11 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
       $count = 1;
       while ($result = $this->recursion->next()) {
+        $skip = FALSE;
+        if ($result == $this->recursion_start_date) {
+          // skip the recursion-start-date from the list we going to generate
+          $skip = TRUE;
+        }
         $baseDate = CRM_Utils_Date::processDate($result->format('Y-m-d H:i:s'));
 
         foreach ($this->dateColumns as $col) {
@@ -344,7 +350,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           $exRangeEndDate   = CRM_Utils_Date::processDate($recursionDates[$count][$exRangeEnd], NULL, FALSE, 'Ymd');
         }
 
-        $skip = FALSE;
         foreach ($this->excludeDates as $exDate) {
           $exDate = CRM_Utils_Date::processDate($exDate, NULL, FALSE, 'Ymd');
           if (!$exRangeStart) {
@@ -830,7 +835,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         $repetitionStartDate = $repetitionStartDate . " " . $formParams['repetition_start_date_time'];
       }
       $repetition_start_date = new DateTime($repetitionStartDate);
-      $repetition_start_date->modify('+1 day');
       $dbParams['start_action_date'] = CRM_Utils_Date::processDate($repetition_start_date->format('Y-m-d H:i:s'));
     }
 
@@ -942,6 +946,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         $currDate = date("Y-m-d H:i:s");
       }
       $start = new DateTime($currDate);
+      $this->recursion_start_date = $start;
       if ($scheduleReminderDetails['repetition_frequency_unit']) {
         $repetition_frequency_unit = $scheduleReminderDetails['repetition_frequency_unit'];
         if ($repetition_frequency_unit == "day") {
