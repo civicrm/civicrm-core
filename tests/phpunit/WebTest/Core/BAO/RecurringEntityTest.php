@@ -68,10 +68,6 @@ class WebTest_Core_BAO_RecurringEntityTest extends CiviSeleniumTestCase {
     $this->checkCRMAlert('Repeat Configuration has been saved');
 
     //Check if assertions are correct
-    $this->assertEquals('week', $this->getSelectedValue('id=repetition_frequency_unit'));
-    $this->assertEquals('1', $this->getSelectedValue('id=repetition_frequency_interval'));
-    $this->assertChecked('start_action_condition_monday');
-    $this->assertChecked('start_action_condition_tuesday');
     $count = $this->getXpathCount("xpath=//div[@id='event_status_id']/div[@class='crm-accordion-body']/div/table/tbody/tr");
     $count = $count - 1;
     $this->assertEquals($occurrences, $count);
@@ -83,6 +79,28 @@ class WebTest_Core_BAO_RecurringEntityTest extends CiviSeleniumTestCase {
     $this->click("_qf_SearchEvent_refresh");
     $this->assertTrue($this->isTextPresent("Recurring Event - (Child)"));
     $this->assertTrue($this->isTextPresent("Recurring Event - (Parent)"));
+
+    //Update Mode Cascade Changes
+    $this->click('event-configure-1');
+    $this->waitForElementPresent("xpath=//span[@id='event-configure-1']/ul[@class='panel']/li/a[text()='Info and Settings']");
+    $this->click("xpath=//span[@id='event-configure-1']/ul[@class='panel']/li/a[text()='Info and Settings']");
+    $this->waitForElementPresent('_qf_EventInfo_cancel-bottom');
+    $this->type('title', 'CiviCon');
+    $this->click('_qf_EventInfo_upload_done-top');
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Cancel']");
+    $this->click("xpath=//div[@id='recurring-dialog']/div[@class='show-block']/div[@class='recurring-dialog-inner-wrapper']/div[@class='recurring-dialog-inner-left']/button[text()='All the entities']");
+    $this->waitForAjaxContent();
+    $this->openCiviPage("event/manage", "reset=1");
+    $newEventTitle = "CiviCon";
+    $this->type("title", $newEventTitle);
+    $this->click("_qf_SearchEvent_refresh");
+    $this->waitForPageToLoad();
+    $countOfEvents = $this->getXpathCount("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody/tr");
+    if ($countOfEvents) {
+      for ($i = 0; $i <= $countOfEvents; $i++) {
+        $this->verifyText("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody/tr/td/a", 'CiviCon');
+      }
+    }
   }
 
   function testRecurringActivity() {
@@ -169,6 +187,24 @@ class WebTest_Core_BAO_RecurringEntityTest extends CiviSeleniumTestCase {
     $this->assertEquals($occurrences, $countOfActivities);
     $this->assertTrue($this->isTextPresent("Recurring Activity - (Child)"));
     $this->assertTrue($this->isTextPresent("Recurring Activity - (Parent)"));
+
+    //Cascade changes
+    $this->click("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td/span/a[text()='Edit']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Cancel']");
+    $this->type('subject', 'Test activity recursion modified');
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Cancel']");
+    $this->click("xpath=//div[@id='recurring-dialog']/div[@class='show-block']/div[@class='recurring-dialog-inner-wrapper']/div[@class='recurring-dialog-inner-left']/button[text()='This and Following entities']");
+    $this->waitForAjaxContent();
+    $this->type('activity_subject', 'Test activity recursion modified');
+    $this->click('_qf_Search_refresh');
+    $this->waitForPageToLoad();
+    $countOfActivities = $this->getXpathCount("xpath=//div[@class='crm-search-results']/table/tbody/tr");
+    if ($countOfActivities) {
+      for ($i = 0; $i <= $countOfActivities; $i++) {
+        $this->verifyText("xpath=//div[@class='crm-search-results']/table/tbody/tr/td[3]", 'Test activity recursion modified');
+      }
+    }
   }
 
 }
