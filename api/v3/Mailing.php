@@ -87,8 +87,8 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   $params['subject']['api.required'] = 1;
   $params['created_id']['api.required'] = 1;
   $params['created_id']['api.default'] = 'user_contact_id';
-//  $params['api.mailing_job.create']['api.default'] = 1;
-//  $params['api.mailing_job.create']['title'] = 'Schedule Mailing?';
+  $params['api.mailing_job.create']['api.default'] = 1;
+  $params['api.mailing_job.create']['title'] = 'Schedule Mailing?';
 }
 
 /**
@@ -250,7 +250,7 @@ function civicrm_api3_mailing_event_forward($params) {
  */
 function _civicrm_api3_mailing_event_forward_spec(&$params) {
   $params['job_id']['api.required'] = 1;
-  $params['g_id']['title'] = 'Job ID';
+  $params['job_id']['title'] = 'Job ID';
   $params['event_queue_id']['api.required'] = 1;
   $params['event_queue_id']['title'] = 'Event Queue ID';
   $params['hash']['api.required'] = 1;
