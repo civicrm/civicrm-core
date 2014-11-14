@@ -77,13 +77,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
     }
 
-    if (!empty($_POST) && !empty($_POST['entity'])) {
-      $mappingID = $_POST['entity'][0];
-    }
-    elseif ($this->_mappingID) {
-      $mappingID = $this->_mappingID;
-    }
-
     $this->add(
       'text',
       'title',
