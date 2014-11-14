@@ -29,10 +29,15 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 
 
 /**
- *  Test APIv3 civicrm_sytanc conformance* functions
+ * Test that the core actions for APIv3 entities comply with standard syntax+behavior.
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Core
+ * By default, this tests all API entities. To only test specific entities, call phpunit with
+ * environment variable SYNTAX_CONFORMANCE_ENTITIES, e.g.
+ *
+ * env SYNTAX_CONFORMANCE_ENTITIES="Contact Event" ./scripts/phpunit api_v3_SyntaxConformanceTest
+ *
+ * @package CiviCRM_APIv3
+ * @subpackage API_Core
  */
 
 class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
@@ -99,19 +104,18 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   public static function entities($skip = NULL) {
-    // To only test specific entities, call phpunit with SYNTAX_CONFORMANCE_ENTITIES="TheEntityName"
-    // or uncomment this line:
-    //return array(array ('Tag'), array ('Activity')  );
-
-    if (getenv('SYNTAX_CONFORMANCE_ENTITIES')) {
-      $result = array();
-      foreach (explode(' ', getenv('SYNTAX_CONFORMANCE_ENTITIES')) as $entity) {
-        $result[] = array($entity);
-      }
-      return $result;
-    }
+    // The order of operations in here is screwy. In the case where SYNTAX_CONFORMANCE_ENTITIES is
+    // defined, we should be able to parse+return it immediately. However, some weird dependency
+    // crept into the system where civicrm_api('Entity','get') must be called as part of entities()
+    // (even if its return value is ignored).
 
     $tmp = civicrm_api('Entity', 'Get', array('version' => 3));
+    if (getenv('SYNTAX_CONFORMANCE_ENTITIES')) {
+      $tmp = array(
+        'values' => explode(' ', getenv('SYNTAX_CONFORMANCE_ENTITIES'))
+      );
+    }
+
     if (!is_array($skip)) {
       $skip = array();
     }
