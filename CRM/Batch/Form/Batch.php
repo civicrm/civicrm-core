@@ -75,7 +75,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
     }
 
     $this->add('textarea', 'description', ts('Description'), $attributes['description']);
-    $this->add('text', 'item_count', ts('Number of items'), $attributes['item_count'], TRUE);
+    $this->add('text', 'item_count', ts('Number of Items'), $attributes['item_count'], TRUE);
     $this->add('text', 'total', ts('Total Amount'), $attributes['total'], TRUE);
   }
 
