@@ -216,7 +216,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
           $testParams['emails'][] = $email;
           $emails .= $emails ? ",'$email'" : "'$email'";
           if (!CRM_Utils_Rule::email($email)) {
-            CRM_Core_Session::setStatus(ts('Please enter a valid email addresses.'), ts('Test not sent.'), 'error');
+            CRM_Core_Session::setStatus(ts('Please enter a valid email address.'), ts('Test not sent.'), 'error');
             $error = TRUE;
           }
         }

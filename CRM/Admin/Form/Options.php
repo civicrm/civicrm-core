@@ -355,7 +355,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if ($self->_gName == 'from_email_address') {
       $formEmail = CRM_Utils_Mail::pluckEmailFromHeader($fields['label']);
       if (!CRM_Utils_Rule::email($formEmail)) {
-        $errors['label'] = ts('Please enter the valid email address.');
+        $errors['label'] = ts('Please enter a valid email address.');
       }
 
       $formName = explode('"', $fields['label']);

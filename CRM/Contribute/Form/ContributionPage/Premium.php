@@ -76,7 +76,7 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
 
     $this->add('text', 'premiums_contact_email', ts('Contact Email') . ' ', $attributes['premiums_contact_email']);
 
-    $this->addRule('premiums_contact_email', ts('Please enter a valid email address for Contact Email') . ' ', 'email');
+    $this->addRule('premiums_contact_email', ts('Please enter a valid email address.') . ' ', 'email');
 
     $this->add('text', 'premiums_contact_phone', ts('Contact Phone'), $attributes['premiums_contact_phone']);
 
