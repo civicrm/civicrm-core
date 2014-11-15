@@ -161,6 +161,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
   }
 
+  protected function runTest() {
+    try {
+      return parent::runTest();
+    } catch (PEAR_Exception $e) {
+      // PEAR_Exception has metadata in funny places, and PHPUnit won't log it nicely
+      throw new Exception(\CRM_Core_Error::formatTextException($e), $e->getCode());
+    }
+  }
+
   /**
    * @return bool
    */
