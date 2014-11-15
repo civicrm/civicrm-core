@@ -158,7 +158,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_BatchUpdateProfile_next') {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete Select type field(s) in the selected profile are not supported for Batch Update and have been excluded."), ts('Some Fields Excluded'), 'info');
+      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Batch Update."), ts('Some Fields Excluded'), 'info');
     }
 
     $this->addDefaultButtons(ts('Update Contacts'));
