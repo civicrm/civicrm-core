@@ -220,13 +220,16 @@
             .done(function(result) {
               CRM.utils.setOptions($('#recipient_listing', $form), result.values);
             });
-          $("#recipientList, a.limit_to", $form).show();
-          $("#recipient").css("margin-left", "12px");
+          $("#recipientList", $form).show();
         } else {
           $("#recipientList", $form).hide();
           if ($('#entity_0', $form).val() !== '1' && $('#limit_to').val() == '') {
-            $('tr.recipient:visible, a.limit_to').hide();
+            $('tr.recipient:visible, a.limit_to, a.recipient').hide();
           }
+        }
+        if ($('#limit_to').val() != '') {
+          $('a.limit_to, a.recipient').show();
+          $('#recipient').css("margin-left", "12px");
         }
       }
       // CRM-14070 Hide limit-to when entity is activity
@@ -234,10 +237,10 @@
         $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
         if ($('#entity_0', $form).val() != '1') {
           if ($('#limit_to', $form).val() == '') {
-            $('#recipient, a.limit_to').hide();
+            $('#recipient, a.limit_to, a.recipient').hide();
           }
           else {
-            $('a.limit_to').show();
+            $('a.limit_to, a.recipient').show();
           }
           $("label[for='recipient']").text('{/literal}{$recipientLabels.other}{literal}');
         }
