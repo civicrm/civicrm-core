@@ -42,7 +42,7 @@ class CRM_Admin_Page_APIDoc extends CRM_Core_Page {
    * @return string
    */
   function run() {
-    CRM_Utils_System::setTitle(ts('API parameters'));
+    CRM_Utils_System::setTitle(ts('API Parameters'));
     return parent::run();
   }
 
