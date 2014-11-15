@@ -255,9 +255,11 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
       });
     } catch (Exception $ex) {
       $e = $ex;
+      if (get_class($e) != 'Exception' || $e->getMessage() != 'Ruh-roh') {
+        throw $e;
+      }
     }
     $this->assertTrue($e instanceof Exception);
-    $this->assertEquals('Ruh-roh', $e->getMessage());
     $this->assertContactsExistByOffset(array(0 => FALSE));
   }
 
