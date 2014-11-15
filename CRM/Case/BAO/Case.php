@@ -1183,7 +1183,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $deleteUrl = "{$url}&action=delete{$contextUrl}";
     $restoreUrl = "{$url}&action=renew{$contextUrl}";
     $viewTitle = ts('View this activity.');
-    $statusTitle = ts('Edit status');
+    $statusTitle = ts('Edit Status');
 
     $emailActivityTypeIDs = array(
       'Email' => CRM_Core_OptionGroup::getValue('activity_type',
