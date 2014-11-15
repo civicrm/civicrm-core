@@ -216,7 +216,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
       $this->click("remove");
       $this->clickLink("_qf_Component_next-bottom");
 
-      $this->checkCRMAlert("Changes Saved.");
+      $this->checkCRMAlert("Changes Saved");
 
       $this->openCiviPage('contribute/search', 'reset=1', '_qf_Search_refresh');
 
