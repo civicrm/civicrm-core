@@ -223,6 +223,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
     //get the mailing groups.
     $groups = CRM_Core_PseudoConstant::nestedGroup('Mailing');
+    asort($groups);
     if ($hiddenMailingGroup) {
       $groups[$hiddenMailingGroup] =
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $hiddenMailingGroup, 'title');
