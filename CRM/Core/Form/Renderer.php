@@ -244,6 +244,12 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     $entity = $field->getAttribute('data-api-entity');
     $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
     $display = array();
+
+    // Custom fields of type contactRef store their data in a slightly different format
+    if ($field->getAttribute('data-crm-custom') && $entity == 'contact') {
+      $vals = array(array('id' => $vals['id'], 'label' => $vals['text']));
+    }
+
     foreach ($vals as $val) {
       // Format contact as link
       if ($entity == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
