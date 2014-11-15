@@ -93,7 +93,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @access public
    */
   static function getSelection($id = NULL) {
-    $mapping = self::getMapping($id);
+    $mapping = self::getMapping();
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $activityType   = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
 
