@@ -209,7 +209,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->click("remove");
     $this->click("_qf_Component_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Changes Saved."));
+    $this->assertTrue($this->isTextPresent("Changes Saved"));
 
     $this->openCiviPage("event/search", "reset=1", "_qf_Search_refresh");
 
