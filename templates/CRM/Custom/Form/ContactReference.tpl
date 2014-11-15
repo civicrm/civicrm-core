@@ -24,6 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Js needed to initialize custom field of type ContactReference *}
+{if empty($form.$element_name.frozen)}
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
@@ -48,3 +49,4 @@
 });
 </script>
 {/literal}
+{/if}
