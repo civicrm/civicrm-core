@@ -83,7 +83,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     $contactDetails = CRM_Contact_BAO_Contact_Utils::contactDetails($this->_activityHolderIds,
       'Activity', $returnProperties
     );
-    $readOnlyFields['assignee_display_name'] = ts('Assigned To');
+    $readOnlyFields['assignee_display_name'] = ts('Assigned to');
     if(!empty($contactDetails)) {
       foreach($contactDetails as $key => $value){
         $assignee = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($key);

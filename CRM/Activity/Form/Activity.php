@@ -179,12 +179,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       ),
       'assignee_contact_id' => array(
         'type' => 'entityRef',
-        'label' => ts('Assigned To'),
+        'label' => ts('Assigned to'),
         'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
       ),
       'followup_assignee_contact_id' => array(
         'type' => 'entityRef',
-        'label' => ts('Assigned To'),
+        'label' => ts('Assigned to'),
         'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
       ),
       'followup_activity_type_id' => array(

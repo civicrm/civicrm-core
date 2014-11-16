@@ -141,7 +141,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData(
       array(
         'With Contact' => "Anderson, {$firstName2}",
-        'Assigned To' => "Summerson, {$firstName1}",
+        'Assigned to' => "Summerson, {$firstName1}",
       ),
       "/label"
     );
