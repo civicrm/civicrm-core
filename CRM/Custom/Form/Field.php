@@ -154,7 +154,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         array('Date' => ts('Select Date')),
         array('Radio' => ts('Radio')),
         array('StateProvince' => ts('Select State/Province'), 'Multi-Select' => ts('Multi-Select State/Province')),
-        array('Country' => ts('Select Country'), 'Multi-Select' => ts('Multi-Select Country ')),
+        array('Country' => ts('Select Country'), 'Multi-Select' => ts('Multi-Select Country')),
         array('File' => ts('Select File')),
         array('Link' => ts('Link')),
         array('ContactReference' => ts('Autocomplete-Select')),
