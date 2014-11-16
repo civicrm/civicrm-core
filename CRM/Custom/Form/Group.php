@@ -167,7 +167,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       // gives the ascii value
       $asciiValue = ord($title{0});
       if ($asciiValue >= 48 && $asciiValue <= 57) {
-        $errors['title'] = ts("Set's Name should not start with digit");
+        $errors['title'] = ts("Name cannot not start with a digit");
       }
     }
 
