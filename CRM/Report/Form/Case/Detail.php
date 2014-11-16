@@ -223,7 +223,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         array(
           'worldregion_id' => array(
             'name' => 'id',
-            'title' => ts('WorldRegion'),
+            'title' => ts('World Region'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::worldRegion(),
