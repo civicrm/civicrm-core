@@ -3862,7 +3862,7 @@ WHERE  id IN ( $groupIDs )
     $name = $targetName[4] ? "%$name%" : $name;
     $this->_where[$grouping][] = "contact_b_log.sort_name LIKE '%$name%'";
     $this->_tables['civicrm_log'] = $this->_whereTables['civicrm_log'] = 1;
-    $this->_qill[$grouping][] = ts('Modified by') . ": $name";
+    $this->_qill[$grouping][] = ts('Modified By') . " $name";
   }
 
   /**
