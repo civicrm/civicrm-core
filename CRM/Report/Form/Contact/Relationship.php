@@ -71,7 +71,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
           'contact_sub_type_a' =>
           array(
-            'title' => ts('Contact SubType (Contact A)'),
+            'title' => ts('Contact Subtype (Contact A)'),
             'name' => 'contact_sub_type',
           ),
         ),
@@ -116,7 +116,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
           'contact_sub_type_b' =>
           array(
-            'title' => ts('Contact SubType (Contact B)'),
+            'title' => ts('Contact Subtype (Contact B)'),
             'name' => 'contact_sub_type',
           ),
         ),

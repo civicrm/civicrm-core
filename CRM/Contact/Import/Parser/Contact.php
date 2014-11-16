@@ -509,7 +509,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $params['contact_sub_type'] = array_search($subType, $subTypes);
       }
       elseif (!CRM_Contact_BAO_ContactType::isExtendsContactType($subType, $this->_contactType)) {
-        $message = "Mismatched or Invalid Contact SubType.";
+        $message = "Mismatched or Invalid Contact Subtype.";
         array_unshift($values, $message);
         return CRM_Import_Parser::NO_MATCH;
       }

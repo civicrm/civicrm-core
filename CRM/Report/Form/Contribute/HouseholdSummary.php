@@ -77,7 +77,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             'title' => ts('Contact Type'),
           ),
           'contact_sub_type' => array(
-            'title' => ts('Contact SubType'),
+            'title' => ts('Contact Subtype'),
           ),
         ),
         'filters' => array(

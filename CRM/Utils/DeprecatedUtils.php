@@ -1374,7 +1374,7 @@ function _civicrm_api3_deprecated_contact_check_params(
 
     if ($csType = CRM_Utils_Array::value('contact_sub_type', $params)) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($csType, $params['contact_type']))) {
-        return civicrm_api3_create_error("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$csType));
+        return civicrm_api3_create_error("Invalid or Mismatched Contact Subtype: " . implode(', ', (array)$csType));
       }
     }
 
