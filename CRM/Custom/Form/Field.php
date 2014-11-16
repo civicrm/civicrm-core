@@ -150,7 +150,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         array('Text' => ts('Text'), 'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
-        array('TextArea' => ts('TextArea'), 'RichTextEditor' => ts('RichTextEditor')),
+        array('TextArea' => ts('TextArea'), 'RichTextEditor' => ts('Rich Text Editor')),
         array('Date' => ts('Select Date')),
         array('Radio' => ts('Radio')),
         array('StateProvince' => ts('Select State/Province'), 'Multi-Select' => ts('Multi-Select State/Province')),
