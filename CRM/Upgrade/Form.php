@@ -44,10 +44,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
 
   protected $_config;
 
-  // note latestVersion is legacy code, and
-  // only used for 2.0 -> 2.1 upgrade
-  public $latestVersion;
-
   /**
    * Upgrade for multilingual
    *
@@ -109,10 +105,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
     $name   = NULL
   ) {
     $this->_config = CRM_Core_Config::singleton();
-
-    // this->latestVersion is legacy code, only used for 2.0 -> 2.1 upgrade
-    // latest ver in 2.1 series
-    $this->latestVersion = '2.1.6';
 
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
@@ -656,60 +648,45 @@ SET    version = '$version'
 
     $phpFunctionName = 'upgrade_' . str_replace('.', '_', $rev);
 
-    // follow old upgrade process for all version
-    // below 3.2.alpha1
-    if (version_compare($rev, '3.2.alpha1') < 0) {
-      if (is_callable(array(
-        'CRM_Upgrade_Incremental_Legacy', $phpFunctionName))) {
-        call_user_func(array('CRM_Upgrade_Incremental_Legacy', $phpFunctionName), $rev);
+    $versionObject = $upgrade->incrementalPhpObject($rev);
+
+    // pre-db check for major release.
+    if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
+      if (!(is_callable(array(
+        $versionObject, 'verifyPreDBstate')))) {
+        CRM_Core_Error::fatal("verifyPreDBstate method was not found for $rev");
       }
-      else {
-        $upgrade->processSQL($rev);
+
+      $error = NULL;
+      if (!($versionObject->verifyPreDBstate($error))) {
+        if (!isset($error)) {
+          $error = "post-condition failed for current upgrade for $rev";
+        }
+        CRM_Core_Error::fatal($error);
       }
+
+    }
+
+    $upgrade->setSchemaStructureTables($rev);
+
+    if (is_callable(array(
+      $versionObject, $phpFunctionName))) {
+      $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
     }
     else {
-      // new upgrade process from version
-      // 3.2.alpha1
-      $versionObject = $upgrade->incrementalPhpObject($rev);
+      $upgrade->processSQL($rev);
+    }
 
-      // pre-db check for major release.
-      if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
-        if (!(is_callable(array(
-          $versionObject, 'verifyPreDBstate')))) {
-          CRM_Core_Error::fatal("verifyPreDBstate method was not found for $rev");
-        }
-
-        $error = NULL;
-        if (!($versionObject->verifyPreDBstate($error))) {
-          if (!isset($error)) {
-            $error = "post-condition failed for current upgrade for $rev";
-          }
-          CRM_Core_Error::fatal($error);
-        }
-
-      }
-
-      $upgrade->setSchemaStructureTables($rev);
-
-      if (is_callable(array(
-        $versionObject, $phpFunctionName))) {
-        $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
-      }
-      else {
-        $upgrade->processSQL($rev);
-      }
-
-      // set post-upgrade-message if any
-      if (is_callable(array(
-        $versionObject, 'setPostUpgradeMessage'))) {
-        $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
-        $versionObject->setPostUpgradeMessage($postUpgradeMessage, $rev);
-        file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
-      } else {
-        $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
-        CRM_Upgrade_Incremental_Legacy::setPostUpgradeMessage($postUpgradeMessage, $rev);
-        file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
-      }
+    // set post-upgrade-message if any
+    if (is_callable(array(
+      $versionObject, 'setPostUpgradeMessage'))) {
+      $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
+      $versionObject->setPostUpgradeMessage($postUpgradeMessage, $rev);
+      file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
+    } else {
+      $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
+      CRM_Upgrade_Incremental_Legacy::setPostUpgradeMessage($postUpgradeMessage, $rev);
+      file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
     }
 
     return TRUE;
