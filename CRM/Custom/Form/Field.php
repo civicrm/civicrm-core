@@ -595,7 +595,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       // gives the ascii value
       $asciiValue = ord($title{0});
       if ($asciiValue >= 48 && $asciiValue <= 57) {
-        $errors['label'] = ts("Field's Name should not start with digit");
+        $errors['label'] = ts("Name cannot not start with a digit");
       }
     }
 
@@ -614,19 +614,19 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       switch ($dataType) {
         case 'Int':
           if (!CRM_Utils_Rule::integer($default)) {
-            $errors['default_value'] = ts('Please enter a valid integer as default value.');
+            $errors['default_value'] = ts('Please enter a valid integer.');
           }
           break;
 
         case 'Float':
           if (!CRM_Utils_Rule::numeric($default)) {
-            $errors['default_value'] = ts('Please enter a valid number as default value.');
+            $errors['default_value'] = ts('Please enter a valid number.');
           }
           break;
 
         case 'Money':
           if (!CRM_Utils_Rule::money($default)) {
-            $errors['default_value'] = ts('Please enter a valid number value.');
+            $errors['default_value'] = ts('Please enter a valid number.');
           }
           break;
 
