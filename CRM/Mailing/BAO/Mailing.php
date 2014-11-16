@@ -2527,14 +2527,14 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
     $templates = array();
 
-    $textFields = array('text_message' => ts('HTML format'), 'sms_text_message' => ts('SMS Message'));
+    $textFields = array('text_message' => ts('HTML Format'), 'sms_text_message' => ts('SMS Message'));
     $modePrefixes = array('Mail' => NULL, 'SMS' => 'SMS');
 
     if ($className != 'CRM_SMS_Form_Upload' && $className != 'CRM_Contact_Form_Task_SMS' &&
       $className != 'CRM_Contact_Form_Task_SMS'
     ) {
       $form->addWysiwyg('html_message',
-        ts('HTML format'),
+        ts('HTML Format'),
         array(
           'cols' => '80', 'rows' => '8',
           'onkeyup' => "return verify(this)",
