@@ -210,7 +210,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           'receive_date' =>
           array('operatorType' => CRM_Report_Form::OP_DATE),
           'contribution_status_id' =>
-          array('title' => ts('Donation Status'),
+          array('title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
@@ -221,7 +221,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
           'total_amount' =>
-          array('title' => ts('Donation Amount'),
+          array('title' => ts('Contribution Amount'),
           ),
           'total_sum' =>
           array('title' => ts('Aggregate Amount'),

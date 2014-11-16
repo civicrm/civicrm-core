@@ -107,7 +107,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'default' => TRUE,
           ),
           'contribution_status_id' => array(
-            'title' => ts('Donation Status'),
+            'title' => ts('Contribution Status'),
           ),
           'frequency_interval' => array(
             'title' => ts('Frequency interval'),
@@ -148,7 +148,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
         ),
         'filters' => array(
           'contribution_status_id' => array(
-            'title' => ts('Donation Status'),
+            'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(5),
