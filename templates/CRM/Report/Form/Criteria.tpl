@@ -25,7 +25,7 @@
 *}
 {* Report form criteria section *}
     {if $colGroups}
-      <div id="col-groups" class="civireport-criteria" >
+  <div id="col-groups" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom">
         {if $componentName eq 'Grant'}
             <h3>{ts}Include these Statistics{/ts}</h3>
         {else}
@@ -64,7 +64,7 @@
     {/if}
 
     {if $groupByElements}
-        <div id="group-by-elements" class="civireport-criteria" >
+        <div id="group-by-elements" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>{ts}Group by Columns{/ts}</h3>
         {assign  var="count" value="0"}
         <table class="report-layout">
@@ -90,7 +90,7 @@
     {/if}
 
     {if $orderByOptions}
-      <div id="order-by-elements" class="civireport-criteria" >
+      <div id="order-by-elements" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>{ts}Order by Columns{/ts}</h3>
 
   <table id="optionField">
@@ -161,7 +161,7 @@
     {/if}
 
     {if $otherOptions}
-        <div id="other-options" class="civireport-criteria" >
+        <div id="other-options" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>{ts}Other Options{/ts}</h3>
         <table class="report-layout">
           {assign var="optionCount" value=0}
@@ -182,7 +182,7 @@
     {/if}
 
     {if $filters}
-  <div id="set-filters" class="civireport-criteria" >
+  <div id="set-filters" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>{ts}Set Filters{/ts}</h3>
         <table class="report-layout">
       {assign var="counter" value=1}
@@ -280,5 +280,3 @@
     });
     </script>
     {/literal}
-
-    <div>{$form.buttons.html}</div>

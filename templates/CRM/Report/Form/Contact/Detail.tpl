@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{include file="CRM/Report/Form/Actions.tpl"}
 {* this div is being used to apply special css *}
     {if !$section }
     <div class="crm-block crm-form-block crm-report-field-form-block">
@@ -31,7 +32,6 @@
     {/if}
 
 <div class="crm-block crm-content-block crm-report-form-block">
-{include file="CRM/Report/Form/Actions.tpl"}
 {if !$section }
 {include file="CRM/Report/Form/Statistics.tpl" top=true}
 {/if}

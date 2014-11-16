@@ -4556,3 +4556,33 @@ span.crm-status-icon {
   cursor: pointer;
   font-size: 11px !important;
 }
+
+/* Reports Styles */
+#crm-container div.crm-report-criteria #mainTabContainer .ui-tabs-panel {
+  float: none;
+  width: auto;
+  min-height: 0;
+}
+#crm-container .ui-tabs .ui-tabs-nav {
+  padding-bottom: 0;
+}
+#crm-container .ui-tabs-nav .ui-state-default {
+  border-color: #CCC;
+  border-width: 1px 1px 0 1px;
+  border-style: solid;
+}
+#crm-container .ui-tabs-nav .ui-state-active {
+  border-color: #FFF;
+}
+#crm-container .left {
+  float: left;
+}
+#crm-container table.criteria-group {
+  border-top: #EEE solid 1px;
+}
+#crm-container .crm-submit-buttons-bottom {
+  padding: 0.2em;
+}
+#crm-container div.crm-buttons-actions {
+  margin-top: 4px;
+}

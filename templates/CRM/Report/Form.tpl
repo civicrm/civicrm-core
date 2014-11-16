@@ -38,6 +38,9 @@
         {include file="CRM/Report/Form/Layout/Table.tpl"}
   </div>
     {else}
+  {*include actions*}
+  {include file="CRM/Report/Form/Actions.tpl"}
+
     {if $criteriaForm OR $instanceForm OR $instanceFormError}
     <div class="crm-block crm-form-block crm-report-field-form-block">
         {include file="CRM/Report/Form/Fields.tpl"}
@@ -45,9 +48,6 @@
     {/if}
 
     <div class="crm-block crm-content-block crm-report-form-block">
-        {*include actions*}
-        {include file="CRM/Report/Form/Actions.tpl"}
-
         {*Statistics at the Top of the page*}
         {include file="CRM/Report/Form/Statistics.tpl" top=true}
 
