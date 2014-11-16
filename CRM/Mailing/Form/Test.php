@@ -77,7 +77,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
     $this->add('select',
       'test_group',
       ts('Send to This Group'),
-      array('' => ts('- none -')) + CRM_Core_PseudoConstant::group('Mailing')
+      array('' => ts('- none -')) + CRM_Core_PseudoConstant::nestedGroup('Mailing')
     );
     $this->setDefaults($defaults);
 
