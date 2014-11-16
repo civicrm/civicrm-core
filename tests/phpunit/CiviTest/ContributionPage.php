@@ -24,7 +24,7 @@ class ContributionPage extends PHPUnit_Framework_Testcase {
       'min_amount' => 10,
       'max_amount' => 10000,
       'goal_amount' => 100000,
-      'thankyou_title' => 'Thanks for Your Support!',
+      'thankyou_title' => 'Thank you for your support!',
       'thankyou_text' => 'Thank you for your support.',
       'is_email_receipt' => 1,
       'receipt_from_name' => 'From TEST',
