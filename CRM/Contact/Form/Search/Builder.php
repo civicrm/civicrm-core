@@ -182,7 +182,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             foreach ($grpId as $val) {
               $error = CRM_Utils_Type::validate($val, 'Integer', FALSE);
               if ($error != $val) {
-                $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter valid value.");
+                $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a valid value.");
                 break;
               }
             }
