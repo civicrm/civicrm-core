@@ -30,7 +30,7 @@
     {if $annual.count}
         <tr>
             <th class="contriTotalLeft right">{ts}Current Year-to-Date{/ts} - {$annual.amount}</th>
-            <th class="right"> &nbsp; {ts}#  Completed Contributions{/ts} - {$annual.count}</th>
+            <th class="right"> &nbsp; {ts}# Completed Contributions{/ts} - {$annual.count}</th>
             <th class="right contriTotalRight"> &nbsp; {ts}Avg Amount{/ts} - {$annual.avg}</th>
             {if $contributionSummary.cancel.amount}
                 <td>&nbsp;</td>
