@@ -67,7 +67,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
     if (!$check) {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/dashboard', 'reset=1'));
-      break;
     }
 
     $this->_contactId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
