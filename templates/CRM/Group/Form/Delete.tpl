@@ -26,7 +26,7 @@
 {* this template is used for confirmation of delete for a group  *}
 <div class="crm-block crm-form-block crm-group-delete-form-block">
 
-<h3>{ts}Delete Group {/ts}</h3>
+<h3>{ts}Delete Group{/ts}</h3>
     <div class="messages status no-popup">
         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
     {ts 1=$title}Are you sure you want to delete the group %1?{/ts}<br /><br />
