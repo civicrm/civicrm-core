@@ -195,7 +195,7 @@ SELECT id
   function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-    CRM_Utils_System::setTitle(ts('Contribution Amounts (%1)', array(1 => $title)));
+    CRM_Utils_System::setTitle(ts('Contribution Amounts') . " ($title)");
 
     if (empty($defaults['pay_later_text'])) {
       $defaults['pay_later_text'] = ts('I will send payment by check');

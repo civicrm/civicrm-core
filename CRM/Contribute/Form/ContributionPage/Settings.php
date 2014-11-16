@@ -61,9 +61,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         $this->_id,
         'title'
       );
-      CRM_Utils_System::setTitle(ts('Title and Settings (%1)',
-          array(1 => $title)
-        ));
+      CRM_Utils_System::setTitle(ts('Title and Settings') . " ($title)");
 
       $ufJoinParams = array(
         'module' => 'OnBehalf',
