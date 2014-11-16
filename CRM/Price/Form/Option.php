@@ -178,7 +178,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         if (in_array($eventComponentId, $allComponents)) {
           $this->isEvent = TRUE;
           // count
-          $this->add('text', 'count', ts('Participants Count'));
+          $this->add('text', 'count', ts('Participant Count'));
           $this->addRule('count', ts('Please enter a valid Max Participants.'), 'positiveInteger');
 
           $this->add('text', 'max_value', ts('Max Participants'));
