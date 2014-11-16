@@ -479,12 +479,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       $count += $dao->count;
     }
     $statistics['counts']['amount'] = array(
-      'title' => ts('Total Amount (Donations)'),
+      'title' => ts('Total Amount (Contributions)'),
       'value' => implode(',  ', $totalAmount),
       'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['count'] = array(
-      'title' => ts('Total Donations'),
+      'title' => ts('Total Contributions'),
       'value' => $count,
     );
     $statistics['counts']['avg'] = array(

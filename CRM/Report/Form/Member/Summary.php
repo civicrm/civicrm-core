@@ -431,7 +431,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
       'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['count'] = array(
-      'title' => ts('Total Donations'),
+      'title' => ts('Total Contributions'),
       'value' => $count,
     );
     $statistics['counts']['memberCount'] = array(
