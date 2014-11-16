@@ -525,7 +525,7 @@
         options: YESNO
       },
       'is_proximity_search': {
-        title: ts('Proximity search'),
+        title: ts('Proximity Search'),
         help: ts('FIXME'),
         type: 'Select',
         options: YESNO // FIXME
