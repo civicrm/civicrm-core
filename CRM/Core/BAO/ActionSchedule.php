@@ -112,7 +112,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $sel1 = $sel2 = $sel3 = $sel4 = $sel5 = array();
     $options = array(
       'manual' => ts('Choose Recipient(s)'),
-      'group' => ts('Select a Group'),
+      'group' => ts('Select Group'),
     );
 
     $entityMapping = array();
@@ -271,7 +271,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $sel4 = $sel5 = array();
     $options = array(
       'manual' => ts('Choose Recipient(s)'),
-      'group' => ts('Select a Group'),
+      'group' => ts('Select Group'),
     );
 
     $recipientMapping = array_combine(array_keys($options), array_keys($options));
