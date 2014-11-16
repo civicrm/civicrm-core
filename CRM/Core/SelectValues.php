@@ -169,7 +169,7 @@ class CRM_Core_SelectValues {
       'Multi-Select' => ts('Multi-Select'),
       'AdvMulti-Select' => ts('AdvMulti-Select'),
       'Link' => ts('Link'),
-      'ContactReference' => ts('Autocomplete Select'),
+      'ContactReference' => ts('Autocomplete-Select'),
     );
   }
 

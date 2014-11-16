@@ -139,7 +139,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         array('Text' => ts('Text'), 'Select' => ts('Select'),
           'Radio' => ts('Radio'), 'CheckBox' => ts('CheckBox'), 'Multi-Select' => ts('Multi-Select'),
           'AdvMulti-Select' => ts('Adv Multi-Select (obsolete)'),
-          'Autocomplete-Select' => ts('Autocomplete Select'),
+          'Autocomplete-Select' => ts('Autocomplete-Select'),
         ),
         array('Text' => ts('Text'), 'Select' => ts('Select'),
           'Radio' => ts('Radio'),
@@ -157,7 +157,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         array('Country' => ts('Select Country'), 'Multi-Select' => ts('Multi-Select Country ')),
         array('File' => ts('Select File')),
         array('Link' => ts('Link')),
-        array('ContactReference' => ts('Autocomplete Select')),
+        array('ContactReference' => ts('Autocomplete-Select')),
       );
     }
   }
