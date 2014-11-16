@@ -122,7 +122,7 @@ SELECT id
 
     //check if selected payment processor supports recurring payment
     if (!empty($recurringPaymentProcessor)) {
-      $this->addElement('checkbox', 'is_recur', ts('Recurring contributions'), NULL,
+      $this->addElement('checkbox', 'is_recur', ts('Recurring Contributions'), NULL,
         array('onclick' => "showHideByValue('is_recur',true,'recurFields','table-row','radio',false);")
       );
       $this->addCheckBox('recur_frequency_unit', ts('Supported recurring units'),
