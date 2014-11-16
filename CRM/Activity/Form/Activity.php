@@ -259,7 +259,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       if (!CRM_Core_Permission::check('delete activities')) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
     }
 

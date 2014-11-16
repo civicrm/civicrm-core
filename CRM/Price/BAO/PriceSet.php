@@ -1151,7 +1151,7 @@ WHERE  id = %1";
     if ($sid && self::eventPriceSetDomainID()) {
       $domain_id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $sid, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domain_id) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
     }
     return TRUE;
