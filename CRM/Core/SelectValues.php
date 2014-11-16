@@ -522,7 +522,7 @@ class CRM_Core_SelectValues {
       '{contribution.total_amount}' => ts('Total Amount'),
       '{contribution.fee_amount}' => ts('Fee Amount'),
       '{contribution.net_amount}' => ts('Net Amount'),
-      '{contribution.non_deductible_amount}' => ts('Non Deductible Amount'),
+      '{contribution.non_deductible_amount}' => ts('Non-deductible Amount'),
       '{contribution.receive_date}' => ts('Contribution Receive Date'),
       '{contribution.payment_instrument}' => ts('Payment Instrument'),
       '{contribution.trxn_id}' => ts('Transaction ID'),
