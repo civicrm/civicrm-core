@@ -594,7 +594,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
   }
 
   function logout() {
