@@ -426,11 +426,11 @@ class CRM_Contact_Form_Search_Criteria {
     $form->add('select', 'relation_type_id', ts('Relationship Type'), array('' => ts('- select -')) + $allRelationshipType, FALSE, array('class' => 'crm-select2'));
     $form->addElement('text', 'relation_target_name', ts('Target Contact'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
     // relation status
-    $relStatusOption = array(ts('Active '), ts('Inactive '), ts('All'));
+    $relStatusOption = array(ts('Active'), ts('Inactive'), ts('All'));
     $form->addRadio('relation_status', ts('Relationship Status'), $relStatusOption);
     $form->setDefaults(array('relation_status' => 0));
     // relation permission
-    $relPermissionOption = array(ts('Any'), ts('Yes '), ts('No ') );
+    $relPermissionOption = array(ts('Any'), ts('Yes'), ts('No') );
     $form->addRadio('relation_permission', ts('Permissioned Relationship?'), $relPermissionOption);
     $form->setDefaults(array('relation_permission' => 0));
 
