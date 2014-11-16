@@ -1182,7 +1182,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $editUrl = "{$url}&action=update{$contextUrl}";
     $deleteUrl = "{$url}&action=delete{$contextUrl}";
     $restoreUrl = "{$url}&action=renew{$contextUrl}";
-    $viewTitle = ts('View this activity.');
+    $viewTitle = ts('View activity');
     $statusTitle = ts('Edit Status');
 
     $emailActivityTypeIDs = array(
