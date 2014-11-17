@@ -285,11 +285,13 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         }
         $dao = new CRM_Core_DAO();
         $qParams = array();
-        $svq = $dao->singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value",
+        $svq = $dao->singleValueQuery("SELECT is_deleted FROM civicrm_contact WHERE id = $value",
           $qParams
         );
-        if (!$svq) {
+        if (!isset($svq)) {
           return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = $value.");
+        } else if ($svq == 1) {
+          return civicrm_api3_create_error("Invalid Contact ID: contact_id $value is a soft-deleted contact.");
         }
 
         $values['contact_id'] = $values['contribution_contact_id'];
