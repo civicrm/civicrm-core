@@ -38,7 +38,7 @@ require_once 'CiviTest/CiviReportTestCase.php';
  * @package CiviCRM
  */
 class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
-  static $_tablesToTruncate = array(
+  protected $_tablesToTruncate = array(
     'civicrm_contact',
     'civicrm_email',
     'civicrm_phone',
