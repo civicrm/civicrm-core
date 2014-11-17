@@ -934,7 +934,12 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $anniversary = false;
 
       if (!CRM_Utils_System::isNull($mapping->entity_recipient)) {
-        $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
+        if ($mapping->entity_recipient == 'event_contacts') {
+          $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
+        }
+        else {
+          $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
+        }
       }
       $from = "{$mapping->entity} e";
 
