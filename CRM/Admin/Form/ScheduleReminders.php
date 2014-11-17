@@ -424,7 +424,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['group_id'] = $values['group_id'];
       $params['recipient_manual'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }
-    elseif (!CRM_Utils_System::isNull($values['recipient_listing'])) {
+    elseif (!CRM_Utils_System::isNull($values['recipient_listing']) && !CRM_Utils_System::isNull($values['limit_to'])) {
       $params['recipient'] = CRM_Utils_Array::value('recipient', $values);
       $params['recipient_listing'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
         CRM_Utils_Array::value('recipient_listing', $values)
