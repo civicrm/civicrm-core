@@ -326,17 +326,17 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
         $count = $dao->count;
         $totalCount .= $count;
         $statistics['counts']['amount' . $index] = array(
-          'title' => ts('Total Amount Pledged (') . $dao->currency . ')',
+          'title' => ts('Total Pledged') . ' (' . $dao->currency . ')',
           'value' => $totalAmount,
           'type' => CRM_Utils_Type::T_STRING,
         );
         $statistics['counts']['avg' . $index] = array(
-          'title' => ts('Average (') . $dao->currency . ')',
+          'title' => ts('Average') . ' (' . $dao->currency . ')',
           'value' => $average,
           'type' => CRM_Utils_Type::T_STRING,
         );
         $statistics['counts']['count' . $index] = array(
-          'title' => ts('Total No Pledges (') . $dao->currency . ')',
+          'title' => ts('Total No Pledges') . ' (' . $dao->currency . ')',
           'value' => $count,
           'type' => CRM_Utils_Type::T_INT,
         );

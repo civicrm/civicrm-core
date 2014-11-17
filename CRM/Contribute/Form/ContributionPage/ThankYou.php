@@ -48,7 +48,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
    */
   function setDefaultValues() {
     $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-    CRM_Utils_System::setTitle(ts('Thank-you and Receipting (%1)', array(1 => $title)));
+    CRM_Utils_System::setTitle(ts('Thank-you and Receipting') . " ($title)");
     return parent::setDefaultValues();
   }
 

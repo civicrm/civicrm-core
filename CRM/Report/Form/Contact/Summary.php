@@ -82,7 +82,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact SubType'),
+            'title' => ts('Contact Subtype'),
           ),
           'gender_id' =>
           array('title' => ts('Gender'),

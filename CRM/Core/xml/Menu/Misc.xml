@@ -56,7 +56,7 @@
   </item>
   <item>
      <path>civicrm/file/delete</path>
-     <title>Delete file</title>
+     <title>Delete File</title>
      <access_arguments>access CiviCRM</access_arguments>
      <page_callback>CRM_Core_BAO_File::deleteAttachment</page_callback>
   </item>

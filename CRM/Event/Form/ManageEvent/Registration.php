@@ -249,7 +249,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $this->addElement('checkbox',
       'is_online_registration',
-      ts('Allow Online Registration?'),
+      ts('Allow Online Registration'),
       NULL,
       array(
         'onclick' => "return showHideByValue('is_online_registration',

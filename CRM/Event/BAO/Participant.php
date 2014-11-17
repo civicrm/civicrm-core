@@ -406,7 +406,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
             {$whereClause}";
 
-      $eventFullText = ts('This event is full!!!');
+      $eventFullText = ts('This event is full.');
       $participants = CRM_Core_DAO::executeQuery($query, $eventParams);
       while ($participants->fetch()) {
         //oops here event is full and we don't want waiting count.
@@ -433,7 +433,7 @@ INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
             {$whereClause}";
 
     $eventMaxSeats = NULL;
-    $eventFullText = ts('This event is full !!!');
+    $eventFullText = ts('This event is full.');
     $participants  = CRM_Core_DAO::executeQuery($query, $eventParams);
     while ($participants->fetch()) {
       if ($participants->event_full_text) {

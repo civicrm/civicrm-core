@@ -179,12 +179,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       ),
       'assignee_contact_id' => array(
         'type' => 'entityRef',
-        'label' => ts('Assigned To'),
+        'label' => ts('Assigned to'),
         'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
       ),
       'followup_assignee_contact_id' => array(
         'type' => 'entityRef',
-        'label' => ts('Assigned To'),
+        'label' => ts('Assigned to'),
         'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
       ),
       'followup_activity_type_id' => array(
@@ -259,7 +259,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       if (!CRM_Core_Permission::check('delete activities')) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
     }
 

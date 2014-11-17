@@ -404,7 +404,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       $form->assign('profile', $profile);
     }
 
-    $form->add('select', 'supporter_profile_id', ts('Supporter profile'), array('' => ts('- select -')) + $profile, TRUE);
+    $form->add('select', 'supporter_profile_id', ts('Supporter Profile'), array('' => ts('- select -')) + $profile, TRUE);
 
     $form->addElement('checkbox', 'is_tellfriend_enabled', ts("Allow 'Tell a friend' functionality"), NULL, array('onclick' => "return showHideByValue('is_tellfriend_enabled',true,'tflimit','table-row','radio',false);"));
 
