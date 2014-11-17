@@ -245,7 +245,7 @@
         }
         else {
           $('#recipient, a.recipient').show()
-$('#recipient').css("margin-left", "-2px");
+          $('#recipient').css("margin-left", "-2px");
           $('a.limit_to').hide();
           $("label[for='recipient']").text('{/literal}{$recipientLabels.activity}{literal}');
         }
