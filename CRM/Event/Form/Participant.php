@@ -782,17 +782,17 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     $notificationStatusIds = implode(',', array_keys(array_intersect($participantStatusName, $notificationStatuses)));
     $this->assign('notificationStatusIds', $notificationStatusIds);
 
-    $this->_participantStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-    $this->addSelect('status_id', $checkCancelledJs + array('option_url' => 'civicrm/admin/participant_status'), TRUE);
+    $this->_participantStatuses = $statusOptions = CRM_Event_BAO_Participant::buildOptions('status_id', 'create');
 
-    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-      'enable_cart'
-    );
-    $pendingInCartStatusId = array_search('Pending in cart', $participantStatusName);
-    $this->assign('pendingInCartStatusId', $pendingInCartStatusId);
-    $this->assign('enableCart', $enableCart);
-    $pendingRefundStatusId = array_search('Pending refund', $participantStatusName);
-    $this->assign('pendingRefundStatusId', $pendingRefundStatusId);
+    // Only show refund status when editing
+    if ($this->_action & CRM_Core_Action::ADD) {
+      $pendingRefundStatusId = array_search('Pending refund', $participantStatusName);
+      if ($pendingRefundStatusId) {
+        unset($statusOptions[$pendingRefundStatusId]);
+      }
+    }
+
+    $this->addSelect('status_id', $checkCancelledJs + array('options' => $statusOptions, 'option_url' => 'civicrm/admin/participant_status'), TRUE);
 
     $this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
 
