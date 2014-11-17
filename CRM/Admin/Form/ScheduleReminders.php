@@ -219,7 +219,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), array('multiple' => TRUE, 'create' => TRUE));
 
     $this->add('select', 'group_id', ts('Group'),
-      CRM_Core_PseudoConstant::nestedGroup(), FALSE, array('class' => 'crm-select2 huge')
+      CRM_Core_PseudoConstant::nestedGroup('Mailing'), FALSE, array('class' => 'crm-select2 huge')
     );
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);
