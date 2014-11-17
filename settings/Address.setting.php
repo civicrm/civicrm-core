@@ -72,11 +72,11 @@ return array (
     'html_type' => 'Text',
     'default' => null,
     'add' => '4.1',
-    'title' => 'Web service url',
+    'title' => 'Web Service URL',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,
-    'help_text' => 'Web service URL.',
+    'help_text' => 'Web Service URL',
     'validate_callback' => 'CRM_Utils_Rule::url',
   ),
 );

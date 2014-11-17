@@ -496,7 +496,7 @@
         type: 'TextArea'
       },
       'help_pre': {
-        title: ts('Pre-form Help '),
+        title: ts('Pre-form Help'),
         help: ts('Explanatory text displayed at the beginning of the form.')
           + ts('Note that this help text is displayed on profile create/edit screens only.'),
         type: 'TextArea'
@@ -525,7 +525,7 @@
         options: YESNO
       },
       'is_proximity_search': {
-        title: ts('Proximity search'),
+        title: ts('Proximity Search'),
         help: ts('FIXME'),
         type: 'Select',
         options: YESNO // FIXME

@@ -122,7 +122,7 @@ SELECT id
 
     //check if selected payment processor supports recurring payment
     if (!empty($recurringPaymentProcessor)) {
-      $this->addElement('checkbox', 'is_recur', ts('Recurring contributions'), NULL,
+      $this->addElement('checkbox', 'is_recur', ts('Recurring Contributions'), NULL,
         array('onclick' => "showHideByValue('is_recur',true,'recurFields','table-row','radio',false);")
       );
       $this->addCheckBox('recur_frequency_unit', ts('Supported recurring units'),
@@ -195,7 +195,7 @@ SELECT id
   function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-    CRM_Utils_System::setTitle(ts('Contribution Amounts (%1)', array(1 => $title)));
+    CRM_Utils_System::setTitle(ts('Contribution Amounts') . " ($title)");
 
     if (empty($defaults['pay_later_text'])) {
       $defaults['pay_later_text'] = ts('I will send payment by check');

@@ -297,7 +297,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
 
     CRM_Friend_BAO_Friend::getValues($defaults);
     if ($this->_entityTable == 'civicrm_pcp') {
-      $defaults['thankyou_text'] = $defaults['thankyou_title'] = ts('Thanks for your Support');
+      $defaults['thankyou_text'] = $defaults['thankyou_title'] = ts('Thank you for your support');
       $defaults['thankyou_text'] = ts('Thanks for supporting this campaign by spreading the word to your friends.');
     }
     elseif ($this->_entityTable == 'civicrm_contribution_page') {

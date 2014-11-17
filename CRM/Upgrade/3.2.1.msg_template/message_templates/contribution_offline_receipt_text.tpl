@@ -1,6 +1,6 @@
 {if $formValues.receipt_text}
 {$formValues.receipt_text}
-{else}{ts}Thanks for your support.{/ts}{/if}
+{else}{ts}Thank you for your support.{/ts}{/if}
 
 {ts}Please print this receipt for your records.{/ts}
 

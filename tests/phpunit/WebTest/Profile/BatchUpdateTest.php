@@ -722,7 +722,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('label', $richTextField);
     $this->click('data_type[0]');
     $this->select('data_type[0]', "label=Note");
-    $this->select('data_type[1]', "label=RichTextEditor");
+    $this->select('data_type[1]', "value=RichTextEditor");
 
     //clicking save
     $this->clickLink('_qf_Field_next_new-top', '_qf_Field_done-bottom', FALSE);

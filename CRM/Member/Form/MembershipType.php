@@ -228,7 +228,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     }
 
     if (($params['minimum_fee'] > 0 ) && !$params['financial_type_id'] ) {
-      $errors['financial_type_id'] = ts('Please enter the financial type.');
+      $errors['financial_type_id'] = ts('Please enter the financial Type.');
     }
 
     if (empty($params['duration_interval']) and $params['duration_unit'] != 'lifetime') {

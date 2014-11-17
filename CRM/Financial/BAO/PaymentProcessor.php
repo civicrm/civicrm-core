@@ -163,7 +163,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    */
   static function del($paymentProcessorID) {
     if (!$paymentProcessorID) {
-      CRM_Core_Error::fatal(ts('Invalid value passed to delete function'));
+      CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
     }
 
     $dao = new CRM_Financial_DAO_PaymentProcessor();
