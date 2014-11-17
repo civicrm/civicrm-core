@@ -181,7 +181,7 @@
         $('#relativeDate, #relativeDateRepeat, #repeatFields, #OR', $form).hide();
       }
 
-      $('#entity_0', $form).change(buildSelects).change(showHideLimitTo);
+      $('#entity_0', $form).change(buildSelects);
 
       loadMsgBox();
       $('#mode', $form).change(loadMsgBox);
@@ -220,29 +220,32 @@
             .done(function(result) {
               CRM.utils.setOptions($('#recipient_listing', $form), result.values);
             });
-          $("#recipientList, a.limit_to", $form).show();
-          $("#recipient").css("margin-left", "12px");
-        } else {
-          $("#recipientList", $form).hide();
-          if ($('#entity_0', $form).val() !== '1' && $('#limit_to').val() == '') {
-            $('tr.recipient:visible, a.limit_to').hide();
-          }
+          $("#recipientList", $form).show();
         }
+
+        var entity = $('#entity_0', $form).val();
+        if (!(entity === '2' || entity === '3')) {
+          $('#recipientList', $form).hide();
+        }
+        showHideLimitTo();
       }
       // CRM-14070 Hide limit-to when entity is activity
       function showHideLimitTo() {
         $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
         if ($('#entity_0', $form).val() != '1') {
           if ($('#limit_to', $form).val() == '') {
-            $('#recipient, a.limit_to').hide();
+            $('tr.recipient:visible, #recipientList, #recipient, a.recipient').hide();
+            $('a.limit_to').show();
           }
           else {
-            $('a.limit_to').show();
+            $('a.limit_to, a.recipient').show();
+            $('#recipient').css("margin-left", "12px");
           }
           $("label[for='recipient']").text('{/literal}{$recipientLabels.other}{literal}');
         }
         else {
-          $('#recipient').show().css("margin-left", "-2px");
+          $('#recipient, a.recipient').show()
+          $('#recipient').css("margin-left", "-2px");
           $('a.limit_to').hide();
           $("label[for='recipient']").text('{/literal}{$recipientLabels.activity}{literal}');
         }

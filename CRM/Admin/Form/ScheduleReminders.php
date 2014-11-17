@@ -77,6 +77,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
     }
 
+    if (!empty($_POST) && !empty($_POST['entity'])) {
+      $mappingID = $_POST['entity'][0];
+    }
+    elseif ($this->_mappingID) {
+      $mappingID = $this->_mappingID;
+    }
+
     $this->add(
       'text',
       'title',
@@ -212,7 +219,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), array('multiple' => TRUE, 'create' => TRUE));
 
     $this->add('select', 'group_id', ts('Group'),
-      CRM_Core_PseudoConstant::nestedGroup(), FALSE, array('class' => 'crm-select2 huge')
+      CRM_Core_PseudoConstant::nestedGroup('Mailing'), FALSE, array('class' => 'crm-select2 huge')
     );
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);
@@ -417,7 +424,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['group_id'] = $values['group_id'];
       $params['recipient_manual'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }
-    elseif (!CRM_Utils_System::isNull($values['recipient_listing'])) {
+    elseif (!CRM_Utils_System::isNull($values['recipient_listing']) && !CRM_Utils_System::isNull($values['limit_to'])) {
       $params['recipient'] = CRM_Utils_Array::value('recipient', $values);
       $params['recipient_listing'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
         CRM_Utils_Array::value('recipient_listing', $values)
