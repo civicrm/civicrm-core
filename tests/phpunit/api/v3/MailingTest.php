@@ -55,6 +55,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     parent::setUp();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
     $this->_contactIDs = array();
+    $this->_contactIDs[] = $this->individualCreate();
     $this->_groupID = $this->groupCreate();
     $this->_groupIDs = array();
     $this->_email = 'test@test.test';
@@ -62,7 +63,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'subject' => 'maild',
       'body_text' => "This is {contact.display_name}",
       'name' => 'mailing name',
-      'created_id' => 1,
+      'created_id' => $this->_contactIDs[0],
     );
   }
 
