@@ -218,10 +218,15 @@
                 $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
                 $('#repetition_start_date_time').val($('#activity_date_time_time').val());
               }
-              $('#activity_date_time_display').blur(function() {
-                $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
+
+              $('#activity_date_time_display').change(function() {
+                $('#repetition_start_date_display').val($('#activity_date_time').val());
+              });
+
+              $('#activity_date_time_time').change(function() {
                 $('#repetition_start_date_time').val($('#activity_date_time_time').val());
               });
+
               if ($('#start_action_offset').val() == "" && $('#repeat_absolute_date_display').val() == "") {
                 $('#recurring-entity-block').addClass('collapsed');
               }

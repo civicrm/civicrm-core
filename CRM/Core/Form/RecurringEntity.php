@@ -88,7 +88,9 @@ class CRM_Core_Form_RecurringEntity {
         self::$_parentEntityId = self::$_entityId;
         self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId(self::$_entityId, $entityTable);
       }
-      self::$_scheduleReminderID = self::$_scheduleReminderDetails->id;
+      if (property_exists(self::$_scheduleReminderDetails, 'id')) {
+        self::$_scheduleReminderID = self::$_scheduleReminderDetails->id;
+      }
     }
     if ($entityTable) {
       CRM_Core_OptionValue::getValues(array('name' => $entityTable.'_repeat_exclude_dates_'.self::$_parentEntityId), $optionValue);
@@ -146,6 +148,12 @@ class CRM_Core_Form_RecurringEntity {
   }
 
   static function buildQuickForm(&$form) {
+    if (self::$_entityTable) {
+      $entityType = explode("_", self::$_entityTable);
+      if ($entityType[1]) {
+        $form->assign('entityType', ucwords($entityType[1]));
+      }
+    }
     $form->assign('currentEntityId', self::$_entityId);
     $form->assign('entityTable', self::$_entityTable);
     $form->assign('scheduleReminderId', self::$_scheduleReminderID);
@@ -434,8 +442,13 @@ class CRM_Core_Form_RecurringEntity {
               }
             }
           }
-          // lets delete current entity from recurring-entity table, which is going to be a new parent
-          CRM_Core_BAO_RecurringEntity::delEntity($params['entity_id'], $params['entity_table'], TRUE);
+
+          // find all entities from the recurring set. At this point we 'll get entities which were not deleted 
+          // for e.g due to participants being present. We need to delete them from recurring tables anyway.
+          $pRepeatingEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['entity_id'], $params['entity_table']);
+          foreach($pRepeatingEntities as $val) {
+            CRM_Core_BAO_RecurringEntity::delEntity($val['id'], $val['table'], TRUE);
+          }
         }
 
         $recursion = new CRM_Core_BAO_RecurringEntity();

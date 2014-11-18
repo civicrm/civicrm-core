@@ -25,7 +25,9 @@
 *}
 
 <div class="crm-block crm-form-block crm-core-form-recurringentity-block crm-accordion-wrapper" id="recurring-entity-block">
-    <div class="crm-accordion-header">Repeat Configuration</div>
+    <div class="crm-accordion-header">
+      Repeat {if $entityType}{$entityType}{/if}
+    </div>
     <div class="crm-accordion-body">
         <div class="crm-submit-buttons">
             {include file="CRM/common/formButtons.tpl" location="top"}
@@ -37,11 +39,11 @@
           </tr>
           <tr class="crm-core-form-recurringentity-block-repetition_frequency_unit">
             <td class="label">{$form.repetition_frequency_unit.label}&nbsp;<span class="crm-marker" title="This field is required.">*</span></td>
-            <td>{$form.repetition_frequency_unit.html} {help id="id-repeats" file="CRM/Core/Form/RecurringEntity.hlp"}</td>
+            <td>{$form.repetition_frequency_unit.html} {help id="id-repeats" entityType=$entityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-repetition_frequency_interval">
             <td class="label">{$form.repetition_frequency_interval.label}&nbsp;<span class="crm-marker" title="This field is required.">*</span></td>
-            <td>{$form.repetition_frequency_interval.html} &nbsp;<span id="repeats-every-text">hour(s)</span> {help id="id-repeats-every" file="CRM/Core/Form/RecurringEntity.hlp"}</td>
+            <td>{$form.repetition_frequency_interval.html} &nbsp;<span id="repeats-every-text">hour(s)</span> {help id="id-repeats-every" entityType=$entityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
             </td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-start_action_condition">
@@ -49,33 +51,33 @@
                 <label for="repeats_on">{$form.start_action_condition.label}: </label>
             </td>
             <td>
-                {$form.start_action_condition.html} {help id="id-repeats-on" file="CRM/Core/Form/RecurringEntity.hlp"}</td>
+                {$form.start_action_condition.html} {help id="id-repeats-on" entityType=$entityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
             </td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-repeats_by">
             <td class="label">{$form.repeats_by.label}</td>
-            <td>{$form.repeats_by.1.html}&nbsp;&nbsp;{$form.limit_to.html} {help id="id-repeats-by-month" file="CRM/Core/Form/RecurringEntity.hlp"}
+            <td>{$form.repeats_by.1.html}&nbsp;&nbsp;{$form.limit_to.html} {help id="id-repeats-by-month" entityType=$entityType file="CRM/Core/Form/RecurringEntity.hlp"}
             </td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-repeats_by">
             <td class="label"></td>
-            <td>{$form.repeats_by.2.html}&nbsp;&nbsp;{$form.entity_status_1.html}&nbsp;&nbsp;{$form.entity_status_2.html} {help id="id-repeats-by-week" file="CRM/Core/Form/RecurringEntity.hlp"}
+            <td>{$form.repeats_by.2.html}&nbsp;&nbsp;{$form.entity_status_1.html}&nbsp;&nbsp;{$form.entity_status_2.html} {help id="id-repeats-by-week" entityType=$entityType file="CRM/Core/Form/RecurringEntity.hlp"}
             </td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-ends">
             <td class="label">{$form.ends.label}&nbsp;<span class="crm-marker" title="This field is required.">*</span></td>
-            <td>{$form.ends.1.html}&nbsp;{$form.start_action_offset.html}&nbsp;occurrences&nbsp;{help id="id-ends-after" file="CRM/Core/Form/RecurringEntity.hlp"}</td>
+            <td>{$form.ends.1.html}&nbsp;{$form.start_action_offset.html}&nbsp;occurrences&nbsp;{help id="id-ends-after" entityType=$entityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-absolute_date">
               <td class="label"></td>
-              <td>{$form.ends.2.html}&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=repeat_absolute_date} {help id="id-ends-on" file="CRM/Core/Form/RecurringEntity.hlp"}
+              <td>{$form.ends.2.html}&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=repeat_absolute_date} {help id="id-ends-on" entityType=$entityType file="CRM/Core/Form/RecurringEntity.hlp"}
               </td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-exclude_date">
               <td class="label">{$form.exclude_date.label}</td>
               <td>&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=exclude_date}
                   &nbsp;{$form.add_to_exclude_list.html}&nbsp;{$form.remove_from_exclude_list.html}
-                  {$form.exclude_date_list.html} {help id="id-exclude-date" file="CRM/Core/Form/RecurringEntity.hlp"}
+                  {$form.exclude_date_list.html} {help id="id-exclude-date" entityType=$entityType file="CRM/Core/Form/RecurringEntity.hlp"}
               </td>
           </tr>
           <tr>
@@ -271,7 +273,7 @@
             if (Object.keys(result).length > 0) {
               var errors = [];
               var participantData = [];
-              var html = 'Based on your repeat configuration here is the list of dates, Do you wish to create recurring set of these dates?<br/><table id="options" class="display"><thead><tr><th>Sr No</th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
+              var html = 'Based on your repeat configuration here is the list of dates, Do you wish to create recurring set of these dates?<br/><table id="options" class="display"><thead><tr><th></th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
               var count = 1;
               for(var i in result) {
                 if (i != 'errors') {
