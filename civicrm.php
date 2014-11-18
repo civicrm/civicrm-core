@@ -928,11 +928,19 @@ class CiviCRM_For_WordPress {
    */
   public function front_end_page_load() {
 
+    static $frontend_loaded = FALSE;
+    if ( $frontend_loaded ) {
+      return;
+    }
+
     // add resources for front end
     $this->add_core_resources( TRUE );
 
     // merge CiviCRM's HTML header with the WordPress theme's header
     add_action( 'wp_head', array( $this, 'wp_head' ) );
+
+    // set flag so this only happens once
+    $frontend_loaded = TRUE;
 
   }
 
@@ -945,6 +953,11 @@ class CiviCRM_For_WordPress {
    * @return void
    */
   public function front_end_css_load() {
+
+    static $frontend_css_loaded = FALSE;
+    if ( $frontend_css_loaded ) {
+      return;
+    }
 
     if (!$this->initialize()) {
       return;
@@ -982,6 +995,9 @@ class CiviCRM_For_WordPress {
         'all' // media
       );
     }
+
+    // set flag so this only happens once
+    $frontend_css_loaded = TRUE;
 
   }
 
