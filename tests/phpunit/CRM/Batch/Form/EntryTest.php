@@ -109,7 +109,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       'fixed_period_start_day' => 101,
       'fixed_period_rollover_day' => 1231
     );
-    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
+    $membershipType = CRM_Member_BAO_MembershipType::add($params);
     $this->_membershipTypeID = $membershipType->id;
 
     $this->_mebershipStatusID = $this->membershipStatusCreate('test status');
