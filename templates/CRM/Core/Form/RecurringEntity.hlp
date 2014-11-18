@@ -28,15 +28,15 @@
 {ts}Repeats{/ts}
 {/htxt}
 {htxt id="id-repeats"}
-  {ts}Access the drop-down menu here to select how frequently your event occurs. You have several options:
+  {ts}Access the drop-down menu here to select how frequently your {$params.entityType|lower} occurs. You have several options:
     <ul>
-        <li>Hourly:&nbsp;&nbsp;your event repeats hourly or after every few hours</li>
-        <li>Daily:&nbsp;&nbsp;your event repeats daily or after every few days</li>
-        <li>Weekly:&nbsp;&nbsp;your event repeats on one or more days every week</li>
-        <li>Monthly:&nbsp;&nbsp;your event repeats on one or more days every month</li>
-        <li>Yearly:&nbsp;&nbsp;your event repeats yearly or after every few years</li>
+        <li>Hourly:&nbsp;&nbsp;your {$params.entityType|lower} repeats hourly or after every few hours</li>
+        <li>Daily:&nbsp;&nbsp;your {$params.entityType|lower} repeats daily or after every few days</li>
+        <li>Weekly:&nbsp;&nbsp;your {$params.entityType|lower} repeats on one or more days every week</li>
+        <li>Monthly:&nbsp;&nbsp;your {$params.entityType|lower} repeats on one or more days every month</li>
+        <li>Yearly:&nbsp;&nbsp;your {$params.entityType|lower} repeats yearly or after every few years</li>
     </ul>
-    For eg - You would select option "monthly", if your event occurs every month.
+    Example: You would select option "monthly", if your {$params.entityType|lower} occurs every month.
   {/ts}
 {/htxt}
 
@@ -45,7 +45,7 @@
 {/htxt}
 {htxt id="id-repeats-every"}
   {ts}Option you select here decides the repetition interval.<br/>
-      For eg - If your event repeats every 5 months, then you would select option 5.{/ts}
+      Example: If your {$params.entityType|lower} repeats every 5 months, then you would select option 5.{/ts}
 {/htxt}
 
 {htxt id="id-repeats-on-title"}
@@ -53,8 +53,8 @@
 {/htxt}
 {htxt id="id-repeats-on"}
   {ts}
-    You can choose to select your event to repeat on weekdays, weekends or any combination of day of the week.<br/>
-    For eg - You can select Monday, Wednesday and Friday for your event to occur on alternate weekdays.
+    You can choose to select your {$params.entityType|lower} to repeat on weekdays, weekends or any combination of day of the week.<br/>
+    Example: You can select Monday, Wednesday and Friday for your {$params.entityType|lower} to occur on alternate weekdays.
   {/ts}
 {/htxt}
 
@@ -64,7 +64,7 @@
 {htxt id="id-repeats-by-month"}
   {ts}
     Options given here are days of a month from 1 - 31<br/>
-    For eg - If your event repeats 8th of every month then you would select 8.
+    Example: If your {$params.entityType|lower} repeats 8th of every month then you would select 8.
   {/ts}
 {/htxt}
 
@@ -73,7 +73,7 @@
 {/htxt}
 {htxt id="id-repeats-by-week"}
     {ts}
-        You can choose to select event occurring every third Friday, last Monday, fourth Wednesday of the month and various other combinations given in the dropdown.
+        You can choose to select {$params.entityType|lower} occurring every third Friday, last Monday, fourth Wednesday of the month and various other combinations given in the dropdown.
     {/ts}
 {/htxt}
 
@@ -82,8 +82,8 @@
 {/htxt}
 {htxt id="id-ends-after"}
   {ts}
-    Use this field to limit/end the repetition of the event.<br/>
-    For eg - You want to repeat an event which is now a six month course(i.e it repeats 6 times), then you give 6 as a value to this field.
+    Use this field to limit/end the repetition of the {$params.entityType|lower}.<br/>
+    Example: If you want to repeat an {$params.entityType|lower} for six months (i.e it repeats 6 times), then set 6 as a value for this field.
   {/ts}
 {/htxt}
 
@@ -93,7 +93,7 @@
 {htxt id="id-ends-on"}
     {ts}
         Choose a specific date here to limit/end the repetition<br/>
-        For eg - Your event ends on 26th of September 2014
+        Example: Your {$params.entityType|lower} ends on 26th of September 2014
     {/ts}
 {/htxt}
 
@@ -102,7 +102,7 @@
 {/htxt}
 {htxt id="id-exclude-date"}
     {ts}
-        Add dates here, if you don't want to repeat your event on those dates.<br/>
-        This field enables you to alter certain session, skip a holiday in the middle of a term or a public holiday on which you are close.
+        Add dates here, if you don't want to repeat your {$params.entityType|lower} on those dates.
+        This field enables you to alter certain sessions, skip holidays, or create gaps in the sequence for other reasons.<br/>
     {/ts}
 {/htxt}
