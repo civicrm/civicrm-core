@@ -1923,6 +1923,20 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $group->setAttribute('allowClear', TRUE);
       }
     }
+    elseif ($fieldName === 'communication_style_id') {
+      $styleOptions = array();
+      $style = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id');
+      foreach ($style as $key => $var) {
+        $styleOptions[$key] = $form->createElement('radio', NULL, ts('Communication Style'), $var, $key);
+      }
+      $group = $form->addGroup($styleOptions, $name, $title);
+      if ($required) {
+        $form->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
+      }
+      else {
+        $group->setAttribute('allowClear', TRUE);
+      }
+    }
     elseif ($fieldName === 'prefix_id' || $fieldName === 'suffix_id') {
       $form->addSelect($name, array(
         'label' => $title,
