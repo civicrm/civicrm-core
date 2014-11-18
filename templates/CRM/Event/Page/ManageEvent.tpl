@@ -109,8 +109,13 @@
                   {foreach from=$rows.tab key=k item=v}
                     {assign var="fld" value=$v.field}
                     {if NOT $row.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
-                    <li><a title="{$v.title}" class="action-item crm-hover-button {$status}"
+                      {if $k eq 'reminder'}
+                        <li><a title="{$v.title}" class="action-item crm-hover-button {$status}"
+                           href="{crmURL p="`$v.url`" q="reset=1&action=browse&component=event&setTab=1&id=`$row.id`"}">{$v.title}</a>
+                      {else}
+                        <li><a title="{$v.title}" class="action-item crm-hover-button {$status}"
                            href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$row.id`"}">{$v.title}</a></li>
+                      {/if}
                   {/foreach}
                 </ul>
               </span>
