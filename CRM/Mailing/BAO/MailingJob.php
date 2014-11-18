@@ -38,6 +38,15 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   CONST MAX_CONTACTS_TO_PROCESS = 1000;
 
   /**
+   *(Dear God Why) Keep a global count of mails processed within the current
+   * request.
+   *
+   * @static
+   * @var int
+   */
+  static $mailsProcessed = 0;
+
+  /**
    * class constructor
    */
   function __construct() {
@@ -503,8 +512,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     }
     $eq->query($query);
 
-    static $config = NULL;
-    static $mailsProcessed = 0;
+    $config = NULL;
 
     if ($config == NULL) {
       $config = CRM_Core_Config::singleton();
@@ -539,7 +547,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
       if (
         $config->mailerBatchLimit > 0 &&
-        $mailsProcessed >= $config->mailerBatchLimit
+        self::$mailsProcessed >= $config->mailerBatchLimit
       ) {
         if (!empty($fields)) {
           $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
@@ -547,7 +555,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         $eq->free();
         return FALSE;
       }
-      $mailsProcessed++;
+      self::$mailsProcessed++;
 
       $fields[] = array(
         'id' => $eq->id,
