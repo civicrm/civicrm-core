@@ -472,8 +472,14 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
   }
 
   $isComplete = FALSE;
+  $config = CRM_Core_Config::singleton();
+  $mailerJobSize = (property_exists($config, 'mailerJobSize')) ? $config->mailerJobSize : NULL;
   while (!$isComplete) {
+    // Q: In CRM_Mailing_BAO_Mailing::processQueue(), the three runJobs*()
+    // functions are all called. Why does Mailing.send_test only call one?
+    // CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize, NULL);
     $isComplete = CRM_Mailing_BAO_MailingJob::runJobs($testEmailParams);
+    // CRM_Mailing_BAO_MailingJob::runJobs_post(NULL);
   }
 
   //return delivered mail info

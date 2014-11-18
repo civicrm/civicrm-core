@@ -53,6 +53,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
     $this->_contactIDs = array();
     $this->_groupID = $this->groupCreate();
     $this->_groupIDs = array();
@@ -73,6 +74,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     foreach ($this->_groupIDs as $groupID) {
       $this->groupDelete($groupID);
     }
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
+    parent::tearDown();
   }
 
   /**
