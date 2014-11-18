@@ -376,8 +376,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       'profileEntities' => array(),
     );
 
-    $configs['allowCoreTypes'][] = 'Contact';
-    $configs['allowCoreTypes'][] = 'Individual';
+    $configs['allowCoreTypes'] = array_merge(array('Contact', 'Individual'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $configs['allowCoreTypes'][] = 'Participant';
     //CRM-15427
     $id = CRM_Utils_Request::retrieve( 'id' , 'Integer' );
