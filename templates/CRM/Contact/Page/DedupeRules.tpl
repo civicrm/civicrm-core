@@ -43,6 +43,9 @@
         <div>
         {strip}
           <table id="options_{$contactType}" class="display">
+            <colgroup>
+              <col align="justify">
+            </colgroup>
             <thead>
             <tr>
               <th>{ts 1=$contactType}%1 Rules{/ts}</th>
