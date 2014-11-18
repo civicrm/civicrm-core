@@ -6,17 +6,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
-  /**
-   * @return null
-   */
-  private function &returnByReference() {
-    static $foo;
-    if ($foo === NULL) {
-      $foo['foo'] = 'original';
-    }
-    return $foo;
-  }
-
   function testIndexArray() {
     $inputs = array();
     $inputs[] = array(
@@ -123,5 +112,18 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array()));
     $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b')));
     $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b','c','d')));
+  }
+
+  function testRemove() {
+    $data = array(
+      'one' => 1,
+      'two' => 2,
+      'three' => 3,
+      'four' => 4,
+      'five' => 5,
+      'six' => 6,
+    );
+    CRM_Utils_Array::remove($data, 'one', 'two', array('three', 'four'), 'five');
+    $this->assertEquals($data, array('six' => 6));
   }
 }
