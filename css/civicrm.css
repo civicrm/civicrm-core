@@ -4556,3 +4556,6 @@ span.crm-status-icon {
   cursor: pointer;
   font-size: 11px !important;
 }
+.crm-container table.mergecontact thead th {
+  width:30%;
+}
