@@ -42,10 +42,7 @@
       <div id="browseValues_{$contactType}">
         <div>
         {strip}
-          <table id="options_{$contactType}" class="display">
-            <colgroup>
-              <col align="justify">
-            </colgroup>
+          <table id="options_{$contactType}" class="display" style = "table-layout: fixed;">
             <thead>
             <tr>
               <th>{ts 1=$contactType}%1 Rules{/ts}</th>
