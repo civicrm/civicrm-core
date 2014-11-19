@@ -42,7 +42,7 @@
       <div id="browseValues_{$contactType}">
         <div>
         {strip}
-          <table id="options_{$contactType}" class="display" style = "table-layout: fixed;">
+          <table id="options_{$contactType}" class="display mergecontact">
             <thead>
             <tr>
               <th>{ts 1=$contactType}%1 Rules{/ts}</th>
