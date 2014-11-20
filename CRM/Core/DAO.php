@@ -1568,7 +1568,7 @@ SELECT contact_id
     $logging->dropTriggers($tableName);
 
     // now create the set of new triggers
-    self::createTriggers($info);
+    self::createTriggers($info, $tableName);
   }
 
   /**
