@@ -112,7 +112,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       $optionTypes = array('1' => ts('Create new result set'));
     }
     else {
-      $optionTypes = array('1' => ts('Create a new result set'),
+      $optionTypes = array('1' => ts('Create new result set'),
         '2' => ts('Use existing result set'),
       );
       $this->add('select',

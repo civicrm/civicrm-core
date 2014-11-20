@@ -149,7 +149,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact SubType'),
+            'title' => ts('Contact Subtype'),
           ),
         ),
       ),
@@ -431,7 +431,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
       'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['count'] = array(
-      'title' => ts('Total Donations'),
+      'title' => ts('Total Contributions'),
       'value' => $count,
     );
     $statistics['counts']['memberCount'] = array(

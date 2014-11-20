@@ -211,6 +211,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var boolean
    */
   public $_useForMember;
+
+  public $_isBillingAddressRequiredForPayLater;
   /**
    * Function to set variables up before form is built
    *
@@ -526,6 +528,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if (CRM_Utils_Request::retrieve('cancel', 'Boolean', CRM_Core_DAO::$_nullObject)) {
       self::cancelRecurring();
     }
+
+    // check if billing block is required for pay later
+    if (CRM_Utils_Array::value('is_pay_later', $this->_values)) {
+      $this->_isBillingAddressRequiredForPayLater = CRM_Utils_Array::value('is_billing_required', $this->_values);
+      $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
+    }
   }
 
   /**
@@ -640,7 +648,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       if ($this->_paymentProcessor &&
         $this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
       ) {
-        $this->assign('payment_type', $this->_paymentProcessor['payment_type']);
         $this->assign('account_holder', $this->_params['account_holder']);
         $this->assign('bank_identification_number', $this->_params['bank_identification_number']);
         $this->assign('bank_name', $this->_params['bank_name']);

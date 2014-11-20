@@ -75,7 +75,7 @@
       <td>{$form.summary.html}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-description">
-      <td class="label">{$form.description.label}</td>
+      <td class="label">{$form.description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='description' id=$eventID}{/if}</td>
       <td>{$form.description.html}</td>
     </tr>
     {if !$isTemplate}
@@ -93,7 +93,7 @@
       <td>
         {$form.max_participants.html|crmAddClass:four}
         {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
-          <a class="crm-popup crm-hover-button" target="_blank" title="{ts}Edit Participant Status Options{/ts}" href="{crmURL p='civicrm/admin/participant_status' q='reset=1'}"><span class="icon edit-icon"> </span></a>
+          <a class="crm-popup crm-hover-button" target="_blank" title="{ts}Edit Participant Status Options{/ts}" href="{crmURL p='civicrm/admin/participant_status' q='reset=1'}"><span class="icon ui-icon-wrench"> </span></a>
         {/if}
       </td>
     </tr>

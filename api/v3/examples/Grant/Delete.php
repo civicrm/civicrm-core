@@ -5,7 +5,7 @@
  */
 function grant_delete_example(){
 $params = array(
-  'id' => 3,
+  'id' => 1,
 );
 
 try{

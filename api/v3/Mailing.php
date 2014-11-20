@@ -146,6 +146,14 @@ function civicrm_api3_mailing_event_confirm($params) {
 }
 
 /**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_mailing_deprecation() {
+  return array('event_confirm' => 'Mailing api "event_confirm" action is deprecated. Use the mailing_event_confirm api instead.');
+}
+
+/**
  * Handle a reply event
  *
  * @param array $params

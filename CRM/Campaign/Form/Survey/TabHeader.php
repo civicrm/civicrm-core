@@ -51,7 +51,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
     }
     $form->assign_by_ref('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting(array('tabSettings' => array(
         'active' => self::getCurrentTab($tabs),
       )));

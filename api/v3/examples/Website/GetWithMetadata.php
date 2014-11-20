@@ -64,11 +64,17 @@ function website_get_expectedresult(){
               'headerPattern' => '/Website/i',
               'dataPattern' => '/^[A-Za-z][0-9A-Za-z]{20,}$/',
               'export' => '1',
+              'html' => array(
+                  'type' => 'Text',
+                ),
             ),
           'website_type_id' => array(
               'name' => 'website_type_id',
               'type' => '1',
               'title' => 'Website Type',
+              'html' => array(
+                  'type' => 'Select',
+                ),
               'pseudoconstant' => array(
                   'optionGroupName' => 'website_type',
                 ),

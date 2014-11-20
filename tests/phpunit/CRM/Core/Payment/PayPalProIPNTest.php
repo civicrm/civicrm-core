@@ -62,13 +62,6 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       )
     );
     $this->_contributionPageID = $contributionPage['id'];
-
-    $this->_financialTypeId = 1;
-
-    // copier & paster from A.net - so have commenter out - uncomment if requirer
-    //for some strange unknown reason, in batch more this value gets set to null
-    // so crure hack here to avoir an exception anr hence an error
-    //$GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = array( );
   }
 
   function tearDown() {
@@ -79,7 +72,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    * test IPN response updates contribution_recur & contribution for first & second contribution
    */
   function testIPNPaymentRecurSuccess() {
-    $this->setupPaymentProcessorTransaction();
+    $this->setupRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
@@ -97,6 +90,33 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
+   * test IPN response updates contribution_recur & contribution for first & second contribution
+   */
+  function testIPNPaymentMembershipRecurSuccess() {
+    $this->setupMembershipRecurringPaymentProcessorTransaction();
+    $this->callAPISuccessGetSingle('membership_payment', array());
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
+    $paypalIPN->main();
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
+    $membershipEndDate = $this->callAPISuccessGetValue('membership', array('return' => 'end_date'));
+    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertEquals('8XA571746W2698126', $contribution['trxn_id']);
+    // source gets set by processor
+    $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
+    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
+    $paypalIPN = new CRM_Core_Payment_PaypalProIPN($this->getPaypalProRecurSubsequentTransaction());
+    $paypalIPN->main();
+    $this->assertEquals(strtotime('+ 1 year', strtotime($membershipEndDate)), strtotime($this->callAPISuccessGetValue('membership', array('return' => 'end_date'))));
+    $contribution = $this->callAPISuccess('contribution', 'get', array('contribution_recur_id' => $this->_contributionRecurID, 'sequential' => 1));
+    $this->assertEquals(2, $contribution['count']);
+    $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
+    $this->callAPISuccessGetCount('line_item', array('entity_id' => $this->ids['membership'], 'entity_table' => 'civicrm_membership'), 2);
+    $this->callAPISuccessGetSingle('line_item', array('contribution_id' => $contribution['values'][1]['id'], 'entity_table' => 'civicrm_membership'));
+    $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id'],));
+
+  }
+  /**
    * CRM-13743 test IPN edge case where the first transaction fails and the second succeeds
    * We are checking that the created contribution has the same date as IPN says it should
    * Note that only one contribution will be created (no evidence of the failed contribution is left)
@@ -104,7 +124,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    * will help future debuggers)
    */
   function testIPNPaymentCRM13743() {
-    $this->setupPaymentProcessorTransaction();
+    $this->setupRecurringPaymentProcessorTransaction();
     $firstPaymentParams = $this->getPaypalProRecurTransaction();
     $firstPaymentParams['txn_type'] = 'recurring_payment_failed';
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($firstPaymentParams);
@@ -142,7 +162,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    * Obviously if the behaviour is fixed then the test should be updated!
    */
   function testIPNPaymentExpressNoError() {
-    $this->setupPaymentProcessorTransaction();
+    $this->setupRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalExpressTransactionIPN());
     try{
       $paypalIPN->main();
@@ -157,34 +177,9 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $this->fail('The Paypal Express IPN should have caused an exception');
   }
 
-
-  function setupPaymentProcessorTransaction() {
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
-      'contact_id' => $this->_contactID,
-      'amount' => 1000,
-      'sequential' => 1,
-      'installments' => 5,
-      'frequency_unit' => 'Month',
-      'frequency_interval' => 1,
-      'invoice_id' => $this->_invoiceID,
-      'contribution_status_id' => 2,
-        'api.contribution.create' => array(
-          'total_amount' => '200',
-          'invoice_id' => $this->_invoiceID,
-          'financial_type_id' => 1,
-          'contribution_status_id' => 'Pending',
-          'contact_id' => $this->_contactID,
-          'contribution_page_id' => $this->_contributionPageID,
-          'payment_processor_id' => $this->_paymentProcessorID,
-      )
-     ));
-    $this->_contributionRecurID = $contributionRecur['id'];
-    $this->_contributionID = $contributionRecur['values']['0']['api.contribution.create']['id'];
-  }
-
   /**
    * get PaymentExpress IPN for a single transaction
-   * @return multitype:string
+   * @return array array representing a Paypal IPN POST
    */
   function getPaypalExpressTransactionIPN() {
     return array(
@@ -232,10 +227,10 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * Get IPN results from follow on IPN transations
-   * @return multitype:string
+   * Get IPN results from follow on IPN transactions
+   * @return array array representing a Paypal IPN POST
    */
-  function getSubsequentPaypalExpressTransation() {
+  function getSubsequentPaypalExpressTransaction() {
     return array(
       'mc_gross' => '5.00',
       'period_type' => ' Regular',
@@ -347,6 +342,5 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    */
   function getPaypalProRecurSubsequentTransaction() {
     return array_merge($this->getPaypalProRecurTransaction(), array('txn_id' => 'secondone'));
-    ;
   }
 }

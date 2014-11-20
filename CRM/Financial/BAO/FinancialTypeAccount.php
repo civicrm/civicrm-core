@@ -244,8 +244,8 @@ WHERE cog.name = 'payment_instrument' ";
       array_search('Cost of Sales Account is', $accountRelationship) => array_search('Cost of Sales', $financialAccountTypeID),
       array_search('Income Account is', $accountRelationship) => array_search('Revenue', $financialAccountTypeID),
     );
-    
-    $dao =  CRM_Core_DAO::executeQuery('SELECT id, financial_account_type_id FROM civicrm_financial_account WHERE name LIKE %1', 
+
+    $dao =  CRM_Core_DAO::executeQuery('SELECT id, financial_account_type_id FROM civicrm_financial_account WHERE name LIKE %1',
       array(1 => array($financialType->name, 'String'))
     );
     $dao->fetch();

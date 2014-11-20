@@ -82,10 +82,18 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
   }
 
   function testLinkCases() {
-    $this->webtestLogin();
+    // Log in as admin first to verify permissions for CiviCase
+    $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
+
+    // let's give full CiviCase permissions to demo user (registered user).
+    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $this->changePermissions($permission);
+
+    // Log in as normal user
+    $this->webtestLogin();
 
     //Add Case 1
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
@@ -308,7 +316,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     // change activity status
     $this->select('activity_change_status', 'value=2');
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[2]/span[text()='Continue']");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
     $this->openCiviPage('case', 'reset=1');
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']");
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');

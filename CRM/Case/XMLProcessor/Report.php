@@ -466,7 +466,7 @@ WHERE      a.id = %1
       }
       $assigneeContacts = implode(', ', $assignee_contact_names);
       $activity['fields'][] = array(
-        'label' => ts('Assigned To'),
+        'label' => ts('Assigned to'),
         'value' => $assigneeContacts,
         'type' => 'String',
       );
@@ -628,7 +628,7 @@ AND    cg.extends = 'Activity'";
       else {
         $query .= "AND cg.extends_entity_column_value IS NULL";
       }
-      $query .= "ORDER BY cf.weight";
+      $query .= "ORDER BY cg.weight, cf.weight";
       $params = array(
         1 => array($activityTypeID,
           'Integer',

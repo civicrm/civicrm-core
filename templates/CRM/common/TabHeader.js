@@ -69,7 +69,7 @@ CRM.$(function($) {
    */
   CRM.tabHeader.getActiveTab = function() {
     return $('.ui-tabs-active', '#mainTabContainer');
-  }
+  };
 
   /**
    * Make a given tab the active one
@@ -84,22 +84,39 @@ CRM.$(function($) {
    * @returns panel jQuery object
    */
   CRM.tabHeader.getTabPanel = function(tab) {
-    return $('#' + $(tab).attr('aria-controls'));
+    var selector = $(tab).attr('aria-controls');
+    return selector ? $('#' + selector) : $();
   };
 
-  CRM.tabHeader.getCount = function(tab) {
-    return parseInt($(tab).find('a em').text(), 10);
+  /**
+   * @param tab jQuery selector
+   * @returns {string|null}
+   */
+  function getCountClass(tab) {
+    var $tab = $(tab),
+      css = $tab.attr('class') || '',
+      val = css.match(/(crm-count-\d+)/);
+    return val && val.length ? val[0] : null;
   }
+
+  /**
+   * @param tab jQuery selector
+   * @returns {Number|null}
+   */
+  CRM.tabHeader.getCount = function(tab) {
+    var cssClass = getCountClass(tab);
+    return cssClass ? parseInt(cssClass.slice(10), 10) : null;
+  };
 
   /**
    * Update the counter in a tab
    * @param tab jQuery selector
-   * @param count number
+   * @param count {Number}
    */
   CRM.tabHeader.updateCount = function(tab, count) {
-    var oldClass = $(tab).attr('class').match(/(crm-count-\d+)/);
+    var oldClass = getCountClass(tab);
     if (oldClass) {
-      $(tab).removeClass(oldClass[0]);
+      $(tab).removeClass(oldClass);
     }
     $(tab)
       .addClass('crm-count-' + count)
@@ -107,15 +124,16 @@ CRM.$(function($) {
   };
 
   /**
-   * Clears tab content so that it will be refreshed next time the user clicks on it
+   * Refresh tab immediately if it is active, otherwise ensure it will be refreshed next time the user clicks on it
    * @param tab
    */
   CRM.tabHeader.resetTab = function(tab) {
     var $panel = CRM.tabHeader.getTabPanel(tab);
     if ($(tab).hasClass('ui-tabs-active')) {
       $panel.crmSnippet('refresh');
-    } else {
-      $panel.data("civiCrmSnippet") && $panel.crmSnippet('destroy');
+    }
+    else if ($panel.data("civiCrmSnippet")) {
+      $panel.crmSnippet('destroy');
     }
   };
 })(CRM.$);

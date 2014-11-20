@@ -53,8 +53,9 @@
     <ul>
       <li>{ts}Simple values such as numbers, true, false and null.{/ts}</li>
       <li>{ts}Strings. You may include quotes around the string to ensure it's not interpreted otherwise, e.g. "false".{/ts}</li>
-      <li>{ts}Arrays should be in js format, e.g. [1, 2, 3, 'foo', 'bar', 'baz'].{/ts}</li>
-      <li>{ts}Associative arrays should be in js object format, e.g. {ldelim}first: "one", second: "two", third: 3{rdelim}.{/ts}</li>
+      <li>{ts}Arrays in js format, e.g. [1, 2, 3, 'foo', 'bar', 'baz'].{/ts}</li>
+      <li>{ts}Associative arrays in js object format, e.g. {ldelim}first: "one", second: "two", third: 3{rdelim}.{/ts}</li>
+      <li>{ts}A comma-separated list will automatically be turned into an array for multivalue operations, or you can explicitly use the js array format above.{/ts}</li>
     </ul>
   </p>
 {/htxt}

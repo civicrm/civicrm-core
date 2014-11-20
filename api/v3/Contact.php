@@ -330,7 +330,7 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
 
   if (!empty($params['contact_sub_type']) && !empty($params['contact_type'])) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type']))) {
-        throw new API_Exception("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$params['contact_sub_type']));
+        throw new API_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array)$params['contact_sub_type']));
       }
     }
 
@@ -720,8 +720,8 @@ function civicrm_api3_contact_getquick($params) {
   //CRM-10687
   if (!empty($params['field_name']) && !empty($params['table_name'])) {
     $table_name = CRM_Utils_String::munge($params['table_name']);
-    $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch')";
-    $exactWhereClause = " WHERE ( $table_name.$field_name = '$name')";
+    $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch') {$where}";
+    $exactWhereClause = " WHERE ( $table_name.$field_name = '$name') {$where}";
     // Search by id should be exact
     if ($field_name == 'id' || $field_name == 'external_identifier') {
       $whereClause = $exactWhereClause;
@@ -835,7 +835,15 @@ LIMIT    0, {$limit}
     }
   }
 
-  return civicrm_api3_create_success($contactList, $params);
+  return civicrm_api3_create_success($contactList, $params, 'contact', 'getquick');
+}
+
+/**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_contact_deprecation() {
+  return array('getquick' => 'The "getquick" action is deprecated in favor of "getlist".');
 }
 
 /**
@@ -974,7 +982,8 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   $request['params']['options']['sort'] = 'sort_name';
   // Contact api doesn't support array(LIKE => 'foo') syntax
   if (!empty($request['input'])) {
-    $request['params'][$request['search_field']] = $request['input'];
+    // CRM-15442 - change spaces to % wildcards when searching by name
+    $request['params'][$request['search_field']] = strpos($request['search_field'], 'name') ? str_replace(' ', '%', $request['input']) : $request['input'];
   }
 }
 

@@ -107,7 +107,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $this->_profileId = CRM_Batch_BAO_Batch::getProfileId($this->_batchInfo['type_id']);
     }
     CRM_Core_Resources::singleton()
-    ->addScriptFile('civicrm', 'templates/CRM/Batch/Form/Entry.js')
+    ->addScriptFile('civicrm', 'templates/CRM/Batch/Form/Entry.js', 1, 'html-header')
     ->addSetting(array('batch' => array('type_id' => $this->_batchInfo['type_id'])))
     ->addSetting(array('setting' => array('monetaryThousandSeparator' => CRM_Core_Config::singleton()->monetaryThousandSeparator)))
     ->addSetting(array('setting' => array('monetaryDecimalPoint' => CRM_Core_Config::singleton()->monetaryDecimalPoint)));
@@ -229,7 +229,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_Entry_next') {
-      CRM_Core_Session::setStatus(ts("FILE or Autocomplete Select type field(s) in the selected profile are not supported for Batch Update."), ts("Some fields have been excluded."), "info");
+      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Batch Update."), ts('Some Fields Excluded'), 'info');
     }
   }
 

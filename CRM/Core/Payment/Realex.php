@@ -87,7 +87,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @return object
    * @static
    */
-  static function &singleton($mode, &$paymentProcessor) {
+  static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_Realex($mode, $paymentProcessor);

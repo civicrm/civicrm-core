@@ -226,8 +226,9 @@ class CRM_Core_Resources {
   public function addSetting($settings) {
     $this->settings = $this->mergeSettings($this->settings, $settings);
     if (!$this->addedSettings) {
+      $region = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
       $resources = $this;
-      CRM_Core_Region::instance('html-header')->add(array(
+      CRM_Core_Region::instance($region)->add(array(
         'callback' => function(&$snippet, &$html) use ($resources) {
           $html .= "\n" . $resources->renderSetting();
         },
@@ -284,7 +285,14 @@ class CRM_Core_Resources {
    * @return string
    */
   public function renderSetting() {
-    $js = 'var CRM = ' . json_encode($this->getSettings()) . ';';
+    // On a standard page request we construct the CRM object from scratch
+    if (!self::isAjaxMode()) {
+      $js = 'var CRM = ' . json_encode($this->getSettings()) . ';';
+    }
+    // For an ajax request we append to it
+    else {
+      $js = 'CRM.$.extend(true, CRM, ' . json_encode($this->getSettings()) . ');';
+    }
     return sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $js);
   }
 
@@ -458,7 +466,7 @@ class CRM_Core_Resources {
    * @access public
    */
   public function addCoreResources($region = 'html-header') {
-    if (!isset($this->addedCoreResources[$region])) {
+    if (!isset($this->addedCoreResources[$region]) && !self::isAjaxMode()) {
       $this->addedCoreResources[$region] = TRUE;
       $config = CRM_Core_Config::singleton();
 
@@ -476,7 +484,7 @@ class CRM_Core_Resources {
       }
 
       // Dynamic localization script
-      $this->addScriptUrl($this->addLocalizationJs(), $jsWeight++, $region);
+      $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $config->lcMessages, array('r' => $this->getCacheCode())), $jsWeight++, $region);
 
       // Add global settings
       $settings = array('config' => array(
@@ -532,16 +540,6 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Deletes and rebuilds dynamic resource files
-   * @return CRM_Core_Resources
-   */
-  public function rebuildDynamicResources() {
-    CRM_Utils_File::flushDynamicResources();
-    $this->addLocalizationJs();
-    return $this;
-  }
-
-  /**
    * Translate strings in a javascript file
    *
    * @param $ext string, extension name
@@ -568,26 +566,12 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Add dynamic l10n js
-   *
-   * @return string URL of JS file
-   */
-  private function addLocalizationJs() {
-    $config = CRM_Core_Config::singleton();
-    $fileName = 'l10n-' . $config->lcMessages . '.js';
-    if (!is_file(CRM_Utils_File::dynamicResourcePath($fileName))) {
-      CRM_Utils_File::addDynamicResource($fileName, $this->createLocalizationJs());
-    }
-    // Dynamic localization script
-    return CRM_Utils_File::dynamicResourceUrl($fileName);
-  }
-
-  /**
    * Create dynamic script for localizing js widgets
    *
    * @return string javascript content
    */
-  private function createLocalizationJs() {
+  static function outputLocalizationJS() {
+    CRM_Core_Page_AJAX::setJsHeaders();
     $config = CRM_Core_Config::singleton();
     $vars = array(
       'moneyFormat' => json_encode(CRM_Utils_Money::format(1234.56)),
@@ -595,7 +579,8 @@ class CRM_Core_Resources {
       'otherSearch' => json_encode(ts('Enter search term...')),
       'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
     );
-    return CRM_Core_Smarty::singleton()->fetchWith('CRM/common/localization.js.tpl', $vars);
+    print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
+    CRM_Utils_System::civiExit();
   }
 
   /**
@@ -680,5 +665,12 @@ class CRM_Core_Resources {
     $config->userSystem->appendCoreResources($items);
 
     return $items;
+  }
+
+  /**
+   * @return bool - is this page request an ajax snippet?
+   */
+  static function isAjaxMode() {
+    return in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(CRM_Core_Smarty::PRINT_SNIPPET, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON));
   }
 }

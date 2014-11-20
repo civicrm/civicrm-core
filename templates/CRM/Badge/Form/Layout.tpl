@@ -63,7 +63,7 @@
               {$form.height_image_1.html}</br>{$form.height_image_1.label}
             </td>
            </tr>
-         </table> 
+         </table>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-image_2">
@@ -83,7 +83,7 @@
             {$form.height_image_2.html}<br/>{$form.height_image_2.label}
            </td>
           </tr>
-         </table> 
+         </table>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-participant_image">
@@ -105,7 +105,7 @@
               {$form.alignment_participant_image.html}</br>{$form.alignment_participant_image.label}
             </td>
            </tr>
-         </table> 
+         </table>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-elements">

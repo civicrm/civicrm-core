@@ -127,7 +127,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'duration_interval' => 1,
     );
     $result = civicrm_api3('membership_type', 'create', $api_params);
-    
+
     // Create a contribution page for testing.
     $contribution_page = md5(microtime());
     $api_params = array(

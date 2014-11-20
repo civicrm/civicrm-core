@@ -75,6 +75,9 @@ class CRM_Upgrade_Incremental_php_FourFive {
     if ($rev == '4.5.beta2') {
       $postUpgradeMessage .= '<br /><br />' . ts('If you use CiviMail for newsletters or other communications, check out the new sample CiviMail templates which use responsive design to optimize display on mobile devices (Administer > Communications > Message Templates ).');
     }
+    if ($rev == '4.5.1') {
+      $postUpgradeMessage .= '<br /><br />' . ts('WARNING: If you use CiviCase with v4.5.alpha*, v4.5.beta*, or v4.5.0, it is possible that previous upgrades corrupted some CiviCase metadata. If you have not already done so, please identify any custom field sets, smart groups, or reports which refer to CiviCase and ensure that they are properly configured.');
+    }
   }
 
   /**
@@ -122,13 +125,13 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    */
   function upgrade_4_5_beta9($rev) {
     $this->addTask(ts('Upgrade DB to 4.5.beta9: SQL'), 'task_4_5_x_runSql', $rev);
-    
+
     $entityTable = array(
       'Participant' => 'civicrm_participant_payment',
       'Contribution' => 'civicrm_contribution',
       'Membership' => 'civicrm_membership',
     );
-    
+
     foreach ($entityTable as $label => $tableName) {
       list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
         FROM {$tableName}")->getDatabaseResult()->fetchRow();
@@ -136,8 +139,8 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
         $endId = $startId + self::BATCH_SIZE - 1;
         $title = ts("Upgrade DB to 4.5.beta9: Fix line items for {$label} (%1 => %2)", array(1 => $startId, 2 => $endId));
         $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, $label);
-      }      
-    }    
+      }
+    }
     return TRUE;
   }
 
@@ -145,44 +148,44 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    * (Queue Task Callback)
    *
    * Function to update the line items
-   * 
+   *
    *
    * @param CRM_Queue_TaskContext $ctx
    * @param $startId int, the first/lowest entity ID to convert
    * @param $endId int, the last/highest entity ID to convert
-   * @param 
+   * @param
    *
    * @return bool
    */
   static function task_4_5_0_fixLineItem(CRM_Queue_TaskContext $ctx, $startId, $endId, $entityTable) {
-    
+
     $sqlParams = array(
       1 => array($startId, 'Integer'),
       2 => array($endId, 'Integer'),
     );
     switch ($entityTable) {
-      case 'Contribution':  
+      case 'Contribution':
         // update all the line item entity_table and entity_id with contribution due to bug CRM-15055
         CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li
           INNER JOIN civicrm_contribution cc ON cc.id = li.contribution_id
           SET entity_id = li.contribution_id, entity_table = 'civicrm_contribution'
           WHERE li.contribution_id IS NOT NULL AND li.entity_table <> 'civicrm_participant' AND (cc.id BETWEEN %1 AND %2)", $sqlParams);
-        
+
         // update the civicrm_line_item.contribution_id
         CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li
-          INNER JOIN civicrm_contribution cc ON cc.id = li.entity_id 
+          INNER JOIN civicrm_contribution cc ON cc.id = li.entity_id
           SET contribution_id = entity_id
-          WHERE li.contribution_id IS NULL AND li.entity_table = 'civicrm_contribution' AND (cc.id BETWEEN %1 AND %2)", $sqlParams); 
+          WHERE li.contribution_id IS NULL AND li.entity_table = 'civicrm_contribution' AND (cc.id BETWEEN %1 AND %2)", $sqlParams);
         break;
-        
+
       case 'Participant':
         // update the civicrm_line_item.contribution_id
-        CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li 
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li
           INNER JOIN civicrm_participant_payment pp ON pp.participant_id = li.entity_id
           SET li.contribution_id = pp.contribution_id
           WHERE li.entity_table = 'civicrm_participant' AND li.contribution_id IS NULL AND (pp.id BETWEEN %1 AND %2)", $sqlParams);
         break;
-        
+
       case 'Membership':
         $upgrade = new CRM_Upgrade_Form();
         // update the line item of  membership
@@ -193,17 +196,17 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
           SET li.entity_table = 'civicrm_membership', li.entity_id = mp.membership_id
           WHERE li.entity_table = 'civicrm_contribution'
           AND pv.membership_type_id IS NOT NULL AND cm.membership_type_id = pv.membership_type_id AND (cm.id BETWEEN %1 AND %2)", $sqlParams);
-        
+
         CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li
           INNER JOIN civicrm_membership_payment mp ON mp.contribution_id = li.contribution_id
           INNER JOIN civicrm_price_field_value pv ON pv.id = li.price_field_value_id
           SET li.entity_table = 'civicrm_membership', li.entity_id = mp.membership_id
           WHERE li.entity_table = 'civicrm_contribution'
           AND pv.membership_type_id IS NOT NULL AND (mp.membership_id BETWEEN %1 AND %2)", $sqlParams);
-        
+
         CRM_Core_DAO::executeQuery("INSERT INTO civicrm_line_item (entity_table, entity_id, price_field_id, label,
           qty, unit_price, line_total, price_field_value_id, financial_type_id)
-          SELECT 'civicrm_membership', cm.id, cpf.id price_field_id, cpfv.label, 1 as qty, cpfv.amount, cpfv.amount line_total, 
+          SELECT 'civicrm_membership', cm.id, cpf.id price_field_id, cpfv.label, 1 as qty, cpfv.amount, cpfv.amount line_total,
           cpfv.id price_field_value_id, cpfv.financial_type_id FROM civicrm_membership cm
           LEFT JOIN civicrm_membership_payment cmp ON cmp.membership_id = cm.id
           INNER JOIN civicrm_price_field_value cpfv ON cpfv.membership_type_id = cm.membership_type_id
@@ -211,7 +214,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
           INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id
           WHERE cmp.contribution_id IS NULL AND cps.name = 'default_membership_type_amount' AND (cm.id BETWEEN %1 AND %2)", $sqlParams);
         break;
-    } 
+    }
     return TRUE;
   }
 

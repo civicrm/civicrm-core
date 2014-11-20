@@ -289,6 +289,20 @@ function custom_option_html_type( ) {
     </div>
 {literal}
 <script type="text/javascript">
+  CRM.$(function($) {
+    var $form = $('form.{/literal}{$form.formClass}{literal}'),
+      deprecatedNotice;
+    function deprecatedWidgets() {
+      deprecatedNotice && deprecatedNotice.close && deprecatedNotice.close();
+      switch ($('#data_type_1', $form).val()) {
+        case 'AdvMulti-Select':
+          deprecatedNotice = CRM.alert({/literal}'{ts escape="js"}The old "Advance Multi-Select" widget is being phased out and will be removed in a future version of CiviCRM. "Multi-Select" is the recommended substitute.{/ts}', '{ts escape="js"}Obsolete widget{/ts}'{literal}, 'alert', {expires: 0});
+          break;
+      }
+    }
+    $('#data_type_1', $form).each(deprecatedWidgets).change(deprecatedWidgets);
+  });
+
     //when page is reload, build show hide boxes
     //as per data type and html type selected.
     custom_option_html_type( );

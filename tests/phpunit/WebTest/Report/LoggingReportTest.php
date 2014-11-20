@@ -125,7 +125,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->click('_qf_Relationship_upload-bottom');
     $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Disable']");
     $this->click("xpath=//div[@class='crm-contact-relationship-current']/div//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Disable']");
-    $this->waitForText("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']", 'Are you sure you want to disable this relationship?');
+    $this->waitForText("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']", 'Are you sure you want to disable this relationship?');
     $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Yes']");
     $this->waitForElementPresent("xpath=//div[@class='crm-contact-relationship-past']/div//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[2]/a[text()='Delete']");
     $this->click("xpath=//div[@class='crm-contact-relationship-past']/div//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[2]/a[text()='Delete']");
@@ -156,6 +156,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody/tr/td[7][text()='Completed']");
 
     //add a case
+    $this->waitForAjaxContent();
     $this->click("xpath=//li[@id='tab_case']/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//div[@class='action-link']/a");
     $this->click("xpath=//div[@class='view-content']//div[@class='action-link']/a");

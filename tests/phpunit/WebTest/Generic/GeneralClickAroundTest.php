@@ -291,7 +291,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertElementPresent("post_URL");
     $this->assertTextPresent("Drupal user account registration option?");
     $this->assertTextPresent("What to do upon duplicate match");
-    $this->assertTextPresent("Proximity search");
+    $this->assertTextPresent("Proximity Search");
   }
 
   function testTags() {

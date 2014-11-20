@@ -160,8 +160,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($payment_processor_id, $this->_mode);
     $this->assign('paymentProcessor', $this->_paymentProcessor);
 
-    CRM_Core_Payment_Form::setCreditCardFields($this);
-    CRM_Core_Payment_Form::buildCreditCard($this);
+    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE);
 
     if ($can_pay_later || self::is_administrator()) {
       $this->addElement('checkbox', 'is_pay_later',
@@ -393,7 +392,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $errors = array();
 
     if ($self->payment_required && empty($self->_submitValues['is_pay_later'])) {
-      $payment = &CRM_Core_Payment::singleton($self->_mode, $self->_paymentProcessor, $this);
+      $payment = CRM_Core_Payment::singleton($self->_mode, $self->_paymentProcessor, CRM_Core_DAO::$_nullObject);
       $error = $payment->checkConfig($self->_mode);
       if ($error) {
         $errors['_qf_default'] = $error;

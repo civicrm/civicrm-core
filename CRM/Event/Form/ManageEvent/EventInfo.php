@@ -208,9 +208,9 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->add('textarea', 'summary', ts('Event Summary'), $attributes['summary']);
     $this->addWysiwyg('description', ts('Complete Description'), $attributes['event_description']);
-    $this->addElement('checkbox', 'is_public', ts('Public Event?'));
+    $this->addElement('checkbox', 'is_public', ts('Public Event'));
     $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
-    $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location?'));
+    $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location'));
 
     $this->addDateTime('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDateTime'));
     $this->addDateTime('end_date', ts('End Date / Time'), FALSE, array('formatType' => 'activityDateTime'));
@@ -260,7 +260,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
         $start = CRM_Utils_Date::processDate($values['start_date']);
         $end = CRM_Utils_Date::processDate($values['end_date']);
         if (($end < $start) && ($end != 0)) {
-          $errors['end_date'] = ts('End date should be after Start date');
+          $errors['end_date'] = ts('End date should be after Start date.');
         }
       }
     }

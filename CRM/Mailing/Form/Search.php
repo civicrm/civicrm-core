@@ -54,9 +54,10 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
-    $statusVals = array(ts('Scheduled'), ts('Complete'), ts('Running'), ts('Canceled'));
-    foreach ($statusVals as $status) {
-      $this->addElement('checkbox', "mailing_status[$status]", NULL, $status);
+    // CRM-15434 - Fix mailing search by status in non-English languages
+    $statusVals = CRM_Core_SelectValues::getMailingJobStatus();
+    foreach ($statusVals as $statusId => $statusName) {
+      $this->addElement('checkbox', "mailing_status[$statusId]", NULL, $statusName);
     }
     $this->addElement('checkbox', 'status_unscheduled', NULL, ts('Draft / Unscheduled'));
     $this->addYesNo('is_archived', ts('Mailing is Archived'), TRUE);

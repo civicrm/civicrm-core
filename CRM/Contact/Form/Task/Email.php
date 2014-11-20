@@ -129,7 +129,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
       CRM_Utils_System::setTitle(implode(',', $displayName) . ' - ' . ts('Email'));
     }
     else {
-      CRM_Utils_System::setTitle(ts('New Email'));          
+      CRM_Utils_System::setTitle(ts('New Email'));
     }
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
 

@@ -92,9 +92,20 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $config = CRM_Core_Config::singleton();
 
     // All cached content needs to be cleared because the civi codebase was just replaced
-    CRM_Core_Resources::singleton()->flushStrings()->rebuildDynamicResources();
-    // cleanup only the templates_c directory
-    $config->cleanup(1, FALSE);
+    CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
+    CRM_Core_Menu::store();
+
+    // This could be removed in later rev
+    if ($currentVer == '2.1.6') {
+      $config = CRM_Core_Config::singleton();
+      // also cleanup the templates_c directory
+      $config->cleanupCaches();
+    } else {
+      $config = CRM_Core_Config::singleton();
+      // cleanup only the templates_c directory
+      $config->cleanup(1, FALSE);
+    }
+    // end of hack
 
     $preUpgradeMessage = NULL;
     $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);

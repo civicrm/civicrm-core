@@ -44,7 +44,7 @@
 {* Replace div id "crm-container" only when profile is not loaded in civicrm container, i.e for profile shown in my account and in profile standalone mode otherwise id should be "crm-profile-block" *}
 
   {if $action eq 1 or $action eq 2 or $action eq 4 }
-  <div id="crm-profile-block" class="crm-container-snippet crm-public">
+  <div id="crm-profile-block" class="crm-container crm-public">
     {else}
   <div id="crm-container" class="crm-container crm-public" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
   {/if}
@@ -204,7 +204,7 @@
         {/if}
       {/if}{* end of main if field name if *}
     {/foreach}
-   
+
     {if $isCaptcha && ( $mode eq 8 || $mode eq 4 || $mode eq 1 ) }
       {include file='CRM/common/ReCAPTCHA.tpl'}
       <script type="text/javascript">cj('.recaptcha_label').attr('width', '140px');</script>

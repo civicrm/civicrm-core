@@ -312,19 +312,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Profile',
       'CustomValue',
       'SurveyRespondant',
-      'Tag',
       'UFMatch',
       'UFJoin',
       'UFField',
       'OptionValue',
       'Relationship',
       'RelationshipType',
-      'ParticipantStatusType',
       'Note',
       'OptionGroup',
       'Membership',
-      'MembershipType',
-      'MembershipStatus',
       'Group',
       'GroupOrganization',
       'GroupNesting',
@@ -334,7 +330,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CustomField',
       'CustomGroup',
       'Contribution',
-      'ContributionRecur',
       'ActivityType',
       'MailingEventConfirm',
       'Case',
@@ -350,14 +345,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Participant',
       'ParticipantPayment',
       'LineItem',
-      'PriceSet',
-      'PriceField',
-      'PriceFieldValue',
       'PledgePayment',
       'ContributionPage',
       'Phone',
       'PaymentProcessor',
-      'MailSettings',
       'Setting',
       'MailingContact',
       'SystemLog' //skip this because it doesn't make sense to update logs
@@ -397,12 +388,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public static function toBeSkipped_getSqlOperators() {
     $entitiesWithout = array(
       'Case',//case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
+      'Contact', // on the todo list!
       'EntityTag', // non-standard api - has inappropriate mandatory fields & doesn't implement limit
-      'Contact', // as with the next 3 a fix is tested & working for this but trying to keep code for review small hence just recording
-      //https://github.com/eileenmcnaughton/civicrm-core/commit/da3d6dcfd73a7e6e5f5a553e98b4608724d33765
-      'Event',// fix is https://github.com/eileenmcnaughton/civicrm-core/commit/cfd3114bd3215fed26c6e933f621b8e893cd7b3e
-      'Participant',//fix is https://github.com/eileenmcnaughton/civicrm-core/commit/6ebae38eb8999756f62259818af8827f50e8d4f3
-      'Pledge',// same fix as participant - keeping out of 4.5 as a conservative move
       'Extension', // can't handle creating 25
       'Note', // note has a default get that isn't implemented in createTestObject -meaning you don't 'get' them
       'MailingGroup', // no get call on MailingGroup
@@ -499,6 +486,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'break_return' => array(
         ),
         'cant_return' => array(
+        ),
+      ),
+      'PriceFieldValue' => array(
+        'cant_update' => array(
+          'weight', //won't update as there is no 1 in the same price set
         ),
       ),
     );
@@ -985,12 +977,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'limit' => 2,
       ),
     ));
+
     // lets use first rather than assume only one exists
     $entity = $getEntities['values'][0];
     $entity2 = $getEntities['values'][1];
     $this->deletableTestObjects[$baoString][] = $entity['id'];
     $this->deletableTestObjects[$baoString][] = $entity2['id'];
     foreach ($fields as $field => $specs) {
+      $resetFKTo = NULL;
       $fieldName = $field;
       if (!empty($specs['uniquename'])) {
         $fieldName = $specs['uniquename'];
@@ -1023,19 +1017,27 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
         case CRM_Utils_Type::T_INT:
           // probably created with a 1
-          $entity[$fieldName] = '6';
-          if (!empty($specs['FKClassName'])) {
+          if ($fieldName == 'weight') {
+            $entity[$fieldName] = 2;
+          }
+          elseif (!empty($specs['FKClassName'])) {
             if($specs['FKClassName'] == $baoString){
               $entity[$fieldName] = (string) $entity2['id'];
             }
             else{
               $uniqueName = CRM_Utils_Array::value('uniqueName', $specs);
+              if (!empty($entity[$fieldName])) {
+                $resetFKTo = array($fieldName => $entity[$fieldName]);
+              }
               $entity[$fieldName] = (string) empty($entity2[$field]) ? CRM_Utils_Array::value($uniqueName, $entity2) : $entity2[$field];
              //todo - there isn't always something set here - & our checking on unset values is limited
               if (empty($entity[$field])) {
                 unset($entity[$field]);
               }
             }
+          }
+          else {
+            $entity[$fieldName] = '6';
           }
           break;
 
@@ -1068,7 +1070,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'id' => $entity['id'],
         $field => isset($entity[$field]) ? $entity[$field] : NULL,
       );
-      if(isset($updateParams['financial_type_id']) && $entityName != 'Product') {
+      if(isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['contribution_type_id'] = $updateParams['financial_type_id'];
       }
@@ -1086,6 +1088,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
       $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
       $this->assertAPIArrayComparison($entity, $checkEntity, array(), "checking if $fieldName was correctly updated\n" . print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE));
+      if ($resetFKTo) {
+        //reset the foreign key fields because otherwise our cleanup routine fails & some other unexpected stuff can kick in
+        $entity = array_merge($entity, $resetFKTo);
+        $updateParams = array_merge($updateParams, $resetFKTo);
+        $this->callAPISuccess($entityName, 'create', $updateParams);
+        if(isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
+          //api has special handling on these 2 fields for backward compatibility reasons
+          $entity['contribution_type_id'] = $updateParams['financial_type_id'];
+        }
+      }
     }
     $baoObj->free();
   }

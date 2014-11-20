@@ -86,6 +86,11 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   protected $_campaignID = NULL;
 
   /**
+   * Check if repeating event
+   */
+  protected $_isRepeatingEvent;
+
+  /**
    * Function to set variables up before form is built
    *
    * @return void
@@ -103,6 +108,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
     if ($this->_id) {
+      $this->_isRepeatingEvent = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
       $this->assign('eventId', $this->_id);
       if (!empty($this->_addBlockName) && empty($this->_addProfileBottom) && empty($this->_addProfileBottomAdd)) {
         $this->add('hidden', 'id', $this->_id);
@@ -114,7 +120,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
       // its an update mode, do a permission check
       if (!CRM_Event_BAO_Event::checkPermission($this->_id, CRM_Core_Permission::EDIT)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
 
       $participantListingID = CRM_Utils_Array::value('participant_listing_id', $eventInfo);
@@ -148,8 +154,13 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
         CRM_Utils_System::setTitle(ts('Edit Event Template') . " - $title");
       }
       else {
+        $configureText = ts('Configure Event');
         $title = CRM_Utils_Array::value('title', $eventInfo);
-        CRM_Utils_System::setTitle(ts('Configure Event') . " - $title");
+        //If it is a repeating event change title
+        if ($this->_isRepeatingEvent) {
+          $configureText = 'Configure Repeating Event';
+        }
+        CRM_Utils_System::setTitle($configureText . " - $title");
       }
       $this->assign('title', $title);
     }
@@ -176,6 +187,12 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     }
 
     $this->_templateId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
+
+    //Is a repeating event
+    if ($this->_isRepeatingEvent) {
+      $isRepeatingEntity = TRUE;
+      $this->assign('isRepeatingEntity', $isRepeatingEntity);
+    }
 
     // also set up tabs
     CRM_Event_Form_ManageEvent_TabHeader::build($this);

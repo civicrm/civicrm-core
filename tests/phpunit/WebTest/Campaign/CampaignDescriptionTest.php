@@ -36,8 +36,8 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCampaign() {
-
-    $this->webtestLogin();
+    // Fixme: testing a theory that this test was failing due to permissions
+    $this->webtestLogin('admin');
 
     // Create new group
     $title = substr(sha1(rand()), 0, 7);
@@ -47,7 +47,7 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $this->enableComponents(array('CiviCampaign'));
 
     //Creating a new Campaign
-    $this->openCivipage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
+    $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
     $campaignTitle = "Campaign $title";
     $this->type("title", $campaignTitle);

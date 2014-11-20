@@ -477,7 +477,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         array(
           array(
             'name' => ts('Type'),
-            'sort'      => 'financial_type_id',
+            'sort'      => 'financial_type',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
           array(
@@ -497,7 +497,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           ),
           array(
             'name' => ts('Status'),
-            'sort' => 'contribution_status_id',
+            'sort' => 'contribution_status',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
           array(

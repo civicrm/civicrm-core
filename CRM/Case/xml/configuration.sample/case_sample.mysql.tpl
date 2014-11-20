@@ -18,6 +18,13 @@ INSERT IGNORE INTO `civicrm_case_type` (  {localize field='title'}`title`{/local
   ({localize}'{ts escape="sql"}Housing Support{/ts}'{/localize}, 'housing_support', {localize}'{ts escape="sql"}Help homeless individuals obtain temporary and long-term housing{/ts}'{/localize}, @max_wt + 1, 0, 1),
   ({localize}'{ts escape="sql"}Adult Day Care Referral{/ts}'{/localize}, 'adult_day_care_referral', {localize}'{ts escape="sql"}Arranging adult day care for senior individuals{/ts}'{/localize}, @max_wt + 2, 0, 1);
 
+-- CRM-15343 set the auto increment civicrm_case_type.id start point to max id to avoid conflict in future insertion
+SELECT @max_case_type_id := max(id) from civicrm_case_type;
+SET @query  = CONCAT("ALTER TABLE civicrm_case_type AUTO_INCREMENT = ", IFNULL(@max_case_type_id,1));
+PREPARE alter_case_type_auto_inc FROM @query;
+EXECUTE alter_case_type_auto_inc;
+DEALLOCATE PREPARE alter_case_type_auto_inc;
+
 -- /*******************************************************
 -- *
 -- * Case Status - Set names for Open and Closed
@@ -28,11 +35,11 @@ SELECT @csgId        := max(id) from civicrm_option_group where name = 'case_sta
   {foreach from=$locales item=locale}
     UPDATE civicrm_option_value SET name = 'Open' where option_group_id = @csgId AND label_{$locale} = 'Ongoing';
     UPDATE civicrm_option_value SET name = 'Closed' where option_group_id = @csgId AND label_{$locale} = 'Resolved';
-  {/foreach}  
+  {/foreach}
 {else}
   UPDATE civicrm_option_value SET name = 'Open' where option_group_id = @csgId AND label = 'Ongoing';
   UPDATE civicrm_option_value SET name = 'Closed' where option_group_id = @csgId AND label = 'Resolved';
-{/if}  
+{/if}
 
 -- /*******************************************************
 -- *
@@ -66,7 +73,7 @@ INSERT INTO `civicrm_option_value` ( `option_group_id`, {localize field='label'}
 INSERT INTO `civicrm_option_value` ( `option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`,  `is_optgroup`, `is_reserved`, `is_active`, `component_id` )
 (SELECT @option_group_id_activity_type, {localize}'{ts escape="sql"}ADC referral{/ts}'{/localize}, (SELECT @max_val := @max_val+1), 'ADC referral',  NULL, 0,  0, (SELECT @max_val := @max_val+1),  0, 0, 1, @caseCompId
  FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_option_value`  WHERE `name` = 'ADC referral'));
- 
+
 -- /*******************************************************
 -- *
 -- * Relationship Types

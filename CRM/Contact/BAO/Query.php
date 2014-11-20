@@ -1000,7 +1000,7 @@ class CRM_Contact_BAO_Query {
           // CRM-13011 : If location type is primary, do not restrict search to the phone
           // type id - we want the primary phone, regardless of what type it is.
           // Otherwise, restrict to the specified phone type for the given field.
-          if ((!$cond) && ($elementName == 'phone') && $elements['location_type'] != 'Primary') {
+          if ((!$cond) && ($elementName == 'phone')) {
             $cond = "phone_type_id = '$elementType'";
           }
           elseif ((!$cond) && ($elementName == 'im')) {
@@ -1130,7 +1130,14 @@ class CRM_Contact_BAO_Query {
                 case 'civicrm_im':
                 case 'civicrm_openid':
 
-                  $this->_tables[$tName] = "\nLEFT JOIN $tableName `$tName` ON contact_a.id = `$tName`.contact_id AND `$tName`.$lCond";
+                  $this->_tables[$tName] = "\nLEFT JOIN $tableName `$tName` ON contact_a.id = `$tName`.contact_id";
+                  if ($tableName != 'civicrm_phone') {
+                    $this->_tables[$tName] .= " AND `$tName`.$lCond";
+                  }
+                  elseif (is_numeric($name)) {
+                    $this->_select[$tName] = "IF (`$tName`.is_primary = $name, `$tName`.phone, NULL) as `$tName`";
+                  }
+
                   // this special case to add phone type
                   if ($cond) {
                     $phoneTypeCondition = " AND `$tName`.$cond ";
@@ -2978,7 +2985,7 @@ WHERE  id IN ( $groupIDs )
           LEFT JOIN civicrm_tag {$tActTable} ON ( {$etActTable}.tag_id = {$tActTable}.id  )";
 
       $this->_where[$grouping][] = "({$tTable}.name $op '". $value . "' OR {$tCaseTable}.name $op '". $value . "' OR {$tActTable}.name $op '". $value . "')";
-      $this->_qill[$grouping][] = ts('Tag %1 %2 ', array(1 => $tagTypesText[2], 2 => $op)) . ' ' . $value;
+      $this->_qill[$grouping][] = ts('Tag %1 %2', array(1 => $tagTypesText[2], 2 => $op)) . ' ' . $value;
     } else {
       $etTable = "`civicrm_entity_tag-" . $value . "`";
       $tTable = "`civicrm_tag-" . $value . "`";
@@ -3308,7 +3315,7 @@ WHERE  id IN ( $groupIDs )
     $this->_where[$grouping][] = $sub;
     if ($config->includeEmailInName) {
       $this->_tables['civicrm_email'] = $this->_whereTables['civicrm_email'] = 1;
-      $this->_qill[$grouping][] = ts('Name or Email ') . "$op - '$name'";
+      $this->_qill[$grouping][] = ts('Name or Email') . " $op - '$name'";
     }
     else {
       $this->_qill[$grouping][] = ts('Name like') . " - '$name'";
@@ -3855,7 +3862,7 @@ WHERE  id IN ( $groupIDs )
     $name = $targetName[4] ? "%$name%" : $name;
     $this->_where[$grouping][] = "contact_b_log.sort_name LIKE '%$name%'";
     $this->_tables['civicrm_log'] = $this->_whereTables['civicrm_log'] = 1;
-    $this->_qill[$grouping][] = ts('Modified by') . ": $name";
+    $this->_qill[$grouping][] = ts('Modified By') . " $name";
   }
 
   /**
@@ -4029,7 +4036,7 @@ WHERE  id IN ( $groupIDs )
        return;
     }
     // also get values array for relation_target_name
-    // for relatinship search we always do wildcard
+    // for relationship search we always do wildcard
     $relationType = $this->getWhereValues('relation_type_id', $grouping);
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
@@ -4059,7 +4066,7 @@ WHERE  id IN ( $groupIDs )
       $params = array('id' => $rel[0]);
       $rType = CRM_Contact_BAO_RelationshipType::retrieve($params, $rTypeValues);
     }
-    if (empty($rTypeValues)) {
+    if (!empty($rTypeValues) && $rTypeValues['name_a_b'] == $rTypeValues['name_b_a']) {
       // if we don't know which end of the relationship we are dealing with we'll create a temp table
       //@todo unless we are dealing with a target group
       self::$_relType = 'reciprocal';

@@ -104,7 +104,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Case opened successfully.");
 
     // Go back to dashboard
-    $this->openCivipage('case', 'reset=1', 'css=a.button');
+    $this->openCiviPage('case', 'reset=1');
 
     // Click on a drilldown cell and check if right radio is checked
     $this->clickLink("css=a.crm-case-summary-drilldown", "css=input.crm-form-submit");

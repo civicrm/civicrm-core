@@ -149,7 +149,7 @@ class CRM_Report_Form_Instance {
     // navigation field
     $parentMenu = CRM_Core_BAO_Navigation::getNavigationList();
 
-    $form->add('select', 'parent_id', ts('Parent Menu'), array('' => ts('-- select --')) + $parentMenu);
+    $form->add('select', 'parent_id', ts('Parent Menu'), array('' => ts('- select -')) + $parentMenu);
 
     // For now we only providing drilldown for one primary detail report only. In future this could be multiple reports
     foreach ($form->_drilldownReport as $reportUrl => $drillLabel) {
@@ -189,7 +189,7 @@ class CRM_Report_Form_Instance {
     $errors = array();
     if ($selfButtonName == $buttonName) {
       if (empty($fields['title'])) {
-        $errors['title'] = ts('Title is a required field');
+        $errors['title'] = ts('Title is a required field.');
         $self->assign('instanceFormError', TRUE);
       }
     }

@@ -63,7 +63,9 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   public function __construct($apiKernel) {
     $this->apiKernel = $apiKernel;
     $this->actions = array(
+      // FIXME: We really need to deal with the api's lack of uniformity wrt case (Entity or entity)
       'Entity' => array('get', 'getactions'),
+      'entity' => array('get', 'getactions'),
       '*' => array('getactions'), // 'getfields'
     );
   }
@@ -73,7 +75,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    */
   public function onApiResolve(\Civi\API\Event\ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
-    $actions = isset($this->actions[$apiRequest['entity']]) ? $this->actions[$apiRequest['entity']] : $this->actions['*'];
+    $actions = $this->getActionNames($apiRequest['version'], $apiRequest['entity']);
     if (in_array($apiRequest['action'], $actions)) {
       $apiRequest['is_metadata'] = TRUE;
       $event->setApiRequest($apiRequest);
@@ -99,12 +101,12 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    * {inheritdoc}
    */
   public function invoke($apiRequest) {
-    if ($apiRequest['entity'] == 'Entity' && $apiRequest['action'] == 'get') {
-      return civicrm_api3_create_success($this->apiKernel->getEntityNames($apiRequest['version']));
+    if (strtolower($apiRequest['entity']) == 'entity' && $apiRequest['action'] == 'get') {
+      return civicrm_api3_create_success($this->apiKernel->getEntityNames($apiRequest['version']), $apiRequest['params'], 'entity', 'get');
     }
     switch ($apiRequest['action']) {
       case 'getactions':
-        return civicrm_api3_create_success($this->apiKernel->getActionNames($apiRequest['version'], $apiRequest['entity']));
+        return civicrm_api3_create_success($this->apiKernel->getActionNames($apiRequest['version'], $apiRequest['entity']), $apiRequest['params'], $apiRequest['entity'], $apiRequest['action']);
 //      case 'getfields':
 //        return $this->doGetFields($apiRequest);
       default:
@@ -125,6 +127,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    * {inheritdoc}
    */
   function getActionNames($version, $entity) {
+    $entity = _civicrm_api_get_camel_name($entity, $version);
     return isset($this->actions[$entity]) ? $this->actions[$entity] : $this->actions['*'];
   }
 }

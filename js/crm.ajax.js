@@ -257,7 +257,7 @@
           return;
         }
         data.url = url;
-        that.element.trigger('crmBeforeLoad', data);
+        that.element.trigger('crmUnload').trigger('crmBeforeLoad', data);
         that._beforeRemovingContent();
         that.element.html(data.content);
         that._handleOrderLinks();
@@ -280,7 +280,7 @@
       this.options.crmForm && $('form', this.element).ajaxFormUnbind();
     },
     _destroy: function() {
-      this.element.removeClass('crm-ajax-container');
+      this.element.removeClass('crm-ajax-container').trigger('crmUnload');
       this._beforeRemovingContent();
       if (this._originalContent !== null) {
         this.element.empty().append(this._originalContent);
@@ -310,6 +310,18 @@
       // HACK: jQuery UI doesn't support relative height
       if (typeof settings.dialog.height === 'string' && settings.dialog.height.indexOf('%') > 0) {
         settings.dialog.height = parseInt($(window).height() * (parseFloat(settings.dialog.height)/100), 10);
+      }
+      // Increase percent width on small screens
+      if (typeof settings.dialog.width === 'string' && settings.dialog.width.indexOf('%') > 0) {
+        var screenWidth = $(window).width(),
+          percentage = parseInt(settings.dialog.width.replace('%', ''), 10),
+          gap = 100-percentage;
+        if (screenWidth < 701) {
+          settings.dialog.width = '100%';
+        }
+        else if (screenWidth < 1400) {
+          settings.dialog.width = '' + parseInt(percentage+gap-((screenWidth - 700)/7*(gap)/100), 10) + '%';
+        }
       }
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
       $(settings.target)

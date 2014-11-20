@@ -118,6 +118,10 @@ class CRM_Member_Task {
       if (!CRM_Core_Permission::check('delete in CiviMember')) {
         unset(self::$_tasks[1]);
       }
+      //CRM-12920 - check for edit permission
+      if( !CRM_Core_Permission::check('edit memberships') ){
+        unset(self::$_tasks[5]);
+      }
     }
     CRM_Utils_Hook::searchTasks('membership', self::$_tasks);
     asort(self::$_tasks);

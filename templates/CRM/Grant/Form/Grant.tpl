@@ -33,7 +33,7 @@
   {if $action eq 8}
      <div class="messages status">
          <p><div class="icon inform-icon"></div>&nbsp;
-         {ts}Are you sure you want to delete this Grant?{/ts} {ts}This operation cannot be undone.{/ts}</p>
+         {ts}Are you sure you want to delete this Grant?{/ts} {ts}This action cannot be undone.{/ts}</p>
          <p>{include file="CRM/Grant/Form/Task.tpl"}</p>
      </div>
   {else}

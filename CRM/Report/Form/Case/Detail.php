@@ -223,7 +223,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         array(
           'worldregion_id' => array(
             'name' => 'id',
-            'title' => ts('WorldRegion'),
+            'title' => ts('World Region'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::worldRegion(),
@@ -289,7 +289,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $elements = array();
     $elements[] = &$this->createElement('select', 'case_activity_all_dates', NULL,
       array(
-        '' => ts('-- select --')) + $this->caseActivityTypes
+        '' => ts('- select -')) + $this->caseActivityTypes
     );
     $this->addGroup($elements, 'case_detail_extra');
 
@@ -628,7 +628,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_activity_last_completed_last_completed_activity_subject', $row) && empty($row['civicrm_activity_last_completed_last_completed_activity_subject'])) {
-        $rows[$rowNum]['civicrm_activity_last_completed_last_completed_activity_subject'] = ts('(No Subject)');
+        $rows[$rowNum]['civicrm_activity_last_completed_last_completed_activity_subject'] = ts('(no subject)');
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_contact_client_sort_name', $row) &&

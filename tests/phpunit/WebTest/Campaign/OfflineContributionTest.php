@@ -80,7 +80,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     $this->openCiviPage('campaign', 'reset=1', "link=Add Campaign");
-    if ($this->isTextPresent('No campaigns found.')) {
+    if ($this->isTextPresent('None found.')) {
       $this->openCiviPage('contribute/add', 'reset=1&action=add&context=standalone', '_qf_Contribution_cancel-bottom');
       $this->assertElementContainsText('crm-container', 'There are currently no active Campaigns.');
     }
@@ -216,7 +216,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
       $this->click("remove");
       $this->clickLink("_qf_Component_next-bottom");
 
-      $this->checkCRMAlert("Changes Saved.");
+      $this->checkCRMAlert("Changes Saved");
 
       $this->openCiviPage('contribute/search', 'reset=1', '_qf_Search_refresh');
 

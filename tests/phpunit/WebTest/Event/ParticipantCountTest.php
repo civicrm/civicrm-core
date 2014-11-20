@@ -106,7 +106,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify number of registered participants
-    $this->assertStringsPresent(array('2 Result'));
+    $this->assertTrue($this->isTextPresent('2 Results'));
   }
 
   function testParticipantCountWithPriceset() {
@@ -290,7 +290,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify number of participants records and total participant count
-    $this->assertStringsPresent(array('2 Result', 'Actual participant count : 24'));
+    $this->assertStringsPresent(array('2 Results', 'Actual participant count : 24'));
 
     // CRM-7953, check custom search Price Set Details for Event
     // Participants
@@ -448,7 +448,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click('_qf_Custom_refresh-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $tableHeaders = array('Contact ID', 'Participant Id', 'Name');
+    $tableHeaders = array('Contact ID', 'Participant ID', 'Name');
     $tableHeaders = array_merge($tableHeaders, array_keys(current($priceFieldOptionCounts)));
 
     $tdnum = 2;

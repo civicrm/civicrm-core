@@ -204,7 +204,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       );
 
 
-      if ($params['option_type'] == 1) {
+      if ($params['option_type'] == 1 && empty($params['option_group_id'])) {
         // first create an option group for this custom group
         $optionGroup = new CRM_Core_DAO_OptionGroup();
         $optionGroup->name = "{$columnName}_" . date('YmdHis');
@@ -1447,7 +1447,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return array
    */
-  static function getFileURL($contactID, $cfID, $fileID = NULL, $absolute = FALSE) {
+  static function getFileURL($contactID, $cfID, $fileID = NULL, $absolute = FALSE, $multiRecordWhereClause = NULL) {
     if ($contactID) {
       if (!$fileID) {
         $params = array('id' => $cfID);
@@ -1462,7 +1462,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         );
 
         //query to fetch id from civicrm_file
-        $query = "SELECT {$columnName} FROM {$tableName} where entity_id = {$contactID}";
+        if ($multiRecordWhereClause) {
+          $query = "SELECT {$columnName} FROM {$tableName} where entity_id = {$contactID} AND {$multiRecordWhereClause}";
+        }
+        else {
+          $query = "SELECT {$columnName} FROM {$tableName} where entity_id = {$contactID}";
+        }
         $fileID = CRM_Core_DAO::singleValueQuery($query);
       }
 
@@ -1526,6 +1531,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param int     $entityId            entity id (contribution, membership...)
    * @param boolean $inline              consider inline custom groups only
    * @param boolean $checkPermission     if false, do not include permissioning clause
+   * @param boolean $includeViewOnly     if true, fields marked 'View Only' are included. Required for APIv3.
    *
    * @return array $customFormatted formatted custom field array
    * @static
@@ -1534,7 +1540,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $customFieldExtend, $customValueId = NULL,
     $entityId = NULL,
     $inline = FALSE,
-    $checkPermission = TRUE
+    $checkPermission = TRUE,
+    $includeViewOnly = false
   ) {
     //get the custom fields for the entity
     //subtype and basic type
@@ -1567,7 +1574,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     // return if field is a 'code' field
-    if (!empty($customFields[$customFieldId]['is_view'])) {
+    if (!$includeViewOnly && !empty($customFields[$customFieldId]['is_view'])) {
       return;
     }
 

@@ -170,7 +170,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $participantId = Participant::create($this->_contactId, $this->_eventId);
     $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId);
 
-    $this->assertEquals($eventFull, 'This event is full !!!', 'Checking if Event is full.');
+    $this->assertEquals($eventFull, 'This event is full.', 'Checking if Event is full.');
 
     Participant::delete($participantId);
     Contact::delete($this->_contactId);

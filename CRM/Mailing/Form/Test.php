@@ -216,7 +216,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
           $testParams['emails'][] = $email;
           $emails .= $emails ? ",'$email'" : "'$email'";
           if (!CRM_Utils_Rule::email($email)) {
-            CRM_Core_Session::setStatus(ts('Please enter a valid email addresses.'), ts('Test not sent.'), 'error');
+            CRM_Core_Session::setStatus(ts('Please enter a valid email address.'), ts('Test not sent.'), 'error');
             $error = TRUE;
           }
         }
@@ -289,6 +289,7 @@ WHERE      e.email IN ($emails)
 AND        e.on_hold = 0
 AND        c.is_opt_out = 0
 AND        c.do_not_email = 0
+AND        c.is_deleted = 0
 AND        c.is_deceased = 0
 GROUP BY   e.id
 ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
@@ -306,7 +307,9 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
 
       $dao->free();
       foreach ($testParams['emails'] as $key => $email) {
-        $email = trim($email);
+        // Email addresses are forced to lower case when saved, so ensure
+        // we have the same case when comparing.
+        $email = trim(strtolower($email));
         $contactId = $emailId = NULL;
         if (array_key_exists($email, $emailDetail)) {
           $emailId = $emailDetail[$email]['email_id'];

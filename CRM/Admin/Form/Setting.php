@@ -267,7 +267,7 @@ AND    time_format <> ''
       unset($params[$setting]);
     }
     CRM_Core_BAO_ConfigSetting::create($params);
-    CRM_Core_Session::setStatus(" ", ts('Changes Saved.'), "success");
+    CRM_Core_Session::setStatus(" ", ts('Changes Saved'), "success");
   }
 
   public function rebuildMenu() {

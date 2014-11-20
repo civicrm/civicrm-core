@@ -100,20 +100,11 @@ function civicrm_error($result) {
 
 /**
  * @param $entity
- * @param null $version
  *
  * @return string
  */
-function _civicrm_api_get_camel_name($entity, $version = NULL) {
-  $fragments = explode('_', $entity);
-  foreach ($fragments as & $fragment) {
-    $fragment = ucfirst($fragment);
-  }
-  // Special case: UFGroup, UFJoin, UFMatch, UFField
-  if ($fragments[0] === 'Uf') {
-    $fragments[0] = 'UF';
-  }
-  return implode('', $fragments);
+function _civicrm_api_get_camel_name($entity) {
+  return CRM_Utils_String::convertStringToCamel($entity);
 }
 
 /**

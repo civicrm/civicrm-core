@@ -71,7 +71,7 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
 
-    CRM_Utils_System::setTitle(ts('Batch Update Contributions via Profile'));
+    CRM_Utils_System::setTitle(ts('Batch Update Contributions Via Profile'));
 
     $validate = FALSE;
     //validations

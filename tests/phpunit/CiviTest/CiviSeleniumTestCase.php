@@ -215,6 +215,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
     $this->open("{$this->sboxPath}civicrm/$url");
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->checkForErrorsOnPage();
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
     }
@@ -230,6 +231,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // conditional wait for page load e.g for ajax form save
     if ($waitForPageLoad) {
       $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->checkForErrorsOnPage();
     }
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
@@ -400,9 +402,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       }
     }
     if ($added) {
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForText('crm-notification-container', "Saved");
+      $this->clickLink("_qf_Component_next-bottom");
+      $this->checkCRMAlert("Saved");
     }
   }
 
@@ -2017,7 +2018,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $financialType
    */
   function addPremium($name, $sku, $amount, $price, $cost, $financialType) {
-    $this->waitForElementPresent("_qf_ManagePremiums_next-bottom");
+    $this->waitForElementPresent("_qf_ManagePremiums_upload-bottom");
     $this->type("name", $name);
     $this->type("sku", $sku);
     $this->click("CIVICRM_QFID_noImage_16");
@@ -2027,7 +2028,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if ($financialType) {
       $this->select("financial_type_id", "label={$financialType}");
     }
-    $this->click("_qf_ManagePremiums_next-bottom");
+    $this->click("_qf_ManagePremiums_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
@@ -2085,6 +2086,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @return void
    */
   function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering = NULL) {
+    // FIXME: Testing a theory that these failures have something to do with permissions
+    $this->webtestLogin('admin');
+
     //add the custom set
     $return = $this->addCustomGroupField($customSets);
 
@@ -2096,8 +2100,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
 
     $this->openCiviPage($pageUrl['url'], $pageUrl['args']);
-    // Open the page again just to make sure caches are cleared
-    $this->openCiviPage($pageUrl['url'], $pageUrl['args']);
+
+    // FIXME: Try to find out what the heck is going on with these tests
+    $this->waitForAjaxContent();
+    $this->checkForErrorsOnPage();
+
     foreach($return as $values) {
       foreach ($values as $entityType => $customData) {
         //initiate necessary variables
@@ -2127,8 +2134,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
             $this->select2($elementName, $entityData);
           }
         }
+        // FIXME: Try to find out what the heck is going on with these tests
+        $this->waitForAjaxContent();
+        $this->checkForErrorsOnPage();
+
         //checking for proper custom data which is loading through ajax
-        $this->waitForElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]");
+        $this->waitForElementPresent("css=.custom-group-{$customData['cgtitle']}");
         $this->assertElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]/div[contains(@class, 'crm-accordion-body')]/table/tbody/tr/td[2]/input",
           "The on the fly custom group field is not present for entity : {$entity} => {$entityData}");
       }
@@ -2271,5 +2282,23 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->assertNotChecked('ajaxPopupsEnabled');
     }
     $this->clickLink("_qf_Display_next-bottom");
+  }
+
+  /**
+   * Attempt to get information about what went wrong if we encounter an error when loading a page
+   */
+  function checkForErrorsOnPage() {
+    foreach (array('Access denied', 'Page not found') as $err) {
+      if ($this->isElementPresent("xpath=//h1[contains(., '$err')]")) {
+        $this->fail("'$err' encountered at " . $this->getLocation() . "\nwhile logged in as '{$this->loggedInAs}'");
+      }
+    }
+    if ($this->isElementPresent("xpath=//span[text()='Sorry but we are not able to provide this at the moment.']")) {
+      $msg = '"Fatal Error" encountered at ' . $this->getLocation();
+      if ($this->isElementPresent('css=div.crm-section.crm-error-message')) {
+        $msg .= "\nError Message: " . $this->getText('css=div.crm-section.crm-error-message');
+      }
+      $this->fail($msg);
+    }
   }
 }

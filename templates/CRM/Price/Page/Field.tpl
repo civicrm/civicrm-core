@@ -65,6 +65,10 @@
           <th>{ts}Active On{/ts}</th>
           <th>{ts}Expire On{/ts}</th>
           <th>{ts}Price{/ts}</th>
+          {if $getTaxDetails}
+            <th>{ts}Tax Label{/ts}</th>
+            <th>{ts}Tax Amount{/ts}</th>
+          {/if}
           <th></th>
       </tr>
       </thead>
@@ -78,6 +82,13 @@
         <td>{if $row.active_on}{$row.active_on|date_format:"%Y-%m-%d %T"}{/if}</td>
         <td>{if $row.expire_on}{$row.expire_on|date_format:"%Y-%m-%d %T"}{/if}</td>
         <td>{if $row.html_type eq "Text"}{$row.price|crmMoney}{else}<a class="action-item" href="{crmURL p="civicrm/admin/price/field/option" q="action=browse&reset=1&sid=$sid&fid=$fid"}">{if $isReserved}{ts}View Price Options{/ts}{else}{ts}Edit Price Options{/ts}{/if}</a>{/if}</td>
+        {if $getTaxDetails}
+            <td>{if $row.tax_rate != '' && $row.html_type eq "Text / Numeric Quantity"}
+                    {$taxTerm} ({$row.tax_rate|string_format:"%.2f"}%)
+                {/if}
+      </td>
+            <td>{if $row.html_type eq "Text / Numeric Quantity" }{$row.tax_amount|crmMoney}{/if}</td>
+        {/if}
         <td class="field-action">{$row.action|replace:'xx':$row.id}</td>
       </tr>
       {/foreach}

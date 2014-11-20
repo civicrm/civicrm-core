@@ -95,6 +95,16 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * @return bool
+   */
+  protected function supportsBackOffice() {
+    if ($this->_processorName == ts('PayPal Pro')) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+  /**
    * express checkout code. Check PayPal documentation for more information
    *
    * @param  array $params assoc array of input parameters for this transaction
@@ -110,6 +120,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['paymentAction'] = $params['payment_action'];
     $args['amt'] = $params['amount'];
     $args['currencyCode'] = $params['currencyID'];
+    $args['desc'] = $params['description'];
     $args['invnum'] = $params['invoiceID'];
     $args['returnURL'] = $params['returnURL'];
     $args['cancelURL'] = $params['cancelURL'];
@@ -201,6 +212,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['invnum'] = $params['invoiceID'];
     $args['returnURL'] = $params['returnURL'];
     $args['cancelURL'] = $params['cancelURL'];
+    $args['desc'] = $params['description'];
 
     $result = $this->invokeAPI($args);
 

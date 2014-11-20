@@ -244,6 +244,12 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     $entity = $field->getAttribute('data-api-entity');
     $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
     $display = array();
+
+    // Custom fields of type contactRef store their data in a slightly different format
+    if ($field->getAttribute('data-crm-custom') && $entity == 'contact') {
+      $vals = array(array('id' => $vals['id'], 'label' => $vals['text']));
+    }
+
     foreach ($vals as $val) {
       // Format contact as link
       if ($entity == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
@@ -298,7 +304,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       $path = $field->getAttribute('data-option-edit-path');
       // NOTE: If we ever needed to support arguments in this link other than reset=1 we could split $path here if it contains a ?
       $url = CRM_Utils_System::url($path, 'reset=1');
-      $el['html'] .= ' <a href="' . $url . '" class="crm-option-edit-link medium-popup crm-hover-button" target="_blank" title="' . ts('Edit Options') . '" data-option-edit-path="' . $path . '"><span class="icon edit-icon"></span></a>';
+      $el['html'] .= ' <a href="' . $url . '" class="crm-option-edit-link medium-popup crm-hover-button" target="_blank" title="' . ts('Edit Options') . '" data-option-edit-path="' . $path . '"><span class="icon ui-icon-wrench"></span></a>';
     }
   }
 

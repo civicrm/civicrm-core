@@ -183,7 +183,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_Batch_next') {
-      CRM_Core_Session::setStatus(ts("FILE or Autocomplete Select type field(s) in the selected profile are not supported for Batch Update and have been excluded."), ts('Unsupport Field Type'), 'error');
+      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Batch Update."), ts('Unsupported Field Type'), 'error');
     }
 
     $this->addDefaultButtons(ts('Update Memberships'));
