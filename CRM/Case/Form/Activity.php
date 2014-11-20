@@ -318,7 +318,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $this->add('select', 'medium_id', ts('Medium'), $encounterMediums, TRUE);
     $i = 0;
     foreach ($this->_caseId as $key => $val) {
-      $this->_relatedContacts[] = CRM_Case_BAO_Case::getRelatedAndGlobalContacts($val);
+      $this->_relatedContacts[] = $rgc = CRM_Case_BAO_Case::getRelatedAndGlobalContacts($val);
       $contName = CRM_Case_BAO_Case::getContactNames($val);
       foreach ($contName as $nkey => $nval) {
         array_push($this->_relatedContacts[$i][0] , $this->_relatedContacts[$i][0]['managerOf']= $nval['display_name']);
@@ -328,7 +328,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     //add case client in send a copy selector.CRM-4438.
     foreach ($this->_caseId as $key => $val) {
-      $relatedContacts[] = CRM_Case_BAO_Case::getContactNames($val);
+      $relatedContacts[] = $relCon= CRM_Case_BAO_Case::getContactNames($val);
     }
 
     if (!empty($relatedContacts)) {
@@ -349,6 +349,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       );
       $this->assign('searchRows', $this->_relatedContacts);
     }
+    $this->_relatedContacts = $rgc + $relCon;
 
     $this->addFormRule(array('CRM_Case_Form_Activity', 'formRule'), $this);
   }
