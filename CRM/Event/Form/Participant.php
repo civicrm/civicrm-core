@@ -1248,6 +1248,8 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
 
+      // CRM-15622: fix for incorrect contribution.fee_amount
+      $paymentParams['fee_amount'] = NULL;
       $result = $payment->doDirectPayment($paymentParams);
 
       if (is_a($result, 'CRM_Core_Error')) {
