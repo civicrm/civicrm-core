@@ -1,0 +1,35 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing
+FIXME: Don't hardcode table-based layout!
+-->
+<table class="form-layout-compressed">
+  <tbody>
+    <tr>
+      <td>
+        <input name="url_tracking" type="checkbox" ng-model="mailing.url_tracking" ng-true-value="1" ng-false-value="0" />
+        <label crm-ui-label crm-for="url_tracking">{{ts('Track Click Throughs')}}</label>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div id="help">
+          {{ts('Track the number of times recipients click each link in this mailing. NOTE: When this feature is enabled, all links in the message body will be automatically re-written to route through your CiviCRM server prior to redirecting to the target page.')}}
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <input name="open_tracking" type="checkbox" ng-model="mailing.open_tracking" ng-true-value="1" ng-false-value="0" />
+        <label crm-ui-label crm-for="open_tracking">{{ts('Track Opens')}}</label>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div id="help">
+          {{ts('Track the number of times recipients open this mailing in their email software.')}}
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>

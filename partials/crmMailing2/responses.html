@@ -1,0 +1,112 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing, crmMailingConst
+FIXME: Don't hardcode table-based layout!
+-->
+<table class="form-layout-compressed">
+  <tbody>
+    <tr>
+      <td>
+        <!-- Comparing data-model and UI of "override_verp", note that true/false are inverted (enabled==0,disabled==1) -->
+        <input name="override_verp" type="checkbox" ng-model="mailing.override_verp" ng-true-value="0" ng-false-value="1" />
+        <label crm-ui-label crm-for="override_verp">{{ts('Track Replies')}}</label>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="help">
+          {{ts('Recipients\' replies are sent to a CiviMail specific address instead of the sender\'s address so they can be stored within CiviCRM.')}}
+        </div>
+      </td>
+    </tr>
+    <tr ng-show="'0' == mailing.override_verp">
+      <td>
+        <input name="forward_replies" type="checkbox" ng-model="mailing.forward_replies" ng-true-value="1" ng-false-value="0" />
+        <label crm-ui-label crm-for="forward_replies">{{ts('Forward Replies')}}</label>
+      </td>
+    </tr>
+    <tr ng-show="'0' == mailing.override_verp">
+      <td>
+        <div class="help">
+          {{ts('If a recipient replies to this mailing, forward the reply to the FROM Email address specified for the mailing.')}}
+        </div>
+      </td>
+    </tr>
+    <tr ng-show="'0' == mailing.override_verp">
+      <td>
+        <input name="auto_responder" type="checkbox" ng-model="mailing.auto_responder" ng-true-value="1" ng-false-value="0" />
+        <label crm-ui-label crm-for="auto_responder">{{ts('Auto-Respond to Replies')}}</label>
+      </td>
+    </tr>
+    <tr ng-show="'0' == mailing.override_verp">
+      <td>
+        <div class="help">
+          {{ts('If a recipient replies to this mailing, send an automated reply using the selected message.')}}
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<table>
+  <tbody>
+    <tr ng-show="'0' == mailing.override_verp && '1' == mailing.auto_responder">
+      <td><label crm-ui-label crm-for="reply_id">{{ts('Auto-Respond Message')}}</label></td>
+      <td>
+        <select
+          name="reply_id"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true}"
+          ng-model="mailing.reply_id"
+          ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Reply'}"
+          required>
+          <option value=""></option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td><label crm-ui-label crm-for="optout_id">{{ts('Opt-out Message')}}</label></td>
+      <td>
+        <select
+          name="optout_id"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true}"
+          ng-model="mailing.optout_id"
+          ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'OptOut'}"
+          required>
+          <option value=""></option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td><label crm-ui-label crm-for="resubscribe_id">{{ts('Resubscribe Message')}}</label></td>
+      <td>
+        <select
+          name="resubscribe_id"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true}"
+          ng-model="mailing.resubscribe_id"
+          ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Resubscribe'}"
+          required>
+          <option value=""></option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td><label crm-ui-label crm-for="unsubscribe_id">{{ts('Unsubscribe Message')}}</label></td>
+      <td>
+        <select
+          name="unsubscribe_id"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true}"
+          ng-model="mailing.unsubscribe_id"
+          ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Unsubscribe'}"
+          required>
+          <option value=""></option>
+        </select>
+      </td>
+    </tr>
+  </tbody>
+</table>

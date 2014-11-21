@@ -1,0 +1,37 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing, crmMailingConst
+FIXME: Don't hardcode table-based layout!
+-->
+<table class="form-layout-compressed">
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="header_id">{{ts('Mailing Header')}}</label>
+    </td>
+    <td>
+      <select
+        name="header_id"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true, allowClear: true}"
+        ng-model="mailing.header_id"
+        ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Header'}">
+        <option value=""></option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="footer_id">{{ts('Mailing Footer')}}</label>
+    </td>
+    <td>
+      <select
+        name="footer_id"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true, allowClear: true}"
+        ng-model="mailing.footer_id"
+        ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Footer'}">
+        <option value=""></option>
+      </select>
+    </td>
+  </tr>
+</table>

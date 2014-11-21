@@ -1,0 +1,28 @@
+.crmMailing2 input[name=subject] {
+  width: 30em;
+}
+.crmMailing2 select, .crmMailing2 input[type=text] {
+  width: 40em;
+}
+.crmMailing2 textarea {
+  margin: 0.5em;
+  width: 95%;
+  height: 20em;
+}
+
+.crmMailing2-recip-est {
+  background: #ee8;
+  font-size: small;
+  padding: 0.33em;
+  margin: 0 0 0 0.5em;
+  width: 9em;
+  text-align: center;
+}
+
+span.crmMailing2-include {
+  color: #060;
+}
+span.crmMailing2-exclude {
+  color: #600;
+  text-decoration: line-through;
+}

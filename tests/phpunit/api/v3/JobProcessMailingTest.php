@@ -57,6 +57,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
     $this->_groupID = $this->groupCreate();
     $this->_email = 'test@test.test';
     $this->_params = array(
@@ -77,6 +78,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->_mut->stop();
     $this->quickCleanup(array('civicrm_mailing', 'civicrm_mailing_job', 'civicrm_contact'));
     CRM_Utils_Hook::singleton()->reset();
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
     parent::tearDown();
 
   }

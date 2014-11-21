@@ -1,0 +1,23 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing
+FIXME: Don't hardcode table-based layout!
+-->
+<table class="form-layout-compressed">
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="visibility">{{ts('Mailing Visibility')}}</label>
+    </td>
+    <td>
+      <select
+        name="visibility"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
+        ng-model="mailing.visibility"
+        ng-options="v.value as v.label for v in crmMailingConst.visibility"
+        required
+        >
+      </select>
+    </td>
+    </tbody>
+</table>

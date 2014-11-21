@@ -115,6 +115,7 @@ function civicrm_api3_mailing_a_b_recipients_update($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_mailing_a_b_send_mail_spec(&$params) {
+  $params['scheduled_date']['title'] = 'Scheduled Dated';
   $params['scheduled_date']['api.default'] = 'now';
 }
 
@@ -156,7 +157,9 @@ function civicrm_api3_mailing_a_b_send_mail($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_mailing_a_b_graph_stats_spec(&$params) {
+  $params['split_count']['title'] = 'Split Count';
   $params['split_count']['api.default'] = 6;
+  $params['split_count_select']['title'] = 'Split Count Select';
   $params['split_count_select']['api.required'] = 1;
 }
 
