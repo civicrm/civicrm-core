@@ -35,6 +35,22 @@ session_start();
 
 require_once '../civicrm.config.php';
 $config = CRM_Core_Config::singleton();
+$logTableExists = FALSE;
+$checkTable = "SHOW TABLES LIKE 'civicrm_notification_log'";
+$dao = CRM_Core_DAO::executeQuery($checkTable);
+if(!$dao->N) {
+  CRM_Core_DAO::executeQuery("CREATE TABLE IF NOT EXISTS `civicrm_notification_log` (
+  `id` INT(10) NOT NULL AUTO_INCREMENT,
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `message_type` VARCHAR(255) NULL DEFAULT NULL,
+  `message_raw` LONGTEXT NULL,
+  PRIMARY KEY (`id`)
+  )");
+}
+
+$dao = CRM_Core_DAO::executeQuery("INSERT INTO civicrm_notification_log (message_raw, message_type) VALUES (%1, 'authorize.net')",
+  array(1 => array(json_encode($_REQUEST), 'String'))
+);
 
 $authorizeNetIPN = new CRM_Core_Payment_AuthorizeNetIPN();
 $authorizeNetIPN->main();
