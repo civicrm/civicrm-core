@@ -349,8 +349,8 @@ function civicrm_api3_mailing_preview($params) {
     'id' => $params['id'],
     'contact_id' => $contactID,
     'subject' => $mime->_headers['Subject'],
-    'html' => $mime->getHTMLBody(),
-    'text' => $mime->getTXTBody(),
+    'body_html' => $mime->getHTMLBody(),
+    'body_text' => $mime->getTXTBody(),
   ));
 }
 
