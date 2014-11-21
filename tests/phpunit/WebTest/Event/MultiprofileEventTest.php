@@ -672,6 +672,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("nick_name", "Nick");
     $this->type("url-1", "http://www.test.com");
 
+    $this->waitForElementPresent('street_address-Primary');
     $this->type("street_address-Primary", "Primary street address");
     $this->type("city-Primary", "primecity");
     $this->type("phone-Primary-1", "98667764");
@@ -683,6 +684,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     $this->type("middle_name", "xyz");
     $this->click("name=gender_id value=2");
+    $this->waitForElementPresent('participant_role');
     $this->select("participant_role", "value=2");
 
     $this->click("_qf_Register_upload-bottom");
@@ -703,6 +705,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("custom_" . $customId[1], "participant_custom1");
     $this->type("custom_" . $customId[2], "participant_custom1");
 
+    $this->waitForElementPresent('street_address-Primary');
     $this->type("street_address-Primary", "Primary street address");
     $this->type("city-Primary", "primecity");
     $this->type("phone-Primary-1", "98667764");

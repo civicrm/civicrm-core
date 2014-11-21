@@ -324,7 +324,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
         array('participant_id' => array('title' => 'Participant ID'),
           'participant_record' => array(
             'name' => 'id',
-            'title' => 'Participant Id',
+            'title' => ts('Participant ID'),
           ),
           'event_id' => array('title' => ts('Event ID'),
             'type' => CRM_Utils_Type::T_STRING,

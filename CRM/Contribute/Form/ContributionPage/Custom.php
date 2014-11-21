@@ -89,7 +89,7 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
 
     if ($this->_id) {
       $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-      CRM_Utils_System::setTitle(ts('Include Profiles (%1)', array(1 => $title)));
+      CRM_Utils_System::setTitle(ts('Include Profiles') . " ($title)");
     }
 
 

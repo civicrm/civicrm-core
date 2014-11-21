@@ -58,7 +58,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
         'kcfinderPath' => $config->userFrameworkResourceURL .'packages' .DIRECTORY_SEPARATOR
       )
     );
-    $resources->addScriptFile('civicrm', 'templates/CRM/Badge/Form/Layout.js');
+    $resources->addScriptFile('civicrm', 'templates/CRM/Badge/Form/Layout.js', 1, 'html-header');
 
     $this->applyFilter('__ALL__', 'trim');
 

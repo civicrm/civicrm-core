@@ -67,7 +67,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
     if (!$check) {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/dashboard', 'reset=1'));
-      break;
     }
 
     $this->_contactId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -80,7 +79,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     }
     elseif ($this->_contactId != $userID) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::VIEW)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to view this contact'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this contact.'));
       }
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
         $this->_edit = FALSE;

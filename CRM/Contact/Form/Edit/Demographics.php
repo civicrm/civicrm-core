@@ -61,8 +61,8 @@ class CRM_Contact_Form_Edit_Demographics {
 
     $form->addDate('birth_date', ts('Date of Birth'), FALSE, array('formatType' => 'birth'));
 
-    $form->addElement('checkbox', 'is_deceased', NULL, ts('Contact is deceased'), array('onclick' => "showDeceasedDate()"));
-    $form->addDate('deceased_date', ts('Deceased date'), FALSE, array('formatType' => 'birth'));
+    $form->addElement('checkbox', 'is_deceased', NULL, ts('Contact is Deceased'), array('onclick' => "showDeceasedDate()"));
+    $form->addDate('deceased_date', ts('Deceased Date'), FALSE, array('formatType' => 'birth'));
   }
 
   /**

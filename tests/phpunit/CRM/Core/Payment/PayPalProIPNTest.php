@@ -94,6 +94,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    */
   function testIPNPaymentMembershipRecurSuccess() {
     $this->setupMembershipRecurringPaymentProcessorTransaction();
+    $this->callAPISuccessGetSingle('membership_payment', array());
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
@@ -110,9 +111,10 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'get', array('contribution_recur_id' => $this->_contributionRecurID, 'sequential' => 1));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
-    $this->markTestIncomplete('This is a test for CRM-15203 but that is currently NOT working (however, getting this far indicates CRM-15527 is fixed');
-    $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id'],));
+    $this->callAPISuccessGetCount('line_item', array('entity_id' => $this->ids['membership'], 'entity_table' => 'civicrm_membership'), 2);
     $this->callAPISuccessGetSingle('line_item', array('contribution_id' => $contribution['values'][1]['id'], 'entity_table' => 'civicrm_membership'));
+    $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id'],));
+
   }
   /**
    * CRM-13743 test IPN edge case where the first transaction fails and the second succeeds

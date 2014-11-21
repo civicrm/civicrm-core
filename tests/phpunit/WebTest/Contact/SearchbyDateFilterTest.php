@@ -158,7 +158,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
    */
   function _checkOpenedPanes($openedPanes = array(
     )) {
-    if (!$this->isTextPresent('No matches found')) {
+    if (!$this->isTextPresent('None found.')) {
       $this->click('css=div.crm-advanced_search_form-accordion div.crm-accordion-header');
     }
 

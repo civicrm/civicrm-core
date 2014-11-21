@@ -159,6 +159,9 @@ class CRM_Contribute_Form_SoftCredit {
 
   /**
    * Function used to set defaults for soft credit block
+   *
+   * @param $defaults
+   * @param $form
    */
   static function setDefaultValues(&$defaults, &$form) {
     //Used to hide/unhide PCP and/or Soft-credit Panes

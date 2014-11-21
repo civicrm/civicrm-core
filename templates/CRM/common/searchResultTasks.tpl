@@ -63,7 +63,7 @@
     {elseif !empty($form._qf_Search_next_print)}
        {$form._qf_Search_next_print.html} &nbsp; &nbsp;
      {/if}
-   
+
       <span id='task-section'>
         {$form.task.html}
         {if $actionButtonName}

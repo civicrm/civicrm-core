@@ -161,6 +161,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
   }
 
+  protected function runTest() {
+    try {
+      return parent::runTest();
+    } catch (PEAR_Exception $e) {
+      // PEAR_Exception has metadata in funny places, and PHPUnit won't log it nicely
+      throw new Exception(\CRM_Core_Error::formatTextException($e), $e->getCode());
+    }
+  }
+
   /**
    * @return bool
    */
@@ -446,6 +455,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->quickCleanup($tablesToTruncate);
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
+    CRM_Core_Transaction::forceRollbackIfEnabled();
+    \Civi\Core\Transaction\Manager::singleton(TRUE);
   }
 
   /**
@@ -623,11 +634,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Example: $this->assertSql(2, 'select count(*) from foo where foo.bar like "%1"',
    * array(1 => array("Whiz", "String")));
    */
-  function assertDBQuery($expected, $query, $params = array()) {
+  function assertDBQuery($expected, $query, $params = array(), $message = '') {
+    if ($message) $message .= ': ';
     $actual = CRM_Core_DAO::singleValueQuery($query, $params);
     $this->assertEquals($expected, $actual,
-      sprintf('expected=[%s] actual=[%s] query=[%s]',
-        $expected, $actual, CRM_Core_DAO::composeQuery($query, $params, FALSE)
+      sprintf('%sexpected=[%s] actual=[%s] query=[%s]',
+        $message, $expected, $actual, CRM_Core_DAO::composeQuery($query, $params, FALSE)
       )
     );
   }
@@ -2997,19 +3009,33 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * we don't have a good way to set up a recurring contribution with a membership so let's just do one then alter it
    */
   function setupMembershipRecurringPaymentProcessorTransaction() {
-    $this->setupRecurringPaymentProcessorTransaction();
     $this->ids['membership_type'] = $this->membershipTypeCreate();
+    //create a contribution so our membership & contribution don't both have id = 1
+    $this->contributionCreate($this->_contactID, 1, 'abcd', '345j');
+    $this->setupRecurringPaymentProcessorTransaction();
+
     $this->ids['membership'] = $this->callAPISuccess('membership', 'create', array(
       'contact_id' => $this->_contactID,
       'membership_type_id' => $this->ids['membership_type'],
       'contribution_recur_id' => $this->_contributionRecurID,
-      'api.membership_payment.create' => array('contribution_id' => $this->_contributionID),
       'format.only_id' => TRUE,
     ));
-    CRM_Core_DAO::executeQuery(
-      "UPDATE civicrm_line_item SET entity_table = 'civicrm_membership', entity_id = {$this->ids['membership']}
-      WHERE entity_id = {$this->_contributionID} AND entity_table = 'civicrm_contribution'"
-    );
+    //CRM-15055 creates line items we don't want so get rid of them so we can set up our own line items
+    CRM_Core_DAO::executeQuery("TRUNCATE civicrm_line_item");
+
+    $this->callAPISuccess('line_item', 'create', array(
+      'entity_table' => 'civicrm_membership',
+      'entity_id' => $this->ids['membership'],
+      'contribution_id' => $this->_contributionID,
+      'label' => 'General',
+      'qty' => 1,
+      'unit_price' => 200,
+      'line_total' => 200,
+      'financial_type_id' => 1,
+      'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', array('return' => 'id', 'label' => 'Membership Amount')),
+      'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', array('return' => 'id', 'label' => 'General')),
+    ));
+    $this->callAPISuccess('membership_payment', 'create', array('contribution_id' => $this->_contributionID, 'membership_id' => $this->ids['membership']));
   }
 
   /**

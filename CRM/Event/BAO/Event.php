@@ -1287,7 +1287,7 @@ WHERE civicrm_event.is_active = 1
         //add participant id
         $fields['participant_id'] = array(
           'name' => 'participant_id',
-          'title' => 'Participant Id',
+          'title' => ts('Participant ID'),
         );
         //check whether its a text drive
         if ($isTest) {

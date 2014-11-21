@@ -120,7 +120,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
       // its an update mode, do a permission check
       if (!CRM_Event_BAO_Event::checkPermission($this->_id, CRM_Core_Permission::EDIT)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
 
       $participantListingID = CRM_Utils_Array::value('participant_listing_id', $eventInfo);
@@ -190,8 +190,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     //Is a repeating event
     if ($this->_isRepeatingEvent) {
-      $isRepeat = 'repeat';
-      $this->assign('isRepeat', $isRepeat);
+      $isRepeatingEntity = TRUE;
+      $this->assign('isRepeatingEntity', $isRepeatingEntity);
     }
 
     // also set up tabs

@@ -61,10 +61,10 @@
         <td id="locUsedMsg" colspan="3">
         </td>
       </tr>
-     
+
     </table>
     {/if}
-    
+
 
 
     <div id="newLocation">
@@ -186,7 +186,7 @@ CRM.$(function($) {
       }
     }
   }
-  
+
   $('input[name=location_option]').click(showLocFields);
   showLocFields(false);
 

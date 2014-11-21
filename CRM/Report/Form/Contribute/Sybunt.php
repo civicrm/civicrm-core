@@ -41,11 +41,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   );
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
-  protected $_add2groupSupported = FALSE;
-
-  /**
-   *
-   */
   /**
    *
    */
@@ -91,7 +86,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact SubType'),
+            'title' => ts('Contact Subtype'),
           ),
         ),
         'filters' =>

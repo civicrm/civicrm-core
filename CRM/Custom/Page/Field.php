@@ -129,7 +129,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
   function browse() {
     $resourceManager = CRM_Core_Resources::singleton();
     if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
-      $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999);
+      $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
     }
 
     $customField = array();

@@ -245,7 +245,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return array defaults
    */
   function setDefaultValues() {
     //some child classes calling setdefaults directly w/o preprocess.

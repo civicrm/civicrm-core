@@ -85,7 +85,7 @@
             <tr class="crm-preferences-address-form-block-address_standardization_url">
               <td class="label">{$form.address_standardization_url.label}
               <td>{$form.address_standardization_url.html}<br />
-              <span class="description">{ts}Web service URL.{/ts}</span>
+              <span class="description">{ts}Web Service URL{/ts}</span>
               </td>
             </tr>
         </table>

@@ -14,7 +14,7 @@
       <directory>CRM</directory>
       <exclude>
         <file>CRM/Contact/Page/View/SMS.php</file>
-      </exclude>  
+      </exclude>
     </whitelist>
   </filter>
   <logging>

@@ -448,7 +448,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click('_qf_Custom_refresh-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $tableHeaders = array('Contact ID', 'Participant Id', 'Name');
+    $tableHeaders = array('Contact ID', 'Participant ID', 'Name');
     $tableHeaders = array_merge($tableHeaders, array_keys(current($priceFieldOptionCounts)));
 
     $tdnum = 2;

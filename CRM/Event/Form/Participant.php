@@ -38,7 +38,7 @@
  * This class generates form components for processing a participation
  * in an event
  */
-class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
+class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment {
 
   public $useLivePageJS = TRUE;
 
@@ -270,53 +270,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
     if ($this->_mode) {
       $this->assign('participantMode', $this->_mode);
-
-      $this->_paymentProcessor = array('billing_mode' => 1);
-
-      $validProcessors = array();
-      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 )");
-
-      foreach ($processors as $ppID => $label) {
-        $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
-        if ($paymentProcessor['payment_processor_type'] == 'PayPal' && !$paymentProcessor['user_name']) {
-          continue;
-        }
-        elseif ($paymentProcessor['payment_processor_type'] == 'Dummy' && $this->_mode == 'live') {
-          continue;
-        }
-        else {
-          $paymentObject = CRM_Core_Payment::singleton($this->_mode, $paymentProcessor, $this);
-          $error = $paymentObject->checkConfig();
-          if (empty($error)) {
-            $validProcessors[$ppID] = $label;
-          }
-          $paymentObject = NULL;
-        }
-      }
-      if (empty($validProcessors)) {
-        CRM_Core_Error::fatal(ts('Could not find valid payment processor for this page'));
-      }
-      else {
-        $this->_processors = $validProcessors;
-      }
-      // also check for billing information
-      // get the billing location type
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-      // CRM-8108 remove ts around Billing location type
-      //$this->_bltID = array_search( ts('Billing'),  $locationTypes );
-      $this->_bltID = array_search('Billing', $locationTypes);
-      if (!$this->_bltID) {
-        CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));
-      }
-      $this->set('bltID', $this->_bltID);
-      $this->assign('bltID', $this->_bltID);
-
-      $this->_fields = array();
-
-      CRM_Core_Payment_Form::setCreditCardFields($this);
-
-      // this required to show billing block
-      $this->assign_by_ref('paymentProcessor', $paymentProcessor);
+      $this->assignPaymentRelatedVariables();
     }
 
     if ($this->_showFeeBlock) {
@@ -394,7 +348,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
     // check for edit permission
     if (!CRM_Core_Permission::checkActionPermission('CiviEvent', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -781,17 +735,17 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     $notificationStatusIds = implode(',', array_keys(array_intersect($participantStatusName, $notificationStatuses)));
     $this->assign('notificationStatusIds', $notificationStatusIds);
 
-    $this->_participantStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-    $this->addSelect('status_id', $checkCancelledJs + array('option_url' => 'civicrm/admin/participant_status'), TRUE);
+    $this->_participantStatuses = $statusOptions = CRM_Event_BAO_Participant::buildOptions('status_id', 'create');
 
-    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-      'enable_cart'
-    );
-    $pendingInCartStatusId = array_search('Pending in cart', $participantStatusName);
-    $this->assign('pendingInCartStatusId', $pendingInCartStatusId);
-    $this->assign('enableCart', $enableCart);
-    $pendingRefundStatusId = array_search('Pending refund', $participantStatusName);
-    $this->assign('pendingRefundStatusId', $pendingRefundStatusId);
+    // Only show refund status when editing
+    if ($this->_action & CRM_Core_Action::ADD) {
+      $pendingRefundStatusId = array_search('Pending refund', $participantStatusName);
+      if ($pendingRefundStatusId) {
+        unset($statusOptions[$pendingRefundStatusId]);
+      }
+    }
+
+    $this->addSelect('status_id', $checkCancelledJs + array('options' => $statusOptions, 'option_url' => 'civicrm/admin/participant_status'), TRUE);
 
     $this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
 

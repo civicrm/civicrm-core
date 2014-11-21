@@ -410,7 +410,7 @@ SELECT  id, html_type
         }
       }
       if ($form->_mode) {
-        CRM_Core_Payment_Form::buildCreditCard($form, TRUE);
+        CRM_Core_Payment_Form::buildPaymentForm($form, $form->_processor, FALSE);
       }
       elseif (!$form->_mode) {
         $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,

@@ -148,6 +148,51 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $group = CRM_Contact_DAO_Group::getTableName();
     $g2contact = CRM_Contact_DAO_GroupContact::getTableName();
 
+    $m = new CRM_Mailing_DAO_Mailing();
+    $m->id = $mailing_id;
+    $m->find(TRUE);
+
+    $email_selection_method = $m->email_selection_method;
+    $location_type_id = $m->location_type_id;
+
+    // Note: When determining the ORDER that results are returned, it's
+    // the record that comes last that counts. That's because we are
+    // INSERT'ing INTO a table with a primary id so that last record
+    // over writes any previous record.
+    switch($email_selection_method) {
+    case 'location-exclude':
+      $location_filter = "($email.location_type_id != $location_type_id)";
+      // If there is more than one email that doesn't match the location,
+      // prefer the one marked is_bulkmail, followed by is_primary.
+      $order_by = "ORDER BY $email.is_bulkmail, $email.is_primary";
+      break;
+    case 'location-only':
+      $location_filter = "($email.location_type_id = $location_type_id)";
+      // If there is more than one email of the desired location, prefer
+      // the one marked is_bulkmail, followed by is_primary.
+      $order_by = "ORDER BY $email.is_bulkmail, $email.is_primary";
+      break;
+    case 'location-prefer':
+      $location_filter = "($email.is_bulkmail = 1 OR $email.is_primary = 1 OR $email.location_type_id = $location_type_id)";
+
+      // ORDER BY is more complicated because we have to set an arbitrary
+      // order that prefers the location that we want. We do that using
+      // the FIELD function. For more info, see:
+      // https://dev.mysql.com/doc/refman/5.5/en/string-functions.html#function_field
+      // We assign the location type we want the value "1" by putting it
+      // in the first position after we name the field. All other location
+      // types are left out, so they will be assigned the value 0. That
+      // means, they will all be equally tied for first place, with our
+      // location being last.
+      $order_by = "ORDER BY FIELD($email.location_type_id, $location_type_id), $email.is_bulkmail, $email.is_primary";
+      break;
+    case 'automatic':
+      // fall through to default
+    default:
+      $location_filter = "($email.is_bulkmail = 1 OR $email.is_primary = 1)";
+      $order_by = "ORDER BY $email.is_bulkmail";
+    }
+
     /* Create a temp table for contact exclusion */
     $mailingGroup->query(
       "CREATE TEMPORARY TABLE X_$job_id
@@ -264,13 +309,13 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $contact.do_not_email = 0
                         AND             $contact.is_opt_out = 0
                         AND             $contact.is_deceased = 0
-                        AND            ($email.is_bulkmail = 1 OR $email.is_primary = 1)
+                        AND             $location_filter
                         AND             $email.email IS NOT NULL
                         AND             $email.email != ''
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null
-                    ORDER BY $email.is_bulkmail";
+                    $order_by";
 
     if ($mode == 'sms') {
       $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
@@ -324,11 +369,11 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $contact.do_not_email = 0
                         AND             $contact.is_opt_out = 0
                         AND             $contact.is_deceased = 0
-                        AND            ($email.is_bulkmail = 1 OR $email.is_primary = 1)
+                        AND             $location_filter
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null
-                    ORDER BY $email.is_bulkmail";
+                    $order_by";
 
     if ($mode == 'sms') {
       $query = "REPLACE INTO       I_$job_id (phone_id, contact_id)
@@ -377,19 +422,19 @@ WHERE      $mg.entity_table = '$group'
 
       $smartGroupInclude = "
 INSERT IGNORE INTO I_$job_id (email_id, contact_id)
-SELECT     e.id as email_id, c.id as contact_id
+SELECT     civicrm_email.id as email_id, c.id as contact_id
 FROM       civicrm_contact c
-INNER JOIN civicrm_email e                ON e.contact_id         = c.id
+INNER JOIN civicrm_email                ON civicrm_email.contact_id         = c.id
 INNER JOIN civicrm_group_contact_cache gc ON gc.contact_id        = c.id
 LEFT  JOIN X_$job_id                      ON X_$job_id.contact_id = c.id
 WHERE      gc.group_id = {$groupDAO->id}
   AND      c.do_not_email = 0
   AND      c.is_opt_out = 0
   AND      c.is_deceased = 0
-  AND      (e.is_bulkmail = 1 OR e.is_primary = 1)
-  AND      e.on_hold = 0
+  AND      $location_filter
+  AND      civicrm_email.on_hold = 0
   AND      X_$job_id.contact_id IS null
-ORDER BY   e.is_bulkmail
+$order_by
 ";
       if ($mode == 'sms') {
         $smartGroupInclude = "
@@ -450,11 +495,11 @@ AND    $mg.mailing_id = {$mailing_id}
                         AND             $contact.do_not_email = 0
                         AND             $contact.is_opt_out = 0
                         AND             $contact.is_deceased = 0
-                        AND             ($email.is_bulkmail = 1 OR $email.is_primary = 1)
+                        AND             $location_filter
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null
-                    ORDER BY $email.is_bulkmail";
+                    $order_by";
     if ($mode == "sms") {
       $query = "REPLACE INTO       I_$job_id (phone_id, contact_id)
                     SELECT DISTINCT     $phone.id as phone_id,
@@ -2482,14 +2527,14 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
     $templates = array();
 
-    $textFields = array('text_message' => ts('HTML format'), 'sms_text_message' => ts('SMS Message'));
+    $textFields = array('text_message' => ts('HTML Format'), 'sms_text_message' => ts('SMS Message'));
     $modePrefixes = array('Mail' => NULL, 'SMS' => 'SMS');
 
     if ($className != 'CRM_SMS_Form_Upload' && $className != 'CRM_Contact_Form_Task_SMS' &&
       $className != 'CRM_Contact_Form_Task_SMS'
     ) {
       $form->addWysiwyg('html_message',
-        ts('HTML format'),
+        ts('HTML Format'),
         array(
           'cols' => '80', 'rows' => '8',
           'onkeyup' => "return verify(this)",
