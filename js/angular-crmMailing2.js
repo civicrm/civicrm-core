@@ -7,6 +7,7 @@
 
   // Time to wait before triggering AJAX update to recipients list
   var RECIPIENTS_DEBOUNCE_MS = 100;
+  var RECIPIENTS_PREVIEW_LIMIT = 10000;
 
   /**
    * Initialize a new mailing
@@ -138,6 +139,8 @@
         return ts('No recipients');
       if ($scope.recipients.length == 1)
         return ts('~1 recipient');
+      if (RECIPIENTS_PREVIEW_LIMIT > 0 && $scope.recipients.length >= RECIPIENTS_PREVIEW_LIMIT)
+        return ts('>%1 recipients', {1: RECIPIENTS_PREVIEW_LIMIT});
       return ts('~%1 recipients', {1: $scope.recipients.length});
     };
     // We monitor four fields -- use debounce so that changes across the
@@ -145,10 +148,22 @@
     var refreshRecipients = _.debounce(function () {
       $scope.$apply(function () {
         $scope.recipients = null;
-        crmApi('Mailing', 'preview_recipients', $scope.mailing)
+        // To get list of recipients, we tentatively save the mailing and
+        // get the resulting recipients -- then rollback any changes.
+        var params = _.extend({}, $scope.mailing, {
+          options:  {force_rollback: 1},
+          'api.MailingRecipients.get': {
+            mailing_id: '$value.id',
+            options: {limit: RECIPIENTS_PREVIEW_LIMIT},
+            'api.contact.getvalue': {'return': 'display_name'},
+            'api.email.getvalue': {'return': 'email'}
+          }
+        });
+
+        crmApi('Mailing', 'create', params)
                 .then(function (recipResult) {
                   $scope.$apply(function () {
-                    $scope.recipients = recipResult.values;
+                    $scope.recipients = recipResult.values[recipResult.id]['api.MailingRecipients.get'].values;
                   });
                 });
       });
