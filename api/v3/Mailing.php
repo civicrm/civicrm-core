@@ -370,18 +370,17 @@ function civicrm_api3_mailing_send_test($params) {
   $testEmailParams['job_id'] = $job['id'];
   $testEmailParams['emails'] = explode(',', $testEmailParams['test_email']);
   if (!empty($params['test_email'])) {
-    $query = "
-SELECT     e.id, e.contact_id, e.email
-FROM       civicrm_email e
-INNER JOIN civicrm_contact c ON e.contact_id = c.id
-WHERE      e.email IN ('" . implode("','", $testEmailParams['emails']) . "')
-AND        e.on_hold = 0
-AND        c.is_opt_out = 0
-AND        c.do_not_email = 0
-AND        c.is_deceased = 0
-GROUP BY   e.id
-ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
-";
+    $query = CRM_Utils_SQL_Select::from('civicrm_email e')
+        ->select(array('e.id', 'e.contact_id', 'e.email'))
+        ->join('c', 'INNER JOIN civicrm_contact c ON e.contact_id = c.id')
+        ->where('e.email IN (@emails)', array('@emails' => $testEmailParams['emails']))
+        ->where('e.on_hold = 0')
+        ->where('c.is_opt_out = 0')
+        ->where('c.do_not_email = 0')
+        ->where('c.is_deceased = 0')
+        ->groupBy('e.id')
+        ->orderBy(array('e.is_bulkmail DESC', 'e.is_primary DESC'))
+        ->toSQL();
     $dao = CRM_Core_DAO::executeQuery($query);
     $emailDetail = array();
     // fetch contact_id and email id for all existing emails
