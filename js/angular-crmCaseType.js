@@ -311,11 +311,9 @@
     $scope.toggleCaseType = function (caseType) {
       caseType.is_active = (caseType.is_active == '1') ? '0' : '1';
       crmApi('CaseType', 'create', caseType, true)
-        .then(function (data) {
-          if (data.is_error) {
-            caseType.is_active = (caseType.is_active == '1') ? '0' : '1'; // revert
-            $scope.$digest();
-          }
+        .catch(function (data) {
+          caseType.is_active = (caseType.is_active == '1') ? '0' : '1'; // revert
+          $scope.$digest();
         });
     };
     $scope.deleteCaseType = function (caseType) {
@@ -325,21 +323,17 @@
         }
       })
         .then(function (data) {
-          if (!data.is_error) {
-            delete caseTypes.values[caseType.id];
-            $scope.$digest();
-          }
+          delete caseTypes.values[caseType.id];
+          $scope.$digest();
         });
     };
     $scope.revertCaseType = function (caseType) {
       caseType.definition = 'null';
       caseType.is_forked = '0';
       crmApi('CaseType', 'create', caseType, true)
-        .then(function (data) {
-          if (data.is_error) {
-            caseType.is_forked = '1'; // restore
-            $scope.$digest();
-          }
+        .catch(function (data) {
+          caseType.is_forked = '1'; // restore
+          $scope.$digest();
         });
     };
   });

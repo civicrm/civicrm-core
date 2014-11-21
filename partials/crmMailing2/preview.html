@@ -1,1 +1,55 @@
-preview.html
+<div ng-controller="PreviewMailingCtrl" class="crmMailing2-preview">
+  <!-- Note:
+  In Firefox (at least), clicking the preview buttons causes the browser to display validation warnings
+  for unrelated fields *and* display preview. To avoid this weird UX, we disable preview buttons when the form is incomplete/invalid.
+  -->
+  <div class="preview-popup">
+    <div ng-show="!mailing.body_html && !mailing.body_text">
+      <em>({{ts('No content to preview')}})</em>
+    </div>
+    <div ng-hide="!mailing.body_html">
+      <button ng-disabled="crmMailing2.$invalid" ng-click="previewHtml()">{{ts('Preview as HTML')}}</button>
+    </div>
+    <div ng-hide="!mailing.body_text">
+      <button ng-disabled="crmMailing2.$invalid" ng-click="previewText()">{{ts('Preview as Plain Text')}}</button>
+    </div>
+    <!--
+    <div ng-hide="!mailing.body_html && !mailing.body_text">
+      <button ng-disabled="crmMailing2.$invalid" ng-click="previewFull()">{{ts('Preview')}}</button>
+    </div>
+    -->
+  </div>
+  <div class="preview-contact" ng-form>
+    <div>
+      {{ts('Send test email to:')}}
+    </div>
+    <div>
+      <input
+        name="preview_test_email"
+        type="email"
+        class="crm-form-text"
+        ng-model="testContact.email"
+        placeholder="example@example.org"
+        />
+    </div>
+    <button ng-disabled="crmMailing2.$invalid || !testContact.email" ng-click="sendTestToContact()">{{ts('Send test')}}</button>
+  </div>
+  <div class="preview-group" ng-form>
+    <div>
+      {{ts('Send test email to group:')}}
+    </div>
+    <div>
+      <select
+        name="preview_test_group"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Select Group')}"
+        ng-model="testGroup.gid"
+        ng-options="group.id as group.title for group in crmMailingConst.groupNames|orderBy:'title'"
+        >
+        <option value=""></option>
+      </select>
+    </div>
+    <button ng-disabled="crmMailing2.$invalid || !testGroup.gid" ng-click="sendTestToGroup()">{{ts('Send test')}}</button>
+  </div>
+  <div class="clear"></div>
+</div>

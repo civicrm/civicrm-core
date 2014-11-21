@@ -27,6 +27,40 @@
       };
     })
 
+    // example: <iframe crm-ui-iframe="getHtmlContent()"></iframe>
+    .directive('crmUiIframe', function ($parse) {
+      return {
+        scope: {
+          crmUiIframe: '@' // expression which evalutes to HTML content
+        },
+        link: function (scope, elm, attrs) {
+          var iframe = $(elm)[0];
+          iframe.setAttribute('width', '100%');
+          iframe.setAttribute('frameborder', '0');
+
+          var refresh = function () {
+            // var iframeHtml = '<html><head><base target="_blank"></head><body onload="parent.document.getElementById(\'' + iframe.id + '\').style.height=document.body.scrollHeight + \'px\'"><scr' + 'ipt type="text/javascript" src="https://gist.github.com/' + iframeId + '.js"></sc' + 'ript></body></html>';
+            var iframeHtml = scope.$parent.$eval(attrs.crmUiIframe);
+
+            var doc = iframe.document;
+            if (iframe.contentDocument) {
+              doc = iframe.contentDocument;
+            }
+            else if (iframe.contentWindow) {
+              doc = iframe.contentWindow.document;
+            }
+
+            doc.open();
+            doc.writeln(iframeHtml);
+            doc.close();
+          }
+
+          scope.$parent.$watch(attrs.crmUiIframe, refresh);
+          //setTimeout(function () { refresh(); }, 50);
+        }
+      };
+    })
+
     // example: <form name="myForm">...<label crm-ui-label crm-for="myField">My Field</span>...<input name="myField"/>...</form>
     //
     // Label adapts based on <input required>, <input ng-required>, or any other validation.
