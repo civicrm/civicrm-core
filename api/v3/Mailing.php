@@ -354,6 +354,11 @@ function civicrm_api3_mailing_preview($params) {
   ));
 }
 
+function _civicrm_api3_mailing_send_test_spec(&$spec) {
+  $spec['test_group']['title'] = 'Test Group ID';
+  $spec['test_email']['title'] = 'Test Email Address';
+}
+
 function civicrm_api3_mailing_send_test($params) {
   if (!array_key_exists('test_group', $params) && !array_key_exists('test_email', $params)) {
     throw new API_Exception("Mandatory key(s) missing from params array: test_group and/or test_email field are required" );

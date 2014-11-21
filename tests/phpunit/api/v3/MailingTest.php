@@ -53,6 +53,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
     $this->_contactIDs = array();
     $this->_contactIDs[] = $this->individualCreate();
@@ -69,13 +70,6 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   function tearDown() {
-    foreach ($this->_contactIDs as $contactID) {
-      $this->contactDelete($contactID);
-    }
-    $this->groupDelete($this->_groupID);
-    foreach ($this->_groupIDs as $groupID) {
-      $this->groupDelete($groupID);
-    }
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
     parent::tearDown();
   }
@@ -170,7 +164,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertTrue((bool)preg_match('/Includer Person/', $previewNames[0]), "Name 'Includer Person' should appear in '" . $previewNames[0] . '"');
   }
 
-  public function testMailerSendTestMail() {
+  public function testMailerSendTest_email() {
     $contactID =  $this->individualCreate();
     $result = $this->callAPISuccess('contact', 'get', array('id' => $contactID));
     $email = $result['values'][$contactID]['email'];
@@ -182,6 +176,30 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertEquals(1, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
     $this->assertEquals($contactID, $deliveredInfo['values'][$deliveredInfo['id']]['contact_id'], "in line " . __LINE__); //verify the contact_id of the recipient
     $this->deleteMailing($mail['id']);
+  }
+
+  public function testMailerSendTest_group() {
+    // BEGIN SAMPLE DATA
+    $this->groupIDs['inc'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
+    $this->contactIDs['alice'] = $this->individualCreate(array('email' => 'alice@example.org', 'first_name' => 'Alice', 'last_name' => 'Person'));
+    $this->contactIDs['bob'] = $this->individualCreate(array('email' => 'bob@example.org', 'first_name' => 'Bob', 'last_name' => 'Person'));
+    $this->contactIDs['carol'] = $this->individualCreate(array('email' => 'carol@example.org', 'first_name' => 'Carol', 'last_name' => 'Person'));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['alice']));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['bob']));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['carol']));
+    // END SAMPLE DATA
+
+    $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', array(
+      'mailing_id' => $mail['id'],
+      'test_email' => NULL,
+      'test_group' => $this->groupIDs['inc'],
+    ));
+    $this->assertEquals(3, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
+    $deliveredContacts = array_values(CRM_Utils_Array::collect('contact_id', $deliveredInfo['values']));
+    $this->assertEquals(array($this->contactIDs['alice'], $this->contactIDs['bob'], $this->contactIDs['carol']), $deliveredContacts);
+    $deliveredEmails = array_values(CRM_Utils_Array::collect('email', $deliveredInfo['values']));
+    $this->assertEquals(array('alice@example.org', 'bob@example.org', 'carol@example.org'), $deliveredEmails);
   }
 
   public function testMailerStats() {
