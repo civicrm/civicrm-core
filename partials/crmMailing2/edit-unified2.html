@@ -1,0 +1,42 @@
+<form name="crmMailing2">
+  <div class="crm-block crm-form-block crmMailing2">
+
+    <div ng-include="partialUrl('summary.html')"/>
+    <div ng-include="partialUrl('mailing.html')" />
+    
+    <div crm-ui-accordion crm-title="ts('HTML')">
+      <div ng-include="partialUrl('field/body_html.html')" />
+    </div>
+    <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='true'>
+      <div ng-include="partialUrl('field/body_text.html')" />
+    </div>
+    <div crm-ui-accordion id="tab-header" crm-title="ts('Header and Footer')" crm-collapsed='true'>
+      <div ng-include="partialUrl('headerFooter.html')" />
+    </div>
+    <div crm-ui-accordion id="tab-attachment" crm-title="ts('Attachments')" crm-collapsed='true'>
+      <div ng-include="partialUrl('attachments.html')" />
+    </div>
+    <div crm-ui-accordion id="tab-pub" crm-title="ts('Publication')" crm-collapsed='true'>
+      <div ng-include="partialUrl('publication.html')" />
+    </div>
+    <div crm-ui-accordion id="tab-response" crm-title="ts('Responses')" crm-collapsed='true'>
+      <div ng-include="partialUrl('responses.html')" />
+    </div>
+    <div crm-ui-accordion id="tab-tracking" crm-title="ts('Tracking')" crm-collapsed='true'>
+      <div ng-include="partialUrl('tracking.html')" />
+    </div>
+    <div crm-ui-accordion crm-title="ts('Preview')">
+      <div ng-include="partialUrl('preview.html')" />
+    </div>
+    <div crm-ui-accordion id="tab-schedule" crm-title="ts('Schedule')">
+      <div ng-include="partialUrl('schedule.html')" />
+    </div>
+
+    <button ng-click="send();
+      leave();">{{ts('Submit Mailing')}}</button>
+    <button ng-click="save();
+      leave();">{{ts('Save Draft')}}</button>
+    <button ng-click="cancel();
+      leave();">{{ts('Delete Draft')}}</button>
+  </div>
+</form>

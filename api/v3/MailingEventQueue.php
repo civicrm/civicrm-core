@@ -46,22 +46,25 @@
  * @access public
  */
 function civicrm_api3_mailing_event_queue_create($params) {
-  if (!array_key_exists('email_id', $params) && !array_key_exists('phone_id', $params)) {
-    throw new API_Exception("Mandatory key(s) missing from params array: email_id or phone_id field are required" );
+  if (!array_key_exists('id', $params) && !array_key_exists('email_id', $params) && !array_key_exists('phone_id', $params)) {
+    throw new API_Exception("Mandatory key missing from params array: id, email_id, or phone_id field is required" );
   }
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_MailingJob',
     array('job_id','contact_id'),
     FALSE
   );
-  $mailingEventQueueArray = array();
-  $mailingEventQueueBAO = CRM_Mailing_Event_BAO_Queue::create($params);
-  _civicrm_api3_object_to_array($mailingEventQueueBAO, $mailingEventQueueArray[$mailingEventQueueBAO->id]);
-  return civicrm_api3_create_success($mailingEventQueueArray);
+  return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_Queue', $params);
 }
+
 function civicrm_api3_mailing_event_queue_get($params) {
   return _civicrm_api3_basic_get('CRM_Mailing_Event_BAO_Queue', $params);
 }
+
+function civicrm_api3_mailing_event_queue_delete($params) {
+  return _civicrm_api3_basic_delete('CRM_Mailing_Event_BAO_Queue', $params);
+}
+
 /**
  * Adjust Metadata for Create action
  *

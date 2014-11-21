@@ -59,7 +59,16 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $result = array();
     $result['crmMailing'] = array(
       'ext' => 'civicrm',
-      'js' => array('js/angular-Mailing.js' , 'js/angularsanitize.js' , 'packages/ckeditor/ckeditor.js'),
+      'js' => array(
+        'js/angular-Mailing.js' ,
+        'js/angularsanitize.js' ,
+        'packages/ckeditor/ckeditor.js'
+       ),
+    );
+    $result['crmMailing2'] = array(
+      'ext' => 'civicrm',
+      'js' => array('js/angular-crmMailing2.js', 'js/angular-crmMailing2-directives.js'),
+      'css' => array('css/angular-crmMailing2.css'),
     );
     $result['crmMailingAB'] = array(
       'ext' => 'civicrm',
@@ -124,6 +133,10 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'mailTokens' => array_values($mailTokens),
         'contactid' => $contactID,
         'fromAddress' => array_values($fromAddress['values'][0]['api.OptionValue.get']['values']),
+        'visibility' => array(
+            array('value' => 'Public Pages', 'label' => ts('Public Pages')),
+            array('value' => 'User and User Admin Only', 'label' => ts('User and User Admin Only')),
+        ),
       ),
     ));
 

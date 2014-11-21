@@ -2,7 +2,31 @@
 (function (angular, $, _) {
   var idCount = 0;
 
+  var partialUrl = function (relPath) {
+    return CRM.resourceUrls['civicrm'] + '/partials/crmUi/' + relPath;
+  };
+
+
   angular.module('crmUi', [])
+
+    // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
+    // WISHLIST: crmCollapsed should support two-way/continous binding
+    .directive('crmUiAccordion', function() {
+      return {
+        scope: {
+          crmTitle: '@',
+          crmCollapsed: '@'
+        },
+        template: '<div class="crm-accordion-wrapper" ng-class="cssClasses"><div class="crm-accordion-header">{{$parent.$eval(crmTitle)}}</div><div class="crm-accordion-body" ng-transclude></div></div>',
+        transclude: true,
+        link: function (scope, element, attrs) {
+          scope.cssClasses = {
+            collapsed: scope.$parent.$eval(attrs.crmCollapsed)
+          };
+        }
+      };
+    })
+
     // example: <form name="myForm">...<label crm-ui-label crm-for="myField">My Field</span>...<input name="myField"/>...</form>
     //
     // Label adapts based on <input required>, <input ng-required>, or any other validation.
@@ -27,7 +51,7 @@
           var formCtrl = scope.$parent.$eval(form.attr('name'));
           var input = $('input[name="' + attrs.crmFor + '"],select[name="' + attrs.crmFor + '"],textarea[name="' + attrs.crmFor + '"]', form);
           if (form.length != 1 || input.length != 1) {
-            if (console.log) console.log('Label cannot be matched to input element. Expected to find one form and one input.', form.length, input.length);
+            if (console.log) console.log('Label cannot be matched to input element. Expected to find one form and one input[name='+attrs.crmFor+'].', form.length, input.length);
             return;
           }
 
@@ -127,6 +151,156 @@
         }
       };
     })
+
+    // example <div crm-ui-tab crm-title="ts('My Title')">...content...</div>
+    // WISHLIST: use a full Angular component instead of an incomplete jQuery wrapper
+    .directive('crmUiTab', function($parse) {
+      return {
+        require: '^crmUiTabSet',
+        restrict: 'EA',
+        scope: {
+          crmTitle: '@',
+          id: '@'
+        },
+        template: '<div ng-transclude></div>',
+        transclude: true,
+        link: function (scope, element, attrs, crmUiTabSetCtrl) {
+          crmUiTabSetCtrl.add(scope);
+        }
+      };
+    })
+
+    // example: <div crm-ui-tab-set><div crm-ui-tab crm-title="Tab 1">...</div><div crm-ui-tab crm-title="Tab 2">...</div></div>
+    .directive('crmUiTabSet', function() {
+      return {
+        restrict: 'EA',
+        scope: {
+          crmUiTabSet: '@'
+        },
+        templateUrl: partialUrl('tabset.html'),
+        transclude: true,
+        controllerAs: 'crmUiTabSetCtrl',
+        controller: function($scope, $parse) {
+          var tabs = $scope.tabs = []; // array<$scope>
+          this.add = function(tab) {
+            if (!tab.id) throw "Tab is missing 'id'";
+            tabs.push(tab);
+          };
+        },
+        link: function (scope, element, attrs) {}
+      };
+    })
+
+    // example: <div crm-ui-wizard="myWizardCtrl"><div crm-ui-wizard-step crm-title="ts('Step 1')">...</div><div crm-ui-wizard-step crm-title="ts('Step 2')">...</div></div>
+    // Note: "myWizardCtrl" has various actions/properties like next() and $first().
+    // WISHLIST: Allow each step to determine if it is "complete" / "valid" / "selectable"
+    // WISHLIST: Allow each step to enable/disable (show/hide) itself
+    .directive('crmUiWizard', function() {
+      return {
+        restrict: 'EA',
+        scope: {
+          crmUiWizard: '@'
+        },
+        templateUrl: partialUrl('wizard.html'),
+        transclude: true,
+        controllerAs: 'crmUiWizardCtrl',
+        controller: function($scope, $parse) {
+          var steps = $scope.steps = []; // array<$scope>
+          var crmUiWizardCtrl = this;
+          var maxVisited = 0;
+          var selectedIndex = null;
+
+          var findIndex = function() {
+            var found = null;
+            angular.forEach(steps, function(step, stepKey) {
+              if (step.selected) found = stepKey;
+            });
+            return found;
+          };
+
+          /// @return int the index of the current step
+          this.$index = function() { return selectedIndex; };
+          /// @return bool whether the currentstep is first
+          this.$first = function() { return this.$index() === 0; };
+          /// @return bool whether the current step is last
+          this.$last = function() { return this.$index() === steps.length -1; };
+          this.$maxVisit = function() { return maxVisited; }
+          this.iconFor = function(index) {
+            if (index < this.$index()) return '√';
+            if (index === this.$index()) return '»';
+            return ' ';
+          }
+          this.isSelectable = function(step) {
+            if (step.selected) return false;
+            var result = false;
+            angular.forEach(steps, function(otherStep, otherKey) {
+              if (step === otherStep && otherKey <= maxVisited) result = true;
+            });
+            return result;
+          };
+
+          /*** @param Object step the $scope of the step */
+          this.select = function(step) {
+            angular.forEach(steps, function(otherStep, otherKey) {
+              otherStep.selected = (otherStep === step);
+              if (otherStep === step && maxVisited < otherKey) maxVisited = otherKey;
+            });
+            selectedIndex = findIndex();
+          };
+          /*** @param Object step the $scope of the step */
+          this.add = function(step) {
+            if (steps.length === 0) {
+              step.selected = true;
+              selectedIndex = 0;
+            }
+            steps.push(step);
+          };
+          this.goto = function(index) {
+            if (index < 0) index = 0;
+            if (index >= steps.length) index = steps.length-1;
+            this.select(steps[index]);
+          };
+          this.previous = function() { this.goto(this.$index()-1); };
+          this.next = function() { this.goto(this.$index()+1); };
+          if ($scope.crmUiWizard) {
+            $parse($scope.crmUiWizard).assign($scope.$parent, this)
+          }
+        },
+        link: function (scope, element, attrs) {}
+      };
+    })
+
+    // Use this to add extra markup to wizard
+    .directive('crmUiWizardButtons', function() {
+      return {
+        require: '^crmUiWizard',
+        restrict: 'EA',
+        scope: {},
+        template: '<span ng-transclude></span>',
+        transclude: true,
+        link: function (scope, element, attrs, crmUiWizardCtrl) {
+          var realButtonsEl = $(element).closest('.crm-wizard').find('.crm-wizard-buttons');
+          $(element).appendTo(realButtonsEl);
+        }
+      };
+    })
+
+    // example <div crm-ui-wizard-step crm-title="ts('My Title')">...content...</div>
+    .directive('crmUiWizardStep', function() {
+      return {
+        require: '^crmUiWizard',
+        restrict: 'EA',
+        scope: {
+          crmTitle: '@'
+        },
+        template: '<div class="crm-wizard-step" ng-show="selected" ng-transclude/></div>',
+        transclude: true,
+        link: function (scope, element, attrs, crmUiWizardCtrl) {
+          crmUiWizardCtrl.add(scope);
+        }
+      };
+    })
+
     // Example: <button crm-confirm="{message: ts('Are you sure you want to continue?')}" on-yes="frobnicate(123)">Frobincate</button>
     // Example: <button crm-confirm="{type: 'disable', obj: myObject}" on-yes="myObject.is_active=0; myObject.save()">Disable</button>
     .directive('crmConfirm', function () {

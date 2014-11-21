@@ -85,9 +85,8 @@ function civicrm_api3_mailing_get_token($params) {
 function _civicrm_api3_mailing_create_spec(&$params) {
   $params['name']['api.required'] = 1;
   $params['subject']['api.required'] = 1;
-  // should be able to default to 'user_contact_id' & have it work but it didn't work in test so
-  // making required for simplicity
   $params['created_id']['api.required'] = 1;
+  $params['created_id']['api.default'] = 'user_contact_id';
   $params['api.mailing_job.create']['api.default'] = 1;
   $params['api.mailing_job.create']['title'] = 'Schedule Mailing?';
 }
@@ -311,6 +310,58 @@ function civicrm_api3_mailing_event_open($params) {
   return civicrm_api3_create_success($params);
 }
 
+/**
+ * Generate a list of likely recipients for a (hypothetical) mailing.
+ *
+ * "Mailing.preview_recipients" == "Mailing.create" + "MailingRecipients.get" + "rollback"
+ *
+ * Ideally, we could add a "force_rollback" option to the API; then downstream code could
+ * combine the actions without needing this function.
+ *
+ * @param array $params
+ * @return array list of recipients
+ * @throws API_Exception
+ */
+function civicrm_api3_mailing_preview_recipients($params) {
+  static $nextId = 0;
+  $savePoint = "civimail_preview_" . ++$nextId;
+  $tx = new CRM_Core_Transaction();
+  CRM_Core_DAO::executeQuery("SAVEPOINT $savePoint");
+
+  // We manually apply defaults (rather than using API defaults) because
+  // (a) these are temporary/non-sense values and (b) we want to
+  // apply defaults regardless of whether mailing has NULL/''/real-value.
+  $params['name'] = 'Placeholder (not saved)';
+  $params['subject'] = 'Placeholder (not saved)';
+  $params['scheduled_date'] = date('YmdHis', time() + 24*60*60);
+
+  // "Mailing.preview_recipients" == "Mailing.create"+"MailingRecipients.get"
+  $params['debug'] = 1;
+  $params['version'] = 3;
+  $params['options']['force_rollback'] = 1;
+  $params['api.MailingRecipients.get'] = array(
+    'options' => array(
+      'limit' => isset($params['options']['limit']) ? $params['options']['limit'] : 1000,
+    ),
+    'api.contact.getvalue' => array(
+      'return' => 'display_name',
+    ),
+    'api.email.getvalue' => array(
+      'return' => 'email',
+    ),
+  );
+
+  try {
+    $mailing = civicrm_api3('Mailing', 'create', $params);
+  } catch (Exception $ex) {
+    CRM_Core_DAO::executeQuery("ROLLBACK TO SAVEPOINT $savePoint");
+    throw $ex;
+  }
+
+  CRM_Core_DAO::executeQuery("ROLLBACK TO SAVEPOINT $savePoint");
+  return civicrm_api3_create_success($mailing['values'][$mailing['id']]['api.MailingRecipients.get']['values']);
+}
+
 function civicrm_api3_mailing_preview($params) {
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_Mailing',
@@ -346,7 +397,13 @@ function civicrm_api3_mailing_preview($params) {
     TRUE, $details[0][$contactID], $attachments
   );
 
-  return civicrm_api3_create_success(array('subject' => $mime->_headers['Subject'], 'html' => $mime->getHTMLBody(), 'text' => $mime->getTXTBody()));
+  return civicrm_api3_create_success(array(
+    'id' => $params['id'],
+    'contact_id' => $contactID,
+    'subject' => $mime->_headers['Subject'],
+    'html' => $mime->getHTMLBody(),
+    'text' => $mime->getTXTBody(),
+  ));
 }
 
 function civicrm_api3_mailing_send_test($params) {
@@ -415,8 +472,14 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
   }
 
   $isComplete = FALSE;
+  $config = CRM_Core_Config::singleton();
+  $mailerJobSize = (property_exists($config, 'mailerJobSize')) ? $config->mailerJobSize : NULL;
   while (!$isComplete) {
+    // Q: In CRM_Mailing_BAO_Mailing::processQueue(), the three runJobs*()
+    // functions are all called. Why does Mailing.send_test only call one?
+    // CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize, NULL);
     $isComplete = CRM_Mailing_BAO_MailingJob::runJobs($testEmailParams);
+    // CRM_Mailing_BAO_MailingJob::runJobs_post(NULL);
   }
 
   //return delivered mail info
@@ -433,6 +496,7 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
  */
 function _civicrm_api3_mailing_stats_spec(&$params) {
   $params['date']['api.default'] = 'now';
+  $params['date']['title'] = 'Date';
 }
 
 function civicrm_api3_mailing_stats($params) {
