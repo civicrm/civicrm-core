@@ -125,6 +125,10 @@ class CRM_Contribute_Task {
       if (!CRM_Core_Permission::check('delete in CiviContribute')) {
         unset(self::$_tasks[1]);
       }
+      //CRM-12920 - check for edit permission
+      if( !CRM_Core_Permission::check('edit contributions') ){
+        unset(self::$_tasks[4],self::$_tasks[6]);
+      }
 
       // remove action "Print or Email Contribution Invoices"
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');

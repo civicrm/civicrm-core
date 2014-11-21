@@ -5,10 +5,10 @@
 
   <style type="text/css">
     {literal}
-    /* Client-specific Styles */ 
+    /* Client-specific Styles */
     #outlook a {padding:0;} /* Force Outlook to provide a "view in browser" menu link. */
     body{width:100% !important; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; margin:0; padding:0;}
-    
+
     /* Prevent Webkit and Windows Mobile platforms from changing default font sizes, while not breaking desktop design. */
     .ExternalClass {width:100%;} /* Force Hotmail to display emails at full width */
     .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div {line-height: 100%;} /* Force Hotmail to display normal line spacing. */
@@ -39,12 +39,12 @@
     table[class="removeMobile"]{width:10px!important;}
     img[class="blog"] {width: 440px!important;height: auto!important;}
     }
-    
+
     /*IPHONE STYLES*/
     @media only screen and (max-width: 480px) {
     a[href^="tel"], a[href^="sms"] {text-decoration: none;color: #136388;pointer-events: none;cursor: default;}
     .mobile_link a[href^="tel"], .mobile_link a[href^="sms"] {text-decoration: none;color:#136388;pointer-events: auto;cursor: default;}
-    
+
     table[class=devicewidth] {width: 280px!important;text-align:center!important;}
     table[class=devicewidthmob] {width: 260px!important;text-align:center!important;}
     table[class=devicewidthinner] {width: 260px!important;text-align:center!important;}
@@ -57,14 +57,14 @@
     td[class="padding-top-right15"]{padding:15px 15px 0 0 !important;}
     td[class="padding-right15"]{padding-right:15px !important;}
     }
-    
+
     @media only screen and (max-device-width: 800px)
     {td[class="padding-top-right15"]{padding:15px 15px 0 0 !important;}
     td[class="padding-right15"]{padding-right:15px !important;}}
     @media only screen and (max-device-width: 769px) {
     .devicewidthmob {font-size:16px;}
     }
-    
+
     @media only screen and (max-width: 640px) {
     .desktop-spacer {display:none !important;}
  }

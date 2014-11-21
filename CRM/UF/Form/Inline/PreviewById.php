@@ -55,7 +55,7 @@ class CRM_UF_Form_Inline_PreviewById extends CRM_UF_Form_AbstractPreview {
   function preProcess() {
     // Inline forms don't get menu-level permission checks
     if (!CRM_Core_Permission::check('access CiviCRM')) {
-      CRM_Core_Error::fatal(ts('Permission denied'));
+      CRM_Core_Error::fatal(ts('Permission Denied'));
     }
     $gid = CRM_Utils_Request::retrieve('id', 'Positive');
     $fields = CRM_Core_BAO_UFGroup::getFields($gid);

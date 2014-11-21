@@ -1033,12 +1033,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset($props['field'])) {
       $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
-    $info = civicrm_api3($props['entity'], 'getoptions', array(
-        'field' => $props['field'],
-        'options' => array('metadata' => array('fields'))
-      )
-    );
-    $options = $info['values'];
+    // Fetch options from the api unless passed explicitly
+    if (isset($props['options'])) {
+      $options = $props['options'];
+    }
+    else {
+      $info = civicrm_api3($props['entity'], 'getoptions', array('field' => $props['field']));
+      $options = $info['values'];
+    }
     if (!array_key_exists('placeholder', $props)) {
       $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
     }
@@ -1051,7 +1053,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     // Core field
     else {
-      foreach($info['metadata']['fields'] as $uniqueName => $fieldSpec) {
+      $info = civicrm_api3($props['entity'], 'getfields');
+      foreach($info['values'] as $uniqueName => $fieldSpec) {
         if (
           $uniqueName === $props['field'] ||
           CRM_Utils_Array::value('name', $fieldSpec) === $props['field'] ||
@@ -1066,7 +1069,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
     $props['data-api-entity'] = $props['entity'];
     $props['data-api-field'] = $props['field'];
-    CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url');
+    CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url', 'options');
     return $this->add('select', $name, $label, $options, $required, $props);
   }
 
@@ -1623,7 +1626,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->assign('selectable', $autoCompleteField['id_field']);
       $this->addEntityRef($autoCompleteField['id_field'], NULL, array('placeholder' => $autoCompleteField['placeholder'], 'api' => $autoCompleteField['api']));
 
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js')
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js', 1, 'html-header')
       ->addSetting(array(
       'form' => array('autocompletes' => $autoCompleteField),
       'ids' => array('profile' => $profiles),

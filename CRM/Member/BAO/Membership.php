@@ -988,7 +988,17 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     //avoid pending membership as current membership: CRM-3027
     $statusIds[] = array_search('Pending', CRM_Member_PseudoConstant::membershipStatus());
     if (!$membershipId) {
-      $statusIds[] = array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus());
+      // CRM-15475
+      $statusIds[] = array_search(
+        'Cancelled', 
+        CRM_Member_PseudoConstant::membershipStatus(
+          NULL, 
+          " name = 'Cancelled' ", 
+          'name', 
+          FALSE, 
+          TRUE
+        )
+      );
     }
     $dao->whereAdd('status_id NOT IN ( ' . implode(',',  $statusIds) . ')');
 
@@ -1271,10 +1281,19 @@ AND civicrm_membership.is_test = %2";
    */
   public static function postProcessMembership($membershipParams, $contactID, &$form, $premiumParams,
     $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
-    $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems) {
+    $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems, $isPayLater) {
     $result      = $membershipContribution = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = array();
+
+    //@todo move this into the calling function & pass in the correct financialTypeID
+    if (isset($paymentParams['financial_type'])) {
+      $financialTypeID = $paymentParams['financial_type'];
+    }
+    else {
+      $financialTypeID = $defaultContributionTypeID;
+    }
+
 
     if (CRM_Utils_Array::value('membership_source', $form->_params)) {
       $membershipParams['contribution_source'] = $form->_params['membership_source'];
@@ -1283,8 +1302,11 @@ AND civicrm_membership.is_test = %2";
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $premiumParams, $contactID,
-        $defaultContributionTypeID,
-        'membership'
+        $financialTypeID,
+        'membership',
+        array(),
+        $isTest,
+        $isPayLater
       );
       if (is_a($result[1], 'CRM_Core_Error')) {
         $errors[1] = CRM_Core_Error::getMessages($result[1]);
@@ -2013,7 +2035,7 @@ LEFT JOIN civicrm_membership mem ON ( cr.id = mem.contribution_recur_id )
     WHERE mem.id = %1 LIMIT 1";
     $params   = array(1 => array($mid, 'Integer'));
     $statusId = CRM_Core_DAO::singleValueQuery($sql, $params);
-    $status   = CRM_Contribute_PseudoConstant::contributionStatus($statusId);
+    $status   = CRM_Contribute_PseudoConstant::contributionStatus($statusId, 'name');
     if ($status == 'Cancelled') {
       return TRUE;
     }
@@ -2356,7 +2378,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       //1. membership with status : PENDING/CANCELLED (CRM-2395)
       //2. Paylater/IPN renew. CRM-4556.
       if ($pending || in_array($currentMembership['status_id'], array(array_search('Pending', $allStatus),
-          array_search('Cancelled', $allStatus),
+          // CRM-15475
+          array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)),
         ))
       ) {
         $membership = new CRM_Member_DAO_Membership();
@@ -2728,7 +2751,11 @@ WHERE      civicrm_membership.is_test = 0";
       //skipping Expired membership records -> reduced extra processing( kiran )
       if (!$dao->is_override &&
         !in_array($dao->status_id, array(array_search('Pending', $allStatus),
-            array_search('Cancelled', $allStatus),
+            // CRM-15475
+            array_search(
+              'Cancelled', 
+              CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)
+            ),
             array_search('Expired', $allStatus),
           ))
       ) {
@@ -2966,11 +2993,23 @@ WHERE      civicrm_membership.is_test = 0";
     if (!$contactID) {
       return array();
     }
-    $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $query = 'SELECT membership_type_id FROM civicrm_membership WHERE contact_id = %1 AND status_id = %2 AND is_test = %3';
     $queryParams = array(
       1 => array($contactID, 'Integer'),
-      2 => array(array_search('Cancelled', $allStatus), 'Integer'),
+      2 => array(
+        // CRM-15475
+        array_search(
+          'Cancelled', 
+          CRM_Member_PseudoConstant::membershipStatus(
+            NULL, 
+            " name = 'Cancelled' ", 
+            'name', 
+            FALSE, 
+            TRUE
+          )
+        ), 
+        'Integer'
+      ),
       3 => array($isTest, 'Boolean'),
     );
 

@@ -422,13 +422,11 @@ input.crm-form-entityref {
 }
 
 .crm-container .crm-section,
-.crm-container div.crm-field-wrapper,
-.crm-container-snippet .crm-section {
+.crm-container div.crm-field-wrapper {
   margin-bottom: 1em;
 }
 
-.crm-container .crm-section .label,
-.crm-container-snippet .crm-section .label {
+.crm-container .crm-section .label {
   float: left;
   width: 17%;
   text-align: right;
@@ -438,8 +436,7 @@ input.crm-form-entityref {
   text-align: left;
 }
 
-.crm-container .crm-section .content,
-.crm-container-snippet .crm-section .content {
+.crm-container .crm-section .content {
   margin-left: 19%;
 }
 
@@ -702,8 +699,7 @@ input.crm-form-entityref {
   color: #000080;
 }
 
-.crm-container .crm-marker,
-.crm-container-snippet .crm-marker {
+.crm-container .crm-marker{
   color: #8A1F11;
   font-weight: bold;
   margin-right: 5px;
@@ -3288,12 +3284,6 @@ div.crm-container form {
   -webkit-overflow-scrolling: touch;
 }
 
-.crm-container .top, .bottom {
-  padding: 15px;
-  background-color: #F5F5F5;
-  border: 1px solid #CCCCCC;
-}
-
 .crm-container .top .dataTables_info {
   float: none;
 }
@@ -4563,6 +4553,9 @@ span.crm-status-icon {
   padding: 5px 8px;
   text-align: center;
   border-radius: 2px;
-  cursor: pointer;  
+  cursor: pointer;
   font-size: 11px !important;
+}
+.crm-container table.mergecontact thead th {
+  width:30%;
 }

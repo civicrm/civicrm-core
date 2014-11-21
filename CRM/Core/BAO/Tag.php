@@ -84,7 +84,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param bool $excludeHidden
    */
   function buildTree($usedFor = NULL, $excludeHidden = FALSE) {
-    $sql = "SELECT id, parent_id, name, description FROM civicrm_tag";
+    $sql = "SELECT id, parent_id, name, description, is_selectable FROM civicrm_tag";
 
     $whereClause = array();
     if ($usedFor) {
@@ -109,6 +109,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $thisref['parent_id'] = $dao->parent_id;
       $thisref['name'] = $dao->name;
       $thisref['description'] = $dao->description;
+      $thisref['is_selectable'] = $dao->is_selectable;
 
       if (!$dao->parent_id) {
         $this->tree[$dao->id] = &$thisref;

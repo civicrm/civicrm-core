@@ -102,7 +102,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
     //per http://wiki.civicrm.org/confluence/display/CRM/Database+layer we are moving away from $ids array
     $contributionID = CRM_Utils_Array::value('contribution', $ids, CRM_Utils_Array::value('id', $params));
-
     $duplicates = array();
     if (self::checkDuplicate($params, $duplicates, $contributionID)) {
       $error = CRM_Core_Error::singleton();
@@ -3399,6 +3398,9 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         if ($primaryParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $id, 'registered_by_id')) {
           $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $primaryParticipantId, 'contribution_id', 'participant_id');
           $id = $primaryParticipantId;
+        }
+        if (!$contributionId) {
+          return;
         }
       }
     }

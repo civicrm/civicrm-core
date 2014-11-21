@@ -1641,23 +1641,18 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
  * fields are prefixed with 'custom_' to represent api params
  */
 function _civicrm_api_get_custom_fields($entity, &$params) {
-  $customfields = array();
   $entity = _civicrm_api_get_camel_name($entity);
-  if (strtolower($entity) == 'contact') {
-    // Use sub-type if available, otherwise stick with 'Contact'
+  if ($entity == 'Contact') {
+    // Use sub-type if available, otherwise "NULL" to fetch from all contact types
     $entity = CRM_Utils_Array::value('contact_type', $params);
-  }
-  $retrieveOnlyParent = FALSE;
-  // we could / should probably test for other subtypes here - e.g. activity_type_id
-  if($entity == 'Contact'){
-    empty($params['contact_sub_type']);
   }
   $customfields = CRM_Core_BAO_CustomField::getFields($entity,
     FALSE,
     FALSE,
-    CRM_Utils_Array::value('contact_sub_type', $params, FALSE),
+    // we could / should probably test for other subtypes here - e.g. activity_type_id
+    CRM_Utils_Array::value('contact_sub_type', $params),
     NULL,
-    $retrieveOnlyParent,
+    FALSE,
     FALSE,
     FALSE
   );

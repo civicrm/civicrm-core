@@ -66,11 +66,11 @@ function setting_getfields_expectedresult(){
           'html_type' => 'Text',
           'default' => '',
           'add' => '4.1',
-          'title' => 'Web service url',
+          'title' => 'Web Service URL',
           'is_domain' => 1,
           'is_contact' => 0,
           'description' => '',
-          'help_text' => 'Web service URL.',
+          'help_text' => 'Web Service URL',
           'validate_callback' => 'CRM_Utils_Rule::url',
         ),
       'tag_unconfirmed' => array(

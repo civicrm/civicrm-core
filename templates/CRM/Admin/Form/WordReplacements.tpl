@@ -47,7 +47,7 @@
             <td>{ts}Enabled{/ts}</td>
             <td>{ts}Original{/ts}</td>
             <td>{ts}Replacement{/ts}</td>
-            <td>{ts}Exact Match?{/ts}</td>
+            <td>{ts}Exact Match{/ts}</td>
         </tr>
 
          {section name="numStrings" start=1 step=1 loop=$numStrings+1}

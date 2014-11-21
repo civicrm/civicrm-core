@@ -205,7 +205,7 @@ class CRM_Core_Payment_BaseIPN {
 
     //add lineitems for recurring payments
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
-      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, CRM_Core_DAO::$_nullArray);
+      $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
     }
 
     //add new soft credit against current contribution id and
@@ -285,7 +285,7 @@ class CRM_Core_Payment_BaseIPN {
 
     //add lineitems for recurring payments
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
-      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, CRM_Core_DAO::$_nullArray);
+      $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
     }
 
     //add new soft credit against current $contribution and
@@ -570,8 +570,14 @@ LIMIT 1;";
     }
 
     //add lineitems for recurring payments
-    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
-      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, $input);
+    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
+      if ($addLineItems) {
+        $input ['line_item'] = $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
+      }
+      else {
+        // this is just to prevent e-notices when we call recordFinancialAccounts - per comments on that line - intention is somewhat unclear
+        $input['line_item'] = array();
+      }
     }
 
     //copy initial contribution custom fields for recurring contributions
@@ -616,7 +622,7 @@ LIMIT 1;";
         $input['contribution_mode'] = 'membership';
       }
       //@todo writing a unit test I was unable to create a scenario where this line did not fatal on second
-      // and subsequent payments. In this case the line items are created at $this->addrecurLineItems
+      // and subsequent payments. In this case the line items are created at $this->addRecurLineItems
       // and since the contribution is saved prior to this line there is always a contribution-id,
       // however there is never a prevContribution (which appears to mean original contribution not previous
       // contribution - or preUpdateContributionObject most accurately)
@@ -624,6 +630,7 @@ LIMIT 1;";
       // to mean "are we updating an exisitng pending contribution"
       //I was able to make the unit test complete as fataling here doesn't prevent
       // the contribution being created - but activities would not be created or emails sent
+
       CRM_Contribute_BAO_Contribution::recordFinancialAccounts($input, NULL);
     }
 
@@ -930,31 +937,38 @@ LIMIT 1;";
 
   /**
    * @param $recurId
-   * @param $contributionId
-   * @param $input
+   * @param $contribution
+   *
+   * @internal param $contributionId
+   *
+   * @return array
    */
-  function addrecurLineItems($recurId, $contributionId, &$input) {
-    $lineSets = $lineItems = array();
+  function addRecurLineItems($recurId, $contribution) {
+    $lineSets = array();
 
-    //Get the first contribution id with recur id
-    if ($recurId) {
-      $contriID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
-      $lineItems = CRM_Price_BAO_LineItem::getLineItems($contriID, 'contribution');
-      if (!empty($lineItems)) {
-        foreach ($lineItems as $key => $value) {
-          $pricesetID = new CRM_Price_DAO_PriceField();
-          $pricesetID->id = $value['price_field_id'];
-          $pricesetID->find(TRUE);
-          $lineSets[$pricesetID->price_set_id][] = $value;
+    $originalContributionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
+    if (!empty($lineItems)) {
+      foreach ($lineItems as $key => $value) {
+        $priceField = new CRM_Price_DAO_PriceField();
+        $priceField->id = $value['price_field_id'];
+        $priceField->find(TRUE);
+        $lineSets[$priceField->price_set_id][] = $value;
+        if ($value['entity_table'] == 'civicrm_membership') {
+          try {
+            civicrm_api3('membership_payment', 'create', array('membership_id' => $value['entity_id'], 'contribution_id' => $contribution->id));
+          }
+          catch (CiviCRM_API3_Exception $e) {
+            // we are catching & ignoring errors as an extra precaution since lost IPNs may be more serious that lost membership_payment data
+            // this fn is unit-tested so risk of changes elsewhere breaking it are otherwise mitigated
+          }
         }
       }
-      if (!empty($input)) {
-        $input['line_item'] = $lineSets;
-      }
-      else {
-        CRM_Price_BAO_LineItem::processPriceSet($contributionId, $lineSets);
-      }
     }
+    else {
+      CRM_Price_BAO_LineItem::processPriceSet($contribution->id, $lineSets, $contribution);
+    }
+    return $lineSets;
   }
 
   // function to copy custom data of the

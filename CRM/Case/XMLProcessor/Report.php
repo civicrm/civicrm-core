@@ -466,7 +466,7 @@ WHERE      a.id = %1
       }
       $assigneeContacts = implode(', ', $assignee_contact_names);
       $activity['fields'][] = array(
-        'label' => ts('Assigned To'),
+        'label' => ts('Assigned to'),
         'value' => $assigneeContacts,
         'type' => 'String',
       );

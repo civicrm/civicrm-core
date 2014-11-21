@@ -76,7 +76,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact SubType'),
+            'title' => ts('Contact Subtype'),
           ),
           'birth_date' =>
           array(
@@ -335,7 +335,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         'fields' =>
         array(
           'assignee_contact_id' =>
-          array('title' => ts('Assigned To'),
+          array('title' => ts('Assigned to'),
             'name' => 'contact_id',
             'default' => TRUE,
           ),

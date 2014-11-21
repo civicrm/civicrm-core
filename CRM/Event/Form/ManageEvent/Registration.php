@@ -249,7 +249,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $this->addElement('checkbox',
       'is_online_registration',
-      ts('Allow Online Registration?'),
+      ts('Allow Online Registration'),
       NULL,
       array(
         'onclick' => "return showHideByValue('is_online_registration',
@@ -361,7 +361,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     extract( ( is_null($configs) ) ? self::getProfileSelectorTypes() : $configs );
     $element = $prefix . "custom_post_id_multiple[$count]";
     $label .= '<br />'.ts('(bottom of page)');
-    $form->addProfileSelector( $element,  $label, $allowCoreTypes, $allowSubTypes, $profileEntities);
+    $form->addProfileSelector( $element,  $label, $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
   }
 
   /**
@@ -380,12 +380,14 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $configs['allowCoreTypes'][] = 'Individual';
     $configs['allowCoreTypes'][] = 'Participant';
     //CRM-15427
-    $participantEventType = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $_GET['id'], 'event_type_id', 'id');
-    $participantRole  = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $_GET['id'], 'default_role_id');
-    $configs['allowSubTypes']['ParticipantEventName'] = array($_GET['id']);
-    $configs['allowSubTypes']['ParticipantEventType'] = array($participantEventType);
-    $configs['allowSubTypes']['ParticipantRole'] = array($participantRole);
-
+    $id = CRM_Utils_Request::retrieve( 'id' , 'Integer' );
+    if ($id) {
+      $participantEventType = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $id, 'event_type_id', 'id');
+      $participantRole  = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'default_role_id');
+      $configs['allowSubTypes']['ParticipantEventName'] = array($id);
+      $configs['allowSubTypes']['ParticipantEventType'] = array($participantEventType);
+      $configs['allowSubTypes']['ParticipantRole'] = array($participantRole);
+    }
     $configs['profileEntities'][] = array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel');
     $configs['profileEntities'][] = array('entity_name' => 'participant_1', 'entity_type' => 'ParticipantModel', 'entity_sub_type' => '*');
 
@@ -929,7 +931,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       if (!empty($params['additional_custom_post_id_multiple'])) {
         $additionalPostMultiple = array();
         foreach ($params['additional_custom_post_id_multiple'] as $key => $value) {
-          if (!$value && !empty($params['custom_post_id'])) {
+          if (is_null($value) && !empty($params['custom_post_id'])) {
             $additionalPostMultiple[$key] = $params['custom_post_id'];
           }
           elseif ($value == 'none') {

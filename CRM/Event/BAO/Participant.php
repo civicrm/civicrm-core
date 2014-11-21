@@ -406,7 +406,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
             {$whereClause}";
 
-      $eventFullText = ts('This event is full!!!');
+      $eventFullText = ts('This event is full.');
       $participants = CRM_Core_DAO::executeQuery($query, $eventParams);
       while ($participants->fetch()) {
         //oops here event is full and we don't want waiting count.
@@ -433,7 +433,7 @@ INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
             {$whereClause}";
 
     $eventMaxSeats = NULL;
-    $eventFullText = ts('This event is full !!!');
+    $eventFullText = ts('This event is full.');
     $participants  = CRM_Core_DAO::executeQuery($query, $eventParams);
     while ($participants->fetch()) {
       if ($participants->event_full_text) {
@@ -2124,5 +2124,29 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       $activityParams['target_contact_id'][] = $targetCid;
     }
     CRM_Activity_BAO_Activity::create($activityParams);
+  }
+
+  /**
+   * Get options for a given field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
+   * @param Array $props : whatever is known about this dao object
+   *
+   * @return Array|bool
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array('condition' => array());
+
+    if ($fieldName == 'status_id' && $context != 'validate') {
+      // Get rid of cart-related option if disabled
+      // FIXME: Why does this option even exist if cart is disabled?
+      if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME, 'enable_cart')) {
+        $params['condition'][] = "name <> 'Pending in cart'";
+      }
+    }
+
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 }

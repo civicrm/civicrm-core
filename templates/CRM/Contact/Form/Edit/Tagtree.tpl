@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
@@ -23,27 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
-class CRM_Upgrade_TwoOne_Controller extends CRM_Upgrade_Controller {
-  /**
-   * @return array
-   */
-  function &getPages() {
-    $pages = array(
-      'CRM_Upgrade_TwoOne_Form_Step1' => NULL,
-      'CRM_Upgrade_TwoOne_Form_Step2' => NULL,
-      'CRM_Upgrade_TwoOne_Form_Step3' => NULL,
-      'CRM_Upgrade_TwoOne_Form_Step4' => NULL,
-    );
-    return $pages;
-  }
-}
-
+*}
+{* This tpl runs recursively to build each level of the tag tree *}
+<ul class="tree-level-{$level}">
+  {foreach from=$tree item="node" key="id"}
+    <li id="tagli_{$id}">
+      <input name="tag[{$id}]" id="tag_{$id}" class="form-checkbox" type="checkbox" value="1" {if $node.is_selectable EQ 0}disabled=""{/if} {if $form.tag.value.$id EQ 1}checked="checked"{/if}/>
+      <span>
+        <label for="tag_{$id}" id="tagLabel_{$id}">{$node.name}</label>
+        {if $node.description}{help id=$id title=$node.name file="CRM/Tag/Form/Tagtree"}{/if}
+      </span>
+      {if $node.children}
+        {* Recurse... *}
+        {include file="CRM/Contact/Form/Edit/Tagtree.tpl" tree=$node.children level=$level+1}
+      {/if}
+    </li>
+  {/foreach}
+</ul>

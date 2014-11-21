@@ -59,7 +59,7 @@ class CRM_Utils_Request {
    *
    * @param string $name name of the variable to be retrieved
    * @param string $type  type of the variable (see CRM_Utils_Type for details)
-   * @param stdClass $store session scope where variable is stored
+   * @param object $store session scope where variable is stored
    * @param bool $abort is this variable required
    * @param mixed $default default value of the variable if not present
    * @param string $method where should we look for the variable

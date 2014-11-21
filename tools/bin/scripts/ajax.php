@@ -91,7 +91,7 @@ function states(&$config) {
       $query = "
 SELECT civicrm_state_province.name name, civicrm_state_province.id id
 FROM civicrm_state_province
-WHERE civicrm_state_province.country_id={$countryId} 
+WHERE civicrm_state_province.country_id={$countryId}
       AND civicrm_state_province.name LIKE LOWER('$stateName%')
 ORDER BY name";
 
@@ -217,7 +217,7 @@ function countries(&$config) {
 SELECT id, name
   FROM civicrm_country
  WHERE {$countryClause}
-   AND {$whereClause} 
+   AND {$whereClause}
 ORDER BY name";
 
     $nullArray = array();

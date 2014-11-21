@@ -43,7 +43,7 @@ class CRM_Event_Task {
   CONST DELETE_EVENTS = 1, PRINT_EVENTS = 2, EXPORT_EVENTS = 3, BATCH_EVENTS = 4, CANCEL_REGISTRATION = 5, EMAIL_CONTACTS = 6,
   // Value for LABEL_CONTACTS is set to 16 in accordance with CRM_Contact_Task::LABEL_CONTACTS
   SAVE_SEARCH = 13, SAVE_SEARCH_UPDATE = 14, PARTICIPANT_STATUS = 15,
-  LABEL_CONTACTS = 16;
+  LABEL_CONTACTS = 16, GROUP_CONTACTS = 20;
 
   /**
    * the task array
@@ -127,11 +127,20 @@ class CRM_Event_Task {
           'class' => 'CRM_Event_Form_Task_Badge',
           'result' => FALSE,
         ),
+        20 => array(
+          'title' => ts('Add Contacts to Group'),
+          'class' => 'CRM_Event_Form_Task_AddToGroup',
+          'result' => FALSE,
+        ),
       );
 
       //CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviEvent')) {
         unset(self::$_tasks[1]);
+      }
+      //CRM-12920 - check for edit permission
+      if( !CRM_Core_Permission::check('edit event participants') ){
+        unset(self::$_tasks[4],self::$_tasks[5],self::$_tasks[15]);
       }
     }
 

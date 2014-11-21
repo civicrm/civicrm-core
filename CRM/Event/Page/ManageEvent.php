@@ -317,14 +317,14 @@ ORDER BY start_date desc
     while ($dao->fetch()) {
       if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
         $manageEvent[$dao->id] = array();
-        $isRepeatingEvent = CRM_Core_BAO_RecurringEntity::getParentFor($dao->id, 'civicrm_event');
+        $isRecurringEvent = CRM_Core_BAO_RecurringEntity::getParentFor($dao->id, 'civicrm_event');
         $manageEvent[$dao->id]['repeat'] = '';
-        if ($isRepeatingEvent) {
-          if ($dao->id == $isRepeatingEvent) {
-            $manageEvent[$dao->id]['repeat'] = 'Repeating Event - (Parent)';
+        if ($isRecurringEvent) {
+          if ($dao->id == $isRecurringEvent) {
+            $manageEvent[$dao->id]['repeat'] = 'Recurring Event - (Parent)';
           }
           else {
-            $manageEvent[$dao->id]['repeat'] = 'Repeating Event - (Child)';
+            $manageEvent[$dao->id]['repeat'] = 'Recurring Event - (Child)';
           }
         }
         CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);

@@ -25,7 +25,7 @@ class CiviSeleniumSettings {
   var $password = 'demo';
 
   var $adminUsername = 'USERNAME';
-  
+
   var $adminPassword = 'PASSWORD';
 
   var $adminApiKey = NULL; // civicrm_contact.api_key for admin

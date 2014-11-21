@@ -84,6 +84,15 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
+   * should the first payment date be configurable when setting up back office recurring payments
+   * In the case of Authorize.net this is an option
+   * @return bool
+   */
+  protected function supportsFutureRecurStartDate() {
+    return TRUE;
+  }
+
+  /**
    * Submit a payment using Advanced Integration Method
    *
    * @param  array $params assoc array of input parameters for this transaction
@@ -757,7 +766,11 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $template->assign('paymentKey', $this->_getParam('paymentKey'));
 
     $template->assign('subscriptionId', $params['subscriptionId']);
-    $template->assign('totalOccurrences', $params['installments']);
+
+    // for open ended subscription totalOccurrences has to be 9999
+    $installments = empty($params['installments']) ? 9999 : $params['installments'];
+    $template->assign('totalOccurrences', $installments);
+
     $template->assign('amount', $params['amount']);
 
     $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');

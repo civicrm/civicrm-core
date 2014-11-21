@@ -342,7 +342,7 @@ SELECT data_type
         case 'Float':
           //     case 'Money':
           if (!CRM_Utils_Rule::numeric($fields["value"])) {
-            $errors['value'] = ts('Please enter a valid number value.');
+            $errors['value'] = ts('Please enter a valid number.');
           }
           break;
 

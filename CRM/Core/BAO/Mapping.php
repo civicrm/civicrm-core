@@ -398,8 +398,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       if (array_key_exists('note', $fields['Contact'])) {
         $noteTitle = $fields['Contact']['note']['title'];
         $fields['Contact']['note']['title'] = $noteTitle . ': ' . ts('Body and Subject');
-        $fields['Contact']['note_body']    = array( 'title' => $noteTitle . ': ' . ts('Body only'),    'name' => 'note_body' );
-        $fields['Contact']['note_subject'] = array( 'title' => $noteTitle . ': ' . ts('Subject only'), 'name' => 'note_subject' );
+        $fields['Contact']['note_body']    = array( 'title' => $noteTitle . ': ' . ts('Body Only'),    'name' => 'note_body' );
+        $fields['Contact']['note_subject'] = array( 'title' => $noteTitle . ': ' . ts('Subject Only'), 'name' => 'note_subject' );
       }
     }
 
@@ -461,6 +461,9 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       if (CRM_Core_Permission::access('CiviGrant')) {
         $fields['Grant'] = CRM_Grant_BAO_Grant::exportableFields();
         unset($fields['Grant']['grant_contact_id']);
+        if ($mappingType == 'Search Builder') {
+          unset($fields['Grant']['grant_type_id']);
+        }
         $compArray['Grant'] = ts('Grant');
       }
     }
