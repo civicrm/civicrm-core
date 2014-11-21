@@ -37,8 +37,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params = array();
   protected $_entity = 'Mailing';
-  protected $_groupIDs; // array(string $pseudonym => int $id)
-  protected $_contactIDs; // array(string $pseudonym => int $id)
+  protected $_contactID;
 
   /**
    * @return array
@@ -55,17 +54,15 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
-    $this->_contactIDs = array();
-    $this->_contactIDs[] = $this->individualCreate();
+    $this->_contactID = $this->individualCreate();
     $this->_groupID = $this->groupCreate();
-    $this->_groupIDs = array();
     $this->_email = 'test@test.test';
     $this->_params = array(
       'subject' => 'Hello {contact.display_name}',
       'body_text' => "This is {contact.display_name}",
       'body_html' => "<p>This is {contact.display_name}</p>",
       'name' => 'mailing name',
-      'created_id' => $this->_contactIDs[0],
+      'created_id' => $this->_contactID,
     );
   }
 
@@ -120,17 +117,17 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   public function testMailerPreviewRecipients() {
     // BEGIN SAMPLE DATA
-    $this->groupIDs['inc'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
-    $this->groupIDs['exc'] = $this->groupCreate(array('name' => 'Example exclude group', 'title' => 'Example exclude group'));
-    $this->contactIDs['includeme'] = $this->individualCreate(array('email' => 'include.me@example.org', 'first_name' => 'Includer', 'last_name' => 'Person'));
-    $this->contactIDs['excludeme'] = $this->individualCreate(array('email' => 'exclude.me@example.org', 'last_name' => 'Excluder', 'last_name' => 'Excluder'));
-    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['includeme']));
-    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['excludeme']));
-    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['exc'], 'contact_id' => $this->contactIDs['excludeme']));
+    $groupIDs['inc'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
+    $groupIDs['exc'] = $this->groupCreate(array('name' => 'Example exclude group', 'title' => 'Example exclude group'));
+    $contactIDs['includeme'] = $this->individualCreate(array('email' => 'include.me@example.org', 'first_name' => 'Includer', 'last_name' => 'Person'));
+    $contactIDs['excludeme'] = $this->individualCreate(array('email' => 'exclude.me@example.org', 'last_name' => 'Excluder', 'last_name' => 'Excluder'));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupIDs['inc'], 'contact_id' => $contactIDs['includeme']));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupIDs['inc'], 'contact_id' => $contactIDs['excludeme']));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupIDs['exc'], 'contact_id' => $contactIDs['excludeme']));
 
     $params = $this->_params;
-    $params['groups']['include'] = array($this->groupIDs['inc']);
-    $params['groups']['exclude'] = array($this->groupIDs['exc']);
+    $params['groups']['include'] = array($groupIDs['inc']);
+    $params['groups']['exclude'] = array($groupIDs['exc']);
     $params['mailings']['include'] = array();
     $params['mailings']['exclude'] = array();
     $params['options']['force_rollback'] = 1;
@@ -157,7 +154,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
     $preview = $create['values'][$create['id']]['api.MailingRecipients.get'];
     $previewIds = array_values(CRM_Utils_Array::collect('contact_id', $preview['values']));
-    $this->assertEquals(array((string)$this->contactIDs['includeme']), $previewIds);
+    $this->assertEquals(array((string)$contactIDs['includeme']), $previewIds);
     $previewEmails = array_values(CRM_Utils_Array::collect('api.email.getvalue', $preview['values']));
     $this->assertEquals(array('include.me@example.org'), $previewEmails);
     $previewNames = array_values(CRM_Utils_Array::collect('api.contact.getvalue', $preview['values']));
@@ -175,29 +172,28 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
     $this->assertEquals(1, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
     $this->assertEquals($contactID, $deliveredInfo['values'][$deliveredInfo['id']]['contact_id'], "in line " . __LINE__); //verify the contact_id of the recipient
-    $this->deleteMailing($mail['id']);
   }
 
   public function testMailerSendTest_group() {
     // BEGIN SAMPLE DATA
-    $this->groupIDs['inc'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
-    $this->contactIDs['alice'] = $this->individualCreate(array('email' => 'alice@example.org', 'first_name' => 'Alice', 'last_name' => 'Person'));
-    $this->contactIDs['bob'] = $this->individualCreate(array('email' => 'bob@example.org', 'first_name' => 'Bob', 'last_name' => 'Person'));
-    $this->contactIDs['carol'] = $this->individualCreate(array('email' => 'carol@example.org', 'first_name' => 'Carol', 'last_name' => 'Person'));
-    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['alice']));
-    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['bob']));
-    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['carol']));
+    $groupIDs['inc'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
+    $contactIDs['alice'] = $this->individualCreate(array('email' => 'alice@example.org', 'first_name' => 'Alice', 'last_name' => 'Person'));
+    $contactIDs['bob'] = $this->individualCreate(array('email' => 'bob@example.org', 'first_name' => 'Bob', 'last_name' => 'Person'));
+    $contactIDs['carol'] = $this->individualCreate(array('email' => 'carol@example.org', 'first_name' => 'Carol', 'last_name' => 'Person'));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupIDs['inc'], 'contact_id' => $contactIDs['alice']));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupIDs['inc'], 'contact_id' => $contactIDs['bob']));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupIDs['inc'], 'contact_id' => $contactIDs['carol']));
     // END SAMPLE DATA
 
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
     $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', array(
       'mailing_id' => $mail['id'],
       'test_email' => NULL,
-      'test_group' => $this->groupIDs['inc'],
+      'test_group' => $groupIDs['inc'],
     ));
     $this->assertEquals(3, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
     $deliveredContacts = array_values(CRM_Utils_Array::collect('contact_id', $deliveredInfo['values']));
-    $this->assertEquals(array($this->contactIDs['alice'], $this->contactIDs['bob'], $this->contactIDs['carol']), $deliveredContacts);
+    $this->assertEquals(array($contactIDs['alice'], $contactIDs['bob'], $contactIDs['carol']), $deliveredContacts);
     $deliveredEmails = array_values(CRM_Utils_Array::collect('email', $deliveredInfo['values']));
     $this->assertEquals(array('alice@example.org', 'bob@example.org', 'carol@example.org'), $deliveredEmails);
   }
@@ -249,7 +245,6 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
       'Unsubscribers' => 20
     );
     $this->checkArrayEquals($expectedResult, $result['values'][$mail['id']]);
-    $this->deleteMailing($mail['id']);
   }
   /**
    * Test civicrm_mailing_delete
