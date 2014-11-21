@@ -60,8 +60,9 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_groupIDs = array();
     $this->_email = 'test@test.test';
     $this->_params = array(
-      'subject' => 'maild',
+      'subject' => 'Hello {contact.display_name}',
       'body_text' => "This is {contact.display_name}",
+      'body_html' => "<p>This is {contact.display_name}</p>",
       'name' => 'mailing name',
       'created_id' => $this->_contactIDs[0],
     );
@@ -91,25 +92,44 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   public function testMailerPreview() {
+    // BEGIN SAMPLE DATA
     $contactID =  $this->individualCreate();
     $displayName = $this->callAPISuccess('contact', 'get', array('id' => $contactID));
     $displayName = $displayName['values'][$contactID]['display_name'];
+    $this->assertTrue(!empty($displayName));
 
-    $result = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $params = $this->_params;
+    $params['api.Mailing.preview'] = array(
+      'id' => '$value.id',
+      'contact_id' => $contactID,
+    );
+    $params['options']['force_rollback'] = 1;
+    // END SAMPLE DATA
 
-    $params = array('id' => $result['id'], 'contact_id' => $contactID);
-    $result = $this->callAPISuccess('mailing', 'preview', $params);
-    $text = $result['values']['text'];
-    $this->assertEquals("This is $displayName", $text); // verify the text returned is correct, with replaced token
-    $this->deleteMailing($result['id']);
+    $maxIDs =  array(
+      'mailing' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing'),
+      'job' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_job'),
+      'group' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_group'),
+      'recip' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_recipients'),
+    );
+    $result = $this->callAPISuccess('mailing', 'create', $params);
+    $this->assertDBQuery($maxIDs['mailing'], 'SELECT MAX(id) FROM civicrm_mailing'); // 'Preview should not create any mailing records'
+    $this->assertDBQuery($maxIDs['job'], 'SELECT MAX(id) FROM civicrm_mailing_job'); // 'Preview should not create any mailing_job record'
+    $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group'); // 'Preview should not create any mailing_group records'
+    $this->assertDBQuery($maxIDs['recip'], 'SELECT MAX(id) FROM civicrm_mailing_recipients'); // 'Preview should not create any mailing_recipient records'
+
+    $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
+    $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
+    $this->assertEquals("This is $displayName", $previewResult['values']['body_text']);
+    $this->assertContains("<p>This is $displayName</p>", $previewResult['values']['body_html']);
   }
 
   public function testMailerPreviewRecipients() {
     // BEGIN SAMPLE DATA
     $this->groupIDs['inc'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
     $this->groupIDs['exc'] = $this->groupCreate(array('name' => 'Example exclude group', 'title' => 'Example exclude group'));
-    $this->contactIDs['includeme'] = $this->individualCreate(array('include.me@example.org'));
-    $this->contactIDs['excludeme'] = $this->individualCreate(array('exclude.me@example.org'));
+    $this->contactIDs['includeme'] = $this->individualCreate(array('email' => 'include.me@example.org', 'first_name' => 'Includer', 'last_name' => 'Person'));
+    $this->contactIDs['excludeme'] = $this->individualCreate(array('email' => 'exclude.me@example.org', 'last_name' => 'Excluder', 'last_name' => 'Excluder'));
     $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['includeme']));
     $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['inc'], 'contact_id' => $this->contactIDs['excludeme']));
     $this->callAPISuccess('GroupContact', 'create', array('group_id' => $this->groupIDs['exc'], 'contact_id' => $this->contactIDs['excludeme']));
@@ -119,6 +139,16 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $params['groups']['exclude'] = array($this->groupIDs['exc']);
     $params['mailings']['include'] = array();
     $params['mailings']['exclude'] = array();
+    $params['options']['force_rollback'] = 1;
+    $params['api.MailingRecipients.get'] = array(
+      'mailing_id' => '$value.id',
+      'api.contact.getvalue' => array(
+        'return' => 'display_name',
+      ),
+      'api.email.getvalue' => array(
+        'return' => 'email',
+      ),
+    );
     // END SAMPLE DATA
 
     $maxIDs =  array(
@@ -126,13 +156,18 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'job' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_job'),
       'group' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_group'),
     );
-    $preview = $this->callAPIAndDocument('Mailing', 'preview_recipients', $params, __FUNCTION__, __FILE__);
+    $create = $this->callAPIAndDocument('Mailing', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertDBQuery($maxIDs['mailing'], 'SELECT MAX(id) FROM civicrm_mailing'); // 'Preview should not create any mailing records'
     $this->assertDBQuery($maxIDs['job'], 'SELECT MAX(id) FROM civicrm_mailing_job'); // 'Preview should not create any mailing_job record'
     $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group'); // 'Preview should not create any mailing_group records'
 
+    $preview = $create['values'][$create['id']]['api.MailingRecipients.get'];
     $previewIds = array_values(CRM_Utils_Array::collect('contact_id', $preview['values']));
     $this->assertEquals(array((string)$this->contactIDs['includeme']), $previewIds);
+    $previewEmails = array_values(CRM_Utils_Array::collect('api.email.getvalue', $preview['values']));
+    $this->assertEquals(array('include.me@example.org'), $previewEmails);
+    $previewNames = array_values(CRM_Utils_Array::collect('api.contact.getvalue', $preview['values']));
+    $this->assertTrue((bool)preg_match('/Includer Person/', $previewNames[0]), "Name 'Includer Person' should appear in '" . $previewNames[0] . '"');
   }
 
   public function testMailerSendTestMail() {
