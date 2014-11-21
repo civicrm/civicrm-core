@@ -1548,6 +1548,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param int     $entityId            entity id (contribution, membership...)
    * @param boolean $inline              consider inline custom groups only
    * @param boolean $checkPermission     if false, do not include permissioning clause
+   * @param boolean $includeViewOnly     if true, fields marked 'View Only' are included. Required for APIv3.
    *
    * @return array $customFormatted formatted custom field array
    * @static
@@ -1556,7 +1557,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $customFieldExtend, $customValueId = NULL,
     $entityId = NULL,
     $inline = FALSE,
-    $checkPermission = TRUE
+    $checkPermission = TRUE,
+    $includeViewOnly = FALSE
   ) {
     //get the custom fields for the entity
     //subtype and basic type
@@ -1589,7 +1591,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     // return if field is a 'code' field
-    if (CRM_Utils_Array::value('is_view', $customFields[$customFieldId])) {
+    if (!$includeViewOnly && !empty($customFields[$customFieldId]['is_view'])) {
       return;
     }
 
