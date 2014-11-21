@@ -6,7 +6,7 @@
   var crmMailing2 = angular.module('crmMailing2');
 
   crmMailing2.factory('crmMailingMgr', function($q, crmApi) {
-    var pickDefaultMailComponent = function(type) {
+    var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
         component_type:type,
         is_default: "1"
@@ -17,11 +17,11 @@
     return {
       // @param scalar idExpr a number or the literal string 'new'
       // @return Promise|Object Mailing (per APIv3)
-      getOrCreate: function (idExpr) {
+      getOrCreate: function getOrCreate(idExpr) {
         return (idExpr == 'new') ? this.create() : this.get(idExpr);
       },
       // @return Promise Mailing (per APIv3)
-      get: function (id) {
+      get: function get(id) {
         return crmApi('Mailing', 'getsingle', {id: id}).then(function(mailing){
           return crmApi('MailingGroup', 'get', {mailing_id: id}).then(function(groupResult){
             mailing.groups = {include: [], exclude: []};
@@ -35,7 +35,7 @@
         });
       },
       // @return Object Mailing (per APIv3)
-      create: function () {
+      create: function create() {
         return {
           name: "revert this", // fixme
           campaign_id: null,
@@ -73,7 +73,6 @@
           }
         });
         return crmApi('Mailing', 'create', params).then(function(result){
-          console.log('preview', params, result);
           return result.values[result.id]['api.Mailing.preview'].values;
         });
       },
@@ -81,7 +80,7 @@
       // @param mailing Object (per APIv3)
       // @param int previewLimit
       // @return Promise for a list of recipients (mailing_id, contact_id, api.contact.getvalue, api.email.getvalue)
-      previewRecipients: function(mailing, previewLimit) {
+      previewRecipients: function previewRecipients(mailing, previewLimit) {
         // To get list of recipients, we tentatively save the mailing and
         // get the resulting recipients -- then rollback any changes.
         var params = _.extend({}, mailing, {
