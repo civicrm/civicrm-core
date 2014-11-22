@@ -164,7 +164,7 @@
             modal: true,
             title: ts('Subject: %1', {
               1: content.subject
-            }),
+            })
           };
           dialogService.open('previewDialog', template, content, options);
         });
