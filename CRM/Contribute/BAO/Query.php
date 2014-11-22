@@ -95,6 +95,7 @@ class CRM_Contribute_BAO_Query {
       $query->_select['contribution_note'] = "civicrm_note.note as contribution_note";
       $query->_element['contribution_note'] = 1;
       $query->_tables['contribution_note'] = 1;
+      $query->_tables['civicrm_contribution'] = 1;
     }
 
     if (CRM_Utils_Array::value('contribution_batch', $query->_returnProperties)) {
