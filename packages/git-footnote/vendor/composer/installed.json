@@ -1,0 +1,14 @@
+[
+    {
+        "name": "totten/jira-api-restclient",
+        "version": "0.1",
+        "version_normalized": "0.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "git://github.com/totten/jira-api-restclient.git",
+            "reference": "origin/anonymous"
+        },
+        "type": "library",
+        "installation-source": "source"
+    }
+]

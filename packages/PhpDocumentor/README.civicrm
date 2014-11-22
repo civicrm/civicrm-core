@@ -1,0 +1,20 @@
+
+	     HACKS TO THE DISTRIBUTED PhpDocumentor 1.4.2
+
+	     $Id: README.civicrm 464 2011-10-13 23:32:52Z eileen $
+
+The {@schema file} tag has been added to parse and format a schema
+file in xml/schema.  Example: {@schema Contact/Contact.xml} will parse
+xml/schema/Contact/Contact.xml and insert the formated result at that
+point.
+
+Changes to Io.inc force reading of user/default.ini as the default
+configuration.
+
+Changes to the earthli template add some missing DocBook
+functionality.
+
+'phpunit.php' has been renamed 'phpunit' and moved to tools/scripts/
+
+The @getfields tag has been added. This gets API fields
+

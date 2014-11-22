@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// usage example: git-footnote CRM http://issues.civicrm.org/jira
+list ($program, $jiraPrefix, $jiraUrl) = $argv;
+
+$message = new \CRM\GitFootnote\CommitMessage(file_get_contents('php://stdin'));
+
+$filter = new \CRM\GitFootnote\CommentFilter();
+$filter->filter($message);
+
+$jiraApi = new Jira_Api(
+  $jiraUrl,
+  new \Jira_Api_Authentication_Anonymous()
+);
+$filter = new \CRM\GitFootnote\JiraFilter("/^{$jiraPrefix}-[0-9]+$/", $jiraUrl, $jiraApi);
+$filter->filter($message);
+
+print $message;

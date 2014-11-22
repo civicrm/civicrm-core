@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<RDF:RDF xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Description RDF:about="urn:root"
+                   NC:en-US_defaultHandlersVersion="3" />
+  <RDF:Description RDF:about="urn:mimetype:application/vnd.ms-excel"
+                   NC:value="application/vnd.ms-excel"
+                   NC:editable="true"
+                   NC:description="CSV document"
+                   NC:alwaysAsk="false"
+                   NC:saveToDisk="true">
+    <NC:fileExtensions>csv</NC:fileExtensions>
+    <NC:fileExtensions>xls</NC:fileExtensions>
+    <NC:fileExtensions>xlb</NC:fileExtensions>
+    <NC:fileExtensions>xlt</NC:fileExtensions>
+    <NC:handlerProp RDF:resource="urn:mimetype:handler:application/vnd.ms-excel"/>
+  </RDF:Description>
+  <RDF:Description RDF:about="urn:mimetype:handler:text/csv"
+                   NC:saveToDisk="true"
+                   NC:alwaysAsk="false" />
+  <RDF:Description RDF:about="urn:mimetype:text/csv"
+                   NC:fileExtensions="csv"
+                   NC:description="CSV document"
+                   NC:value="text/csv"
+                   NC:editable="true"
+                   NC:alwaysAsk="false"
+                   NC:saveToDisk="true">
+      <NC:handlerProp RDF:resource="urn:mimetype:handler:text/csv"/>
+  </RDF:Description>
+</RDF:RDF>

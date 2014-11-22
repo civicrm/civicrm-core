@@ -1,0 +1,23 @@
+use strict;
+
+# CiviCRM configs
+$civicrm_soap_proxy =
+    'http://localhost/drupal/modules/civicrm/extern/soap.php';
+
+$civicrm_soap_login = 'my_soap_user';
+$civicrm_soap_pass  = 'my_soap_password';
+
+# If you configure a civicrm_sql_dsn, the proxy, login and pass information is
+# retrieved from the database, and the $civicrm_soap_proxy, $civicrm_soap_login
+# and $civicrm_soap_pass are ignored.  You must configure civicrm_sql_dsn if
+# you want to support multiple CiviMail installations on a shared server.
+#
+# @civicrm_sql_dsn =
+#   ( ['DBI:mysql:database=mail;host=127.0.0.1;port=3306', 'user1', 'passwd1'],
+#     ['DBI:mysql:database=mail;host=host2', 'username2', 'password2'] );
+
+# unset antivirus scanners
+@av_scanners = ();
+@av_scanners_backup = ();
+
+1;  # insure a defined return

@@ -1,0 +1,39 @@
+{
+    "name": "totten/git-footnote",
+    "description": "Git hook for generating footnotes",
+    "homepage": "https://github.com/totten/git-footnote",
+    "license": "LGPL-3.0+",
+    "repositories": {
+        "jira-api-restclient-unofficial": {
+            "type": "package",
+            "package": {
+                "name": "totten/jira-api-restclient",
+                "version": "0.1",
+                "source": {
+                    "url": "git://github.com/totten/jira-api-restclient.git",
+                    "type": "git",
+                    "reference": "origin/anonymous"
+                }
+            }
+        }
+    },
+    "require": {
+        "php": ">=5.3",
+        "totten/jira-api-restclient": "0.1"
+    },
+    "autoload": {
+        "psr-0": {
+            "CRM\\GitFootnote": "src/",
+            "Jira": "vendor/totten/jira-api-restclient"
+         }
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "authors": [
+        {
+            "name": "Tim Otten",
+            "email": "to-git@think.hm"
+        }
+    ]
+}
