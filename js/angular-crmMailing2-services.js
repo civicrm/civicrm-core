@@ -73,6 +73,7 @@
           }
         });
         return crmApi('Mailing', 'create', params).then(function(result){
+          // changes rolled back, so we don't care about updating mailing
           return result.values[result.id]['api.Mailing.preview'].values;
         });
       },
@@ -93,7 +94,27 @@
           }
         });
         return crmApi('Mailing', 'create', params).then(function(recipResult){
+          // changes rolled back, so we don't care about updating mailing
           return recipResult.values[recipResult.id]['api.MailingRecipients.get'].values;
+        });
+      },
+
+      // @param mailing Object (per APIv3)
+      // @param testEmail string
+      // @param testGroup int (id#)
+      // @return Promise for a list of delivery reports
+      sendTest: function(mailing, testEmail, testGroup) {
+        var params = _.extend({}, mailing, {
+          // options:  {force_rollback: 1},
+          'api.Mailing.send_test': {
+            mailing_id: '$value.id',
+            test_email: testEmail,
+            test_group: testGroup
+          }
+        });
+        return crmApi('Mailing', 'create', params).then(function(result){
+          if (result.id && !mailing.id) mailing.id = result.id;  // no rollback, so update mailing.id
+          return result.values[result.id]['api.Mailing.send_test'].values;
         });
       }
     };
