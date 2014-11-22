@@ -141,7 +141,7 @@
   //   - mailing: object
   crmMailing2.controller('PreviewMailingCtrl', function ($scope, dialogService, crmMailingMgr) {
     $scope.ts = CRM.ts('CiviMail');
-    $scope.testContact = {email: ''};
+    $scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
     $scope.testGroup = {gid: null};
 
     $scope.previewHtml = function previewHtml() {
