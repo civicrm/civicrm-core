@@ -156,8 +156,7 @@
     // Open a dialog with a preview of the current mailing
     // @param template string URL of the template to use in the preview dialog
     $scope.previewDialog = function previewDialog(template) {
-      CRM.status(ts('Previewing'));
-      crmMailingMgr
+      var p = crmMailingMgr
         .preview($scope.mailing)
         .then(function(content){
           var options = {
@@ -169,6 +168,7 @@
           };
           dialogService.open('previewDialog', template, content, options);
         });
+        CRM.status({start: ts('Previewing'), success: ''}, CRM.toJqPromise(p));
     };
     $scope.sendTestToContact = function sendTestToContact() {
       $scope.sendTest($scope.mailing, $scope.testContact.email, null);
