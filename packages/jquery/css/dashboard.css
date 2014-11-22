@@ -1,0 +1,207 @@
+/**
+* @file
+*    CSS for the jQuery.dashboard() plugin.
+*
+* Released under the GNU General Public License.  See LICENSE.txt.
+*/
+
+#crm-container .column {
+  float: left;
+  margin: 0;
+  /* padding-bottom and min-height make sure that there is always a sizable drop zone. */
+  min-height: 400px;
+  height: 400px;
+  height: auto !important;
+  padding: 0 0 250px;
+  list-style-type: none;
+}
+
+#crm-container .column-0 {
+  width: 40%;
+}
+
+#crm-container .column-1 {
+  width: 60%;
+}
+
+/* The placeholder that indicates where a dragged widget will land if dropped now. */
+#crm-container .placeholder {
+  margin: 5px;
+  border: 3px dashed pink;
+}
+
+/* Spacing between widgets. */
+#crm-container li.widget, #crm-container li.empty-placeholder { margin: 6px 3px; }
+#crm-container li.widget {
+  padding: 0px;
+}
+
+/* Spacing inside widgets. */
+#crm-container .widget-wrapper {
+  padding: 0px;
+  overflow-x:auto;
+  margin-right: .25em
+}
+
+/* wodget header / title */
+#crm-container .widget-header {
+  background:#CDE8FE none repeat scroll 0 0;
+  color:#000;
+  cursor:move;
+  display:inline;
+  font-size:1.2em;
+  margin:0;
+}
+
+/* widget content / body*/
+#crm-container .widget-content {
+  background-color: #ffffff;
+  padding:0.5em;
+}
+
+/* Standards-browsers do this anyway because all inner block elements are floated.  IE doesn't because it's crap. */
+#crm-container .widget-controls {
+  background-color:#CDE8FE;
+  display:block;
+  padding:5px 0px;
+}
+
+#crm-container .widget-icon, #crm-container .full-screen-close-icon img {
+  display: block;
+  float: right;
+  margin-left: 2px;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+#full-screen-header {
+  display: block;
+  padding: .2em .4em;
+  background: #F0F0E8;
+  /* Although this is an <a> link, it doesn't have an href="" attribute. */
+  cursor: pointer;
+}
+
+/* Make the throbber in-yer-face. */
+#crm-container .throbber {
+  text-align: right;
+  background:url("images/throbber.gif") no-repeat scroll 0 0 transparent;
+  height:20px;
+  width:20px;
+}
+
+#crm-container p.loadtext {
+  margin:1.6em 0 0 26px;
+}
+
+#crm-container .minimize-icon {
+  background-position:-63px -17px;
+  background-image:url('../jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png');
+  height:16px;
+  width:16px;
+  padding-right:2px;
+  float: left;
+}
+
+#crm-container .maximize-icon {
+  background-position:-31px -18px;
+  background-image:url('../jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png');
+  height:16px;
+  width:16px;
+  padding-right:2px;
+  float: left;
+}
+
+#crm-container .close-icon {
+  background-position:-81px -129px;
+  background-image:url('../jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png');
+  height:16px;
+  width:16px;
+  padding-right:2px;
+}
+
+#crm-container .fullscreen-icon {
+  background-position:-159px -113px;
+  background-image:url('../jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png');
+  height:16px;
+  width:16px;
+}
+
+/* CSS for Dashlets */
+
+#crm-container #available-dashlets {
+  width: 98%;
+  border: 2px dashed pink;
+  background-color: #999999;
+  min-height:40px;
+}
+
+#crm-container .dash-column {
+  border: 2px solid #696969;
+  min-height: 100px;
+  background-color: #EEEEEE
+}
+
+#crm-container .dashlets-header {
+  font-weight: bold;
+}
+
+#crm-container #dashlets-header-col-0 {
+  float: left;
+  width: 40%;
+}
+
+#crm-container #dashlets-header-col-1 {
+  margin-left: 42%;
+  width: 56%;
+}
+
+#crm-container #existing-dashlets-col-0 {
+  float: left;
+  width: 40%;
+}
+
+#crm-container #existing-dashlets-col-1 {
+  margin-left: 42%;
+  width: 56%;
+}
+
+#crm-container .portlet {
+  margin: .5em;
+  width: 75%;
+  display: inline-block;
+}
+
+#crm-container .portlet-header {
+  margin: 0.3em;
+  padding: 0.5em;
+  cursor: pointer;
+}
+
+#crm-container #available-dashlets .portlet {
+  width: auto;
+}
+
+#crm-container .portlet-header .ui-icon {
+  float: right;
+}
+
+#crm-container .portlet-content {
+  padding: 0.4em;
+}
+
+#crm-container .ui-sortable-placeholder {
+  border: 1px dotted black;
+  visibility: visible !important;
+  height: 50px !important;
+}
+
+#crm-container .ui-sortable-placeholder * {
+  visibility: hidden;
+}
+
+#crm-container .delete-dashlet {
+  display: block;
+  float: right;
+  cursor: pointer;
+}
