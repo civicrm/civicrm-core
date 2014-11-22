@@ -1869,7 +1869,10 @@ EOS;
    * @param $alias String alternative field name ('as') @todo- not actually used
    * @param bool $returnSanitisedArray return a sanitised array instead of a clause
    *  this is primarily so we can add filters @ the api level to the Query object based fields
-   *  @todo a better solutution would be for the query object to apply these filters based on the
+   *
+   * @throws Exception
+   * @internal param string $fieldname name of fields
+   * @todo a better solution would be for the query object to apply these filters based on the
    *  api supported format (but we don't want to risk breakage in alpha stage & query class is scary
    *  @todo @time of writing only IN & NOT IN are supported for the array style syntax (as test is
    *  required to extend further & it may be the comments per above should be implemented. It may be
@@ -1893,7 +1896,7 @@ EOS;
               return (sprintf('%s %s', $fieldName, $operator));
             }
             else{
-              return NULL;  // not yet implemented (tests required to implement)
+              return (sprintf('%s %s ', $fieldName, $operator));
             }
             break;
 
@@ -1939,6 +1942,15 @@ EOS;
         }
       }
     }
+  }
+
+  /**
+   * @see http://issues.civicrm.org/jira/browse/CRM-9150
+   * support for other syntaxes is discussed in ticket but being put off for now
+   * @return array
+   */
+  public static function acceptedSQLOperators() {
+    return array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'IS NOT NULL', 'IS NULL');
   }
 
   /**

@@ -154,7 +154,8 @@ class CRM_Utils_System {
    * @param boolean $print   are we displaying to the screen or bypassing theming?
    * @param boolean $maintenance  for maintenance mode
    *
-   * @return void           prints content on stdout
+   * @return string
+   *
    * @access public
    * @static
    */
