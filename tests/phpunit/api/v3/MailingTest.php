@@ -162,16 +162,19 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   public function testMailerSendTest_email() {
-    $contactID =  $this->individualCreate();
-    $result = $this->callAPISuccess('contact', 'get', array('id' => $contactID));
-    $email = $result['values'][$contactID]['email'];
+    $contactIDs['alice'] = $this->individualCreate(array('email' => 'alice@example.org', 'first_name' => 'Alice', 'last_name' => 'Person'));
 
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
 
-    $params = array('mailing_id' => $mail['id'], 'test_email' => $email, 'test_group' => NULL);
+    $params = array('mailing_id' => $mail['id'], 'test_email' => 'alice@example.org', 'test_group' => NULL);
     $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
     $this->assertEquals(1, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
-    $this->assertEquals($contactID, $deliveredInfo['values'][$deliveredInfo['id']]['contact_id'], "in line " . __LINE__); //verify the contact_id of the recipient
+
+    $deliveredContacts = array_values(CRM_Utils_Array::collect('contact_id', $deliveredInfo['values']));
+    $this->assertEquals(array($contactIDs['alice']), $deliveredContacts);
+
+    $deliveredEmails = array_values(CRM_Utils_Array::collect('email', $deliveredInfo['values']));
+    $this->assertEquals(array('alice@example.org'), $deliveredEmails);
   }
 
   public function testMailerSendTest_group() {
@@ -192,8 +195,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'test_group' => $groupIDs['inc'],
     ));
     $this->assertEquals(3, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
+
     $deliveredContacts = array_values(CRM_Utils_Array::collect('contact_id', $deliveredInfo['values']));
     $this->assertEquals(array($contactIDs['alice'], $contactIDs['bob'], $contactIDs['carol']), $deliveredContacts);
+
     $deliveredEmails = array_values(CRM_Utils_Array::collect('email', $deliveredInfo['values']));
     $this->assertEquals(array('alice@example.org', 'bob@example.org', 'carol@example.org'), $deliveredEmails);
   }
