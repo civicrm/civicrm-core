@@ -171,10 +171,22 @@
         });
     };
     $scope.sendTestToContact = function sendTestToContact() {
-      CRM.alert('Send test to contact, ' + $scope.testContact.email);
+      $scope.sendTest($scope.mailing, $scope.testContact.email, null);
     };
     $scope.sendTestToGroup = function sendTestToGroup() {
-      CRM.alert('Send test to group, ' + $scope.testGroup.gid);
+      $scope.sendTest($scope.mailing, null, $scope.testGroup.gid);
+    };
+    $scope.sendTest = function sendTest(mailing, testEmail, testGroup) {
+      var promise = crmMailingMgr.sendTest(mailing, testEmail, testGroup).then(function(deliveryInfos){
+        var count = Object.keys(deliveryInfos).length;
+        if (count === 0) {
+          CRM.alert(ts('Could not identify any recipients. Perhaps the group is empty?'));
+        }
+      });
+      CRM.status({
+        start: ts('Sending...'),
+        success: ts('Sent')
+      }, CRM.toJqPromise(promise));
     };
   });
 
