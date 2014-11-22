@@ -118,5 +118,55 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->assertEquals('', $result['values'][$thirdCustomField]['1']);
     $this->assertEquals('value 4', $result['values'][$thirdCustomField]['2']);
   }
-}
+  
+  public function testMultipleCustomValues() {
+    $params = array(
+      'first_name' => 'abc3',
+      'last_name' => 'xyz3',
+      'contact_type' => 'Individual',
+      'email' => 'man3@yahoo.com',
+      'custom_' . $this->ids['single']['custom_field_id'] => "value 1",
+      'custom_' . $this->ids['multi']['custom_field_id'][0] . '-1' => "multi value 1",
+      'custom_' . $this->ids['multi']['custom_field_id'][0] . '-2' => "multi value 2",
+      'custom_' . $this->ids['multi']['custom_field_id'][1] => "second multi value 1",
+    );
 
+    $result = $this->callAPISuccess('Contact', 'create', $params);
+    $contact_id = $result['id'];
+    $firstCustomField = $this->ids['multi']['custom_field_id'][1];
+    $secondCustomField = $this->ids['single']['custom_field_id'];
+    $thirdCustomField = $this->ids['multi']['custom_field_id'][0];
+    
+    $createParams = array(
+      'contact_type' => 'Individual',
+      'id' => $contact_id,
+       'custom_' . $firstCustomField . '-1' => "second multi value 2",
+       'custom_' . $firstCustomField . '-2' => "second multi value 3",
+    );
+    $result = $this->callAPISuccess('Contact', 'create', $createParams);
+
+    $params = array(
+      'id' => $result['id'],
+      'entity_id' => $result['id'],
+    );
+
+    $result = $this->callAPISuccess('CustomValue', 'Get', $params);
+    // delete the contact
+    $this->callAPISuccess('contact', 'delete', array('id' => $contact_id));
+    
+    $this->assertEquals($contact_id, $result['values'][$secondCustomField]['entity_id']);
+    $this->assertEquals('value 1', $result['values'][$secondCustomField]['latest']);
+    $this->assertEquals('value 1', $result['values'][$secondCustomField][0]);
+
+    $this->assertEquals($contact_id, $result['values'][$thirdCustomField]['entity_id']);
+    $this->assertEquals('multi value 1', $result['values'][$thirdCustomField][1]);
+    $this->assertEquals('multi value 2', $result['values'][$thirdCustomField][2]);
+    
+    $this->assertEquals($contact_id, $result['values'][$firstCustomField]['entity_id']);
+    $this->assertEquals('second multi value 1', $result['values'][$firstCustomField][1]);
+    $this->assertEquals('', $result['values'][$firstCustomField][2]);
+    $this->assertEquals('second multi value 2', $result['values'][$firstCustomField][3]);
+    $this->assertEquals('second multi value 3', $result['values'][$firstCustomField][4]);
+    $this->assertEquals('second multi value 3', $result['values'][$firstCustomField]['latest']);
+  }
+}

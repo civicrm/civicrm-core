@@ -921,8 +921,9 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
       if ($checkCheckBoxField && !empty($fields['custom_' . $customFieldID]) && $fields['custom_' . $customFieldID]['html_type'] == 'CheckBox') {
         formatCheckBoxField($value, 'custom_' . $customFieldID, $entity);
       }
+      
       CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $values['custom'],
-        $value, $extends, $customValueID, $entityId, FALSE, FALSE
+        $value, $extends, $customValueID, $entityId, FALSE, FALSE, TRUE
       );
     }
   }
