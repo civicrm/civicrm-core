@@ -1312,6 +1312,10 @@ WHERE id={$id}; ";
             'title' => ts('Note(s)'),
             'name' => 'note',
           ),
+          'communication_style_id' => array(
+            'title' => ts('Communication Style'),
+            'name' => 'communication_style_id',
+          ),
         ));
       }
 

@@ -1909,13 +1909,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           '' => ts('- select -')) + CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label'), $required
       );
     }
-    elseif ($fieldName === 'gender_id') {
-      $genderOptions = array();
-      $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-      foreach ($gender as $key => $var) {
-        $genderOptions[$key] = $form->createElement('radio', NULL, ts('Gender'), $var, $key);
+    elseif (in_array($fieldName, array('gender_id', 'communication_style_id'))) {
+      $options = array();
+      $pseudoValues = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $fieldName);
+      foreach ($pseudoValues as $key => $var) {
+        $options[$key] = $form->createElement('radio', NULL, ts($title), $var, $key);
       }
-      $group = $form->addGroup($genderOptions, $name, $title);
+      $group = $form->addGroup($options, $name, $title);
       if ($required) {
         $form->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
       }
