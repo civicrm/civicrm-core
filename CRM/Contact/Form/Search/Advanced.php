@@ -364,13 +364,16 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       }
     }
 
-    // CRM-13848
-    $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
-    if ($financialType && is_array($financialType)) {
-      unset($this->_formValues['financial_type_id']);
-      foreach ($financialType as $notImportant => $typeID) {
-        $this->_formValues['financial_type_id'][$typeID] = 1;
+    foreach (array('financial_type_id', 'contribution_soft_credit_type_id', 'contribution_status') as $element) {
+      $value = CRM_Utils_Array::value($element, $this->_formValues);
+      if ($value && is_array($value)) {
+        $this->_formValues[$element] = array('IN' => $value);
       }
+    }
+
+    foreach (array('contribution_source', 'contribution_trxn_id') as $element) {
+      $value = CRM_Utils_Array::value($element, $this->_formValues);
+      $this->_formValues[$element] = array('LIKE' => "%$value%");
     }
 
     $taglist = CRM_Utils_Array::value('contact_taglist', $this->_formValues);
