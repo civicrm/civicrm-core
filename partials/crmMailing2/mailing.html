@@ -14,8 +14,8 @@ FIXME: Don't hardcode table-based layout!
           name="fromAddress"
           ui-jq="select2"
           ui-options="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
-          ng-model="mailing.from"
-          ng-options="frm.label as frm.label for frm in crmMailingConst.fromAddress"
+          ng-model="fromPlaceholder.label"
+          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
           required>
           <option value=""></option>
         </select>
@@ -31,7 +31,7 @@ FIXME: Don't hardcode table-based layout!
           ui-jq="select2"
           ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
           ng-model="mailing.replyto_email"
-          ng-options="frm.label as frm.label for frm in crmMailingConst.fromAddress"
+          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
           >
           <option value=""></option>
         </select>
