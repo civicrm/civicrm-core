@@ -1447,7 +1447,7 @@ class CRM_Contact_BAO_Query {
    *
    * @return array
    */
-  public static function convertFormValues(&$formValues, $wildcard = 0, $useEquals = FALSE) {
+  static function convertFormValues(&$formValues, $wildcard = 0, $useEquals = FALSE, $apiEntity = NULL) {
     $params = array();
     if (empty($formValues)) {
       return $params;
@@ -1498,7 +1498,7 @@ class CRM_Contact_BAO_Query {
         }
       }
       else {
-        $values = CRM_Contact_BAO_Query::fixWhereValues($id, $values, $wildcard, $useEquals);
+        $values = CRM_Contact_BAO_Query::fixWhereValues($id, $values, $wildcard, $useEquals, $apiEntity);
 
         if (!$values) {
           continue;
@@ -1517,7 +1517,7 @@ class CRM_Contact_BAO_Query {
    *
    * @return array|null
    */
-  public static function &fixWhereValues($id, &$values, $wildcard = 0, $useEquals = FALSE) {
+  static function &fixWhereValues($id, &$values, $wildcard = 0, $useEquals = FALSE, $apiEntity = NULL) {
     // skip a few search variables
     static $skipWhere = NULL;
     static $likeNames = NULL;
@@ -1544,6 +1544,10 @@ class CRM_Contact_BAO_Query {
       substr($id, 0, 7) == 'hidden_'
     ) {
       return $result;
+    }
+
+    if ($apiEntity) {
+      $id = $apiEntity . '_' . $id;
     }
 
     if (!$likeNames) {

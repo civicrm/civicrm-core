@@ -91,6 +91,11 @@
     <default>NULL</default>
     <comment>FK to civicrm_pcp.id</comment>
     <add>2.2</add>
+    <pseudoconstant>
+      <table>civicrm_pcp</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>pcp_id</name>
