@@ -47,6 +47,17 @@ define('API_LATEST_VERSION', 3);
 /**
  *  Base class for CiviCRM unit tests
  *
+ * This class supports two (mutually-exclusive) techniques for cleaning up test data. Subclasses
+ * may opt for one or neither:
+ *
+ * 1. quickCleanup() is a helper which truncates a series of tables. Call quickCleanup()
+ *    as part of setUp() and/or tearDown(). quickCleanup() is thorough - but it can
+ *    be cumbersome to use (b/c you must identify the tables to cleanup) and slow to execute.
+ * 2. useTransaction() executes the test inside a transaction. It's easier to use
+ *    (because you don't need to identify specific tables), but it doesn't work for tests
+ *    which manipulate schema or truncate data -- and could behave inconsistently
+ *    for tests which specifically examine DB transactions.
+ *
  *  Common functions for unit tests
  * @package CiviCRM
  */
@@ -118,6 +129,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *               test (method).
    */
   public $DBResetRequired = TRUE;
+
+  /**
+   * @var CRM_Core_Transaction|NULL
+   */
+  private $tx = NULL;
 
   /**
    *  Constructor
@@ -451,12 +467,23 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     error_reporting(E_ALL & ~E_NOTICE);
     $session = CRM_Core_Session::singleton();
     $session->set('userID', NULL);
-    $tablesToTruncate = array('civicrm_contact');
-    $this->quickCleanup($tablesToTruncate);
+
+    if ($this->tx) {
+      $this->tx->rollback()->commit();
+      $this->tx = NULL;
+
+      CRM_Core_Transaction::forceRollbackIfEnabled();
+      \Civi\Core\Transaction\Manager::singleton(TRUE);
+    } else {
+      CRM_Core_Transaction::forceRollbackIfEnabled();
+      \Civi\Core\Transaction\Manager::singleton(TRUE);
+
+      $tablesToTruncate = array('civicrm_contact');
+      $this->quickCleanup($tablesToTruncate);
+    }
+
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
-    CRM_Core_Transaction::forceRollbackIfEnabled();
-    \Civi\Core\Transaction\Manager::singleton(TRUE);
   }
 
   /**
@@ -2369,6 +2396,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param bool $dropCustomValueTables
    */
   function quickCleanup($tablesToTruncate, $dropCustomValueTables = FALSE) {
+    if ($this->tx) {
+      throw new Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
+    }
     if ($dropCustomValueTables) {
       $tablesToTruncate[] = 'civicrm_custom_group';
       $tablesToTruncate[] = 'civicrm_custom_field';
@@ -3073,5 +3103,27 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     );
 
     $this->callAPISuccess('Mailing', 'delete', $params);
+  }
+
+  /**
+   * Wrap the entire test case in a transaction
+   *
+   * Only subsequent DB statements will be wrapped in TX -- this cannot
+   * retroactively wrap old DB statements. Therefore, it makes sense to
+   * call this at the beginning of setUp().
+   *
+   * Note: Recall that TRUNCATE and ALTER will force-commit transactions, so
+   * this option does not work with, e.g., custom-data.
+   *
+   * WISHLIST: Monitor SQL queries in unit-tests and generate an exception
+   * if TRUNCATE or ALTER is called while using a transaction.
+   *
+   * @param bool $nest whether to use nesting or reference-counting
+   */
+  function useTransaction($nest = TRUE) {
+    if (!$this->tx) {
+      $this->tx = new CRM_Core_Transaction($nest);
+      $this->tx->rollback();
+    }
   }
 }

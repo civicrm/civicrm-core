@@ -1,5 +1,5 @@
 (function (angular, $, _) {
-  var partialUrl = function (relPath) {
+  var partialUrl = function partialUrl(relPath) {
     return CRM.resourceUrls['civicrm'] + '/partials/crmMailing2/' + relPath;
   };
 
@@ -19,34 +19,34 @@
         templateUrl: partialUrl('edit.html'),
         controller: 'EditMailingCtrl',
         resolve: {
-          selectedMail: function($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
+          selectedMail: function selectedMail($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
         }
       });
       $routeProvider.when('/mailing2/:id/unified', {
         templateUrl: partialUrl('edit-unified.html'),
         controller: 'EditMailingCtrl',
         resolve: {
-          selectedMail: function($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
+          selectedMail: function selectedMail($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
         }
       });
       $routeProvider.when('/mailing2/:id/unified2', {
         templateUrl: partialUrl('edit-unified2.html'),
         controller: 'EditMailingCtrl',
         resolve: {
-          selectedMail: function($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
+          selectedMail: function selectedMail($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
         }
       });
       $routeProvider.when('/mailing2/:id/wizard', {
         templateUrl: partialUrl('edit-wizard.html'),
         controller: 'EditMailingCtrl',
         resolve: {
-          selectedMail: function($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
+          selectedMail: function selectedMail($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
         }
       });
     }
   ]);
 
-  crmMailing2.controller('ListMailingsCtrl', function ($scope) {
+  crmMailing2.controller('ListMailingsCtrl', function ListMailingsCtrl($scope) {
     // We haven't implemented this in Angular, but some users may get clever
     // about typing URLs, so we'll provide a redirect.
     window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
@@ -55,7 +55,7 @@
     });
   });
 
-  crmMailing2.controller('EditMailingCtrl', function ($scope, selectedMail) {
+  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location) {
     $scope.mailing = selectedMail;
     $scope.crmMailingConst = CRM.crmMailing;
 
@@ -77,6 +77,17 @@
         scheduled: 'false'
       });
     };
+
+    // Transition URL "/mailing2/new" => "/mailing2/123" as soon as ID is known
+    $scope.$watch('mailing.id', function(newValue, oldValue) {
+      if (newValue && newValue != oldValue) {
+        var parts = $location.path().split('/'); // e.g. "/mailing2/new" or "/mailing2/123/wizard"
+        parts[2] = newValue;
+        $location.path(parts.join('/'));
+        $location.replace();
+        // FIXME: Angular unnecessarily refreshes UI
+      }
+    });
   });
 
   // Controller for the edit-recipients fields (
@@ -84,7 +95,7 @@
   // Scope members:
   //  - [input] mailing: object
   //  - [output] recipients: array of recipient records
-  crmMailing2.controller('EditRecipCtrl', function ($scope, dialogService, crmApi, crmMailingMgr) {
+  crmMailing2.controller('EditRecipCtrl', function EditRecipCtrl($scope, dialogService, crmApi, crmMailingMgr) {
     // TODO load & live update real recipients list
     $scope.recipients = null;
     $scope.getRecipientsEstimate = function () {
@@ -114,7 +125,7 @@
     $scope.$watchCollection("mailing.mailings.include", refreshRecipients);
     $scope.$watchCollection("mailing.mailings.exclude", refreshRecipients);
 
-    $scope.previewRecipients = function () {
+    $scope.previewRecipients = function previewRecipients() {
       var model = {
         recipients: $scope.recipients
       };
@@ -125,15 +136,7 @@
           1: $scope.getRecipientsEstimate()
         }),
       };
-      dialogService.open('recipDialog', partialUrl('dialog/recipients.html'), model, options)
-        .then(
-          function (result) {
-            // console.log('Closed!');
-          },
-          function (error) {
-            // console.log('Cancelled!');
-          }
-        );
+      dialogService.open('recipDialog', partialUrl('dialog/recipients.html'), model, options);
     };
   });
 
@@ -149,23 +152,22 @@
   //   - mailing: object
   crmMailing2.controller('PreviewMailingCtrl', function ($scope, dialogService, crmMailingMgr) {
     $scope.ts = CRM.ts('CiviMail');
-    $scope.testContact = {email: ''};
+    $scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
     $scope.testGroup = {gid: null};
 
-    $scope.previewHtml = function() {
+    $scope.previewHtml = function previewHtml() {
       $scope.previewDialog(partialUrl('dialog/previewHtml.html'));
     };
-    $scope.previewText = function() {
+    $scope.previewText = function previewText() {
       $scope.previewDialog(partialUrl('dialog/previewText.html'));
     };
-    $scope.previewFull = function() {
+    $scope.previewFull = function previewFull() {
       $scope.previewDialog(partialUrl('dialog/previewFull.html'));
     };
     // Open a dialog with a preview of the current mailing
     // @param template string URL of the template to use in the preview dialog
-    $scope.previewDialog = function(template) {
-      CRM.status(ts('Previewing'));
-      crmMailingMgr
+    $scope.previewDialog = function previewDialog(template) {
+      var p = crmMailingMgr
         .preview($scope.mailing)
         .then(function(content){
           var options = {
@@ -173,16 +175,29 @@
             modal: true,
             title: ts('Subject: %1', {
               1: content.subject
-            }),
+            })
           };
           dialogService.open('previewDialog', template, content, options);
         });
+        CRM.status({start: ts('Previewing'), success: ''}, CRM.toJqPromise(p));
     };
-    $scope.sendTestToContact = function() {
-      CRM.alert('Send test to contact, ' + $scope.testContact.email);
+    $scope.sendTestToContact = function sendTestToContact() {
+      $scope.sendTest($scope.mailing, $scope.testContact.email, null);
     };
-    $scope.sendTestToGroup = function() {
-      CRM.alert('Send test to group, ' + $scope.testGroup.gid);
+    $scope.sendTestToGroup = function sendTestToGroup() {
+      $scope.sendTest($scope.mailing, null, $scope.testGroup.gid);
+    };
+    $scope.sendTest = function sendTest(mailing, testEmail, testGroup) {
+      var promise = crmMailingMgr.sendTest(mailing, testEmail, testGroup).then(function(deliveryInfos){
+        var count = Object.keys(deliveryInfos).length;
+        if (count === 0) {
+          CRM.alert(ts('Could not identify any recipients. Perhaps the group is empty?'));
+        }
+      });
+      CRM.status({
+        start: ts('Sending...'),
+        success: ts('Sent')
+      }, CRM.toJqPromise(promise));
     };
   });
 
@@ -191,7 +206,7 @@
   //   - "subject"
   //   - "body_html"
   //   - "body_text"
-  crmMailing2.controller('PreviewMailingDialogCtrl', function ($scope, crmMailingMgr) {
+  crmMailing2.controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope, crmMailingMgr) {
     $scope.ts = CRM.ts('CiviMail');
   });
 
