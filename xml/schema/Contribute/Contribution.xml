@@ -99,7 +99,7 @@
   </foreignKey>
   <field>
     <name>contribution_page_id</name>
-    <title>Contribution Page</title>
+    <title>Contribution Page ID</title>
     <type>int unsigned</type>
     <import>true</import>
     <comment>The Contribution Page which triggered this contribution</comment>
@@ -377,7 +377,7 @@
   </field>
   <field>
     <name>contribution_status_id</name>
-    <title>Contribution Status</title>
+    <title>Contribution Status ID</title>
     <type>int unsigned</type>
     <default>1</default>
     <import>true</import>

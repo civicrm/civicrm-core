@@ -407,7 +407,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       if (CRM_Core_Permission::access('CiviContribute')) {
         $fields['Contribution'] = CRM_Contribute_BAO_Contribution::exportableFields();
         unset($fields['Contribution']['contribution_contact_id']);
-        unset($fields['Contribution']['contribution_status_id']);
         $compArray['Contribution'] = ts('Contribution');
       }
     }
@@ -1268,4 +1267,3 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     }
   }
 }
-
