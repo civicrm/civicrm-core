@@ -532,7 +532,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     //to create an cms user
-    if (!$this->_userID) {
+    if (!$this->_contactID) {
       $createCMSUser = FALSE;
 
       if ($this->_values['custom_pre_id']) {
