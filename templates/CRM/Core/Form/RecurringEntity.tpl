@@ -273,7 +273,7 @@
             if (Object.keys(result).length > 0) {
               var errors = [];
               var participantData = [];
-              var html = 'Based on your repeat configuration here is the list of dates, Do you wish to create recurring set of these dates?<br/><table id="options" class="display"><thead><tr><th></th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
+              var html = 'Based on your repeat configuration, here is the list of dates. Do you wish to create a recurring set with these dates?<br/><table id="options" class="display"><thead><tr><th></th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
               var count = 1;
               for(var i in result) {
                 if (i != 'errors') {
