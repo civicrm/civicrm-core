@@ -55,7 +55,7 @@
     });
   });
 
-  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail) {
+  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location) {
     $scope.mailing = selectedMail;
     $scope.crmMailingConst = CRM.crmMailing;
 
@@ -77,6 +77,17 @@
         scheduled: 'false'
       });
     };
+
+    // Transition URL "/mailing2/new" => "/mailing2/123" as soon as ID is known
+    $scope.$watch('mailing.id', function(newValue, oldValue) {
+      if (newValue && newValue != oldValue) {
+        var parts = $location.path().split('/'); // e.g. "/mailing2/new" or "/mailing2/123/wizard"
+        parts[2] = newValue;
+        $location.path(parts.join('/'));
+        $location.replace();
+        // FIXME: Angular unnecessarily refreshes UI
+      }
+    });
   });
 
   // Controller for the edit-recipients fields (
