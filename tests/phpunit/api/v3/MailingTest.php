@@ -106,24 +106,35 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $getGroup1 = $this->callAPISuccess('MailingGroup', 'get', array('mailing_id' => $createResult['id']));
     $getGroup1_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup1['values']));
     $this->assertEquals(array($groupIDs['a']), $getGroup1_ids);
+    $getRecip1 = $this->callAPISuccess('MailingRecipients', 'get', array('mailing_id' => $createResult['id']));
+    $getRecip1_ids = array_values(CRM_Utils_Array::collect('contact_id', $getRecip1['values']));
+    $this->assertEquals(array($contactIDs['a']), $getRecip1_ids);
 
     // ** Pass 2: Update without any changes to groups[include]
     $nullopParams = $createParams;
     $nullopParams['id'] = $createResult['id'];
+    $updateParams['api.mailing_job.create'] = 1;
     unset($nullopParams['groups']['include']);
     $this->callAPISuccess('Mailing', 'create', $nullopParams);
     $getGroup2 = $this->callAPISuccess('MailingGroup', 'get', array('mailing_id' => $createResult['id']));
     $getGroup2_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup2['values']));
     $this->assertEquals(array($groupIDs['a']), $getGroup2_ids);
+    $getRecip2 = $this->callAPISuccess('MailingRecipients', 'get', array('mailing_id' => $createResult['id']));
+    $getRecip2_ids = array_values(CRM_Utils_Array::collect('contact_id', $getRecip2['values']));
+    $this->assertEquals(array($contactIDs['a']), $getRecip2_ids);
 
     // ** Pass 3: Update with different groups[include]
     $updateParams = $createParams;
     $updateParams['id'] = $createResult['id'];
     $updateParams['groups']['include'] = array($groupIDs['b']);
+    $updateParams['api.mailing_job.create'] = 1;
     $this->callAPISuccess('Mailing', 'create', $updateParams);
     $getGroup3 = $this->callAPISuccess('MailingGroup', 'get', array('mailing_id' => $createResult['id']));
     $getGroup3_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup3['values']));
     $this->assertEquals(array($groupIDs['b']), $getGroup3_ids);
+    $getRecip3 = $this->callAPISuccess('MailingRecipients', 'get', array('mailing_id' => $createResult['id']));
+    $getRecip3_ids = array_values(CRM_Utils_Array::collect('contact_id', $getRecip3['values']));
+    $this->assertEquals(array($contactIDs['b']), $getRecip3_ids);
   }
 
   public function testMailerPreview() {
