@@ -69,6 +69,29 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test for creating price sets used for both events and contributions.
+   */
+  public function testCreatePriceSetForEventAndContribution() {
+    // Create the price set
+    $createParams = array(
+      'name' => 'some_price_set',
+      'title' => 'Some Price Set',
+      'is_active' => 1,
+      'financial_type_id' => 1,
+      'extends' => array(1,2),
+    );
+    $createResult = $this->callAPIAndDocument($this->_entity, 'create', $createParams, __FUNCTION__, __FILE__);
+
+    // Get priceset we just created.
+    $result = $this->callAPISuccess($this->_entity, 'getSingle', array(
+      'id' => $createResult['id'],
+    ));
+
+    // Count the number of items in 'extends'.
+    $this->assertEquals(2, count($result['extends']));
+  }
+
+  /**
    * Check that no name doesn't cause failure
    */
   public function testCreatePriceSetNoName() {
