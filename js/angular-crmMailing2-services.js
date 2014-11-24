@@ -28,7 +28,8 @@
             mailing.mailings = {include: [], exclude: []};
             _.each(groupResult.values, function(mailingGroup) {
               var bucket = (mailingGroup.entity_table == 'civicrm_group') ? 'groups' : 'mailings';
-              mailing[bucket][mailingGroup.group_type].push(mailingGroup.entity_id);
+              var entityId = parseInt(mailingGroup.entity_id);
+              mailing[bucket][mailingGroup.group_type].push(entityId);
             });
             return mailing;
           });
