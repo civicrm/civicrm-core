@@ -642,6 +642,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           'data_type' => CRM_Utils_Type::T_STRING
         ));
 
+      $contributionPage = array(
+        'contribution_page' => array(
+          'title' => ts('Contribution Page'),
+          'name' => 'contribution_page',
+          'where' => 'civicrm_contribution_page.title',
+          'data_type' => CRM_Utils_Type::T_STRING
+        ));
+
       $contributionNote = array(
         'contribution_note' =>
         array(
@@ -693,7 +701,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         ),
       );
 
-      $fields = array_merge($impFields, $typeField, $contributionStatus, $optionField, $expFieldProduct,
+      $fields = array_merge($impFields, $typeField, $contributionStatus, $contributionPage, $optionField, $expFieldProduct,
         $expFieldsContrib, $contributionNote, $contributionRecurId, $extraFields, $softCreditFields, $financialAccount,
         CRM_Core_BAO_CustomField::getFieldsForImport('Contribution')
       );
