@@ -153,8 +153,9 @@
         $(element).on("select2-removing", function (e) {
           var option = convertValueToObj(e.val);
           var typeKey = option.entity_type == 'civicrm_mailing' ? 'mailings' : 'groups';
-          arrayRemove(scope.mailing[typeKey][option.mode], option.entity_id);
-          scope.$apply();
+          scope.$parent.$apply(function(){
+            arrayRemove(scope.mailing[typeKey][option.mode], option.entity_id);
+          });
           e.preventDefault();
         });
 
