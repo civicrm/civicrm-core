@@ -210,15 +210,31 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Add JavaScript variables to the global CRM object.
+   * Add JavaScript variables to CRM.vars
    *
    * Example:
    * From the server:
-   * CRM_Core_Resources::singleton()->addSetting(array('myNamespace' => array('foo' => 'bar')));
-   * From javascript:
-   * CRM.myNamespace.foo // "bar"
+   * CRM_Core_Resources::singleton()->addVars('myNamespace', array('foo' => 'bar'));
+   * Access var from javascript:
+   * CRM.vars.myNamespace.foo // "bar"
    *
    * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Javascript+Reference
+   *
+   * @param string $nameSpace - usually the name of your extension
+   * @param array $vars
+   * @return CRM_Core_Resources
+   */
+  public function addVars($nameSpace, $vars) {
+    $existing = CRM_Utils_Array::value($nameSpace, CRM_Utils_Array::value('vars', $this->settings), array());
+    $vars = $this->mergeSettings($existing, $vars);
+    $this->addSetting(array('vars' => array($nameSpace => $vars)));
+    return $this;
+  }
+
+  /**
+   * Add JavaScript variables to the root of the CRM object.
+   * This function is usually reserved for low-level system use.
+   * Extensions and components should generally use addVars instead.
    *
    * @param $settings array
    * @return CRM_Core_Resources
