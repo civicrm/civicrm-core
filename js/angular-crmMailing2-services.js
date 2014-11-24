@@ -118,6 +118,18 @@
       },
 
       // @param mailing Object (per APIv3)
+      // @return Promise
+      'delete': function(mailing) {
+        if (mailing.id) {
+          return crmApi('Mailing', 'delete', {id: mailing.id});
+        } else {
+          var d = $q.defer();
+          d.resolve();
+          return d.promise;
+        }
+      },
+
+      // @param mailing Object (per APIv3)
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
         var params = _.extend({}, mailing, {
@@ -153,6 +165,29 @@
         });
       },
 
+      // @param mailing Object (per APIv3)
+      // @return Promise
+      save: function(mailing) {
+        var params = _.extend({}, mailing);
+        return crmApi('Mailing', 'create', params).then(function(result){
+          if (result.id && !mailing.id) mailing.id = result.id;  // no rollback, so update mailing.id
+          return result.values[result.id];
+        });
+      },
+
+      // Schedule/send the mailing
+      // @param mailing Object (per APIv3)
+      // @return Promise
+      submit: function(mailing) {
+        throw 'Not implemented: crmMailingMgr.submit';
+//        var params = _.extend({}, mailing);
+//        return crmApi('Mailing', 'create', params).then(function(result){
+//          if (result.id && !mailing.id) mailing.id = result.id;  // no rollback, so update mailing.id
+//          return result.values[result.id];
+//        });
+      },
+
+      // Immediately send a test message
       // @param mailing Object (per APIv3)
       // @param testEmail string
       // @param testGroup int (id#)
