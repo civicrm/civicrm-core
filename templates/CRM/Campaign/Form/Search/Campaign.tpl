@@ -229,8 +229,8 @@
       },
       "fnRowCallback": function (nRow, aData, iDisplayIndex) {
         //insert the id for each row for enable/disable.
-        var rowId = 'campaign_row_' + aData[0];
-        CRM.$(nRow).attr('id', rowId);
+        var rowId = 'campaign-' + aData[0];
+        CRM.$(nRow).attr('id', rowId).addClass('crm-entity');
         //handled disabled rows.
         var isActive = Boolean(Number(aData[10]));
         if (!isActive) {

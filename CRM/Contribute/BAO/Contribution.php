@@ -3130,6 +3130,13 @@ WHERE  contribution_id = %1 ";
           $types = (array) CRM_Utils_Array::value('payment_processor', $page, 0);
           $params['condition'] = 'id IN (' . implode(',', $types) . ')';
         }
+        break;
+      // CRM-13981 This field was combined with soft_credits in 4.5 but the api still supports it
+      case 'honor_type_id':
+        $className = 'CRM_Contribute_BAO_ContributionSoft';
+        $fieldName = 'soft_credit_type_id';
+        $params['condition'] = "v.name IN ('in_honor_of','in_memory_of')";
+        break;
     }
     return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
   }
