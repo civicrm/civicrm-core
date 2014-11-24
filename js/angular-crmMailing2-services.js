@@ -152,6 +152,7 @@
         // get the resulting recipients -- then rollback any changes.
         var params = _.extend({}, mailing, {
           options:  {force_rollback: 1},
+          'api.mailing_job.create': 1, // note: exact match to API default
           'api.MailingRecipients.get': {
             mailing_id: '$value.id',
             options: { limit: previewLimit },
@@ -168,7 +169,9 @@
       // @param mailing Object (per APIv3)
       // @return Promise
       save: function(mailing) {
-        var params = _.extend({}, mailing);
+        var params = _.extend({}, mailing, {
+          'api.mailing_job.create': 0 // note: exact match to API default
+        });
         return crmApi('Mailing', 'create', params).then(function(result){
           if (result.id && !mailing.id) mailing.id = result.id;  // no rollback, so update mailing.id
           return result.values[result.id];
@@ -180,7 +183,9 @@
       // @return Promise
       submit: function(mailing) {
         throw 'Not implemented: crmMailingMgr.submit';
-//        var params = _.extend({}, mailing);
+//        var params = _.extend({}, mailing, {
+//          'api.mailing_job.create': 1 // note: exact match to API default
+//        });
 //        return crmApi('Mailing', 'create', params).then(function(result){
 //          if (result.id && !mailing.id) mailing.id = result.id;  // no rollback, so update mailing.id
 //          return result.values[result.id];
