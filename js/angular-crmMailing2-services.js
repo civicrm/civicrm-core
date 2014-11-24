@@ -5,7 +5,59 @@
 
   var crmMailing2 = angular.module('crmMailing2');
 
-  crmMailing2.factory('crmMailingMgr', function($q, crmApi) {
+  // The representation of from/reply-to addresses is inconsistent in the mailing data-model,
+  // so the UI must do some adaptation. The crmFromAddresses provides a richer way to slice/dice
+  // the available "From:" addrs. Records are like the underlying OptionValues -- but add "email"
+  // and "author".
+  crmMailing2.factory('crmFromAddresses', function($q, crmApi) {
+    var emailRegex = /^"(.*)" \<([^@\>]*@[^@\>]*)\>$/;
+    var addrs = _.map(CRM.crmMailing.fromAddress, function(addr){
+      var match = emailRegex.exec(addr.label);
+      return _.extend({}, addr, {
+        email: match ? match[2] : '(INVALID)',
+        author: match ? match[1] : '(INVALID)'
+      });
+    });
+    function first(array) {
+      return (array.length == 0) ? null : array[0];
+    };
+
+    return {
+      getAll: function getAll() {
+        return addrs;
+      },
+      getByAuthorEmail: function getByAuthorEmail(author, email, autocreate) {
+        var result = null;
+        _.each(addrs, function(addr){
+          if (addr.author == author && addr.email == email) {
+            result = addr;
+          }
+        });
+        if (!result && autocreate) {
+          result = {
+            label: '(INVALID) "' + author + '" <' + email + '>',
+            author: author,
+            email: email
+          };
+          addrs.push(result);
+        }
+        return result;
+      },
+      getByEmail: function getByEmail(email) {
+        return first(_.where(addrs, {email: email}));
+      },
+      getByLabel: function(label) {
+        return first(_.where(addrs, {label: label}));
+      },
+      getDefault: function getDefault() {
+        return first(_.where(addrs, {is_default: "1"}));
+      }
+    };
+  });
+
+  // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
+  crmMailing2.factory('crmMailingMgr', function($q, crmApi, crmFromAddresses) {
+    window.f = crmFromAddresses; // REVERT
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
         component_type:type,
@@ -40,7 +92,8 @@
         return {
           name: "revert this", // fixme
           campaign_id: null,
-          from: _.where(CRM.crmMailing.fromAddress, {is_default: "1"})[0].label,
+          from_name: crmFromAddresses.getDefault().author,
+          from_email: crmFromAddresses.getDefault().email,
           replyto_email: "",
           subject: "For {contact.display_name}", // fixme
           dedupe_email: "1",

@@ -55,9 +55,10 @@
     });
   });
 
-  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location) {
+  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmFromAddresses) {
     $scope.mailing = selectedMail;
     $scope.crmMailingConst = CRM.crmMailing;
+    $scope.crmFromAddresses = crmFromAddresses;
 
     $scope.partialUrl = partialUrl;
     $scope.ts = CRM.ts('CiviMail');
@@ -87,6 +88,15 @@
         $location.replace();
         // FIXME: Angular unnecessarily refreshes UI
       }
+    });
+
+    $scope.fromPlaceholder = {
+      label: crmFromAddresses.getByAuthorEmail($scope.mailing.from_name, $scope.mailing.from_email, true).label
+    };
+    $scope.$watch('fromPlaceholder.label', function(newValue){
+      var addr = crmFromAddresses.getByLabel(newValue);
+      $scope.mailing.from_name = addr.author;
+      $scope.mailing.from_email = addr.email;
     });
   });
 
