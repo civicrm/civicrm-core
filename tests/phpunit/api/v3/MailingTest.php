@@ -82,6 +82,50 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->getAndCheck($this->_params, $result['id'], 'mailing');
   }
 
+  /**
+   * The Mailing.create API supports magic properties "groups[include,enclude]" and "mailings[include,exclude]".
+   * Make sure these work
+   */
+  public function testMagicGroups_create_update() {
+    // BEGIN SAMPLE DATA
+    $groupIDs['a'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
+    $groupIDs['b'] = $this->groupCreate(array('name' => 'Example exclude group', 'title' => 'Example exclude group'));
+    $contactIDs['a'] = $this->individualCreate(array('email' => 'include.me@example.org', 'first_name' => 'Includer', 'last_name' => 'Person'));
+    $contactIDs['b'] = $this->individualCreate(array('email' => 'exclude.me@example.org', 'last_name' => 'Excluder', 'last_name' => 'Excluder'));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupIDs['a'], 'contact_id' => $contactIDs['a']));
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupIDs['b'], 'contact_id' => $contactIDs['b']));
+    // END SAMPLE DATA
+
+    // ** Pass 1: Create
+    $createParams = $this->_params;
+    $createParams['groups']['include'] = array($groupIDs['a']);
+    $createParams['groups']['exclude'] = array();
+    $createParams['mailings']['include'] = array();
+    $createParams['mailings']['exclude'] = array();
+    $createResult = $this->callAPISuccess('Mailing', 'create', $createParams);
+    $getGroup1 = $this->callAPISuccess('MailingGroup', 'get', array('mailing_id' => $createResult['id']));
+    $getGroup1_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup1['values']));
+    $this->assertEquals(array($groupIDs['a']), $getGroup1_ids);
+
+    // ** Pass 2: Update without any changes to groups[include]
+    $nullopParams = $createParams;
+    $nullopParams['id'] = $createResult['id'];
+    unset($nullopParams['groups']['include']);
+    $this->callAPISuccess('Mailing', 'create', $nullopParams);
+    $getGroup2 = $this->callAPISuccess('MailingGroup', 'get', array('mailing_id' => $createResult['id']));
+    $getGroup2_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup2['values']));
+    $this->assertEquals(array($groupIDs['a']), $getGroup2_ids);
+
+    // ** Pass 3: Update with different groups[include]
+    $updateParams = $createParams;
+    $updateParams['id'] = $createResult['id'];
+    $updateParams['groups']['include'] = array($groupIDs['b']);
+    $this->callAPISuccess('Mailing', 'create', $updateParams);
+    $getGroup3 = $this->callAPISuccess('MailingGroup', 'get', array('mailing_id' => $createResult['id']));
+    $getGroup3_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup3['values']));
+    $this->assertEquals(array($groupIDs['b']), $getGroup3_ids);
+  }
+
   public function testMailerPreview() {
     // BEGIN SAMPLE DATA
     $contactID =  $this->individualCreate();

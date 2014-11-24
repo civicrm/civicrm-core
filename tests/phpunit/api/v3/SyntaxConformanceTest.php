@@ -235,7 +235,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   public static function toBeSkipped_create($sequential = FALSE) {
-    $entitiesWithoutCreate = array('MailingGroup', 'Constant', 'Entity', 'Location', 'Profile', 'MailingRecipients');
+    $entitiesWithoutCreate = array('Constant', 'Entity', 'Location', 'Profile', 'MailingRecipients');
     if ($sequential === TRUE) {
       return $entitiesWithoutCreate;
     }
