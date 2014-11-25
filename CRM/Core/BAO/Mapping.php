@@ -403,7 +403,9 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT)) {
       if (CRM_Core_Permission::access('CiviContribute')) {
         $fields['Contribution'] = CRM_Contribute_BAO_Contribution::exportableFields();
-        unset($fields['Contribution']['contribution_contact_id']);
+        foreach (array('contribution_contact_id', 'contribution_soft_credit_name', 'contribution_soft_credit_amount', 'contribution_soft_credit_type', 'contribution_soft_credit_contribution_id') as $element) {
+          unset($fields['Contribution'][$element]);
+        }
         $compArray['Contribution'] = ts('Contribution');
       }
     }

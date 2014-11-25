@@ -269,16 +269,14 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $config = CRM_Core_Config::singleton();
     if (!empty($_POST)) {
-      foreach (array('financial_type_id', 'contribution_soft_credit_type_id', 'contribution_status') as $element) {
-        $value = CRM_Utils_Array::value($element, $this->_formValues);
-        if ($value && is_array($value)) {
-          $this->_formValues[$element] = array('IN' => $value);
-        }
-      }
-
-      foreach (array('contribution_source', 'contribution_trxn_id') as $element) {
+      foreach (array('financial_type_id', 'contribution_soft_credit_type_id', 'contribution_status', 'contribution_source', 'contribution_trxn_id') as $element) {
         $value = CRM_Utils_Array::value($element, $this->_formValues);
         if ($value) {
+          if (is_array($value)) {
+            $this->_formValues[$element] = array('IN' => $value);
+          }
+        }
+        else {
           $this->_formValues[$element] = array('LIKE' => "%$value%");
         }
       }
