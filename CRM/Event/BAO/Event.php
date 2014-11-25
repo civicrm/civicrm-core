@@ -1817,7 +1817,7 @@ WHERE  id = $cfID
     $events = array();
 
     $query = "
-SELECT CONCAT_WS(' :: ' , ca.name, ca.street_address, ca.city, sp.name) title, ce.loc_block_id
+SELECT CONCAT_WS(' :: ' , ca.name, ca.street_address, ca.city, sp.name, ca.supplemental_address_1, ca.supplemental_address_2) title, ce.loc_block_id
 FROM   civicrm_event ce
 INNER JOIN civicrm_loc_block lb ON ce.loc_block_id = lb.id
 INNER JOIN civicrm_address ca   ON lb.address_id = ca.id
