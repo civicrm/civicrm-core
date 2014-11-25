@@ -340,8 +340,14 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
 
         //CRM-10117
-        $message = ts('%1 must be in proper money format (decimal point/comma/space is allowed).', array(1 => $label));
-        $type = 'money';
+        if (!empty($qf->_quickConfig)) {
+          $message = ts('Please enter a valid amount.');
+          $type = 'money';
+        }
+        else {
+          $message = ts('%1 must be a number (with or without decimal point).', array(1 => $label));
+          $type = 'numeric';
+        }
         // integers will have numeric rule applied to them.
         $qf->addRule($elementName, $message, $type);
         break;
