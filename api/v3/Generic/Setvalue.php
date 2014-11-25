@@ -69,8 +69,10 @@ function civicrm_api3_generic_setValue($apiRequest) {
   }
 
   $dao_name = _civicrm_api3_get_DAO($entity);
-  if (CRM_Core_DAO::setFieldValue($dao_name, $id, $field, $value)) {
-    $params = array('id' => $id, $field => $value);
+  $params = array('id' => $id, $field => $value);
+  CRM_Utils_Hook::pre('edit', $entity, $id, $params);
+
+  if (CRM_Core_DAO::setFieldValue($dao_name, $id, $field, $params[$field])) {
     $entityDAO = new $dao_name();
     $entityDAO->copyValues($params);
     CRM_Utils_Hook::post('edit', $entity, $entityDAO->id, $entityDAO);
