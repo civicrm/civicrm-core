@@ -354,14 +354,14 @@ class CRM_Contribute_BAO_Query {
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.$name", $op, $value, $dataType);
-        list($op, $value) = self::buildQillForFieldValue('CRM_Contribute_DAO_Contribution', $name, $value, $op, $pseudoExtraParam);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_Contribution', $name, $value, $op, $pseudoExtraParam);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
       case 'contribution_page':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fields[$name]['where'], $op, $value, 'String');
-        list($op, $value) = self::buildQillForFieldValue('CRM_Contribute_DAO_Contribution', $name, $value, $op);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_Contribution', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$name]['title'], 2 => $op, 3 => $value));
         $query->_tables['civicrm_contribution_page'] = $query->_whereTables['civicrm_contribution_page'] = 1;
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
@@ -382,7 +382,7 @@ class CRM_Contribute_BAO_Query {
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_soft.$name",
           $op, $value, CRM_Utils_Type::typeToString($fields[$qillName]['type'])
         );
-        list($op, $value) = self::buildQillForFieldValue('CRM_Contribute_DAO_ContributionSoft', $name, $value, $op);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_ContributionSoft', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
         $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
         return;
@@ -1027,35 +1027,5 @@ class CRM_Contribute_BAO_Query {
       'contribution_recur_modified_date' => ('Recurring Contribution Modified Date'),
       'contribution_recur_failure_retry_date' => ts('Failed Recurring Contribution Retry Date'),
     );
-  }
-
-  static function buildQillForFieldValue($daoName, $fieldName, $fieldValue, $op, $pseduoExtraParam = array()) {
-    $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
-
-    //For those $fieldName which don't have any associated pseudoconstant defined
-    if (empty($pseduoOptions)) {
-      if (is_array($fieldValue)) {
-        $op = key($fieldValue);
-        $fieldValue = $fieldValue[$op];
-      }
-      return array($op, $fieldValue);
-    }
-    elseif (is_array($fieldValue)) {
-      $qillString = array();
-      if (in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators())) {
-        $op = key($fieldValue);
-        $fieldValue = $fieldValue[$op];
-      }
-      foreach ((array)$fieldValue as $val) {
-        $qillString[] = $pseduoOptions[$val];
-      }
-      return array($op, implode(', ', $qillString));
-    }
-    else {
-      if (array_key_exists($fieldValue, $pseduoOptions)) {
-        $fieldValue = $pseduoOptions[$fieldValue];
-      }
-      return array($op, $fieldValue);
-    }
   }
 }
