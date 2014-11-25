@@ -70,6 +70,12 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
         $groupExist = TRUE;
       }
     }
+    if (!$groupExist) {
+      $statusMsg = ts('Email: %1 has been successfully unsubscribed from this Mailing List/Group.',
+        array(1 => $email)
+      );
+      CRM_Core_Session::setStatus( $statusMsg, '', 'fail' );
+    }
     $this->assign('groupExist', $groupExist);
 
   }
