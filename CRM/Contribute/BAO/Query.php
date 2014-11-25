@@ -321,6 +321,9 @@ class CRM_Contribute_BAO_Query {
       case 'contribution_trxn_id':
       case (strpos($name, '_amount') !== FALSE):
       case (strpos($name, '_date') !== FALSE):
+        if (!$value) {
+          break;
+        }
         $qillName = $name;
         $pseudoExtraParam = NULL;
         if (in_array($name, array('financial_type', 'contribution_status', 'contribution_payment_instrument'))) {
@@ -369,6 +372,9 @@ class CRM_Contribute_BAO_Query {
 
       case 'contribution_pcp_made_through_id':
       case 'contribution_soft_credit_type_id':
+        if (!$value) {
+          break;
+        }
         $qillName = $name;
         if ($name == 'contribution_pcp_made_through_id') {
           $qillName = $name = 'pcp_id';
