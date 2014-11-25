@@ -32,11 +32,8 @@
       <div ng-include="partialUrl('schedule.html')" />
     </div>
 
-    <button ng-click="send();
-      leave();">{{ts('Submit Mailing')}}</button>
-    <button ng-click="save();
-      leave();">{{ts('Save Draft')}}</button>
-    <button ng-click="cancel();
-      leave();">{{ts('Delete Draft')}}</button>
+    <button ng-click="submit().then(leave)">{{ts('Submit Mailing')}}</button>
+    <button ng-click="save().then(leave);">{{ts('Save Draft')}}</button>
+    <button crm-confirm="{title:ts('Delete Draft?'), message:ts('Are you sure you want to delete the draft mailing?')}" on-yes="delete().then(leave)">{{ts('Delete Draft')}}</button>
   </div>
 </form>

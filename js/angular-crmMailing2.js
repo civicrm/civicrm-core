@@ -55,23 +55,36 @@
     });
   });
 
-  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location) {
+  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmFromAddresses, $q) {
     $scope.mailing = selectedMail;
     $scope.crmMailingConst = CRM.crmMailing;
+    $scope.crmFromAddresses = crmFromAddresses;
 
     $scope.partialUrl = partialUrl;
     $scope.ts = CRM.ts('CiviMail');
 
-    $scope.send = function() {
-      CRM.alert('Send!');
+    // @return Promise
+    $scope.submit = function submit() {
+       // CRM.status doesn't work with Angular promises, so do backflips
+       var p = crmMailingMgr.submit($scope.mailing);
+       var p2 = CRM.status(null, CRM.toJqPromise(p));
+       return CRM.toAPromise($q, p2);
     };
-    $scope.save = function() {
-      CRM.alert('Save!');
+    // @return Promise
+    $scope.save = function save() {
+      // CRM.status doesn't work with Angular promises, so do backflips
+      var p = crmMailingMgr.save($scope.mailing);
+      var p2 = CRM.status(null, CRM.toJqPromise(p));
+      return CRM.toAPromise($q, p2);
     };
-    $scope.cancel = function() {
-      CRM.alert('Cancel!');
+    // @return Promise
+    $scope.delete = function cancel() {
+      // CRM.status doesn't work with Angular promises, so do backflips
+      var p = crmMailingMgr.delete($scope.mailing);
+      var p2 = CRM.status({start: $scope.ts('Deleting...'), success: $scope.ts('Deleted')}, CRM.toJqPromise(p));
+      return CRM.toAPromise($q, p2);
     };
-    $scope.leave = function() {
+    $scope.leave = function leave() {
       window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
         reset: 1,
         scheduled: 'false'
@@ -87,6 +100,15 @@
         $location.replace();
         // FIXME: Angular unnecessarily refreshes UI
       }
+    });
+
+    $scope.fromPlaceholder = {
+      label: crmFromAddresses.getByAuthorEmail($scope.mailing.from_name, $scope.mailing.from_email, true).label
+    };
+    $scope.$watch('fromPlaceholder.label', function(newValue){
+      var addr = crmFromAddresses.getByLabel(newValue);
+      $scope.mailing.from_name = addr.author;
+      $scope.mailing.from_email = addr.email;
     });
   });
 
