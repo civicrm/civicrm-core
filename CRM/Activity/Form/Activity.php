@@ -977,7 +977,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $params['parent_entity_id'] = $params['entity_id'];
         $scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($params['entity_id'], $params['entity_table']);
       }
-      $params['schedule_reminder_id'] = $scheduleReminderDetails->id;
+      if (property_exists($scheduleReminderDetails, 'id')) {
+        $params['schedule_reminder_id'] = $scheduleReminderDetails->id;
+      }
     }
     $params['dateColumns'] = array('activity_date_time');
 
