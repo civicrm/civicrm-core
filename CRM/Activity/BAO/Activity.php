@@ -2163,8 +2163,8 @@ AND cl.modified_id  = c.id
 
 
         $Activityfields = array(
-          'activity_type' => array('title' => ts('Activity Type'), 'type' => CRM_Utils_Type::T_STRING),
-          'activity_status' => array('title' => ts('Activity Status'), 'type' => CRM_Utils_Type::T_STRING),
+          'activity_type' => array('title' => ts('Activity Type'), 'name' => 'activity_type', 'type' => CRM_Utils_Type::T_STRING),
+          'activity_status' => array('title' => ts('Activity Status'), 'name' => 'activity_status', 'type' => CRM_Utils_Type::T_STRING),
         );
         $fields = array_merge($Activityfields, $exportableFields);
       }
@@ -2670,4 +2670,3 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
 }
-
