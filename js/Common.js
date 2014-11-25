@@ -732,6 +732,16 @@ CRM.strings = CRM.strings || {};
     return jqDeferred.promise();
   };
 
+  CRM.toAPromise = function($q, jqPromise) {
+    var aDeferred = $q.defer();
+    jqPromise.then(
+      function(data) { aDeferred.resolve(data); },
+      function(data) { aDeferred.reject(data); }
+      // should we also handle progress events?
+    );
+    return aDeferred.promise;
+  };
+
   /**
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
