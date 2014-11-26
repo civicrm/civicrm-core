@@ -581,38 +581,6 @@ WHERE  id = %1";
   }
 
   /**
-   * Get the Price Field ID. We call this function when more than one being present would represent an error
-   * starting format derived from current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
-   * @param array $priceSet
-   *
-   * @throws CRM_Core_Exception
-   * @return int
-   */
-  static function getOnlyPriceFieldID(array $priceSet) {
-    if(count($priceSet['fields']) > 1) {
-      throw new CRM_Core_Exception(ts('expected only one price field to be in priceset but multiple are present'));
-    }
-    return (int) implode('_', array_keys($priceSet['fields']));
-  }
-
-  /**
-   * Get the Price Field Value ID. We call this function when more than one being present would represent an error
-   * current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
-   * @param array $priceSet
-   *
-   * @throws CRM_Core_Exception
-   * @return int
-   */
-  static function getOnlyPriceFieldValueID(array $priceSet) {
-    $priceFieldID = self::getOnlyPriceFieldID($priceSet);
-    if(count($priceSet['fields'][$priceFieldID]['options']) > 1) {
-      throw new CRM_Core_Exception(ts('expected only one price field to be in priceset but multiple are present'));
-    }
-    return (int) implode('_', array_keys($priceSet['fields'][$priceFieldID]['options']));
-  }
-
-
-  /**
    * @param CRM_Core_Form $form
    * @param $id
    * @param string $entityTable
