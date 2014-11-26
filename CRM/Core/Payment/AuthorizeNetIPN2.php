@@ -90,12 +90,15 @@ class CRM_Core_Payment_AuthorizeNetIPN2 extends CRM_Core_Payment_BaseIPN {
     }
 
     // At this point $object has first contribution loaded.
-    // Lets do a check to make sure this payment has the amount same as that of first contribution.
+    /* Lets do a check to make sure this payment has the amount same as that of first contribution.
+    // we have commented this out for fuzion 'shadow copy' used while re-running - investigating issue
+    // where by amount is changed & they are not recorded
     if ($objects['contribution']->total_amount != $input['amount']) {
       CRM_Core_Error::debug_log_message("Subscription amount mismatch.");
       echo "Failure: Subscription amount mismatch<p>";
       return FALSE;
     }
+    */
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
