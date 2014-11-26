@@ -498,10 +498,7 @@ WHERE  title = %1
 
     if (count($parentGroupSelectValues) > 1) {
       if (CRM_Core_Permission::isMultisiteEnabled()) {
-        $required = empty($parentGroups) ? TRUE : FALSE;
-        $required = (($obj->_id && CRM_Core_BAO_Domain::isDomainGroup($obj->_id)) ||
-          !isset($obj->_id)
-        ) ? FALSE : $required;
+        $required = !isset($obj->_id) || ($obj->_id && CRM_Core_BAO_Domain::isDomainGroup($obj->_id)) ? FALSE : empty($parentGroups);
       }
       else {
         $required = FALSE;
