@@ -345,8 +345,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $type = 'money';
         }
         else {
-          $message = ts('%1 must be an integer (whole number).', array(1 => $label));
-          $type = 'positiveInteger';
+          $message = ts('%1 must be a number (with or without decimal point).', array(1 => $label));
+          $type = 'numeric';
         }
         // integers will have numeric rule applied to them.
         $qf->addRule($elementName, $message, $type);
