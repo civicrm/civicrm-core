@@ -331,7 +331,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return string
    */

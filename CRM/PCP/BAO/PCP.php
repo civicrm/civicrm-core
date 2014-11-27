@@ -50,7 +50,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   }
 
   /**
-   * function to add or update either a Personal Campaign Page OR a PCP Block
+   * add or update either a Personal Campaign Page OR a PCP Block
    *
    * @param array $params reference array contains the values submitted by the form
    * @param bool $pcpBlock if true, create or update PCPBlock, else PCP
@@ -89,7 +89,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   }
 
   /**
-   * function to get the Display  name of a contact for a PCP
+   * get the Display  name of a contact for a PCP
    *
    * @param  int $id      id for the PCP
    *
@@ -110,7 +110,7 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
   }
 
   /**
-   * Function to return PCP  Block info for dashboard
+   * return PCP  Block info for dashboard
    *
    * @param $contactId
    *
@@ -373,9 +373,9 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
-   * @param object $form form object
+   * @param CRM_Core_Form $form form object
    *
    * @return void
    * @access public
@@ -740,9 +740,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get pcp block is active
    *
-   * @param $pcpId
+   * @param int $pcpId
    * @param $component
-   * @internal param int $id campaign page id
    *
    * @return int
    * @access public
@@ -765,11 +764,10 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get pcp block is enabled for component page
    *
-   * @param $pageId
+   * @param int $pageId
    * @param $component
-   * @internal param int $id contribution page id
    *
-   * @return String
+   * @return string
    * @access public
    * @static
    */
@@ -811,9 +809,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get email is enabled for supporter's profile
    *
-   * @param $profileId
-   *
-   * @internal param int $id supporter's profile id
+   * @param int $profileId supporter's profile id
    *
    * @return boolean
    * @access public
@@ -836,10 +832,8 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
   /**
    * Function to obtain the title of page associated with a pcp
    *
-   * @param $pcpId
+   * @param int $pcpId
    * @param $component
-   *
-   * @internal param int $id campaign page id
    *
    * @return int
    * @access public
@@ -868,10 +862,8 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
   /**
    * Function to get pcp block & entity id given pcp id
    *
-   * @param $pcpId
+   * @param int $pcpId
    * @param $component
-   *
-   * @internal param int $id campaign page id
    *
    * @return String
    * @access public
@@ -900,8 +892,6 @@ WHERE pcp.id = %1";
    *
    * @param $component
    *
-   * @internal param int $id campaign page id
-   *
    * @return String
    * @access public
    * @static
@@ -919,10 +909,8 @@ WHERE pcp.id = %1";
   /**
    * Function to get supporter profile id
    *
-   * @param $component_id
+   * @param int $component_id
    * @param string $component
-   *
-   * @internal param int $contributionPageId contribution page id
    *
    * @return int
    * @access public

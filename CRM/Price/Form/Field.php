@@ -74,7 +74,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   protected $_useForMember;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @param null
    *
@@ -100,7 +100,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null
@@ -170,7 +170,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @param null
    *
@@ -394,7 +394,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * @param array $fields posted values of the form
    *
    * @param $files
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise

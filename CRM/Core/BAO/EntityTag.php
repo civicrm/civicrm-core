@@ -72,7 +72,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Core_BAO_EntityTag object
+   * @return CRM_Core_BAO_EntityTag object
    * @access public
    * @static
    */
@@ -101,24 +101,22 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Check if there is data to create the object
    *
-   * @params array  $params         (reference ) an assoc array of name/value pairs
-   *
-   * @param $params
+   * @param array  $params an assoc array of name/value pairs
    *
    * @return boolean
    * @access public
    * @static
    */
-  static function dataExists(&$params) {
-    return ($params['tag_id'] == 0) ? FALSE : TRUE;
+  static function dataExists($params) {
+    return !($params['tag_id'] == 0);
   }
 
   /**
-   * Function to delete the tag for a contact
+   * delete the tag for a contact
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Core_BAO_EntityTag object
+   * @return CRM_Core_BAO_EntityTag object
    * @access public
    * @static
    *
@@ -138,10 +136,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @param array $entityIds (reference ) the array of entity ids to be added
    * @param int $tagId the id of the tag
-   * @param string $entityTable
-   * @params string $entityTable name of entity table default:civicrm_contact
+   * @param string $entityTable name of entity table default:civicrm_contact
    *
-   * @return array             (total, added, notAdded) count of enities added to tag
+   * @return array (total, added, notAdded) count of enities added to tag
    * @access public
    * @static
    */
@@ -182,10 +179,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @param array $entityIds (reference ) the array of entity ids to be removed
    * @param int $tagId the id of the tag
-   * @param string $entityTable
-   * @params string $entityTable name of entity table default:civicrm_contact
+   * @param string $entityTable name of entity table default:civicrm_contact
    *
-   * @return array             (total, removed, notRemoved) count of entities removed from tags
+   * @return array (total, removed, notRemoved) count of entities removed from tags
    * @access public
    * @static
    */
@@ -224,11 +220,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * takes an associative array and creates tag entity record for all tag entities
    *
-   * @param array $params (reference )  an assoc array of name/value pairs
+   * @param array $params (reference)  an assoc array of name/value pairs
    * @param $entityTable
    * @param $entityID
-   *
-   * @internal param array $contactId contact id
    *
    * @return void
    * @access public
@@ -288,7 +282,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Function to get contact tags
+   * get contact tags
    */
   static function getContactTags($contactID, $count = FALSE) {
     $contactTags = array();
@@ -321,7 +315,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Function to get child contact tags given parentId
+   * get child contact tags given parentId
    */
   static function getChildEntityTags($parentId, $entityId, $entityTable = 'civicrm_contact') {
     $entityTags = array();

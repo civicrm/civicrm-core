@@ -59,7 +59,7 @@ class CRM_Activity_Form_Task_Delete extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *

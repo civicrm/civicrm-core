@@ -136,7 +136,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   /**
    * Class constructor
    *
-   * @param $params
+   * @param array $params
    * @param $customFields
    * @param string params the params for the where clause
    *
@@ -209,7 +209,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
     $this->_options = &$this->_query->_options;
   }
-  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -276,15 +275,13 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     }
     return self::$_links;
   }
-  //end of function
 
   /**
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param $params
+   * @param array $params
    *
-   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -297,7 +294,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * returns the column headers as an array of tuples:
@@ -792,5 +788,4 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     }
   } //func close
 }
-//end of class
 

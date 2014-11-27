@@ -42,16 +42,12 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_BAO_OptionGroup object
+   * @return CRM_Core_BAO_OptionGroup object
    * @access public
    * @static
    */
@@ -79,7 +75,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * function to add the Option Group
+   * add the Option Group
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -111,7 +107,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * Function to delete Option Group
+   * delete Option Group
    *
    * @param  int  $optionGroupId     Id of the Option Group to be deleted.
    *
@@ -132,7 +128,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * Function to get title of the option group
+   * get title of the option group
    *
    * @param  int  $optionGroupId     Id of the Option Group.
    *

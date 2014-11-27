@@ -99,14 +99,12 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * - View
    *
-   * @param $activityTypeId
+   * @param int $activityTypeId
    * @param null $sourceRecordId
    * @param bool $accessMailingReport
    * @param null $activityId
    * @param null $key
    * @param null $compContext
-   *
-   * @internal param string $activityType type of activity
    *
    * @return array
    * @access public
@@ -277,9 +275,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param $params
+   * @param array $params
    *
-   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {

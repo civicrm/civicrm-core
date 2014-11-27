@@ -45,7 +45,7 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
   );
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public

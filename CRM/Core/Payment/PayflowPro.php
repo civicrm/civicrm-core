@@ -405,7 +405,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * NOTE: 'doTransferCheckout' not implemented
    */
   /**
-   * @param $params
+   * @param array $params
    * @param $component
    *
    * @throws Exception

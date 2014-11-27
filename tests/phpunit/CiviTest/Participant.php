@@ -33,8 +33,7 @@ class Participant extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to delete a participant
    *
-   * @param $participantId
-   * @internal param int $participantID id of the participant to delete
+   * @param int $participantId
    * @return boolean true if participant deleted, false otherwise
    */
   static function delete($participantId) {

@@ -476,9 +476,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1,$contribution['count']);
   }
 
-  /*
-     * Create test with unique field name on source
-     */
+  /**
+   * Create test with unique field name on source
+   */
   function testCreateContributionSource() {
 
     $params = array(
@@ -514,9 +514,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receive_date'])));
   }
 
-  /*
-     * Create test with unique field name on source
-     */
+  /**
+   * Create test with unique field name on source
+   */
   function testCreateContributionSourceInvalidContac() {
 
     $params = array(
@@ -607,11 +607,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('my contribution note', $result['values'][0]['note']);
     $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
   }
-  /*
-     * This is the test for creating soft credits - however a 'get' is not yet possible via API
-     * as the current BAO functions are contact-centric (from what I can find)
-     *
-     */
+
+  /**
+   * This is the test for creating soft credits - however a 'get' is not yet possible via API
+   * as the current BAO functions are contact-centric (from what I can find)
+   */
   function testCreateContributionWithSoftCredt() {
     $description = "Demonstrates creating contribution with SoftCredit";
     $subfile     = "ContributionCreateWithSoftCredit";
@@ -1763,7 +1763,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
  }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $context
    */
   function _checkFinancialRecords($params,$context) {

@@ -49,7 +49,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @param array  $params (reference ) an assoc array of name/value pairs
    * @param array  $contact  contact object
    *
-   * @return object CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact object
    * @access public
    * @static
    */

@@ -50,7 +50,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * per http://wiki.civicrm.org/confluence/display/CRM/Database+layer
    *  "we are moving away from the $ids param "
    *
-   * @return object CRM_Contact_BAO_Relationship object
+   * @return CRM_Contact_BAO_Relationship object
    * @access public
    * @static
    */
@@ -194,7 +194,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param integer $contactId  this is contact id for adding relationship
    * @param array $ids          the array that holds all the db ids
    *
-   * @return object CRM_Contact_BAO_Relationship
+   * @return CRM_Contact_BAO_Relationship
    * @access public
    * @static
    */
@@ -303,7 +303,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Function to get get list of relationship type based on the contact type.
+   * get get list of relationship type based on the contact type.
    *
    * @param int $contactId this is the contact id of the current contact.
    * @param null $contactSuffix
@@ -311,15 +311,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param string $contactType contact type
    * @param boolean $all if true returns relationship types in both the direction
    * @param string $column name/label that going to retrieve from db.
-   *
-   *
    * @param bool $biDirectional
    * @param string $contactSubType includes relationshiptypes between this subtype
-   *
    * @param boolean $onlySubTypeRelationTypes if set only subtype which is passed by $contactSubType
    *                                          related relationshiptypes get return
    *
-   * @internal param string $strContact this value is currently ignored, keeping it there for legacy reasons
    * @access public
    * @static
    *
@@ -455,7 +451,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Function to delete the relationship
+   * delete the relationship
    *
    * @param int $id relationship id
    *
@@ -504,7 +500,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Function to disable/enable the relationship
+   * disable/enable the relationship
    *
    * @param int $id relationship id
    *
@@ -774,7 +770,6 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    *
    * @param array $params input parameters to find object
    * @param array $values output values of the object
-   * @internal param array $ids the array that holds all the db ids
    *
    * @return array (reference)   the values that could be potentially assigned to smarty
    * @access public

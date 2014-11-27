@@ -396,11 +396,7 @@ function civicrm_api3_case_delete($params) {
  *
  * @param $options
  *
- * @internal param $params
- *
- * @internal param $options
- *
- * @return array (reference) case object
+ * @return array case object
  */
 function _civicrm_api3_case_read($caseId, $options) {
   $return = CRM_Utils_Array::value('return', $options, array());

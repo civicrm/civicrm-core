@@ -190,7 +190,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_isBillingAddressRequiredForPayLater;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -571,7 +571,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Function to add the custom fields
+   * add the custom fields
    *
    * @param $id
    * @param $name
@@ -675,7 +675,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $eventID
    *
    * @throws Exception
@@ -733,7 +733,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Function to handle process after the confirmation of payment by User
+   * handle process after the confirmation of payment by User
    *
    * @param null $contactID
    * @param null $contribution
@@ -838,7 +838,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Process the participant
    *
-   * @param $params
+   * @param array $params
    * @param $contactID
    *
    * @return void
@@ -950,8 +950,8 @@ WHERE  v.option_group_id = g.id
    * @access public
    */
   /**
-   * @param $form
-   * @param $params
+   * @param CRM_Core_Form $form
+   * @param array $params
    * @param bool $skipCurrent
    *
    * @return int|string
@@ -1049,8 +1049,8 @@ WHERE  v.option_group_id = g.id
    * @access public
    */
   /**
-   * @param $form
-   * @param $params
+   * @param CRM_Core_Form $form
+   * @param array $params
    *
    * @return mixed
    */

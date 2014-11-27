@@ -116,7 +116,7 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @param null
    *

@@ -100,7 +100,7 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -190,8 +190,6 @@ AND    {$this->_componentClause}";
 
       // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
-
-      // CRM_Core_Error::debug('input',$input);
 
       $values = array();
       $mail = $elements['baseIPN']->sendMail($input, $ids, $objects, $values, FALSE, $elements['createPdf']);

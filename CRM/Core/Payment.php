@@ -132,7 +132,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return mixed
    */
@@ -451,8 +451,6 @@ abstract class CRM_Core_Payment {
   /**
    * This function checks to see if we have the right config values
    *
-   * @internal param string $mode the mode we are operating in (live or test)
-   *
    * @return string the error message if any
    * @public
    */
@@ -596,7 +594,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Function to check whether a method is present ( & supported ) by the payment processor object.
+   * check whether a method is present ( & supported ) by the payment processor object.
    *
    * @param  string $method method to check for.
    *

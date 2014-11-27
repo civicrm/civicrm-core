@@ -111,12 +111,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   protected $_crmDir = 'Activity';
 
-  /*
-     * Survey activity
-     *
-     * @var boolean
-     */
-
+  /**
+   * Survey activity
+   *
+   * @var boolean
+   */
   protected $_isSurveyActivity;
 
   protected $_values = array();
@@ -211,7 +210,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -510,7 +509,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -822,8 +821,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @param array $files the uploaded files if any
    * @param $self
    *
-   * @internal param array $options additional user data
-   *
    * @return true if no errors, else array of errors
    * @access public
    * @static
@@ -865,7 +862,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -1167,7 +1164,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to let injecting activity type file do any processing
+   * let injecting activity type file do any processing
    * needed, before the activity is added/updated
    *
    */
@@ -1179,7 +1176,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to let injecting activity type file do any processing
+   * let injecting activity type file do any processing
    * needed, after the activity has been added/updated
    *
    */

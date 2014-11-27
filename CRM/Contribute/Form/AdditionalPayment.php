@@ -628,7 +628,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return mixed
    */

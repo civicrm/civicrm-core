@@ -111,7 +111,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact object
    * @access public
    * @static
    */
@@ -261,7 +261,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * Function to create contact
+   * create contact
    * takes an associative array and creates a contact object and all the associated
    * derived objects (i.e. individual, location, email, phone etc)
    *
@@ -274,7 +274,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param bool $skipDelete
    *
    * @throws Exception
-   * @return object CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact object
    * @access public
    * @static
    */
@@ -551,7 +551,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   *
    * Get the values for pseudoconstants for name->value and reverse.
    *
    * @param array   $defaults (reference) the default values, some of which need to be resolved.
@@ -682,18 +681,14 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array   $params   (reference ) an assoc array of name/value pairs
    * @param array   $defaults (reference ) an assoc array to hold the name / value pairs
    *                        in a hierarchical manner
    * @param boolean $microformat  for location in microformat
    *
-   * @return object CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact object
    * @access public
    * @static
    */
@@ -735,7 +730,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * function to get the display name of a contact
+   * get the display name of a contact
    *
    * @param  int    $id id of the contact
    *
@@ -883,7 +878,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * function to delete the image of a contact
+   * delete the image of a contact
    *
    * @param  int $id id of the contact
    *
@@ -902,12 +897,10 @@ WHERE id={$id}; ";
   }
 
   /**
-   * function to return relative path
+   * Return relative path
    * @todo make this a method of $config->userSystem (i.e. UF classes) rather than a static function
    *
-   * @param $absolutePath
-   *
-   * @internal param String $absPath absolute path
+   * @param string $absolutePath absolute path
    *
    * @return String $relativePath Relative url of uploaded image
    */
@@ -970,18 +963,12 @@ WHERE id={$id}; ";
   }
 
   /**
-   * function to validate type of contact image
+   * Validate type of contact image
    *
-   * @param $params
+   * @param array $params
    * @param  String $imageIndex index of image field
-   *
    * @param  String $statusMsg status message to be set after operation
-   *
-   * @param string $opType
-   *
-   * @internal param Array $param array of contact/profile field to be edited/added
-   *
-   * @opType String $opType     type of operation like fatal, bounce etc
+   * @param string $opType type of operation like fatal, bounce etc
    *
    * @return boolean true if valid image extension
    */
@@ -1614,7 +1601,6 @@ WHERE id={$id}; ";
    * @param $fields
    * @param int $contactId contact id
    *
-   * @internal param array $properties a flat return properties name value array
    * @return array a hierarchical property tree if appropriate
    * @access public
    * @static
@@ -1791,21 +1777,16 @@ ORDER BY civicrm_email.is_primary DESC";
   /**
    * function to add/edit/register contacts through profile.
    *
-   * @params  array  $params        Array of profile fields to be edited/added.
-   * @params  int    $contactID     contact_id of the contact to be edited/added.
-   * @params  array  $fields        array of fields from UFGroup
-   * @params  int    $addToGroupID  specifies the default group to which contact is added.
-   * @params  int    $ufGroupId     uf group id (profile id)
-   * @param $params
-   * @param $fields
-   * @param null $contactID
-   * @param null $addToGroupID
-   * @param null $ufGroupId
-   * @param   string $ctype contact type
-   * @param   boolean $visibility basically lets us know where this request is coming from
+   * @param array $params Array of profile fields to be edited/added.
+   * @param array $fields Array of fields from UFGroup
+   * @param int $contactID id of the contact to be edited/added.
+   * @param int $addToGroupID specifies the default group to which contact is added.
+   * @param int $ufGroupId uf group id (profile id)
+   * @param ctype
+   * @param boolean $visibility basically lets us know where this request is coming from
    *                                if via a profile from web, we restrict what groups are changed
    *
-   * @return  int                   contact id created/edited
+   * @return int contact id created/edited
    * @static
    * @access public
    */
@@ -1901,7 +1882,7 @@ ORDER BY civicrm_email.is_primary DESC";
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $fields
    * @param null $contactID
    * @param null $ufGroupId

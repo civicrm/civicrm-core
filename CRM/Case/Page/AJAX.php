@@ -185,7 +185,7 @@ class CRM_Case_Page_AJAX {
   }
 
   /**
-   * Function to delete relationships specific to case and relationship type
+   * delete relationships specific to case and relationship type
    */
   static function deleteCaseRoles() {
     $caseId  = CRM_Utils_Type::escape($_POST['case_id'], 'Integer');

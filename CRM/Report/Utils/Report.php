@@ -180,8 +180,7 @@ WHERE  inst.report_id = %1";
    *
    * @return bool
    */
-  static function mailReport($fileContent, $instanceID = NULL, $outputMode = 'html', $attachments = array(
-    )) {
+  static function mailReport($fileContent, $instanceID = NULL, $outputMode = 'html', $attachments = array()) {
     if (!$instanceID) {
       return FALSE;
     }
@@ -216,7 +215,7 @@ WHERE  inst.report_id = %1";
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $rows
    */
   static function export2csv(&$form, &$rows) {
@@ -390,7 +389,7 @@ WHERE  inst.report_id = %1";
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */
@@ -463,8 +462,7 @@ WHERE  inst.report_id = %1";
    *
    * @return string URL query string
    */
-  static function getPreviewCriteriaQueryParams($defaults = array(
-    ), $params = array()) {
+  static function getPreviewCriteriaQueryParams($defaults = array(), $params = array()) {
     static $query_string;
     if (!isset($query_string)) {
       if (!empty($params)) {

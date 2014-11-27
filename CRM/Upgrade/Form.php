@@ -618,9 +618,6 @@ SET    version = '$version'
    * @param $rev string, the target (intermediate) revision e.g '3.2.alpha1'
    *
    * @return bool
-   * @internal param string $currentVer , the original revision
-   * @internal param string $latestVer , the target (final) revision
-   * @internal param string $postUpgradeMessageFile , path of a modifiable file which lists the post-upgrade messages
    */
   static function doIncrementalUpgradeStart(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();

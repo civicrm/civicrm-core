@@ -593,8 +593,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /*
-     * Functions below generally don't need to be modified
-     */
+   * Functions below generally don't need to be modified
+   */
   /**
    * @return mixed
    */

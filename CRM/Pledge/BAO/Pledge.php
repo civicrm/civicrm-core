@@ -59,7 +59,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Pledge_BAO_Pledge object
+   * @return CRM_Pledge_BAO_Pledge object
    * @access public
    * @static
    */
@@ -74,7 +74,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * function to add pledge
+   * add pledge
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -143,7 +143,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Pledge_BAO_Pledge object
+   * @return CRM_Pledge_BAO_Pledge object
    * @access public
    * @static
    */
@@ -253,7 +253,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * Function to delete the pledge
+   * delete the pledge
    *
    * @param int $id pledge id
    *
@@ -299,7 +299,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * function to get the amount details date wise.
+   * get the amount details date wise.
    *
    * @param string $status
    * @param string $startDate
@@ -417,7 +417,6 @@ GROUP BY  currency
  GROUP BY  cp.currency
 ";
     if ($select) {
-      // CRM_Core_Error::debug($status . ' start:' . $startDate . '- end:' . $endDate, $query);
       $dao    = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
       $amount = array();
       $count  = 0;
@@ -490,8 +489,8 @@ GROUP BY  currency
   /**
    * Function to send Acknowledgment and create activity.
    *
-   * @param object $form form object.
-   * @param array  $params (reference ) an assoc array of name/value pairs.
+   * @param CRM_Core_Form $form form object.
+   * @param array $params an assoc array of name/value pairs.
    * @access public
    *
    * @return void.
@@ -534,7 +533,6 @@ GROUP BY  currency
         }
       }
     }
-    //end
 
     //assign pledge fields value to template.
     $pledgeFields = array(
@@ -795,8 +793,6 @@ GROUP BY  currency
    *
    * @param $contactID
    *
-   * @internal param int $contactId Contact ID
-   *
    * @return int count of pledge records
    * @access public
    * @static
@@ -807,7 +803,7 @@ GROUP BY  currency
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */

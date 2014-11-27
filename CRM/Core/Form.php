@@ -802,10 +802,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * assign value to name in template
    *
-   * @param $var
-   * @param mixed $value value of varaible
+   * @param string $var name of variable
+   * @param mixed $value value of variable
    *
-   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -816,10 +815,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * assign value to name in template by reference
    *
-   * @param $var
+   * @param string $var name of variable
    * @param mixed $value value of varaible
    *
-   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -843,7 +841,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param string $name
    *
-   * @internal param string $type
    * @return array
    */
   function get_template_vars($name=null) {
@@ -964,11 +961,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button
-   * @param string $nextType
+   * @param string $nextType button type for the form after processing
    * @param string $backType
    * @param bool|string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
    *
-   * @internal param string $type button type for the form after processing
    * @return void
    * @access public
    */
@@ -1254,16 +1250,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   *  Function to add date
-   *  @param string $name   name of the element
-   *  @param string $label  label of the element
-   *  @param array  $attributes key / value pair
+   * Add date
+   * @param string $name   name of the element
+   * @param string $label  label of the element
+   * @param array  $attributes key / value pair
    *
-   // if you need time
-   *  $attributes = array ( 'addTime' => true,
-   *                        'formatType' => 'relative' or 'birth' etc check advanced date settings
-   *                      );
-   *  @param boolean $required  true if required
+   * // if you need time
+   * $attributes = array(
+   *   'addTime' => true,
+   *   'formatType' => 'relative' or 'birth' etc check advanced date settings
+   * );
+   * @param boolean $required  true if required
    *
    */
   function addDate($name, $label, $required = FALSE, $attributes = NULL) {
@@ -1609,7 +1606,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $profiles ids of profiles that are on the form (to be autofilled)
    * @param array $autoCompleteField
    *
-   * @internal param array $field metadata of field to use as selector including
    *  - name_field
    *  - id_field
    *  - url (for ajax lookup)

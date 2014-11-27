@@ -50,7 +50,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem object
    * @access public
    * @static
    */
@@ -78,7 +78,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem object
    * @access public
    * @static
    */

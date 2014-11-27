@@ -158,14 +158,11 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Group', $this->_id);
   }
 
-  /*
-   * This function sets the default values for the form. LocationType that in edit/view mode
+  /**
+   * Set default values for the form. LocationType that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
-   * @return void
-   */
-  /**
    * @return array
    */
   function setDefaultValues() {
@@ -212,7 +209,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -314,7 +311,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * global validation rules for the form
    *
    * @param array $fields posted values of the form
-   *
    * @param $fileParams
    * @param $options
    *
@@ -412,10 +408,7 @@ WHERE  title = %1
 
       $group = CRM_Contact_BAO_Group::create($params);
 
-      /*
-       * Remove any parent groups requested to be removed
-       */
-
+      //Remove any parent groups requested to be removed
       if (!empty($this->_groupValues['parents'])) {
         $parentGroupIds = explode(',', $this->_groupValues['parents']);
         foreach ($parentGroupIds as $parentGroupId) {
@@ -428,10 +421,7 @@ WHERE  title = %1
 
       CRM_Core_Session::setStatus(ts('The Group \'%1\' has been saved.', array(1 => $group->title)), ts('Group Saved'), 'success');
 
-      /*
-             * Add context to the session, in case we are adding members to the group
-             */
-
+      // Add context to the session, in case we are adding members to the group
       if ($this->_action & CRM_Core_Action::ADD) {
         $this->set('context', 'amtg');
         $this->set('amtgID', $group->id);
@@ -447,43 +437,34 @@ WHERE  title = %1
     }
   }
 
-  /*
+  /**
    * Build parent groups form elements
    *
-   * @obj form object passed by reference
+   * @param CRM_Core_Form $form
    *
-   * @return parent groups array
+   * @return array parent groups
    * @static
    * @access public
    */
-  /**
-   * @param $obj
-   *
-   * @return array
-   */
-  static function buildParentGroups( &$obj ) {
+  static function buildParentGroups(&$form) {
     $groupNames = CRM_Core_PseudoConstant::group();
     $parentGroups = $parentGroupElements = array();
-    if (isset($obj->_id) &&
-      CRM_Utils_Array::value('parents', $obj->_groupValues)
-    ) {
-      $parentGroupIds = explode(',', $obj->_groupValues['parents']);
+    if (isset($form->_id) && !empty($form->_groupValues['parents'])) {
+      $parentGroupIds = explode(',', $form->_groupValues['parents']);
       foreach ($parentGroupIds as $parentGroupId) {
         $parentGroups[$parentGroupId] = $groupNames[$parentGroupId];
         if (array_key_exists($parentGroupId, $groupNames)) {
           $parentGroupElements[$parentGroupId] = $groupNames[$parentGroupId];
-          $obj->addElement('checkbox', "remove_parent_group_$parentGroupId",
+          $form->addElement('checkbox', "remove_parent_group_$parentGroupId",
             $groupNames[$parentGroupId]
           );
         }
       }
     }
-    $obj->assign_by_ref('parent_groups', $parentGroupElements);
+    $form->assign_by_ref('parent_groups', $parentGroupElements);
 
-    if (isset($obj->_id)) {
-      $potentialParentGroupIds = CRM_Contact_BAO_GroupNestingCache::getPotentialCandidates($obj->_id,
-        $groupNames
-      );
+    if (isset($form->_id)) {
+      $potentialParentGroupIds = CRM_Contact_BAO_GroupNestingCache::getPotentialCandidates($form->_id, $groupNames);
     }
     else {
       $potentialParentGroupIds = array_keys($groupNames);
@@ -498,12 +479,12 @@ WHERE  title = %1
 
     if (count($parentGroupSelectValues) > 1) {
       if (CRM_Core_Permission::isMultisiteEnabled()) {
-        $required = !isset($obj->_id) || ($obj->_id && CRM_Core_BAO_Domain::isDomainGroup($obj->_id)) ? FALSE : empty($parentGroups);
+        $required = !isset($form->_id) || ($form->_id && CRM_Core_BAO_Domain::isDomainGroup($form->_id)) ? FALSE : empty($parentGroups);
       }
       else {
         $required = FALSE;
       }
-      $obj->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required, array('class' => 'crm-select2'));
+      $form->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required, array('class' => 'crm-select2'));
     }
 
     return $parentGroups;

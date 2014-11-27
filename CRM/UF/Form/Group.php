@@ -58,7 +58,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   protected $_allPanes;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -109,7 +109,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -208,7 +208,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public

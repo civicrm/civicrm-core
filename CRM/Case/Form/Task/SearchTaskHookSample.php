@@ -73,7 +73,7 @@ WHERE cs.id IN ( {$caseIDs} )";
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

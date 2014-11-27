@@ -340,15 +340,12 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
-
-  /* function for saving the checkbox selections
-   * $action select   - select a particular contact
-   *         unselect - unselect a particular contact
-   */
   /**
+   * Save checkbox selections
+   *
    * @param $cacheKey
    * @param string $action
-   * @param null $cIds
+   * @param array $cIds
    * @param string $entity_table
    */
   static function markSelection($cacheKey, $action = 'unselect', $cIds = NULL, $entity_table = 'civicrm_contact') {
@@ -398,7 +395,7 @@ WHERE  cacheKey LIKE %1 AND is_selected = 1
   }
 
   /**
-   * function to get the selections
+   * get the selections
    *
    * @param string $cacheKey cache key
    * @param string $action action
@@ -462,23 +459,23 @@ WHERE  cacheKey LIKE %1
   }
 
   /**
-   * @param $obj
-   * @param $params
+   * @param CRM_Core_Form $form
+   * @param array $params
    *
    * @return mixed
    */
-  static function buildSelectedContactPager( &$obj, &$params) {
+  static function buildSelectedContactPager(&$form, &$params) {
     $params['status'] = ts('Contacts %%StatusMessage%%');
     $params['csvString'] = NULL;
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
-    $params['rowCount'] = $obj->get(CRM_Utils_Pager::PAGE_ROWCOUNT);
+    $params['rowCount'] = $form->get(CRM_Utils_Pager::PAGE_ROWCOUNT);
 
     if (!$params['rowCount']) {
       $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
     }
 
-    $qfKey = CRM_Utils_Request::retrieve('qfKey','String', $this);
+    $qfKey = CRM_Utils_Request::retrieve('qfKey','String', $form);
     $cacheKey = "civicrm search {$qfKey}";
 
     $query = "
@@ -490,11 +487,11 @@ WHERE  cacheKey LIKE %1
 ";
     $params1[1] = array("{$cacheKey}%", 'String');
     $params1[2] = array("{$cacheKey}_alphabet%", 'String');
-    $paramsTotal     = CRM_Core_DAO::singleValueQuery($query, $params1);
+    $paramsTotal = CRM_Core_DAO::singleValueQuery($query, $params1);
     $params['total'] = $paramsTotal;
-    $obj->_pager    = new CRM_Utils_Pager($params);
-    $obj->assign_by_ref('pager', $obj->_pager);
-    list($offset, $rowCount) = $obj->_pager->getOffsetAndRowCount();
+    $form->_pager = new CRM_Utils_Pager($params);
+    $form->assign_by_ref('pager', $form->_pager);
+    list($offset, $rowCount) = $form->_pager->getOffsetAndRowCount();
     $params['offset'] = $offset;
     $params['rowCount1'] = $rowCount;
     return $params;

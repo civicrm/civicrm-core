@@ -537,7 +537,7 @@ class CRM_Pledge_BAO_Query {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function buildSearchForm(&$form) {
     // pledge related dates

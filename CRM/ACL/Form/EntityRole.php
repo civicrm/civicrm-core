@@ -43,7 +43,7 @@
 class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -72,7 +72,7 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

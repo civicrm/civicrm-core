@@ -69,7 +69,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param array  $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
-   * @return object CRM_Member_BAO_Membership object
+   * @return CRM_Member_BAO_Membership object
    * @access public
    * @static
    */
@@ -230,7 +230,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param string $activityType
    *
    * @throws CRM_Core_Exception
-   * @internal param bool $callFromAPI Is this function called from API?
    *
    * @return CRM_Member_BAO_Membership object
    * @access public
@@ -431,7 +430,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
   }
 
   /**
-   * Function to check the membership extended through relationship
+   * check the membership extended through relationship
    *
    * @param int $membershipId membership id
    * @param int $contactId contact id
@@ -504,9 +503,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param array $defaults (reference ) an assoc array to hold the name / value pairs
    *                        in a hierarchical manner
    *
-   * @internal param array $ids (reference) the array that holds all the db ids
-   *
-   * @return object CRM_Member_BAO_Membership object
+   * @return CRM_Member_BAO_Membership object
    * @access public
    * @static
    */
@@ -538,7 +535,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
   /**
    *
-   * Function to get membership status and membership type values
+   * get membership status and membership type values
    *
    * @param int $membershipId membership id of values to return
    *
@@ -574,7 +571,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   }
 
   /**
-   * Function to delete membership.
+   * delete membership.
    * Wrapper for most delete calls. Use this unless you JUST want to delete related memberships w/o deleting the parent.
    *
    * @param int $membershipId membership id that needs to be deleted
@@ -591,7 +588,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   }
 
   /**
-   * Function to delete membership.
+   * delete membership.
    *
    * @param int $membershipId membership id that needs to be deleted
    *
@@ -717,18 +714,15 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   /**
    * Function to build Membership  Block in Contribution Pages
    *
-   * @param object $form form object
-   * @param $pageID
-   * @param $cid
+   * @param CRM_Core_Form $form form object
+   * @param int $pageID - unused?
+   * @param int $cid - contact checked for having a current membership for a particular membership
    * @param boolean $formItems
    * @param int $selectedMembershipTypeID selected membership id
    * @param boolean $thankPage thank you page
    * @param null $isTest
    *
    * @return bool Is this a separate membership payment
-   * @internal param int $pageId contribution page id
-   * @internal param bool $memContactId contact who is to be
-   * checked for having a current membership for a particular membership
    *
    * @static
    */
@@ -919,10 +913,9 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   /**
    * Function to return Membership Block info in Contribution Pages
    *
-   * @param $pageID
+   * @param int $pageID contribution page id
    *
    * @return array|null
-   * @internal param int $pageId contribution page id
    *
    * @static
    */
@@ -957,16 +950,15 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
 
   /**
    * Function to return a current membership of given contact
-   *        NB: if more than one membership meets criteria, a randomly selected one is returned.
+   * NB: if more than one membership meets criteria, a randomly selected one is returned.
    *
    * @param int $contactID contact id
    * @param int $memType membership type, null to retrieve all types
    * @param int $isTest
-   * @param null $membershipId
+   * @param int $membershipId if provided, then determine if it is current
    * @param boolean $onlySameParentOrg true if only Memberships with same parent org as the $memType wanted, false otherwise
    *
    * @return array|bool
-   * @internal param int $membershipID if provided, then determine if it is current
    * @static
    */
   static function getContactMembership($contactID, $memType, $isTest, $membershipId = NULL, $onlySameParentOrg = FALSE) {
@@ -1473,17 +1465,14 @@ AND civicrm_membership.is_test = %2";
    * @param int $contactID id of the contact
    * @param int $membershipTypeID id of the new membership type
    * @param boolean $is_test if this is test contribution or live contribution
-   * @param object $form form object
+   * @param CRM_Core_Form $form form object
    * @param null $changeToday
    * @param int $modifiedID individual contact id in case of On Behalf signup (CRM-4027 )
    * @param null $customFieldsFormatted
    * @param int $numRenewTerms how many membership terms are being added to end date (default is 1)
-   *
    * @param integer $membershipID Membership ID, this should always be passed in & optionality should be removed
    *
    * @throws CRM_Core_Exception
-   * @internal param array $ipnParams array of name value pairs, to be used (for e.g source) when $form not present
-   * @return CRM_Member_DAO_Membership $membership          object of membership
    *
    * @static
    * @access public
@@ -1717,12 +1706,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * function to create memberships for related contacts
    * takes into account the maximum related memberships
    *
-   * @param  array $params array of key - value pairs
-   * @param $dao
+   * @param array $params array of key - value pairs
+   * @param CRM_Core_DAO $dao membership object
    *
-   * @internal param object $membership membership object
-   *
-   * @return null|relatedMembership     array of memberships if created
+   * @return null|array     array of memberships if created
    * @static
    * @access public
    */
@@ -1907,7 +1894,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param null $membershipTypeID
    *
    * @return array
@@ -1962,11 +1949,10 @@ FROM   civicrm_membership_type
   /**
    * Function to get membership record count for a Contact
    *
-   * @param $contactID
+   * @param int $contactID
    * @param boolean $activeOnly
    *
-   * @internal param int $contactId Contact ID
-   * @return int count of membership records
+   * @return null|string
    * @access public
    * @static
    */
@@ -2144,14 +2130,12 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param CRM_Contribute_Form_Contribution_Confirm $form
    * @param $tempParams
    * @param $isTest
-   *
    * @param $lineItems
    * @param $minimumFee
    * @param $financialTypeID
    *
    * @throws CRM_Core_Exception
    * @throws Exception
-   * @internal param $membershipDetails
    * @return CRM_Contribute_BAO_Contribution
    */
   public static function processSecondaryFinancialTransaction($contactID, &$form, $tempParams, $isTest, $lineItems, $minimumFee, $financialTypeID) {
@@ -2239,9 +2223,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param $isTest
    * @param $numTerms
    * @param $membershipContribution
-   * @param $form
-   *
-   * @internal param $createdMemberships
+   * @param CRM_Core_Form $form
    *
    * @return array
    */
@@ -2267,7 +2249,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @param array $errors
    *
-   * @internal param $message
    *
    * @return string
    */
@@ -2283,7 +2264,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
   /**
    * Extract relevant values from the form so we can separate form logic from BAO logcis
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $changeToday
    * @param $membershipTypeDetails
    *
@@ -2799,7 +2780,6 @@ WHERE      civicrm_membership.is_test = 0";
           $updateCount++;
         }
       }
-      // CRM_Core_Error::debug( 'fEnd', count( $GLOBALS['_DB_DATAOBJECT']['RESULTS'] ) );
     }
     $result['is_error'] = 0;
     $result['messages'] = ts('Processed %1 membership records. Updated %2 records.', array(1 => $processCount, 2 => $updateCount));
@@ -2815,9 +2795,7 @@ WHERE      civicrm_membership.is_test = 0";
    * @param bool $onlyLifeTime
    *
    * @return array
-   * @internal param array $contactMembershipType array of allMembershipTypes Key - value pairs
    */
-
   static function getAllContactMembership($contactID, $isTest = FALSE, $onlyLifeTime = FALSE) {
     $contactMembershipType = array();
     if (!$contactID) {
@@ -2927,13 +2905,10 @@ WHERE      civicrm_membership.is_test = 0";
   /**
    * Function to record line items for default membership
    *
-   * @param $qf object
+   * @param CRM_Core_Form $qf
+   * @param array $membershipType array with membership type and organization
+   * @param int $priceSetId
    *
-   * @param $membershipType array with membership type and organization
-   *
-   * @param $priceSetId
-   *
-   * @internal param $ $ priceSetId priceset id
    * @access public
    * @static
    */

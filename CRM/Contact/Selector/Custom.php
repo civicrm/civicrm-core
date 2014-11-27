@@ -157,7 +157,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
       $this->_search = new $className($formValues);
     }
   }
-  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -206,15 +205,13 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     }
     return self::$_links;
   }
-  //end of function
 
   /**
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param $params
+   * @param array $params
    *
-   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -225,7 +222,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * returns the column headers as an array of tuples:
@@ -416,7 +412,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $action
    * @param $sortID
    * @param null $displayRelationshipType

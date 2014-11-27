@@ -93,7 +93,7 @@ class CRM_Utils_Migrate_Import {
   }
 
   /**
-   * @param $dao
+   * @param CRM_Core_DAO $dao
    * @param $xml
    * @param bool $save
    * @param null $keyName

@@ -79,7 +79,7 @@ class CRM_Grant_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param bool $useTable
    */
   static function preProcessCommon(&$form, $useTable = FALSE) {
@@ -151,8 +151,6 @@ class CRM_Grant_Form_Task extends CRM_Core_Form {
    * @param string $title title of the main button
    * @param string $nextType
    * @param string $backType
-   *
-   * @internal param string $type button type for the form after processing
    *
    * @return void
    * @access public

@@ -306,7 +306,7 @@ class CRM_Core_BAO_CustomValueTable {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $entityTable
    * @param $entityID
    */
@@ -352,7 +352,7 @@ class CRM_Core_BAO_CustomValueTable {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $customFields
    * @param $entityTable
    * @param $entityID
@@ -484,13 +484,13 @@ AND    $cond
   }
 
   /**
-   * Function to take in an array of entityID, custom_XXX => value
+   * take in an array of entityID, custom_XXX => value
    * and set the value in the appropriate table. Should also be able
    * to set the value to null. Follows api parameter/return conventions
    *
    * @array $params
    *
-   * @param $params
+   * @param array $params
    *
    * @throws Exception
    * @return array
@@ -623,7 +623,7 @@ AND    cf.id IN ( $fieldIDList )
   }
 
   /**
-   * Function to take in an array of entityID, custom_ID
+   * take in an array of entityID, custom_ID
    * and gets the value from the appropriate table.
    *
    * To get the values of custom fields with IDs 13 and 43 for contact ID 1327, use:
@@ -635,7 +635,7 @@ AND    cf.id IN ( $fieldIDList )
    *
    * @array $params
    *
-   * @param $params
+   * @param array $params
    *
    * @throws Exception
    * @return array

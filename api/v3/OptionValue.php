@@ -3,9 +3,7 @@
 /**
  * Retrieve one or more OptionValues
  *
- * @param $params
- *
- * @internal param $array $ params input parameters
+ * @param array $params
  *
  * {@example OptionValueGet.php 0}
  * @example OptionValueGet.php
@@ -35,7 +33,7 @@ function civicrm_api3_option_value_get($params) {
  *
  * {@example OptionValueCreate.php}
  *
- * @param $params
+ * @param array $params
  *
  * @throws API_Exception
  * @return array of newly created option_value property values.

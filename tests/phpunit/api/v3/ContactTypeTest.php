@@ -90,10 +90,10 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     }
   }
 
-  /*
-     * test add methods with valid data
-     * success expected
-     */
+  /**
+   * test add methods with valid data
+   * success expected
+   */
   function testContactCreate() {
 
     // check for Type:Individual Subtype:sub_individual
@@ -134,9 +134,9 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   }
 
 
-  /*
-     * test add with invalid data
-     */
+  /**
+   * test add with invalid data
+   */
   function testContactAddInvalidData() {
 
     // check for Type:Individual Subtype:sub_household
@@ -158,10 +158,10 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   }
 
 
-  /*
-     * test update with no subtype to valid subtype
-     * success expected
-     */
+  /**
+   * test update with no subtype to valid subtype
+   * success expected
+   */
   function testContactUpdateNoSubtypeValid() {
 
     // check for Type:Individual
@@ -224,9 +224,9 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   }
 
 
-  /*
-     * test update with no subtype to invalid subtype
-     */
+  /**
+   * test update with no subtype to invalid subtype
+   */
   function testContactUpdateNoSubtypeInvalid() {
 
     // check for Type:Individual
@@ -271,10 +271,10 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', $params);
   }
 
-  /*
-     * test update with no subtype to valid subtype
-     * success expected
-     */
+  /**
+   * test update with no subtype to valid subtype
+   * success expected
+   */
   function testContactUpdateSubtypeValid() {
 
     $params = array(
@@ -361,9 +361,9 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', $params);
   }
 
-  /*
-     * test update with no subtype to invalid subtype
-     */
+  /**
+   * test update with no subtype to invalid subtype
+   */
   function testContactUpdateSubtypeInvalid() {
 
     // check for Type:Individual subtype:sub_individual

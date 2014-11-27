@@ -11,7 +11,7 @@ class test_extension_manager_paymenttest extends CRM_Core_Payment {
    *
    * @param string  $mode the mode of operation: live or test
    * @param array  $paymentProcessor the details of the payment processor being invoked
-   * @param object  $paymentForm      reference to the form object if available
+   * @param CRM_Core_Form  $paymentForm      reference to the form object if available
    * @param boolean $force            should we force a reload of this payment object
    *
    * @return object

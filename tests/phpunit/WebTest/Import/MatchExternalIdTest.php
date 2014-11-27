@@ -35,9 +35,9 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
-     *  Test participant import for Individuals matching on external identifier.
-     */
+  /**
+   *  Test participant import for Individuals matching on external identifier.
+   */
   function testContributionImport() {
     $this->webtestLogin();
 
@@ -48,9 +48,9 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Contribution', $headers, $rows, 'Individual', 'Insert new contributions', $fieldMapper);
   }
 
-  /*
-     *  Test membership import for Individuals matching on external identifier.
-     */
+  /**
+   *  Test membership import for Individuals matching on external identifier.
+   */
   function testMemberImportIndividual() {
     $this->webtestLogin();
 
@@ -61,9 +61,9 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Membership', $headers, $rows, 'Individual', 'Skip', $fieldMapper);
   }
 
-  /*
-     *  Test participant import for Individuals matching on external identifier.
-     */
+  /**
+   *  Test participant import for Individuals matching on external identifier.
+   */
   function testParticipantImportIndividual() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -75,10 +75,9 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Event', $headers, $rows, 'Individual', 'Skip', $fieldMapper);
   }
 
-  /*
-      *  Helper function to provide data for contribution  import for Individual.
-      */
   /**
+   * Helper function to provide data for contribution  import for Individual.
+   *
    * @return array
    */
   function _contributionIndividualCSVData() {
@@ -126,10 +125,9 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows, $fieldMapper);
   }
 
-  /*
-     *  Helper function to provide data for membership import for Individual.
-     */
   /**
+   * Helper function to provide data for membership import for Individual.
+   *
    * @return array
    */
   function _memberIndividualCSVData() {
@@ -176,10 +174,9 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows, $fieldMapper);
   }
 
-  /*
-     *  Helper function to provide data for participant import for Individual.
-     */
   /**
+   * Helper function to provide data for participant import for Individual.
+   *
    * @return array
    */
   function _participantIndividualCSVData() {
@@ -235,19 +232,14 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows, $fieldMapper);
   }
 
-  /*
-     * Helper function to add new contact
-     *
-     * @params $firstName, $lastName, $externalId
-     *
-     * @return int external id
-     */
   /**
+   * Helper function to add new contact
+   *
    * @param $firstName
    * @param $lastName
    * @param $externalId
    *
-   * @return mixed
+   * @return int external id
    */
   function _addContact($firstName, $lastName, $externalId) {
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
@@ -269,20 +261,14 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     return $externalId;
   }
 
-  /*
-     * Helper function to add new event
-     *
-     * @params array $params parameters to create an event
-     *
-     * @return array $params event details of newly created event
-     */
   /**
+   * Helper function to add new event
+   *
    * @param array $params
    *
-   * @return array
+   * @return array event details of newly created event
    */
-  function _addNewEvent($params = array(
-    )) {
+  function _addNewEvent($params = array()) {
     if (empty($params)) {
 
       // Use default payment processor

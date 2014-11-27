@@ -40,7 +40,7 @@
 class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
   /**
-   * Function to pre  process the form
+   * pre  process the form
    *
    * @access public
    *
@@ -51,7 +51,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   }
 
   /**
-   * This function sets the default values for the form. Manage Premiums that in edit/view mode
+   * Set default values for the form. Manage Premiums that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -87,7 +87,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -272,7 +272,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

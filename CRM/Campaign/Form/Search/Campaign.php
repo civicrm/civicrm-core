@@ -70,7 +70,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *

@@ -43,7 +43,7 @@
  * {@getfields address_create}
  * {@example AddressCreate.php}
  *
- * @param $params
+ * @param array $params
  *
  * @return array of newly created tag property values.
  * @access public
@@ -78,9 +78,9 @@ function civicrm_api3_address_create(&$params) {
   }
 
   /**
-    * create array for BAO (expects address params in as an
-    * element in array 'address'
-    */
+   * Create array for BAO (expects address params in as an
+   * element in array 'address'
+   */
   $addressBAO = CRM_Core_BAO_Address::add($params, TRUE);
   if (empty($addressBAO)) {
     return civicrm_api3_create_error("Address is not created or updated ");

@@ -49,16 +49,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Contribute_BAO_ContributionType object
+   * @return CRM_Contribute_BAO_ContributionType object
    * @access public
    * @static
    */
@@ -86,7 +82,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * function to add the financial types
+   * add the financial types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -118,12 +114,11 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * Function to delete financial Types
+   * delete financial Types
    *
-   * @param $financialTypeId
+   * @param int $financialTypeId
    *
    * @return array|bool
-   * @internal param int $contributionTypeId
    * @static
    */
   static function del($financialTypeId) {

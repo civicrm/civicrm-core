@@ -90,7 +90,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @param null
    *

@@ -279,10 +279,9 @@ class CRM_Core_Page {
   /**
    * assign value to name in template
    *
-   * @param $var
+   * @param string $var
    * @param mixed $value value of varaible
    *
-   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -293,10 +292,9 @@ class CRM_Core_Page {
   /**
    * assign value to name in template by reference
    *
-   * @param $var
+   * @param string $var
    * @param mixed $value (reference) value of varaible
    *
-   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -320,7 +318,6 @@ class CRM_Core_Page {
    *
    * @param string $name
    *
-   * @internal param string $type
    * @return array
    */
   function get_template_vars($name=null) {
@@ -328,7 +325,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * function to destroy all the session state of this page.
+   * destroy all the session state of this page.
    *
    * @access public
    *

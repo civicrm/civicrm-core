@@ -166,7 +166,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $component
    */
   function doRecurCheckout(&$params, $component) {
@@ -435,8 +435,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *
    * @return bool|object
    */
-  function cancelSubscription(&$message = '', $params = array(
-    )) {
+  function cancelSubscription(&$message = '', $params = array()) {
     $orderNo = CRM_Utils_Array::value('subscriptionId', $params);
 
     $merchant_id  = $this->_paymentProcessor['user_name'];

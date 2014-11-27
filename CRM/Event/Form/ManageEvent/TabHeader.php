@@ -39,7 +39,7 @@
 class CRM_Event_Form_ManageEvent_TabHeader {
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    */
@@ -60,7 +60,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    * @throws Exception

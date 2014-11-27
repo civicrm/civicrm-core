@@ -41,7 +41,7 @@ class CRM_Core_Page_AJAX_Location {
    * FIXME: we should make this method like getLocBlock() OR use the same method and
    * remove this one.
    *
-   * Function to obtain the location of given contact-id.
+   * obtain the location of given contact-id.
    * This method is used by on-behalf-of form to dynamically generate poulate the
    * location field values for selected permissioned contact.
    */

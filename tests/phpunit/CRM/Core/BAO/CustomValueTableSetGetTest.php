@@ -22,10 +22,9 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  /*
-     * Test setValues() and GetValues() methods with custom Date field
-     *
-     */
+  /**
+   * Test setValues() and GetValues() methods with custom Date field
+   */
   function testSetGetValuesDate() {
     $params = array();
     $contactID = Contact::createIndividual();
@@ -121,10 +120,10 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     Contact::delete($contactID);
   }
 
-  /*
-     * Test setValues() and getValues() methods with custom field YesNo(Boolean) Radio
-     *
-     */
+  /**
+   * Test setValues() and getValues() methods with custom field YesNo(Boolean) Radio
+   *
+   */
   function testSetGetValuesYesNoRadio() {
     $params = array();
     $contactID = Contact::createIndividual();

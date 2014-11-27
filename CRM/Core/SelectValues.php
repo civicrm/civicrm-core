@@ -355,7 +355,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Function to get hours
+   * get hours
    *
    *
    * @static
@@ -369,7 +369,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Function to get minutes
+   * get minutes
    *
    *
    * @static
@@ -383,7 +383,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Function to get the Map Provider
+   * get the Map Provider
    *
    * @return array $map array of map providers
    * @static

@@ -571,7 +571,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $mail
    *
    * @return mixed
@@ -629,7 +629,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $errors
    * @param string $emailName
    */
@@ -742,7 +742,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   public function getLoginDestination(&$form) {
     return;

@@ -389,7 +389,6 @@ class CRM_Utils_Mail {
   }
 
   /**
-   *
    * @param string $fileName
    * @param string $html
    * @param string $format

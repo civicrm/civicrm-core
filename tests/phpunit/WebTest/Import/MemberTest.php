@@ -35,9 +35,9 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
-     *  Test participant import for Individuals.
-     */
+  /**
+   *  Test participant import for Individuals.
+   */
   function testMemberImportIndividual() {
 
     $this->webtestLogin();
@@ -49,9 +49,9 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Membership', $headers, $rows, 'Individual', 'Skip', $fieldMapper);
   }
 
-  /*
-     *  Test participant import for Households.
-     */
+  /**
+   *  Test participant import for Households.
+   */
   function testMemberImportHousehold() {
 
     $this->webtestLogin();
@@ -63,9 +63,9 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Membership', $headers, $rows, 'Household', 'Skip', $fieldMapper);
   }
 
-  /*
-     *  Test participant import for Organizations.
-     */
+  /**
+   *  Test participant import for Organizations.
+   */
   function testMemberImportOrganization() {
 
     $this->webtestLogin();
@@ -77,10 +77,9 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Membership', $headers, $rows, 'Organization', 'Skip', $fieldMapper);
   }
 
-  /*
-     * Helper function to provide data for Membeship import for Individuals.
-     */
   /**
+   * Helper function to provide data for Membeship import for Individuals.
+   *
    * @return array
    */
   function _memberIndividualCSVData() {
@@ -124,10 +123,9 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows, $fieldMapper);
   }
 
-  /*
-     * Helper function to provide data for Membeship import for Households.
-     */
   /**
+   * Helper function to provide data for Membeship import for Households.
+   *
    * @return array
    */
   function _memberHouseholdCSVData() {
@@ -169,10 +167,9 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows, $fieldMapper);
   }
 
-  /*
-     * Helper function to provide data for Membeship import for Organizations.
-     */
   /**
+   * Helper function to provide data for Membeship import for Organizations.
+   *
    * @return array
    */
   function _memberOrganizationCSVData() {

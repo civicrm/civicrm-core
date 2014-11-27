@@ -96,7 +96,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @throws Exception
    */
@@ -114,7 +114,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @throws Exception
    */
@@ -123,7 +123,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @throws Exception
    */

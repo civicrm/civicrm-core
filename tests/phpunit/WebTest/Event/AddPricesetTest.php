@@ -498,7 +498,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Function to test to regiter participant for event with
+   * test to regiter participant for event with
 
    * multiple price fields in price-set
    * CRM-11986

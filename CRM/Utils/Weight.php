@@ -39,7 +39,7 @@ class CRM_Utils_Weight {
   static $SIGNABLE_FIELDS = array('reset', 'dao', 'idName', 'url', 'filter'); // 'id','src','dst','dir'
 
   /**
-   * Function to correct duplicate weight entries by putting them (duplicate weights) in sequence.
+   * correct duplicate weight entries by putting them (duplicate weights) in sequence.
    *
    * @param string  $daoName full name of the DAO
    * @param array   $fieldValues field => value to be used in the WHERE
@@ -265,7 +265,7 @@ class CRM_Utils_Weight {
    *
    * @param null $groupBy
    *
-   * @return Object CRM_Core_DAO objet that holds the results of the query
+   * @return CRM_Core_DAO objet that holds the results of the query
    */
   static function &query($queryType,
       $daoName,
@@ -338,7 +338,7 @@ class CRM_Utils_Weight {
 
   /**
    * @param $rows
-   * @param $daoName
+   * @param string $daoName
    * @param $idName
    * @param $returnURL
    * @param null $filter

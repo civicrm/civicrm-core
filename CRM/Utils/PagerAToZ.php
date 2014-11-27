@@ -57,7 +57,7 @@ class CRM_Utils_PagerAToZ {
   }
 
   /**
-   * Function to return the all the static characters
+   * return the all the static characters
    *
    * @return array $staticAlphabets is a array of static characters
    * @access private
@@ -69,7 +69,7 @@ class CRM_Utils_PagerAToZ {
   }
 
   /**
-   * Function to return the all the dynamic characters
+   * return the all the dynamic characters
    *
    * @param $query
    * @param $isDAO

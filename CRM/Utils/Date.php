@@ -288,13 +288,11 @@ class CRM_Utils_Date {
    * %P - uppercase ante/post meridiem ('AM', 'PM')
    * %Y - year as a decimal number including the century ('2005')
    *
-   * @param string $dateString
+   * @param string $dateString date and time in 'YYYY-MM-DD hh:mm:ss' format
    * @param string $format the output format
    * @param array $dateParts an array with the desired date parts
    *
-   * @internal param string $date date and time in 'YYYY-MM-DD hh:mm:ss' format
    * @return string  the $format-formatted $date
-   *
    * @static
    */
   static function customFormat($dateString, $format = NULL, $dateParts = NULL) {
@@ -704,7 +702,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Function to get customized today
+   * get customized today
    *
    * This function is used for getting customized today. To get
    * actuall today pass 'dayParams' as null. or else pass the day,
@@ -737,7 +735,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Function to find whether today's date lies in
+   * find whether today's date lies in
    * the given range
    *
    * @param  date  $startDate  start date for the range
@@ -765,7 +763,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Function to get start date and end from
+   * get start date and end from
    * the given relative term and unit
    *
    * @param  date $relative eg: term.unit

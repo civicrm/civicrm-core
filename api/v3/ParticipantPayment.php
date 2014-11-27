@@ -85,9 +85,7 @@ function _civicrm_api3_participant_payment_create_spec(&$params) {
  *
  * This API is used for deleting a Participant Payment
  *
- * @param $params
- *
- * @internal param Int $participantPaymentID Id of the Participant Payment to be deleted
+ * @param array $params
  *
  * @return array API result
  * @example ParticipantPaymentDelete.php

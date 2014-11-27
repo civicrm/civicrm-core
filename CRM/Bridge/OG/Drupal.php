@@ -37,7 +37,7 @@
 class CRM_Bridge_OG_Drupal {
 
   /**
-   * @param $params
+   * @param array $params
    * @param $op
    */
   static function nodeapi(&$params, $op) {
@@ -68,7 +68,7 @@ class CRM_Bridge_OG_Drupal {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $op
    * @param null $groupType
    */
@@ -115,7 +115,7 @@ class CRM_Bridge_OG_Drupal {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $op
    */
   static function updateCiviACLRole(&$params, $op) {
@@ -162,7 +162,7 @@ SELECT v.id
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $op
    */
   static function updateCiviACLEntityRole(&$params, $op) {
@@ -184,7 +184,7 @@ SELECT v.id
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $op
    */
   static function updateCiviACL(&$params, $op) {
@@ -210,7 +210,7 @@ SELECT v.id
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $op
    *
    * @throws Exception

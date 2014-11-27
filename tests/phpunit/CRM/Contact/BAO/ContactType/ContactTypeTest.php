@@ -63,10 +63,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->subTypesHousehold[] = $params['name'];
   }
 
-  /*
-     * test contactTypes() and subTypes() methods with valid data
-     * success expected
-     */
+  /**
+   * test contactTypes() and subTypes() methods with valid data
+   * success expected
+   */
   function testGetMethods() {
 
     // check all contact types
@@ -122,9 +122,9 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     }
   }
 
-  /*
-     * test subTypes() methods with invalid data
-     */
+  /**
+   * test subTypes() methods with invalid data
+   */
   function testGetMethodsInvalid() {
 
     $params = 'invalid';
@@ -136,10 +136,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals(empty($result), TRUE, 'In line ' . __LINE__);
   }
 
-  /*
-     * test add() methods with valid data
-     * success expected
-     */
+  /**
+   * test add() methods with valid data
+   * success expected
+   */
   function testAdd() {
 
     $params = array(
@@ -169,9 +169,9 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     CRM_Contact_BAO_ContactType::del($result->id);
   }
 
-  /*
-     * test add() with invalid data
-     */
+  /**
+   * test add() with invalid data
+   */
   function testAddInvalid1() {
 
     // parent id does not exist in db
@@ -209,10 +209,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals($result, NULL, 'In line' . __LINE__);
   }
 
-  /*
-     * test del() with valid data
-     * success expected
-     */
+  /**
+   * test del() with valid data
+   * success expected
+   */
   function testDel() {
 
     $params = array(
@@ -229,9 +229,9 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals(in_array($subtype->name, $result), TRUE, 'In line ' . __LINE__);
   }
 
-  /*
-     * test del() with invalid data
-     */
+  /**
+   * test del() with invalid data
+   */
   function testDelInvalid() {
 
     $del = CRM_Contact_BAO_ContactType::del(NULL);

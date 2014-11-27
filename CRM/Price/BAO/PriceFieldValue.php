@@ -46,7 +46,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @param $ids
    *
-   * @return object CRM_Price_DAO_PriceFieldValue object
+   * @return CRM_Price_DAO_PriceFieldValue object
    * @access public
    * @static
    */
@@ -75,7 +75,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @param $ids
    *
-   * @return object CRM_Price_DAO_PriceFieldValue object
+   * @return CRM_Price_DAO_PriceFieldValue object
    * @access public
    * @static
    */
@@ -129,7 +129,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param array $params   (reference ) an assoc array
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Price_DAO_PriceFieldValue object
+   * @return CRM_Price_DAO_PriceFieldValue object
    * @access public
    * @static
    */

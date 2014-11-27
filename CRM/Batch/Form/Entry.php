@@ -115,7 +115,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -294,7 +294,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -514,7 +514,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     return TRUE;
   }
-  //end of function
 
   /**
    * process membership records
