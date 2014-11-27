@@ -69,7 +69,27 @@ function civicrm_api3_generic_setValue($apiRequest) {
   }
 
   $dao_name = _civicrm_api3_get_DAO($entity);
-  if (CRM_Core_DAO::setFieldValue($dao_name, $id, $field, $value)) {
+  // setFieldValue below doesn't support custom data, 
+  // so if we encounter custom data we use the api create call instead
+  if ( array_key_exists('custom_group_id', $fields[$field]) ) {
+    $updateCustomFieldParams = array(
+      'version' => 3,
+      'sequential' => 1,
+      'id' => $id,
+      $field => $value,
+    );
+    $updateCustomFieldResult = civicrm_api($entity, 'create', $updateCustomFieldParams);
+    
+    if ( !civicrm_error($updateCustomFieldResult) ) {
+      $entity = array('id' => $id, $field => $value);
+      CRM_Utils_Hook::post('edit', $entity, $id, $entity);
+      return civicrm_api3_create_success($entity);
+    }
+    else {
+      return civicrm_api3_create_error("error assigning $field=$value for $entity (id=$id)");
+    }
+  }
+  elseif (CRM_Core_DAO::setFieldValue($dao_name, $id, $field, $value)) {
     $params = array('id' => $id, $field => $value);
     $entityDAO = new $dao_name();
     $entityDAO->copyValues($params);
