@@ -26,15 +26,20 @@
 *}
 {* this template is for configuring Scheduled Reminders *}
 
+{if $tabHeader}
+  {include file="CRM/common/TabHeader.tpl"}
+{else}
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
    {include file="CRM/Admin/Form/ScheduleReminders.tpl"}
 {else}
   {* include wysiwyg related files*}
   {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
-  {capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
-  <div class="help">
-    {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
-  </div>
+  {if !$component}
+    {capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
+    <div class="help">
+      {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
+    </div>
+  {/if}
   {if $rows}
     <div id="reminder">
       {include file="CRM/Admin/Page/Reminders.tpl"}
@@ -42,10 +47,20 @@
   {else}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-      {ts}None found.{/ts}
+      {if $component}
+        {ts}No Scheduled Reminders have been created for this {$component}.{/ts}
+      {else}
+        {ts}None found.{/ts}
+      {/if}
     </div>
   {/if}
   <div class="action-link">
-    <a href="{crmURL q="action=add&reset=1"}" id="newScheduleReminder" class="button"><span><div class="icon add-icon"></div>{ts}Add Reminder{/ts}</span></a>
+    {if $component}
+      {assign var='urlParams' value="action=add&context=$component&compId=$compId&reset=1"}
+    {else}
+      {assign var='urlParams' value="action=add&reset=1"}
+    {/if}
+    <a href="{crmURL q=$urlParams}" id="newScheduleReminder" class="button"><span><div class="icon add-icon"></div>{ts}Add Reminder{/ts}</span></a>
   </div>
+{/if}
 {/if}
