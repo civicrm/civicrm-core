@@ -53,7 +53,7 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
   protected $_tags;
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -77,7 +77,7 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $rule
    *
    * @return array
@@ -144,6 +144,5 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
       CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", array(1 => $this->_tags[$key])), 'success', array('expires' => 0));
     }
   }
-  //end of function
 }
 

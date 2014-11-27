@@ -433,7 +433,7 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function buildSearchForm(&$form) {
     foreach (CRM_Member_PseudoConstant::membershipType() as $id => $Name) {

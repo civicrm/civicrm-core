@@ -200,7 +200,7 @@ class CRM_Auction_Page_Item extends CRM_Core_Page {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param bool $sortBy
    * @param $force
    *

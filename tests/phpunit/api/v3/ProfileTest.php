@@ -256,9 +256,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'Invalid Activity Id (aid).');
   }
 
-  /*
-     * check contact activity profile with wrong activity type
-     */
+  /**
+   * check contact activity profile with wrong activity type
+   */
   function testContactActivityGetWrongActivityType() {
     //flush cache by calling with reset
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
@@ -289,9 +289,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     );
   }
 
-  /*
-     * check contact activity profile with success
-     */
+  /**
+   * check contact activity profile with success
+   */
   function testContactActivityGetSuccess() {
     list($params, $expected) = $this->_createContactWithActivity();
 
@@ -318,6 +318,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals('defaultValue', $result['values']['custom_1']['default_value']);
     $this->assertFalse(array_key_exists('participant_status', $result['values']));
   }
+
   /**
    * Check getfields works & gives us our fields - partipant profile
    */
@@ -535,9 +536,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       );
     }
   }
-  /*
-     * check contact activity profile without activity id
-     */
+
+  /**
+   * check contact activity profile without activity id
+   */
   function testContactActivitySubmitWithoutActivityId() {
     list($params, $expected) = $this->_createContactWithActivity();
 
@@ -547,9 +549,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: activity_id');
   }
 
-  /*
-     * check contact activity profile wrong activity id
-     */
+  /**
+   * check contact activity profile wrong activity id
+   */
   function testContactActivitySubmitWrongActivityId() {
     list($params, $expected) = $this->_createContactWithActivity();
     $params = array_merge($params, $expected);
@@ -558,9 +560,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals($result['error_message'], 'Invalid Activity Id (aid).');
   }
 
-  /*
-     * check contact activity profile with wrong activity type
-     */
+  /**
+   * check contact activity profile with wrong activity type
+   */
   function testContactActivitySubmitWrongActivityType() {
     //flush cache by calling with reset
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
@@ -591,9 +593,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'This activity cannot be edited or viewed via this profile.');
   }
 
-  /*
-     * check contact activity profile with success
-     */
+  /**
+   * check contact activity profile with success
+   */
   function testContactActivitySubmitSuccess() {
     list($params, $expected) = $this->_createContactWithActivity();
 
@@ -701,10 +703,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     }
   }
 
-  /*
-     * Helper function to create an Individual with address/email/phone info. Import UF Group and UF Fields
-     */
   /**
+   * Helper function to create an Individual with address/email/phone info. Import UF Group and UF Fields
    * @param array $params
    *
    * @return mixed

@@ -2263,7 +2263,7 @@ class CRM_Contact_BAO_Query {
   /**
    * Given a result dao, extract the values and return that array
    *
-   * @param Object $dao
+   * @param CRM_Core_DAO $dao
    *
    * @return array values for this query
    */
@@ -4366,11 +4366,10 @@ civicrm_relationship.is_permission_a_b = 0
    * @param string $sort
    * @param int $offset
    * @param int $row_count
-   * @param bool $smartGroupCache
+   * @param bool $smartGroupCache  ?? update smart group cache?
    * @param bool $count return count obnly
    * @param bool $skipPermissions Should permissions be ignored or should the logged in user's permissions be applied
    *
-   * @params bool $smartGroupCache ?? update smart group cache?
    *
    * @return array
    * @access public
@@ -5388,14 +5387,12 @@ AND   displayRelType.is_active = 1
    * @param $op       string the sql operator, this function should handle ALL SQL operators
    * @param $value string|integer|array depends on the operator and who's calling the query builder
    * @param $grouping int    the index where to place the where clause
-   * @param $selectValues
+   * @param $selectValues the key value pairs for this element. This allows us to use this function for things besides option-value pairs
    * @param $field    array  an array that contains various properties of the field identified by $name
    * @param $label    string The label for this field element
    * @param $dataType string The data type for this element
-   *
    * @param bool $useIDsOnly
    *
-   * @internal param array $selectValue the key value pairs for this element. This allows us to use this function for things besides option-value pairs
    * @return void     adds the where clause and qill to the query object
    */
   function optionValueQuery(
@@ -5466,7 +5463,7 @@ AND   displayRelType.is_active = 1
   }
 
   /**
-   * function to check and explode a user defined numeric string into an array
+   * check and explode a user defined numeric string into an array
    * this was the protocol used by search builder in the old old days before we had
    * super nice js widgets to do the hard work
    *

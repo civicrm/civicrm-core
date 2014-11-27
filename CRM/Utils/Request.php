@@ -125,7 +125,6 @@ class CRM_Utils_Request {
    * This is a replacement for $_REQUEST which includes $_GET/$_POST
    * but excludes $_COOKIE / $_ENV / $_SERVER.
    *
-   * @internal param string $method
    * @return array
    */
   static function exportValues() {

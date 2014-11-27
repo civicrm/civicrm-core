@@ -18,7 +18,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public $pay_later_receipt;
 
   /**
-   * @param $params
+   * @param array $params
    * @param $participant
    * @param $event
    *
@@ -313,7 +313,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
   /**
    * @param $events_in_cart
-   * @param $params
+   * @param array $params
    */
   function emailReceipt($events_in_cart, $params) {
     $contact_details    = CRM_Contact_BAO_Contact::getContactDetails($this->payer_contact_id);
@@ -560,7 +560,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    * @throws Exception
@@ -601,7 +601,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
   /**
    * @param $mer_participant
-   * @param $params
+   * @param array $params
    * @param $event
    *
    * @return object

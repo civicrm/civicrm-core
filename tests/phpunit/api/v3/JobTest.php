@@ -287,7 +287,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param $op
    * @param $objectName
    * @param $id
-   * @param $params
+   * @param array $params
    */
   function hookPreRelationship($op, $objectName, $id, &$params ) {
     if($op == 'delete') {

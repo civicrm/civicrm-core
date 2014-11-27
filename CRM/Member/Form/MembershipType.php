@@ -58,7 +58,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   }
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -108,7 +108,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -212,7 +212,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   }
 
   /**
-   * Function for validation
+   * validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -289,7 +289,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

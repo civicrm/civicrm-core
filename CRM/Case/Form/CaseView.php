@@ -38,14 +38,14 @@
  *
  */
 class CRM_Case_Form_CaseView extends CRM_Core_Form {
-  /*
-     * check for merge cases.
-     */
-
+  /**
+   * check for merge cases.
+   * @var bool
+   */
   private $_mergeCases = FALSE;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -193,7 +193,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -206,7 +206,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public

@@ -51,7 +51,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Contact_BAO_Group object
+   * @return CRM_Contact_BAO_Group object
    * @access public
    * @static
    */
@@ -67,7 +67,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Function to delete the group and all the object that connect to
+   * delete the group and all the object that connect to
    * this group. Incredibly destructive
    *
    * @param int $id group id
@@ -204,9 +204,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param $groupID
    * @param bool $useCache
    *
-   * @internal param int $lngGroupId this is group id
-   *
-   * @return array $aMembers this arrray contains the list of members for this group id
+   * @return array $aMembers this array contains the list of members for this group id
    * @access public
    * @static
    */
@@ -226,7 +224,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Returns array of group object(s) matching a set of one or Group properties.
    *
-   * @param null $params
+   * @param array $params Limits the set of groups returned.
    * @param array $returnProperties Which properties should be included in the returned group objects.
    *                                       (member_count should be last element.)
    *
@@ -234,9 +232,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param null $offset
    * @param null $rowCount
    *
-   * @internal param array $param Array of one or more valid property_name=>value pairs.
-   *                                       Limits the set of groups returned.
-   * @return  An array of group objects.
+   * @return array of group objects.
    *
    * @access public
    *
@@ -610,10 +606,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * get permission relevant clauses
    * CRM-12209
-   *
-   * @internal param $existingClauses
-   *
-   * @internal param $clauses
    *
    * @param bool $force
    *
@@ -1123,7 +1115,7 @@ WHERE  id IN $groupIdString
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return null|string
    */
@@ -1143,7 +1135,7 @@ WHERE {$whereClause}";
 
   /**
    * Generate permissioned where clause for group search
-   * @param $params
+   * @param array $params
    * @param bool $sortBy
    * @param bool $excludeHidden
    *
@@ -1234,7 +1226,7 @@ WHERE {$whereClause}";
   }
 
   /**
-   * Function to define action links
+   * define action links
    *
    * @return array $links array of action links
    * @access public

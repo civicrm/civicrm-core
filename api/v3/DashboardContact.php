@@ -84,7 +84,7 @@ function _civicrm_api3_dashboard_contact_create_spec(&$params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return array|null
  */

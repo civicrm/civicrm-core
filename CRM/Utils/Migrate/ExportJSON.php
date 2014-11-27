@@ -50,7 +50,7 @@ class CRM_Utils_Migrate_ExportJSON {
   protected $_sitePrefix = 'Site 1';
 
   /**
-   * @param $params
+   * @param array $params
    */
   function __construct(&$params) {
     foreach ($params as $name => $value) {
@@ -512,7 +512,7 @@ WHERE ac.contact_id IN ( $ids )
   }
 
   /**
-   * @param $daoName
+   * @param string $daoName
    * @param bool $onlyKeys
    *
    * @return array

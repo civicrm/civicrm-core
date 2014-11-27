@@ -47,16 +47,12 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Contribute_BAO_ManagePremium object
+   * @return CRM_Contribute_BAO_ManagePremium object
    * @access public
    * @static
    */
@@ -90,7 +86,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
   }
 
   /**
-     * function to add the financial types
+     * add the financial types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -131,7 +127,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
   }
 
   /**
-   * Function to delete premium Types
+   * delete premium Types
    *
    * @param int $productID
    * @static

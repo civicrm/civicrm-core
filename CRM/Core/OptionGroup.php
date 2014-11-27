@@ -47,7 +47,7 @@ class CRM_Core_OptionGroup {
   );
 
   /**
-   * @param $dao
+   * @param CRM_Core_DAO $dao
    * @param bool $flip
    * @param bool $grouping
    * @param bool $localize
@@ -242,7 +242,7 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * Function to lookup titles OR ids for a set of option_value populated fields. The retrieved value
+   * lookup titles OR ids for a set of option_value populated fields. The retrieved value
    * is assigned a new fieldname by id or id's by title
    * (each within a specificied option_group)
    *
@@ -443,9 +443,7 @@ WHERE  v.option_group_id = g.id
    *                          bool   'is_default'  (optional) - is this the default one to display when rendered in form
    *                          bool   'is_active'   (optional) - should this element be rendered
    * @param int $defaultID (reference) - the option value ID of the default element (if set) is returned else 'null'
-   * @param null $groupTitle
-   *
-   * @internal param string $groupLabel - the optional label of the option group else set to group name
+   * @param null $groupTitle the optional label of the option group else set to group name
    *
    * @access public
    * @static

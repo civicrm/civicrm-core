@@ -57,7 +57,7 @@ class CRM_Core_PseudoConstant {
   private static $cache;
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    *
    * activity type
    * @var array
@@ -101,7 +101,7 @@ class CRM_Core_PseudoConstant {
   private static $countryIsoCode;
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    *
    * group
    * @var array
@@ -159,7 +159,7 @@ class CRM_Core_PseudoConstant {
   private static $worldRegions;
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    *
    * activity status
    * @var array
@@ -531,7 +531,7 @@ class CRM_Core_PseudoConstant {
 
   /**
    * DEPRECATED generic populate method
-   * All pseudoconstant functions that use this method are also deprecated.
+   * All pseudoconstant functions that use this method are also @deprecated
    *
    * The static array $var is populated from the db
    * using the <b>$name DAO</b>.
@@ -618,13 +618,11 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    *
    * Get all Activty types.
    *
    * The static array activityType is returned
-   *
-   * @internal param bool $all - get All Activity  types - default is to get only active ones.
    *
    * @access public
    * @static
@@ -926,7 +924,7 @@ WHERE  id = %1";
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    *
    * Get all groups from database
    *
@@ -937,7 +935,7 @@ WHERE  id = %1";
    * Note: any database errors will be trapped by the DAO.
    *
    * @param string $groupType type of group(Access/Mailing)
-   * @param bool|\boolen $excludeHidden exclude hidden groups.
+   * @param bool $excludeHidden exclude hidden groups.
    *
    * @access public
    * @static
@@ -1425,7 +1423,7 @@ WHERE  id = %1";
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    * Get all active payment processors
    *
    * The static array paymentProcessor is returned
@@ -1461,7 +1459,7 @@ WHERE  id = %1";
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    *
    * The static array paymentProcessorType is returned
    *
@@ -1514,7 +1512,7 @@ WHERE  id = %1";
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    *
    * Get all Activity Statuses.
    *
@@ -1541,7 +1539,7 @@ WHERE  id = %1";
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    *
    * Get all Visibility levels.
    *

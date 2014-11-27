@@ -50,11 +50,11 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
   }
 
-  /*
-     * Set up for group contact tests
-     *
-     * @todo set up calls function that doesn't work @ the moment
-     */
+  /**
+   * Set up for group contact tests
+   *
+   * @todo set up calls function that doesn't work @ the moment
+   */
   function setUp() {
     parent::setUp();
 

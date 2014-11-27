@@ -44,16 +44,8 @@ class CRM_Core_ScheduledJob {
 
   var $remarks = array();
 
-  /*
-     * Class constructor
-     *
-     * @param string $namespace namespace prefix for component's files
-     * @access public
-     *
-     */
-
   /**
-   * @param $params
+   * @param array $params
    */
   public function __construct($params) {
     foreach ($params as $name => $param) {

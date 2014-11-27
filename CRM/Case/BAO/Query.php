@@ -700,7 +700,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @static

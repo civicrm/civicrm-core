@@ -45,7 +45,6 @@ class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
    * @param object $controller
    * @param \const|int $action
    *
-   * @internal param \CRM_Event_Controller $object
    * @return \CRM_Event_StateMachine_Registration CRM_Event_StateMachine
    */
   function __construct($controller, $action = CRM_Core_Action::NONE) {

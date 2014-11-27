@@ -6,7 +6,7 @@
  */
 class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -90,7 +90,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -101,7 +101,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * default values are retrieved from the database
    *
    * @access public

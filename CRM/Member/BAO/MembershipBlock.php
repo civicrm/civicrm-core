@@ -40,7 +40,7 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
     parent::__construct();
   }
   /**
-   * function to add the membership Blocks
+   * add the membership Blocks
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -61,7 +61,7 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
   }
 
   /**
-   * Function to delete membership Blocks
+   * delete membership Blocks
    *
    * @param int $id
    *

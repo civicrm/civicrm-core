@@ -43,7 +43,7 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Campaign_DAO_Campaign object
+   * @return CRM_Campaign_DAO_Campaign object
    * @access public
    * @static
    */
@@ -99,7 +99,7 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   }
 
   /**
-   * function to delete the campaign
+   * delete the campaign
    *
    * @param  int $id id of the campaign
    *
@@ -308,12 +308,11 @@ Order By  camp.title";
   }
 
   /**
-   * Function to retrieve campaigns for dashboard.
+   * retrieve campaigns for dashboard.
    *
    * @static
    */
-  static function getCampaignSummary($params = array(
-    ), $onlyCount = FALSE) {
+  static function getCampaignSummary($params = array(), $onlyCount = FALSE) {
     $campaigns = array();
 
     //build the limit and order clause.
@@ -466,7 +465,7 @@ SELECT  campaign.id               as id,
   }
 
   /**
-   * Function to get Campaigns groups
+   * get Campaigns groups
    *
    * @param int $campaignId campaign id
    *
@@ -536,7 +535,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    *
    */
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param null $connectedCampaignId
    */
   public static function addCampaign(&$form, $connectedCampaignId = NULL) {
@@ -619,7 +618,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    * Add campaign in compoent search.
    * and assign needful info to templates.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param string $elementName
    */
   public static function addCampaignInComponentSearch(&$form, $elementName = 'campaign_id') {

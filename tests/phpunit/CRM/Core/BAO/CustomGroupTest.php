@@ -51,7 +51,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function to test getTree()
+   * test getTree()
    */
   function testGetTree() {
     $params           = array();
@@ -91,7 +91,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function to test retrieve() with Empty Params
+   * test retrieve() with Empty Params
    */
   function testRetrieveEmptyParams() {
     $params = array();
@@ -100,7 +100,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function to test retrieve() with Inalid Params
+   * test retrieve() with Inalid Params
    */
   function testRetrieveInvalidParams() {
     $params = array('id' => 99);

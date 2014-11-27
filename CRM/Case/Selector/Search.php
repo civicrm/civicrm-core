@@ -176,7 +176,6 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
     $this->_query->_distinctComponentClause = " civicrm_case.id ";
     $this->_query->_groupByComponentClause = " GROUP BY civicrm_case.id ";
   }
-  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -246,15 +245,13 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
     return $actionLinks;
   }
-  //end of function
 
   /**
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param $params
+   * @param array $params
    *
-   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -270,7 +267,6 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * Returns total number of rows for the query.
@@ -414,7 +410,6 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
-   *
    * @return array              $qill         which contains an array of strings
    * @access public
    */
@@ -514,5 +509,4 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
     return ts('Case Search');
   }
 }
-//end of class
 

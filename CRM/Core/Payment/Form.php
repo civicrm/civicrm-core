@@ -82,7 +82,7 @@ class CRM_Core_Payment_Form {
    * add general billing fields
    * @todo set these like processor fields & let payment processors alter them
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access protected
@@ -353,7 +353,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * function to map address fields
+   * map address fields
    *
    * @param $id
    * @param $src
@@ -395,7 +395,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * function to get the credit card expiration month
+   * get the credit card expiration month
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * See CRM-9017
    *
@@ -413,7 +413,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * function to get the credit card expiration year
+   * get the credit card expiration year
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * This function exists only to make it consistent with getCreditCardExpirationMonth
    *

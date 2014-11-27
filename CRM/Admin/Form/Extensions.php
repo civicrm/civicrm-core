@@ -40,7 +40,7 @@
 class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
   /**
-   * Function to for pre-processing
+   * for pre-processing
    *
    * @return void
    * @access public
@@ -85,7 +85,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -98,7 +98,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -169,7 +169,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

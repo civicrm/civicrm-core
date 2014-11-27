@@ -51,7 +51,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Function to create a user of Joomla.
+   * create a user of Joomla.
    *
    * @param array  $params associated array
    * @param string $mail email id for cms user
@@ -120,15 +120,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Check if username and email exists in the Joomla! db
+   * Check if username and email exists in the drupal db
    *
-   * @params $params    array   array of name and mail values
-   * @params $errors    array   array of errors
-   * @params $emailName string  field label for the 'email'
-   *
-   * @param $params
-   * @param $errors
-   * @param string $emailName
+   * @param array $params array of name and mail values
+   * @param array $errors array of errors
+   * @param string $emailName  field label for the 'email'
    *
    * @return void
    */
@@ -444,7 +440,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Function to set the email address of the user
+   * set the email address of the user
    *
    * @param object $user handle to the user object
    *
@@ -779,7 +775,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   public function getLoginDestination(&$form) {
     $args = NULL;

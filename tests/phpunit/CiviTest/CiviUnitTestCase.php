@@ -538,7 +538,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   // Request a record from the DB by seachColumn+searchValue. Success if a record is found.
   /**
-   * @param $daoName
+   * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
    * @param $searchColumn
@@ -559,7 +559,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   // Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
   /**
-   * @param $daoName
+   * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
    * @param $searchColumn
@@ -572,7 +572,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   // Request a record from the DB by id. Success if row not found.
   /**
-   * @param $daoName
+   * @param string $daoName
    * @param $id
    * @param null $message
    */
@@ -584,7 +584,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   // Request a record from the DB by id. Success if row not found.
   /**
-   * @param $daoName
+   * @param string $daoName
    * @param $id
    * @param null $message
    */
@@ -596,7 +596,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   // Compare a single column value in a retrieved DB record to an expected value
   /**
-   * @param $daoName
+   * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
    * @param $searchColumn
@@ -612,7 +612,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   // Compare all values in a single retrieved DB record to an array of expected values
   /**
-   * @param $daoName
+   * @param string $daoName
    * @param $searchParams
    * @param $expectedValues
    */
@@ -781,11 +781,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * check that api returned 'is_error' => 1
    * else provide full message
-   * @param $result
+   * @param array $result
    * @param $expected
    * @param array $valuesToExclude
    * @param string $prefix extra test to add to message
-   * @internal param array $apiResult api result
    */
   function assertAPIArrayComparison($result, $expected, $valuesToExclude = array(), $prefix = '') {
     $valuesToExclude = array_merge($valuesToExclude, array('debug', 'xdebug', 'sequential'));
@@ -805,7 +804,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param $entity
    * @param $action
-   * @param $params
+   * @param array $params
    * @return array|int
    */
   function civicrm_api($entity, $action, $params) {
@@ -1082,10 +1081,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Private helper function for calling civicrm_contact_add
    *
-   * @param $params
+   * @param array $params for civicrm_contact_add api function call
    *
    * @throws Exception
-   * @internal param \parameters $array for civicrm_contact_add api function call
    *
    * @return int    id of Household created
    */
@@ -1163,7 +1161,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return mixed
    */
@@ -1186,10 +1184,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Function to delete Membership Type
+   * delete Membership Type
    *
-   * @param $params
-   * @internal param int $membershipTypeID
+   * @param array $params
    */
   function membershipTypeDelete($params) {
     $this->callAPISuccess('MembershipType', 'Delete', $params);
@@ -1256,7 +1253,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Function to delete Relatinship Type
+   * delete Relatinship Type
    *
    * @param int $relationshipTypeID
    */
@@ -1290,7 +1287,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Function to create Participant
+   * create Participant
    *
    * @param array $params  array of contact id and event id values
    *
@@ -1342,7 +1339,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create contribution page
    *
-   * @param $params
+   * @param array $params
    * @return object of contribution page
    */
   function contributionPageCreate($params) {
@@ -1409,8 +1406,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param int $cID contact_id
    *
-   * @internal param int $cTypeID id of financial type
-   *
    * @return int id of created contribution
    */
   function pledgeCreate($cID) {
@@ -1436,8 +1431,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to delete contribution
    *
-   * @param $pledgeId
-   * @internal param int $contributionId
+   * @param int $pledgeId
    */
   function pledgeDelete($pledgeId) {
     $params = array(
@@ -1486,7 +1480,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create online contribution
    *
-   * @param $params
+   * @param array $params
    * @param int $financialType id of financial type
    *
    * @param int $invoiceID
@@ -1656,10 +1650,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to delete Locations of contact
    *
-   * @params array $pamars parameters
+   * @param array $params parameters
    */
   function locationDelete($params) {
-    $result = $this->callAPISuccess('Location', 'delete', $params);
+    $this->callAPISuccess('Location', 'delete', $params);
   }
 
   /**
@@ -1701,8 +1695,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to add a Group
    *
-   * @params array to add group
-   *
    * @param array $params
    * @return int groupId of created group
    */
@@ -1727,8 +1719,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to delete a Group
    *
-   * @param $gid
-   * @internal param int $id
+   * @param int $gid
    */
   function groupDelete($gid) {
 
@@ -1817,7 +1808,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Function to delete Group for a contact
    *
    * @param $contactId
-   * @internal param array $params
    */
   function contactGroupDelete($contactId) {
     $params = array(
@@ -1830,9 +1820,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create Activity
    *
-   * @param null $params
+   * @param array $params
    * @return array|int
-   * @internal param int $contactId
    */
   function activityCreate($params = NULL) {
 
@@ -1874,7 +1863,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create an activity type
    *
-   * @params array $params parameters
+   * @param array $params parameters
    */
   function activityTypeCreate($params) {
     $result = $this->callAPISuccess('ActivityType', 'create', $params);
@@ -1884,7 +1873,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to delete activity type
    *
-   * @params Integer $activityTypeId id of the activity type
+   * @param int $activityTypeId id of the activity type
    */
   function activityTypeDelete($activityTypeId) {
     $params['activity_type_id'] = $activityTypeId;
@@ -1897,8 +1886,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param array $params
    * @return array|int
-   * @internal param string $className
-   * @internal param string $title name of custom group
    */
   function customGroupCreate($params = array()) {
     $defaults = array(
@@ -1976,8 +1963,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * participant:testCreateWithCustom for how to use this
    *
    * @param string $function __FUNCTION__
-   * @param $filename
-   * @internal param string $file __FILE__
+   * @param $filename string $file __FILE__
    *
    * @return array $ids ids of created objects
    */
@@ -2009,8 +1995,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param array $params (custom_group_id) is required
    * @return array|int
-   * @internal param string $name name of custom field
-   * @internal param int $apiversion API  version to use
    */
   function customFieldCreate($params) {
     $params = array_merge(array(
@@ -2047,8 +2031,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   /**
    * Function to create note
-   *
-   * @params array $params  name-value pair for an event
    *
    * @param $cId
    * @return array $note
@@ -2198,9 +2180,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Tidy up examples array so that fields that change often ..don't
    * and debug related fields are unset
    *
-   * @param $result
+   * @param array $result
    *
-   * @internal param array $params
    */
   function tidyExampleResult(&$result){
     if(!is_array($result)) {
@@ -2276,8 +2257,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to delete note
    *
-   * @params int $noteID
+   * @param array $params
    *
+   * @return array|int
    */
   function noteDelete($params) {
     return $this->callAPISuccess('Note', 'delete', $params);
@@ -2424,7 +2406,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    */
   /**
-   * @param $params
+   * @param array $params
    * @param $id
    * @param $entity
    * @param int $delete

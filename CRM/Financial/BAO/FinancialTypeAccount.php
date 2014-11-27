@@ -50,18 +50,14 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   private static $financialAccount;
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @param array $allValues
    *
-   * @return object CRM_Contribute_BAO_ContributionType object
+   * @return CRM_Contribute_BAO_ContributionType object
    * @access public
    * @static
    */
@@ -77,7 +73,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * function to add the financial types
+   * add the financial types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -106,12 +102,11 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * Function to delete financial Types
+   * delete financial Types
    *
-   * @param $financialTypeAccountId
-   * @param null $accountId
+   * @param int $financialTypeAccountId
+   * @param int $accountId
    *
-   * @internal param int $contributionTypeId
    * @static
    */
   static function del($financialTypeAccountId, $accountId = null) {
@@ -163,7 +158,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * Function to get Financial Account Name
+   * get Financial Account Name
    *
    * @param int $entityId
    *
@@ -230,8 +225,6 @@ WHERE cog.name = 'payment_instrument' ";
    * @param $financialType
    *
    * @return array
-   * @internal param int $financialTypeId financial type id
-   *
    * @static
    */
   static function createDefaultFinancialAccounts($financialType) {

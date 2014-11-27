@@ -688,26 +688,19 @@ LIMIT 1;";
     return TRUE;
   }
 
-  /*
+  /**
    * Send receipt from contribution. Note that the compose message part has been moved to contribution
    * In general LoadObjects is called first to get the objects but the composeMessageArray function now calls it
    *
-   * @params array $input Incoming data from Payment processor
-   * @params array $ids Related object IDs
-   * @params array $values values related to objects that have already been loaded
-   * @params bool $recur is it part of a recurring contribution
-   * @params bool $returnMessageText Should text be returned instead of sent. This
-   * is because the function is also used to generate pdfs
-   */
-  /**
-   * @param $input
-   * @param $ids
+   * @param array $input Incoming data from Payment processor
+   * @param array $ids Related object IDs
    * @param $objects
-   * @param $values
-   * @param bool $recur
-   * @param bool $returnMessageText
+   * @param array $values values related to objects that have already been loaded
+   * @param bool $recur is it part of a recurring contribution
+   * @param bool $returnMessageText Should text be returned instead of sent. This
+   *  is because the function is also used to generate pdfs
    *
-   * @return mixed
+   * @return array
    */
   function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
     $contribution = &$objects['contribution'];
@@ -936,10 +929,8 @@ LIMIT 1;";
   }
 
   /**
-   * @param $recurId
+   * @param int $recurId
    * @param $contribution
-   *
-   * @internal param $contributionId
    *
    * @return array
    */

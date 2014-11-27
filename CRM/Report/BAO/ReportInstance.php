@@ -44,7 +44,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Report_DAO_ReportInstance object
+   * @return CRM_Report_DAO_ReportInstance object
    * @access public
    * @static
    */
@@ -118,14 +118,14 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
   }
 
   /**
-   * Function to create instance
+   * create instance
    * takes an associative array and creates a instance object and does any related work like permissioning, adding to dashboard etc.
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
    * @param array   $params      (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Report_BAO_ReportInstance object
+   * @return CRM_Report_BAO_ReportInstance object
    * @access public
    * @static
    */
@@ -238,7 +238,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $defaults
    *
    * @return CRM_Report_DAO_ReportInstance|null

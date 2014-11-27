@@ -83,7 +83,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_paymentFields = array();
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -130,7 +130,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    * Adding discussion from CRM-11915 as code comments
    * When multiple payment processors are configured for a event and user does any selection changes for them on online event registeration page :
@@ -312,7 +312,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -545,7 +545,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * build the radio/text form elements for the amount field
    *
-   * @param object   $form form object
+   * @param CRM_Core_Form   $form form object
    * @param boolean  $required  true if you want to add formRule
    * @param int      $discountId discount id for the event
    *
@@ -691,7 +691,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   public static function formatFieldsForOptionFull(&$form) {
     $priceSet = $form->get('priceSet');
@@ -806,7 +806,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @param array $files the uploaded files if any
    * @param $self
    *
-   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -969,7 +968,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -1208,10 +1207,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
     }
   }
-  //end of function
 
   /*
-   * Function to process Registration of free event
+   * process Registration of free event
    *
    * @param  array $param Form valuess
    * @param  int contactID
@@ -1221,7 +1219,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    */
   /**
-   * @param $params
+   * @param array $params
    * @param null $contactID
    */
   public function processRegistration($params, $contactID = NULL) {

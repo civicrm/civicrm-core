@@ -54,7 +54,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @param string $trxnEntityTable entity_table
    *
-   * @return object CRM_Core_BAO_FinancialTrxn object
+   * @return CRM_Core_BAO_FinancialTrxn object
    * @access public
    * @static
    */
@@ -120,16 +120,12 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Contribute_BAO_ContributionType object
+   * @return CRM_Contribute_BAO_ContributionType object
    * @access public
    * @static
    */
@@ -144,18 +140,14 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   }
 
   /**
-   *
    * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
    * NOTE: This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
    *
-   * @param $entity_id
+   * @param $entity_id id of the entity usually the contactID.
    * @param string $orderBy to get single trxn id for a entity table i.e last or first.
-   *
    * @param bool $newTrxn
    *
-   * @internal param string $entityTable name of the entity table usually 'civicrm_contact'
-   * @internal param int $entityID id of the entity usually the contactID.
-   * @return array( ) reference $tag array of category id's the contact belongs to.
+   * @return array $tag array of category id's the contact belongs to.
    *
    * @access public
    * @static
@@ -194,14 +186,11 @@ LIMIT 1;";
 
   /**
    * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
-   * NOTE: This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
+   * @todo This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
    *
-   * @param $entity_id
+   * @param int $entity_id id of the entity usually the contactID.
    *
-   * @internal param string $entityTable name of the entity table usually 'civicrm_contact'
-   * @internal param int $entityID id of the entity usually the contactID.
-   *
-   * @return array( ) reference $tag array of catagory id's the contact belongs to.
+   * @return array $tag array of catagory id's the contact belongs to.
    *
    * @access public
    * @static
@@ -221,11 +210,10 @@ WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
   /**
    * Given an financial_trxn_id  check for previous entity_financial_trxn.
    *
-   * @param $financial_trxn_id
+   * @param $financial_trxn_id id of the latest payment.
    *
-   * @internal param int $financialTrxn_id id of the latest payment.
    *
-   * @return array( ) $payment array of previous payments
+   * @return array $payment array of previous payments
    *
    * @access public
    * @static
@@ -274,13 +262,10 @@ WHERE  ef2.financial_trxn_id =%1
    * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
    * NOTE: This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
    *
-   * @param $entity_id
-   * @param string $entity_table
+   * @param $entity_id id of the entity usually the contactID.
+   * @param string $entity_table name of the entity table usually 'civicrm_contact'
    *
-   * @internal param string $entityTable name of the entity table usually 'civicrm_contact'
-   * @internal param int $entityID id of the entity usually the contactID.
-   *
-   * @return array(  ) reference $tag array of catagory id's the contact belongs to.
+   * @return array $tag array of catagory id's the contact belongs to.
    *
    * @access public
    * @static
@@ -372,15 +357,15 @@ WHERE ceft.entity_id = %1";
       CRM_Core_BAO_FinancialTrxn::createPremiumTrxn($params);
     }
   }
+
   /**
    * create financial trxn and items when fee is charged
    *
-   * @params params to create trxn entries
+   * @param array $params to create trxn entries
    *
    * @access public
    * @static
    */
-
   static function recordFees($params) {
     $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));
     $domainId = CRM_Core_Config::domainID();
@@ -431,7 +416,7 @@ WHERE ceft.entity_id = %1";
   }
 
   /*
-   * function to get partial payment amount and type of it
+   * get partial payment amount and type of it
    * return @array : payment type => amount
    * payment type  : 'amount_owed' or 'refund_due'
    */

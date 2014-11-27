@@ -599,35 +599,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Delete some or all of the items in the settings table
-   *
-   * @param string $group The group name of the entries to be deleted
-   * @param string $name  The name of the setting to be deleted
-   * @param int    $componentID The optional component ID (so componenets can share the same name space)
-   *
-   * @return void
-   * @static
-   * @access public
-   *
-  static function deleteItem($group, $name = NULL, $componentID = NULL, $contactID = NULL) {
-    $dao = self::dao($group, $name, $componentID, $contactID);
-    $dao->delete();
-
-    // also reset memory cache if any
-    CRM_Utils_System::flushCache();
-
-    $cacheKey = self::inCache($group, $name, $componentID, $contactID, FALSE);
-    if ($cacheKey) {
-      if ($name) {
-        unset(self::$_cache[$cacheKey][$name]);
-      }
-      else {
-        unset(self::$_cache[$cacheKey]);
-      }
-    }
-  }*/
-
-  /**
    * This provides information about the setting - similar to the fields concept for DAO information.
    * As the setting is serialized code creating validation setting input needs to know the data type
    * This also helps move information out of the form layer into the data layer where people can interact with
@@ -641,12 +612,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * The following params will filter the result. If none are passed all settings will be returns
    *
-   * @params string $name Name of specific setting e.g customCSSURL
-   * @params integer $componentID id of relevant component.
-   *
-   * @param null $componentID
+   * @param int $componentID id of relevant component
    * @param array $filters
-   * @param null $domainID
+   * @param int $domainID
    * @param null $profile
    *
    * @return array $result - the following information as appropriate for each setting
@@ -936,7 +904,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param null $domainID
    */
   static function fixAndStoreDirAndURL(&$params, $domainID = NULL) {
@@ -1011,7 +979,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $group
    */
   static function storeDirectoryOrURLPreferences(&$params, $group) {
@@ -1024,7 +992,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param bool $setInConfig
    */
   static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {

@@ -58,7 +58,7 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   function buildForm(&$form) {
 
@@ -246,8 +246,8 @@ civicrm_contact AS contact_a
   }
 
   /*
-     * Functions below generally don't need to be modified
-     */
+   * Functions below generally don't need to be modified
+   */
   function count() {
     $sql = $this->all();
 

@@ -145,7 +145,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -229,9 +229,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * global validation rules for the form
    *
-   * @param $values
-   *
-   * @internal param array $fields posted values of the form
+   * @param array $values
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -267,7 +265,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @param array $contribIDs Contribution Id
    * @param array $params associated array of submitted values
    * @param array $contactIds Contact Id
-   * @param object $form form object
+   * @param CRM_Core_Form $form form object
    * @static
    *
    */

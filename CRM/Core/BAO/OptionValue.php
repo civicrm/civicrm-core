@@ -122,16 +122,12 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
      return $bao->nextvalue;
   }
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_BAO_OptionValue object
+   * @return CRM_Core_BAO_OptionValue object
    * @access public
    * @static
    */
@@ -159,7 +155,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Function to add an Option Value
+   * add an Option Value
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -226,11 +222,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Function to delete Option Value
+   * delete Option Value
    *
-   * @param $optionValueId
-   *
-   * @internal param int $optionGroupId Id of the Option Group to be deleted.
+   * @param int $optionValueId
    *
    * @return boolean
    *
@@ -248,7 +242,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Function to retrieve activity type label and description
+   * retrieve activity type label and description
    *
    * @param int     $activityTypeId  activity type id
    *
@@ -417,10 +411,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * updates options values weights.
    *
-   * @param $opGroupId
+   * @param int $opGroupId
    * @param array $opWeights options value , weight pair
    *
-   * @internal param int $opGroupIde option group id.
    * @return void
    * @access public
    * @static

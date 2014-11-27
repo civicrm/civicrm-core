@@ -41,10 +41,10 @@
 class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   public $_contactId = NULL;
 
-  /*
-     * always show public groups
-     */
-
+  /**
+   * always show public groups
+   * @var bool
+   */
   public $_onlyPublicGroups = TRUE;
 
   public $_edit = TRUE;
@@ -87,14 +87,13 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     }
   }
 
-  /*
-     * Heart of the viewing process. The runner gets all the meta data for
-     * the contact and calls the appropriate type of page to view.
-     *
-     * @return void
-     * @access public
-     *
-     */
+  /**
+   * Heart of the viewing process. The runner gets all the meta data for
+   * the contact and calls the appropriate type of page to view.
+   *
+   * @return void
+   * @access public
+   */
   function preProcess() {
     if (!$this->_contactId) {
       CRM_Core_Error::fatal(ts('You must be logged in to view this page.'));
@@ -111,7 +110,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   }
 
   /**
-   * Function to build user dashboard
+   * build user dashboard
    *
    * @return void
    * @access public

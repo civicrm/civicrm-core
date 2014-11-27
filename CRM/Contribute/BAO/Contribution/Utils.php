@@ -35,9 +35,9 @@
 class CRM_Contribute_BAO_Contribution_Utils {
 
   /**
-   * Function to process payment after confirmation
+   * process payment after confirmation
    *
-   * @param object $form form object
+   * @param CRM_Core_Form $form form object
    * @param array $paymentParams array with payment related key
    * value pairs
    * @param array $premiumParams array with premium related key
@@ -45,9 +45,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @param int $contactID contact id
    * @param int $contributionTypeId financial type id
    * @param int|string $component component id
-   *
    * @param array $fieldTypes presumably relates to custom field types - used when building data for sendMail
-   *
    * @param $isTest
    * @param $isPayLater
    *
@@ -359,7 +357,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * Is a payment being made.
    * Note that setting is_monetary on the form is somewhat legacy and the behaviour around this setting is confusing. It would be preferable
    * to look for the amount only (assuming this cannot refer to payment in goats or other non-monetary currency
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return bool
    */
@@ -371,7 +369,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
   }
   /**
-   * Function to get the contribution details by month
+   * get the contribution details by month
    * of the year
    *
    * @param int     $param year
@@ -415,7 +413,7 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * Function to get the contribution details by year
+   * get the contribution details by year
    *
    * @return array associated array
    *
@@ -458,7 +456,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $contactID
    * @param $mail
    */
@@ -480,7 +478,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param string $type
    *
    * @return bool
@@ -751,7 +749,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return bool
    */

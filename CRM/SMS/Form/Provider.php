@@ -62,7 +62,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -164,7 +164,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

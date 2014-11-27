@@ -827,7 +827,7 @@ AND
   }
 
   /**
-   * function to check if running in upgrade mode
+   * check if running in upgrade mode
    */
   static function isUpgradeMode($path = NULL) {
     if (defined('CIVICRM_UPGRADE_ACTIVE')) {

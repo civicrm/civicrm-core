@@ -49,7 +49,7 @@ class CRM_Pledge_Form_Task_Result extends CRM_Pledge_Form_Task {
   function preProcess() {}
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

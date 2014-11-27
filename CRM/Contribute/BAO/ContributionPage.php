@@ -43,7 +43,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Contribute_DAO_ContributionPage object
+   * @return CRM_Contribute_DAO_ContributionPage object
    * @access public
    * @static
    */
@@ -106,7 +106,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     }
 
   /**
-   * Function to send the emails
+   * send the emails
    *
    * @param int $contactID contact id
    * @param array $values associated array of fields
@@ -423,11 +423,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     }
   }
 
-  /*
-     * Construct the message to be sent by the send function
-     *
-     */
   /**
+   * Construct the message to be sent by the send function
+   *
    * @param $tplParams
    * @param $contactID
    * @param $isTest
@@ -455,7 +453,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Function to send the emails for Recurring Contribution Notication
+   * send the emails for Recurring Contribution Notication
    *
    * @param string $type txnType
    * @param int $contactID contact id for contributor
@@ -553,7 +551,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Function to add the custom fields for contribution page (ie profile)
+   * add the custom fields for contribution page (ie profile)
    *
    * @param int $gid uf group id
    * @param string $name

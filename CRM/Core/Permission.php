@@ -701,7 +701,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * Function to get component name from given permission.
+   * get component name from given permission.
    *
    * @param string $permission
    *

@@ -48,8 +48,7 @@ class CRM_Dedupe_Finder {
    *
    * @return array  array of (cid1, cid2, weight) dupe triples
    */
-  static function dupes($rgid, $cids = array(
-    )) {
+  static function dupes($rgid, $cids = array()) {
     $rgBao             = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->id         = $rgid;
     $rgBao->contactIds = $cids;

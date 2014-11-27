@@ -143,14 +143,13 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   protected $_ufGroupID;
 
-  /*
-     * csv - common search values
-     *
-     * @var array
-     * @access protected
-     * @static
-     */
-
+  /**
+   * csv - common search values
+   *
+   * @var array
+   * @access protected
+   * @static
+   */
   static $csv = array('contact_type', 'group', 'tag');
 
   /**

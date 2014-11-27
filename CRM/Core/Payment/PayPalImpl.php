@@ -192,7 +192,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   /**
    * do the express checkout at paypal. Check PayPal documentation for more information
    *
-   * @param $params
+   * @param array $params
    *
    * @internal param string $token the key associated with this transaction
    *
@@ -237,7 +237,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
   //LCD add new function for handling recurring payments for PayPal Express
   /**
-   * @param $params
+   * @param array $params
    *
    * @return mixed
    */
@@ -437,7 +437,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Function to check whether a method is present ( & supported ) by the payment processor object.
+   * check whether a method is present ( & supported ) by the payment processor object.
    *
    * @param  string $method method to check for.
    *
@@ -459,8 +459,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *
    * @return array|bool|object
    */
-  function cancelSubscription(&$message = '', $params = array(
-    )) {
+  function cancelSubscription(&$message = '', $params = array()) {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
       $args = array();
       $this->initialize($args, 'ManageRecurringPaymentsProfileStatus');
@@ -485,8 +484,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *
    * @return array|bool|object
    */
-  function updateSubscriptionBillingInfo(&$message = '', $params = array(
-    )) {
+  function updateSubscriptionBillingInfo(&$message = '', $params = array()) {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
       $config = CRM_Core_Config::singleton();
       $args = array();
@@ -547,7 +545,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param string $component
    *
    * @throws Exception

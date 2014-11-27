@@ -234,7 +234,6 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
       }
     }
 
-    // CRM_Core_Error::debug_var( 'c', $contribution );
     $contribution->save();
     $transaction->commit();
 
@@ -317,7 +316,6 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
     $transaction = new CRM_Core_Transaction();
 
-    // CRM_Core_Error::debug_var( 'c', $contribution );
     if ($status == 'PAYMENT_DECLINED' ||
       $status == 'CANCELLED_BY_GOOGLE' ||
       $status == 'CANCELLED'

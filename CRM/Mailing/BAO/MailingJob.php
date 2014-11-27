@@ -49,7 +49,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return CRM_Mailing_BAO_MailingJob
    */

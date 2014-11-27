@@ -83,9 +83,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @internal param array $ids the array that holds all the db ids
-   *
-   * @return object CRM_Event_BAO_Participant object
+   * @return CRM_Event_BAO_Participant object
    * @access public
    * @static
    */
@@ -190,9 +188,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @internal param array $ids the array that holds all the db ids
-   *
-   * @return object CRM_Event_BAO_Participant object
+   * @return CRM_Event_BAO_Participant object
    * @access public
    * @static
    */
@@ -487,13 +483,10 @@ SELECT  event.event_full_text,
    * with total participant count that field going to carry.
    *
    * @param int $eventId event id.
-   * @param array $skipParticipantIds
+   * @param array $skipParticipantIds an array of participant ids those we should skip.
    * @param bool $considerCounted
    * @param bool $considerWaiting
    * @param bool $considerTestParticipants
-   *
-   * @internal param array $skipParticipants an array of participant ids those we should skip.
-   * @internal param int $isTest would you like to consider test participants.
    *
    * @return array $optionsCount an array of each option id and total count
    * @static
@@ -783,7 +776,7 @@ GROUP BY  participant.event_id
   }
 
   /**
-   * function to get the event name/sort name for a particular participation / participant
+   * get the event name/sort name for a particular participation / participant
    *
    * @param  int    $participantId  id of the participant
 
@@ -925,7 +918,7 @@ WHERE  civicrm_participant.id = {$participantId}
    * @param array $input an assosiative array of name /value pairs
    * from other function
    *
-   * @return object CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution object
    * @access public
    * @static
    */
@@ -1140,10 +1133,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @param null $newStatusID
    * @param bool $updatePrimaryStatus
    *
-   * @internal param int $statusId status id for participant
-   * return void
-   *
-   * @return bool
+   * @return bool|void
    * @access public
    * @static
    */
@@ -1177,9 +1167,8 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @param  int $participantIds array of participant ids
    * @param  int $statusId status     id for participant
    * @param bool $updateRegisterDate
-   * @params boolean $updateRegisterDate  way to track when status changed.
    *
-   * return void
+   * @return void
    *
    * @access public
    * @static
@@ -1440,7 +1429,7 @@ UPDATE  civicrm_participant
   }
 
   /**
-   * Function to send mail and create activity
+   * send mail and create activity
    * when participant status changed.
    *
    * @param  int $participantId participant id.
@@ -1698,11 +1687,9 @@ UPDATE  civicrm_participant
   }
 
   /**
-   * Function to get participant record count for a Contact
+   * get participant record count for a Contact
    *
-   * @param $contactID
-   *
-   * @internal param int $contactId Contact ID
+   * @param int $contactID
    *
    * @return int count of participant records
    * @access public
@@ -1751,9 +1738,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   /**
    * Function to get additional Participant edit & view url .
    *
-   * @param $participantIds
-   *
-   * @internal param array $paticipantIds an array of additional participant ids.
+   * @param array $participantIds an array of additional participant ids.
    *
    * @return array of Urls.
    * @access public
@@ -1832,7 +1817,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $participantId
    * @param $contributionId
    * @param $feeBlock

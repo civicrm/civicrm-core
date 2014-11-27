@@ -68,7 +68,7 @@ class CRM_Pledge_Form_Task_Print extends CRM_Pledge_Form_Task {
   }
 
   /**
-   * Build the form - it consists of
+   * Build the form object - it consists of
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
    *

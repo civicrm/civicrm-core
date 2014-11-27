@@ -196,7 +196,7 @@ class CRM_Contact_Page_AJAX {
   }
 
   /**
-   * Function to fetch PCP ID by PCP Supporter sort_name, also displays PCP title and associated Contribution Page title
+   * fetch PCP ID by PCP Supporter sort_name, also displays PCP title and associated Contribution Page title
    */
   static function getPCPList() {
     $name  = CRM_Utils_Array::value('s', $_GET);
@@ -317,7 +317,7 @@ class CRM_Contact_Page_AJAX {
   }
 
   /**
-   * Function to fetch the custom field help
+   * fetch the custom field help
    */
   static function customField() {
     $fieldId          = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
@@ -518,7 +518,7 @@ ORDER BY sort_name ";
   }
 
   /**
-   * Function to delete custom value
+   * delete custom value
    *
    */
   static function deleteCustomValue() {
@@ -581,7 +581,7 @@ ORDER BY sort_name ";
   }
 
   /**
-     *Function to check the CMS username
+     *  check the CMS username
      *
     */
   static public function checkUserName() {

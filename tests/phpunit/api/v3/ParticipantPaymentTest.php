@@ -346,7 +346,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $context
    */
   function _checkFinancialRecords($params, $context) {

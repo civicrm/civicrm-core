@@ -63,9 +63,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @internal param array $ids the array that holds all the db ids
-   *
-   * @return object CRM_Case_BAO_Case object
+   * @return CRM_Case_BAO_Case object
    * @access public
    * @static
    */
@@ -105,9 +103,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @internal param array $ids the array that holds all the db ids
-   *
-   * @return object CRM_Case_BAO_Case object
+   * @return CRM_Case_BAO_Case object
    * @access public
    * @static
    */
@@ -251,7 +247,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *                        in a hierarchical manner
    * @param array $ids      (reference) the array that holds all the db ids
    *
-   * @return object CRM_Case_BAO_Case object
+   * @return CRM_Case_BAO_Case object
    * @access public
    * @static
    */
@@ -261,7 +257,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * Function to process case activity add/delete
+   * process case activity add/delete
    * takes an associative array and
    *
    * @param array $params (reference ) an assoc array of name/value pairs
@@ -279,7 +275,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * Function to get the case subject for Activity
+   * get the case subject for Activity
    *
    * @param int $activityId  activity id
    *
@@ -297,7 +293,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * Function to get the case type.
+   * get the case type.
    *
    * @param int $caseId
    *
@@ -446,8 +442,6 @@ WHERE civicrm_case.id = %1";
    *
    * @param $activityId
    *
-   * @internal param $activity_id
-   *
    * @return int, case ID
    */
   static function getCaseIdByActivityId($activityId) {
@@ -515,10 +509,8 @@ WHERE civicrm_case.id = %1";
    *
    * @param $contactID
    * @param boolean $includeDeleted include the deleted cases in result
-   *
    * @param null $caseType
    *
-   * @internal param int $contactId ID of the contact
    * @return array
    *
    * @access public
@@ -1900,10 +1892,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param $caseId
    * @param int $relationshipId relationship id
    * @param int $relContactId case role assignee contactId.
-   *
    * @param null $contactId
    *
-   * @internal param int $caseID case id
    * @return void on success creates activity and case activity
    *
    * @static

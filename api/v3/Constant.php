@@ -137,7 +137,7 @@ function civicrm_api3_constant_get($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_constant_get_spec(&$params) {
   $options = array(

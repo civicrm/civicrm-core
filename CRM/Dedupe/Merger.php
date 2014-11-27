@@ -537,7 +537,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * Function to batch merge a set of contacts based on rule-group and group.
+   * batch merge a set of contacts based on rule-group and group.
    *
    * @param  int $rgid rule group id
    * @param  int $gid group id
@@ -545,13 +545,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *                              A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                              Does a force merge otherwise.
    * @param  boolean $autoFlip wether to let api decide which contact to retain and which to delete.
-   *
-   *
    * @param bool $redirectForPerformance
    *
    * @return array|bool
-   * @internal param array $cacheParams prev-next-cache params based on which next pair of contacts are computed.
-   *                              Generally used with batch-merge.
    * @static
    * @access public
    */
@@ -583,7 +579,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * Function to merge given set of contacts. Performs core operation.
+   * merge given set of contacts. Performs core operation.
    *
    * @param  array $dupePairs set of pair of contacts for whom merge is to be done.
    * @param  array $cacheParams prev-next-cache params based on which next pair of contacts are computed.
@@ -600,8 +596,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @static
    * @access public
    */
-  static function merge($dupePairs = array(
-    ), $cacheParams = array(), $mode = 'safe',
+  static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe',
     $autoFlip = TRUE, $redirectForPerformance = FALSE
   ) {
     $cacheKeyString = CRM_Utils_Array::value('cache_key_string', $cacheParams);

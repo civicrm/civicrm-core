@@ -35,7 +35,7 @@
 class CRM_Report_Form_Instance {
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function buildForm(&$form) {
     // we should not build form elements in dashlet mode
@@ -198,7 +198,7 @@ class CRM_Report_Form_Instance {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $defaults
    */
   static function setDefaultValues(&$form, &$defaults) {
@@ -264,7 +264,7 @@ class CRM_Report_Form_Instance {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param bool $redirect
    */
   static function postProcess(&$form, $redirect = TRUE) {

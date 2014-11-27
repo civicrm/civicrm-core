@@ -47,7 +47,6 @@ class Manager {
   private $frames = array();
 
   /**
-   *
    * @var int
    */
   private $savePointCount = 0;

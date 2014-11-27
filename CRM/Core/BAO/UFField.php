@@ -47,16 +47,12 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
 
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_BAO_UFField object
+   * @return CRM_Core_BAO_UFField object
    * @access public
    * @static
    */
@@ -124,7 +120,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Function to check duplicate for duplicate field in a group
+   * check duplicate for duplicate field in a group
    *
    * @param array $params an associative array with field and values
    * @param $ids
@@ -198,12 +194,12 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * function to add the UF Field
+   * add the UF Field
    *
    * @param array $params (reference) array containing the values submitted by the form
    * @param array $ids array containing the id
    *
-   * @return object CRM_Core_BAO_UFField object
+   * @return CRM_Core_BAO_UFField object
    *
    * @access public
    * @static
@@ -272,7 +268,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Function to enable/disable profile field given a custom field id
+   * enable/disable profile field given a custom field id
    *
    * @param int      $customFieldId     custom field id
    * @param boolean  $is_active         set the is_active field
@@ -366,9 +362,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Function to check the status of custom field used in uf fields
    *
-   * @params  int $UFFieldId     uf field id
-   *
-   * @param $UFFieldId
+   * @param int $UFFieldId
    *
    * @return boolean   false if custom field are disabled else true
    * @static
@@ -501,16 +495,12 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * function to check for mix profile fields (eg: individual + other contact types)
+   * Check for mix profile fields (eg: individual + other contact types)
    *
-   * @params int     $ufGroupId  uf group id
-   * @params boolean $check      this is to check mix profile (if true it will check if profile is
-   *                             pure ie. it contains only one contact type)
-   *
-   * @param $ufGroupId
+   * @param int $ufGroupId
    *
    * @return  true for mix profile else false
-   * @acess public
+   * @access public
    * @static
    */
   static function checkProfileType($ufGroupId) {
@@ -577,8 +567,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @param bool $skipComponentType
    *
-   * @return  profile group_type
-   * @acess public
+   * @return string profile group_type
+   * @access public
    * @static
    *
    * TODO Why is this function in this class? It seems to be about the UFGroup.
@@ -595,15 +585,13 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * function to get the profile type (eg: individual/organization/household)
    *
-   * @param $ufGroupType
+   * @param string $ufGroupType
    * @param boolean $returnMixType this is true, then field type of  mix profile field is returned
    * @param boolean $onlyPure      true if only pure profiles are required
-   *
    * @param bool $skipComponentType
    *
-   * @internal param int $ufGroupId uf group id
-   * @return  profile group_type
-   * @acess public
+   * @return string profile group_type
+   * @access public
    * @static
    *
    * TODO Why is this function in this class? It seems to be about the UFGroup.
@@ -707,7 +695,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @param $ctype
    *
    * @return  true for mix profile group else false
-   * @acess public
+   * @access public
    * @static
    */
   static function checkProfileGroupType($ctype) {
@@ -738,11 +726,9 @@ SELECT ufg.id as id
   }
 
   /**
-   * check for searchable or in selector field for given profile.
+   * Check for searchable or in selector field for given profile.
    *
-   * @params int     $profileID profile id.
-   *
-   * @param $profileID
+   * @param int $profileID
    *
    * @return boolean $result    true/false.
    */
@@ -768,11 +754,9 @@ SELECT  id
   }
 
   /**
-   *Reset In selector and is seachable values for given $profileID.
+   * Reset In selector and is searchable values for given $profileID.
    *
-   * @params int $profileID profile id.
-   *
-   * @param $profileID
+   * @param int $profileID
    *
    * @return void.
    */

@@ -39,9 +39,9 @@
 class CRM_Contribute_Form_SoftCredit {
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access static

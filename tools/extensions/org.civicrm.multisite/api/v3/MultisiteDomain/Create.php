@@ -43,7 +43,7 @@ function civicrm_api3_multisite_domain_create($params) {
  * @param array $params array or parameters determined by getfields
  */
 /**
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_multisite_domain_create_spec(&$params) {
   $params['name']['api.required'] = 1;

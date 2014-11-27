@@ -8,7 +8,7 @@ class Contact extends CiviUnitTestCase {
    * Helper function to create
    * a contact
    *
-   * @param $params
+   * @param array $params
    *
    * @return int $contactID id of created contact
    */

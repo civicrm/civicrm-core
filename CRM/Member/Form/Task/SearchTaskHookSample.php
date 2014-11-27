@@ -72,7 +72,7 @@ WHERE      mem.id IN ( $memberIDs )";
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

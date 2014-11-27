@@ -53,7 +53,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Core_DAO_CustomGroup object
+   * @return CRM_Core_DAO_CustomGroup object
    * @access public
    * @static
    */
@@ -212,16 +212,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_DAO_CustomGroup object
+   * @return CRM_Core_DAO_CustomGroup object
    * @access public
    * @static
    */
@@ -301,19 +297,14 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * An array containing all custom groups and their custom fields is returned.
    *
    * @param string $entityType - of the contact whose contact type is needed
-   * @param object $form - not used but required
-   * @param null $entityID
-   * @param null $groupID
+   * @param CRM_Core_Form $form - not used but required
+   * @param int $entityID
+   * @param int $groupID
    * @param string $subType
    * @param string $subName
-   * @param boolean $fromCache
+   * @param bool $fromCache
+   * @param bool $onlySubType
    *
-   * @param null $onlySubType
-   *
-   * @internal param int $entityId - optional - id of entity if we need to populate the tree with custom values.
-   * @internal param int $groupId - optional group id (if we need it for a single group only)
-   *                           - if groupId is 0 it gets for inline groups only
-   *                           - if groupId is -1 we get for all groups
    * @return array $groupTree  - array  The returned array is keyed by group id and has the custom group table fields
    * and a subkey 'fields' holding the specific custom fields.
    * If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
@@ -1373,7 +1364,7 @@ ORDER BY civicrm_custom_group.weight,
 
   /**
    * @param $groupTree
-   * @param $params
+   * @param array $params
    * @param bool $skipFile
    */
   static function postProcess(&$groupTree, &$params, $skipFile = FALSE) {
@@ -1491,7 +1482,7 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * generic function to build all the form elements for a specific group tree
    *
-   * @param object    $form             the form object
+   * @param CRM_Core_Form    $form             the form object
    * @param array     $groupTree        the group tree object
    * @param boolean   $inactiveNeeded   return inactive custom groups
    * @param string    $prefix           prefix for custom grouptree assigned to template
@@ -1525,7 +1516,7 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * Function to extract the get params from the url, validate
+   * extract the get params from the url, validate
    * and store it in session
    *
    * @param CRM_Core_Form $form the form object
@@ -1620,7 +1611,7 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * Function to check the type of custom field type (eg: Used for Individual, Contribution, etc)
+   * check the type of custom field type (eg: Used for Individual, Contribution, etc)
    * this function is used to get the custom fields of a type (eg: Used for Individual, Contribution, etc )
    *
    * @param  int     $customFieldId          custom field id
@@ -1800,7 +1791,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
   /**
    * Build custom data view
    *
-   * @param object $form page object
+   * @param CRM_Core_Form $form page object
    * @param array $groupTree associated array
    * @param boolean $returnCount true if customValue count needs to be returned
    * @param null $gID
