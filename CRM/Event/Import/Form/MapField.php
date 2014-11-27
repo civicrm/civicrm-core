@@ -335,7 +335,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
               continue;
             }
             if ($self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
-              $errors['_qf_default'] .= ts('Missing required field: Provide Particiapnt ID') . '<br />';
+              $errors['_qf_default'] .= ts('Missing required field: Provide Participant ID') . '<br />';
             }
             else {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
