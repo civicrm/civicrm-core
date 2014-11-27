@@ -653,11 +653,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
 
 
         $confirmUrl = CRM_Utils_System::url('civicrm/petition/confirm',
-          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&p={$params['sid']}",
+          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&pid={$params['sid']}",
           TRUE
         );
         $confirmUrlPlainText = CRM_Utils_System::url('civicrm/petition/confirm',
-          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&p={$params['sid']}",
+          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&pid={$params['sid']}",
           TRUE,
           NULL,
           FALSE
