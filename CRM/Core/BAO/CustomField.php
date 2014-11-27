@@ -1865,7 +1865,7 @@ SELECT $columnName
       $params['fk_field_name'] = 'id';
       $params['fk_attributes'] = 'ON DELETE SET NULL';
     }
-    if ($field->default_value) {
+    if (isset($field->default_value)) {
       $params['default'] = "'{$field->default_value}'";
     }
 
