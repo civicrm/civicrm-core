@@ -114,13 +114,28 @@ class CRM_Contribute_Task {
           'class' => 'CRM_Contribute_Form_Task_PDFLetter',
           'result' => FALSE,
         ),
+        9 => array(
+          'title' => ts('Print or Email Contribution Invoices'),
+          'class' => 'CRM_Contribute_Form_Task_Invoice',
+          'result' => FALSE,
+        ),
       );
 
       //CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviContribute')) {
         unset(self::$_tasks[1]);
       }
+      //CRM-12920 - check for edit permission
+      if( !CRM_Core_Permission::check('edit contributions') ){
+        unset(self::$_tasks[4],self::$_tasks[6]);
+      }
 
+      // remove action "Print or Email Contribution Invoices"
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+      if (!$invoicing) {
+        unset(self::$_tasks[9]);
+      }
       CRM_Utils_Hook::searchTasks('contribution', self::$_tasks);
       asort(self::$_tasks);
     }

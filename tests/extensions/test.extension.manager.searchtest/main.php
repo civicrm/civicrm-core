@@ -67,7 +67,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   function &columns() {
     // return by reference
     $columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
       ts('State') => 'state_province',

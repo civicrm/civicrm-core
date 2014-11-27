@@ -221,29 +221,5 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
     return $ppt;
   }
 
-  /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * @param String $fieldName
-   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param Array $props : whatever is known about this dao object
-   *
-   * @return Array|bool
-   */
-  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
-    $params = array();
-    // Special logic for fields whose options depend on context or properties
-    switch ($fieldName) {
-      // These options are not in the db
-      case 'billing_mode':
-        return array(
-          CRM_Core_Payment::BILLING_MODE_FORM => 'form',
-          CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
-          CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
-        );
-    }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
-  }
 }
 

@@ -10,8 +10,10 @@
       el = this[0],
       ret = {},
       $row = this.first().closest('.crm-entity');
-    ret.entity = $row.data('entity') || $row[0].id.split('-')[0];
-    ret.id = $row.data('id') || $row[0].id.split('-')[1];
+      ret.entity = $row.data('entity') || $row[0].id.split('-')[0];
+      ret.id = $row.data('id') || $row[0].id.split('-')[1];
+      ret.action = $row.data('action') || 'setvalue';
+
     if (!ret.entity || !ret.id) {
       return false;
     }
@@ -41,7 +43,7 @@
           field: info.field,
           value: checked ? 1 : 0
         };
-        CRM.api(info.entity, 'setvalue', params, {
+        CRM.api(info.entity, info.action, params, {
           context: this,
           error: function(data) {
             editableSettings.error.call(this, info.entity, info.field, checked, data);
@@ -66,10 +68,11 @@
         $(this).crmError(data.error_message, ts('Error'));
         $(this).removeClass('crm-editable-saving');
       },
-      success: function(entity, field, value, data) {
+      success: function(entity, field, value, data, settings) {
         var $i = $(this);
         CRM.status(ts('Saved'));
         $i.removeClass('crm-editable-saving crm-error');
+        value = value === '' ? settings.placeholder : value;
         $i.html(value);
       }
     };
@@ -120,7 +123,7 @@
         var
           info = $i.crmEditableEntity(),
           params = {},
-          action = $i.data('action') || 'setvalue';
+          action = $i.data('action') || info.action;
         if (!info.field) {
           return false;
         }
@@ -144,7 +147,7 @@
               value = $i.data('options')[value];
             }
             $i.trigger('crmFormSuccess');
-            editableSettings.success.call(this, info.entity, info.field, value, data);
+            editableSettings.success.call(this, info.entity, info.field, value, data, settings);
           }
         });
       }, settings);

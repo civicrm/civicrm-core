@@ -105,7 +105,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
-    'default' => 'null',
+    'default' => null,
     'add' => '4.3',
     'title' => 'Fatal Error Handler',
     'is_domain' => 1,

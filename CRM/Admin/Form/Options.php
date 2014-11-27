@@ -109,7 +109,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if ($this->_id && in_array($this->_gName, CRM_Core_OptionGroup::$_domainIDGroups)) {
       $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domainID) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
     }
   }
@@ -150,6 +150,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('%1 Option', array(1 => $this->_gLabel)));
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -259,7 +261,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       (($this->_action & CRM_Core_Action::ADD) || !$isReserved)
     ) {
       $caseID = CRM_Core_Component::getComponentID('CiviCase');
-      $components = array('' => ts('Contacts OR Cases'), $caseID => ts('Cases Only'));
+      $components = array('' => ts('Contacts AND Cases'), $caseID => ts('Cases Only'));
       $this->add('select',
         'component_id',
         ts('Component'),
@@ -353,7 +355,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if ($self->_gName == 'from_email_address') {
       $formEmail = CRM_Utils_Mail::pluckEmailFromHeader($fields['label']);
       if (!CRM_Utils_Rule::email($formEmail)) {
-        $errors['label'] = ts('Please enter the valid email address.');
+        $errors['label'] = ts('Please enter a valid email address.');
       }
 
       $formName = explode('"', $fields['label']);
@@ -437,4 +439,5 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', array(1 => $this->_gLabel, 2 => $optionValue->label)), ts('Saved'), 'success');
     }
   }
+
 }

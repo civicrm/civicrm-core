@@ -31,7 +31,7 @@
     {include file="CRM/Price/Form/DeleteSet.tpl"}
 {else}
     <div id="help">
-        {ts}Price sets allow you to set up multiple event registration options with associated fees (e.g. pre-conference workshops, additional meals, etc.). Configure Price Sets for events which need more than a single set of fee levels.{/ts}
+      {ts}Price sets allow you to set up flexible multi-option pricing schemes for your contribution, event and membership pages. Use a price set if the standard pricing options are insufficient for your needs.{/ts}
     </div>
 
     {if $usedBy}

@@ -5,35 +5,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Utils_ArrayTest
  */
 class CRM_Utils_ArrayTest extends CiviUnitTestCase {
-  function testBreakReference() {
-    // Get a reference and make a change
-    $fooRef1 = self::returnByReference();
-    $this->assertEquals('original', $fooRef1['foo']);
-    $fooRef1['foo'] = 'modified';
-
-    // Make sure that the referenced item was actually changed
-    $fooRef2 = self::returnByReference();
-    $this->assertEquals('modified', $fooRef1['foo']);
-    $this->assertEquals('original', $fooRef2['foo']);
-
-    // Get a non-reference, make a change, and make sure the references were unaffected.
-    $fooNonReference = CRM_Utils_Array::breakReference(self::returnByReference());
-    $fooNonReference['foo'] = 'privately-modified';
-    $this->assertEquals('modified', $fooRef1['foo']);
-    $this->assertEquals('original', $fooRef2['foo']);
-    $this->assertEquals('privately-modified', $fooNonReference['foo']);
-  }
-
-  /**
-   * @return null
-   */
-  private function &returnByReference() {
-    static $foo;
-    if ($foo === NULL) {
-      $foo['foo'] = 'original';
-    }
-    return $foo;
-  }
 
   function testIndexArray() {
     $inputs = array();
@@ -141,5 +112,18 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array()));
     $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b')));
     $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b','c','d')));
+  }
+
+  function testRemove() {
+    $data = array(
+      'one' => 1,
+      'two' => 2,
+      'three' => 3,
+      'four' => 4,
+      'five' => 5,
+      'six' => 6,
+    );
+    CRM_Utils_Array::remove($data, 'one', 'two', array('three', 'four'), 'five');
+    $this->assertEquals($data, array('six' => 6));
   }
 }

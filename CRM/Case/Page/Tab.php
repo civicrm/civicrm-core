@@ -81,9 +81,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
       else {
         CRM_Contact_Page_View::checkUserPermission($this);
       }
-
-      // set page title
-      CRM_Contact_Page_View::setTitle($this->_contactId);
     }
     else {
       if ($this->_action & CRM_Core_Action::VIEW) {

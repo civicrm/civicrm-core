@@ -46,9 +46,9 @@
 {literal}
 <script type="text/javascript">
     CRM.$(function($) {
-      if (cj('#crm-recently-viewed').offset().left > 150) {
-        cj('#crm-recently-viewed').removeClass('left').addClass('right');
-          }
+      if ($('#crm-recently-viewed').offset().left > 150) {
+        $('#crm-recently-viewed').removeClass('left').addClass('right');
+      }
     });
 </script>
 {/literal}

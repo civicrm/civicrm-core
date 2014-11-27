@@ -72,7 +72,6 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
       LEFT JOIN civicrm_price_field_value pv ON pv.id = li.price_field_value_id
       SET entity_table = 'civicrm_membership', entity_id = %1
       WHERE pv.membership_type_id = %2
-      AND entity_table = 'civicrm_contribution' AND entity_id = contribution_id
       AND contribution_id = %3";
     CRM_Core_DAO::executeQuery($sql, array(1 => array($dao->membership_id, 'Integer'), 2 => array($membershipTypeID, 'Integer'), 3 => array($dao->contribution_id, 'Integer')));
     return $dao;

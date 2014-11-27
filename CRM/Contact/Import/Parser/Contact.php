@@ -380,7 +380,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       /* If it's a dupe,external Identifier  */
 
       if ($externalDupe = CRM_Utils_Array::value($externalID, $this->_allExternalIdentifiers)) {
-        $errorMessage = ts('External Identifier conflicts with record %1', array(1 => $externalDupe));
+        $errorMessage = ts('External ID conflicts with record %1', array(1 => $externalDupe));
         array_unshift($values, $errorMessage);
         $importRecordParams = array(
           $statusFieldName => 'ERROR',
@@ -487,7 +487,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
       if ($internalCid = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['external_identifier'], 'id', 'external_identifier')) {
         if ($internalCid != CRM_Utils_Array::value('id', $params)) {
-          $errorMessage = ts('External Identifier already exists in database.');
+          $errorMessage = ts('External ID already exists in Database.');
           array_unshift($values, $errorMessage);
           $importRecordParams = array(
             $statusFieldName => 'ERROR',
@@ -509,7 +509,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $params['contact_sub_type'] = array_search($subType, $subTypes);
       }
       elseif (!CRM_Contact_BAO_ContactType::isExtendsContactType($subType, $this->_contactType)) {
-        $message = "Mismatched or Invalid Contact SubType.";
+        $message = "Mismatched or Invalid Contact Subtype.";
         array_unshift($values, $message);
         return CRM_Import_Parser::NO_MATCH;
       }
@@ -534,30 +534,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       if (empty($params['id']) && !empty($params['external_identifier'])) {
         if ($cid) {
           $params['id'] = $cid;
-        }
-        else {
-          //update contact if dedupe found contact id, CRM-4148
-          $dedupeParams = $formatted;
-
-          //special case to check dedupe if external id present.
-          //if we send external id dedupe will stop.
-          unset($dedupeParams['external_identifier']);
-          require_once 'CRM/Utils/DeprecatedUtils.php';
-          $checkDedupe = _civicrm_api3_deprecated_duplicate_formatted_contact($dedupeParams);
-          if (CRM_Core_Error::isAPIError($checkDedupe, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
-            $matchingContactIds = explode(',', $checkDedupe['error_message']['params'][0]);
-            if (count($matchingContactIds) == 1) {
-              $params['id'] = array_pop($matchingContactIds);
-            }
-            else {
-              $message = "More than one matching contact found for given criteria.";
-              array_unshift($values, $message);
-              $this->_retCode = CRM_Import_Parser::NO_MATCH;
-            }
-          }
-          else {
-            $createNewContact = TRUE;
-          }
         }
       }
 
@@ -769,7 +745,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           if (isset($relationType->$direction)) {
             //validation of related contact subtype for update mode
             if ($relCsType = CRM_Utils_Array::value('contact_sub_type', $params[$key]) && $relCsType != $relationType->$direction) {
-              $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact");
+              $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact.");
               array_unshift($values, $errorMessage);
               return CRM_Import_Parser::NO_MATCH;
             }
@@ -807,7 +783,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
               if (!empty($relatedCsType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params[$key]['id'], $relatedCsType) &&
                 $relatedCsType != CRM_Utils_Array::value('contact_sub_type', $formatting))) {
-                $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact ID: %1", array(1 => $params[$key]['id']));
+                $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact.") . ' ' . ts("ID: %1", array(1 => $params[$key]['id']));
                 array_unshift($values, $errorMessage);
                 return CRM_Import_Parser::NO_MATCH;
               }
@@ -1429,7 +1405,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                     continue;
                   }
                   else {
-                    self::addToErrorMsg(ts('State / Province'), $errorMessage);
+                    self::addToErrorMsg(ts('State/Province'), $errorMessage);
                   }
                 }
               }
@@ -1455,7 +1431,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                   }
                   else {
                     if (self::in_value($stateValue['country'], $countryIsoCodes) || self::in_value($stateValue['country'], $countryNames)) {
-                      self::addToErrorMsg(ts('Country input value is in table but not "available": "This Country is valid but is NOT in the list of Available Countries currently configured for your site. This can be viewed and modifed from Administer > Localization > Languages, Currency, Locations." '), $errorMessage);
+                      self::addToErrorMsg(ts('Country input value is in table but not "available": "This Country is valid but is NOT in the list of Available Countries currently configured for your site. This can be viewed and modifed from Administer > Localization > Languages Currency Locations." '), $errorMessage);
                     }
                     else {
                       self::addToErrorMsg(ts('Country input value not in country table: "The Country value appears to be invalid. It does not match any value in CiviCRM table of countries."'), $errorMessage);
@@ -1617,7 +1593,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param $value
    * @param $valueArray
    *
-   * @return ture if value present in array or retun false
+   * @return bool
    *
    * @access public
    */
@@ -1714,7 +1690,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * format params for update and fill mode
    *
-   * @param $params       array  referance to an array containg all the
+   * @param $params       array  reference to an array containing all the
    * values for import
    * @param $onDuplicate  int
    * @param $cid          int    contact id

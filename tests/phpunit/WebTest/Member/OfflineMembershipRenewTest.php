@@ -76,7 +76,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -94,7 +93,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -181,7 +179,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -199,15 +196,14 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
-    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span[1]/a[1][text()='View']");
 
     // click through to the membership view screen
-    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[9]/span[1]/a[1][text()='View']");
 
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
@@ -269,7 +265,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -378,7 +373,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);

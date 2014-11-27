@@ -25,7 +25,6 @@
 *}
 {* View existing membership record. *}
 <div class="crm-block crm-content-block crm-membership-view-form-block">
-    <h3>{ts}View Membership{/ts}</h3>
     <div class="crm-submit-buttons">
         {* Check permissions and make sure this is not an inherited membership (edit and delete not allowed for inherited memberships) *}
         {if ! $owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'edit memberships') }

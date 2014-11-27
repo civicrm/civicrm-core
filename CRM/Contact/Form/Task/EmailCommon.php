@@ -46,7 +46,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   public $_toContactEmails = array();
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function preProcessFromAddress(&$form) {
     $form->_single = FALSE;
@@ -116,6 +116,17 @@ class CRM_Contact_Form_Task_EmailCommon {
     }
 
     $form->_fromEmails = CRM_Utils_Array::crmArrayMerge($emails, $domainEmails);
+
+    // Add signature
+    $defaultEmail = civicrm_api3('email', 'getsingle', array('id' => key($form->_fromEmails)));
+    $defaults = array();
+    if (!empty($defaultEmail['signature_html'])) {
+      $defaults['html_message'] = '<br/><br/>--' . $defaultEmail['signature_html'];
+    }
+    if (!empty($defaultEmail['signature_text'])) {
+      $defaults['text_message'] = "\n\n--\n" . $defaultEmail['signature_text'];
+    }
+    $form->setDefaults($defaults);
   }
 
   /**
@@ -133,7 +144,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
     $cid = $form->get('cid');
     if ($cid) {
-      $form->_contactIds = explode(',',$cid);
+      $form->_contactIds = explode(',', $cid);
     }
     if (count($form->_contactIds) > 1) {
       $form->_single = FALSE;
@@ -228,6 +239,10 @@ class CRM_Contact_Form_Task_EmailCommon {
           // build array's which are used to setdefaults
           if (in_array($contactId, $form->_toContactIds)) {
             $form->_toContactDetails[$contactId] = $form->_contactDetails[$contactId];
+            // If a particular address has been specified as the default, use that instead of contact's primary email
+            if (!empty($form->_toEmail) && $form->_toEmail['contact_id'] == $contactId) {
+              $email = $form->_toEmail['email'];
+            }
             $toArray[] = array(
               'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",

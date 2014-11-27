@@ -167,7 +167,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       // gives the ascii value
       $asciiValue = ord($title{0});
       if ($asciiValue >= 48 && $asciiValue <= 57) {
-        $errors['title'] = ts("Set's Name should not start with digit");
+        $errors['title'] = ts("Name cannot not start with a digit");
       }
     }
 
@@ -499,7 +499,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       CRM_Core_Session::setStatus(ts('Your custom field set \'%1 \' has been saved.', array(1 => $group->title)), ts('Saved'), 'success');
     }
     else {
-      $url = CRM_Utils_System::url('civicrm/admin/custom/group/field/add', 'reset=1&action=add&gid=' . $group->id);
+      // Jump directly to adding a field if popups are disabled
+      $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
+      $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&new=1&gid=' . $group->id . '&action=' . ($action ? 'add' : 'browse'));
       CRM_Core_Session::setStatus(ts("Your custom field set '%1' has been added. You can add custom fields now.",
           array(1 => $group->title)
         ), ts('Saved'), 'success');
@@ -544,16 +546,22 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   static function getFormattedList(&$list) {
     $relName = array();
 
-    foreach ($list as $k => $v) {
-      $key = substr($k, 0, strpos($k, '_'));
+    foreach ($list as $listItemKey => $itemValue) {
+      // Extract the relationship ID.
+      $key = substr($listItemKey, 0, strpos($listItemKey, '_'));
       if (isset($list["{$key}_b_a"])) {
+        $relName["$key"] = $list["{$key}_a_b"];
+        // Are the two labels different?
         if ($list["{$key}_a_b"] != $list["{$key}_b_a"]) {
           $relName["$key"] = $list["{$key}_a_b"] . ' / ' . $list["{$key}_b_a"];
         }
         unset($list["{$key}_b_a"]);
+        unset($list["{$key}_a_b"]);
       }
       else {
+        // If no '_b_a' label exists save the '_a_b' one and unset it from the list
         $relName["{$key}"] = $list["{$key}_a_b"];
+        unset($list["{$key}_a_b"]);
       }
     }
     return $relName;

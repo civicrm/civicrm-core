@@ -81,7 +81,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
 
     $this->openCiviPage("campaign", "reset=1", "link=Add Campaign");
 
-    if ($this->isTextPresent('No campaigns found.')) {
+    if ($this->isTextPresent('None found.')) {
       $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
       $this->assertTrue($this->isTextPresent('There are currently no active Campaigns.'));
     }
@@ -97,9 +97,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->type("description", "This is a test campaign");
 
     // include groups for the campaign
-    $this->addSelection("includeGroups-f", "label=$groupName");
-    $this->click("//option[@value=4]");
-    $this->click("add");
+    $this->multiselect2("includeGroups", array("$groupName", "Advisory Board"));
 
     // fill the end date for campaign
     $this->webtestFillDate("end_date", "+1 year");
@@ -115,8 +113,8 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
       "Status message didn't show up after saving campaign!"
     );
 
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
 
     $this->offlineParticipantAddTest($campaignTitle, $id);
   }
@@ -137,8 +135,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->click("campaign_id");
     $this->select("campaign_id", "value=$id");
     $this->waitForElementPresent('_qf_EventInfo_upload_done-bottom');
-    $this->click("_qf_EventInfo_upload_done-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_EventInfo_upload_done-bottom");
 
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
@@ -150,7 +147,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
-    $this->webtestFillAutocomplete($firstName, 'contact_id');
+    $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
     $this->select2("event_id", $eventName);
@@ -212,7 +209,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->click("remove");
     $this->click("_qf_Component_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Changes Saved."));
+    $this->assertTrue($this->isTextPresent("Changes Saved"));
 
     $this->openCiviPage("event/search", "reset=1", "_qf_Search_refresh");
 

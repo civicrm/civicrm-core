@@ -183,6 +183,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
       if (!CRM_Utils_System::isNull($eventTemplates)) {
         $this->add('select', 'template_id', ts('From Template'), array('' => ts('- select -')) + $eventTemplates, FALSE, array('class' => 'crm-select2 huge'));
       }
+      // Make sure this form redirects properly
+      $this->preventAjaxSubmit();
     }
 
     // add event title, make required if this is not a template
@@ -202,13 +204,13 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->addSelect('default_role_id', array(), TRUE);
 
-    $this->addSelect('participant_listing_id', array('placeholder' => ts('Disabled')));
+    $this->addSelect('participant_listing_id', array('placeholder' => ts('Disabled'), 'option_url' => NULL));
 
     $this->add('textarea', 'summary', ts('Event Summary'), $attributes['summary']);
     $this->addWysiwyg('description', ts('Complete Description'), $attributes['event_description']);
-    $this->addElement('checkbox', 'is_public', ts('Public Event?'));
+    $this->addElement('checkbox', 'is_public', ts('Public Event'));
     $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
-    $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location?'));
+    $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location'));
 
     $this->addDateTime('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDateTime'));
     $this->addDateTime('end_date', ts('End Date / Time'), FALSE, array('formatType' => 'activityDateTime'));
@@ -258,7 +260,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
         $start = CRM_Utils_Date::processDate($values['start_date']);
         $end = CRM_Utils_Date::processDate($values['end_date']);
         if (($end < $start) && ($end != 0)) {
-          $errors['end_date'] = ts('End date should be after Start date');
+          $errors['end_date'] = ts('End date should be after Start date.');
         }
       }
     }

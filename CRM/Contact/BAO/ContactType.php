@@ -641,10 +641,10 @@ WHERE name = %1";
    * @access public
    * @static
    */
-  static function add($params) {
+  static function add(&$params) {
 
     // label or name
-    if (empty($params['label'])) {
+    if (empty($params['id']) && empty($params['label'])) {
       return;
     }
     if (!empty($params['parent_id']) &&
@@ -683,7 +683,7 @@ WHERE name = %1";
       $navigation = array(
         'label' => "New $contact",
         'name' => "New $contactName",
-        'url' => "civicrm/contact/add&ct=$name&cst=$contactName&reset=1",
+        'url' => "civicrm/contact/add?ct=$name&cst=$contactName&reset=1",
         'permission' => 'add contacts',
         'parent_id' => $navinfo['id'],
         'is_active' => $active,

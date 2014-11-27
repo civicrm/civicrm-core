@@ -101,7 +101,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact SubType'),
+            'title' => ts('Contact Subtype'),
           ),
         ),
         'filters' =>
@@ -184,7 +184,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'default' => TRUE,
             'statistics' =>
             array('sum' => ts('Aggregate Amount'),
-              'count' => ts('Donations'),
+              'count' => ts('Contributions'),
               'avg' => ts('Average'),
             ),
           ),
@@ -202,13 +202,13 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
           ),
           'contribution_status_id' =>
-          array('title' => ts('Donation Status'),
+          array('title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
           ),
           'total_amount' =>
-          array('title' => ts('Donation Amount'),
+          array('title' => ts('Contribution Amount'),
           ),
         ),
       ),
@@ -241,22 +241,6 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
         ),
         'grouping' => 'softcredit-fields',
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Soft Credit Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
     );
 
     // If we have a campaign, build out the relevant elements
@@ -271,6 +255,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
       );
     }
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
     $this->_currencyColumn = 'civicrm_contribution_currency';
@@ -463,7 +448,7 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
       'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['count'] = array(
-      'title' => ts('Total Donations'),
+      'title' => ts('Total Contributions'),
       'value' => $count,
     );
     $statistics['counts']['avg'] = array(

@@ -85,8 +85,8 @@
     {literal}
     <script type="text/javascript">
       CRM.$(function($) {
-          cj('.collapsed').click( function( ) {
-              var currentObj = cj( this );
+          $('.collapsed').click( function( ) {
+              var currentObj = $( this );
               if ( currentObj.hasClass( 'expanded') ) {
                   currentObj.removeClass( 'expanded' );
                   currentObj.parent( ).parent( ).next( ).hide( );
@@ -109,9 +109,9 @@
     {literal}
 
     CRM.$(function($) {
-      var tabIndex = cj('#tab_' + selectedTab).prevAll().length;
-      cj("#mainTabContainer").tabs({active: tabIndex});
-      cj(".crm-tab-button").addClass("ui-corner-bottom");
+      var tabIndex = $('#tab_' + selectedTab).prevAll().length;
+      $("#mainTabContainer").tabs({active: tabIndex});
+      $(".crm-tab-button").addClass("ui-corner-bottom");
     });
     {/literal}
     </script>
@@ -120,7 +120,7 @@
     {literal}
     <script type="text/javascript">
     CRM.$(function($) {
-      cj('.crm-extensions-refresh').click(function(event){
+      $('.crm-extensions-refresh').click(function(event){
         event.stopPropagation();
         CRM.alert('', '{/literal}{ts escape="js"}Refreshing...{/ts}{literal}', 'crm-msg-loading', {expires: 0});
         CRM.api('Extension', 'refresh', {}, {

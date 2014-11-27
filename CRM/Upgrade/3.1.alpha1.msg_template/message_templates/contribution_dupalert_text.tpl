@@ -4,7 +4,7 @@ Duplicate Matching Rules for your site.{/ts}
 
 {ts}Organization Name{/ts}: {$onBehalfName}
 {ts}Organization Email{/ts}: {$onBehalfEmail}
-{ts}Organization Contact Id{/ts}: {$onBehalfID}
+{ts}Organization Contact ID{/ts}: {$onBehalfID}
 
 {ts}If you think this may be a duplicate contact which should be merged with an existing record -
 Go to "CiviCRM >> Administer CiviCRM >> Find and Merge Duplicate Contacts". Use the strict

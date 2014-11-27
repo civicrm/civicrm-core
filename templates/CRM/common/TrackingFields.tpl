@@ -29,7 +29,7 @@
 CRM.$(function($) {
 {/literal}
     {foreach from=$trackingFields key=trackingFieldName item=dontCare}
-       cj("#{$trackingFieldName}").parent().parent().hide( );
+       $("#{$trackingFieldName}").parent().parent().hide( );
     {/foreach}
 {literal}
   }

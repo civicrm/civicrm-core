@@ -76,6 +76,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     );
 
     $fields = array_merge($fields, array(
+      'source_contact_id' => array(
+        'title' => ts('Source Contact'),
+        'headerPattern' => '/Source.Contact?/i',
+      ),
       'activity_label' => array(
         'title' => ts('Activity Type Label'),
         'headerPattern' => '/(activity.)?type label?/i',
@@ -264,12 +268,15 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
         if ($key == 'activity_date_time' && $val) {
           $params[$key] = CRM_Utils_Date::formatDate($val, $dateType);
         }
-        elseif ($customFields[$customFieldID]['data_type'] == 'Date') {
+        elseif (!empty($customFields[$customFieldID]) && $customFields[$customFieldID]['data_type'] == 'Date') {
           CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $params, $dateType, $key);
         }
-        elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
+        elseif (!empty($customFields[$customFieldID]) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
           $params[$key] = CRM_Utils_String::strtoboolstr($val);
         }
+      }
+      elseif ($key == 'activity_date_time') {
+        $params[$key] = CRM_Utils_Date::formatDate($val, $dateType);
       }
       elseif ($key == 'activity_subject') {
         $params['subject'] = $val;

@@ -93,8 +93,8 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
     $this->assign('searchCount', $searchCount);
     $this->assign('searchDone', $this->get('searchDone'));
     $this->assign('contact_type_display', ts('Organization'));
-    $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), array('class' => 'form-submit'));
-    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'form-submit'));
+    $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), array('class' => 'crm-form-submit'));
+    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'crm-form-submit'));
 
 
     $this->addButtons(array(
@@ -170,7 +170,7 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
         $status[] = ts('%count relationship was not created because the contact is not of the right type for this relationship', array('count' => $invalid, 'plural' => '%count relationships were not created because the contact is not of the right type for this relationship'));
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts('Relationship Created', array('count' => $valid, 'plural' => 'Relationships Created')), 'success', array('expires' => 0));
+      CRM_Core_Session::setStatus($status, ts('Relationship created.', array('count' => $valid, 'plural' => 'Relationships created.')), 'success', array('expires' => 0));
     }
   }
 

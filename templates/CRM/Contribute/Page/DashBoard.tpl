@@ -66,15 +66,14 @@
 
 <div class="float-right">
 <table class="form-layout-compressed">
-<tr>
+  <tr>
     <td>
-     <a href="{$configPagesURL}" class="button"><span>{ts}Manage Contribution Pages{/ts}
-       </span></a>
+      <a href="{$configPagesURL}" class="button no-popup"><span>{ts}Manage Contribution Pages{/ts}</span></a>
     </td>
-    <td><a href="{$newPageURL}" class="button"><span><div class="icon add-icon"></div>{ts}Add Contribution Page{/ts}
-        </span></a>
+    <td>
+      <a href="{$newPageURL}" class="button no-popup"><span><div class="icon add-icon"></div>{ts}Add Contribution Page{/ts}</span></a>
     </td>
-</tr>
+  </tr>
 </table>
 </div>
 {/if}

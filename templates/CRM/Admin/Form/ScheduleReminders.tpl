@@ -45,7 +45,7 @@
 
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>
-        <td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong>{ts}OR{/ts}</strong><br /></td>
+        <td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong id='OR'>OR</strong><br /></td>
     </tr>
 
     <tr id="relativeDate" class="crm-scheduleReminder-form-block-description">
@@ -80,17 +80,17 @@
       <td>{$form.from_email.html}&nbsp;&nbsp;</td>
     </tr>
     <tr class="crm-scheduleReminder-form-block-recipient">
-      <td id="recipientLabel" class="right">{$form.recipient.label}</td><td colspan="3">{$form.limit_to.html}&nbsp;&nbsp;{$form.recipient.html}&nbsp;&nbsp;{help id="recipient" title=$form.recipient.label}</td>
+      <td id="recipientLabel" class="right">{$form.recipient.label}</td><td colspan="3">{$form.limit_to.html}&nbsp;{help id="limit_to" class="limit_to" title=$form.recipient.label}{$form.recipient.html}&nbsp;{help id="recipient" class="recipient" title=$recipientLabels.activity}</td>
     </tr>
-    <tr id="recipientList" class="crm-scheduleReminder-form-block-recipientListing">
+    <tr id="recipientList" class="crm-scheduleReminder-form-block-recipientListing recipient">
         <td class="right">{$form.recipient_listing.label}</td><td colspan="3">{$form.recipient_listing.html}</td>
     </tr>
-    <tr id="recipientManual" class="crm-scheduleReminder-form-block-recipient_manual_id">
+    <tr id="recipientManual" class="crm-scheduleReminder-form-block-recipient_manual_id recipient">
         <td class="label">{$form.recipient_manual_id.label}</td>
         <td>{$form.recipient_manual_id.html}{edit}<div class="description">{ts}You can manually send out the reminders to these recipients.{/ts}</div>{/edit}</td>
     </tr>
 
-    <tr id="recipientGroup" class="crm-scheduleReminder-form-block-recipient_group_id">
+    <tr id="recipientGroup" class="crm-scheduleReminder-form-block-recipient_group_id recipient">
         <td class="label">{$form.group_id.label}</td>
         <td>{$form.group_id.html}</td>
     </tr>
@@ -98,30 +98,44 @@
       <td class="label">{$form.mode.label}</td>
       <td>{$form.mode.html}</td>
     </tr>
-    <tr id="smsProvider" class="crm-scheduleReminder-form-block-sms_provider_id">
-      <td class="label">{$form.sms_provider_id.label}</td>
-      <td>{$form.sms_provider_id.html}</td>
+    <tr class="crm-scheduleReminder-form-block-active">
+      <td class="label"></td>
+      <td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
     </tr>
   </table>
-  <fieldset id="compose_id"><legend>{$title}</legend>
-     <table id="email-field-table" class="form-layout-compressed">
-        <tr class="crm-scheduleReminder-form-block-active">
-           <td class="label"></td>
-           <td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
-        </tr>
-        <tr class="crm-scheduleReminder-form-block-template">
+  <fieldset id="email" class="crm-collapsible" style="display: block;">
+    <legend class="collapsible-title">{ts}Email Screen{/ts}</legend>
+      <div>
+       <table id="email-field-table" class="form-layout-compressed">
+         <tr class="crm-scheduleReminder-form-block-template">
             <td class="label">{$form.template.label}</td>
             <td>{$form.template.html}</td>
-        </tr>
-        <tr class="crm-scheduleReminder-form-block-subject">
+         </tr>
+         <tr class="crm-scheduleReminder-form-block-subject">
             <td class="label">{$form.subject.label}</td>
             <td>{$form.subject.html}</td>
-        </tr>
-
-  </table>
-    <div id="email">{include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}</div>
-    {if $sms}<div id="sms">{include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}</div>{/if}
+         </tr>
+       </table>
+       {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
+    </div>
+    </fieldset>
+    {if $sms}
+      <fieldset id="sms" class="crm-collapsible"><legend class="collapsible-title">{ts}SMS Screen{/ts}</legend>
+        <div>
+        <table id="sms-field-table" class="form-layout-compressed">
+          <tr id="smsProvider" class="crm-scheduleReminder-form-block-sms_provider_id">
+            <td class="label">{$form.sms_provider_id.label}</td>
+            <td>{$form.sms_provider_id.html}</td>
+          </tr>
+          <tr class="crm-scheduleReminder-form-block-sms-template">
+            <td class="label">{$form.SMStemplate.label}</td>
+            <td>{$form.SMStemplate.html}</td>
+          </tr>
+        </table>
+        {include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}
+    <div>
   </fieldset>
+  {/if}
 
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    = "is_repeat"
@@ -152,148 +166,108 @@
 
 {literal}
 <script type='text/javascript'>
-    var entityMapping = eval({/literal}{$entityMapping}{literal});
-    var recipientMapping = eval({/literal}{$recipientMapping}{literal});
-
-    cj('#absolute_date_display').change( function() {
-        if(cj('#absolute_date_display').val()) {
-            cj('#relativeDate').hide();
-            cj('#relativeDateRepeat').hide();
-            cj('#repeatFields').hide();
-        } else {
-            cj('#relativeDate').show();
-            cj('#relativeDateRepeat').show();
-        }
-    });
-
     CRM.$(function($) {
-        if (cj('#absolute_date_display').val()) {
-            cj('#relativeDate').hide();
-            cj('#relativeDateRepeat').hide();
-            cj('#repeatFields').hide();
-         }
+      var $form = $('form.{/literal}{$form.formClass}{literal}'),
+        recipientMapping = eval({/literal}{$recipientMapping}{literal});
 
-         cj('#entity_0').change( function( ) {
-              buildSelect("start_action_date");
-        buildSelect("end_date");
-        buildSelect1("recipient");
-         });
-     });
+      $('#absolute_date_display', $form).change(function() {
+        if($(this).val()) {
+          $('#relativeDate, #relativeDateRepeat, #repeatFields, #OR', $form).hide();
+        } else {
+          $('#relativeDate, #relativeDateRepeat, #OR', $form).show();
+        }
+      });
+      if ($('#absolute_date_display', $form).val()) {
+        $('#relativeDate, #relativeDateRepeat, #repeatFields, #OR', $form).hide();
+      }
 
-  CRM.$(function($) {
-    loadMsgBox();
-    cj('#mode').change(function () {
+      $('#entity_0', $form).change(buildSelects);
+
       loadMsgBox();
-    });
+      $('#mode', $form).change(loadMsgBox);
 
-    showHideLimitTo();
-    cj('#entity_0').change(function () {
       showHideLimitTo();
+      buildSelects();
+
+      $('#recipient', $form).change(populateRecipient);
+      $('#limit_to', $form).change(populateRecipient).change(buildSelects);
+
+      var entity = $('#entity_0', $form).val();
+      if (!(entity === '2' || entity === '3') || $('#recipient', $form).val() !== '1') {
+        $('#recipientList', $form).hide();
+      }
+      else if (entity === '1') {
+        $('#recipient', $form).change(buildSelects);
+      }
+
+      function buildSelects() {
+        var mappingID = $('#entity_0', $form).val();
+
+        $.getJSON(CRM.url('civicrm/ajax/mapping'), {mappingID: mappingID},
+          function (result) {
+            CRM.utils.setOptions($('#start_action_date', $form), result.sel4);
+            CRM.utils.setOptions($('#end_date', $form), result.sel4);
+            CRM.utils.setOptions($('#recipient', $form), result.sel5);
+            recipientMapping = result.recipientMapping;
+            populateRecipient();
+          }
+        );
+      }
+      function populateRecipient() {
+        var recipient = $("#recipient", $form).val();
+        if ((recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') && $('#limit_to').val() != '') {
+          CRM.api3('participant', 'getoptions', {field: recipientMapping[recipient] == 'participant_role' ? 'role_id' : 'status_id', sequential: 1})
+            .done(function(result) {
+              CRM.utils.setOptions($('#recipient_listing', $form), result.values);
+            });
+          $("#recipientList", $form).show();
+        }
+
+        var entity = $('#entity_0', $form).val();
+        if (!(entity === '2' || entity === '3')) {
+          $('#recipientList', $form).hide();
+        }
+        showHideLimitTo();
+      }
+      // CRM-14070 Hide limit-to when entity is activity
+      function showHideLimitTo() {
+        $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
+        if ($('#entity_0', $form).val() != '1') {
+          if ($('#limit_to', $form).val() == '') {
+            $('tr.recipient:visible, #recipientList, #recipient, a.recipient').hide();
+            $('a.limit_to').show();
+          }
+          else {
+            $('a.limit_to, a.recipient').show();
+            $('#recipient').css("margin-left", "12px");
+          }
+          $("label[for='recipient']").text('{/literal}{$recipientLabels.other}{literal}');
+        }
+        else {
+          $('#recipient, a.recipient').show()
+          $('#recipient').css("margin-left", "-2px");
+          $('a.limit_to').hide();
+          $("label[for='recipient']").text('{/literal}{$recipientLabels.activity}{literal}');
+        }
+      }
     });
-  });
 
   function loadMsgBox() {
     if (cj('#mode').val() == 'Email' || cj('#mode').val() == 0){
       cj('#sms').hide();
-      cj('#smsProvider').hide();
       cj('#email').show();
     }
     else if (cj('#mode').val() == 'SMS'){
       cj('#email').hide();
       cj('#sms').show();
-      cj('#smsProvider').show();
+      showSaveUpdateChkBox('SMS');
     }
     else if (cj('#mode').val() == 'User_Preference'){
         cj('#email').show();
         cj('#sms').show();
-        cj('#smsProvider').show();
+      showSaveUpdateChkBox('SMS');
       }
   }
-
-  function showHideLimitTo() {
-    if (cj('#entity_0').val() == 1) {
-      cj('#limit_to').hide();
-    }
-    else {
-      cj('#limit_to').show();
-    }
-  }
-
-  CRM.$(function($) {
-    if (cj('#is_recipient_listing').val()) {
-      cj('#recipientList').show();
-    }
-    else {
-      cj('#recipientList').hide();
-    }
-    cj('#recipient').change(function () {
-      populateRecipient();
-    });
-  });
-
-     function populateRecipient( ) {
-         var recipient = cj("#recipient option:selected").val();
-    var entity = cj("#entity_0 option:selected").val();
-    var postUrl = "{/literal}{crmURL p='civicrm/ajax/populateRecipient' h=0}{literal}";
-
-    if(recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') {
-          var elementID = '#recipient_listing';
-             cj( elementID ).html('');
-          cj.post(postUrl, {recipient: recipientMapping[recipient]},
-            function ( response ) {
-          response = eval( response );
-          for (i = 0; i < response.length; i++) {
-                         cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
-                    }
-    });
-          cj("#recipientList").show();
-                cj('#is_recipient_listing').val(1);
-    } else {
-       cj("#recipientList").hide();
-       cj('#is_recipient_listing').val('');
-    }
-
-    if (entityMapping[entity] == 'civicrm_activity') {
-       cj("#recipientLabel").text("Recipient(s)");
-    } else {
-        cj("#recipientLabel").text("Limit Recipients");
-    }
-     }
-     function buildSelect( selectID ) {
-         var elementID = '#' +  selectID;
-         cj( elementID ).html('');
-   var mappingID = cj('#entity_0').val();
-         var postUrl = "{/literal}{crmURL p='civicrm/ajax/mapping' h=0}{literal}";
-         cj.post( postUrl, { mappingID: mappingID},
-             function ( response ) {
-                 response = eval( response );
-                 for (i = 0; i < response.length; i++) {
-                     cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
-                 }
-             }
-         );
-
-     }
-
- function buildSelect1( selectID ) {
-         var elementID = '#' +  selectID;
-         cj( elementID ).html('');
-   var mappingID = cj('#entity_0').val();
-         var postUrl1 = "{/literal}{crmURL p='civicrm/ajax/mapping1' h=0}{literal}";
-
-   cj('#is_recipient_listing').val('');
-         cj.post( postUrl1, { mappingID: mappingID},
-             function ( result ) {
-                 var responseResult = cj.parseJSON(result);
-                 var response       = eval(responseResult.sel5);
-                 recipientMapping   = eval(responseResult.recipientMapping);
-                 for (i = 0; i < response.length; i++) {
-                     cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
-                 }
-     populateRecipient();
-             }
-         );
-     }
 
  </script>
  {/literal}

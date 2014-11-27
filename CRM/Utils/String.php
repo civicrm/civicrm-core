@@ -103,6 +103,26 @@ class CRM_Utils_String {
   }
 
   /**
+   * convert possibly underscore separated words to camel case with special handling for 'UF'
+   * e.g
+   * membership_payment returns MembershipPayment
+   * @param string $string
+   *
+   * @return string string
+   */
+  static function convertStringToCamel($string) {
+    $fragments = explode('_', $string);
+    foreach ($fragments as & $fragment) {
+      $fragment = ucfirst($fragment);
+    }
+    // Special case: UFGroup, UFJoin, UFMatch, UFField
+    if ($fragments[0] === 'Uf') {
+      $fragments[0] = 'UF';
+    }
+    return implode('', $fragments);
+  }
+
+  /**
    *
    * Takes a variable name and munges it randomly into another variable name
    *
@@ -717,5 +737,17 @@ class CRM_Utils_String {
     }
   }
 
+  /**
+   * Many parts of the codebase have a convention of internally passing around
+   * HTML-encoded URLs. This effectively means that "&" is replaced by "&amp;"
+   * (because most other odd characters are %-escaped in URLs; and %-escaped
+   * strings don't need any extra escaping in HTML).
+   *
+   * @param string $url URL with HTML entities
+   * @return string URL without HTML entities
+   */
+  public static function unstupifyUrl($htmlUrl) {
+    return str_replace('&amp;', '&', $htmlUrl);
+  }
 }
 

@@ -32,8 +32,8 @@
             <input type="text" class="form-text" id="sort_name_navigation" placeholder="{ts}Find Contacts{/ts}" name="sort_name" style="width: 12em;" />
             <input type="text" id="sort_contact_id" style="display: none" />
             <input type="hidden" name="hidden_location" value="1" />
-            <input type="hidden" name="qfKey" value="{crmKey name='CRM_Contact_Controller_Search' addSequence=1}" />
-            <div style="height:1px; overflow:hidden;"><input type="submit" value="{ts}Go{/ts}" name="_qf_Advanced_refresh" class="form-submit default" /></div>
+            <input type="hidden" name="qfKey" value="" />
+            <div style="height:1px; overflow:hidden;"><input type="submit" value="{ts}Go{/ts}" name="_qf_Advanced_refresh" class="crm-form-submit default" /></div>
           </div>
         </form>
         <ul>
@@ -80,6 +80,9 @@
     $("#crm-nav-menu-container").html(menuMarkup).css({'padding-bottom': '10px'});
   }
 {/literal}{/if}{literal}
+  // CRM-15493 get the current qfKey
+  $("input[name=qfKey]", "#quickSearch").val($('#civicrm-navigation-menu').data('qfkey'));
+
 $('#civicrm-menu').ready(function() {
   $('#root-menu-div .outerbox').css({'margin-top': '6px'});
   $('#root-menu-div .menu-ul li').css({'padding-bottom': '2px', 'margin-top': '2px'});
@@ -110,7 +113,7 @@ $('#civicrm-menu').ready(function() {
       },
       focus: function (event, ui){
         return false;
-      }, 
+      },
       select: function (event, ui) {
         document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
         return false;
@@ -123,18 +126,22 @@ $('#civicrm-menu').ready(function() {
     .keydown(function() {
       $.Menu.closeAll();
     });
-  $('.crm-hidemenu').click(function() {
+  $('.crm-hidemenu').click(function(e) {
     $.Menu.closeAll();
     $('#civicrm-menu').slideUp();
-    var alert = CRM.alert({/literal}'<a href="#" id="crm-restore-menu">{ts escape='js'}Restore Menu{/ts}</a>', "{ts escape='js'}CiviCRM Menu Hidden{/ts}"{literal});
-    $('#crm-notification-container')
-      .off('.hideMenu')
-      .on('click.hideMenu', '#crm-restore-menu', function() {
-        alert.close();
-        $('#civicrm-menu').slideDown();
-        return false;
-      });
-    return false;
+    if ($('#crm-notification-container').length) {
+      var alert = CRM.alert({/literal}'<a href="#" id="crm-restore-menu" style="text-align: center; margin-top: -8px;">{ts escape='js'}Restore CiviCRM Menu{/ts}</a>'{literal}, '', 'none', {expires: 10000});
+      $('#crm-restore-menu')
+        .button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}})
+        .click(function(e) {
+          e.preventDefault();
+          alert.close();
+          $('#civicrm-menu').slideDown();
+        })
+        .parent().css('text-align', 'center').find('.ui-button-text').css({'padding-top': '4px', 'padding-bottom': '4px'})
+      ;
+    }
+    e.preventDefault();
   });
   $('.crm-quickSearchField').click(function() {
     var label = $(this).text();

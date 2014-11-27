@@ -446,7 +446,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    *
    * @return int   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  function &getRows($action, $offset, $rowCount, $sort, $output = NULL, $extraWhereClause = NULL) {
 
     $multipleFields = array('url');
     //$sort object processing for location fields
@@ -479,6 +479,11 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     }
 
     $additionalWhereClause = 'contact_a.is_deleted = 0';
+
+    if ($extraWhereClause) {
+      $additionalWhereClause .= " AND {$extraWhereClause}";
+    }
+
     $returnQuery = NULL;
     if ($this->_multiRecordTableName) {
       $returnQuery = TRUE;

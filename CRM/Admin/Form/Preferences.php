@@ -203,6 +203,10 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
               );
               break;
 
+            case 'wysiwyg':
+              $this->addWysiwyg($fieldName, $fieldValue['title'], $fieldValue['attributes']);
+              break;
+
             case 'entity_reference':
               $this->addEntityRef($fieldName, $fieldValue['title'], CRM_Utils_Array::value('options', $fieldValue, array()));
           }

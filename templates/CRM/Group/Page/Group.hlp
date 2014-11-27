@@ -63,3 +63,12 @@
 {htxt id="id-group-organization"}
 <p>{ts}Some organizations find it useful to be able to connect Organization contacts to Groups (one-to-one relationship) to represent a multi-org hierarchy. The org contact holds info about the org itself (name, location, etc.) and the group holds other sub-groups/contacts related to that group (employees, alumni, online activists, members, etc.).{/ts}</p>
 {/htxt}
+
+{htxt id="update_smart_groups-title"}
+  {ts}Update Smart Group Counts{/ts}
+{/htxt}
+{htxt id="update_smart_groups"}
+  <p>
+    {ts}Update this page with current statistics on the number of contacts in each smart group.{/ts}
+  </p>
+{/htxt}

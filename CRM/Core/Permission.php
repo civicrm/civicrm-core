@@ -429,7 +429,7 @@ class CRM_Core_Permission {
    * check permissions for delete and edit actions
    *
    * @param string $module component name.
-   * @param $action action to be check across component
+   * @param integer $action action to be check across component
    *
    *
    * @return bool

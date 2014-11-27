@@ -34,41 +34,21 @@
  */
 
 /**
- * This class generates form components generic to Mobile provider
+ * This class generates form components generic to Contribution admin
  *
  */
-class CRM_Contribute_Form extends CRM_Core_Form {
+class CRM_Contribute_Form extends CRM_Admin_Form {
 
   /**
-   * The id of the object being edited / created
-   *
-   * @var int
-   */
-  protected $_id;
-
-  /**
-   * The name of the BAO object for this form
-   *
-   * @var string
-   */
-  protected $_BAOName;
-
-  function preProcess() {
-    $this->_id = $this->get('id');
-    $this->_BAOName = $this->get('BAOName');
-  }
-
-  /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
    *
-   * @return void
+   * @return array
    */
   function setDefaultValues() {
     $defaults = array();
-    $params = array();
 
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
@@ -101,40 +81,5 @@ class CRM_Contribute_Form extends CRM_Core_Form {
     return $defaults;
   }
 
-  /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
-   */
-  public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
-
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
-    }
-  }
 }
 

@@ -52,6 +52,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_caseTypes', array($this, 'hook_caseTypes'));
     \CRM_Case_XMLRepository::singleton(TRUE);
+    \CRM_Case_XMLProcessor::flushStaticCaches();
 
     // CRM-9404 - set-up is a bit cumbersome but had to put something in place to set up activity types & case types
     //. Using XML was causing breakage as id numbers were changing over time

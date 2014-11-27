@@ -131,9 +131,16 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
       die("Cannot open $dsn: " . $db->getMessage());
     }
 
-    if (!$lineMode) {
-      $string = file_get_contents($fileName);
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    $multiLingual = (bool) $domain->locales;
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('multilingual', $multiLingual);
+    $smarty->assign('locales', explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales));
 
+    if (!$lineMode) {
+
+      $string = $smarty->fetch($fileName);
       // change \r\n to fix windows issues
       $string = str_replace("\r\n", "\n", $string);
 

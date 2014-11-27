@@ -120,7 +120,7 @@ function loadVoterList( )
      var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=voterList' }"{literal};
 
      var searchVoterFor = {/literal}'{$searchVoterFor}'{literal};
-     CRM.$( 'table.gotvVoterRecords', 'form#{/literal}{$form.formName}{literal}').dataTable({
+     CRM.$( 'table.gotvVoterRecords', 'form.{/literal}{$form.formClass}{literal}').dataTable({
                "bFilter"    : false,
     "bAutoWidth" : false,
         "bProcessing": true,
@@ -137,7 +137,7 @@ function loadVoterList( )
       var dataLength = aoData.length;
 
       var count = 1;
-      var searchCriteria = new Array( 'campaign_search_voter_for' );
+      var searchCriteria = ['campaign_search_voter_for'];
 
       //get the search criteria.
                         var searchParams = {/literal}{$searchParams}{literal};

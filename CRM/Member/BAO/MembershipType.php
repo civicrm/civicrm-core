@@ -89,37 +89,46 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * function to add the membership types
    *
    * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $ids array contains the id (deprecated)
    *
    * @access public
    * @static
    *
    * @return object
    */
-  static function add(&$params, &$ids) {
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+  static function add(&$params, $ids = array()) {
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipType', $ids));
+    if (!$id) {
+      if (!isset($params['is_active'])) {
+        // do we need this?
+        $params['is_active'] = FALSE;
+      }
+      if (!isset($params['domain_id'])) {
+        $params['domain_id'] = CRM_Core_Config::domainID();
+      }
+    }
 
     // action is taken depending upon the mode
     $membershipType = new CRM_Member_DAO_MembershipType();
-
     $membershipType->copyValues($params);
+    $membershipType->id = $id;
 
-    $membershipType->domain_id = CRM_Core_Config::domainID();
-
-    $membershipType->id = CRM_Utils_Array::value('membershipType', $ids);
-
-    // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an oganization is changed.
+    // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an organization is changed.
     $previousID = NULL;
-    if ($membershipType->id) {
-      $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipType->id, 'member_of_contact_id');
+    if ($id) {
+      $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $id, 'member_of_contact_id');
     }
 
     $membershipType->save();
-
-    self::createMembershipPriceField($params, $ids, $previousID, $membershipType->id);
+    if ($id) {
+      // on update we may need to retrieve some details for the price field function - otherwise we get e-notices on attempts to retrieve
+      // name etc - the presence of previous id tells us this is an update
+      $params = array_merge(civicrm_api3('membership_type', 'getsingle', array('id' => $membershipType->id)), $params);
+    }
+    self::createMembershipPriceField($params, $previousID, $membershipType->id);
     // update all price field value for quick config when membership type is set CRM-11718
-    if (!empty($ids['membershipType'])) {
-      self::updateAllPriceFieldValue($ids['membershipType'], $params);
+    if ($id) {
+      self::updateAllPriceFieldValue($id, $params);
     }
 
     return $membershipType;
@@ -656,11 +665,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
   /**
    * @param $params
-   * @param $ids
    * @param $previousID
    * @param $membershipTypeId
    */
-  public static function createMembershipPriceField($params, $ids, $previousID, $membershipTypeId) {
+  public static function createMembershipPriceField($params, $previousID, $membershipTypeId) {
 
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
 
@@ -697,7 +705,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         CRM_Member_Form_MembershipType::checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, $optionsIds);
         $fieldParams['option_id'] = CRM_Utils_Array::value('option_id', $optionsIds);
       }
-      $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
+      CRM_Price_BAO_PriceField::create($fieldParams);
     }
     else {
       $fieldID = $results['id'];

@@ -25,7 +25,6 @@
 *}
 {* View existing event registration record. *}
 <div class="crm-block crm-content-block crm-event-participant-view-form-block">
-    <h3>{ts}View Participant{/ts}</h3>
     <div class="action-link">
         <div class="crm-submit-buttons">
             {if call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
@@ -49,7 +48,7 @@
     <tr class="crm-event-participantview-form-block-displayName">
       <td class="label">{ts}Participant Name{/ts}</td>
       <td class="bold">
-        <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contact_id"}" title="view contact record">{$displayName}</a>
+        <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contact_id"}" title="{ts}View contact record{/ts}">{$displayName}</a>
         <div class="crm-submit-buttons">
             <a class="button" href="{crmURL p='civicrm/event/badge' q="reset=1&context=view&id=$id&cid=$contact_id"}" title="{ts}Print Event Name Badge{/ts}"><span><div class="icon print-icon"></div> {ts}Print Name Badge{/ts}</span></a>
         </div>

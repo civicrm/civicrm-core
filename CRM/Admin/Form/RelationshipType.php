@@ -47,9 +47,9 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('Relationship Type'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-
       return;
     }
 
@@ -171,6 +171,6 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('The Relationship Type has been saved.'), ts('Saved'), 'success');
     }
   }
-  //end of function
+
 }
 

@@ -90,6 +90,8 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('Financial Batch'));
+
     if (isset( $this->_id)) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'title');
       CRM_Utils_System::setTitle($this->_title .' - '.ts( 'Accounting Batch'));
@@ -315,6 +317,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       CRM_Core_Error::statusBounce(ts('You dont have permission to %1 this batch'), array(1 => $actionName));
     }
   }
+
 }
 
 

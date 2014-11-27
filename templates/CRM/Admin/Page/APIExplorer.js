@@ -2,15 +2,21 @@
   var
     entity,
     action,
-    actions = ['get'],
+    actions = {values: ['get']},
     fields = [],
+    getFieldData = {},
     options = {},
     params = {},
     smartyStub,
     fieldTpl = _.template($('#api-param-tpl').html()),
     optionsTpl = _.template($('#api-options-tpl').html()),
     returnTpl = _.template($('#api-return-tpl').html()),
-    chainTpl = _.template($('#api-chain-tpl').html());
+    chainTpl = _.template($('#api-chain-tpl').html()),
+
+    // Operators with special properties
+    BOOL = ['IS NULL', 'IS NOT NULL'],
+    TEXT = ['LIKE', 'NOT LIKE'],
+    MULTI = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'];
 
   /**
    * Call prettyPrint function if it successfully loaded from the cdn
@@ -28,7 +34,7 @@
   function addField(name) {
     $('#api-params').append($(fieldTpl({name: name || ''})));
     var $row = $('tr:last-child', '#api-params');
-    $('.api-param-name', $row).crmSelect2({
+    $('input.api-param-name', $row).crmSelect2({
       data: fields.concat({id: '-', text: ts('Other') + '...'})
     }).change();
   }
@@ -71,26 +77,25 @@
   /**
    * Fetch fields for entity+action
    */
-  function getFields() {
+  function getFields(changedElement) {
     var required = [];
     fields = [];
-    options = {};
+    options = getFieldData = {};
     // Special case for getfields
     if (action === 'getfields') {
       fields.push({
         id: 'api_action',
         text: 'Action'
       });
-      options.api_action = [];
-      $('option', '#api-action').each(function() {
-        if (this.value) {
-          options.api_action.push({key: this.value, value: $(this).text()});
-        }
-      });
+      options.api_action = _.reduce(actions.values, function(ret, item) {
+        ret[item] = item;
+        return ret;
+      }, {});
       showFields(['api_action']);
       return;
     }
-    CRM.api3(entity, 'getFields', {'api_action': action, sequential: 1, options: {get_options: 'all'}}).done(function(data) {
+    CRM.api3(entity, 'getFields', {'api_action': action, options: {get_options: 'all'}}).done(function(data) {
+      getFieldData = data.values;
       _.each(data.values, function(field) {
         if (field.name) {
           fields.push({
@@ -106,6 +111,9 @@
           }
         }
       });
+      if ($(changedElement).is('#api-entity') && data.deprecated) {
+        CRM.alert(data.deprecated, entity + ' Deprecated');
+      }
       showFields(required);
       if (action === 'get' || action === 'getsingle') {
         showReturn();
@@ -126,15 +134,23 @@
    */
   function getActions() {
     if (entity) {
+      $('#api-action').addClass('loading');
       CRM.api3(entity, 'getactions').done(function(data) {
-        // Ensure 'get' is always an action
-        actions = _.union(['get'], data.values);
+        actions = data;
         populateActions();
       });
     } else {
-      actions = ['get'];
+      actions = {values: ['get']};
       populateActions();
     }
+  }
+
+  function isActionDeprecated(action) {
+    return !!(typeof actions.deprecated === 'object' && actions.deprecated[action]);
+  }
+
+  function renderAction(option) {
+    return isActionDeprecated(option.id) ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
   }
 
   /**
@@ -142,9 +158,22 @@
    * @param el
    */
   function populateActions(el) {
-    $('#api-action').select2({
-      data: _.transform(actions, function(ret, item) {ret.push({text: item, id: item})})
+    var val = $('#api-action').val();
+    $('#api-action').removeClass('loading').select2({
+      data: _.transform(actions.values, function(ret, item) {ret.push({text: item, id: item})}),
+      formatSelection: renderAction,
+      formatResult: renderAction
     });
+    // If previously selected action is not available, set it to 'get' if possible
+    if (_.indexOf(actions.values, val) < 0) {
+      $('#api-action').select2('val', _.indexOf(actions.values, 'get') < 0 ? actions.values[0] : 'get', true);
+    }
+  }
+
+  function onChangeAction(action) {
+    if (isActionDeprecated(action)) {
+      CRM.alert(actions.deprecated[action], action + ' deprecated');
+    }
   }
 
   /**
@@ -162,20 +191,56 @@
   }
 
   /**
-   * Add/remove option list for selected field's pseudoconstant
+   * Render value input as a textfield, option list, entityRef, or hidden,
+   * Depending on selected param name and operator
    */
-  function toggleOptions() {
-    var name = $(this).val(),
-      $valField = $(this).closest('tr').find('.api-param-value');
-    if (options[name]) {
-      $valField.val('').select2({
-        multiple: true,
-        data: _.transform(options[name], function(result, option) {
-          result.push({id: option.key, text: option.value});
-        })
-      });
+  function renderValueField() {
+    var $row = $(this).closest('tr'),
+      name = $('input.api-param-name', $row).val(),
+      operator = $('.api-param-op', $row).val(),
+      operatorType = $.inArray(operator, MULTI) > -1 ? 'multi' : ($.inArray(operator, BOOL) > -1 ? 'bool' : 'single'),
+      $valField = $('input.api-param-value', $row),
+      currentVal = $valField.val();
+    // Boolean fields only have 1 possible value
+    if (operatorType == 'bool') {
+      if ($valField.data('select2')) {
+        $valField.select2('destroy');
+      }
+      $valField.css('visibility', 'hidden').val('1');
+      return;
     }
-    else if ($valField.data('select2')) {
+    $valField.css('visibility', '');
+    // Option list or entityRef input
+    if ((options[name] || (getFieldData[name] && getFieldData[name].FKApiName)) && $.inArray(operator, TEXT) < 0) {
+      // Reset value before switching to a select from something else
+      if ($(this).is('.api-param-name') || !$valField.data('select2')) {
+        $valField.val('');
+      }
+      // When switching from multi-select to single select
+      else if (operatorType == 'single' && currentVal.indexOf(',') > -1) {
+        $valField.val(currentVal.split(',')[0]);
+      }
+      // Select options
+      if (options[name]) {
+
+        $valField.select2({
+          multiple: (operatorType === 'multi'),
+          data: _.map(options[name], function (value, key) {
+            return {id: key, text: value};
+          })
+        });
+      }
+      // EntityRef
+      else {
+        $valField.crmEntityRef({
+          entity: getFieldData[name].FKApiName,
+          select: {multiple: (operatorType === 'multi')}
+        });
+      }
+      return;
+    }
+    // Plain text input
+    if ($valField.data('select2')) {
       $valField.select2('destroy');
     }
   }
@@ -188,12 +253,12 @@
   function evaluate(val, makeArray) {
     try {
       if (!val.length) {
-        return val;
+        return makeArray ? [] : '';
       }
       var first = val.charAt(0),
         last = val.slice(-1);
       // Simple types
-      if (val === 'true' || val === 'false' || val === 'null' || !isNaN(val)) {
+      if (val === 'true' || val === 'false' || val === 'null') {
         return eval(val);
       }
       // Quoted strings
@@ -205,8 +270,16 @@
         return eval('(' + val + ')');
       }
       // Transform csv to array
-      if (makeArray && val.indexOf(',') > 0) {
-        return val.split(',');
+      if (makeArray) {
+        var result = [];
+        $.each(val.split(','), function(k, v) {
+          result.push(evaluate($.trim(v)) || v);
+        });
+        return result;
+      }
+      // Integers - quote any number that starts with 0 to avoid oddities
+      if (!isNaN(val) && val.search(/[^\d]/) < 0 && (val.length === 1 || first !== '0')) {
+        return parseInt(val, 10);
       }
       // Ok ok it's really a string
       return val;
@@ -234,7 +307,7 @@
       });
       return 'array(' + ret + ')';
     }
-    return JSON.stringify(val);
+    return JSON.stringify(val).replace(/\$/g, '\\$');
   }
 
   /**
@@ -260,9 +333,9 @@
     });
     $('input.api-param-value, input.api-option-value').each(function() {
       var $row = $(this).closest('tr'),
-        val = evaluate($(this).val(), $(this).is('.select2-offscreen')),
+        op = $('select.api-param-op', $row).val() || '=',
         name = $('input.api-param-name', $row).val(),
-        op = $('select.api-param-op', $row).val() || '=';
+        val = evaluate($(this).val(), $.inArray(op, MULTI) > -1);
 
       // Ignore blank values for the return field
       if ($(this).is('#api-return-value') && !val) {
@@ -323,6 +396,8 @@
       smarty: "{crmAPI var='result' entity='" + entity + "' action='" + action + "'",
       php: "$result = civicrm_api3('" + entity + "', '" + action + "'",
       json: "CRM.api3('" + entity + "', '" + action + "'",
+      drush: "drush cvapi " + entity + '.' + action + ' ',
+      wpcli: "wp cv api " + entity + '.' + action + ' ',
       rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&json=" + JSON.stringify(params) + "&api_key=yoursitekey&key=yourkey"
     };
     smartyStub = false;
@@ -337,6 +412,9 @@
       q.php += "  '" + key + "' => " + phpFormat(value) + ",\n";
       q.json += "  \"" + key + '": ' + js;
       q.smarty += ' ' + key + '=' + smartyFormat(js, key);
+      // FIXME: This is not totally correct cli syntax
+      q.drush += key + '=' + js + ' ';
+      q.wpcli += key + '=' + js + ' ';
     });
     if (i) {
       q.php += ")";
@@ -348,7 +426,7 @@
     if (action.indexOf('get') < 0) {
       q.smarty = '{* Smarty API only works with get actions *}';
     } else if (smartyStub) {
-      q.smarty = "{* Smarty does not have a syntax for array literals; assign complex variables on the server *}\n" + q.smarty;
+      q.smarty = "{* Smarty does not have a syntax for array literals; assign complex variables from php *}\n" + q.smarty;
     }
     $.each(q, function(type, val) {
       $('#api-' + type).removeClass('prettyprinted').text(val);
@@ -362,7 +440,7 @@
       alert(ts('Select an entity.'));
       return;
     }
-    if (action.indexOf('get') < 0) {
+    if (action.indexOf('get') < 0 && action != 'check') {
       var msg = action === 'delete' ? ts('This will delete data from CiviCRM. Are you sure?') : ts('This will write to the database. Continue?');
       CRM.confirm({title: ts('Confirm %1', {1: action}), message: msg}).on('crmConfirm:yes', execute);
     } else {
@@ -370,6 +448,10 @@
     }
   }
 
+  /**
+   * Execute api call and display the results
+   * Note: We have to manually execute the ajax in order to add the secret extra "prettyprint" param
+   */
   function execute() {
     $('#api-result').html('<div class="crm-loading-element"></div>');
     $.ajax({
@@ -389,18 +471,25 @@
   }
 
   $(document).ready(function() {
+    $('#api-entity').crmSelect2({
+      // Add strikethough class to selection to indicate deprecated apis
+      formatSelection: function(option) {
+        return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
+      }
+    });
     $('form#api-explorer')
       .on('change', '#api-entity, #api-action', function() {
         entity = $('#api-entity').val();
-        if ($(this).is('#api-entity')) {
-          $('#api-action').select2('val', 'get');
-          getActions();
-        }
         action = $('#api-action').val();
+        if ($(this).is('#api-entity')) {
+          getActions();
+        } else {
+          onChangeAction(action);
+        }
         if (entity && action) {
           $('#api-params').html('<tr><td colspan="4" class="crm-loading-element"></td></tr>');
           $('#api-params-table thead').show();
-          getFields();
+          getFields(this);
           buildParams();
         } else {
           $('#api-params, #api-generated pre').empty();
@@ -410,8 +499,8 @@
       .on('change keyup', 'input.api-input, #api-params select', buildParams)
       .on('submit', submit);
     $('#api-params')
-      .on('change', '.api-param-name', toggleOptions)
-      .on('change', '.api-param-name, .api-option-name', function() {
+      .on('change', 'input.api-param-name, select.api-param-op', renderValueField)
+      .on('change', 'input.api-param-name, .api-option-name', function() {
         if ($(this).val() === '-') {
           $(this).select2('destroy');
           $(this).val('').focus();

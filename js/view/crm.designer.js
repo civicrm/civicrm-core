@@ -49,6 +49,7 @@
 
     initialize: function(options) {
       CRM.designerApp.vent.on('ufUnsaved', this.onUfChanged, this);
+      CRM.designerApp.vent.on('ufSaved', this.onUfSaved, this);
     },
     onClose: function() {
       this.undoAlert && this.undoAlert.close && this.undoAlert.close();
@@ -56,6 +57,10 @@
     },
     onUfChanged: function(isUfUnsaved) {
       this.isUfUnsaved = isUfUnsaved;
+    },
+    onUfSaved: function() {
+      CRM.designerApp.vent.off('ufUnsaved', this.onUfChanged, this);
+      this.isUfUnsaved = false;
     },
     onRender: function() {
       var designerDialog = this;
@@ -193,11 +198,11 @@
       'click .crm-designer-preview': 'doPreview'
     },
     onRender: function() {
-      this.$('.crm-designer-save').button().attr({
+      this.$('.crm-designer-save').button({icons: {primary: 'ui-icon-check'}}).attr({
         disabled: 'disabled',
-        style: 'opacity:.5; box-shadow:none; cursor:default;'
+        style: 'opacity:.5; cursor:default;'
       });
-      this.$('.crm-designer-preview').button();
+      this.$('.crm-designer-preview').button({icons: {primary: 'ui-icon-search'}});
     },
     initialize: function(options) {
       CRM.designerApp.vent.on('ufUnsaved', this.onUfChanged, this);
@@ -215,7 +220,7 @@
         return;
       }
       var $dialog = this.$el.closest('.crm-designer-dialog'); // FIXME use events
-      $dialog.block({message: 'Saving...', theme: true});
+      $dialog.block();
       var profile = ufGroupModel.toStrictJSON();
       profile["api.UFField.replace"] = {values: ufGroupModel.getRel('ufFieldCollection').toSortedJSON(), 'option.autoweight': 0};
       CRM.api('UFGroup', 'create', profile, {
@@ -249,7 +254,7 @@
       if (!this.previewMode) {
         $('.crm-designer-preview-canvas').html('');
         $('.crm-designer-canvas > *, .crm-designer-palette-region').show();
-        $('.crm-designer-preview span').html(ts('Preview'));
+        $('.crm-designer-preview').button('option', {icons: {primary: 'ui-icon-search'}}).find('span').text(ts('Preview'));;
         return;
       }
       if (this.model.getRel('ufFieldCollection').hasDuplicates()) {
@@ -257,7 +262,7 @@
         return;
       }
       var $dialog = this.$el.closest('.crm-designer-dialog'); // FIXME use events
-      $dialog.block({message: 'Loading...', theme: true});
+      $dialog.block();
       // CRM-12188
       CRM.designerApp.clearPreviewArea();
       $.post(CRM.url("civicrm/ajax/inline"), {
@@ -272,7 +277,7 @@
         $dialog.unblock();
         $('.crm-designer-canvas > *, .crm-designer-palette-region').hide();
         $('.crm-designer-preview-canvas').html(data).show().trigger('crmLoad').find(':input').prop('readOnly', true);
-        $('.crm-designer-preview span').html(ts('Edit'));
+        $('.crm-designer-preview').button('option', {icons: {primary: 'ui-icon-pencil'}}).find('span').text(ts('Edit'));
       });
     }
   });

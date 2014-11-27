@@ -178,12 +178,13 @@ abstract class CRM_Utils_Hook {
     // must be reentrant. PHP is finicky about running
     // multiple loops over the same variable. The circumstances
     // to reproduce the issue are pretty intricate.
-    $result = $fResult = array();
+    $result = array();
 
     if ($civiModules !== NULL) {
       foreach ($civiModules as $module) {
         $fnName = "{$module}_{$fnSuffix}";
         if (function_exists($fnName)) {
+          $fResult = array();
           switch ($numParams) {
             case 0:
               $fResult = $fnName();
@@ -217,11 +218,11 @@ abstract class CRM_Utils_Hook {
               CRM_Core_Error::fatal(ts('Invalid hook invocation'));
               break;
           }
-        }
 
-        if (!empty($fResult) &&
-          is_array($fResult)) {
-          $result = array_merge($result, $fResult);
+          if (!empty($fResult) &&
+            is_array($fResult)) {
+            $result = array_merge($result, $fResult);
+          }
         }
       }
     }
@@ -253,7 +254,7 @@ abstract class CRM_Utils_Hook {
    *
    * @param string $op         the type of operation being performed
    * @param string $objectName the name of the object
-   * @param object $id         the object id if available
+   * @param int $id         the object id if available
    * @param array  $params     the parameters used for object creation / editing
    *
    * @return null the return value is ignored
@@ -299,6 +300,18 @@ abstract class CRM_Utils_Hook {
    */
   static function links($op, $objectName, &$objectId, &$links, &$mask = NULL, &$values = array()) {
     return self::singleton()->invoke(6, $op, $objectName, $objectId, $links, $mask, $values, 'civicrm_links');
+  }
+
+  /**
+   * This hook is invoked during the CiviCRM form preProcess phase.
+   *
+   * @param string $formName the name of the form
+   * @param object $form     reference to the form object
+   *
+   * @return null the return value is ignored
+   */
+  static function preProcess($formName, &$form) {
+    return self::singleton()->invoke(2, $formName, $form, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_preProcess');
   }
 
   /**

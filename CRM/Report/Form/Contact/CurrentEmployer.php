@@ -106,7 +106,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact SubType'),
+            'title' => ts('Contact Subtype'),
           ),
         ),
         'filters' =>
@@ -134,6 +134,18 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           array('title' => ts('Employee Since'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
+          ),
+        ),
+      ),
+      'civicrm_phone' =>
+      array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'grouping' => 'contact-fields',
+        'fields' =>
+        array(
+          'phone' =>
+          array('title' => ts('Phone'),
+            'default' => TRUE,
           ),
         ),
       ),
@@ -241,6 +253,9 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
           ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id
              AND {$this->_aliases['civicrm_address']}.is_primary = 1 )
 
+     LEFT JOIN  civicrm_phone {$this->_aliases['civicrm_phone']}
+          ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id
+             AND {$this->_aliases['civicrm_phone']}.is_primary = 1)
      LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
           ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
              AND {$this->_aliases['civicrm_email']}.is_primary = 1) ";
@@ -387,4 +402,3 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
     }
   }
 }
-

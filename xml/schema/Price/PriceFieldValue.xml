@@ -7,6 +7,7 @@
   <add>3.3</add>
   <field>
     <name>id</name>
+    <title>Price Field Value ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Price Field Value</comment>
@@ -18,6 +19,7 @@
   </primaryKey>
   <field>
     <name>price_field_id</name>
+    <title>Price Field</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_price_field</comment>
@@ -58,7 +60,7 @@
     <html>
       <type>TextArea</type>
       <rows>2</rows>
-    <cols>60</cols>
+      <cols>60</cols>
     </html>
     <default>NULL</default>
     <localizable>true</localizable>
@@ -110,6 +112,7 @@
   </field>
   <field>
     <name>membership_type_id</name>
+    <title>Membership Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Membership Type</comment>
@@ -137,6 +140,7 @@
   </field>
   <field>
     <name>is_default</name>
+    <title>Is Default Price Field Option?</title>
     <type>boolean</type>
     <comment>Is this default price field option</comment>
     <default>0</default>
@@ -147,6 +151,7 @@
   </field>
   <field>
     <name>is_active</name>
+    <title>Price Field Value is Active</title>
     <type>boolean</type>
     <comment>Is this price field value active</comment>
     <default>1</default>

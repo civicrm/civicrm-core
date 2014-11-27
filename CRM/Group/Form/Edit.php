@@ -111,8 +111,14 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         $this->assign('count', CRM_Contact_BAO_Group::memberCount($this->_id));
         CRM_Utils_System::setTitle(ts('Confirm Group Delete'));
       }
+      if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
+        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to delete this reserved group."));
+      }
     }
     else {
+      if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
+        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to change settings for this reserved group."));
+      }
       if (isset($this->_id)) {
         $groupValues = array(
           'id' => $this->_id,
@@ -492,10 +498,7 @@ WHERE  title = %1
 
     if (count($parentGroupSelectValues) > 1) {
       if (CRM_Core_Permission::isMultisiteEnabled()) {
-        $required = empty($parentGroups) ? TRUE : FALSE;
-        $required = (($obj->_id && CRM_Core_BAO_Domain::isDomainGroup($obj->_id)) ||
-          !isset($obj->_id)
-        ) ? FALSE : $required;
+        $required = !isset($obj->_id) || ($obj->_id && CRM_Core_BAO_Domain::isDomainGroup($obj->_id)) ? FALSE : empty($parentGroups);
       }
       else {
         $required = FALSE;

@@ -24,10 +24,9 @@
  +--------------------------------------------------------------------+
 *}
 {**
- * This file provides the HTML for the on-behalf-of form. 
+ * This file provides the HTML for the on-behalf-of form.
  * Also used for related contact edit form.
  * FIXME: This is way more complex than it needs to be
- * FIXME: About 1% of this javascript is needed for contribution forms
  * FIXME: Why are we not just using the dynamic form tpl to display this profile?
  *}
 
@@ -117,10 +116,10 @@
               {if $form.onbehalf.$phone_ext_field.html}
                 &nbsp;{$form.onbehalf.$phone_ext_field.html}
               {/if}
-            {/if} 
-	    {if $onBehalfOfFields.$fieldName.data_type eq 'Date'}
+            {/if}
+      {if $onBehalfOfFields.$fieldName.data_type eq 'Date'}
             {assign var=elementName value=onbehalf[$fieldName]}
-	       {include file="CRM/common/jcalendar.tpl" elementName=$elementName elementId=onbehalf_$fieldName}
+         {include file="CRM/common/jcalendar.tpl" elementName=$elementName elementId=onbehalf_$fieldName}
             {/if}
             {if $onBehalfOfFields.$fieldName.help_post}
               <br /><span class='description'>{$onBehalfOfFields.$fieldName.help_post}</span>
@@ -169,16 +168,17 @@ function showOnBehalf(onBehalfRequired) {
 }
 
 function resetValues() {
-  cj('input[type=text], select, textarea', "#select_org div").not('#onbehalfof_id').val('');
-  cj('input[type=radio], input[type=checkbox]', "#select_org tr td").prop('checked', false);
+  // Don't trip chain-select when clearing values
+  cj('.crm-chain-select-control', "#select_org div").select2('val', '');
+  cj('input[type=text], select, textarea', "#select_org div").not('.crm-chain-select-control, #onbehalfof_id').val('').change();
+  cj('input[type=radio], input[type=checkbox]', "#select_org div").prop('checked', false).change();
 }
 
 function createNew( ) {
   if (cj("#mode").prop('checked')) {
     var textMessage = ' {/literal}{ts escape="js"}Use existing organization{/ts}{literal} ';
-    cj("#onbehalf_organization_name").removeAttr('readonly');
+    cj("#onbehalf_organization_name").prop('readonly', false);
     cj("#mode").prop('checked', false);
-    cj("#mode").removeAttr('checked');
     resetValues();
   }
   else {
@@ -201,12 +201,15 @@ function setOrgName( ) {
 function setLocationDetails(contactID , reset) {
   var submittedCID = {/literal}"{$submittedOnBehalf}"{literal};
   var submittedOnBehalfInfo = {/literal}'{$submittedOnBehalfInfo}'{literal};
-  submittedOnBehalfInfo = cj.parseJSON(submittedOnBehalfInfo);
-  if (submittedCID == contactID) {
-    cj.each(submittedOnBehalfInfo, function(key, value) {
-      cj('#onbehalf_' + key ).val(value);
-    });
-    return;
+  if (submittedOnBehalfInfo) {
+    submittedOnBehalfInfo = cj.parseJSON(submittedOnBehalfInfo);
+
+    if (submittedCID == contactID) {
+      cj.each(submittedOnBehalfInfo, function(key, value) {
+        cj('#onbehalf_' + key ).val(value);
+      });
+      return;
+    }
   }
 
   resetValues();
@@ -217,6 +220,11 @@ function setLocationDetails(contactID , reset) {
     timeout     : 5000, //Time in milliseconds
     success     : function(data, status) {
       for (var ele in data) {
+        if (cj("#"+ ele).hasClass('crm-chain-select-target')) {
+          cj("#"+ ele).data('newVal', data[ele].value).off('.autofill').on('crmOptionsUpdated.autofill', function() {console.log(this.id, cj(this).data('newVal'));
+            cj(this).off('.autofill').val(cj(this).data('newVal')).change();
+          });
+        }
         if (data[ele].type == 'Radio') {
           if (data[ele].value) {
             cj("input[name='"+ ele +"']").filter("[value=" + data[ele].value + "]").prop('checked', true);
@@ -246,15 +254,16 @@ function setLocationDetails(contactID , reset) {
             // remove selected values from left and selected values to right
             cj('#onbehalf\\['+ customFld +'\\]-f option[value="' + selectedOption + '"]').remove()
               .appendTo('#onbehalf\\['+ customFld +'\\]-t');
+            cj('#onbehalf_'+ customFld).val(selectedOption);
           }
         }
         else {
-          cj('#' + ele ).val(data[ele].value);
+          cj('#' + ele ).val(data[ele].value).change();
         }
       }
     },
     error       : function(XMLHttpRequest, textStatus, errorThrown) {
-      console.error("HTTP error status: ", textStatus);
+      CRM.console('error', "HTTP error status: ", textStatus);
     }
   });
 }
@@ -296,9 +305,9 @@ function selectCreateOrg( orgOption, reset ) {
 {if $membershipContactID}
 {literal}
   CRM.$(function($) {
-    cj('#organization_id').val("{/literal}{$membershipContactName}{literal}");
-    cj('#organization_name').val("{/literal}{$membershipContactName}{literal}");
-    cj('#onbehalfof_id').val("{/literal}{$membershipContactID}{literal}");
+    $('#organization_id').val("{/literal}{$membershipContactName}{literal}");
+    $('#organization_name').val("{/literal}{$membershipContactName}{literal}");
+    $('#onbehalfof_id').val("{/literal}{$membershipContactID}{literal}");
     setLocationDetails( "{/literal}{$membershipContactID}{literal}" );
   });
 {/literal}

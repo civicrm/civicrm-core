@@ -105,7 +105,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     }
     // Add javascript
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Search/Builder.js')
+      ->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Search/Builder.js', 1, 'html-header')
       ->addSetting(array(
         'searchBuilder' => array(
           // Index of newly added/expanded block (1-based index)
@@ -182,7 +182,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             foreach ($grpId as $val) {
               $error = CRM_Utils_Type::validate($val, 'Integer', FALSE);
               if ($error != $val) {
-                $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter valid value.");
+                $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a valid value.");
                 break;
               }
             }
@@ -236,7 +236,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             // Check Empty values for Integer Or Boolean Or Date type For operators other than IS NULL and IS NOT NULL.
             if (!in_array($v[1],
                 array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
-              if ((($type == 'Int' || $type == 'Boolean') && !trim($v[2])) && $v[2] != '0') {
+              if ((($type == 'Int' || $type == 'Boolean') && !is_array($v[2]) && !trim($v[2])) && $v[2] != '0') {
                 $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a value.");
               }
               elseif ($type == 'Date' && !trim($v[2])) {
@@ -248,23 +248,25 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
           if ($type && empty($errorMsg)) {
             // check for valid format while using IN Operator
             if ($v[1] == 'IN') {
-              $inVal = trim($v[2]);
-              //checking for format to avoid db errors
-              if ($type == 'Int') {
-                if (!preg_match('/^[(]([A-Za-z0-9\,]+)[)]$/', $inVal)) {
-                  $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter correct Data (in valid format).");
+              if (!is_array($v[2])) {
+                $inVal = trim($v[2]);
+                //checking for format to avoid db errors
+                if ($type == 'Int') {
+                  if (!preg_match('/^[(]([A-Za-z0-9\,]+)[)]$/', $inVal)) {
+                    $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter correct Data (in valid format).");
+                  }
                 }
-              }
-              else {
-                if (!(substr($inVal, 0, 1) == '(' && substr($inVal, -1, 1) == ')') && !preg_match('/^[(]([A-Za-z0-9åäöÅÄÖüÜœŒæÆøØ\,\s]+)[)]$/', $inVal)) {
-                  $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter correct Data (in valid format).");
+                else {
+                  if (!(substr($inVal, 0, 1) == '(' && substr($inVal, -1, 1) == ')') && !preg_match('/^[(]([A-Za-z0-9åäöÅÄÖüÜœŒæÆøØ\,\s]+)[)]$/', $inVal)) {
+                    $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter correct Data (in valid format).");
+                  }
                 }
               }
 
               // Validate each value in parenthesis to avoid db errors
               if (empty($errorMsg)) {
                 $parenValues = array();
-                $parenValues = explode(',', trim($inVal, "(..)"));
+                $parenValues = is_array($v[2]) ? $v[2] : explode(',', trim($inVal, "(..)"));
                 foreach ($parenValues as $val) {
                   $val = trim($val);
                   if (!$val && $val != '0') {
@@ -441,16 +443,20 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       'member_is_pay_later' => 'yesno',
       'is_override' => 'yesno',
     );
-    $entities = array('contact', 'address', 'activity', 'participant', 'pledge', 'member', 'contribution');
+    $entities = array('contact', 'address', 'activity', 'participant', 'pledge', 'member', 'contribution', 'case', 'grant');
     CRM_Contact_BAO_Query_Hook::singleton()->alterSearchBuilderOptions($entities, $options);
     foreach ($entities as $entity) {
       $fields = civicrm_api3($entity, 'getfields');
       foreach ($fields['values'] as $field => $info) {
         if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id'])) {
           $options[$field] = $entity;
+          // Hack for when search field doesn't match db field - e.g. "country" instead of "country_id"
           if (substr($field, -3) == '_id') {
             $options[substr($field, 0, -3)] = $entity;
           }
+        }
+        elseif (!empty($info['data_type']) && in_array($info['data_type'], array('StateProvince', 'Country'))) {
+          $options[$field] = $entity;
         }
         elseif (in_array(substr($field, 0, 3), array('is_', 'do_')) || CRM_Utils_Array::value('data_type', $info) == 'Boolean') {
           $options[$field] = 'yesno';

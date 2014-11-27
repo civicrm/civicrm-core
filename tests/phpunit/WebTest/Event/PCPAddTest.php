@@ -25,7 +25,6 @@
  */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
-require_once 'WebTest/Event/AddEventTest.php';
 
 /**
  * Class WebTest_Event_PCPAddTest
@@ -78,8 +77,8 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $conPcp = FALSE;
     $conIsAprovalNeeded = TRUE;
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
 
     //create contribution page for event pcp with campaign type as contribution
     $contributionPageId = $this->webtestAddContributionPage($conHash,
@@ -251,6 +250,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
       $this->assertChecked("is_multiple_registrations");
     }
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField("intro_text", $registerIntro);
 
     // enable confirmation email
@@ -362,7 +362,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_PCP_refresh");
     $id = explode('id=', $this->getAttribute("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody//tr/td/a[text()='$pcpTitle']@href"));
     $pcpUrl = "civicrm/pcp/info?reset=1&id=$id[1]";
-    $this->click("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody//tr/td/a[text()='$pcpTitle']/../../td[7]/span/a[text()='Approve']");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td/a[text()='$pcpTitle']/../../td[7]/span[1]/a[2][text()='Approve']");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -490,12 +490,10 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
     $this->select2("event_id", $eventName);
 
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Search_refresh");
 
     $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody/tr[1]/td[@class='crm-participant-sort_name']/a[text()='{$sortName}']/../../td[11]/span/a[text()='View']", "xpath=//table[@class='selector row-highlight']/tbody/tr/td[8]/span/a[text()='View']", FALSE);
-    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr/td[8]/span/a[text()='View']");
-    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']", "_qf_ParticipantView_cancel-bottom", false);
 
     $this->webtestVerifyTabularData(
       array(
@@ -526,8 +524,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->type("css=.crm-basic-criteria-form-block input#sort_name", $pcpCreatorFirstName);
 
     // click to search
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     $this->click("xpath=//div[@class='crm-search-results']//table/tbody//tr/td[3]/a[text()='{$sortName}']");
     $this->waitForPageToLoad($this->getTimeoutMsec());

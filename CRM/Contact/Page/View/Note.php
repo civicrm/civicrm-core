@@ -208,9 +208,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
     // check logged in url permission
     CRM_Contact_Page_View::checkUserPermission($this);
 
-    // set page title
-    CRM_Contact_Page_View::setTitle($this->_contactId);
-
     $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
     CRM_Utils_System::setTitle(ts('Notes for') . ' ' . $displayName);
 

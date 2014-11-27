@@ -44,12 +44,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     'Relationship');
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
 
     $contact_type = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '_');
@@ -77,7 +71,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
           'contact_sub_type_a' =>
           array(
-            'title' => ts('Contact SubType (Contact A)'),
+            'title' => ts('Contact Subtype (Contact A)'),
             'name' => 'contact_sub_type',
           ),
         ),
@@ -88,6 +82,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'sort_name',
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
+          ),
+          'contact_type_a' =>
+          array('title' => ts('Contact Type A'),
+            'name' => 'contact_type',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $contact_type,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'grouping' => 'conact_a_fields',
@@ -115,7 +116,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
           'contact_sub_type_b' =>
           array(
-            'title' => ts('Contact SubType (Contact B)'),
+            'title' => ts('Contact Subtype (Contact B)'),
             'name' => 'contact_sub_type',
           ),
         ),
@@ -126,6 +127,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'sort_name',
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
+          ),
+          'contact_type_b' =>
+          array('title' => ts('Contact Type B'),
+            'name' => 'contact_type',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $contact_type,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'grouping' => 'conact_b_fields',
@@ -207,21 +215,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'default' => TRUE,
           ),
         ),
-        'filters' =>
-        array(
-          'contact_type_a' =>
-          array('title' => ts('Contact Type  A'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $contact_type,
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'contact_type_b' =>
-          array('title' => ts('Contact Type  B'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $contact_type,
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
         'grouping' => 'relation-fields',
       ),
       'civicrm_relationship' =>
@@ -287,24 +280,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_Group',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
     );
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
@@ -423,8 +401,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             if ($op) {
-
-              if ($tableName == 'civicrm_relationship_type' &&
+              if (($tableName == 'civicrm_contact' || $tableName == 'civicrm_contact_b') &&
                 ($fieldName == 'contact_type_a' || $fieldName == 'contact_type_b')
               ) {
                 $cTypes = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
@@ -451,12 +428,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                 }
 
                 if (!empty($contactSubTypes)) {
-                  if ($fieldName == 'contact_type_a') {
-                    $field['name'] = 'contact_sub_type_a';
-                  }
-                  else {
-                    $field['name'] = 'contact_sub_type_b';
-                  }
+                  $field['name'] = 'contact_sub_type';
                   $field['dbAlias'] = $field['alias'] . '.' . $field['name'];
                   $subTypeClause = $this->whereClause($field,
                     $op,

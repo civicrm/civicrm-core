@@ -133,13 +133,13 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         $op = new PHPUnit_Extensions_Database_Operation_Insert();
         //Create the User
         $op->execute($this->_dbconn,
-          new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+          $this->createXMLDataSet(
             dirname(__FILE__) . '/dataset/mailing_contact.xml'
           )
         );
         //~ Create the Mailing and connections to the user
         $op->execute($this->_dbconn,
-          new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+          $this->createXMLDataSet(
             dirname(__FILE__) . '/dataset/mailing_delivered.xml'
           )
         );
@@ -168,13 +168,13 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         $op = new PHPUnit_Extensions_Database_Operation_Insert();
         //Create the User
         $op->execute($this->_dbconn,
-          new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+          $this->createXMLDataSet(
             dirname(__FILE__) . '/dataset/mailing_contact.xml'
           )
         );
         //~ Create the Mailing and connections to the user
         $op->execute($this->_dbconn,
-          new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+          $this->createXMLDataSet(
             dirname(__FILE__) . '/dataset/mailing_bounced.xml'
           )
         );

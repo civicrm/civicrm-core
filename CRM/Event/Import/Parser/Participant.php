@@ -299,6 +299,10 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
             $params[$key] = CRM_Utils_String::strtoboolstr($val);
           }
         }
+        if($key == 'participant_register_date') {
+          CRM_Utils_Date::convertToDefaultDate($params, $dateType, 'participant_register_date');
+          $formatted['participant_register_date'] = CRM_Utils_Date::processDate($params['participant_register_date']);
+        }
       }
     }
 

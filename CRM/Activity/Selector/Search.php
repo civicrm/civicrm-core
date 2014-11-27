@@ -344,6 +344,17 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         );
       }
 
+      //Check if recurring activity
+      $isRecurringActivity = CRM_Core_BAO_RecurringEntity::getParentFor($row['activity_id'], 'civicrm_activity');
+      $row['repeat'] = '';
+      if ($isRecurringActivity) {
+        if ($row['activity_id'] == $isRecurringActivity) {
+          $row['repeat'] = 'Recurring Activity - (Parent)';
+        }
+        else {
+          $row['repeat'] = 'Recurring Activity - (Child)';
+        }
+      }
       $rows[] = $row;
     }
 
@@ -379,7 +390,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         ),
         array(
           'name' => ts('Subject'),
-          'sort' => 'subject',
+          'sort' => 'activity_subject',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
@@ -396,7 +407,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         ),
         array(
           'name' => ts('Status'),
-          'sort' => 'status_id',
+          'sort' => 'activity_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(

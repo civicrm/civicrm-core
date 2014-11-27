@@ -147,10 +147,9 @@ CRM.$(function($) {
           $("input[name=select_merge_tag]", this).crmError(ts('Select a tag'));
           return false;
         }
-        /* send synchronous request so that disabling any actions for slow servers*/
         var postUrl = {/literal}"{crmURL p='civicrm/ajax/mergeTags' h=0 }"{literal};
         var data = {fromId: tag.id, toId: toId, key:{/literal}"{crmKey name='civicrm/ajax/mergeTags'}"{literal}};
-        cj.ajax({
+        $.ajax({
           type: "POST",
           url: postUrl,
           data: data,

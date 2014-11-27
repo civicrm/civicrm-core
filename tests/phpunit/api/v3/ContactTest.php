@@ -871,7 +871,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     //  Insert a row in civicrm_contact creating individual contact
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+      $this->createXMLDataSet(
         dirname(__FILE__) . '/dataset/contact_ind.xml'
       )
     );
@@ -902,10 +902,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $this->assertEquals($value, $getResult['values'][23][$key]);
     }
     //  Check updated civicrm_contact against expected
-    $expected = new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+    $expected = $this->createXMLDataSet(
       dirname(__FILE__) . '/dataset/contact_ind_upd.xml'
     );
-    $actual = new PHPUnit_Extensions_Database_DataSet_QueryDataset(
+    $actual = new PHPUnit_Extensions_Database_DataSet_QueryDataSet(
       $this->_dbconn
     );
     $actual->addTable('civicrm_contact');
@@ -919,7 +919,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     //  Insert a row in civicrm_contact creating organization contact
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+      $this->createXMLDataSet(
         dirname(__FILE__) . '/dataset/contact_org.xml'
       )
     );
@@ -935,10 +935,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'Update', $params);
 
     //  Check updated civicrm_contact against expected
-    $expected = new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+    $expected = $this->createXMLDataSet(
       dirname(__FILE__) . '/dataset/contact_org_upd.xml'
     );
-    $actual = new PHPUnit_Extensions_Database_DataSet_QueryDataset(
+    $actual = new PHPUnit_Extensions_Database_DataSet_QueryDataSet(
       $this->_dbconn
     );
     $actual->addTable('civicrm_contact');
@@ -952,7 +952,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     //  Insert a row in civicrm_contact creating household contact
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+      $this->createXMLDataSet(
         dirname(__FILE__) . '/dataset/contact_hld.xml'
       )
     );
@@ -985,7 +985,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     //  Insert a row in civicrm_contact creating individual contact
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+      $this->createXMLDataSet(
         dirname(__FILE__) . '/dataset/contact_ind.xml'
       )
     );
@@ -1109,12 +1109,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     //  Insert a row in civicrm_contact creating individual contact
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+      $this->createXMLDataSet(
         dirname(__FILE__) . '/dataset/contact_17.xml'
       )
     );
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+      $this->createXMLDataSet(
         dirname(__FILE__) . '/dataset/email_contact_17.xml'
       )
     );
@@ -1140,7 +1140,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     //  Insert a row in civicrm_contact creating contact 17
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+      $this->createXMLDataSet(
         dirname(__FILE__) . '/dataset/contact_17.xml'
       )
     );
@@ -1159,7 +1159,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     //  Insert a row in civicrm_contact creating contact 17
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(dirname(__FILE__) . '/dataset/contact_17.xml'
+      $this->createXMLDataSet(dirname(__FILE__) . '/dataset/contact_17.xml'
       )
     );
 
@@ -1683,7 +1683,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     //  Insert a row in civicrm_contact creating contact 17
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+      $this->createXMLDataSet(
         dirname(__FILE__) . '/dataset/contact_17.xml'
       )
     );
@@ -1850,5 +1850,59 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', array('contact_id' => $contactID, 'city' => 'Cool City', 'location_type_id' => 1,));
     $result = $this->callAPISuccess('contact', 'get', array('city' => 'Cool City', 'return' => 'contact_type'));
     $this->assertEquals(1, $result['count']);
+  }
+
+  /**
+   * CRM-15443 - ensure getlist api does not return deleted contacts
+   */
+  function testGetlistExcludeConditions() {
+    $name = md5(time());
+    $contact = $this->individualCreate(array('last_name' => $name));
+    $deceasedContact = $this->individualCreate(array('last_name' => $name, 'is_deceased' => 1));
+    $deletedContact = $this->individualCreate(array('last_name' => $name, 'is_deleted' => 1));
+    // We should get all but the deleted contact
+    $result = $this->callAPISuccess('contact', 'getlist', array('input' => $name));
+    $this->assertEquals(2, $result['count'], 'In line ' . __LINE__);
+    // Force-exclude the deceased contact
+    $result = $this->callAPISuccess('contact', 'getlist', array('input' => $name, 'params' => array('is_deceased' => 0)));
+    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals($contact, $result['values'][0]['id'], 'In line ' . __LINE__);
+  }
+
+  /**
+   * Test contact.getactions
+   */
+  function testGetActions() {
+    $description = "Getting the available actions for an entity.";
+    $result = $this->callAPIAndDocument($this->_entity, 'getactions', array(), __FUNCTION__, __FILE__, $description);
+    $expected = array(
+      'create',
+      'delete',
+      'get',
+      'getactions',
+      'getcount',
+      'getfields',
+      'getlist',
+      'getoptions',
+      'getquick',
+      'getrefcount',
+      'getsingle',
+      'getvalue',
+      'merge',
+      'proximity',
+      'replace',
+      'setvalue',
+      'update',
+    );
+    $deprecated = array(
+      'update',
+      'getquick',
+    );
+    foreach ($expected as $action) {
+      $this->assertTrue(in_array($action, $result['values']), "Expected action $action");
+    }
+    foreach ($deprecated as $action) {
+      $this->assertArrayKeyExists($action, $result['deprecated']);
+    }
   }
 }

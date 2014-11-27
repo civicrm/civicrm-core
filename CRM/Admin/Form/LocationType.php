@@ -46,8 +46,8 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
    * @access public
    */
   public function buildQuickForm() {
-
     parent::buildQuickForm();
+    $this->setPageTitle(ts('Location Type'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -70,7 +70,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
       'variable'
     );
 
-    $this->add('text', 'display_name', ts('Display Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'display_name'));
+    $this->add('text', 'display_name', ts('Display Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'display_name'), TRUE);
     $this->add('text', 'vcard_name', ts('vCard Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'vcard_name'));
 
     $this->add('text', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'description'));
@@ -127,4 +127,5 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
         array(1 => $locationType->name)
       ), ts('Saved'), 'success');
   }
+
 }

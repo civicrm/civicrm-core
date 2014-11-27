@@ -467,7 +467,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
       $this->buildTabs();
     }
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting(array('tabSettings' => array(
         'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
       )));
@@ -496,6 +496,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         'link' => CRM_Utils_System::url('civicrm/campaign', "reset=1&type=$name"),
       );
     }
+    $allTabs['campaign']['class'] = 'livePage';
     $this->assign('tabHeader', $allTabs);
   }
 }

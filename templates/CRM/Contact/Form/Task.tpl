@@ -53,12 +53,12 @@
   CRM.$(function($) {
     $("#popupContainer").css({
       "background-color":"#E0E0E0",
-      'display':'none',
+      'display':'none'
     });
 
     $("#popup-button").click(function() {
       $("#popupContainer").dialog({
-        title: "Selected Contacts",
+        title: {/literal}"{ts escape='js'}Selected Contacts{/ts}"{literal},
         width:700,
         height:500,
         modal: true,

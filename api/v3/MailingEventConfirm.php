@@ -70,7 +70,10 @@ function civicrm_api3_mailing_event_confirm_create($params) {
  */
 function _civicrm_api3_mailing_event_confirm_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
+  $params['contact_id']['title'] = 'Contact ID';
   $params['subscribe_id']['api.required'] = 1;
+  $params['subscribe_id']['title'] = 'Subscribe Event ID';
   $params['hash']['api.required'] = 1;
+  $params['hash']['title'] = 'Hash';
 }
 

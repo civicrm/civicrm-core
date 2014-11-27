@@ -31,11 +31,11 @@ function grant_get_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 2,
+  'id' => 1,
   'values' => array(
-      '2' => array(
-          'id' => '2',
-          'contact_id' => '4',
+      '1' => array(
+          'id' => '1',
+          'contact_id' => '5',
           'application_received_date' => '20130728084957',
           'decision_date' => '20130805000000',
           'grant_type_id' => '1',

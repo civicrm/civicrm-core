@@ -122,9 +122,6 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
 
       // check logged in url permission
       CRM_Contact_Page_View::checkUserPermission($this);
-
-      // set page title
-      CRM_Utils_System::setTitle(ts('Grant by') .  ' ' . $displayName);
     }
     $this->assign('action', $this->_action);
 

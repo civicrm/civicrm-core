@@ -28,7 +28,7 @@
   <div class="label" id="pricelabel"><label>
     {if ( $extends eq 'Contribution' ) || ( $extends eq 'Membership' )}
       {ts}Total Amount{/ts}{else}{ts}Total Fee(s){/ts}
- 			{if $isAdditionalParticipants} {ts}for this participant{/ts}{/if}
+       {if $isAdditionalParticipants} {ts}for this participant{/ts}{/if}
     {/if}</label></div>
   <div class="content calc-value" id="pricevalue" ></div>
 </div>
@@ -200,7 +200,7 @@ function display( totalfee ) {
     scriptfee   = totalfee;
     scriptarray = price;
     cj('#total_amount').val( totalfee );
-    cj('#pricevalue').data('raw-total', totalfee );
+    cj('#pricevalue').data('raw-total', totalfee).trigger('change');
 
     ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
     if (typeof skipPaymentMethod == 'function') {

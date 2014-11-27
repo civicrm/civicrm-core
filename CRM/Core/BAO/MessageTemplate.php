@@ -139,11 +139,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *
    * @return object
    */
-  static function getMessageTemplates($all = TRUE) {
+  static function getMessageTemplates($all = TRUE, $isSMS = FALSE) {
     $msgTpls = array();
 
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->is_active = 1;
+    $messageTemplates->is_sms = $isSMS;
 
     if (!$all) {
       $messageTemplates->workflow_id = 'NULL';
@@ -504,6 +505,13 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
 
       $config = CRM_Core_Config::singleton();
+      if (isset($params['isEmailPdf']) && $params['isEmailPdf'] == 1) {
+        $pdfHtml = CRM_Contribute_BAO_ContributionPage::addInvoicePdfToEmail($params['contributionId'], $params['contactId']);
+        if (empty($params['attachments'])) {
+          $params['attachments'] = array();
+        }
+        $params['attachments'][] =  CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $format) ;
+      }
       $pdf_filename = '';
       if ($config->doNotAttachPDFReceipt &&
         $params['PDFFilename'] &&
@@ -513,6 +521,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
           $params['attachments'] = array();
         }
         $params['attachments'][] = CRM_Utils_Mail::appendPDF($params['PDFFilename'], $params['html'], $format);
+        if (isset($params['tplParams']['email_comment'])) {
+          $params['html'] = $params['tplParams']['email_comment'];
+          $params['text'] = strip_tags($params['tplParams']['email_comment']);
+        }
       }
 
       $sent = CRM_Utils_Mail::send($params);

@@ -79,11 +79,12 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
+   * Build a nested array from hierarchical tags. Supports infinite levels of nesting.
    * @param null $usedFor
    * @param bool $excludeHidden
    */
   function buildTree($usedFor = NULL, $excludeHidden = FALSE) {
-    $sql = "SELECT civicrm_tag.id, civicrm_tag.parent_id,civicrm_tag.name FROM civicrm_tag ";
+    $sql = "SELECT id, parent_id, name, description, is_selectable FROM civicrm_tag";
 
     $whereClause = array();
     if ($usedFor) {
@@ -101,42 +102,23 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
     $dao = CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
 
-    $orphan = array();
+    $refs = array();
     while ($dao->fetch()) {
+      $thisref = &$refs[$dao->id];
+
+      $thisref['parent_id'] = $dao->parent_id;
+      $thisref['name'] = $dao->name;
+      $thisref['description'] = $dao->description;
+      $thisref['is_selectable'] = $dao->is_selectable;
+
       if (!$dao->parent_id) {
-        $this->tree[$dao->id]['name'] = $dao->name;
+        $this->tree[$dao->id] = &$thisref;
       }
       else {
-        if (array_key_exists($dao->parent_id, $this->tree)) {
-          $parent = &$this->tree[$dao->parent_id];
-          if (!isset($this->tree[$dao->parent_id]['children'])) {
-            $this->tree[$dao->parent_id]['children'] = array();
-          }
-        }
-        else {
-          //3rd level tag
-          if (!array_key_exists($dao->parent_id, $orphan)) {
-            $orphan[$dao->parent_id] = array('children' => array());
-          }
-          $parent = &$orphan[$dao->parent_id];
-        }
-        $parent['children'][$dao->id] = array('name' => $dao->name);
+        $refs[$dao->parent_id]['children'][$dao->id] = &$thisref;
       }
     }
-    if (sizeof($orphan)) {
-      //hang the 3rd level lists at the right place
-      foreach ($this->tree as & $level1) {
-        if (!isset($level1['children'])) {
-          continue;
-        }
 
-        foreach ($level1['children'] as $key => & $level2) {
-          if (array_key_exists($key, $orphan)) {
-            $level2['children'] = $orphan[$key]['children'];
-          }
-        }
-      }
-    }
   }
 
   /**
@@ -333,7 +315,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @static
    */
   static function add(&$params, $ids = array()) {
-    if (!self::dataExists($params)) {
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
+    if (!$id && !self::dataExists($params)) {
       return NULL;
     }
 
@@ -346,8 +329,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     }
 
     $tag->copyValues($params);
-    $tag->id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
-    $hook = empty($params['id']) ? 'create' : 'edit';
+    $tag->id = $id;
+    $hook = !$id ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Tag', $tag->id, $params);
 
     // save creator id and time

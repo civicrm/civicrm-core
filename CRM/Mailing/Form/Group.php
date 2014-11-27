@@ -103,7 +103,6 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     $defaults['dedupe_email'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
       'dedupe_email_default', NULL, FALSE
     );
-
     if ($this->_mailingID) {
       // check that the user has permission to access mailing id
       CRM_Mailing_BAO_Mailing::checkPermission($this->_mailingID);
@@ -124,6 +123,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
       $defaults['campaign_id'] = $mailing->campaign_id;
       $defaults['dedupe_email'] = $mailing->dedupe_email;
+      $defaults['location_type_id'] = $mailing->location_type_id;
+      $defaults['email_selection_method'] = $mailing->email_selection_method;
 
       $dao = new CRM_Mailing_DAO_MailingGroup();
 
@@ -143,7 +144,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
         $mailingGroups[$entityTable][$dao->group_type][] = $dao->entity_id;
       }
 
-      $defaults['includeGroups'] = $mailingGroups['civicrm_group']['include'];
+      $defaults['includeGroups'] = CRM_Utils_Array::value('include', $mailingGroups['civicrm_group']);
       $defaults['excludeGroups'] = CRM_Utils_Array::value('exclude', $mailingGroups['civicrm_group']);
 
       if (!empty($mailingGroups['civicrm_mailing'])) {
@@ -213,8 +214,15 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     //dedupe on email option
     $this->addElement('checkbox', 'dedupe_email', ts('Remove duplicate emails?'));
 
+    // location types
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('id' => 'display_name'));
+    $this->addElement('select', 'location_type_id', ts("Location Type"), array('' => '-select-') + $locationTypes);
+
+    $methods = CRM_Core_SelectValues::emailSelectMethods();
+    $this->addElement('select', 'email_selection_method', ts("Email Selection Method"), $methods);
+
     //get the mailing groups.
-    $groups = CRM_Core_PseudoConstant::group('Mailing');
+    $groups = CRM_Core_PseudoConstant::nestedGroup('Mailing');
     if ($hiddenMailingGroup) {
       $groups[$hiddenMailingGroup] =
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $hiddenMailingGroup, 'title');
@@ -235,81 +243,45 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       $this->add('select', 'baseGroup',
         ts('Unsubscription Group'),
         array(
-          '' => ts('- select -')) + $staticGroups,
-        TRUE
+          '' => ts('- select -')) + CRM_Contact_BAO_Group::getGroupsHierarchy($staticGroups, NULL, '&nbsp;&nbsp;', TRUE),
+        TRUE,
+        array('class' => 'crm-select2 huge')
       );
     }
 
-    if (count($groups) <= 10) {
-      // setting minimum height to 2 since widget looks strange when size (height) is 1
-      $groupSize = max(count($groups), 2);
-    }
-    else {
-      $groupSize = 10;
-    }
-    $inG = &$this->addElement('advmultiselect', 'includeGroups',
-      ts('Include Group(s)') . ' ',
-      $groups,
-      array(
-        'size' => $groupSize,
-        'style' => 'width:auto; min-width:240px;',
-        'class' => 'advmultiselect',
-      )
+    $select2style = array(
+      'multiple' => TRUE,
+      'style' => 'width: 100%; max-width: 60em;',
+      'class' => 'crm-select2',
+      'placeholder' => ts('- select -'),
     );
 
-    //as we are having hidden smart group so no need.
-    if (!$this->_searchBasedMailing) {
-      $this->addRule('includeGroups', ts('Please select a group to be mailed.'), 'required');
-    }
-
-    $outG = &$this->addElement('advmultiselect', 'excludeGroups',
-      ts('Exclude Group(s)') . ' ',
+    $this->add('select', 'includeGroups',
+      ts('Include Group(s)'),
       $groups,
-      array(
-        'size' => $groupSize,
-        'style' => 'width:auto; min-width:240px;',
-        'class' => 'advmultiselect',
-      )
+      !$this->_searchBasedMailing,
+      $select2style
     );
 
-    $inG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $outG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-    $outG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
+    $this->add('select', 'excludeGroups',
+      ts('Exclude Group(s)'),
+      $groups,
+      FALSE,
+      $select2style
+    );
 
-    if (count($mailings) <= 10) {
-      // setting minimum height to 2 since widget looks strange when size (height) is 1
-      $mailingSize = max(count($mailings), 2);
-    }
-    else {
-      $mailingSize = 10;
-    }
-    $inM = &$this->addElement('advmultiselect', 'includeMailings',
+    $this->add('select', 'includeMailings',
       ts('INCLUDE Recipients of These Mailing(s)') . ' ',
       $mailings,
-      array(
-        'size' => $mailingSize,
-        'style' => 'width:auto; min-width:240px;',
-        'class' => 'advmultiselect',
-      )
+      FALSE,
+      $select2style
     );
-    $outM = &$this->addElement('advmultiselect', 'excludeMailings',
+    $this->add('select', 'excludeMailings',
       ts('EXCLUDE Recipients of These Mailing(s)') . ' ',
       $mailings,
-      array(
-        'size' => $mailingSize,
-        'style' => 'width:auto; min-width:240px;',
-        'class' => 'advmultiselect',
-      )
+      FALSE,
+      $select2style
     );
-
-    $inM->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $outM->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inM->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-    $outM->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-
-    $urls = array('' => ts('- select -'), -1 => ts('CiviCRM Search'),
-    ) + CRM_Contact_Page_CustomSearch::info();
 
     $this->addFormRule(array('CRM_Mailing_Form_Group', 'formRule'));
 
@@ -409,7 +381,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     }
 
     foreach (
-      array('name', 'group_id', 'search_id', 'search_args', 'campaign_id', 'dedupe_email') as $n
+      array('name', 'group_id', 'search_id', 'search_args', 'campaign_id', 'dedupe_email', 'location_type_id', 'email_selection_method') as $n
     ) {
       if (!empty($values[$n])) {
         $params[$n] = $values[$n];
@@ -485,7 +457,6 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       $params['created_id'] = $session->get('userID');
       $params['created_date'] = date('YmdHis');
     }
-
     $mailing = CRM_Mailing_BAO_Mailing::create($params, $ids);
     $this->set('mailing_id', $mailing->id);
 
@@ -616,7 +587,15 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       $errors['search_id'] = ts('You must select a search to filter');
     }
 
+    if (!empty($fields['location_type_id'])) {
+      if ($fields['email_selection_method'] == 'automatic') {
+        $errors['location_type_id'] = ts("If 'Email Selection Method' is automatic, you are not allowed to choose any 'Location Type'");
+      }
+    }
+    elseif ($fields['email_selection_method'] != 'automatic') {
+      $errors['email_selection_method'] = ts("If 'Location Type' is not selected, you must set the 'Email Selection Method' to automatic as well.");
+    }
+
     return empty($errors) ? TRUE : $errors;
   }
 }
-

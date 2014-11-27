@@ -223,8 +223,8 @@ AND    p.entity_id    = e.id
 
   function setColumns() {
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
-      ts('Participant Id') => 'participant_id',
+      ts('Contact ID') => 'contact_id',
+      ts('Participant ID') => 'participant_id',
       ts('Name') => 'display_name',
     );
 

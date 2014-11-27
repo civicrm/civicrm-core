@@ -112,6 +112,19 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * various pre defined email selection methods
+   * @static
+   */
+  static function emailSelectMethods() {
+    return array(
+      'automatic' => ts("Automatic"),
+      'location-only' => ts("Only send to email addresses assigned to the specified location"),
+      'location-prefer' => ts("Prefer email addresses assigned to the specified location"),
+      'location-exclude' => ts("Exclude email addresses assigned to the specified location")
+    );
+  }
+
+  /**
    * various pre defined member visibility options
    * @static
    */
@@ -156,7 +169,7 @@ class CRM_Core_SelectValues {
       'Multi-Select' => ts('Multi-Select'),
       'AdvMulti-Select' => ts('AdvMulti-Select'),
       'Link' => ts('Link'),
-      'ContactReference' => ts('Autocomplete Select'),
+      'ContactReference' => ts('Autocomplete-Select'),
     );
   }
 
@@ -509,7 +522,7 @@ class CRM_Core_SelectValues {
       '{contribution.total_amount}' => ts('Total Amount'),
       '{contribution.fee_amount}' => ts('Fee Amount'),
       '{contribution.net_amount}' => ts('Net Amount'),
-      '{contribution.non_deductible_amount}' => ts('Non Deductible Amount'),
+      '{contribution.non_deductible_amount}' => ts('Non-deductible Amount'),
       '{contribution.receive_date}' => ts('Contribution Receive Date'),
       '{contribution.payment_instrument}' => ts('Payment Instrument'),
       '{contribution.trxn_id}' => ts('Transaction ID'),
@@ -554,9 +567,7 @@ class CRM_Core_SelectValues {
         'is_deceased', 'deceased_date', 'legal_identifier', 'contact_sub_type', 'user_unique_id',
       );
 
-      $customFields = CRM_Core_BAO_CustomField::getFields('Individual');
-      $customFieldsAddress = CRM_Core_BAO_CustomField::getFields('Address');
-      $customFields = $customFields + $customFieldsAddress;
+      $customFields = CRM_Core_BAO_CustomField::getFields(array('Individual', 'Address'));
       $legacyTokenNames = array_flip(CRM_Utils_Token::legacyContactTokens());
 
       foreach ($values as $val) {
@@ -564,8 +575,12 @@ class CRM_Core_SelectValues {
           continue;
         }
         //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
-        if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($val)) {
-          $tokens["{contact.$val}"] = !empty($customFields[$customFieldId]) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
+        $customFieldId = CRM_Core_BAO_CustomField::getKeyID($val);
+        if ($customFieldId) {
+          // CRM-15191 - if key is not in $customFields then the field is disabled and should be ignored
+          if (!empty($customFields[$customFieldId])) {
+            $tokens["{contact.$val}"] = $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'];
+          }
         }
         else {
           // Support legacy token names
@@ -876,6 +891,14 @@ class CRM_Core_SelectValues {
     );
   }
 
+  static function billingMode() {
+    return array(
+      CRM_Core_Payment::BILLING_MODE_FORM => 'form',
+      CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
+      CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
+    );
+  }
+
   /**
    * Frequency unit for schedule reminders
    */
@@ -890,4 +913,3 @@ class CRM_Core_SelectValues {
     return $scheduleReminderFrequencyUnits;
   }
 }
-

@@ -49,7 +49,7 @@ run_seleniumTest()
     sub_menu
     echo "Enter Your Option: "
     read choice
-   
+
     cd $ORIGPWD/../test/selenium-ruby/CRM
     # Running Selenium (ruby) Tests
     ruby ruby_unit_tests.rb $choice
@@ -136,7 +136,7 @@ run_option()
       echo "Unit Tests Successfully Completed. Log stored in the File : " $PATH4LOG/Result/$logUT; echo;
       echo " **************************************************************************** ";
       ;;
-  
+
     # Stress Tests
   "ST" | "st" | "St")
       echo "Running Stress Tests"; echo;
@@ -144,7 +144,7 @@ run_option()
       echo "Stress Tests Successfully Completed."; echo;
       echo " **************************************************************************** ";
       ;;
-  
+
     # Selenium (Ruby) Tests
   "SRT" | "srt" | "Srt")
       echo "Running Selenium (Ruby) Tests"; echo;

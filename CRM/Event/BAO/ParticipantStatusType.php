@@ -119,7 +119,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
    *
    * @return array
    */
-  public function process($params) {
+  public static function process($params) {
 
     $returnMessages = array();
 

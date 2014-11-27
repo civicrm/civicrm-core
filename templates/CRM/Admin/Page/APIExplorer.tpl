@@ -85,11 +85,13 @@
 
 <form id="api-explorer">
   <label for="api-entity">{ts}Entity{/ts}:</label>
-  <select class="crm-form-select crm-select2" id="api-entity" name="entity">
+  <select class="crm-form-select" id="api-entity" name="entity">
     <option value="" selected="selected">{ts}Choose{/ts}...</option>
     {crmAPI entity="Entity" action="get" var="entities" version=3}
     {foreach from=$entities.values item=entity}
-      <option value="{$entity}">{$entity}</option>
+      <option value="{$entity}" {if !empty($entities.deprecated) && in_array($entity, $entities.deprecated)}class="strikethrough"{/if}>
+        {$entity}
+      </option>
     {/foreach}
   </select>
   &nbsp;&nbsp;
@@ -128,9 +130,15 @@
       <tr><td>Smarty</td><td><pre class="prettyprint linenums" id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
       <tr><td>Php</td><td><pre class="prettyprint linenums" id="api-php" title='php syntax'></pre></td></tr>
       <tr><td>Javascript</td><td><pre class="prettyprint linenums" id="api-json" title='javascript syntax'></pre></td></tr>
+      {if $config->userSystem->is_drupal}
+        <tr><td>Drush</td><td><pre class="prettyprint" id="api-drush" title='drush syntax'></pre></td></tr>
+      {/if}
+      {if $config->userSystem->is_wordpress}
+        <tr><td>WP-CLI</td><td><pre class="prettyprint" id="api-wpcli" title='wp-cli syntax'></pre></td></tr>
+      {/if}
     </table>
   </div>
-  <input type="submit" value="{ts}Execute{/ts}" class="form-submit"/>
+  <input type="submit" value="{ts}Execute{/ts}" class="crm-form-submit"/>
 <pre id="api-result" class="linenums">
 {ts}The result of api calls are displayed in this area.{/ts}
 </pre>

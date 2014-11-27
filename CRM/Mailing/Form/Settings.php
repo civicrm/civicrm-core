@@ -96,7 +96,7 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
       $dao->storeValues($dao, $defaults);
       $defaults['visibility'] = $dao->visibility;
     }
-    
+
     return $defaults;
   }
 

@@ -190,7 +190,7 @@ function custom_option_html_type( ) {
               {$form.filter.html}
               &nbsp;&nbsp;<span><a href="#" onclick="toggleContactRefFilter('Group'); return false;">{ts}Filter by Group{/ts}</a></span>
         <br />
-        <span class="description">{ts}Filter contact search results for this field using Contact Lookup API parameters. EXAMPLE: To list Students in group 3:{/ts} "action=lookup&group=3&contact_sub_type=Student" {docURL page="developer/techniques/api"}</span>
+        <span class="description">{ts}Filter contact search results for this field using Contact Lookup API parameters. EXAMPLE: To list Students in group 3:{/ts} "action=lookup&group=3&contact_sub_type=Student" {docURL page="Using the API" resource="wiki"}</span>
             </td>
         </tr>
         <tr  class="crm-custom-field-form-block-options_per_line" id="optionsPerLine" {if $action neq 2 && ($form.data_type.value.0.0 >= 4 && $form.data_type.value.1.0 neq 'CheckBox' || $form.data_type.value.1.0 neq 'Radio' )}class="hide-block"{/if}>
@@ -289,6 +289,20 @@ function custom_option_html_type( ) {
     </div>
 {literal}
 <script type="text/javascript">
+  CRM.$(function($) {
+    var $form = $('form.{/literal}{$form.formClass}{literal}'),
+      deprecatedNotice;
+    function deprecatedWidgets() {
+      deprecatedNotice && deprecatedNotice.close && deprecatedNotice.close();
+      switch ($('#data_type_1', $form).val()) {
+        case 'AdvMulti-Select':
+          deprecatedNotice = CRM.alert({/literal}'{ts escape="js"}The old "Advance Multi-Select" widget is being phased out and will be removed in a future version of CiviCRM. "Multi-Select" is the recommended substitute.{/ts}', '{ts escape="js"}Obsolete widget{/ts}'{literal}, 'alert', {expires: 0});
+          break;
+      }
+    }
+    $('#data_type_1', $form).each(deprecatedWidgets).change(deprecatedWidgets);
+  });
+
     //when page is reload, build show hide boxes
     //as per data type and html type selected.
     custom_option_html_type( );

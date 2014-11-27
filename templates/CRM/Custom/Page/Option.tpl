@@ -25,9 +25,8 @@
 *}
 {if $action eq 1 or $action eq 2 or $action eq 4 or $action eq 8}
     {include file="CRM/Custom/Form/Option.tpl"}
-{/if}
-
-{if $customOption}
+{else}
+  {if $customOption}
     {if $reusedNames}
         <div class="message status">
             <div class="icon inform-icon"></div> &nbsp; {ts 1=$reusedNames}These Multiple Choice Options are shared by the following custom fields: %1{/ts}
@@ -51,7 +50,7 @@
             <th>&nbsp;</th>
           </tr>
           {foreach from=$customOption item=row key=id}
-            <tr id="OptionValue-{$id}"class="crm-entity {cycle values="odd-row,even-row"} {$row.class} crm-custom_option {if NOT $row.is_active} disabled{/if}">
+            <tr id="OptionValue-{$id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class} crm-custom_option {if NOT $row.is_active} disabled{/if}">
               <td><span class="crm-custom_option-label crm-editable crmf-label">{$row.label}</span></td>
               <td><span class="crm-custom_option-value disabled-crm-editable" data-field="value" data-action="update">{$row.value}</span></td>
               <td class="crm-custom_option-default_value crmf-value">{$row.default_value}</td>
@@ -65,15 +64,17 @@
 
         <div class="action-link">
             <a href="{crmURL q="reset=1&action=add&fid=$fid&gid=$gid"}" class="button action-item"><span><div class="icon add-icon"></div> {ts 1=$fieldTitle}Add Option for '%1'{/ts}</span></a>
+            <a href="{crmURL p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid"}" class="button action-item cancel"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
         </div>
       </div>
     </div>
 
-{else}
+  {else}
     {if $action eq 16}
         <div class="messages status no-popup">
            <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
-           {capture assign=crmURL}{crmURL p='civicrm/admin/custom/group/field/option' q="action=add&fid=$fid&gid=$gid"}{/capture}{ts 1=$fieldTitle 2=$crmURL}There are no multiple choice options for the custom field '%1', <a href='%2' class="action-item">add one</a>.{/ts}
+           {ts}None found.{/ts}
         </div>
     {/if}
+  {/if}
 {/if}

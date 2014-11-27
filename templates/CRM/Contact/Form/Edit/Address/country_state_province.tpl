@@ -32,7 +32,7 @@
         {$form.address.$blockId.country_id.html}
      </td>
    {/if}
-   {if !empty($form.address.$blockId.state_province_id)} 
+   {if !empty($form.address.$blockId.state_province_id)}
      <td>
         {$form.address.$blockId.state_province_id.label}<br />
         {$form.address.$blockId.state_province_id.html}

@@ -63,7 +63,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
-
+    $this->setPageTitle(ts('Price Option'));
     $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive',
       $this
     );
@@ -170,7 +170,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
           '' => ' ') + $membershipTypes, FALSE,
           array('onClick' => "calculateRowValues( );")
         );
-        $this->add('text', 'membership_num_terms', ts('Number of terms'), $attributes['membership_num_terms']);
+        $this->add('text', 'membership_num_terms', ts('Number of Terms'), $attributes['membership_num_terms']);
       }
       else {
         $allComponents = explode(CRM_Core_DAO::VALUE_SEPARATOR, $extendComponentId);
@@ -178,7 +178,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         if (in_array($eventComponentId, $allComponents)) {
           $this->isEvent = TRUE;
           // count
-          $this->add('text', 'count', ts('Participants Count'));
+          $this->add('text', 'count', ts('Participant Count'));
           $this->addRule('count', ts('Please enter a valid Max Participants.'), 'positiveInteger');
 
           $this->add('text', 'max_value', ts('Max Participants'));
@@ -271,7 +271,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   /**
    * global validation rules for the form
    *
-   * @param array $fields (referance) posted values of the form
+   * @param array $fields posted values of the form
    *
    * @param $files
    * @param $form

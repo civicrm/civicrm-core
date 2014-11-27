@@ -541,7 +541,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
    */
   public function defaultContactCountryName() {
     static $cachedContactCountryName = NULL;
-    if (!$cachedContactCountryName) {
+    if (!$cachedContactCountryName && $this->defaultContactCountry) {
       $countryCodes = CRM_Core_PseudoConstant::country();
       $cachedContactCountryName = $countryCodes[$this->defaultContactCountry];
     }

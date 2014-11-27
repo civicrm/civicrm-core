@@ -78,8 +78,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @access public
    */ function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
-      // helper variable for nicer formatting
-      $deleteExtra = ts('Are you sure you want to delete this price field?');
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit Price Field'),
@@ -108,7 +106,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
           'url' => 'civicrm/admin/price/field',
           'qs' => 'action=delete&reset=1&sid=%%sid%%&fid=%%fid%%',
           'title' => ts('Delete Price'),
-          'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
         ),
       );
     }
@@ -124,6 +121,11 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @access public
    */
   function browse() {
+    $resourceManager = CRM_Core_Resources::singleton();
+    if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
+      $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
+    }
+
     $priceField    = array();
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
@@ -132,6 +134,12 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     $priceFieldBAO->orderBy('weight, label');
     $priceFieldBAO->find();
 
+    // display taxTerm for priceFields
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $getTaxDetails = FALSE;
+    $taxRate = CRM_Core_PseudoConstant::getTaxRates();
     while ($priceFieldBAO->fetch()) {
       $priceField[$priceFieldBAO->id] = array();
       CRM_Core_DAO::storeValues($priceFieldBAO, $priceField[$priceFieldBAO->id]);
@@ -143,7 +151,16 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
         CRM_Price_BAO_PriceFieldValue::retrieve($params, $optionValues);
 
+        $financialTypeId = $optionValues['financial_type_id'];
         $priceField[$priceFieldBAO->id]['price'] = CRM_Utils_Array::value('amount', $optionValues);
+        if ($invoicing && isset($taxRate[$financialTypeId])) {
+          $priceField[$priceFieldBAO->id]['tax_rate'] = $taxRate[$financialTypeId];
+          $getTaxDetails = TRUE;
+        }
+        if (isset($priceField[$priceFieldBAO->id]['tax_rate'])) {
+          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($priceField[$priceFieldBAO->id]['price'], $priceField[$priceFieldBAO->id]['tax_rate']);
+          $priceField[$priceFieldBAO->id]['tax_amount'] = $taxAmount['tax_amount'];
+        }
       }
 
       $action = array_sum(array_keys($this->actionLinks()));
@@ -170,7 +187,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
       // need to translate html types from the db
       $htmlTypes = CRM_Price_BAO_PriceField::htmlTypes();
-      $priceField[$priceFieldBAO->id]['html_type'] = $htmlTypes[$priceField[$priceFieldBAO->id]['html_type']];
+      $priceField[$priceFieldBAO->id]['html_type_display'] = $htmlTypes[$priceField[$priceFieldBAO->id]['html_type']];
       $priceField[$priceFieldBAO->id]['order'] = $priceField[$priceFieldBAO->id]['weight'];
       $priceField[$priceFieldBAO->id]['action'] = CRM_Core_Action::formLink(
         self::actionLinks(),
@@ -185,6 +202,8 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         'PriceField',
         $priceFieldBAO->id
       );
+      $this->assign('taxTerm', $taxTerm);
+      $this->assign('getTaxDetails', $getTaxDetails);
     }
 
     $returnURL = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$this->_sid}");
@@ -287,7 +306,10 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       }
     }
 
-    if ($this->_sid) {
+    if ($action & CRM_Core_Action::DELETE) {
+      CRM_Utils_System::setTitle(ts('Delete Price Field'));
+    }
+    elseif ($this->_sid) {
       $groupTitle = CRM_Price_BAO_PriceSet::getTitle($this->_sid);
       $this->assign('sid', $this->_sid);
       $this->assign('groupTitle', $groupTitle);

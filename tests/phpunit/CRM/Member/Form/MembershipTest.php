@@ -199,7 +199,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     //  Insert test data
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/dataset/data.xml'
       )
     );

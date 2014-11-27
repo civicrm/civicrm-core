@@ -61,7 +61,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $yearsInPast = 4;
     $date        = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, 0);
     $count       = $date['maxYear'];
-    $optionYear  = array('' => ts('-- select --'));
+    $optionYear  = array('' => ts('- select -'));
 
     $this->_yearStatisticsFrom = $date['minYear'];
     $this->_yearStatisticsTo = $date['maxYear'];
@@ -106,7 +106,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact SubType'),
+            'title' => ts('Contact Subtype'),
           ),
         ),
         'grouping' => 'contact-fields',
@@ -210,7 +210,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           'receive_date' =>
           array('operatorType' => CRM_Report_Form::OP_DATE),
           'contribution_status_id' =>
-          array('title' => ts('Donation Status'),
+          array('title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
@@ -221,30 +221,13 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
           'total_amount' =>
-          array('title' => ts('Donation Amount'),
+          array('title' => ts('Contribution Amount'),
           ),
           'total_sum' =>
           array('title' => ts('Aggregate Amount'),
             'type' => CRM_Report_Form::OP_INT,
             'dbAlias' => 'civicrm_contribution_total_amount_sum',
             'having' => TRUE,
-          ),
-        ),
-      ),
-    ) + array(
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
           ),
         ),
       ),
@@ -272,6 +255,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
       'is_statistics' => TRUE,
     );
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
@@ -517,11 +501,12 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $this->customDataFrom();
     $this->groupBy();
 
+    $sql = NULL;
     $rows = array();
 
     // build array of result based on column headers. This method also allows
     // modifying column headers before using it to build result set i.e $rows.
-    $this->buildRows($rows);
+    $this->buildRows($sql, $rows);
 
     // format result set.
     $this->formatDisplay($rows, FALSE);
@@ -545,7 +530,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function buildRows(&$rows) {
+  function buildRows($sql, &$rows) {
     $contactIds = array();
 
     $addWhere = '';

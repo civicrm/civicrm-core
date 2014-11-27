@@ -438,7 +438,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
 
       if (!$this->_single) {
         $pre = array(
-          array('desc' => ts('Contact Id')),
+          array('desc' => ts('Contact ID')),
           array(
             'name' => ts('Name'),
             'sort' => 'sort_name',

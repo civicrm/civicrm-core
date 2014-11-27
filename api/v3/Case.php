@@ -147,8 +147,10 @@ function _civicrm_api3_case_create_spec(&$params) {
   $params['contact_id']['title'] = 'Case Client';
   $params['contact_id']['api.required'] = 1;
   $params['status_id']['api.default'] = 1;
+  $params['status_id']['api.aliases'] = array('case_status');
   $params['creator_id']['api.default'] = 'user_contact_id';
   $params['creator_id']['type'] = CRM_Utils_Type::T_INT;
+  $params['creator_id']['title'] = 'Case Created By';
   $params['start_date']['api.default'] = 'now';
   $params['medium_id'] = array(
     'name' => 'medium_id',
@@ -265,9 +267,25 @@ SELECT DISTINCT case_id
 
 /**
  * Deprecated. Use activity API instead
+ *
+ * @param array $params
+ *
+ * @throws API_Exception
+ * @return array
  */
 function civicrm_api3_case_activity_create($params) {
-  return civicrm_api3_activity_create($params);
+  require_once "api/v3/Activity.php";
+  return civicrm_api3_activity_create($params) + array(
+    'deprecated' => CRM_Utils_Array::value('activity_create', _civicrm_api3_case_deprecation()),
+  );
+}
+
+/**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_case_deprecation() {
+  return array('activity_create' => 'Case api "activity_create" action is deprecated. Use the activity api instead.');
 }
 
 /**
@@ -333,8 +351,9 @@ function civicrm_api3_case_update($params) {
   $case = array();
 
   _civicrm_api3_object_to_array($dao, $case);
+  $values[$dao->id] = $case;
 
-  return civicrm_api3_create_success($case, $params, 'case', 'update', $dao);
+  return civicrm_api3_create_success($values, $params, 'case', 'update', $dao);
 }
 
 /**
@@ -414,6 +433,8 @@ function _civicrm_api3_case_read($caseId, $options) {
 
 /**
  * Internal function to format create params for processing
+ *
+ * @param array $params
  */
 function _civicrm_api3_case_format_params(&$params) {
   // figure out case type id from case type and vice-versa

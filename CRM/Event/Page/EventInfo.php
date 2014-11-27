@@ -144,10 +144,20 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
             else {
               $labelClass = 'price_set_field-label';
             }
-
+            // show tax rate with amount
+            $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+            $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+            $displayOpt = CRM_Utils_Array::value('tax_display_settings', $invoiceSettings);
+            $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
             foreach ($fieldValues['options'] as $optionId => $optionVal) {
               $values['feeBlock']['isDisplayAmount'][$fieldCnt] = CRM_Utils_Array::value('is_display_amounts', $fieldValues);
-              $values['feeBlock']['value'][$fieldCnt] = $optionVal['amount'];
+              if ($invoicing && isset($optionVal['tax_amount'])) {
+                $values['feeBlock']['value'][$fieldCnt] = CRM_Price_BAO_PriceField::getTaxLabel($optionVal, 'amount', $displayOpt, $taxTerm);
+                $values['feeBlock']['tax_amount'][$fieldCnt] = $optionVal['tax_amount'];
+              }
+              else {
+                $values['feeBlock']['value'][$fieldCnt] = $optionVal['amount'];
+              }
               $values['feeBlock']['label'][$fieldCnt] = $optionVal['label'];
               $values['feeBlock']['lClass'][$fieldCnt] = $labelClass;
               $fieldCnt++;
@@ -162,6 +172,16 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     $params = array('entity_id' => $this->_id, 'entity_table' => 'civicrm_event');
     $values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
+
+    // fix phone type labels
+    if (!empty($values['location']['phone'])) {
+      $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+      foreach ($values['location']['phone'] as &$val) {
+        if (!empty($val['phone_type_id'])) {
+          $val['phone_type_display'] = $phoneTypes[$val['phone_type_id']];
+        }
+      }
+    }
 
     //retrieve custom field information
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', $this, $this->_id, 0, $values['event']['event_type_id']);
@@ -331,6 +351,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $this->assign('feeBlock', $values['feeBlock']);
     }
     $this->assign('location', $values['location']);
+
+    if (CRM_Core_Permission::check('access CiviEvent')) {
+      $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME, 'enable_cart');
+      $this->assign('manageEventLinks', CRM_Event_Page_ManageEvent::tabs($enableCart));
+    }
 
     return parent::run();
   }

@@ -327,8 +327,12 @@ SELECT  survey.id    as id,
         );
       }
     }
-
-    return $activityTypes[$cacheKey];
+    if (!empty($activityTypes[$cacheKey])) {
+      return $activityTypes[$cacheKey];
+    }
+    else {
+      return;
+    }
   }
 
   /**
@@ -793,7 +797,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
         $voterLinks['reserve'] = array(
           'name' => 'reserve',
           'url' => 'civicrm/survey/search',
-          'qs' => 'sid=%%id%%&reset=1&op=reserve&force=1',
+          'qs' => 'sid=%%id%%&reset=1&op=reserve',
           'title' => ts('Reserve Respondents'),
         );
       }
@@ -1052,11 +1056,13 @@ INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
    *
    * @return array success message
    */
-  public function releaseRespondent($params) {
+  public static function releaseRespondent($params) {
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
     $reserveStatusId = array_search('Scheduled', $activityStatus);
     $surveyActivityTypes = CRM_Campaign_BAO_Survey::getSurveyActivityType();
-    $surveyActivityTypesIds = array_keys($surveyActivityTypes);
+    if (!empty($surveyActivityTypes) && is_array($surveyActivityTypes)) {
+      $surveyActivityTypesIds = array_keys($surveyActivityTypes);
+    }
 
     //retrieve all survey activities related to reserve action.
     $releasedCount = 0;

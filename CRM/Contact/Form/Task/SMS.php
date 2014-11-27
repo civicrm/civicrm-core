@@ -59,9 +59,6 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
-    if ($cid) {
-      CRM_Contact_Page_View::setTitle($cid);
-    }
 
     CRM_Contact_Form_Task_SMSCommon::preProcessProvider($this);
 

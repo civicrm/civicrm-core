@@ -160,7 +160,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     if (array_key_exists('participant_campaign_id', $this->_fields)) {
       $defaults['participant_campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values['event']);
     }
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
 
     return $defaults;
   }
@@ -191,7 +190,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
       foreach (array(
         'first_name', 'last_name') as $name) {
-        if (!empty($$keys[$name]) &&
+        if (array_key_exists($name, $$keys) &&
           CRM_Utils_Array::value('is_required', CRM_Utils_Array::value($name, $$keys))
         ) {
           $$name = 1;

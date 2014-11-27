@@ -202,13 +202,13 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['gender_id']['title'] = 'Gender ID';
   $params['gender']['title'] = 'Gender';
   $params['on_hold']['title'] = 'Primary Email On Hold';
-  $params['im']['title'] = 'Primary Instant Messanger';
-  $params['im_id']['title'] = 'Primary Instant Messanger ID';
+  $params['im']['title'] = 'Primary Instant Messenger';
+  $params['im_id']['title'] = 'Primary Instant Messenger ID';
   $params['group_id']['title'] = 'Group Memberships (filter)';
   $params['group']['title'] = 'Group Memberships (filter, array)';
   $params['tag']['title'] = 'Assigned tags (filter, array)';
-  $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birthdate is equal to or greater than'));
-  $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birthdate is equal to or less than'));
+  $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or greater than'));
+  $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or less than'));
   $params['deceased_date_low'] = array('name' => 'deceased_date_low','type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or greater than'));
   $params['deceased_date_high'] = array('name' => 'deceased_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or less than'));
 }
@@ -330,7 +330,7 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
 
   if (!empty($params['contact_sub_type']) && !empty($params['contact_type'])) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type']))) {
-        throw new API_Exception("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$params['contact_sub_type']));
+        throw new API_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array)$params['contact_sub_type']));
       }
     }
 
@@ -720,8 +720,8 @@ function civicrm_api3_contact_getquick($params) {
   //CRM-10687
   if (!empty($params['field_name']) && !empty($params['table_name'])) {
     $table_name = CRM_Utils_String::munge($params['table_name']);
-    $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch')";
-    $exactWhereClause = " WHERE ( $table_name.$field_name = '$name')";
+    $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch') {$where}";
+    $exactWhereClause = " WHERE ( $table_name.$field_name = '$name') {$where}";
     // Search by id should be exact
     if ($field_name == 'id' || $field_name == 'external_identifier') {
       $whereClause = $exactWhereClause;
@@ -835,7 +835,15 @@ LIMIT    0, {$limit}
     }
   }
 
-  return civicrm_api3_create_success($contactList, $params);
+  return civicrm_api3_create_success($contactList, $params, 'contact', 'getquick');
+}
+
+/**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_contact_deprecation() {
+  return array('getquick' => 'The "getquick" action is deprecated in favor of "getlist".');
 }
 
 /**
@@ -877,8 +885,11 @@ function civicrm_api3_contact_merge($params) {
  */
 function _civicrm_api3_contact_proximity_spec(&$params) {
   $params['latitude']['api.required'] = 1;
+  $params['latitude']['title'] = 'Latitude';
   $params['longitude']['api.required'] = 1;
+  $params['longitude']['title'] = 'Longitude';
   $params['unit']['api.default'] = 'meter';
+  $params['unit']['title'] = 'Unit of Measurement';
 }
 
 /**
@@ -971,7 +982,8 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   $request['params']['options']['sort'] = 'sort_name';
   // Contact api doesn't support array(LIKE => 'foo') syntax
   if (!empty($request['input'])) {
-    $request['params'][$request['search_field']] = $request['input'];
+    // CRM-15442 - change spaces to % wildcards when searching by name
+    $request['params'][$request['search_field']] = strpos($request['search_field'], 'name') ? str_replace(' ', '%', $request['input']) : $request['input'];
   }
 }
 

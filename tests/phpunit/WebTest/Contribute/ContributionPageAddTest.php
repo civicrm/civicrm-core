@@ -39,7 +39,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $rand = 2 * rand(2, 50);
     $pageTitle = 'Donate Online ' . $hash;
     // create contribution page with randomized title and default params
-    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array("Webtest Dummy" . substr(sha1(rand()), 0, 7) => 'Dummy'), TRUE, TRUE, 'required');
+    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array('Test Processor' => 'Dummy'), TRUE, TRUE, 'required');
 
     $this->openCiviPage("admin/contribute", "reset=1");
 
@@ -69,6 +69,19 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     foreach ($texts as $text) {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
     }
+
+    // Disable and re-enable Other Amounts (verify fix for CRM-15021)
+    $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", '_qf_Amount_next-bottom');
+    $this->click("is_allow_other_amount");
+    $this->clickLink("_qf_Amount_upload_done-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", '_qf_Main_upload-bottom');
+    $this->assertFalse($this->isTextPresent('Other Amount'), 'Other Amount present but not expected.');
+    $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", '_qf_Amount_next-bottom');
+    $this->click("is_allow_other_amount");
+    $this->clickLink("_qf_Amount_upload_done-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", '_qf_Main_upload-bottom');
+    $this->assertTrue($this->isTextPresent('Other Amount'), 'Other Amount not present but expected.');
+    $this->isElementPresent("xpath=//div[@class='content other_amount-content']/input");
   }
 
   // CRM-12510 Test copy contribution page
@@ -81,7 +94,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $rand = 2 * rand(2, 50);
     $pageTitle = 'Donate Online ' . $hash;
     // create contribution page with randomized title and default params
-    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array("Webtest Dummy" . substr(sha1(rand()), 0, 7) => 'Dummy'), TRUE, TRUE, 'required');
+    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array('Test Processor' => 'Dummy'), TRUE, TRUE, 'required');
 
     $this->openCiviPage("admin/contribute", "reset=1");
 
@@ -139,7 +152,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $pageTitle = 'Donate Online ' . $hash;
 
     // create contribution page with randomized title, default params and separate payment for Membership and Contribution
-    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array("Webtest Dummy" . substr(sha1(rand()), 0, 7) => 'Dummy'),
+    $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array('Test Processor' => 'Dummy'),
       TRUE, TRUE, 'required', TRUE, FALSE, TRUE, NULL, TRUE,
       1, 7, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE
     );
@@ -279,7 +292,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $hash = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
     $pageTitle = 'Donate Online ' . $hash;
-    $processor = array("Webtest Dummy" . substr(sha1(rand()), 0, 7) => 'Dummy');
+    $processor = array('Test Processor' => 'Dummy');
 
     // Create a new payment processor
     while (list($processorName, $processorType) = each($processor)) {

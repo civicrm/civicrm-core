@@ -79,7 +79,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
     $this->_values = $this->get('values');
     if ($this->_id && empty($this->_values)) {
-
       //get location values.
       $params = array(
         'entity_id' => $this->_id,
@@ -111,9 +110,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     if (!empty($defaults['loc_block_id'])) {
       $defaults['loc_event_id'] = $defaults['loc_block_id'];
       $countLocUsed = CRM_Event_BAO_Event::countEventsUsingLocBlockId($defaults['loc_block_id']);
-      if ($countLocUsed > 1) {
-        $this->assign('locUsed', TRUE);
-      }
+      $this->assign('locUsed', $countLocUsed);
     }
 
     $config = CRM_Core_Config::singleton();
@@ -125,19 +122,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       $defaults['address'][1]['state_province_id'] = $config->defaultContactStateProvince;
     }
 
-    if (!empty($defaults['address'])) {
-      foreach ($defaults['address'] as $key => $value) {
-        CRM_Contact_Form_Edit_Address::fixStateSelect($this,
-          "address[$key][country_id]",
-          "address[$key][state_province_id]",
-          "address[$key][county_id]",
-          CRM_Utils_Array::value('country_id', $value,
-            $config->defaultContactCountry
-          ),
-          CRM_Utils_Array::value('state_province_id', $value)
-        );
-      }
-    }
     $defaults['location_option'] = $this->_oldLocBlockId ? 2 : 1;
 
     return $defaults;
@@ -221,10 +205,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
         '2' => ts('Use existing location'),
       );
 
-      $this->addRadio('location_option', ts("Choose Location"), $optionTypes,
-        array(
-          'onclick' => "showLocFields();"), '<br/>', FALSE
-      );
+      $this->addRadio('location_option', ts("Choose Location"), $optionTypes);
 
       if (!isset($locationEvents[$this->_oldLocBlockId]) || (!$this->_oldLocBlockId)) {
         $locationEvents = array(

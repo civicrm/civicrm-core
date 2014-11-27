@@ -53,7 +53,6 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->openCiviPage('profile/edit', 'reset=1&gid=4', NULL);
     $testUserFirstName = "Testuserfirst";
     $testUserLastName = "Testuserlast";
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Edit_next");
     $this->type("first_name", $testUserFirstName);
     $this->type("last_name", $testUserLastName);
@@ -69,12 +68,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = "Fraser";
-    $contactName = "{$lastName}, {$firstName}";
-    $displayName = "{$firstName} {$lastName}";
-    $email = "{$lastName}.{$firstName}@example.org";
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
+    $client = $this->createDialogContact("client_id");
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
@@ -106,7 +100,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
 
     $summaryStrings = array(
       "Summary",
-      $displayName,
+      $client['display_name'],
       "Type: {$caseTypeLabel}",
       "Open Date: {$today}",
       "Status: {$caseStatusLabel}",
@@ -117,7 +111,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->_testVerifyCaseActivities($activityTypes);
 
     $openCaseData = array(
-      "Client" => $displayName,
+      "Client" => $client['display_name'],
       "Activity Type" => "Open Case",
       "Subject" => $subject,
       "Created By" => "{$testUserFirstName} {$testUserLastName}",
@@ -138,16 +132,25 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->select("case_status_id","value=2");
     $this->click("_qf_Activity_upload-top");
 
-    $this->_testSearchbyDate($firstName, $lastName, "this.quarter");
-    $this->_testSearchbyDate($firstName, $lastName, "0");
-    $this->_testSearchbyDate($firstName, $lastName, "this.year");
+    $this->_testSearchbyDate($client['first_name'], $client['last_name'], "this.quarter");
+    $this->_testSearchbyDate($client['first_name'], $client['last_name'], "0");
+    $this->_testSearchbyDate($client['first_name'], $client['last_name'], "this.year");
+    $this->_testAssignToClient($client['first_name'], $client['last_name'], $caseTypeLabel);
   }
 
   function testAjaxCustomGroupLoad() {
-    $this->webtestLogin();
+    // Log in as admin first to verify permissions for CiviCase
+    $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
+
+    // let's give full CiviCase permissions to demo user (registered user).
+    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $this->changePermissions($permission);
+
+    // Log in as normal user
+    $this->webtestLogin();
 
     $triggerElement = array('name' => 'case_type_id', 'type' => 'select');
     $customSets = array(
@@ -176,13 +179,14 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    * @param $creatorName
    */
   function _testVerifyCaseRoles($caseRoles, $creatorName) {
-    $this->waitForElementPresent("xpath=//table[@id='caseRoles-selector']/tbody/tr[4]/td[2]/a");
+    $id = $this->urlArg('id');
+    $this->waitForElementPresent("xpath=//table[@id='caseRoles-selector-$id']/tbody/tr[4]/td[2]/a");
     // check that expected roles are listed in the Case Roles pane
     foreach ($caseRoles as $role) {
       $this->assertText("css=div.crm-case-roles-block", $role);
     }
     // check that case creator role has been assigned to logged in user
-    $this->verifyText("xpath=//table[@id='caseRoles-selector']/tbody/tr[4]/td[2]", $creatorName);
+    $this->verifyText("xpath=//table[@id='caseRoles-selector-$id']/tbody/tr[4]/td[2]", $creatorName);
   }
 
   /**
@@ -262,9 +266,27 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
       $this->webtestFillDate("case_to_end_date_low", "-1 month");
       $this->webtestFillDate("case_to_end_date_high", "+1 month");
     }
-    $this->click("_qf_Advanced_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Advanced_refresh");
     $this->assertElementContainsText('Advanced', "$lastName, $firstName");
+  }
+
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $caseTypeLabel
+   *
+   * test for assign case to another client
+   */
+   function _testAssignToClient($firstName, $lastName, $caseTypeLabel) {
+    $this->openCiviPage('case/search', 'reset=1', '_qf_Search_refresh-bottom');
+    $this->type('sort_name', $firstName);
+    $this->clickLink('_qf_Search_refresh-bottom');
+    $this->waitForElementPresent("xpath=//table[@class='caseSelector']/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']");
+
+    $this->clickPopupLink("xpath=//table[@class='caseSelector']/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']/../../td[11]/span[2]/ul/li/a[contains(text(),'Assign to Another Client')]");
+    $client = $this->createDialogContact("reassign_contact_id");
+    $this->clickLink('_qf_EditClient_done-bottom');
+    $this->assertElementContainsText('page-title', "{$client['display_name']} - $caseTypeLabel");
   }
 }
 

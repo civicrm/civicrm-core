@@ -55,14 +55,16 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  showHideMapAPIkey( cj('#mapProvider').val( ) );
-});
-function showHideMapAPIkey( mapProvider ) {
-  if ( mapProvider && ( mapProvider == 'OpenStreetMaps' ) ) {
-    cj('#Mapping tr.crm-map-form-block-mapAPIKey').hide( );
-  } else {
-    cj('#Mapping tr.crm-map-form-block-mapAPIKey').show( );
+  var $form = $('form.{/literal}{$form.formClass}{literal}');
+  function showHideMapAPIkey() {
+    var mapProvider = $(this).val();
+    if ( !mapProvider || ( mapProvider === 'OpenStreetMaps' ) ) {
+      $('tr.crm-map-form-block-mapAPIKey', $form).hide( );
+    } else {
+      $('tr.crm-map-form-block-mapAPIKey', $form).show( );
+    }
   }
-}
+  $('#mapProvider').each(showHideMapAPIkey).change(showHideMapAPIkey);
+});
 </script>
 {/literal}

@@ -146,6 +146,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   CONST CB_PREFIX = 'mark_x_', CB_PREFIY = 'mark_y_', CB_PREFIZ = 'mark_z_', CB_PREFIX_LEN = 7;
 
   /**
+   * @internal to keep track of chain-select fields
+   * @var array
+   */
+  private $_chainSelectFields = array();
+
+  /**
    * Constructor for the basic form page
    *
    * We should not use QuickForm directly. This class provides a lot
@@ -170,6 +176,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->_name = $name;
     }
     else {
+      // CRM-15153 - FIXME this name translates to a DOM id and is not always unique!
       $this->_name = CRM_Utils_String::getClassName(CRM_Utils_System::getClassName($this));
     }
 
@@ -187,11 +194,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset(self::$_template)) {
       self::$_template = CRM_Core_Smarty::singleton();
     }
+    // Workaround for CRM-15153 - give each form a reasonably unique css class
+    $this->addClass(CRM_Utils_System::getClassName($this));
 
     $this->assign('snippet', CRM_Utils_Array::value('snippet', $_GET));
   }
 
   static function generateID() {
+  }
+
+  /**
+   * Add one or more css classes to the form
+   * @param $className
+   */
+  public function addClass($className) {
+    $classes = $this->getAttribute('class');
+    $this->setAttribute('class', ($classes ? "$classes " : '') . $className);
   }
 
   /**
@@ -222,19 +240,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Simple easy to use wrapper around addElement. Deal with
    * simple validation rules
    *
-   * @param $type
-   * @param $name
+   * @param string $type
+   * @param string $name
    * @param string $label
-   * @param string $attributes
+   * @param string|array $attributes (options for select elements)
    * @param bool $required
-   * @param null $extra
-   *
-   * @internal param \type $string of html element to be added
-   * @internal param \name $string of the html element
-   * @internal param \display $string label for the html element
-   * @internal param \attributes $string used for this element.
-   *               These are not default values
-   * @internal param \is $bool this a required field
+   * @param array $extra (attributes for select elements)
    *
    * @return HTML_QuickForm_Element could be an error object
    * @access public
@@ -242,9 +253,23 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   function &add($type, $name, $label = '',
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
-    // Normalize this property
-    if ($type == 'select' && is_array($extra) && !empty($extra['multiple'])) {
-      $extra['multiple'] = 'multiple';
+    if ($type == 'select' && is_array($extra)) {
+      // Normalize this property
+      if (!empty($extra['multiple'])) {
+        $extra['multiple'] = 'multiple';
+      }
+      else {
+        unset($extra['multiple']);
+      }
+      // Add placeholder option for select
+      if (isset($extra['placeholder'])) {
+        if ($extra['placeholder'] === TRUE) {
+          $extra['placeholder'] = $required ? ts('- select -') : ts('- none -');
+        }
+        if (($extra['placeholder'] || $extra['placeholder'] === '') && empty($extra['multiple']) && is_array($attributes) && !isset($attributes[''])) {
+          $attributes = array('' => $extra['placeholder']) + $attributes;
+        }
+      }
     }
     $element = $this->addElement($type, $name, $label, $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
@@ -371,6 +396,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   function validate() {
     $error = parent::validate();
 
+    $this->validateChainSelectFields();
+
     $hookErrors = CRM_Utils_Hook::validate(
       get_class($this),
       $this->_submitValues,
@@ -407,6 +434,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->_formBuilt = TRUE;
 
     $this->preProcess();
+
+    CRM_Utils_Hook::preProcess(get_class($this), $this);
 
     $this->assign('translatePermission', CRM_Core_Permission::check('translate CiviCRM'));
 
@@ -471,10 +500,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $js = CRM_Utils_Array::value('js', $button);
       $isDefault = CRM_Utils_Array::value('isDefault', $button, FALSE);
       if ($isDefault) {
-        $attrs = array('class' => 'form-submit default');
+        $attrs = array('class' => 'crm-form-submit default');
       }
       else {
-        $attrs = array('class' => 'form-submit');
+        $attrs = array('class' => 'crm-form-submit');
       }
 
       if ($js) {
@@ -633,10 +662,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @access public
    */
   function toSmarty() {
+    $this->preProcessChainSelectFields();
     $renderer = $this->getRenderer();
     $this->accept($renderer);
     $content = $renderer->toArray();
     $content['formName'] = $this->getName();
+    // CRM-15153
+    $content['formClass'] = CRM_Utils_System::getClassName($this);
     return $content;
   }
 
@@ -1003,17 +1035,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset($props['field'])) {
       $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
-    $info = civicrm_api3($props['entity'], 'getoptions', array(
-        'field' => $props['field'],
-        'options' => array('metadata' => array('fields'))
-      )
-    );
-    $options = $info['values'];
+    // Fetch options from the api unless passed explicitly
+    if (isset($props['options'])) {
+      $options = $props['options'];
+    }
+    else {
+      $info = civicrm_api3($props['entity'], 'getoptions', array('field' => $props['field']));
+      $options = $info['values'];
+    }
     if (!array_key_exists('placeholder', $props)) {
       $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
-    }
-    if ($props['placeholder'] !== NULL && empty($props['multiple'])) {
-      $options = array('' => '') + $options;
     }
     // Handle custom field
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
@@ -1024,7 +1055,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     // Core field
     else {
-      foreach($info['metadata']['fields'] as $uniqueName => $fieldSpec) {
+      $info = civicrm_api3($props['entity'], 'getfields');
+      foreach($info['values'] as $uniqueName => $fieldSpec) {
         if (
           $uniqueName === $props['field'] ||
           CRM_Utils_Array::value('name', $fieldSpec) === $props['field'] ||
@@ -1039,7 +1071,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
     $props['data-api-entity'] = $props['entity'];
     $props['data-api-field'] = $props['field'];
-    CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url');
+    CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url', 'options');
     return $this->add('select', $name, $label, $options, $required, $props);
   }
 
@@ -1051,8 +1083,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $allowCoreTypes only present a UFGroup if its group_type includes a subset of $allowCoreTypes; e.g. 'Individual', 'Activity'
    * @param string $allowSubTypes only present a UFGroup if its group_type is compatible with $allowSubypes
    * @param array $entities
+   * @param bool $default //CRM-15427
    */
-  function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities) {
+  function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE) {
     // Output widget
     // FIXME: Instead of adhoc serialization, use a single json_encode()
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
@@ -1062,6 +1095,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // Note: client treats ';;' as equivalent to \0, and ';;' works better in HTML
       'data-group-type' => CRM_Core_BAO_UFGroup::encodeGroupType($allowCoreTypes, $allowSubTypes, ';;'),
       'data-entities' => json_encode($entities),
+      //CRM-15427
+      'data-default' => $default,
     ));
   }
 
@@ -1593,7 +1628,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->assign('selectable', $autoCompleteField['id_field']);
       $this->addEntityRef($autoCompleteField['id_field'], NULL, array('placeholder' => $autoCompleteField['placeholder'], 'api' => $autoCompleteField['api']));
 
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js')
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js', 1, 'html-header')
       ->addSetting(array(
       'form' => array('autocompletes' => $autoCompleteField),
       'ids' => array('profile' => $profiles),
@@ -1673,6 +1708,130 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   function allowAjaxSubmit() {
     $this->removeAttribute('data-no-ajax-submit');
+  }
+
+  /**
+   * Sets page title based on entity and action
+   * @param string $entityLabel
+   */
+  function setPageTitle($entityLabel) {
+    switch ($this->_action) {
+      case CRM_Core_Action::ADD:
+        CRM_Utils_System::setTitle(ts('New %1', array(1 => $entityLabel)));
+        break;
+      case CRM_Core_Action::UPDATE:
+        CRM_Utils_System::setTitle(ts('Edit %1', array(1 => $entityLabel)));
+        break;
+      case CRM_Core_Action::VIEW:
+      case CRM_Core_Action::PREVIEW:
+        CRM_Utils_System::setTitle(ts('View %1', array(1 => $entityLabel)));
+        break;
+      case CRM_Core_Action::DELETE:
+        CRM_Utils_System::setTitle(ts('Delete %1', array(1 => $entityLabel)));
+        break;
+    }
+  }
+
+  /**
+   * Create a chain-select target field. All settings are optional; the defaults usually work.
+   *
+   * @param string $elementName
+   * @param array $settings
+   *
+   * @return HTML_QuickForm_Element
+   */
+  public function addChainSelect($elementName, $settings = array()) {
+    $props = $settings += array(
+      'control_field' => str_replace(array('state_province', 'StateProvince', 'county', 'County'), array('country', 'Country', 'state_province', 'StateProvince'), $elementName),
+      'data-callback' => strpos($elementName, 'rovince') ? 'civicrm/ajax/jqState' : 'civicrm/ajax/jqCounty',
+      'label' => strpos($elementName, 'rovince') ? ts('State/Province') : ts('County'),
+      'data-empty-prompt' => strpos($elementName, 'rovince') ? ts('Choose country first') : ts('Choose state first'),
+      'data-none-prompt' => ts('- N/A -'),
+      'multiple' => FALSE,
+      'required' => FALSE,
+      'placeholder' => empty($settings['required']) ? ts('- none -') : ts('- select -'),
+    );
+    CRM_Utils_Array::remove($props, 'label', 'required', 'control_field');
+    $props['class'] = (empty($props['class']) ? '' : "{$props['class']} ") . 'crm-select2';
+    $props['data-select-prompt'] = $props['placeholder'];
+    $props['data-name'] = $elementName;
+
+    $this->_chainSelectFields[$settings['control_field']] = $elementName;
+
+    // Passing NULL instead of an array of options
+    // CRM-15225 - normally QF will reject any selected values that are not part of the field's options, but due to a
+    // quirk in our patched version of HTML_QuickForm_select, this doesn't happen if the options are NULL
+    // which seems a bit dirty but it allows our dynamically-popuplated select element to function as expected.
+    return $this->add('select', $elementName, $settings['label'], NULL, $settings['required'], $props);
+  }
+
+  /**
+   * Set options and attributes for chain select fields based on the controlling field's value
+   */
+  private function preProcessChainSelectFields() {
+    foreach ($this->_chainSelectFields as $control => $target) {
+      $targetField = $this->getElement($target);
+      $targetType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'county' : 'stateProvince';
+      $options = array();
+      // If the control field is on the form, setup chain-select and dynamically populate options
+      if ($this->elementExists($control)) {
+        $controlField = $this->getElement($control);
+        $controlType = $targetType == 'county' ? 'stateProvince' : 'country';
+
+        $targetField->setAttribute('class', $targetField->getAttribute('class') . ' crm-chain-select-target');
+
+        $css = (string) $controlField->getAttribute('class');
+        $controlField->updateAttributes(array(
+          'class' => ($css ? "$css " : 'crm-select2 ') . 'crm-chain-select-control',
+          'data-target' => $target,
+        ));
+        $controlValue = $controlField->getValue();
+        if ($controlValue) {
+          $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
+          if (!$options) {
+            $targetField->setAttribute('placeholder', $targetField->getAttribute('data-none-prompt'));
+          }
+        } else {
+          $targetField->setAttribute('placeholder', $targetField->getAttribute('data-empty-prompt'));
+          $targetField->setAttribute('disabled', 'disabled');
+        }
+      }
+      // Control field not present - fall back to loading default options
+      else {
+        $options = CRM_Core_PseudoConstant::$targetType();
+      }
+      if (!$targetField->getAttribute('multiple')) {
+        $options = array('' => $targetField->getAttribute('placeholder')) + $options;
+        $targetField->removeAttribute('placeholder');
+      }
+      $targetField->_options = array();
+      $targetField->loadArray($options);
+    }
+  }
+
+  /**
+   * Validate country / state / county match and suppress unwanted "required" errors
+   */
+  private function validateChainSelectFields() {
+    foreach ($this->_chainSelectFields as $control => $target) {
+      if ($this->elementExists($control)) {
+        $controlValue = (array)$this->getElementValue($control);
+        $targetField = $this->getElement($target);
+        $controlType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'stateProvince' : 'country';
+        $targetValue = array_filter((array)$targetField->getValue());
+        if ($targetValue || $this->getElementError($target)) {
+          $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
+          if ($targetValue) {
+            if (!array_intersect($targetValue, array_keys($options))) {
+              $this->setElementError($target, $controlType == 'country' ? ts('State/Province does not match the selected Country') : ts('County does not match the selected State/Province'));
+            }
+          } // Suppress "required" error for field if it has no options
+          elseif (!$options) {
+            $this->setElementError($target, NULL);
+          }
+        }
+      }
+    }
   }
 }
 

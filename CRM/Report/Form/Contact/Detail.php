@@ -76,7 +76,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact SubType'),
+            'title' => ts('Contact Subtype'),
           ),
           'birth_date' =>
           array(
@@ -335,7 +335,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         'fields' =>
         array(
           'assignee_contact_id' =>
-          array('title' => ts('Assigned To'),
+          array('title' => ts('Assigned to'),
             'name' => 'contact_id',
             'default' => TRUE,
           ),
@@ -356,22 +356,6 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           ),
         'grouping' => 'activity-fields',
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_Group',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
       'civicrm_phone' =>
       array(
         'dao' => 'CRM_Core_DAO_Phone',
@@ -386,7 +370,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         'grouping' => 'contact-fields',
       ),
     );
-
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }

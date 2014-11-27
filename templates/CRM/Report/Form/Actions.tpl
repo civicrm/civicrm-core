@@ -57,8 +57,28 @@
                         {/if}
                         {if $form.groups}
                             <tr>
-                                <td>{$form.groups.html|crmAddClass:big}</td>
-                                <td align="right">{$form.$group.html}</td>
+                                <td>
+                                  {$form.groups.html}{$form.$group.html}
+                                  <script type="text/javascript">
+                                    {literal}
+                                    (function($) {
+                                      $('#groups').val('').change(function() {
+                                        CRM.confirm({
+                                          message: ts({/literal}'{ts escape='js' 1='<em>%1</em>'}Add all contacts to %1 group?{/ts}'{literal}, {1: $('option:selected', '#groups').text()})
+                                        })
+                                          .on({
+                                            'crmConfirm:yes': function() {
+                                              $('#groups').siblings(':submit').click();
+                                            },
+                                            'crmConfirm:no dialogclose': function() {
+                                              $('#groups').select2('val', '');
+                                            }
+                                          });
+                                      });
+                                    })(CRM.$);
+                                    {/literal}
+                                  </script>
+                                </td>
                             </tr>
                         {/if}
                     </table>

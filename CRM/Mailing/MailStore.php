@@ -44,7 +44,7 @@ class CRM_Mailing_MailStore {
    * @throws Exception
    * @return object        mail store implementation for processing CiviMail-bound emails
    */
-  function getStore($name = NULL) {
+  public static function getStore($name = NULL) {
     $dao               = new CRM_Core_DAO_MailSettings;
     $dao->domain_id    = CRM_Core_Config::domainID();
     $name ? $dao->name = $name : $dao->is_default = 1;
@@ -53,6 +53,9 @@ class CRM_Mailing_MailStore {
     }
 
     $protocols = CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol');
+    if (empty($protocols[$dao->protocol])) {
+      throw new Exception("Empty mail protocol");
+    }
 
     switch ($protocols[$dao->protocol]) {
       case 'IMAP':

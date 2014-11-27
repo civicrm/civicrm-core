@@ -156,3 +156,19 @@ function _civicrm_api3_system_log_spec(&$params) {
     'type' => CRM_Utils_Type::T_STRING,
   );
 }
+
+/**
+ * System.Get API
+ *
+ * @param arary $params
+ */
+function civicrm_api3_system_get($params) {
+  $returnValues = array(
+    array(
+      'version' => CRM_Utils_System::version(),
+      'uf' => CIVICRM_UF,
+    ),
+  );
+  return civicrm_api3_create_success($returnValues, $params, 'System', 'get');
+}
+

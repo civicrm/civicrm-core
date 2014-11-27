@@ -195,22 +195,6 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
 
         ),
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_Group',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts(' Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      )
     )
     + $this->getAddressColumns(array('group_by' => FALSE))
     + $this->getPhoneColumns();
@@ -229,6 +213,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
 
     }
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     $this->_currencyColumn = 'civicrm_pledge_currency';
     parent::__construct();
@@ -341,17 +326,17 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
         $count = $dao->count;
         $totalCount .= $count;
         $statistics['counts']['amount' . $index] = array(
-          'title' => ts('Total Amount Pledged (') . $dao->currency . ')',
+          'title' => ts('Total Pledged') . ' (' . $dao->currency . ')',
           'value' => $totalAmount,
           'type' => CRM_Utils_Type::T_STRING,
         );
         $statistics['counts']['avg' . $index] = array(
-          'title' => ts('Average (') . $dao->currency . ')',
+          'title' => ts('Average') . ' (' . $dao->currency . ')',
           'value' => $average,
           'type' => CRM_Utils_Type::T_STRING,
         );
         $statistics['counts']['count' . $index] = array(
-          'title' => ts('Total No Pledges (') . $dao->currency . ')',
+          'title' => ts('Total No Pledges') . ' (' . $dao->currency . ')',
           'value' => $count,
           'type' => CRM_Utils_Type::T_INT,
         );

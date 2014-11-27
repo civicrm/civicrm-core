@@ -50,7 +50,7 @@
    CRM.$(function($) {
      buildChart( );
 
-     cj("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(e){
+     $("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(e){
        // image creator php file path and append image name
        var url = CRM.url('civicrm/report/chart', 'name=' + '{/literal}{$chartId}{literal}' + '.png');
 

@@ -84,12 +84,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     $resources = CRM_Core_Resources::singleton();
 
     if ($resources->ajaxPopupsEnabled) {
-      $resources->addScriptFile('civicrm', 'js/crm.livePage.js');
       // Script needed by some popups
       $this->assign('includeWysiwygEditor', TRUE);
     }
 
-    $resources->addScriptFile('civicrm', 'js/crm.searchForm.js');
+    $resources->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
 
     $this->addButtons(array(
       array(
@@ -99,7 +98,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       ),
     ));
 
-    $this->setAttribute('class', 'crm-search-form');
+    $this->addClass('crm-search-form');
   }
 
   /**

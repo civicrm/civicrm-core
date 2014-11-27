@@ -71,6 +71,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'visibility' => 'Public',
       'is_active' => 1,
     );
+    $ids = array();
     $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
     $this->_membershipTypeID = $membershipType->id;
     $this->_mebershipStatusID = $this->membershipStatusCreate('test status');

@@ -31,6 +31,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class TransactionSubscriber
+ *
+ * Implement transaction management for API calls. Two API options are accepted:
+ *  - is_transactional: bool|'nest' - if true, then all work is done inside a transaction. by default, true for mutator actions (C-UD)
+ *      'nest' will force creation of a nested transaction; otherwise, the default is to re-use any existing transactions
+ *  - options.force_rollback: bool - if true, all work is done in a nested transaction which will be rolled back
+ *
  * @package Civi\API\Subscriber
  */
 class TransactionSubscriber implements EventSubscriberInterface {
@@ -51,6 +57,14 @@ class TransactionSubscriber implements EventSubscriberInterface {
   private $transactions = array();
 
   /**
+   * @var array (scalar $apiRequestId => bool)
+   *
+   * A list of requests which should be forcibly rolled back to
+   * their save points.
+   */
+  private $forceRollback = array();
+
+  /**
    * Determine if an API request should be treated as transactional
    *
    * @param \Civi\API\Provider\ProviderInterface $apiProvider
@@ -58,10 +72,48 @@ class TransactionSubscriber implements EventSubscriberInterface {
    * @return bool
    */
   public function isTransactional($apiProvider, $apiRequest) {
+    if ($this->isForceRollback($apiProvider, $apiRequest)) {
+      return true;
+    }
     if (isset($apiRequest['params']['is_transactional'])) {
-      return \CRM_Utils_String::strtobool($apiRequest['params']['is_transactional']);
+      return \CRM_Utils_String::strtobool($apiRequest['params']['is_transactional']) || $apiRequest['params']['is_transactional'] == 'nest';
     }
     return strtolower($apiRequest['action']) == 'create' || strtolower($apiRequest['action']) == 'delete' || strtolower($apiRequest['action']) == 'submit';
+  }
+
+  /**
+   * Determine if caller wants us to *always* rollback.
+   *
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
+   * @param array $apiRequest
+   * @return bool
+   */
+  public function isForceRollback($apiProvider, $apiRequest) {
+    // FIXME: When APIv3 uses better parsing, the [params][options][force_rollback] check will be redundant
+    if (isset($apiRequest['params']['options']['force_rollback'])) {
+      return \CRM_Utils_String::strtobool($apiRequest['params']['options']['force_rollback']);
+    }
+    if (isset($apiRequest['options']['force_rollback'])) {
+      return \CRM_Utils_String::strtobool($apiRequest['options']['force_rollback']);
+    }
+    return FALSE;
+  }
+
+  /**
+   * Determine if caller wants a nested transaction or a re-used transaction.
+   *
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
+   * @param array $apiRequest
+   * @return bool True if a new nested transaction is required; false if active tx may be used
+   */
+  public function isNested($apiProvider, $apiRequest) {
+    if ($this->isForceRollback($apiProvider, $apiRequest)) {
+      return TRUE;
+    }
+    if (isset($apiRequest['params']['is_transactional']) && $apiRequest['params']['is_transactional'] === 'nest')  {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
@@ -72,7 +124,10 @@ class TransactionSubscriber implements EventSubscriberInterface {
   function onApiPrepare(\Civi\API\Event\PrepareEvent $event) {
     $apiRequest = $event->getApiRequest();
     if ($this->isTransactional($event->getApiProvider(), $apiRequest)) {
-      $this->transactions[$apiRequest['id']] = new \CRM_Core_Transaction();
+      $this->transactions[$apiRequest['id']] = new \CRM_Core_Transaction($this->isNested($event->getApiProvider(), $apiRequest));
+    }
+    if ($this->isForceRollback($event->getApiProvider(), $apiRequest)) {
+      $this->transactions[$apiRequest['id']]->rollback();
     }
   }
 
@@ -81,7 +136,12 @@ class TransactionSubscriber implements EventSubscriberInterface {
    */
   function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
-    unset($this->transactions[$apiRequest['id']]);
+    if (isset($this->transactions[$apiRequest['id']])) {
+      if (civicrm_error($event->getResponse())) {
+        $this->transactions[$apiRequest['id']]->rollback();
+      }
+      unset($this->transactions[$apiRequest['id']]);
+    }
   }
 
   /**

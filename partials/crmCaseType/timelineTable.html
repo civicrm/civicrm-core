@@ -45,7 +45,7 @@ Required vars: activitySet
       <input
         class="number"
         type="text"
-        ng-pattern="/^[0-9]*$/"
+        ng-pattern="/^-?[0-9]*$/"
         ng-model="activity.reference_offset"
         ng-hide="activity.name == 'Open Case'"
         ng-required="activity.name != 'Open Case'"
@@ -63,7 +63,9 @@ Required vars: activitySet
       </select>
     </td>
     <td>
-      <a class="crm-hover-button" ng-click="removeItem(activitySet.activityTypes, activity)">
+      <a class="crm-hover-button"
+         ng-show="isActivityRemovable(activitySet, activity)"
+         ng-click="removeItem(activitySet.activityTypes, activity)">
         <span class="icon delete-icon" title="Remove"></span>
       </a>
     </td>

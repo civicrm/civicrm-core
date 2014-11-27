@@ -750,8 +750,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (!empty($groups)) {
       foreach ($groups as $id => $value) {
         $groupList[$id]['group_id'] = $value['id'];
+        $groupList[$id]['count'] = $value['count'];
         $groupList[$id]['group_name'] = $value['title'];
-        $groupList[$id]['class'] = implode(' ', $value['class']);
 
         // append parent names if in search mode
         if (empty($params['parent_id']) && !empty($value['parents'])) {
@@ -761,8 +761,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
             $title[] = $allGroups[$gId];
           }
           $groupList[$id]['group_name'] .= '<div class="crm-row-parent-name"><em>'.ts('Child of').'</em>: ' . implode(', ', $title) . '</div>';
-          $groupList[$id]['class'] = in_array('disabled', $value['class']) ? 'disabled' : '';
+          $value['class'] = array_diff($value['class'], array('crm-row-parent'));
         }
+        $value['class'][] = 'crm-entity';
+        $groupList[$id]['class'] = $value['id'] . ',' . implode(' ', $value['class']);
 
         $groupList[$id]['group_description'] = CRM_Utils_Array::value('description', $value);
         if (!empty($value['group_type'])) {
@@ -831,10 +833,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $query = "
         SELECT groups.*, createdBy.sort_name as created_by {$select}
         FROM  civicrm_group groups
-              LEFT JOIN civicrm_contact createdBy
-                     ON createdBy.id = groups.created_id
-              {$from}
+        LEFT JOIN civicrm_contact createdBy
+          ON createdBy.id = groups.created_id
+        {$from}
         WHERE $whereClause {$where}
+        GROUP BY groups.id
         {$orderBy}
         {$limit}";
 
@@ -854,7 +857,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $links = self::actionLinks();
 
     $allTypes = CRM_Core_OptionGroup::values('group_type');
-    $values = array();
+    $values = $groupsToCount = array();
 
     $visibility = CRM_Core_SelectValues::ufVisibility();
 
@@ -866,7 +869,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       if ($permission) {
         $newLinks = $links;
-        $values[$object->id] = array('class' => array());
+        $values[$object->id] = array(
+          'class' => array(),
+          'count' => '0',
+        );
         CRM_Core_DAO::storeValues($object, $values[$object->id]);
         if ($object->saved_search_id) {
           $values[$object->id]['title'] .= ' (' . ts('Smart Group') . ')';
@@ -909,6 +915,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $action = $action & CRM_Core_Action::mask($groupPermissions);
 
         $values[$object->id]['visibility'] = $visibility[$values[$object->id]['visibility']];
+
+        $groupsToCount[$object->saved_search_id ? 'civicrm_group_contact_cache' : 'civicrm_group_contact'][] = $object->id;
 
         if (isset($values[$object->id]['group_type'])) {
           $groupTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -961,6 +969,18 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           $contactUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$object->created_id}");
           $values[$object->id]['created_by'] = "<a href='{$contactUrl}'>{$object->created_by}</a>";
         }
+      }
+    }
+
+    // Get group counts
+    foreach ($groupsToCount as $table => $groups) {
+      $where = "group_id IN (" . implode(',', $groups) . ")";
+      if ($table == 'civicrm_group_contact') {
+        $where .= " AND status = 'Added'";
+      }
+      $dao = CRM_Core_DAO::executeQuery("SELECT group_id, COUNT(id) as `count` FROM $table WHERE $where GROUP BY group_id");
+      while($dao->fetch()) {
+        $values[$dao->group_id]['count'] = $dao->count;
       }
     }
 

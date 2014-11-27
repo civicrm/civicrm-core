@@ -47,9 +47,6 @@
  * @access public
  */
 function smarty_modifier_crmReplace($string, $attribute, $value) {
-  static $endOfElement = '/>';
-
-  // if we know what attribute we need to replace
   // we need to search and replace the string: $attribute=XXX or $attribute="XXX"
   // with $attribute=\"$value\"
   $pattern = '/' . $attribute . '="([^"]+?)"/';

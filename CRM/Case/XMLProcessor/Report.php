@@ -289,7 +289,7 @@ WHERE      a.id = %1
         if ($dao->activity_type_id == CRM_Core_OptionGroup::getValue('activity_type', 'Email', 'name')) {
           $anyActivity = TRUE;
         }
-        $activityTypes = $this->allActivityTypes(FALSE, $anyActivity);
+        $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, $anyActivity);
         $activityTypeInfo = NULL;
 
         if (isset($activityTypes[$dao->activity_type_id])) {
@@ -466,7 +466,7 @@ WHERE      a.id = %1
       }
       $assigneeContacts = implode(', ', $assignee_contact_names);
       $activity['fields'][] = array(
-        'label' => ts('Assigned To'),
+        'label' => ts('Assigned to'),
         'value' => $assigneeContacts,
         'type' => 'String',
       );
@@ -628,7 +628,7 @@ AND    cg.extends = 'Activity'";
       else {
         $query .= "AND cg.extends_entity_column_value IS NULL";
       }
-      $query .= "ORDER BY cf.weight";
+      $query .= "ORDER BY cg.weight, cf.weight";
       $params = array(
         1 => array($activityTypeID,
           'Integer',

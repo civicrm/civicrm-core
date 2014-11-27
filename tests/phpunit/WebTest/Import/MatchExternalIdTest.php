@@ -285,8 +285,8 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     )) {
     if (empty($params)) {
 
-      // We need a payment processor
-      $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+      // Use default payment processor
+      $processorName = 'Test Processor';
       $this->webtestAddPaymentProcessor($processorName);
 
       // create an event
@@ -348,10 +348,10 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
 
-    $this->check("is_online_registration");
+    $this->click("is_online_registration");
     $this->assertChecked("is_online_registration");
 
-    $this->fillRichTextField("intro_text", "Fill in all the fields below and click Continue.");
+    $this->fillRichTextField("intro_text", "Fill in all the fields below and click Continue.", 'CKEditor', TRUE);
 
     // enable confirmation email
     $this->click("CIVICRM_QFID_1_is_email_confirm");

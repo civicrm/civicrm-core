@@ -218,8 +218,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     }
 
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'js/crm.livePage.js')
-      ->addScriptFile('civicrm', 'templates/CRM/Case/Form/CaseView.js');
+      ->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header')
+      ->addScriptFile('civicrm', 'templates/CRM/Case/Form/CaseView.js', 2, 'html-header');
 
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles    = $xmlProcessor->get($this->_caseType, 'CaseRoles');
@@ -278,7 +278,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $this->add('select', 'add_activity_type_id', '', $activityLinks, FALSE, array('class' => 'crm-select2 crm-action-menu action-icon-plus twenty'));
     if ($this->_hasAccessToAllCases) {
       $this->add('select', 'report_id', '',
-        array('' => ts('Run QA Audit / Redact')) + $reports,
+        array('' => ts('Activity Audit')) + $reports,
         FALSE,
         array('class' => 'crm-select2 crm-action-menu action-icon-clipboard')
       );
@@ -321,14 +321,14 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
           $this->getButtonName('next', 'merge_case'),
           ts('Merge'),
           array(
-            'class' => 'form-submit-inline hiddenElement',
+            'class' => 'crm-form-submit-inline hiddenElement',
           )
         );
       }
     }
 
     //call activity form
-    self::activityForm($this);
+    self::activityForm($this, $aTypes);
 
     //get case related relationships (Case Role)
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($this->_contactID, $this->_caseID);
@@ -501,8 +501,9 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   /**
    * Build the activity selector/datatable
    * @param CRM_Core_Form $form
+   * @param array $aTypes to include acivities related to current case id $form->_caseID
    */
-  static function activityForm($form) {
+  static function activityForm($form, $aTypes = array()) {
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($form->_contactID, $form->_caseID);
     //build reporter select
     $reporters = array("" => ts(' - any reporter - '));
@@ -519,6 +520,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         $aTypesFilter[$typeDetails['id']] = CRM_Utils_Array::value('label', $typeDetails);
       }
     }
+    $aTypesFilter = $aTypesFilter + $aTypes;
     asort($aTypesFilter);
     $form->add('select', 'activity_type_filter_id', ts('Activity Type'), array('' => ts('- select activity type -')) + $aTypesFilter, FALSE, array('id' => 'activity_type_filter_id_'.$form->_caseID));
 

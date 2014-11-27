@@ -80,7 +80,7 @@ function buildAdditionalBlocks( blockName, className ) {
         async   : false,
         success : function(html){
             cj(fname).after(html);
-            cj(fname).next().trigger('crmLoad');
+            cj(fname).nextAll().trigger('crmLoad');
         }
     });
 
@@ -177,7 +177,7 @@ function clearFirstBlock( blockName , blockId ) {
 }
 
 function getAddressBlock( position ) {
-   var addressBlockIds = new Array();
+   var addressBlockIds = [];
    var i = 0;
    switch ( position ) {
         case 'last':

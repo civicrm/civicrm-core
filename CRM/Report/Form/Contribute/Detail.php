@@ -85,7 +85,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact SubType'),
+            'title' => ts('Contact Subtype'),
           ),
         ),
         'filters' =>
@@ -244,6 +244,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'financial_type_id' => array('title' => ts('Financial Type')),
           'contribution_status_id' => array('title' => ts('Contribution Status')),
           'payment_instrument_id' => array('title' => ts('Payment Instrument')),
+          'receive_date' => array('title' => ts('Receive Date')),
         ),
         'grouping' => 'contri-fields',
       ),
@@ -262,23 +263,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'options' => CRM_Core_OptionGroup::values('soft_credit_type'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-      ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-            'type' => CRM_Utils_Type::T_INT,
           ),
         ),
       ),
@@ -323,6 +307,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       ),
     ) + $this->addAddressFields(FALSE);
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
     // Don't show Batch display column and filter unless batches are being used
@@ -415,8 +400,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                        ON temp1_civireport.civicrm_contribution_contribution_id = {$this->_aliases['civicrm_contribution']}.id
                INNER JOIN civicrm_contribution_soft contribution_soft_civireport
                        ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id
-               INNER JOIN civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-                       ON {$this->_aliases['civicrm_contact']}.id = contribution_soft_civireport.contact_id";
+               INNER JOIN civicrm_contact      {$this->_aliases['civicrm_contact']}
+                       ON {$this->_aliases['civicrm_contact']}.id = contribution_soft_civireport.contact_id
+               {$this->_aclFrom}";
     }
 
     if (!empty($this->_params['ordinality_value'])) {
@@ -493,12 +479,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       $count += $dao->count;
     }
     $statistics['counts']['amount'] = array(
-      'title' => ts('Total Amount (Donations)'),
+      'title' => ts('Total Amount (Contributions)'),
       'value' => implode(',  ', $totalAmount),
       'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['count'] = array(
-      'title' => ts('Total Donations'),
+      'title' => ts('Total Contributions'),
       'value' => $count,
     );
     $statistics['counts']['avg'] = array(

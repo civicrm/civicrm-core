@@ -47,6 +47,8 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('Contact Type'));
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -153,5 +155,6 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
         array(1 => $contactType->label)
       ), ts('Saved'), 'success');
   }
+
 }
 

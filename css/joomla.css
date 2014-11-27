@@ -57,96 +57,8 @@ td.active {
 
 td.label {
   background: none;
-}
-
-/*
-** Menu styles
-*/
-#crm-container .menu {
-  padding: 0 0 0 0.5em;
-  margin: 0 0 0 2em;
-}
-#crm-container .menu ul {
-  list-style: none;
-  border: none;
-  text-align:left;
-}
-#crm-container .menu li a {
-  width: 100%;
-  text-decoration: none;
-}
-#crm-container li.expanded {
-  list-style-type: circle;
-  list-style-image: url(menu-expanded.png);
-  padding: 0.2em 0.5em 0 0;
-  margin: 0;
-}
-#crm-container li.collapsed {
-  list-style-type: disc;
-  list-style-image: url(menu-collapsed.png);
-  padding: 0.2em 0.5em 0 0;
-  margin: 0;
-}
-#crm-container li a.active {
-  color: #000;
-}
-#crm-container td.menu-disabled {
-  background: #ccc;
-}
-
-/* Tab navigation */
-#crm-container .tabs {
-  margin: 0 0 0.5em 0.5em;
-}
-#crm-container ul.primary {
-  border-collapse: collapse;
-  padding: 0 0 0 1em;
-  white-space: nowrap;
-  list-style: none;
-  margin: 5px;
-  height: auto;
-  line-height: normal;
-  border-bottom: 1px solid #bbb;
-}
-#crm-container ul.primary li {
-  display: inline;
-}
-#crm-container ul.primary li a {
-  background-color: #ddd;
-  border-color: #bbb;
-  border-width: 1px;
-  border-style: solid solid none solid;
-  height: auto;
-  margin-right: 0.5em;
-  padding: 0 1em;
-  text-decoration: none;
-}
-#crm-container ul.primary li.active a {
-  background-color: #fff;
-  border: 1px solid #bbb;
-  border-bottom: #fff 1px solid;
-}
-#crm-container ul.primary li a:hover {
-  background-color: #eee;
-  border-color: #ccc;
-  border-bottom-color: #eee;
-}
-#crm-container ul.secondary {
-  border-bottom: 1px solid #bbb;
-  padding: 0.5em 1em 0.5em 1em;
-  margin: 5px;
-}
-#crm-container ul.secondary li {
-  display: inline;
-  padding: 0 1em;
-  border-right: 1px solid #ccc;
-}
-#crm-container ul.secondary a {
-  padding: 0;
-  text-decoration: none;
-}
-#crm-container ul.secondary a.active {
-  border-bottom: 4px solid #999;
+  color: #3e3e3e;
+  display: table-cell;
 }
 
 /*
@@ -166,7 +78,7 @@ br.clear {
 .container-inline div {
   display: inline;
 }
-.container-inline .form-submit {
+.container-inline .crm-form-submit {
   margin: 0;
 }
 .item-list .icon {
@@ -195,25 +107,13 @@ br.clear {
   padding: 0;
   list-style: disc;
 }
-.form-item {
-  margin-top: 1em;
-  margin-bottom: 1em;
-}
-tr.light .form-item, tr.dark .form-item {
-  margin-top: 0;
-  margin-bottom: 0;
-  white-space: nowrap;
-}
-.form-item input.error, .form-item textarea.error {
-  border: 2px solid red;
-}
 /* Override .9em field help size from civicrm.css - CiviCRM 2.0 */
 #crm-container div.description, #crm-container span.description, #crm-container dd.description {
   font-size: 1em;
 }
 #crm-container div.description, #crm-container span.description {
-   margin: 2px 0 15px 0;
-   display: block;
+  margin: 2px 0 15px 0;
+  display: block;
 }
 .form-item label {
   font-weight: bold;
@@ -221,7 +121,7 @@ tr.light .form-item, tr.dark .form-item {
 .form-item label.option {
   font-weight: normal;
 }
-.form-submit {
+.crm-form-submit {
   margin: 0.5em 0;
 }
 .marker, .form-required {
@@ -289,7 +189,7 @@ tr.light .form-item, tr.dark .form-item {
   font-weight: bold;
   color: #9cf;
 }
-#search .form-text, #search .form-submit {
+#search .form-text, #search .crm-form-submit {
   border: 1px solid #369;
   font-size: 1.1em;
 }
@@ -299,7 +199,7 @@ tr.light .form-item, tr.dark .form-item {
   padding: 0 0.5em 0 0.5em;
   margin: 0 0 0.5em 0;
 }
-#search .form-submit {
+#search .crm-form-submit {
   height: 1.5em;
 }
 #main {
@@ -395,29 +295,29 @@ tr.light .form-item, tr.dark .form-item {
 /* Moved from civicrm.css in v3.2 */
 
 ul#civicrm-menu {
-    z-index: 1;
-    position:relative;
-    border: none;
-    left:0px;
-    height:0px;
-    padding: 2px 0px 25px 2px !important;
-    padding-bottom:25px !important; /*moz bottom */
-    padding-bottom:2px; /*ie bottom */
+  z-index: 1;
+  position:relative;
+  border: none;
+  left:0px;
+  height:0px;
+  padding: 2px 0px 25px 2px !important;
+  padding-bottom:25px !important; /*moz bottom */
+  padding-bottom:2px; /*ie bottom */
 }
 
 div#toolbar-box div.m {
-    padding: 0px !important;
+  padding: 0px !important;
   min-height: 0;
   border: 0;
   margin-top: 8px;
 }
 
 div#toolbar-box, div#toolbar-box div.m{
-    height: auto;
+  height: auto;
 }
 
 ul#civicrm-menu li#crm-qsearch {
-    height:0px;
+  height:0px;
 }
 .crm-tab-button,
 .ui-tabs .ui-tabs-nav li {
@@ -452,19 +352,26 @@ ul#civicrm-menu li#crm-qsearch {
   top: 100px;
 }
 
-#crm-container textarea,
-#crm-container input,
-#crm-container select {
+.crm-container textarea,
+.crm-container input,
+.crm-container select {
   font-size: 12px;
   margin-bottom: auto;
   margin-right: 4px;
   width: auto;
   padding: 2px 4px;
 }
-#crm-container textarea,
-#crm-container input {
+.crm-container .select2-search input {
+  width: 100%;
+}
+.crm-container textarea,
+.crm-container input {
   height: auto;
 }
-#crm-container input[type=submit] {
+.crm-container input[type=submit] {
   height: auto;
+}
+
+.crm-container .disabled {
+  font-weight: normal;
 }

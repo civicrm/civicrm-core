@@ -314,7 +314,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'displayName' => $displayName,
         'contributionID' => CRM_Utils_Array::value('contribution_id', $values),
         'contributionOtherID' => CRM_Utils_Array::value('contribution_other_id', $values),
-        'membershipID' => CRM_Utils_Array::value('membership_id', $values),
         // CRM-5095
         'lineItem' => CRM_Utils_Array::value('lineItem', $values),
         // CRM-5095
@@ -370,8 +369,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
       // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
       $sendTemplateParams = array(
-        'groupName' => $tplParams['membershipID'] ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
-        'valueName' => $tplParams['membershipID'] ? 'membership_online_receipt' : 'contribution_online_receipt',
+        'groupName' => !empty($values['isMembership']) ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
+        'valueName' => !empty($values['isMembership']) ? 'membership_online_receipt' : 'contribution_online_receipt',
         'contactId' => $contactID,
         'tplParams' => $tplParams,
         'isTest' => $isTest,
@@ -394,6 +393,15 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_receipt', $values);
         $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_receipt', $values);
+        //send email with pdf invoice
+        $template = CRM_Core_Smarty::singleton( );
+        $taxAmt = $template->get_template_vars('dataArray');
+        $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+        $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+        if (count($taxAmt) > 0 && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+          $sendTemplateParams['isEmailPdf'] = True;
+          $sendTemplateParams['contributionId'] = $values['contribution_id'];
+        }
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
 
@@ -888,6 +896,23 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     return $sctJson;
   }
 
+   /**
+   * Generate html for pdf in confirmation receipt email  attachment
+   * @param int $contributionId Contribution Page Id
+   * @param int $userID contact id for contributor
+   * @return array $pdfHtml
+   */
+  static function addInvoicePdfToEmail($contributionId, $userID) {
+    $contributionID = array($contributionId);
+    $contactId = array($userID);
+    $pdfParams = array(
+      'output' => 'pdf_invoice',
+      'forPage' => 'confirmpage'
+    );
+    $pdfHtml = CRM_Contribute_Form_Task_Invoice::printPDF($contributionID,
+      $pdfParams, $contactId, CRM_Core_DAO::$_nullObject);
+    return $pdfHtml;
+  }
 
   /**
    * helper to determine if the page supports separate membership payments

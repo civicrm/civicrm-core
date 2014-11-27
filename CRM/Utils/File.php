@@ -244,24 +244,25 @@ class CRM_Utils_File {
   }
 
   /**
-   * Appends trailing slashed to paths
+   * Appends a slash to the end of a string if it doesn't already end with one
    *
-   * @param $name
-   * @param null $separator
+   * @param string $path
+   * @param string $slash
    *
    * @return string
    * @access public
    * @static
    */
-  static function addTrailingSlash($name, $separator = NULL) {
-    if (!$separator) {
-      $separator = DIRECTORY_SEPARATOR;
+  static function addTrailingSlash($path, $slash = NULL) {
+    if (!$slash) {
+      // FIXME: Defaulting to backslash on windows systems can produce unexpected results, esp for URL strings which should always use forward-slashes.
+      // I think this fn should default to forward-slash instead.
+      $slash = DIRECTORY_SEPARATOR;
     }
-
-    if (substr($name, -1, 1) != $separator) {
-      $name .= $separator;
+    if (!in_array(substr($path, -1, 1), array('/', '\\'))) {
+      $path .= $slash;
     }
-    return $name;
+    return $path;
   }
 
   /**
@@ -527,8 +528,9 @@ HTACCESS;
    * @return string
    */
   static function absoluteDirectory($directory) {
-    // Do nothing on windows - config will need to specify absolute path
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    // check if directory is already absolute, if so return immediately
+    // Note: Windows PHP accepts any mix of "/" or "\", so "C:\htdocs" or "C:/htdocs" would be a valid absolute path
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && preg_match(';^[a-zA-Z]:[/\\\\];', $directory)) {
       return $directory;
     }
 
@@ -686,61 +688,6 @@ HTACCESS;
       return FALSE;
     }
     return TRUE;
-  }
-
-  /**
-   * Create a static file (e.g. css or js) in the dynamic resource directory
-   * Note: if the file already exists it will be overwritten
-   * @param string $fileName
-   * @param string $contents
-   */
-  static function addDynamicResource($fileName, $contents) {
-    // First ensure the directory exists
-    $path = self::dynamicResourcePath();
-    if (!is_dir($path)) {
-      self::createDir($path);
-      self::restrictBrowsing($path);
-    }
-    file_put_contents("$path/$fileName", $contents);
-  }
-
-  /**
-   * Get the path of a dynamic resource file
-   * With no fileName supplied, returns the path of the directory
-   * @param string $fileName
-   * @return string
-   */
-  static function dynamicResourcePath($fileName = NULL) {
-    $config = CRM_Core_Config::singleton();
-    // FIXME: Use self::baseFilePath once url issue has been resolved
-    $path = self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadDir)) . 'dynamic';
-    if ($fileName !== NULL) {
-      $path .= "/$fileName";
-    }
-    return $path;
-  }
-
-  /**
-   * Get the URL of a dynamic resource file
-   * @param string $fileName
-   * @return string
-   */
-  static function dynamicResourceUrl($fileName) {
-    $config = CRM_Core_Config::singleton();
-    // FIXME: Need a better way of getting the url of the baseFilePath
-    return self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadURL)) . 'dynamic/' . $fileName;
-  }
-
-  /**
-   * Delete all files from the dynamic resource directory
-   */
-  static function flushDynamicResources() {
-    $files = glob(self::dynamicResourcePath('*'));
-    foreach ($files ? $files : array() as $file) {
-      if (is_file($file)) {
-        unlink($file);
-      }
-    }
   }
 }
 

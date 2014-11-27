@@ -74,7 +74,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
       'Contact Type B' => 'Individual',
     );
     foreach ($data as $param => $val) {
-      $this->assertElementContainsText('option11', $val, "Could not able to save $param");
+      $this->assertElementContainsText("xpath=//table[@class='display dataTable no-footer']", $val, "Could not able to save $param");
     }
   }
 
@@ -99,7 +99,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->type('description', $description);
 
     $this->click('_qf_RelationshipType_next-bottom');
-    $this->waitForText("xpath=//*[@id='RelationshipType']/div[2]/table/tbody/tr[1]/td[2]/label[@class='error']", 'This field is required.');
+    $this->waitForText("xpath=//*[@id='RelationshipType']/div[2]/table/tbody/tr[1]/td[2]/label[@class='crm-inline-error']", 'This field is required.');
 
     //enter the relationship type values.
     $labelAB = 'Test Relationship Type A - B - DUPLICATE TO BE' . rand();

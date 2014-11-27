@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Price Set ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Price Set</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
+    <title>Price Set Domain</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -56,6 +58,7 @@
   </index>
   <field>
     <name>title</name>
+    <title>Price Set Title</title>
     <type>varchar</type>
     <length>255</length>
     <required>true</required>
@@ -68,6 +71,7 @@
   </field>
   <field>
     <name>is_active</name>
+    <title>Price Set Is Active?</title>
     <type>boolean</type>
     <default>1</default>
     <comment>Is this price set active</comment>
@@ -78,6 +82,7 @@
   </field>
   <field>
     <name>help_pre</name>
+    <title>Price Set Pre Help</title>
     <type>text</type>
     <localizable>true</localizable>
     <comment>Description and/or help text to display before fields in form.</comment>
@@ -90,6 +95,7 @@
   </field>
   <field>
     <name>help_post</name>
+    <title>Price Set Post Help</title>
     <type>text</type>
     <localizable>true</localizable>
     <comment>Description and/or help text to display after fields in form.</comment>
@@ -102,6 +108,7 @@
   </field>
   <field>
     <name>javascript</name>
+    <title>Price Set Javascript</title>
     <type>varchar</type>
     <length>64</length>
     <comment>Optional Javascript script function(s) included on the form with this price_set. Can be used for conditional</comment>
@@ -112,6 +119,7 @@
   </field>
   <field>
     <name>extends</name>
+    <title>Price Set Extends</title>
     <type>varchar</type>
     <length>255</length>
     <required>true</required>
@@ -128,6 +136,7 @@
   </field>
   <field>
     <name>contribution_type_id</name>
+    <title>Price Set Contribution Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Contribution Type(for membership price sets only).</comment>
@@ -167,6 +176,7 @@
   </foreignKey>
   <field>
     <name>is_quick_config</name>
+    <title>Is Price Set Quick Config?</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Is set if edited on Contribution or Event Page rather than through Manage Price Sets</comment>
@@ -177,6 +187,7 @@
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Price Set Is Reserved</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Is this a predefined system price set  (i.e. it can not be deleted, edited)?</comment>

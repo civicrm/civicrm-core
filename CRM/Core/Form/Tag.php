@@ -153,31 +153,12 @@ class CRM_Core_Form_Tag {
     // are deleted we will have to set $params[tagset id] = '' which is done by above logic
     foreach ($params as $parentId => $value) {
       $newTagIds = array();
-      $realTagIds = array();
+      $tagIds = array();
 
       if ($value) {
-        $tagsIDs = explode(',', $value);
-        foreach ($tagsIDs as $tagId) {
-          if (!is_numeric($tagId)) {
-            // check if user has selected existing tag or is creating new tag
-            // this is done to allow numeric tags etc.
-            $tagValue = explode(':::', $tagId);
-
-            if (isset($tagValue[1]) && $tagValue[1] == 'value') {
-              $tagParams = array(
-                'name' => $tagValue[0],
-                'parent_id' => $parentId,
-              );
-              $tagObject = CRM_Core_BAO_Tag::add($tagParams, CRM_Core_DAO::$_nullArray);
-              $tagId = $tagObject->id;
-            }
-          }
-
-          $realTagIds[] = $tagId;
-          if ($form && $form->_action != CRM_Core_Action::UPDATE) {
-            $newTagIds[] = $tagId;
-          }
-          elseif (!array_key_exists($tagId, $existingTags)) {
+        $tagIds = explode(',', $value);
+        foreach ($tagIds as $tagId) {
+          if ($form && $form->_action != CRM_Core_Action::UPDATE || !array_key_exists($tagId, $existingTags)) {
             $newTagIds[] = $tagId;
           }
         }
@@ -189,8 +170,8 @@ class CRM_Core_Form_Tag {
                     WHERE civicrm_tag.id=civicrm_entity_tag.tag_id
                       AND civicrm_entity_tag.entity_table='{$entityTable}'
                       AND entity_id={$entityId} AND parent_id={$parentId}";
-      if (!empty($realTagIds)) {
-        $deleteSQL .= " AND tag_id NOT IN (" . implode(', ', $realTagIds) . ");";
+      if (!empty($tagIds)) {
+        $deleteSQL .= " AND tag_id NOT IN (" . implode(', ', $tagIds) . ");";
       }
 
       CRM_Core_DAO::executeQuery($deleteSQL);

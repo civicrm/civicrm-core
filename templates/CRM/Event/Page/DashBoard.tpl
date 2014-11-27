@@ -57,7 +57,16 @@
     <tbody>
     {foreach from=$eventSummary.events item=values key=id}
     <tr class="crm-event_{$id}">
-        <td class="crm-event-eventTitle"><a href="{crmURL p="civicrm/event/info" q="reset=1&id=`$id`"}" title="{ts}View event info page{/ts}">{$values.eventTitle}</a></td>
+        <td class="crm-event-eventTitle"><a href="{crmURL p="civicrm/event/info" q="reset=1&id=`$id`"}" title="{ts}View event info page{/ts}">{$values.eventTitle}</a>
+            {if $values.is_repeating_event}
+                <br/>
+                {if $values.is_repeating_event eq $id}
+                    <span>{ts}Repeating Event{/ts} - ({ts}Parent{/ts})</span>
+                {else}
+                    <span>{ts}Repeating Event{/ts} - ({ts}Child{/ts})</span>
+                {/if}
+            {/if}
+        </td>
         <td class="crm-event-id">{$id}</td>
         <td class="crm-event-eventType">{$values.eventType}</td>
         <td class="crm-event-isPublic">{$values.isPublic}</td>
@@ -110,7 +119,7 @@
                     {foreach from=$eventSummary.tab key=k item=v}
                       {assign var="fld" value=$v.field}
                       {if NOT $values.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
-                      <li><a title="{$v.title}" class="action-item crm-hover-button {$status}"
+                      <li><a title="{$v.title}" class="action-item crm-hover-button no-popup {$status}"
                              href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$id`"}">{$v.title}</a></li>
                     {/foreach}
                   </ul>

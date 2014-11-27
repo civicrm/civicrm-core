@@ -46,7 +46,7 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
      * Define the columns for search result rows
      */
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Individual Name') => 'sort_name',
       ts('Individual State') => 'indState',
       ts('Employer') => 'employer',

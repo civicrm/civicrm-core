@@ -435,8 +435,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     //set address block defaults
     CRM_Contact_Form_Edit_Address::setDefaultValues( $defaults, $this );
 
+
     if (!empty($defaults['image_URL'])) {
-      list($imageWidth, $imageHeight) = getimagesize($defaults['image_URL']);
+      list($imageWidth, $imageHeight) = getimagesize(CRM_Utils_String::unstupifyUrl($defaults['image_URL']));
       list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
       $this->assign('imageWidth', $imageWidth);
       $this->assign('imageHeight', $imageHeight);
@@ -548,23 +549,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
       if (!$hasPrimary) {
         $defaults[$name][1]['is_primary'] = TRUE;
-      }
-    }
-
-    // set defaults for country-state widget
-    if (!empty($defaults['address']) && is_array($defaults['address'])) {
-      foreach ($defaults['address'] as $blockId => $values) {
-        CRM_Contact_Form_Edit_Address::fixStateSelect($this,
-          "address[$blockId][country_id]",
-          "address[$blockId][state_province_id]",
-          "address[$blockId][county_id]",
-          CRM_Utils_Array::value('country_id',
-            $values, $config->defaultContactCountry
-          ),
-          CRM_Utils_Array::value('state_province_id',
-            $values, $config->defaultContactStateProvince
-          )
-        );
       }
     }
   }
@@ -838,16 +822,18 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         'subName' => 'view',
         'isDefault' => TRUE,
       ),
-      array(
+    );
+    if (CRM_Core_Permission::check('add contacts')) {
+      $buttons[] = array(
         'type' => 'upload',
         'name' => ts('Save and New'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'subName' => 'new',
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
+      );
+    }
+    $buttons[] = array(
+      'type' => 'cancel',
+      'name' => ts('Cancel'),
     );
 
     if (!empty($this->_values['contact_sub_type'])) {

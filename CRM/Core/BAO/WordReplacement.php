@@ -195,7 +195,7 @@ WHERE  domain_id = %1
   /**
    * Rebuild
    */
-  static function rebuild() {
+  static function rebuild($clearCaches = TRUE) {
     $id = CRM_Core_Config::domainID();
     $stringOverride = self::getAllAsConfigArray($id);
     $params = array('locale_custom_strings' => serialize($stringOverride));
@@ -203,12 +203,13 @@ WHERE  domain_id = %1
     if ($wordReplacementSettings) {
       CRM_Core_Config::singleton()->localeCustomStrings = $stringOverride;
 
-      // Reset navigation
-      CRM_Core_BAO_Navigation::resetNavigation();
-      // Clear js string cache
-      CRM_Core_Resources::singleton()->flushStrings();
-      // Clear dynamic js files which may contain localization
-      CRM_Utils_File::flushDynamicResources();
+      // Partially mitigate the inefficiency introduced in CRM-13187 by doing this conditionally
+      if ($clearCaches) {
+        // Reset navigation
+        CRM_Core_BAO_Navigation::resetNavigation();
+        // Clear js localization
+        CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
+      }
 
       return TRUE;
     }

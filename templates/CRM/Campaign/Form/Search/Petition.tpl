@@ -27,7 +27,7 @@
 {if !$hasPetitions}
     <div class="messages status no-popup">
         <div class="icon inform-icon"></div> &nbsp;
-        {ts}No petitions found.{/ts}
+        {ts}None found.{/ts}
     </div>
 
     <div class="action-link">
@@ -164,7 +164,7 @@ function loadPetitionList( )
      noRecordFoundMsg += '<div class="qill">';
 
      var count = 0;
-     var searchQill = new Array( );
+     var searchQill = [];
      for ( param in searchParams ) {
        if ( val = CRM.$( '#' + param ).val( ) ) {
          if ( param == 'petition_campaign_id' ) val = campaigns[val];
@@ -200,8 +200,8 @@ function loadPetitionList( )
              "fnDrawCallback": function() { CRM.$().crmtooltip(); },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
          //insert the id for each row for enable/disable.
-         var rowId = 'petition_row_' + aData[0];
-         CRM.$(nRow).attr( 'id', rowId );
+         var rowId = 'survey-' + aData[0];
+         CRM.$(nRow).attr( 'id', rowId).addClass('crm-entity');
          //handled disabled rows.
          var isActive = Boolean(Number(aData[7]));
          if ( !isActive ) CRM.$(nRow).addClass( 'disabled' );
@@ -216,7 +216,7 @@ function loadPetitionList( )
       var dataLength = aoData.length;
 
       var count = 1;
-      var searchCriteria = new Array( );
+      var searchCriteria = [];
 
       //get the search criteria.
                         var searchParams = {/literal}{$searchParams}{literal};

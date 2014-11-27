@@ -58,6 +58,7 @@
     {* Block for change status, case type and start date. *}
     {if $activityTypeFile EQ 'ChangeCaseStatus'
     || $activityTypeFile EQ 'ChangeCaseType'
+    || $activityTypeFile EQ 'LinkCases'
     || $activityTypeFile EQ 'ChangeCaseStartDate'}
       {include file="CRM/Case/Form/Activity/$activityTypeFile.tpl"}
       <tr class="crm-case-activity-form-block-details">
@@ -81,7 +82,7 @@
               <tbody>
                 <tr id="with-clients" class="crm-case-activity-form-block-client_name">
                   <td class="label font-size12pt">{ts}Client{/ts}</td>
-                  <td class="view-value">	
+                  <td class="view-value">
                     <span class="font-size12pt">
                       {foreach from=$client_names item=client name=clients key=id}
                         {foreach from=$client_names.$id item=client1}
@@ -244,7 +245,7 @@
               <td class="label">{$form.followup_activity_subject.label}</td>
               <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
             </tr>
-	    <tr>
+      <tr>
               <td class="label">
                 {$form.followup_assignee_contact_id.label}
                 {edit}
@@ -321,9 +322,9 @@
     {literal}
     <script type="text/javascript">
       CRM.$(function($) {
-        cj('.crm-with-contact').click(function(){
-          cj('#with-contacts-widget').toggle();
-          cj('#with-clients').toggle();
+        $('.crm-with-contact').click(function() {
+          $('#with-contacts-widget').toggle();
+          $('#with-clients').toggle();
           return false;
         });
       });

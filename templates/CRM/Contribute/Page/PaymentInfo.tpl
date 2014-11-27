@@ -27,17 +27,23 @@
 {literal}
 <script type='text/javascript'>
 CRM.$(function($) {
-  if (cj("#payment-info").length) {
+  if ($("#payment-info").length) {
     var dataUrl = {/literal}'{crmURL p="civicrm/payment/view" h=0 q="action=browse&id=$participantId&cid=`$contactId`&component=event&context=payment_info&snippet=4"}'{literal};
-    cj.ajax({
+    $.ajax({
       url: dataUrl,
       async: false,
       success: function(html) {
-        cj("#payment-info").html(html).trigger('crmLoad');
+        $("#payment-info").html(html).trigger('crmLoad');
       }
     });
 
-    cj('.total_amount-section').remove();
+    var taxAmount = "{$totalTaxAmount}";
+    if (taxAmount) {
+      $('.total_amount-section').show();
+    }
+    else {
+      $('.total_amount-section').remove();
+    }
   }
 });
 </script>

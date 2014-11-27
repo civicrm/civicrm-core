@@ -49,7 +49,7 @@
         <label for="qa_email">{ts}Email:{/ts}</label>
     </div>
     <div>
-        <input type="text" name="email[1][email]" id="qa_email" class="form-text" maxlength="64" />
+        <input type="email" name="email[1][email]" id="qa_email" class="form-text" maxlength="64" />
     </div>
 
     <input type="hidden" name="email[1][location_type_id]" value="{$primaryLocationType}" />
@@ -61,7 +61,7 @@
     <input type="hidden" name="qfKey" value="{crmKey name='CRM_Contact_Form_Contact' addSequence=1}" />
 </div>
 
-<div class="form-item"><input type="submit" name="_qf_Contact_next" value="{ts}Save{/ts}" class="form-submit" /></div>
+<div class="form-item"><input type="submit" name="_qf_Contact_next" value="{ts}Save{/ts}" class="crm-form-submit" /></div>
 
 </form>
 </div>

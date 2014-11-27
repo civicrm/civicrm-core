@@ -157,7 +157,7 @@ class CRM_Utils_Geocode_Yahoo {
       $values['geo_code_1'] = $ret['latitude'];
       $values['geo_code_2'] = $ret['longitude'];
 
-      if ($ret['postal']) {
+      if (!empty($ret['postal'])) {
         $current_pc = CRM_Utils_Array::value('postal_code', $values);
         $skip_postal = FALSE;
 

@@ -100,6 +100,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     if ($this->_caseId) {
       $this->assign('caseId', $this->_caseId);
       $this->assign('countId', count($this->_caseId));
+      $this->assign('caseID', CRM_Utils_Array::first($this->_caseId));
     }
 
     if (!$this->_caseId ||
@@ -317,7 +318,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $this->add('select', 'medium_id', ts('Medium'), $encounterMediums, TRUE);
     $i = 0;
     foreach ($this->_caseId as $key => $val) {
-      $this->_relatedContacts[] = CRM_Case_BAO_Case::getRelatedAndGlobalContacts($val);
+      $this->_relatedContacts[] = $rgc = CRM_Case_BAO_Case::getRelatedAndGlobalContacts($val);
       $contName = CRM_Case_BAO_Case::getContactNames($val);
       foreach ($contName as $nkey => $nval) {
         array_push($this->_relatedContacts[$i][0] , $this->_relatedContacts[$i][0]['managerOf']= $nval['display_name']);
@@ -327,7 +328,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     //add case client in send a copy selector.CRM-4438.
     foreach ($this->_caseId as $key => $val) {
-      $relatedContacts[] = CRM_Case_BAO_Case::getContactNames($val);
+      $relatedContacts[] = $relCon= CRM_Case_BAO_Case::getContactNames($val);
     }
 
     if (!empty($relatedContacts)) {
@@ -348,6 +349,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       );
       $this->assign('searchRows', $this->_relatedContacts);
     }
+    $this->_relatedContacts = $rgc + $relCon;
 
     $this->addFormRule(array('CRM_Case_Form_Activity', 'formRule'), $this);
   }
@@ -598,9 +600,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       // update existing case record if needed
       $caseParams = $params;
       $caseParams['id'] = $vval['case_id'];
-      if (!empty($caseParams['case_type_id'])) {
-        $caseParams['case_type_id'] = CRM_Core_DAO::VALUE_SEPARATOR . $caseParams['case_type_id'] . CRM_Core_DAO::VALUE_SEPARATOR;
-      }
       if (!empty($caseParams['case_status_id'])) {
         $caseParams['status_id'] = $caseParams['case_status_id'];
       }

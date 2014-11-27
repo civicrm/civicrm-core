@@ -143,7 +143,9 @@ function civicrm_api3_profile_get($params) {
  */
 function _civicrm_api3_profile_get_spec(&$params) {
   $params['profile_id']['api.required'] = TRUE;
+  $params['profile_id']['title'] = 'Profile ID';
   $params['contact_id']['description'] = 'If no contact is specified an array of defaults will be returned';
+  $params['contact_id']['title'] = 'Contact ID';
 }
 
 /**
@@ -320,6 +322,7 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
     _civicrm_api3_buildprofile_submitfields(FALSE, FALSE, True);
   }
   $params['profile_id']['api.required'] = TRUE;
+  $params['profile_id']['title'] = 'Profile ID';
 }
 
 /**
@@ -690,7 +693,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
  *
  * @param $profileID
  *
- * @return array
+ * @return integer|string
  * @throws CiviCRM_API3_Exception
  */
 function _civicrm_api3_profile_getProfileID($profileID) {
@@ -728,4 +731,15 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
     $values['send_receipt'] = array('title' => 'Send Receipt', 'type' => (int) 16);
   }
   return $values;
+}
+
+/**
+ * @deprecated api notice
+ * @return array of deprecated actions
+ */
+function _civicrm_api3_profile_deprecation() {
+  return array(
+    'set' => 'Profile api "set" action is deprecated in favor of "submit".',
+    'apply' => 'Profile api "apply" action is deprecated in favor of "submit".',
+  );
 }

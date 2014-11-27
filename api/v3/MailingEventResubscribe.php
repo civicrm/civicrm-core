@@ -74,7 +74,10 @@ function civicrm_api3_mailing_event_resubscribe_create($params) {
  */
 function _civicrm_api3_mailing_event_resubscribe_create_spec(&$params) {
   $params['event_queue_id']['api.required'] = 1;
+  $params['event_queue_id']['title'] = 'Event Queue ID';
   $params['job_id']['api.required'] = 1;
+  $params['job_id']['title'] = 'Job ID';
   $params['hash']['api.required'] = 1;
+  $params['hash']['title'] = 'Hash';
 }
 

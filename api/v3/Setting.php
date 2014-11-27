@@ -42,8 +42,9 @@ function civicrm_api3_setting_getfields($params) {
         'title' => 'name of setting field',
         'api.required' => 1,
         'type' => CRM_Utils_Type::T_STRING),
-      'group' => array('title' => 'name of setting field',
+      'group' => array(
         'api.required' => 0,
+        'title' => 'Setting Group',
         'description' => 'Settings Group. This is required if the setting is not stored in config',
         'type' => CRM_Utils_Type::T_STRING)
       );
@@ -113,9 +114,10 @@ function civicrm_api3_setting_getdefaults(&$params){
  */
 function _civicrm_api3_setting_getdefaults_spec(&$params) {
   $params['domain_id'] = array(
-      'api.default' => 'current_domain',
-      'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain
-       an array or "all" are acceptable values for multiple domains'
+    'api.default' => 'current_domain',
+    'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain
+      an array or "all" are acceptable values for multiple domains',
+    'title' => 'Setting Domain',
   );
 }
 
@@ -150,7 +152,8 @@ function _civicrm_api3_setting_revert_spec(&$params) {
   $params['domain_id'] = array(
     'api.default' => 'current_domain',
     'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain
-       an array or "all" are acceptable values for multiple domains'
+      an array or "all" are acceptable values for multiple domains',
+    'title' => 'Setting Domain',
   );
 }
 
@@ -182,9 +185,10 @@ function _civicrm_api3_setting_fill_spec(&$params) {
   $params['name'] = array('title' => 'Setting Name belongs to');
   $params['component_id'] = array('title' => 'id of relevant component');
   $params['domain_id'] = array(
-      'api.default' => 'current_domain',
-      'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain
-       an array or "all" are acceptable values for multiple domains'
+    'api.default' => 'current_domain',
+    'title' => 'Setting Domain',
+    'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain
+      an array or "all" are acceptable values for multiple domains'
   );
 }
 
@@ -213,10 +217,12 @@ function civicrm_api3_setting_create($params) {
 function _civicrm_api3_setting_create_spec(&$params) {
   $params['domain_id'] = array(
     'api.default' => 'current_domain',
+    'title' => 'Setting Domain',
     'description' => 'if you do not pass in a domain id this will default to the current domain
       an array or "all" are acceptable values for multiple domains'
    );
    $params['group'] = array(
+     'title' => 'Setting Group',
      'description' => 'if you know the group defining it will make the api more efficient'
    )
   ;
@@ -225,7 +231,7 @@ function _civicrm_api3_setting_create_spec(&$params) {
 /**
  * Returns array of settings matching input parameters
  *
- * @param array $params  (referance) Array of one or more valid
+ * @param array $params Array of one or more valid
  *                       property_name=>value pairs.
  *
  * @return array Array of matching settings
@@ -235,7 +241,7 @@ function _civicrm_api3_setting_create_spec(&$params) {
 function civicrm_api3_setting_get($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result =   $result = CRM_Core_BAO_Setting::getItems($params, $domains, CRM_Utils_Array::value('return', $params, array()));
-  return civicrm_api3_create_success($result,$params,'setting','get');
+  return civicrm_api3_create_success($result, $params,'setting','get');
 }
 /**
  * Metadata for setting create function
@@ -244,11 +250,13 @@ function civicrm_api3_setting_get($params) {
  */
 function _civicrm_api3_setting_get_spec(&$params) {
   $params['domain_id'] = array(
-      'api.default' => 'current_domain',
-      'description' => 'if you do not pass in a domain id this will default to the current domain'
+    'api.default' => 'current_domain',
+    'title' => 'Setting Domain',
+    'description' => 'if you do not pass in a domain id this will default to the current domain'
   );
   $params['group'] = array(
-      'description' => 'if you know the group defining it will make the api more efficient'
+    'title' => 'Setting Group',
+    'description' => 'if you know the group defining it will make the api more efficient'
   )
   ;
 }
@@ -303,7 +311,8 @@ function _civicrm_api3_setting_getvalue_spec(&$params) {
       'title' => 'Contact Id',
   );
   $params['domain_id'] = array(
-      'description' => 'if you do not pass in a domain id this will default to the current domain'
+    'title' => 'Setting Domain',
+    'description' => 'if you do not pass in a domain id this will default to the current domain'
   );
 }
 

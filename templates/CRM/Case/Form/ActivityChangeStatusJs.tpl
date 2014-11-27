@@ -37,11 +37,11 @@
           caseId = $(this).attr('case_id'),
           data = 'snippet=1&reset=1',
           $el = $('<div class="crm-activity_change_status"></div>');
-        $el.block({theme:true});
+        $el.block();
 
         $el.load(CRM.url('civicrm/case/changeactivitystatus'), data, function() {
           $el.unblock().trigger('crmLoad');
-          cj("#activity_change_status").val(current_status_id);
+          $("#activity_change_status").val(current_status_id);
         });
 
         CRM.confirm({

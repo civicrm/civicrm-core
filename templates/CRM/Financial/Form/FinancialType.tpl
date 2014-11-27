@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting financial type  *}
-<h3>{if $action eq 1}{ts}New Financial Type{/ts}{elseif $action eq 2}{ts}Edit Financial Type{/ts}{else}{ts}Delete Financial Type{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-financial_type-form-block">
    {if $action eq 8}
       <div class="messages status">

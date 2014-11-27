@@ -1182,8 +1182,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $editUrl = "{$url}&action=update{$contextUrl}";
     $deleteUrl = "{$url}&action=delete{$contextUrl}";
     $restoreUrl = "{$url}&action=renew{$contextUrl}";
-    $viewTitle = ts('View this activity.');
-    $statusTitle = ts('Edit status');
+    $viewTitle = ts('View activity');
+    $statusTitle = ts('Edit Status');
 
     $emailActivityTypeIDs = array(
       'Email' => CRM_Core_OptionGroup::getValue('activity_type',
@@ -1307,10 +1307,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
       //check for operations.
       if (self::checkPermission($dao->id, 'Move To Case', $dao->activity_type_id)) {
-        $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'move\',' . $dao->id . ', ' . $caseID . ' ); return false;">' . ts('Move To Case') . '</a> ';
+        $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'move\',' . $dao->id . ', ' . $caseID . ', this ); return false;">' . ts('Move To Case') . '</a> ';
       }
       if (self::checkPermission($dao->id, 'Copy To Case', $dao->activity_type_id)) {
-        $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'copy\',' . $dao->id . ',' . $caseID . ' ); return false;">' . ts('Copy To Case') . '</a> ';
+        $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'copy\',' . $dao->id . ',' . $caseID . ', this ); return false;">' . ts('Copy To Case') . '</a> ';
       }
       // if there are file attachments we will return how many and, if only one, add a link to it
       if (!empty($dao->attachment_ids)) {
@@ -1375,13 +1375,18 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    */
   static function getRelatedContacts($caseID, $skipDetails = FALSE) {
     $values = array();
-    $query = 'SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, crt.label_b_a as role, ce.email
- FROM civicrm_relationship cr
- LEFT JOIN civicrm_relationship_type crt ON crt.id = cr.relationship_type_id
- LEFT JOIN civicrm_contact cc ON cc.id = cr.contact_id_b
- LEFT JOIN civicrm_email   ce ON ce.contact_id = cc.id
- WHERE cr.case_id =  %1 AND ce.is_primary= 1
- GROUP BY cc.id';
+    $query = '
+      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, crt.label_b_a as role, ce.email
+      FROM civicrm_relationship cr
+      LEFT JOIN civicrm_relationship_type crt
+        ON crt.id = cr.relationship_type_id
+      LEFT JOIN civicrm_contact cc
+        ON cc.id = cr.contact_id_b
+      LEFT JOIN civicrm_email ce
+        ON ce.contact_id = cc.id
+        AND ce.is_primary= 1
+      WHERE cr.case_id =  %1
+      GROUP BY cc.id';
 
     $params = array(1 => array($caseID, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
@@ -2038,9 +2043,9 @@ SELECT civicrm_contact.id as casemanager_id,
    *
    * @return array of case and related data keyed on case id
    */
-  static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE) {
+  static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE, $includeClosed = FALSE) {
     //params from ajax call.
-    $where = array('( ca.end_date is null )');
+    $where = array($includeClosed ? '(1)' : '(ca.end_date is null)');
     if ($caseType = CRM_Utils_Array::value('case_type', $params)) {
       $where[] = "( civicrm_case_type.title LIKE '%$caseType%' )";
     }
@@ -2048,6 +2053,9 @@ SELECT civicrm_contact.id as casemanager_id,
       $config = CRM_Core_Config::singleton();
       $search = ($config->includeWildCardInName) ? "%$sortName%" : "$sortName%";
       $where[] = "( sort_name LIKE '$search' )";
+    }
+    if ($cid = CRM_Utils_Array::value('contact_id', $params)) {
+      $where[] = " c.id = $cid ";
     }
     if (is_array($excludeCaseIds) &&
       !CRM_Utils_System::isNull($excludeCaseIds)
@@ -2079,15 +2087,19 @@ SELECT civicrm_contact.id as casemanager_id,
             ca.id,
             ca.subject as case_subject,
             civicrm_case_type.title as case_type,
-            ca.start_date as start_date
+            ca.start_date as start_date,
+            ca.end_date as end_date,
+            ca.status_id
       FROM  civicrm_case ca INNER JOIN civicrm_case_contact cc ON ca.id=cc.case_id
  INNER JOIN  civicrm_contact c ON cc.contact_id=c.id
  INNER JOIN  civicrm_case_type ON ca.case_type_id = civicrm_case_type.id
      WHERE  {$whereClause}
-  ORDER BY  c.sort_name
+  ORDER BY  c.sort_name, ca.end_date
             {$limitClause}
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
+    $statuses = CRM_Case_BAO_Case::buildOptions('status_id', 'create');
+
     $unclosedCases = array();
     while ($dao->fetch()) {
       if ($doFilterCases && !array_key_exists($dao->id, $filterCases)) {
@@ -2098,7 +2110,9 @@ SELECT civicrm_contact.id as casemanager_id,
         'case_type' => $dao->case_type,
         'contact_id' => $dao->contact_id,
         'start_date' => $dao->start_date,
+        'end_date' => $dao->end_date,
         'case_subject' => $dao->case_subject,
+        'case_status' => $statuses[$dao->status_id],
       );
     }
     $dao->free();

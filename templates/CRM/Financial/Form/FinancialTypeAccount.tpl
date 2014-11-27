@@ -24,11 +24,10 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting financial type  *}
-<h3>{if $action eq 8}{ts}Delete Financial Type Account{/ts}{elseif $action eq 1}{ts}Add New Financial Type Account{/ts}{elseif $action eq 2}{ts}Edit Financial Type Account{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-financial_type-form-block">
   {if $action eq 8}
     <div class="messages status">
-      <div class="icon inform-icon"></div>    
+      <div class="icon inform-icon"></div>
       {ts}WARNING: You cannot delete a financial type if it is currently used by any Contributions, Contribution Pages or Membership Types. Consider disabling this option instead.{/ts} {ts}Deleting a financial type cannot be undone. Unbalanced transactions may be created if you delete this account.{/ts} {ts}Do you want to continue?{/ts}
       </div>
   {else}

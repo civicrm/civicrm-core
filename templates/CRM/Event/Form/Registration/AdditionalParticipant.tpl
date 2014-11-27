@@ -79,7 +79,7 @@
 
 function allowGroupOnWaitlist( participantCount, currentCount )
 {
-  var formId          = {/literal}'{$formId}'{literal};
+  var formId          = {/literal}'{$formName}'{literal};
   var waitingMsg      = {/literal}'{$waitingMsg}'{literal};
   var confirmedMsg    = {/literal}'{$confirmedMsg}'{literal};
   var paymentBypassed = {/literal}'{$paymentBypassed}'{literal};

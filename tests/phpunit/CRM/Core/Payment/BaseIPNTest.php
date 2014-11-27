@@ -65,7 +65,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();
     $this->input = $this->ids = $this->objects = array();
-    $this->IPN = new CRM_Core_Payment_AuthorizeNetIPN();
+    $this->IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->input);
 
     $this->_contactId = $this->individualCreate();
     $this->ids['contact'] = $this->_contactId;

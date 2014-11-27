@@ -50,7 +50,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
-    $validStrings = array();
+    $validateStrings = array();
 
     $fields = array(
       'Full Conference' => 'Text',
@@ -59,7 +59,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
       'Evening Sessions' => 'CheckBox',
     );
     $this->_testAddPriceFields($fields, $validateStrings);
-    // var_dump($validateStrings);
 
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
@@ -88,7 +87,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom');
   }
 
   /**
@@ -97,6 +96,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
    * @param bool $dateSpecificFields
    */
   function _testAddPriceFields(&$fields, &$validateStrings, $dateSpecificFields = FALSE) {
+    $this->clickLinkSuppressPopup('newPriceField');
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
 
@@ -148,7 +148,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
             ),
           );
           $this->addMultipleChoiceOptions($options, $validateStrings);
-          $this->check('is_required');
+          $this->click('is_required');
           if ($dateSpecificFields == TRUE) {
             $this->webtestFillDateTime('active_on', '-1 week');
           }
@@ -176,6 +176,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
           break;
       }
       $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
+      $this->waitForText('crm-notification-container', "Price Field '".$label."' has been saved.");
     }
   }
 
@@ -221,8 +222,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
@@ -275,6 +276,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->check('is_online_registration');
     $this->assertChecked('is_online_registration');
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField('intro_text', $registerIntro);
 
     // enable confirmation email
@@ -381,8 +383,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
@@ -435,6 +437,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->check('is_online_registration');
     $this->assertChecked('is_online_registration');
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField('intro_text', $registerIntro);
 
     // enable confirmation email
@@ -454,9 +457,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestAddContact($firstName, 'Anderson', TRUE);
-    $contactName = "Anderson, $firstName";
-    $displayName = "$firstName Anderson";
+    $lastName = 'Anderson'. substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, $lastName, TRUE);
+    $contactName = "$lastName, $firstName";
+    $displayName = "$firstName $lastName";
 
     $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone', '_qf_Participant_upload-bottom');
 
@@ -468,6 +472,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Select role
     $this->multiselect2('role_id', array('Volunteer'));
 
+    $this->waitForElementPresent("xpath=//input[@class='crm-form-radio']");
     $this->click("xpath=//input[@class='crm-form-radio']");
     $this->click("xpath=//input[@class='crm-form-checkbox']");
 
@@ -508,9 +513,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
-    $this->webtestAddContact($firstName, 'Anderson', TRUE);
-    $contactName = "Anderson, $firstName";
-    $displayName = "$firstName Anderson";
+    $lastName = 'Anderson'. substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, $lastName, TRUE);
+    $contactName = "$lastName, $firstName";
+    $displayName = "$firstName $lastName";
 
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
     $usedFor = 'Event';
@@ -594,9 +600,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('source', 'Event StandaloneAddTest Webtest');
 
     // Select an event fee
-    $this->waitForElementPresent('priceset');
-    $this->type("//div[@id='priceset']/div[2]/div[2]/input", '5');
-    $this->fireEvent("//div[@id='priceset']/div[2]/div[2]/input", 'blur');
+    $this->waitForElementPresent("xpath=//div[@id='priceset']/div[2]/div[2]");
+    $this->type("xpath=//div[@id='priceset']/div[2]/div[2]/input", '5');
+    $this->fireEvent("xpath=//div[@id='priceset']/div[2]/div[2]/input", 'blur');
+    $this->waitForElementPresent("xpath=//div[@id='priceset']/div[3]/div[2]/div[1]/span/input");
     $this->click("xpath=//div[@id='priceset']/div[3]/div[2]/div[1]/span/input");
     $this->click("xpath=//div[@id='priceset']/div[4]/div[2]/div[1]/span/input");
     $this->click("xpath=//div[@id='priceset']/div[4]/div[2]/div[2]/span/input");
@@ -611,7 +618,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText("css=#crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
+    $this->waitForText("crm-notification-container", "Event registration for $displayName has been added");
 
     $this->waitForElementPresent("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
@@ -666,10 +673,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         'Contribution Status' => 'Completed',
         'Paid By' => 'Check',
         'Check Number' => '1044',
-        'Total Amount' => '$ 2,705.00',
         'Received Into' => 'Deposit Bank Account',
       )
     );
+    $this->verifyText("xpath=//td[text()='Contribution Amount']/following-sibling::td//div/div", preg_quote('Contribution Total: $ 2,705.00'));
   }
 
 
@@ -719,13 +726,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
     //check the delete for price field
     $this->openCiviPage("admin/price/field", "reset=1&action=browse&sid={$sid}");
-    $this->click("xpath=//table[@id='option11']/tbody/tr/td[9]/span[2]/ul/li[2]/a");
-    // Check confirmation alert.
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to delete this price field?/",
-      $this->getConfirmation()
-    ));
-    $this->chooseOkOnNextConfirmation();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("xpath=//table[@id='options']/tbody/tr/td[9]/span[2]/ul/li[2]/a");
     //assert the message
     $this->waitForText('price_set_used_by',
       "it is currently in use by one or more active events or contribution pages or contributions or event templates.");

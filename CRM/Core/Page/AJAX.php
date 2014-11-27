@@ -126,9 +126,7 @@ class CRM_Core_Page_AJAX {
     if (!$result) {
       $priceSetId = null;
     }
-    echo json_encode($priceSetId);
-
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($priceSetId);
   }
 
   /**
@@ -197,6 +195,17 @@ class CRM_Core_Page_AJAX {
     }
     echo $output;
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Set headers appropriate for a js file
+   */
+  static function setJsHeaders() {
+    // Encourage browsers to cache for a long time - 1 year
+    $year = 60*60*24*364;
+    header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
+    header('Content-Type:	application/javascript');
+    header("Cache-Control: max-age=$year, public");
   }
 
   /**

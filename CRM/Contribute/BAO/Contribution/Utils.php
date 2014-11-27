@@ -46,8 +46,13 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @param int $contributionTypeId financial type id
    * @param int|string $component component id
    *
-   * @param null $fieldTypes
+   * @param array $fieldTypes presumably relates to custom field types - used when building data for sendMail
    *
+   * @param $isTest
+   * @param $isPayLater
+   *
+   * @throws CRM_Core_Exception
+   * @throws Exception
    * @return array associated array
    *
    * @static
@@ -59,40 +64,34 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $contactID,
     $contributionTypeId,
     $component = 'contribution',
-    $fieldTypes = NULL
+    $fieldTypes = NULL,
+    $isTest,
+    $isPayLater
   ) {
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
-    $isTest = ($form->_mode == 'test') ? 1 : 0;
     $lineItems = $form->_lineItem;
+    $isPaymentTransaction = self::isPaymentTransaction($form);
 
     $contributionType = new CRM_Financial_DAO_FinancialType();
-    if (isset($paymentParams['financial_type'])) {
-      $contributionType->id = $paymentParams['financial_type'];
-    }
-    elseif (!empty($form->_values['pledge_id'])) {
-      $contributionType->id = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
-        $form->_values['pledge_id'],
-        'financial_type_id'
-      );
-    }
-    else {
-      $contributionType->id = $contributionTypeId;
-    }
+    $contributionType->id = $contributionTypeId;
     if (!$contributionType->find(TRUE)) {
+      //@todo - surely this check was part of the 4.3 upgrade & can go now?
       CRM_Core_Error::fatal('Could not find a system table');
     }
 
     // add some financial type details to the params list
     // if folks need to use it
-    $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $contributionType->name;
+    //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
+    $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $contributionType->name;
     //CRM-11456
-    $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionType->id);
+    $paymentParams['financialType_accounting_code'] =  $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionTypeId);
     $paymentParams['contributionPageID'] = $form->_params['contributionPageID'] = $form->_values['id'];
 
 
     $payment = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
-    if ($form->_values['is_monetary'] && $form->_amount > 0.0 && is_array($form->_paymentProcessor)) {
+
+    if ($isPaymentTransaction) {
       $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
     }
 
@@ -101,7 +100,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
     $result = NULL;
     if ($form->_contributeMode == 'notify' ||
-      $form->_params['is_pay_later']
+      $isPayLater
     ) {
       // this is not going to come back, i.e. we fill in the other details
       // when we get a callback from the payment processor
@@ -122,7 +121,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->_params['contributionID'] = $contribution->id;
       }
 
-      $form->_params['contributionTypeID'] = $contributionType->id;
+      $form->_params['contributionTypeID'] = $contributionTypeId;
       $form->_params['item_name'] = $form->_params['description'];
       $form->_params['receive_date'] = $now;
 
@@ -135,7 +134,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->set('params', $form->_params);
       $form->postProcessPremium($premiumParams, $contribution);
 
-      if ($form->_values['is_monetary'] && $form->_amount > 0.0) {
+      if ($isPaymentTransaction) {
         // add qfKey so we can send to paypal
         $form->_params['qfKey'] = $form->controller->_key;
         if ($component == 'membership') {
@@ -143,12 +142,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
           return $membershipResult;
         }
         else {
-          if (!$form->_params['is_pay_later']) {
+          if (!$isPayLater) {
             if (is_object($payment)) {
-              // call postprocess hook before leaving
+              // call postProcess hook before leaving
               $form->postProcessHook();
               // this does not return
-              $result = &$payment->doTransferCheckout($form->_params, 'contribute');
+              $result = $payment->doTransferCheckout($form->_params, 'contribute');
             }
             else{
               CRM_Core_Error::fatal($paymentObjError);
@@ -205,7 +204,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
       }
     }
-    elseif ($form->_values['is_monetary'] && $form->_amount > 0.0) {
+    elseif ($isPaymentTransaction) {
       if (!empty($paymentParams['is_recur']) &&
         $form->_contributeMode == 'direct'
       ) {
@@ -246,7 +245,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
 
         $paymentParams['contributionID'] = $contribution->id;
-        $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
+        //CRM-15297 deprecate contributionTypeID
+        $paymentParams['financialTypeID'] = $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
         $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
 
         if ($form->_values['is_recur'] && $contribution->contribution_recur_id) {
@@ -267,6 +267,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
     if (is_a($result, 'CRM_Core_Error')) {
       //make sure to cleanup db for recurring case.
+      //@todo this clean up has always been controversial as many orgs prefer to see failed transactions.
+      // most recent discussion has been that they should be retained and this could be altered
       if (!empty($paymentParams['contributionID'])) {
         CRM_Contribute_BAO_Contribution::deleteContribution($paymentParams['contributionID']);
       }
@@ -295,6 +297,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       // result has all the stuff we need
       // lets archive it to a financial transaction
+      //@todo - this is done in 2 places - can't we just do it once straight after retrieving contribution type -
+      // when would this be a bad thing?
       if ($contributionType->is_deductible) {
         $form->assign('is_deductible', TRUE);
         $form->set('is_deductible', TRUE);
@@ -319,7 +323,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
         );
       }
       $form->postProcessPremium($premiumParams, $contribution);
-
+      if (is_array($result) && !empty($result['trxn_id'])) {
+        $contribution->trxn_id = $result['trxn_id'];
+      }
       $membershipResult[1] = $contribution;
     }
 
@@ -349,6 +355,21 @@ class CRM_Contribute_BAO_Contribution_Utils {
   }
   }
 
+  /**
+   * Is a payment being made.
+   * Note that setting is_monetary on the form is somewhat legacy and the behaviour around this setting is confusing. It would be preferable
+   * to look for the amount only (assuming this cannot refer to payment in goats or other non-monetary currency
+   * @param $form
+   *
+   * @return bool
+   */
+  static protected function isPaymentTransaction($form) {
+    if(!empty($form->_values['is_monetary']) && $form->_amount >= 0.0) {
+      return TRUE;
+    }
+    return FALSE;
+
+  }
   /**
    * Function to get the contribution details by month
    * of the year
@@ -859,6 +880,25 @@ LIMIT 1
       $_cache[$contactID] = $details;
     }
     return $_cache[$contactID];
+  }
+
+  /**
+   * Calculate the tax amount based on given tax rate.
+   *
+   * @param float $amount amount of field.
+   * @param float $taxRate tax rate of selected financial account for field.
+   *
+   * @return array array of tax amount
+   *
+   * @access public
+   * @static
+   *
+   */
+  public static function calculateTaxAmount($amount, $taxRate) {
+    $taxAmount = array();
+    $taxAmount['tax_amount'] = ($taxRate/100) * CRM_Utils_Rule::cleanMoney($amount);
+
+    return $taxAmount;
   }
 }
 

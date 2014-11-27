@@ -74,10 +74,10 @@ class CRM_Case_BAO_Query {
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['civicrm_case_type'])) {
+    if (!empty($query->_returnProperties['case_type'])) {
       $query->_select['case_type'] = "civicrm_case_type.title as case_type";
       $query->_element['case_type'] = 1;
-      $query->_tables['civicrm_case_type'] = $query->_whereTables['civicrm_case_type'] = 1;
+      $query->_tables['case_type'] = $query->_whereTables['case_type'] = 1;
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
     }
 
@@ -260,7 +260,7 @@ class CRM_Case_BAO_Query {
       case 'case_status_id':
         $statuses = CRM_Case_PseudoConstant::caseStatus();
         // Standardize input from checkboxes or single value
-        if (is_array($value)) {
+        if (is_array($value) && $query->_mode == CRM_Contact_BAO_Query::MODE_CASE) {
           $value = array_keys($value, 1);
         }
         foreach ((array) $value as $k) {
@@ -275,12 +275,16 @@ class CRM_Case_BAO_Query {
         }
         if ($val) {
           $query->_where[$grouping][] = "civicrm_case.status_id IN (" . implode(',', $val) . ")";
-          $query->_qill[$grouping][] = ts('Case Status is %1', array(1 => implode(' ' . ts('or') . ' ', $names)));
-          $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
         }
+        else {
+          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_case.status_id', $op, $value, "Integer");
+        }
+        $query->_qill[$grouping][] = ts('Case Status is %1', array(1 => implode(' ' . ts('or') . ' ', $names)));
+        $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
         return;
 
       case 'case_type_id':
+      case 'case_type':
         $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
 
         if (is_array($value)) {
@@ -300,7 +304,12 @@ class CRM_Case_BAO_Query {
           $names[] = $caseTypes[$caseTypeId];
         }
 
-        $query->_where[$grouping][] = "(civicrm_case.case_type_id IN (" . implode(',', $val) . "))";
+        if ($val) {
+          $query->_where[$grouping][] = "(civicrm_case.case_type_id IN (" . implode(',', $val) . "))";
+        }
+        else {
+          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_case.case_type_id', $op, $value, "Integer");
+        }
 
         $query->_qill[$grouping][] = ts('Case Type is %1', array(1 => implode(' ' . ts('or') . ' ', $names)));
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;

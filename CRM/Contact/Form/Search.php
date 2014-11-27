@@ -337,7 +337,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setAttribute('class', 'crm-search-form crm-ajax-selection-form');
     CRM_Core_Resources::singleton()
       // jsTree is needed for tags popup
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
@@ -381,10 +380,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $url = CRM_Utils_System::makeURL('qfKey') . $formQFKey;
         CRM_Utils_System::redirect($url);
       }
+      $permissionForGroup = FALSE;
 
       if (!empty($this->_groupID)) {
-        $permissionForGroup = FALSE;
-
         // check if user has permission to edit members of this group
         $permission = CRM_Contact_BAO_Group::checkPermission($this->_groupID);
         if ($permission && in_array(CRM_Core_Permission::EDIT, $permission)) {
@@ -394,12 +392,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         // check if _groupID exists, it might not if
         // we are displaying a hidden group
         if (!isset($this->_group[$this->_groupID])) {
-          $permissionForGroup = FALSE;
           $this->_group[$this->_groupID] =
             CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'title');
         }
-
-        $this->assign('permissionedForGroup', $permissionForGroup);
 
         // set the group title
         $groupValues = array('id' => $this->_groupID, 'title' => $this->_group[$this->_groupID]);
@@ -430,7 +425,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'group_contact_status', ts('Group Status')
       );
 
-      $this->assign('permissionedForGroup', FALSE);
+      $this->assign('permissionedForGroup', $permissionForGroup);
     }
 
     // add the go button for the action form, note it is of type 'next' rather than of type 'submit'
@@ -450,16 +445,24 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->assign_by_ref('group', $groupValues);
       $this->add('submit', $this->_actionButtonName, ts('Add Contacts to %1', array(1 => $this->_group[$this->_amtgID])),
         array(
-          'class' => 'form-submit',
+          'class' => 'crm-form-submit',
         )
       );
       $this->add('hidden', 'task', CRM_Contact_Task::GROUP_CONTACTS);
+      $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
+      $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all');
+      $this->assign('ts_sel_id', $selectedRowsRadio->_attributes['id']);
+      $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
     }
     else {
       $this->addTaskMenu($tasks);
     }
 
-    if ($qfKeyParam = CRM_Utils_Array::value('qfKey', $this->_formValues)) {
+    $selectedContactIds = array();
+    $qfKeyParam = CRM_Utils_Array::value('qfKey', $this->_formValues);
+    // We use ajax to handle selections only if the search results component_mode is set to "contacts"
+    if ($qfKeyParam && ($this->get('component_mode') <= 1 || $this->get('component_mode') == 7)) {
+      $this->addClass('crm-ajax-selection-form');
       $qfKeyParam = "civicrm search {$qfKeyParam}";
       $selectedContactIdsArr = CRM_Core_BAO_PrevNextCache::getSelection($qfKeyParam);
       $selectedContactIds = array_keys($selectedContactIdsArr[$qfKeyParam]);

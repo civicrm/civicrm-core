@@ -20,10 +20,10 @@ logCPS=CPSTestResult
 create_log()
 {
     cd $ORIGPWD/../test/
-    
-    PATH4LOG=`pwd` 
-    
-    if [ ! -d "Result" ] ; then 
+
+    PATH4LOG=`pwd`
+
+    if [ ! -d "Result" ] ; then
 	mkdir Result
     fi
 }
@@ -41,7 +41,7 @@ run_cpsTest()
 {
     cd $ORIGPWD/../test/selenium-ruby/CPS
     # Running Selenium (ruby) Tests
-    ruby test_cps_personal.rb 
+    ruby test_cps_personal.rb
 }
 ###########################################################
 ##

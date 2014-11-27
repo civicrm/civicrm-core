@@ -266,20 +266,22 @@ class CRM_Activity_Page_AJAX {
       // edit links
       $row['actions'] = '';
       if ($hasAccessToAllCases) {
-        switch($row['source']){
+        $contactType = empty($row['relation_type']) ? '' : (string) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $row['relation_type'], 'contact_type_b');
+        $contactType = $contactType == 'Contact' ? '' : $contactType;
+        switch($row['source']) {
         case 'caseRel':
           $row['actions'] =
-            '<a href="#editCaseRoleDialog" title="'. ts('Reassign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'. $row['relation_type'] .'" data-rel_id="'. $row['rel_id'] .'"data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
+            '<a href="#editCaseRoleDialog" title="'. ts('Reassign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="'. $row['relation_type'] .'" data-rel_id="'. $row['rel_id'] .'"data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
               '<span class="icon edit-icon"></span>'.
             '</a>'.
-            '<a href="#deleteCaseRoleDialog" title="'. ts('Remove %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'.$row['relation_type'].'" data-key="'. CRM_Core_Key::get('civicrm/ajax/delcaserole') .'">'.
+            '<a href="#deleteCaseRoleDialog" title="'. ts('Remove %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="'.$row['relation_type'].'" data-key="'. CRM_Core_Key::get('civicrm/ajax/delcaserole') .'">'.
               '<span class="icon delete-icon"></span>'.
             '</a>';
           break;
 
         case 'caseRoles':
           $row['actions'] =
-            '<a href="#editCaseRoleDialog" title="'. ts('Assign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'. $row['relation_type'] .'" data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
+            '<a href="#editCaseRoleDialog" title="'. ts('Assign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="'. $row['relation_type'] .'" data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
               '<span class="icon edit-icon"></span>'.
             '</a>';
           break;
@@ -296,14 +298,12 @@ class CRM_Activity_Page_AJAX {
 
   static function convertToCaseActivity() {
     $params = array('caseID', 'activityID', 'contactID', 'newSubject', 'targetContactIds', 'mode');
+    $vals = array();
     foreach ($params as $param) {
       $vals[$param] = CRM_Utils_Array::value($param, $_POST);
     }
 
-    $retval = self::_convertToCaseActivity($vals);
-
-    echo json_encode($retval);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(self::_convertToCaseActivity($vals));
   }
 
   /**
@@ -458,6 +458,18 @@ class CRM_Activity_Page_AJAX {
 
     // get the contact activities
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($params);
+
+    foreach ($activities as $key => $value) {
+      //Check if recurring activity
+      if (CRM_Utils_Array::value('is_recurring_activity', $value)) {
+        if ($key == $value['is_recurring_activity']) {
+          $activities[$key]['activity_type'] = $activities[$key]['activity_type'].'<br/><span class="bold">Recurring Activity - (Parent)</span>';
+        }
+        else {
+          $activities[$key]['activity_type'] = $activities[$key]['activity_type'].'<br/><span class="bold">Recurring Activity - (Child)</span>';
+        }
+      }
+    }
 
     // store the activity filter preference CRM-11761
     $session = CRM_Core_Session::singleton();

@@ -75,17 +75,15 @@
         </table>
         {/strip}
 
-        {if !($action eq 1 and $action eq 2)}
-            <div class="action-link">
-              <a href="{crmURL q="action=add&reset=1"}" class="button newRelationshipType"><span><div class="icon add-icon"></div>{ts}Add Relationship Type{/ts}</span></a>
-            </div>
-        {/if}
 </div>
 {else}
     <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
-        {capture assign=crmURL}{crmURL p='civicrm/admin/reltype' q="action=add&reset=1"}{/capture}
-        {ts 1=$crmURL}There are no relationship types present. You can <a href='%1'>add one</a>.{/ts}
+      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+      {ts}None found.{/ts}
     </div>
 {/if}
+  <div class="action-link">
+    <a href="{crmURL q="action=add&reset=1"}" class="button newRelationshipType"><span><div class="icon add-icon"></div>{ts}Add Relationship Type{/ts}</span></a>
+    <a href="{crmURL p="civicrm/admin" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
+  </div>
 {/if}

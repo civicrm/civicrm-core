@@ -40,7 +40,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
     parent::__construct($formValues);
 
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Address') => 'address',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
@@ -52,8 +52,8 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
    * @param $form
    */
   function buildForm(&$form) {
-    $groups = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::allGroup();
-    $form->addElement('select', 'group_id', ts('Group'), $groups);
+    $groups = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup(FALSE);
+    $form->addElement('select', 'group_id', ts('Group'), $groups, array('class' => 'crm-select2 huge'));
 
     /**
      * if you are using the standard template, this array tells the template what elements

@@ -88,10 +88,10 @@ abstract class CRM_Core_Payment {
    *
    * @param string  $mode the mode of operation: live or test
    * @param array  $paymentProcessor the details of the payment processor being invoked
-   * @param object  $paymentForm      reference to the form object if available
+   * @param object $paymentForm deprecated - avoid referring to this if possible. If you have to use it document why as this is scary interaction
    * @param boolean $force            should we force a reload of this payment object
    *
-   * @return object
+   * @return CRM_Core_Payment
    * @static
    *
    */
@@ -103,6 +103,7 @@ abstract class CRM_Core_Payment {
     }
 
     $cacheKey = "{$mode}_{$paymentProcessor['id']}_" . (int)isset($paymentForm);
+
     if (!isset(self::$_singleton[$cacheKey]) || $force) {
       $config = CRM_Core_Config::singleton();
       $ext = CRM_Extension_System::singleton()->getMapper();
@@ -112,6 +113,9 @@ abstract class CRM_Core_Payment {
       }
       else {
         $paymentClass = 'CRM_Core_' . $paymentProcessor['class_name'];
+        if (empty($paymentClass)) {
+          throw new CRM_Core_Exception('no class provided');
+        }
         require_once (str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php');
       }
 
@@ -120,9 +124,9 @@ abstract class CRM_Core_Payment {
     }
 
     //load the payment form for required processor.
-    if ($paymentForm !== NULL) {
-      self::$_singleton[$cacheKey]->setForm($paymentForm);
-    }
+    //if ($paymentForm !== NULL) {
+      //self::$_singleton[$cacheKey]->setForm($paymentForm);
+    //}
 
     return self::$_singleton[$cacheKey];
   }
@@ -143,6 +147,51 @@ abstract class CRM_Core_Payment {
 
     $log = new CRM_Utils_SystemLogger();
     $log->alert($message, $_REQUEST);
+  }
+
+  /**
+   * check if capability is supported
+   * @param string $capability e.g BackOffice, LiveMode, FutureRecurStartDate
+   *
+   * @return bool
+   */
+  public function supports($capability) {
+    $function = 'supports' . ucfirst($capability);
+    if (method_exists($this, $function)) {
+      return $this->$function();
+    }
+    return FALSE;
+  }
+
+  /**
+   * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * The intention is to support off-site (other than paypal) & direct debit but that is not all working yet so to reach a 'stable' point we disable
+   * @return bool
+   */
+  protected function supportsBackOffice() {
+    if ($this->_paymentProcessor['billing_mode'] == 4 || $this->_paymentProcessor['payment_type'] != 1) {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
+  }
+
+  /**
+   * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * @return bool
+   */
+  protected function supportsLiveMode() {
+    return TRUE;
+  }
+
+  /**
+   * should the first payment date be configurable when setting up back office recurring payments
+   * We set this to false for historical consistency but in fact most new processors use tokens for recurring and can support this
+   * @return bool
+   */
+  protected function supportsFutureRecurStartDate() {
+    return FALSE;
   }
 
   /**
@@ -167,9 +216,203 @@ abstract class CRM_Core_Payment {
   /**
    * Getter for accessing member vars
    *
+   * @param $name
+   *
+   * @return null
    */
   function getVar($name) {
     return isset($this->$name) ? $this->$name : NULL;
+  }
+
+  /**
+   * get name for the payment information type
+   *
+   * @return string
+   */
+  public function getPaymentTypeName() {
+    return $this->_paymentProcessor['payment_type'] == 1 ? 'credit_card' : 'direct_debit';
+  }
+
+  /**
+   * get label for the payment information type
+   *
+   * @return string
+   */
+  public function getPaymentTypeLabel() {
+    return $this->_paymentProcessor['payment_type'] == 1 ? 'Credit Card' : 'Direct Debit';
+  }
+
+  /**
+   * get array of fields that should be displayed on the payment form
+   * @todo make payment type an option value & use it in the function name - currently on debit & credit card work
+   * @return array
+   * @throws CiviCRM_API3_Exception
+   */
+  public function getPaymentFormFields() {
+    if ($this->_paymentProcessor['billing_mode'] == 4) {
+      return array();
+    }
+    return $this->_paymentProcessor['payment_type'] == 1 ? $this->getCreditCardFormFields() : $this->getDirectDebitFormFields();
+  }
+
+  /**
+   * get array of fields that should be displayed on the payment form for credit cards
+   *
+   * @return array
+   */
+  protected function getCreditCardFormFields() {
+    return array(
+      'credit_card_type',
+      'credit_card_number',
+      'cvv2',
+      'credit_card_exp_date',
+    );
+  }
+
+  /**
+   * get array of fields that should be displayed on the payment form for direct debits
+   *
+   * @return array
+   */
+  protected function getDirectDebitFormFields() {
+    return array(
+      'account_holder',
+      'bank_account_number',
+      'bank_identification_number',
+      'bank_name',
+    );
+  }
+
+  /**
+   * return an array of all the details about the fields potentially required for payment fields
+   * Only those determined by getPaymentFormFields will actually be assigned to the form
+   *
+   * @return array field metadata
+   */
+  public function getPaymentFormFieldsMetadata() {
+    //@todo convert credit card type into an option value
+    $creditCardType = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::creditCard();
+    return array(
+      'credit_card_number' => array(
+        'htmlType' => 'text',
+        'name' => 'credit_card_number',
+        'title' => ts('Card Number'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 20,
+          'autocomplete' => 'off'
+        ),
+        'is_required' => TRUE,
+      ),
+      'cvv2' => array(
+        'htmlType' => 'text',
+        'name' => 'cvv2',
+        'title' => ts('Security Code'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 5,
+          'maxlength' => 10,
+          'autocomplete' => 'off'
+        ),
+        'is_required' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
+          'cvv_backoffice_required',
+          NULL,
+          1
+        ),
+        'rules' => array(
+          array(
+            'rule_message' => ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),
+            'rule_name' => 'integer',
+            'rule_parameters' => NULL,
+        )),
+      ),
+      'credit_card_exp_date' => array(
+        'htmlType' => 'date',
+        'name' => 'credit_card_exp_date',
+        'title' => ts('Expiration Date'),
+        'cc_field' => TRUE,
+        'attributes' => CRM_Core_SelectValues::date('creditCard'),
+        'is_required' => TRUE,
+        'rules' => array(
+          array(
+            'rule_message' => ts('Card expiration date cannot be a past date.'),
+            'rule_name' => 'currentDate',
+            'rule_parameters' => TRUE,
+          )),
+      ),
+      'credit_card_type' => array(
+        'htmlType' => 'select',
+        'name' => 'credit_card_type',
+        'title' => ts('Card Type'),
+        'cc_field' => TRUE,
+        'attributes' => $creditCardType,
+        'is_required' => FALSE,
+      ),
+      'account_holder' => array(
+        'htmlType' => 'text',
+        'name' => 'account_holder',
+        'title' => ts('Account Holder'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 34,
+          'autocomplete' => 'on'
+        ),
+        'is_required' => TRUE,
+      ),
+      //e.g. IBAN can have maxlength of 34 digits
+      'bank_account_number' => array(
+        'htmlType' => 'text',
+        'name' => 'bank_account_number',
+        'title' => ts('Bank Account Number'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 34,
+          'autocomplete' => 'off'
+        ),
+        'rules' => array(
+          array(
+            'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
+            'rule_name' => 'nopunctuation',
+            'rule_parameters' => NULL,
+        )),
+        'is_required' => TRUE,
+      ),
+      //e.g. SWIFT-BIC can have maxlength of 11 digits
+      'bank_identification_number' => array(
+        'htmlType' => 'text',
+        'name' => 'bank_identification_number',
+        'title' => ts('Bank Identification Number'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 11,
+          'autocomplete' => 'off'
+        ),
+        'is_required' => TRUE,
+        'rules' => array(
+          array(
+            'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
+            'rule_name' => 'nopunctuation',
+            'rule_parameters' => NULL,
+        )),
+      ),
+      'bank_name' => array(
+        'htmlType' => 'text',
+        'name' => 'bank_name',
+        'title' => ts('Bank Name'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 64,
+          'autocomplete' => 'off'
+        ),
+        'is_required' => TRUE,
+
+      )
+    );
   }
 
   /**
@@ -182,6 +425,28 @@ abstract class CRM_Core_Payment {
    * @abstract
    */
   abstract function doDirectPayment(&$params);
+
+  /**
+   * process payment - this function wraps around both doTransferPayment and doDirectPayment
+   * it ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms more agnostic
+   *
+   * @param array $params
+   *
+   * @param $component
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function doPayment(&$params, $component) {
+    if ($this->_paymentProcessor['billing_mode'] == 4) {
+      $result = $this->doTransferCheckout($params, $component);
+    }
+    else {
+      $result = $this->doDirectPayment($params, $component);
+    }
+    if (is_a($result, 'CRM_Core_Error')) {
+      throw new CRM_Core_Exception(CRM_Core_Error::getMessages($result));
+    }
+  }
 
   /**
    * This function checks to see if we have the right config values
@@ -355,15 +620,13 @@ abstract class CRM_Core_Payment {
       case 'cancel' :
         $url = 'civicrm/contribute/unsubscribe';
         break;
-
       case 'billing' :
         //in notify mode don't return the update billing url
-        if ($this->_paymentProcessor['billing_mode'] == self::BILLING_MODE_NOTIFY) {
+        if (!$this->isSupported('updateSubscriptionBillingInfo')) {
           return NULL;
         }
-      	$url = 'civicrm/contribute/updatebilling';
+        $url = 'civicrm/contribute/updatebilling';
         break;
-
       case 'update' :
         $url = 'civicrm/contribute/updaterecur';
         break;

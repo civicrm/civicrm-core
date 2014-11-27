@@ -240,8 +240,12 @@ class CRM_Core_Component {
    */
   static function getComponentID($componentName) {
     $info = self::_info();
-
-    return $info[$componentName]->componentID;
+    if (!empty($info[$componentName])) {
+      return $info[$componentName]->componentID;
+    }
+    else {
+      return;
+    }
   }
 
   /**

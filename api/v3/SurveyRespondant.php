@@ -34,6 +34,14 @@
  */
 
 /**
+ * @deprecated api notice
+ * @return string to indicate this entire api entity is deprecated
+ */
+function _civicrm_api3_survey_respondant_deprecation() {
+  return 'The survey_respondant api is not currently supported.';
+}
+
+/**
  * Get the list of signatories
  *
  * @param  array   $params           (reference ) input parameters

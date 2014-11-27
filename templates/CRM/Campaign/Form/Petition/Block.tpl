@@ -147,9 +147,9 @@
 {literal}
   <script type="text/javascript">
 
-cj(document).ready(function(){
-  cj('#selector tr:even').addClass('odd-row ');
-  cj('#selector tr:odd ').addClass('even-row');
+CRM.$(function($) {
+  $('#selector tr:even').addClass('odd-row ');
+  $('#selector tr:odd ').addClass('even-row');
 });
 
   </script>

@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Case Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Autoincremented type id</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>name</name>
+    <title>Case Type Name</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -33,6 +35,7 @@
   </index>
   <field>
     <name>title</name>
+    <title>Case Type Title</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -42,6 +45,7 @@
   </field>
   <field>
     <name>description</name>
+    <title>Case Type Description</title>
     <type>varchar</type>
     <length>255</length>
     <localizable>true</localizable>
@@ -50,18 +54,21 @@
   </field>
   <field>
     <name>is_active</name>
+    <title>Case Type Is Active</title>
     <type>boolean</type>
     <comment>Is this entry active?</comment>
     <add>4.5</add>
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Case Type Is Reserved</title>
     <type>boolean</type>
     <comment>Is this case type a predefined system type?</comment>
     <add>4.5</add>
   </field>
   <field>
     <name>weight</name>
+    <title>Case Type Weight</title>
     <type>int</type>
     <required>true</required>
     <default>1</default>
@@ -70,6 +77,7 @@
   </field>
   <field>
     <name>definition</name>
+    <title>Case Type Definition</title>
     <type>blob</type>
     <comment>xml definition of case type</comment>
     <add>4.5</add>

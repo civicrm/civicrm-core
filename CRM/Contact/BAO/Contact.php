@@ -1002,7 +1002,7 @@ WHERE id={$id}; ";
 
     if (in_array($params[$imageIndex]['type'], $mimeType)) {
       $photo = basename($params[$imageIndex]['name']);
-      $params[$imageIndex] =  CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$photo, TRUE);
+      $params[$imageIndex] =  CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$photo, TRUE, NULL, TRUE, TRUE);
       return TRUE;
     }
     else {
@@ -1312,6 +1312,10 @@ WHERE id={$id}; ";
             'title' => ts('Note(s)'),
             'name' => 'note',
           ),
+          'communication_style_id' => array(
+            'title' => ts('Communication Style'),
+            'name' => 'communication_style_id',
+          ),
         ));
       }
 
@@ -1445,7 +1449,7 @@ WHERE id={$id}; ";
 
         if ($contactType != 'All') {
           $fields = array_merge($fields,
-            CRM_Core_BAO_CustomField::getFieldsForImport($contactType, $status, TRUE, $search, TRUE, $withMultiRecord)
+            CRM_Core_BAO_CustomField::getFieldsForImport($contactType, $status, FALSE, $search, TRUE, $withMultiRecord)
           );
         }
         else {
@@ -2812,7 +2816,6 @@ AND       civicrm_openid.is_primary = 1";
         'title' => ts('Add Contribution'),
         'weight' => 5,
         'ref' => 'new-contribution',
-        'class' => 'huge-popup',
         'key' => 'contribution',
         'tab' => 'contribute',
         'component' => 'CiviContribute',
@@ -2828,7 +2831,6 @@ AND       civicrm_openid.is_primary = 1";
         'title' => ts('Register for Event'),
         'weight' => 10,
         'ref' => 'new-participant',
-        'class' => 'huge-popup',
         'key' => 'participant',
         'tab' => 'participant',
         'component' => 'CiviEvent',
@@ -2864,7 +2866,6 @@ AND       civicrm_openid.is_primary = 1";
         'title' => ts('Add Membership'),
         'weight' => 20,
         'ref' => 'new-membership',
-        'class' => 'huge-popup',
         'key' => 'membership',
         'tab' => 'member',
         'component' => 'CiviMember',
@@ -3101,6 +3102,52 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
+   * Generate triggers to update the timestamp on the corresponding civicrm_contact row,
+   * on insert/update/delete to a table that extends civicrm_contact.
+   * Don't regenerate triggers for all such tables if only asked for one table.
+   *
+   * @param array $info
+   *   Reference to the array where generated trigger information is being stored
+   * @param string|null $reqTableName
+   *   Name of the table for which triggers are being generated, or NULL if all tables
+   * @param array $relatedTableNames
+   *   Array of all core or all custom table names extending civicrm_contact
+   * @param string $contactRefColumn
+   *   'contact_id' if processing core tables, 'entity_id' if processing custom tables
+   * @return void
+   *
+   * @link https://issues.civicrm.org/jira/browse/CRM-15602
+   * @see triggerInfo
+   * @access public
+   * @static
+   */
+  static function generateTimestampTriggers(&$info, $reqTableName, $relatedTableNames, $contactRefColumn) {
+    // Safety
+    $contactRefColumn = CRM_Core_DAO::escapeString($contactRefColumn);
+    // If specific related table requested, just process that one
+    if (in_array($reqTableName, $relatedTableNames)) {
+      $relatedTableNames = array($reqTableName);
+    }
+
+    // If no specific table requested (include all related tables),
+    // or a specific related table requested (as matched above)
+    if (empty($reqTableName) || in_array($reqTableName, $relatedTableNames)) {
+      $info[] = array(
+        'table' => $relatedTableNames,
+        'when' => 'AFTER',
+        'event' => array('INSERT', 'UPDATE'),
+        'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.$contactRefColumn;\n",
+      );
+      $info[] = array(
+        'table' => $relatedTableNames,
+        'when' => 'AFTER',
+        'event' => array('DELETE'),
+        'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = OLD.$contactRefColumn;\n",
+      );
+    }
+  }
+
+  /**
    * Get a list of triggers for the contact table
    *
    * @see hook_civicrm_triggerInfo
@@ -3118,6 +3165,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       }
     }
 
+    // Update timestamp for civicrm_contact itself
     if ($tableName == NULL || $tableName == self::getTableName()) {
       $info[] = array(
         'table' => array(self::getTableName()),
@@ -3135,18 +3183,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       'civicrm_phone',
       'civicrm_website',
     );
-    $info[] = array(
-      'table' => $relatedTables,
-      'when' => 'AFTER',
-      'event' => array('INSERT', 'UPDATE'),
-      'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.contact_id;\n",
-    );
-    $info[] = array(
-      'table' => $relatedTables,
-      'when' => 'AFTER',
-      'event' => array('DELETE'),
-      'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = OLD.contact_id;\n",
-    );
+    self::generateTimestampTriggers($info, $tableName, $relatedTables, 'contact_id');
 
     // Update timestamp when modifying related custom-data tables
     $customGroupTables = array();
@@ -3157,18 +3194,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       $customGroupTables[] = $customGroupDAO->table_name;
     }
     if (!empty($customGroupTables)) {
-      $info[] = array(
-        'table' => $customGroupTables,
-        'when' => 'AFTER',
-        'event' => array('INSERT', 'UPDATE'),
-        'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.entity_id;\n",
-      );
-      $info[] = array(
-        'table' => $customGroupTables,
-        'when' => 'AFTER',
-        'event' => array('DELETE'),
-        'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = OLD.entity_id;\n",
-      );
+      self::generateTimestampTriggers($info, $tableName, $customGroupTables, 'entity_id');
     }
 
     // Update phone table to populate phone_numeric field
@@ -3191,7 +3217,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    *
    * @param  int     $contactId   contact id.
    *
-   * @return true if present else false.
+   * @return bool true if present else false.
    * @access public
    * @static
    */

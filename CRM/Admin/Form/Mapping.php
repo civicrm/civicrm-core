@@ -55,6 +55,8 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
 
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('Field Mapping'));
+
     if ($this->_action == CRM_Core_Action::DELETE) {
       return;
     }
@@ -110,6 +112,6 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
       CRM_Core_BAO_Mapping::add($params);
     }
   }
-  //end of function
+
 }
 

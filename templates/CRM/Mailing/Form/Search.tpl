@@ -75,20 +75,20 @@
 
 {literal}
 <script type="text/javascript">
-  cj(document).ready( function( ) {
-    var archiveOption = cj("input[name^='is_archived']:radio");
-    cj('#status_unscheduled').change(function() {
-      if (cj(this).prop('checked') ) {
+  CRM.$(function($) {
+    var archiveOption = $("input[name^='is_archived']:radio");
+    $('#status_unscheduled').change(function() {
+      if ($(this).prop('checked') ) {
         archiveOption.prop({checked: false, disabled: true}).change();
       } else {
         archiveOption.prop('disabled', false);
       }
     }).trigger('change');
     archiveOption.change(function() {
-      if (cj("input[name^='is_archived']:radio:checked").length) {
-        cj('#status_unscheduled').prop({checked: false, disabled: true}).change();
+      if ($("input[name^='is_archived']:radio:checked").length) {
+        $('#status_unscheduled').prop({checked: false, disabled: true}).change();
       } else {
-        cj('#status_unscheduled').prop('disabled', false);
+        $('#status_unscheduled').prop('disabled', false);
       }
     }).trigger('change');
   });

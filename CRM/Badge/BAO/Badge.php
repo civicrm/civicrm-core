@@ -475,6 +475,7 @@ class CRM_Badge_BAO_Badge {
     $dao = CRM_Core_DAO::executeQuery($queryString);
     $rows = array();
     while ($dao->fetch()) {
+      $query->convertToPseudoNames($dao);
       $rows[$dao->participant_id] = array();
       foreach ($returnProperties as $key => $dontCare) {
         $rows[$dao->participant_id][$key] = isset($dao->$key) ? $dao->$key : NULL;

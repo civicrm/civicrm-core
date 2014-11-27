@@ -39,8 +39,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create an event
@@ -106,15 +106,15 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify number of registered participants
-    $this->assertStringsPresent(array('2 Result'));
+    $this->assertTrue($this->isTextPresent('2 Results'));
   }
 
   function testParticipantCountWithPriceset() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create priceset
@@ -188,7 +188,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
       else {
         $this->_testAddMultipleChoiceOptions($field['options']);
       }
-      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom', FALSE);
+      $this->waitForText("crm-notification-container", "Price Field '$label' has been saved.");
     }
 
     // create event.
@@ -289,7 +290,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify number of participants records and total participant count
-    $this->assertStringsPresent(array('2 Result', 'Actual participant count : 24'));
+    $this->assertStringsPresent(array('2 Results', 'Actual participant count : 24'));
 
     // CRM-7953, check custom search Price Set Details for Event
     // Participants
@@ -387,6 +388,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->check('is_online_registration');
     $this->assertChecked('is_online_registration');
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField('intro_text', 'Fill in all the fields below and click Continue.');
 
     // enable confirmation email
@@ -446,7 +448,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click('_qf_Custom_refresh-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $tableHeaders = array('Contact Id', 'Participant Id', 'Name');
+    $tableHeaders = array('Contact ID', 'Participant ID', 'Name');
     $tableHeaders = array_merge($tableHeaders, array_keys(current($priceFieldOptionCounts)));
 
     $tdnum = 2;

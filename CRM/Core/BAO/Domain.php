@@ -207,6 +207,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * @param bool $skipFatal
    *
+   * @return array name & email for domain
    * @throws Exception
    */
   static function getNameAndEmail($skipFatal = FALSE) {

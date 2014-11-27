@@ -32,7 +32,7 @@
     var pPartiRef   = Array( );
     var optionSep   = '|';
 
-    cj(document).ready( function( ) {
+    CRM.$(function($) {
       pricesetParticipantCount( );
       allowGroupOnWaitlist(0, pPartiCount);
     });

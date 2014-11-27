@@ -112,7 +112,7 @@ table {
   font-weight: bold;
   color: #9cf;
 }
-#search .form-text, #search .form-submit {
+#search .form-text, #search .crm-form-submit {
   border: 1px solid #369;
   font-size: 1.1em;
 }
@@ -122,7 +122,7 @@ table {
   padding: 0 0.5em 0 0.5em;
   margin: 0 0 0.5em 0;
 }
-#search .form-submit {
+#search .crm-form-submit {
   height: 1.5em;
 }
 #mission {

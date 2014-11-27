@@ -269,7 +269,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   }
 
   function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
   }
 
   function logout() {
@@ -321,6 +321,11 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   function getTimeZoneString() {
     // This class extends Drupal, but we don't want Drupal's behavior; reproduce CRM_Utils_System_Base::getTimeZoneString
     return date_default_timezone_get();
+  }
+
+  function clearResourceCache() {
+    // UGH. Obscure Drupal-specific implementation. Why does UnitTests extend Drupal?
+    // You should delete this function if the base-classes are properly rearranged.
   }
 }
 

@@ -758,7 +758,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     // @TODO: Create profile with custom fields
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/dataset/uf_group_contact_activity_26.xml'
       )
     );

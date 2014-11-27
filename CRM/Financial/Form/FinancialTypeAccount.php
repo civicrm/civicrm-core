@@ -127,23 +127,12 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * @access public
    */
   public function buildQuickForm() {
+    parent::buildQuickForm();
+    $this->setPageTitle(ts('Financial Type Account'));
+
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Delete Financial Account Type'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'))
-        )
-      );
       return;
     }
-
-    parent::buildQuickForm();
 
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
@@ -283,6 +272,13 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       );
       $defaults = array();
       if ($self->_action == CRM_Core_Action::ADD) {
+        $relationshipId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+        $isTax = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $values['financial_account_id'], 'is_tax');
+        if ($values['account_relationship'] == $relationshipId) {
+          if (!($isTax)) {
+            $errorMsg['financial_account_id'] = ts('Is Tax? must be set for respective financial account');
+          }
+        }
         $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
         if ($result) {
           $errorFlag = TRUE;
@@ -351,6 +347,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
         "reset=1&action=browse&aid={$this->_aid}"));
     }
   }
+
 }
 
 

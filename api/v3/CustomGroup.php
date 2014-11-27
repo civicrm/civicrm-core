@@ -76,11 +76,7 @@ function civicrm_api3_custom_group_create($params) {
     $params['extends_entity_column_value'] = CRM_Utils_Array::explodePadded($params['extends_entity_column_value']);
   }
 
-
-  $customGroup = CRM_Core_BAO_CustomGroup::create($params);
-
-  _civicrm_api3_object_to_array($customGroup, $values[$customGroup->id]);
-  return civicrm_api3_create_success($values, $params, 'custom_group', $customGroup);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -129,3 +125,14 @@ function civicrm_api3_custom_group_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom group
+ */
+function civicrm_api3_custom_group_setvalue($params) {
+  require_once 'api/v3/Generic/Setvalue.php';
+  $result = civicrm_api3_generic_setValue(array("entity" => 'custom_group', 'params' => $params));
+  if (empty($result['is_error'])) {
+    CRM_Utils_System::flushCache();
+  }
+  return $result;
+}

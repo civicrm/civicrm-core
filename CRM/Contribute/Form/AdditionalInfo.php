@@ -139,6 +139,19 @@ class CRM_Contribute_Form_AdditionalInfo {
         array('CRM_Contribute_DAO_Contribution', $form->_id, 'invoice_id')
       );
     }
+    $element = $form->add('text', 'creditnote_id', ts('Credit Note ID'),
+      $attributes['creditnote_id']
+    );
+    if ($form->_online) {
+      $element->freeze();
+    }
+    else {
+      $form->addRule('creditnote_id',
+        ts('This Credit Note ID already exists in the database.'),
+        'objectExists',
+        array('CRM_Contribute_DAO_Contribution', $form->_id, 'creditnote_id')
+      );
+    }
 
     $form->add('select', 'contribution_page_id',
       ts('Online Contribution Page'),
@@ -286,6 +299,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       'net_amount',
       'trxn_id',
       'invoice_id',
+      'creditnote_id',
       'campaign_id',
       'contribution_page_id',
     );
@@ -473,6 +487,18 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
     }
 
+     $template = CRM_Core_Smarty::singleton( );
+     $taxAmt = $template->get_template_vars('dataArray');
+     $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
+     $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+     $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+     if ((!empty($taxAmt) || isset($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+       $isEmailPdf = True;
+     }
+     else {
+       $isEmailPdf = False;
+     }
+
     list($sendReceipt, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       array(
         'groupName' => 'msg_tpl_workflow_contribution',
@@ -484,6 +510,7 @@ class CRM_Contribute_Form_AdditionalInfo {
         'toEmail' => $contributorEmail,
         'isTest' => $form->_mode == 'test',
         'PDFFilename' => ts('receipt').'.pdf',
+        'isEmailPdf' => $isEmailPdf,
       )
     );
 

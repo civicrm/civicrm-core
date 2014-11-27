@@ -103,6 +103,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
         CRM_Core_Action::EXPORT => array(
           'name' => ts('Move'),
           'url' => 'civicrm/admin/custom/group/field/move',
+          'class' => 'small-popup',
           'qs' => 'reset=1&fid=%%id%%',
           'title' => ts('Move Custom Field'),
         ),
@@ -126,6 +127,11 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @access public
    */
   function browse() {
+    $resourceManager = CRM_Core_Resources::singleton();
+    if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
+      $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
+    }
+
     $customField = array();
     $customFieldBAO = new CRM_Core_BAO_CustomField();
 
@@ -275,7 +281,9 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
       $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_gid);
       $this->assign('gid', $this->_gid);
       $this->assign('groupTitle', $groupTitle);
-      CRM_Utils_System::setTitle(ts('%1 - Custom Fields', array(1 => $groupTitle)));
+      if ($action & CRM_Core_Action::BROWSE) {
+        CRM_Utils_System::setTitle(ts('%1 - Custom Fields', array(1 => $groupTitle)));
+      }
     }
 
     // assign vars to templates

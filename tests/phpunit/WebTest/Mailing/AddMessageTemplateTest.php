@@ -113,8 +113,7 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->type("name", "Mailing $mailingName Webtest");
 
     // Add the test mailing group
-    $this->select("includeGroups-f", "$groupName");
-    $this->click("add");
+    $this->select("includeGroups", "$groupName");
 
     // click next
     $this->click("_qf_Group_next");
@@ -176,10 +175,9 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->type("sort_name", $firstName);
     $this->click("activity_type_id[19]");
     $this->click("_qf_Search_refresh");
-    $this->waitForElementPresent("_qf_Search_next_print");
-
-    $this->click("xpath=id('Search')/div[3]/div/div[2]/table/tbody/tr[2]/td[9]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_ActivityView_next");
+    $this->waitForElementPresent("xpath=//form[@id='Search']/div[3]/div/div[2]/table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[1][text()='View']");
+    $this->click("xpath=//form[@id='Search']/div[3]/div/div[2]/table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[2]");
     $this->assertElementContainsText('help', "Bulk Email Sent.", "Status message didn't show up after saving!");
   }
 }

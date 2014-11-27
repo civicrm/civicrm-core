@@ -79,9 +79,10 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
 
+    $caseId = CRM_Utils_Array::first($form->_caseId);
     $form->_caseType = CRM_Case_PseudoConstant::caseType();
     $form->_caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
-      $form->_caseId,
+      $caseId,
       'case_type_id'
     );
     if (!in_array($form->_caseTypeId, $form->_caseType)) {
@@ -185,13 +186,14 @@ class CRM_Case_Form_Activity_ChangeCaseType {
 
     // 1. initiate xml processor
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
+    $caseId = CRM_Utils_Array::first($form->_caseId);
     $xmlProcessorParams = array(
       'clientID' => $form->_currentlyViewedContactId,
       'creatorID' => $form->_currentUserId,
       'standardTimeline' => 1,
       'activityTypeName' => 'Change Case Type',
       'activity_date_time' => CRM_Utils_Array::value('reset_date_time', $params),
-      'caseID' => $form->_caseId,
+      'caseID' => $caseId,
       'resetTimeline' => CRM_Utils_Array::value('is_reset_timeline', $params),
     );
 

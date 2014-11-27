@@ -39,7 +39,18 @@
 class CRM_Utils_JSON {
 
   /**
+   * Output json to the client
+   * @param mixed $input
+   */
+  static function output($input) {
+    header('Content-Type: application/json');
+    echo json_encode($input);
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
    * Function to create JSON object
+   * @deprecated
    *
    * @param  array  $params     associated array, that needs to be
    *                            converted to JSON array

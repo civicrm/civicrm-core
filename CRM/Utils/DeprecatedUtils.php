@@ -285,11 +285,13 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         }
         $dao = new CRM_Core_DAO();
         $qParams = array();
-        $svq = $dao->singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value",
+        $svq = $dao->singleValueQuery("SELECT is_deleted FROM civicrm_contact WHERE id = $value",
           $qParams
         );
-        if (!$svq) {
+        if (!isset($svq)) {
           return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = $value.");
+        } else if ($svq == 1) {
+          return civicrm_api3_create_error("Invalid Contact ID: contact_id $value is a soft-deleted contact.");
         }
 
         $values['contact_id'] = $values['contribution_contact_id'];
@@ -415,7 +417,9 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
               $contact->external_identifier = $externalId;
               $errorMsg = NULL;
               if (!$contact->find(TRUE)) {
-                $errorMsg = $contactId ? ts("Soft Credit ContactID - $contactId doesn't exist. Row was skipped.") : ts("Provided Soft Credit External Identifier - $externalIddoesn't exist. Row was skipped.");
+                $field = $contactId ? ts('Contact ID') : ts('External ID');
+                $errorMsg = ts("Soft Credit %1 - %2 doesn't exist. Row was skipped.",
+                  array(1 => $field, 2 => $contactId ? $contactId : $externalId));
               }
 
               if ($errorMsg) {
@@ -869,7 +873,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
     return TRUE;
   }
 
-  if (isset($values['preferred_communication_method'])) {
+  if (!empty($values['preferred_communication_method'])) {
     $comm = array();
     $pcm = array_change_key_case(array_flip(CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method')), CASE_LOWER);
 
@@ -1261,7 +1265,7 @@ function _civicrm_api3_deprecated_participant_check_params($params, $checkDuplic
   if (!empty($params['event_id'])) {
     $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'is_template');
     if (!empty($isTemplate)) {
-      return civicrm_api3_create_error(ts('Event templates are not meant to be registered'));
+      return civicrm_api3_create_error(ts('Event templates are not meant to be registered.'));
     }
   }
 
@@ -1372,7 +1376,7 @@ function _civicrm_api3_deprecated_contact_check_params(
 
     if ($csType = CRM_Utils_Array::value('contact_sub_type', $params)) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($csType, $params['contact_type']))) {
-        return civicrm_api3_create_error("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$csType));
+        return civicrm_api3_create_error("Invalid or Mismatched Contact Subtype: " . implode(', ', (array)$csType));
       }
     }
 

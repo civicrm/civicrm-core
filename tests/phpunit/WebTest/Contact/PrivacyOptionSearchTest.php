@@ -121,7 +121,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("No matches found"));
+    $this->assertTrue($this->isTextPresent("None found."));
 
     // Go to advance search, check for 'Include' + 'OR' options.
     $this->openCiviPage("contact/search/advanced", "reset=1");

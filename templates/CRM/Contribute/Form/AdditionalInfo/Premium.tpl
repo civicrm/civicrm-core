@@ -59,7 +59,7 @@
                var min_amount = document.getElementById("min_amount");
 
 
-               var amount = new Array();
+               var amount = [];
                amount[0] = '';
 
                if( product_id > 0 ) {

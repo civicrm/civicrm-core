@@ -129,7 +129,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $controller->reset();
     $controller->set('cid', $this->_contactId);
     $controller->set('crid', $this->_crid);
-    $controller->set('context', 'Search');
+    $controller->set('context', 'contribution');
     $controller->set('limit', 50);
     $controller->process();
     $controller->run();
@@ -254,14 +254,14 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $this->_action = CRM_Core_Action::ADD;
     }
     else {
-      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, empty($this->_id));
+      if (empty($this->_contactId)) {
+        $this->_contactId = civicrm_api3('contribution', 'getvalue', array('id' => $this->_id, 'return' => 'contact_id'));
+      }
       $this->assign('contactId', $this->_contactId);
 
       // check logged in url permission
       CRM_Contact_Page_View::checkUserPermission($this);
-
-      // set page title
-      CRM_Contact_Page_View::setTitle($this->_contactId);
     }
     $this->assign('action', $this->_action);
 

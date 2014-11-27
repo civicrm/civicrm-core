@@ -37,7 +37,7 @@
  * This class generates form components for Membership Type
  *
  */
-class CRM_Member_Form_MembershipType extends CRM_Member_Form {
+class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
   /**
    * max number of contacts we will display for membership-organisation
@@ -53,6 +53,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/admin/member/membershipType', 'reset=1');
     $session->pushUserContext($url);
+
+    $this->setPageTitle(ts('Membership Type'));
   }
 
   /**
@@ -226,7 +228,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     }
 
     if (($params['minimum_fee'] > 0 ) && !$params['financial_type_id'] ) {
-      $errors['financial_type_id'] = ts('Please enter the financial type.');
+      $errors['financial_type_id'] = ts('Please enter the financial Type.');
     }
 
     if (empty($params['duration_interval']) and $params['duration_unit'] != 'lifetime') {

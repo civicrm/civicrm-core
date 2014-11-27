@@ -176,7 +176,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_currentUserID = NULL;
   protected $_session       = NULL;
 
-  public $_stateCountryMap = array();
   /**
    * pre processing work done here.
    *
@@ -358,7 +357,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
         } elseif (!empty($this->_multiRecordFields)
            && (!$this->_multiRecord || !in_array($this->_multiRecord, array(CRM_Core_Action::DELETE, CRM_Core_Action::UPDATE)) )) {
-          CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+          CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
           //multirecord listing page
           $multiRecordFieldListing = TRUE;
           $page = new CRM_Profile_Page_MultipleRecordFieldsListing();
@@ -558,7 +557,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     if (!empty($this->_defaults['image_URL'])) {
-      list($imageWidth, $imageHeight) = getimagesize($this->_defaults['image_URL']);
+      list($imageWidth, $imageHeight) = getimagesize(CRM_Utils_String::unstupifyUrl($this->_defaults['image_URL']));
       list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
       $this->assign("imageWidth", $imageWidth);
       $this->assign("imageHeight", $imageHeight);
@@ -684,21 +683,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
       return FALSE;
     }
 
-    if (count($this->_submitValues)) {
-      $locationTypeId = null;
-      foreach ($this->_fields as $field) {
-        if (!empty($field['location_type_id'])) {
-          $locationTypeId = $field['location_type_id'];
-        }
-        if (array_key_exists("country-{$locationTypeId}", $this->_fields) &&
-          array_key_exists("state_province-{$locationTypeId}", $this->_fields) &&
-          !empty($this->_submitValues["country-{$locationTypeId}"])) {
-          $this->_fields["state_province-{$locationTypeId}"]['is_required'] =
-            CRM_Core_Payment_Form::checkRequiredStateProvince($this, "country-{$locationTypeId}");
-        }
-      }
-    }
-
     $this->assign('id', $this->_id);
     $this->assign('mode', $this->_mode);
     $this->assign('action', $this->_action);
@@ -742,10 +726,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $addCaptcha = array();
     $emailPresent = FALSE;
 
-    // cache the state country fields. based on the results, we could use our javascript solution
-    // in create or register mode
-    $stateCountryMap = array();
-
     // add the form elements
     foreach ($this->_fields as $name => $field) {
       // make sure that there is enough permission to expose this field
@@ -762,12 +742,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
 
       list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
-      if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
-        if (!array_key_exists($index, $stateCountryMap)) {
-          $stateCountryMap[$index] = array();
-        }
-        $stateCountryMap[$index][$prefixName] = $name;
-      }
 
       CRM_Core_BAO_UFGroup::buildProfile($this, $field, $this->_mode);
 
@@ -825,11 +799,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    // lets do the defaults, so we can use it for the below state country routines
+    //let's do set defaults for the profile
     $this->setDefaultsValues();
-
-    // also do state country js
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap, $this->_defaults);
 
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, NULL);
     if ($this->_mode == self::MODE_CREATE) {
@@ -840,9 +811,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     $this->assign('groupId', $this->_gid);
-
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
 
     // if view mode pls freeze it with the done button.
     if ($this->_action & CRM_Core_Action::VIEW) {

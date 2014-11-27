@@ -158,12 +158,8 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
     foreach ($this->_fields as $name => $field) {
       if ((substr($name, 0, 6) == 'custom') && !empty($field['is_search_range'])) {
-        $from = CRM_Utils_Request::retrieve($name . '_from', 'String',
-          $this, FALSE, NULL, 'REQUEST'
-        );
-        $to = CRM_Utils_Request::retrieve($name . '_to', 'String',
-          $this, FALSE, NULL, 'REQUEST'
-        );
+        $from = CRM_Utils_Request::retrieve($name . '_from', 'String', $this);
+        $to = CRM_Utils_Request::retrieve($name . '_to', 'String', $this);
         $value = array();
         if ($from && $to) {
           $value['from'] = $from;
@@ -247,6 +243,10 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       if (isset($value) && $value != NULL) {
         if (!is_array($value)) {
           $value = trim($value);
+        }
+        $operator = CRM_Utils_Request::retrieve($name . '_operator', 'String', $this);
+        if ($operator) {
+          $this->_params[$name . '_operator'] = $operator;
         }
         $this->_params[$name] = $this->_fields[$name]['value'] = $value;
       }

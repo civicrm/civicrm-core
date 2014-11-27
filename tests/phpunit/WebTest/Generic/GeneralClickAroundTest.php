@@ -37,8 +37,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
   function login() {
     $this->webtestLogin();
-    $this->open($this->sboxPath . "civicrm");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('');
   }
 
   function testSearchMenu() {
@@ -93,8 +92,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
     // Contacts → Manage Groups
     $this->click("//ul[@id='civicrm-menu']/li[4]");
-    $this->click("xpath=//div[@id='root-menu-div']//div/ul//li/div/a[text()='Manage Groups']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//div[@id='root-menu-div']//div/ul//li/div/a[text()='Manage Groups']");
 
     $this->assertTextPresent("Find Groups");
     $this->assertElementPresent("title");
@@ -105,31 +103,29 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
   }
 
   function testContributionDashboard() {
-    $this->login();
+    $this->webtestLogin();
     // Enable CiviContribute module if necessary
     $this->enableComponents("CiviContribute");
 
     // Contributions → Dashboard
     $this->click("css=ul#civicrm-menu li.crm-Contributions");
-    $this->click("css=ul#civicrm-menu li.crm-Contributions li.crm-Dashboard a");
-    $this->waitForElementPresent('chart_type');
+    $this->clickLink("css=ul#civicrm-menu li.crm-Contributions li.crm-Dashboard a");
 
+    $this->waitForElementPresent("xpath=//*[@id='chart_view']/a");
+    $this->waitForElementPresent("xpath=//*[@id='ContributionCharts']/div[4]/div[3]");
     $this->assertTextPresent("Contribution Summary");
-    $this->assertTextPresent("Select Year (for monthly breakdown)");
     $this->assertTextPresent("Recent Contributions");
-    $this->assertTextPresent("Find more contributions...");
   }
 
   function testEventDashboard() {
-    $this->login();
+    $this->webtestLogin();
 
     // Enable CiviEvent module if necessary
     $this->enableComponents("CiviEvent");
 
     // Events → Dashboard
     $this->click("css=ul#civicrm-menu li.crm-Events");
-    $this->click("css=ul#civicrm-menu li.crm-Events li.crm-Dashboard a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("css=ul#civicrm-menu li.crm-Events li.crm-Dashboard a");
 
     $this->assertTextPresent("Event Summary");
     $this->assertTextPresent("Counted:");
@@ -146,7 +142,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
   }
 
   function testMembershipsDashboard() {
-    $this->login();
+    $this->webtestLogin();
 
     // Enable CiviMember module if necessary
     $this->enableComponents("CiviMember");
@@ -163,7 +159,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
   }
 
   function testFindContributions() {
-    $this->login();
+    $this->webtestLogin();
 
     // Enable CiviContribute module if necessary
     $this->enableComponents("CiviContribute");
@@ -171,8 +167,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Search → Find Contributions
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Search");
-    $this->click("css=ul#civicrm-menu li.crm-Find_Contributions a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("css=ul#civicrm-menu li.crm-Find_Contributions a");
 
     $this->assertTextPresent("Edit Search Criteria");
     $this->assertElementPresent("sort_name");
@@ -189,7 +184,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
   }
 
   function testNewMailing() {
-    $this->login();
+    $this->webtestLogin();
 
     // Enable CiviMail module if necessary
     $this->enableComponents("CiviMail");
@@ -200,13 +195,12 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // New Mailing Form
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Mailings");
-    $this->click("css=ul#civicrm-menu li.crm-New_Mailing a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("css=ul#civicrm-menu li.crm-New_Mailing a");
 
     $this->assertTextPresent("New Mailing");
     $this->assertElementPresent("name");
-    $this->assertElementPresent("includeGroups-f");
-    $this->assertElementPresent("excludeGroups-t");
+    $this->assertElementPresent("includeGroups");
+    $this->assertElementPresent("excludeGroups");
   }
 
   function testConstituentReportSummary() {
@@ -214,25 +208,24 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
     // Constituent Report Summary
     $this->click("css=ul#civicrm-menu li.crm-Reports");
-    $this->click("css=ul#civicrm-menu li.crm-Contact_Reports a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("xpath=//div[@id='Contact']/table/tbody/tr/td/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("css=ul#civicrm-menu li.crm-Contact_Reports a");
+
+    $this->clickLink("xpath=//div[@id='Contact']/table/tbody/tr/td/a");
 
     $this->assertTextPresent("Constituent Summary");
-    $this->click("//form[@id='Summary']/div[2]/div/div/div/div");
-    $this->assertTextPresent("Display Columns");
+    $this->click("//div[contains(text(), 'Report Criteria')]");
+    $this->waitForVisible("//h3[contains(text(), 'Display Columns')]");
     $this->click("//form[@id='Summary']/div[2]//div[@id='id_default']/div/div/div");
-    $this->assertTextPresent("Most Important Issue");
+    $this->waitForVisible("//label[contains(text(), 'Most Important Issue')]");
     $this->assertTextPresent("Set Filters");
     $this->assertTextPresent("Contact Name");
     $this->assertTextPresent("Contact Source");
     $this->assertTextPresent("Country");
-    $this->assertTextPresent("State / Province");
+    $this->assertTextPresent("State/Province");
     $this->assertTextPresent("Group");
     $this->assertTextPresent("Tag");
-    $this->click("_qf_Summary_submit");
-    $this->waitForElementPresent("_qf_Summary_submit_print");
+    $this->clickLink("_qf_Summary_submit");
+
     $this->assertTextPresent("Row(s) Listed");
     $this->assertTextPresent("Total Row(s)");
   }
@@ -242,8 +235,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Administer");
-    $this->click("xpath=//div[@id='root-menu-div']//a[text()='Custom Fields']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Custom Fields']");
 
     $this->assertTextPresent("Custom Data");
     $this->assertTextPresent("Constituent Information");
@@ -251,8 +243,8 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Food Preference");
 
     // Verify create form
-    $this->click("//span[contains(text(), 'Add Set of Custom Fields')]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("//span[contains(text(), 'Add Set of Custom Fields')]");
+
     $this->assertElementPresent("title");
     $this->assertElementPresent("extends[0]");
     $this->assertElementPresent("weight");
@@ -266,13 +258,14 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Administer");
     $this->click("css=ul#civicrm-menu li.crm-Customize_Data_and_Screens");
-    $this->click("xpath=//div[@id='root-menu-div']//a[text()='Profiles']");
+    $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Profiles']");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->assertTextPresent("CiviCRM Profile");
     // Verify Reserved Profiles
-    $this->click("ui-id-3");
+
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[2]/a");
+    $this->waitForElementPresent("newCiviCRMProfile-bottom");
     $this->assertTextPresent("New Household");
     $this->assertTextPresent("New Individual");
     $this->assertTextPresent("New Organization");
@@ -281,7 +274,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Summary Overlay");
 
     // Verify profiles that are not reserved
-    $this->click("ui-id-2");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[1]/a");
     $this->assertTextPresent("Name and Address");
     $this->assertTextPresent("Supporter Profile");
 
@@ -298,7 +291,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertElementPresent("post_URL");
     $this->assertTextPresent("Drupal user account registration option?");
     $this->assertTextPresent("What to do upon duplicate match");
-    $this->assertTextPresent("Proximity search");
+    $this->assertTextPresent("Proximity Search");
   }
 
   function testTags() {
@@ -307,9 +300,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Administer");
     $this->click("css=ul#civicrm-menu li.crm-Customize_Data_and_Screens");
-    $this->click("xpath=//div[@id='root-menu-div']//a[text()='Tags (Categories)']");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Tags (Categories)']");
 
     // Verify tags
     $this->assertTextPresent("Non-profit");
@@ -325,9 +316,8 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Administer");
     $this->click("css=ul#civicrm-menu li.crm-Customize_Data_and_Screens");
-    $this->click("xpath=//div[@id='root-menu-div']//a[text()='Activity Types']");
+    $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Activity Types']");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Verify activity types
     $this->assertTextPresent("Meeting");
@@ -343,9 +333,8 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Administer");
     $this->click("css=ul#civicrm-menu li.crm-Customize_Data_and_Screens");
-    $this->click("xpath=//div[@id='root-menu-div']//a[text()='Relationship Types']");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Relationship Types']");
 
     // Verify relationship types
     $this->assertTextPresent("Child of");
@@ -362,8 +351,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Administer");
     $this->click("css=ul#civicrm-menu li.crm-Communications");
-    $this->click("xpath=//div[@id='root-menu-div']//a[text()='Message Templates']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Message Templates']");
 
     // Verify message templates
     $this->click("//a[contains(text(),'System Workflow Messages')]");

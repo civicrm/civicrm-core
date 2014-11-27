@@ -39,8 +39,6 @@
  * UR DOIN IT RIGHT!
  */
 
-require_once 'PHPUnit/Framework/TestCase.php';
-
 /**
  * Class HelloTest
  */

@@ -203,6 +203,13 @@ class CRM_Core_PseudoConstant {
   private static $accountOptionValues;
 
   /**
+   * Tax Rates
+   * @var array
+   * @static
+   */
+  private static $taxRates;
+
+  /**
    * Low-level option getter, rarely accessed directly.
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
    * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Pseudoconstant+%28option+list%29+Reference
@@ -980,8 +987,6 @@ WHERE  id = %1";
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
-   *
    * Get all permissioned groups from database
    *
    * The static array group is returned, and if it's
@@ -991,7 +996,7 @@ WHERE  id = %1";
    * Note: any database errors will be trapped by the DAO.
    *
    * @param string $groupType type of group(Access/Mailing)
-   * @param bool|\boolen $excludeHidden exclude hidden groups.
+   * @param bool $excludeHidden exclude hidden groups.
    *
    * @access public
    * @static
@@ -1000,6 +1005,18 @@ WHERE  id = %1";
    */
   public static function group($groupType = NULL, $excludeHidden = TRUE) {
     return CRM_Core_Permission::group($groupType, $excludeHidden);
+  }
+
+  /**
+   * Fetch groups in a nested format suitable for use in select form element
+   * @param bool $checkPermissions
+   * @param string|null $groupType
+   * @param bool $excludeHidden
+   * @return array
+   */
+  public static function nestedGroup($checkPermissions = TRUE, $groupType = NULL, $excludeHidden = TRUE) {
+    $groups = $checkPermissions ? self::group($groupType, $excludeHidden) : self::allGroup($groupType, $excludeHidden);
+    return CRM_Contact_BAO_Group::getGroupsHierarchy($groups, NULL, '&nbsp;&nbsp;', TRUE);
   }
 
   /**
@@ -1837,6 +1854,39 @@ WHERE  id = %1
    */
   public static function getModuleExtensions($fresh = FALSE) {
     return CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles($fresh);
+  }
+
+
+  /**
+   * Get all tax rates
+   *
+   * The static array tax rates is returned
+   *
+   * @access public
+   * @static
+   *
+   * @return array - array list of tax rates with the financial type
+   */
+  public static function getTaxRates() {
+    if (!self::$taxRates) {
+      self::$taxRates = array();
+      $sql = "
+        SELECT fa.tax_rate, efa.entity_id
+        FROM civicrm_entity_financial_account efa
+        INNER JOIN civicrm_financial_account fa ON fa.id = efa.financial_account_id
+        INNER JOIN civicrm_option_value cov ON cov.value = efa.account_relationship
+        INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
+        WHERE efa.entity_table = 'civicrm_financial_type'
+        AND cov.name = 'Sales Tax Account is'
+        AND cog.name = 'account_relationship'
+        AND fa.is_active = 1";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      while ($dao->fetch()) {
+        self::$taxRates[$dao->entity_id] = $dao->tax_rate;
+      }
+    }
+
+    return self::$taxRates;
   }
 }
 

@@ -63,7 +63,6 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     // Add Contact
     $firstName2 = 'An_' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "Summerson");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Edit and expand all tabs
     $this->click('link=Edit');
@@ -161,11 +160,11 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->click('extends[0]');
     $this->select('extends[0]', "value=Contact");
     $this->click("//option[@value='Contact']");
-    $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    $this->clickLink('_qf_Group_next-bottom');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', $customGroupTitle);
+    $this->waitForElementPresent('_qf_Field_cancel-bottom');
     $gid = $this->urlArg('gid');
 
     // create another custom field - Date
@@ -182,10 +181,10 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->click("is_searchable");
 
     // clicking save
-    $this->click('_qf_Field_next-bottom');
-    $this->waitForElementPresent('newCustomField');
+    $this->click('_qf_Field_done-bottom');
+    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td");
 
-    $this->assertTrue($this->isTextPresent("Custom field '{$customField}' has been saved."));
+    $this->waitForText('crm-notification-container', "Custom field '{$customField}' has been saved.");
     $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
 

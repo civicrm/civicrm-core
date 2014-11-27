@@ -506,14 +506,13 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeId,
     );
     $result = $this->callAPISuccess('membership', 'get', $params);
-    //exit;
     // If it fails here CRM-14758 is not fixed
     $this->assertEquals(1, $result['count']);
     $result = $result['values'][$result['id']];
     $this->assertEquals($OrganizationMembershipID, $result['owner_membership_id']);
 
     // Create third employee
-    $memberContactId[2] = $this->individualCreate(array('current_employer' => $employerId[0]), 2);
+    $memberContactId[2] = $this->individualCreate(array('employer_id' => $employerId[0]), 2);
 
     // Check that employee does NOT inherit the membership (max_related = 2)
     $params = array(

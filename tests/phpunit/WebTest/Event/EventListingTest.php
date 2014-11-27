@@ -160,7 +160,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Location' information has been saved.");
+    $this->waitForText("crm-notification-container", "'Event Location' information has been saved.");
   }
 }
 

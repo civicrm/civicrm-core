@@ -48,7 +48,7 @@ class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_For
      * Define the columns for search result rows
      */
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Full Name') => 'sort_name',
       ts('First Name') => 'first_name',
       ts('Last Name') => 'last_name',

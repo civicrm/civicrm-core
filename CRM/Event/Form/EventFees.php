@@ -147,9 +147,6 @@ class CRM_Event_Form_EventFees {
       $billingDefaults = $form->getProfileDefaults('Billing', $form->_contactId);
       $defaults[$form->_pId] = array_merge($defaults[$form->_pId], $billingDefaults);
 
-      // now fix all state country selectors, set correct state based on country
-      CRM_Core_BAO_Address::fixAllStateSelects($form, $defaults[$form->_pId]);
-
       //             // hack to simplify credit card entry for testing
       //             $defaults[$form->_pId]['credit_card_type']     = 'Visa';
       //             $defaults[$form->_pId]['credit_card_number']   = '4807731747657838';
@@ -380,8 +377,17 @@ SELECT  id, html_type
       CRM_Event_Form_Registration::initEventFee($form, $event['id']);
       CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->_discountId);
       $lineItem = array();
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+      $totalTaxAmount = 0;
       if (!CRM_Utils_System::isNull(CRM_Utils_Array::value('line_items', $form->_values))) {
         $lineItem[] = $form->_values['line_items'];
+        foreach ($form->_values['line_items'] as $key => $value) {
+          $totalTaxAmount = $value['tax_amount'] + $totalTaxAmount;
+        }
+      }
+      if ($invoicing) {
+        $form->assign('totalTaxAmount', $totalTaxAmount);
       }
       $form->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
       $discounts = array();
@@ -404,7 +410,7 @@ SELECT  id, html_type
         }
       }
       if ($form->_mode) {
-        CRM_Core_Payment_Form::buildCreditCard($form, TRUE);
+        CRM_Core_Payment_Form::buildPaymentForm($form, $form->_processor, FALSE);
       }
       elseif (!$form->_mode) {
         $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,

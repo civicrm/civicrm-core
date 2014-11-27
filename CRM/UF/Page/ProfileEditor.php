@@ -13,7 +13,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
 
   static function registerProfileScripts() {
     static $loaded = FALSE;
-    if ($loaded) {
+    if ($loaded || CRM_Core_Resources::isAjaxMode()) {
       return;
     }
     $loaded = TRUE;
@@ -31,6 +31,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             'is_active' => 1,
             'rowCount' => 1000, // FIXME
           )),
+          'contactSubTypes' => CRM_Contact_BAO_ContactType::subTypes(),
           'profilePreviewKey' => CRM_Core_Key::get('CRM_UF_Form_Inline_Preview', TRUE),
         );
       })
@@ -81,8 +82,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    */
   static function getSchemaJSON() {
     $entityTypes = explode(',', $_REQUEST['entityTypes']);
-    echo json_encode(self::getSchema($entityTypes));
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(self::getSchema($entityTypes));
   }
 
   /**
@@ -196,7 +196,9 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         case 'Individual':
         case 'Organization':
         case 'Household':
-          if ($field['field_type'] != $extends && $field['field_type'] != 'Contact') {
+          if ($field['field_type'] != $extends && $field['field_type'] != 'Contact'
+            //CRM-15595 check if subtype
+            && !in_array($field['field_type'], CRM_Contact_BAO_ContactType::subTypes($extends))) {
             continue 2;
           }
           break;

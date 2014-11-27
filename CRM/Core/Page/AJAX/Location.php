@@ -130,19 +130,21 @@ class CRM_Core_Page_AJAX_Location {
         'supplemental_address_2',
         'city',
         'postal_code',
-        'country',
+        'county',
         'state_province',
+        'country',
       );
 
       foreach ($addressFields as $field) {
         if (array_key_exists($field, $addressSequence)) {
           $addField = $field;
-          if (in_array($field, array(
-            'state_province', 'country'))) {
+          $type = 'Text';
+          if (in_array($field, array('state_province', 'country', 'county'))) {
             $addField = "{$field}_id";
+            $type = 'Select';
           }
           $elements["onbehalf_{$field}-{$locTypeId}"] = array(
-            'type' => 'Text',
+            'type' => $type,
             'value' =>  isset($location['address'][1]) ? $location['address'][1][$addField] : null,
           );
           unset($profileFields["{$field}-{$locTypeId}"]);
@@ -195,62 +197,22 @@ class CRM_Core_Page_AJAX_Location {
         }
       }
 
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($elements);
   }
 
   static function jqState() {
-    if (empty($_GET['_value'])) {
-      CRM_Utils_System::civiExit();
-    }
-
-    $result = CRM_Core_PseudoConstant::stateProvinceForCountry($_GET['_value']);
-
-    $elements = array(array(
-      'name' => $result ? ts('- select a state -') : ts('- N/A -'),
-      'value' => '',
-    ));
-    foreach ($result as $id => $name) {
-      $elements[] = array(
-        'name' => $name,
-        'value' => $id,
-      );
-    }
-
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'country'));
   }
 
   static function jqCounty() {
-    if (!isset($_GET['_value']) || CRM_Utils_System::isNull($_GET['_value'])) {
-      $elements = array(
-        array('name' => ts('(choose state first)'), 'value' => '')
-      );
-    }
-    else {
-      $result = CRM_Core_PseudoConstant::countyForState($_GET['_value']);
-
-      $elements = array(array(
-        'name' => $result ? ts('- select -') : ts('- N/A -'),
-        'value' => '',
-      ));
-      foreach ($result as $id => $name) {
-        $elements[] = array(
-          'name' => $name,
-          'value' => $id,
-        );
-      }
-    }
-
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'stateProvince'));
   }
 
   static function getLocBlock() {
     // i wish i could retrieve loc block info based on loc_block_id,
     // Anyway, lets retrieve an event which has loc_block_id set to 'lbid'.
-    if ($_POST['lbid']) {
-      $params = array('1' => array($_POST['lbid'], 'Integer'));
+    if ($_REQUEST['lbid']) {
+      $params = array('1' => array($_REQUEST['lbid'], 'Integer'));
       $eventId = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_event WHERE loc_block_id=%1 LIMIT 1', $params);
     }
     // now lets use the event-id obtained above, to retrieve loc block information.
@@ -296,9 +258,8 @@ class CRM_Core_Page_AJAX_Location {
     }
 
     // set the message if loc block is being used by more than one event.
-    $result['count_loc_used'] = CRM_Event_BAO_Event::countEventsUsingLocBlockId($_POST['lbid']);
+    $result['count_loc_used'] = CRM_Event_BAO_Event::countEventsUsingLocBlockId($_REQUEST['lbid']);
 
-    echo json_encode($result);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($result);
   }
 }

@@ -93,36 +93,15 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * @access public
    */
   public function buildQuickForm() {
-    //parent::buildQuickForm( );
+    parent::buildQuickForm( );
+    $this->setPageTitle(ts('Premium Product'));
 
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       CRM_Contribute_BAO_Premium::buildPremiumPreviewBlock($this, $this->_id);
-
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Done with Preview'),
-            'isDefault' => TRUE,
-          ),
-        )
-      );
-
       return;
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
       return;
     }
 
@@ -222,7 +201,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
         ),
       )
     );
-
     $this->assign('productId', $this->_id);
   }
 
@@ -420,5 +398,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $config = CRM_Core_Config::singleton();
     return $config->imageUploadURL.basename($newFilename);
   }
+
 }
 
