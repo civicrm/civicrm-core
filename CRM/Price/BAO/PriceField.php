@@ -451,6 +451,18 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         $selectOption = $allowedOptions = $priceVal = array();
 
         foreach ($customOption as $opt) {
+<<<<<<< HEAD
+
+          //CRM-14512
+          if ($field->is_display_amounts) {
+            $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' .  $opt['label'];
+          }	
+			
+          $count = CRM_Utils_Array::value('count', $opt, '');
+          $max_value = CRM_Utils_Array::value('max_value', $opt, '');
+          $priceVal[$opt['id']] = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
+     
+=======
           $taxAmount = CRM_Utils_Array::value('tax_amount', $opt);
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
@@ -464,6 +476,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
               $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
             }
           }
+>>>>>>> ec712c0779e1ef9883665ec22d14be0aabb0f470
           $selectOption[$opt['id']] = $opt['label'];
           $priceVal[$opt['id']] = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
 
@@ -492,10 +505,21 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         $check = array();
         foreach ($customOption as $opId => $opt) {
+<<<<<<< HEAD
+
+          //CRM-14512			
+          if ($field->is_display_amounts) {
+            $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' .  $opt['label'];
+          }	
+=======
           $taxAmount = CRM_Utils_Array::value('tax_amount', $opt);
+>>>>>>> ec712c0779e1ef9883665ec22d14be0aabb0f470
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
 
+<<<<<<< HEAD
+         
+=======
           if ($field->is_display_amounts) {
             $opt['label'] .= '&nbsp;-&nbsp;';
             if (isset($taxAmount) && $invoicing) {
@@ -506,6 +530,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             }
           }
           $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
+>>>>>>> ec712c0779e1ef9883665ec22d14be0aabb0f470
           $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $opt['label'],
             array('price' => json_encode(array($opt['id'], $priceVal)),
              'data-amount' => $opt[$valueFieldName],
