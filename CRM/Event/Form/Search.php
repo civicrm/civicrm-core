@@ -268,6 +268,12 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     if (!empty($_POST)) {
       $this->_formValues = $this->controller->exportValues($this->_name);
+      foreach (array('participant_status_id', 'participant_role_id') as $element) {
+        $value = CRM_Utils_Array::value($element, $this->_formValues);
+        if ($value && is_array($value)) {
+          $this->_formValues[$element] = array('IN' => $value);
+        }
+      }
     }
 
     if (empty($this->_formValues)) {

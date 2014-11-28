@@ -364,7 +364,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       }
     }
 
-    foreach (array('financial_type_id', 'contribution_soft_credit_type_id', 'contribution_status', 'contribution_source', 'contribution_trxn_id', 'activity_type_id', 'status_id', 'activity_subject') as $element) {
+    foreach (array('financial_type_id', 'contribution_soft_credit_type_id', 'contribution_status', 'contribution_source', 'contribution_trxn_id', 'activity_type_id', 'status_id', 'activity_subject', 'participant_status_id', 'participant_role_id') as $element) {
       $value = CRM_Utils_Array::value($element, $this->_formValues);
       if ($value) {
         if (is_array($value)) {

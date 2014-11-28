@@ -275,9 +275,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
           if (is_array($value)) {
             $this->_formValues[$element] = array('IN' => $value);
           }
-        }
-        else {
-          $this->_formValues[$element] = array('LIKE' => "%$value%");
+          else {
+            $this->_formValues[$element] = array('LIKE' => "%$value%");
+          }
         }
       }
 

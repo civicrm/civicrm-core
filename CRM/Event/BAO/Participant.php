@@ -110,6 +110,10 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
     // ensure that role ids are encoded as a string
     if (isset($params['role_id']) && is_array($params['role_id'])) {
+      if (in_array(key($params['role_id']), CRM_Core_DAO::acceptedSQLOperators())) {
+        $op = key($params['role_id']);
+        $params['role_id'] = $params['role_id'][$op];
+      }
       $params['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
     }
 
@@ -750,44 +754,31 @@ GROUP BY  participant.event_id
       $fields = array();
 
       $participantFields = CRM_Event_DAO_Participant::export();
+      $eventFields = CRM_Event_DAO_Event::export();
       $noteField = array(
         'participant_note' => array(
           'title' => 'Participant Note',
           'name' => 'participant_note',
-        ),
-      );
+          'type' => CRM_Utils_Type::T_STRING,
+        ));
 
       $participantStatus = array(
         'participant_status' => array(
           'title' => 'Participant Status',
           'name' => 'participant_status',
-        ),
-      );
+          'type' => CRM_Utils_Type::T_STRING,
+        ));
 
       $participantRole = array(
         'participant_role' => array(
           'title' => 'Participant Role',
           'name' => 'participant_role',
-        ),
-      );
-
-      //CRM-13595 add event id to participant export
-      $eventid = array(
-        'event_id' => array(
-          'title' => 'Event ID',
-          'name' => 'event_id',
-        ),
-      );
-      $eventtitle = array(
-        'event_title' => array(
-          'title' => 'Event Title',
-          'name' => 'event_title',
-        ),
-      );
+          'type' => CRM_Utils_Type::T_STRING,
+        ));
 
       $discountFields = CRM_Core_DAO_Discount::export();
 
-      $fields = array_merge($participantFields, $participantStatus, $participantRole, $eventid, $eventtitle, $noteField, $discountFields);
+      $fields = array_merge($participantFields, $participantStatus, $participantRole,  $eventFields, $noteField, $discountFields);
 
       // add custom data
       $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant'));
