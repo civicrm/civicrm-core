@@ -423,7 +423,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           $fields['Participant'] = array_merge($fields['Participant'], $componentPaymentFields);
         }
 
-        unset($fields['Participant']['participant_contact_id']);
         $compArray['Participant'] = ts('Participant');
       }
     }

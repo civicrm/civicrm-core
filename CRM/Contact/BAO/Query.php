@@ -1542,7 +1542,7 @@ class CRM_Contact_BAO_Query {
       return $result;
     }
 
-    if ($apiEntity) {
+    if ($apiEntity && substr($id, 0, strlen($apiEntity)) != $apiEntity) {
       $id = $apiEntity . '_' . $id;
     }
 
@@ -5551,12 +5551,13 @@ AND   displayRelType.is_active = 1
         }
         // FIX ME: we should potentially move this to component Query and write a wrapper function that
         // handles pseudoconstant fixes for all component
-        elseif ($value['pseudoField'] == 'participant_role') {
-          $viewRoles = array();
+        elseif (in_array($value['pseudoField'], array('participant_status', 'participant_role'))) {
+          $pseudoOptions = $viewValues = array();
+          $pseudoOptions = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', $value['pseudoField'], array('flip' => 1));
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, $val) as $k => $v) {
-            $viewRoles[] = CRM_Event_PseudoConstant::participantRole($v);
+            $viewValues[] = $pseudoOptions[$v];
           }
-          $dao->$key = implode(', ', $viewRoles);
+          $dao->$key = implode(', ', $viewValues);
         }
         else {
           $labels = CRM_Core_OptionGroup::values($value['pseudoField']);
