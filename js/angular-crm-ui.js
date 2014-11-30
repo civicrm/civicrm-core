@@ -265,6 +265,47 @@
       };
     })
 
+    // usage: <select crm-ui-select="{placeholder:'Something',allowClear:true,...}" crm-ui-select-model="myobj.field"><option...></select>
+    .directive('crmUiSelect', function ($parse) {
+      return {
+        scope: {
+          crmUiSelect: '@',
+          crmUiSelectModel: '@',
+          crmUiSelectChange: '@'
+        },
+        link: function (scope, element, attrs) {
+          var model = $parse(attrs.crmUiSelectModel);
+
+          // In cases where UI initiates update, there may be an extra
+          // call to refreshUI, but it doesn't create a cycle.
+
+          function refreshUI() {
+            $(element).select2('val', model(scope.$parent));
+          }
+          function refreshModel() {
+            var oldValue = model(scope.$parent), newValue = $(element).select2('val');
+            if (oldValue != newValue) {
+              scope.$parent.$apply(function(){
+                model.assign(scope.$parent, newValue);
+              });
+              if (attrs.crmUiSelectChange) {
+                scope.$parent.$eval(attrs.crmUiSelectChange);
+              }
+            }
+          }
+          function init() {
+            // TODO watch select2-options
+            var options = attrs.crmUiSelect ? scope.$parent.$eval(attrs.crmUiSelect) : {};
+            $(element).select2(options);
+            $(element).on('change', refreshModel);
+            setTimeout(refreshUI, 0);
+            scope.$parent.$watch(attrs.crmUiSelectModel, refreshUI);
+          }
+          init();
+        }
+      };
+    })
+
     // example <div crm-ui-tab crm-title="ts('My Title')">...content...</div>
     // WISHLIST: use a full Angular component instead of an incomplete jQuery wrapper
     .directive('crmUiTab', function($parse) {
