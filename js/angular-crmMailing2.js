@@ -300,4 +300,114 @@
     $scope.ts = CRM.ts('CiviMail');
   });
 
+  // Controller for the in-place msg-template management
+  // Scope members:
+  //  - [input] mailing: object
+  crmMailing2.controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService, $parse) {
+    var ts = $scope.ts = CRM.ts('CiviMail');
+    $scope.crmMsgTemplates = crmMsgTemplates;
+
+    // @return Promise MessageTemplate (per APIv3)
+    $scope.saveTemplate = function saveTemplate() {
+      var model = {
+        selected_id: $scope.mailing.msg_template_id,
+        tpl: {
+          msg_title: '',
+          msg_subject: $scope.mailing.subject,
+          msg_text: $scope.mailing.body_text,
+          msg_html: $scope.mailing.body_html
+        }
+      };
+      var options = {
+        autoOpen: false,
+        modal: true,
+        title: ts('Save Template')
+      };
+      return dialogService.open('saveTemplateDialog', partialUrl('dialog/saveTemplate.html'), model, options)
+        .then(function(item){
+          $parse('mailing.msg_template_id').assign($scope, item.id);
+          return item;
+        });
+    };
+
+    // @param int id
+    // @return Promise
+    $scope.loadTemplate = function loadTemplate(id) {
+      return crmMsgTemplates.get(id).then(function (tpl) {
+        $scope.mailing.subject = tpl.msg_subject;
+        $scope.mailing.body_text = tpl.msg_text;
+        $scope.mailing.body_html = tpl.msg_html;
+      });
+    };
+  });
+
+  // Controller for the "Save Message Template" dialog
+  // Scope members:
+  //   - [input] "model": Object
+  //     - "selected_id": int
+  //     - "tpl": Object
+  //       - "msg_subject": string
+  //       - "msg_text": string
+  //       - "msg_html": string
+  crmMailing2.controller('SaveMsgTemplateDialogCtrl', function SaveMsgTemplateDialogCtrl($scope, crmMsgTemplates, dialogService) {
+    var ts = $scope.ts = CRM.ts('CiviMail');
+    $scope.saveOpt = {mode: '', newTitle: ''};
+    $scope.selected = null;
+
+    $scope.save = function save() {
+      var tpl = _.extend({}, $scope.model.tpl);
+      switch ($scope.saveOpt.mode) {
+        case 'add':
+          tpl.msg_title = $scope.saveOpt.newTitle;
+          break;
+        case 'update':
+          tpl.id = $scope.selected.id;
+          tpl.msg_title = $scope.selected.msg_title;
+          break;
+        default:
+          throw 'SaveMsgTemplateDialogCtrl: Unrecognized mode: ' + $scope.saveOpt.mode;
+      }
+      return crmMsgTemplates.save(tpl)
+        .then(function (item) {
+          CRM.status(ts('Saved'));
+          return item;
+        });
+    };
+
+    function scopeApply(f) {
+      return function () {
+        var args = arguments;
+        $scope.$apply(function () {
+          f.apply(args);
+        });
+      };
+    }
+
+    function init() {
+      crmMsgTemplates.get($scope.model.selected_id).then(
+        function (tpl) {
+          $scope.saveOpt.mode = 'update';
+          $scope.selected = tpl;
+        },
+        function () {
+          $scope.saveOpt.mode = 'add';
+          $scope.selected = null;
+        }
+      );
+      // When using dialogService with a button bar, the major button actions
+      // need to be registered with the dialog widget (and not embedded in
+      // the body of the dialog).
+      var buttons = {};
+      buttons[ts('Save')] = function () {
+        $scope.save().then(function (item) {
+          dialogService.close('saveTemplateDialog', item);
+        });
+      };
+      buttons[ts('Cancel')] = function () {
+        dialogService.cancel('saveTemplateDialog');
+      };
+      dialogService.setButtons('saveTemplateDialog', buttons);
+    }
+    setTimeout(scopeApply(init), 0);
+  });
 })(angular, CRM.$, CRM._);
