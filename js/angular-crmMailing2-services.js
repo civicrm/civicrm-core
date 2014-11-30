@@ -20,7 +20,7 @@
     });
     function first(array) {
       return (array.length == 0) ? null : array[0];
-    };
+    }
 
     return {
       getAll: function getAll() {
@@ -57,7 +57,6 @@
 
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
   crmMailing2.factory('crmMailingMgr', function($q, crmApi, crmFromAddresses) {
-    window.f = crmFromAddresses; // REVERT
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
         component_type:type,
@@ -135,7 +134,7 @@
         var params = _.extend({}, mailing, {
           options:  {force_rollback: 1},
           'api.Mailing.preview': {
-            id: '$value.id',
+            id: '$value.id'
           }
         });
         return crmApi('Mailing', 'create', params).then(function(result){

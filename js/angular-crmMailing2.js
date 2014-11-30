@@ -46,7 +46,7 @@
     }
   ]);
 
-  crmMailing2.controller('ListMailingsCtrl', function ListMailingsCtrl($scope) {
+  crmMailing2.controller('ListMailingsCtrl', function ListMailingsCtrl() {
     // We haven't implemented this in Angular, but some users may get clever
     // about typing URLs, so we'll provide a redirect.
     window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
@@ -61,7 +61,7 @@
     $scope.crmFromAddresses = crmFromAddresses;
 
     $scope.partialUrl = partialUrl;
-    $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts('CiviMail');
 
     // @return Promise
     $scope.submit = function submit() {
@@ -81,7 +81,7 @@
     $scope.delete = function cancel() {
       // CRM.status doesn't work with Angular promises, so do backflips
       var p = crmMailingMgr.delete($scope.mailing);
-      var p2 = CRM.status({start: $scope.ts('Deleting...'), success: $scope.ts('Deleted')}, CRM.toJqPromise(p));
+      var p2 = CRM.status({start: ts('Deleting...'), success: ts('Deleted')}, CRM.toJqPromise(p));
       return CRM.toAPromise($q, p2);
     };
     $scope.leave = function leave() {
@@ -118,7 +118,7 @@
   //  - [input] mailing: object
   //  - [output] recipients: array of recipient records
   crmMailing2.controller('EditRecipCtrl', function EditRecipCtrl($scope, dialogService, crmApi, crmMailingMgr) {
-    // TODO load & live update real recipients list
+    var ts = $scope.ts = CRM.ts('CiviMail');
     $scope.recipients = null;
     $scope.getRecipientsEstimate = function () {
       var ts = $scope.ts;
@@ -191,7 +191,7 @@
         modal: true,
         title: ts('Preview (%1)', {
           1: $scope.getRecipientsEstimate()
-        }),
+        })
       };
       dialogService.open('recipDialog', partialUrl('dialog/recipients.html'), model, options);
     };
@@ -208,7 +208,8 @@
   // Note: Expects $scope.model to be an object with properties:
   //   - mailing: object
   crmMailing2.controller('PreviewMailingCtrl', function ($scope, dialogService, crmMailingMgr) {
-    $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts('CiviMail');
+
     $scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
     $scope.testGroup = {gid: null};
 
@@ -270,7 +271,8 @@
   // Controller for the "Preview Mailing Component" segment
   // which displays header/footer/auto-responder
   crmMailing2.controller('PreviewComponentCtrl', function PreviewMailingDialogCtrl($scope, dialogService) {
-    $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts('CiviMail');
+
     $scope.previewComponent = function previewComponent(title, componentId) {
       var component = _.where(CRM.crmMailing.headerfooterList, {id: ""+componentId});
       if (!component || !component[0]) {
