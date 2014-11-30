@@ -5,6 +5,31 @@
 
   var crmMailing2 = angular.module('crmMailing2');
 
+  crmMailing2.directive('crmMailingReviewBool', function(){
+    return {
+      scope: {
+        crmOn: '@',
+        crmTitle: '@'
+      },
+      template: '<span ng-class="spanClasses"><span class="icon" ng-class="iconClasses"></span>{{crmTitle}} </span>',
+      link: function(scope, element, attrs){
+        function refresh() {
+          if (scope.$parent.$eval(attrs.crmOn)) {
+            scope.spanClasses = {'crmMailing2-active': true};
+            scope.iconClasses = {'ui-icon-check': true};
+          } else {
+            scope.spanClasses = {'crmMailing2-inactive': true};
+            scope.iconClasses = {'ui-icon-close': true};
+          }
+          scope.crmTitle = scope.$parent.$eval(attrs.crmTitle);
+        }
+        refresh();
+        scope.$parent.$watch(attrs.crmOn, refresh);
+        scope.$parent.$watch(attrs.crmTitle, refresh);
+      }
+    };
+  });
+
   // example: <input name="subject" /> <input crm-mailing-token crm-for="subject"/>
   // WISHLIST: Instead of global CRM.crmMailing.mailTokens, accept token list as an input
   crmMailing2.directive('crmMailingToken', function () {

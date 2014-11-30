@@ -58,3 +58,8 @@ input[name=preview_test_email]::-webkit-input-placeholder  {
 input[name=preview_test_email]:-ms-input-placeholder {
   text-align: center;
 }
+.crmMailing2-active {
+}
+.crmMailing2-inactive {
+  text-decoration: line-through;
+}
