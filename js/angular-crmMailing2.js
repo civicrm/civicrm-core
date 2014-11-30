@@ -132,6 +132,41 @@
         return ts('>%1 recipients', {1: RECIPIENTS_PREVIEW_LIMIT});
       return ts('~%1 recipients', {1: $scope.recipients.length});
     };
+    $scope.getIncludesAsString = function() {
+      var first = true;
+      var names = '';
+      _.each($scope.mailing.groups.include, function(id){
+        if (!first) names = names + ', ';
+        var group = _.where(CRM.crmMailing.groupNames, {id: ''+id});
+        names = names + group[0].title;
+        first = false;
+      });
+      _.each($scope.mailing.mailings.include, function(id){
+        if (!first) names = names + ', ';
+        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: ''+id});
+        names = names + oldMailing[0].name;
+        first = false;
+      });
+      return names;
+    };
+    $scope.getExcludesAsString = function() {
+      var first = true;
+      var names = '';
+      _.each($scope.mailing.groups.exclude, function(id){
+        if (!first) names = names + ', ';
+        var group = _.where(CRM.crmMailing.groupNames, {id: ''+id});
+        names = names + group[0].title;
+        first = false;
+      });
+      _.each($scope.mailing.mailings.exclude, function(id){
+        if (!first) names = names + ', ';
+        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: ''+id});
+        names = names + oldMailing[0].name;
+        first = false;
+      });
+      return names;
+    };
+
     // We monitor four fields -- use debounce so that changes across the
     // four fields can settle-down before AJAX.
     var refreshRecipients = _.debounce(function () {
@@ -229,6 +264,37 @@
   //   - "body_html"
   //   - "body_text"
   crmMailing2.controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope, crmMailingMgr) {
+    $scope.ts = CRM.ts('CiviMail');
+  });
+
+  // Controller for the "Preview Mailing Component" segment
+  // which displays header/footer/auto-responder
+  crmMailing2.controller('PreviewComponentCtrl', function PreviewMailingDialogCtrl($scope, dialogService) {
+    $scope.ts = CRM.ts('CiviMail');
+    $scope.previewComponent = function previewComponent(title, componentId) {
+      var component = _.where(CRM.crmMailing.headerfooterList, {id: ""+componentId});
+      if (!component || !component[0]) {
+        CRM.alert(ts('Invalid component ID (%1)', {
+          1: componentId
+        }));
+        return;
+      }
+      var options = {
+        autoOpen: false,
+        modal: true,
+        title: title // component[0].name
+      };
+      dialogService.open('previewComponentDialog', partialUrl('dialog/previewComponent.html'), component[0], options);
+    };
+  });
+
+  // Controller for the "Preview Mailing" dialog
+  // Note: Expects $scope.model to be an object with properties:
+  //   - "name"
+  //   - "subject"
+  //   - "body_html"
+  //   - "body_text"
+  crmMailing2.controller('PreviewComponentDialogCtrl', function PreviewMailingDialogCtrl($scope) {
     $scope.ts = CRM.ts('CiviMail');
   });
 
