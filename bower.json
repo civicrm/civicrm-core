@@ -1,0 +1,17 @@
+{
+  "name": "civicrm",
+  "description": "CiviCRM",
+  "version": "5.0.0",
+  "license": "AGPL-3.0",
+  "private": true,
+  "dependencies": {
+    "angular": "1.3.x",
+    "angular-file-upload": "~1.1.5",
+    "angular-jquery-dialog-service": "totten/angular-jquery-dialog-service#jquery-closure",
+    "angular-mocks": "1.3.x",
+    "angular-route": "1.3.x",
+    "angular-ui-sortable": "0.12.x",
+    "angular-ui-utils": "0.1.x",
+    "angular-unsavedChanges": "~0.1.1"
+  }
+}
