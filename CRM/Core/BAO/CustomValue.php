@@ -190,7 +190,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   }
 
   /**
-   * Function to delet option value give an option value and custom group id
+   * delet option value give an option value and custom group id
    *
    * @param int $customValueID custom value ID
    * @param int $customGroupID custom group ID

@@ -43,13 +43,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    */
   static $_defaultPaymentProcessor = NULL;
 
-  /*
+  /**
    * Create Payment Processor
    *
-   * @params array parameters for Processor entity
-   */
-  /**
-   * @param $params
+   * @param array $params parameters for Processor entity
    *
    * @return CRM_Financial_DAO_PaymentProcessor
    * @throws Exception
@@ -102,7 +99,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-     * @return object CRM_Financial_DAO_PaymentProcessor object on success, null otherwise
+     * @return CRM_Financial_DAO_PaymentProcessor object on success, null otherwise
    * @access public
    * @static
    */
@@ -153,11 +150,9 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Function  to delete payment processor
    *
-   * @param $paymentProcessorID
+   * @param int $paymentProcessorID
    *
    * @return null
-   * @internal param int $paymentProcessorId ID of the processor to be deleted.
-   *
    * @access public
    * @static
    */
@@ -181,7 +176,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Function to get the payment processor details
+   * get the payment processor details
    *
    * @param  int    $paymentProcessorID payment processor id
    * @param  string $mode               payment mode ie test or live
@@ -256,7 +251,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
 
   /**
-   * Function to build payment processor details
+   * build payment processor details
    *
    * @param object $dao   payment processor object
    * @param  string $mode payment mode ie test or live
@@ -364,14 +359,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Function to retrieve payment processor id / info/ object based on component-id.
+   * retrieve payment processor id / info/ object based on component-id.
    *
    * @param $entityID
    * @param string $component component
    * @param string $type type of payment information to be retrieved
    *
-   * @internal param int $componentID id of a component
-   * @return id / array / object based on type
+   * @return int / array / object based on type
    * @static
    * @access public
    */

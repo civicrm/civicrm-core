@@ -39,7 +39,7 @@
 class CRM_Mailing_Page_AJAX {
 
   /**
-   * Function to fetch the template text/html messages
+   * fetch the template text/html messages
    */
   public static function template() {
     $templateId = CRM_Utils_Type::escape($_POST['tid'], 'Integer');
@@ -60,7 +60,7 @@ class CRM_Mailing_Page_AJAX {
   }
 
   /**
-   * Function to retrieve contact mailings
+   * retrieve contact mailings
    */
   public static function getContactMailings() {
     $contactID = CRM_Utils_Type::escape($_GET['contact_id'], 'Integer');

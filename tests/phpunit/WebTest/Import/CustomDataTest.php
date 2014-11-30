@@ -102,10 +102,9 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     }
   }
 
-  /*
-     *  Helper function to provide data for custom data import.
-     */
   /**
+   * Helper function to provide data for custom data import.
+   *
    * @param $customGroupTitle
    * @param $firstName1
    * @param $firstName2
@@ -323,20 +322,21 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     $contactReferenceFieldId = $contactReferenceFieldId[1];
 
     $customDataParams = array(
-      'headers' =>
-      array(
+      'headers' => array(
         "custom_{$dateFieldId}" => "$dateFieldLabel :: $customGroupTitle",
         "custom_{$radioFieldId}" => "$radioFieldLabel :: $customGroupTitle",
         "custom_{$multiSelectFieldId}" => "$multiSelectLabel :: $customGroupTitle",
         "custom_{$contactReferenceFieldId}" => "$contactReferenceLabel :: $customGroupTitle",
       ),
-      'rows' =>
-      array(0 => array("custom_{$dateFieldId}" => date('Y-m-d'),
+      'rows' => array(
+        0 => array(
+          "custom_{$dateFieldId}" => date('Y-m-d'),
           "custom_{$radioFieldId}" => '2',
           "custom_{$multiSelectFieldId}" => '3',
           "custom_{$contactReferenceFieldId}" => $id1,
         ),
-        1 => array("custom_{$dateFieldId}" => date('Y-m-d', mktime(0, 0, 0, 4, 5, date('Y'))),
+        1 => array(
+          "custom_{$dateFieldId}" => date('Y-m-d', mktime(0, 0, 0, 4, 5, date('Y'))),
           "custom_{$radioFieldId}" => '1',
           "custom_{$multiSelectFieldId}" => '2',
           "custom_{$contactReferenceFieldId}" => $id2,

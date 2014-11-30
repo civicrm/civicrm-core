@@ -1338,7 +1338,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   //    }
 
   /**
-   * function to build common params
+   * build common params
    *
    */
   private function contactParams() {

@@ -47,7 +47,7 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
   protected $_title;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -68,7 +68,7 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

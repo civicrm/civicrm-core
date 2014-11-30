@@ -183,7 +183,6 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
 
     $this->_query->_distinctComponentClause = " civicrm_mailing_recipients.id ";
   }
-  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -225,15 +224,13 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     }
     return self::$_links;
   }
-  //end of function
 
   /**
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param $params
+   * @param array $params
    *
-   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -249,7 +246,6 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * Returns total number of rows for the query.
@@ -332,7 +328,6 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
   }
 
   /**
-   *
    * @return array   $qill         which contains an array of strings
    * @access public
    */

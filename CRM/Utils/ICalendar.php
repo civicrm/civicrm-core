@@ -85,7 +85,6 @@ class CRM_Utils_ICalendar {
   }
 
   /**
-   *
    * Send the ICalendar to the browser with the specified content type
    * - 'text/calendar' : used for downloaded ics file
    * - 'text/plain'    : used for iCal formatted feed
@@ -94,16 +93,10 @@ class CRM_Utils_ICalendar {
    * @access public
    *
    * @param string $calendar The calendar data to be published.
-   *
    * @param string $content_type
-   *
-   * @param string $charset The character set to use, defaults to
-   * 'us-ascii'.
-   *
-   * @param null $fileName
+   * @param string $charset The character set to use, defaults to 'us-ascii'.
+   * @param string $fileName The file name (for downloads)
    * @param string $disposition How the file should be sent ('attachment' for downloads)
-   *
-   * @internal param string $filename The file name (for downloads)
    *
    * @return void
    */

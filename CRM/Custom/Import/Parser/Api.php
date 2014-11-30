@@ -176,7 +176,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    *
    * Although the api will accept any strtotime valid string CiviCRM accepts at least one date format
    * not supported by strtotime so we should run this through a conversion
-   * @internal param \unknown $params
    */
   function formatDateParams() {
     $session = CRM_Core_Session::singleton();

@@ -145,8 +145,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
    *
    * @return int|mixed|null
    */
-  static function find_or_create_contact($registeringContactID = NULL, $fields = array(
-    )) {
+  static function find_or_create_contact($registeringContactID = NULL, $fields = array()) {
     $contact_id = self::find_contact($fields);
 
     if ($contact_id) {

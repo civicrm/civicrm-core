@@ -220,7 +220,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     $this->_options = &$this->_query->_options;
   }
-  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -299,15 +298,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
     return self::$_links;
   }
-  //end of function
 
   /**
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param $params
+   * @param array $params
    *
-   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -318,7 +315,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * @param null $action
@@ -825,7 +821,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   }
 
   /**
-   * @param $sort
+   * @param CRM_Utils_Sort $sort
    *
    * @return string
    */
@@ -989,7 +985,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   }
 
   /**
-   * @param object $sort
+   * @param CRM_Utils_Sort $sort
    * @param string $cacheKey
    * @param int $start
    * @param int $end
@@ -1051,10 +1047,9 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    *
    * @param int $start start for limit clause
    * @param int $end end for limit clause
-   * @param $sort
+   * @param CRM_Utils_Sort $sort
    * @param string $cacheKey cache key
    *
-   * @internal param $object $sort sort object
    * @return void
    */
   function rebuildPreNextCache($start, $end, $sort, $cacheKey) {
@@ -1185,7 +1180,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $action
    * @param $sortID
    * @param null $displayRelationshipType
@@ -1260,5 +1255,4 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
     return $properties;
   }
 }
-//end of class
 

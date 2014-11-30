@@ -139,7 +139,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -236,7 +236,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -252,10 +252,9 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
     $this->postProcessCommon();
   }
-  //end of function
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

@@ -119,7 +119,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */

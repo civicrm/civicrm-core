@@ -165,7 +165,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $errorMessage = 'Membership Start Date is required to create a memberships.';
       CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
     }
-    //end
 
     //for date-Formats
     $session = CRM_Core_Session::singleton();

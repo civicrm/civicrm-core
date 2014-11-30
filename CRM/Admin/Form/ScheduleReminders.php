@@ -48,7 +48,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   public $_freqUnits;
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -345,7 +345,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

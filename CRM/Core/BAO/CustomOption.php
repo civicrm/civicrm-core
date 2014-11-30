@@ -40,16 +40,12 @@
 class CRM_Core_BAO_CustomOption {
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_BAO_CustomOption object
+   * @return CRM_Core_BAO_CustomOption object
    * @access public
    * @static
    */
@@ -66,10 +62,9 @@ class CRM_Core_BAO_CustomOption {
   /**
    * Returns all active options ordered by weight for a given field
    *
-   * @param $fieldID
+   * @param int $fieldID field whose options are needed
    * @param  boolean $inactiveNeeded do we need inactive options ?
    *
-   * @internal param int $fieldId field whose options are needed
    * @return array $customOption all active options for fieldId
    * @static
    */
@@ -166,7 +161,7 @@ WHERE  id = %1
   }
 
   /**
-   * Function to delete Option
+   * delete Option
    *
    * param $optionId integer option id
    *
@@ -213,7 +208,7 @@ WHERE  id = %1";
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @throws Exception
    */

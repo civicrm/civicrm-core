@@ -44,7 +44,7 @@ class CRM_Export_BAO_Export {
   CONST EXPORT_ROW_COUNT = 10000;
 
   /**
-   * Function to get the list the export fields
+   * get the list the export fields
    *
    * @param int $selectAll user preference while export
    * @param array $ids contact ids
@@ -1207,7 +1207,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   /**
-   * Function to handle import error file creation.
+   * handle import error file creation.
    *
    */
   static function invoke() {
@@ -1789,7 +1789,7 @@ WHERE  id IN ( $deleteIDString )
   }
 
   /**
-   * Function to merge household record into the individual record
+   * merge household record into the individual record
    * if exists
    *
    * @param string $exportTempTable temporary temp table that stores the records

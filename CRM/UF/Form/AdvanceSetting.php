@@ -35,11 +35,11 @@
 class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
   /**
-   * Function to build the form for Advance Settings.
+   * Build the form object for Advance Settings.
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */

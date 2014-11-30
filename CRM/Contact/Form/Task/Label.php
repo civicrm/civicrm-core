@@ -51,7 +51,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -92,7 +92,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @param null
    *
@@ -374,7 +374,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     return FALSE;
   }
   /**
-   * function to create labels (pdf)
+   * create labels (pdf)
    *
    * @param   array    $contactRows   assciated array of contact data
    * @param   string   $format   format in which labels needs to be printed
@@ -402,7 +402,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   }
 
   /**
-   * function to create the array of returnProperties
+   * create the array of returnProperties
    *
    * @param   string   $format   format for which return properties build
    *

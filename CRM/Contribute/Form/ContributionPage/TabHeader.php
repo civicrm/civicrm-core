@@ -38,7 +38,7 @@
  */
 class CRM_Contribute_Form_ContributionPage_TabHeader {
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    */
@@ -58,7 +58,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    */

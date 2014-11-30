@@ -186,7 +186,7 @@ AND    p.entity_id    = e.id
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @throws Exception
    */

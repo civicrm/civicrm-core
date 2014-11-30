@@ -214,7 +214,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   public $_isBillingAddressRequiredForPayLater;
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -674,7 +674,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Function to add the custom fields
+   * add the custom fields
    *
    * @param $id
    * @param $name
@@ -840,7 +840,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Function to authenticate pledge user during online payment.
+   * authenticate pledge user during online payment.
    *
    * @access public
    *

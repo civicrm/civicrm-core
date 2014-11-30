@@ -159,22 +159,16 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * All CRM single or multi page pages should inherit from this class.
    *
-   * @param null $title
-   * @param bool $modal
+   * @param string $title descriptive title of the controller
+   * @param bool $modal whether controller is modal
    * @param null $mode
-   * @param null $scope
-   * @param bool $addSequence
-   * @param bool $ignoreKey
-   *
-   * @internal param \title $string descriptive title of the controller
-   * @internal param \whether $boolean controller is modal
-   * @internal param \scope $string name of session if we want unique scope, used only by Controller_Simple
-   * @internal param \addSequence $boolean should we add a unique sequence number to the end of the key
-   * @internal param \ignoreKey $boolean should we not set a qfKey for this controller (for standalone forms)
+   * @param string $scope name of session if we want unique scope, used only by Controller_Simple
+   * @param bool $addSequence should we add a unique sequence number to the end of the key
+   * @param bool $ignoreKey should we not set a qfKey for this controller (for standalone forms)
    *
    * @access public
    *
-   * @return \CRM_Core_Controller
+   * @return CRM_Core_Controller
    */
   function __construct(
     $title = NULL,
@@ -415,7 +409,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * getter method for stateMachine
    *
-   * @return object
+   * @return CRM_Core_StateMachine
    * @access public
    */
   function getStateMachine() {
@@ -425,7 +419,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * setter method for stateMachine
    *
-   * @param object a stateMachineObject
+   * @param CRM_Core_StateMachine $stateMachine
    *
    * @return void
    * @access public
@@ -438,7 +432,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * add pages to the controller. Note that the controller does not really care
    * the order in which the pages are added
    *
-   * @param object $stateMachine the state machine object
+   * @param CRM_Core_StateMachine $stateMachine
    * @param \const|int $action the mode in which the state machine is operating
    *                              typicaly this will be add/view/edit
    *
@@ -500,7 +494,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * function to destroy all the session state of the controller.
+   * destroy all the session state of the controller.
    *
    * @access public
    *
@@ -541,7 +535,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Get the variable from the form scope
    *
-   * @param  string name  : name  of the variable
+   * @param  string $name  : name  of the variable
    *
    * @access public
 
@@ -595,7 +589,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * @param $wizard
+   * @param array $wizard
    */
   function addWizardStyle(&$wizard) {
     $wizard['style'] = array(
@@ -613,10 +607,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * assign value to name in template
    *
-   * @param $var
+   * @param string $var
    * @param mixed $value value of varaible
    *
-   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -627,10 +620,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * assign value to name in template by reference
    *
-   * @param $var
+   * @param string $var
    * @param mixed $value (reference) value of varaible
    *
-   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -654,7 +646,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *
    * @param string $name
    *
-   * @internal param string $type
    * @return array
    */
   function get_template_vars($name=null) {

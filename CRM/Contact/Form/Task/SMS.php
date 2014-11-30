@@ -73,7 +73,7 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *

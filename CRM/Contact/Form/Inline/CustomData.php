@@ -69,7 +69,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * build the form elements for custom data
+   * Build the form object elements for custom data
    *
    * @return void
    * @access public

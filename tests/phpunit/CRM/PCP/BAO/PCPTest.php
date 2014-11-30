@@ -141,7 +141,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   }
 
   /**
-   * function to build params
+   * build params
    *
    */
   private function pcpBlockParams() {
@@ -166,7 +166,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   }
 
   /**
-   * function to build params
+   * build params
    *
    */
   private function pcpParams() {

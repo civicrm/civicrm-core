@@ -307,7 +307,7 @@ class CRM_Activity_Page_AJAX {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */

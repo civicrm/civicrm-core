@@ -154,15 +154,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   public $_eID = NULL;
 
-  /*
-     *Line Item for Price Set
-     */
-
+  /**
+   * Line Item for Price Set
+   */
   public $_lineItem = NULL;
-  /*
-     *Contribution mode for event registration for offline mode
-     */
 
+  /*
+   * Contribution mode for event registration for offline mode
+   */
   public $_contributeMode = 'direct';
 
   public $_online;
@@ -199,7 +198,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_onlinePendingContributionId = NULL;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -592,7 +591,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -799,11 +798,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * global validation rules for the form
    *
-   * @param $values
+   * @param array $values posted values of the form
    * @param $files
    * @param $self
-   *
-   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -875,7 +872,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    */

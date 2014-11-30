@@ -50,7 +50,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Price_DAO_LineItem object
+   * @return CRM_Price_DAO_LineItem object
    * @access public
    * @static
    */
@@ -93,7 +93,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Price_BAO_LineItem object
+   * @return CRM_Price_BAO_LineItem object
    * @access public
    * @static
    */
@@ -350,7 +350,7 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * Function to process price set and line items.
+   * process price set and line items.
    *
    * @param $entityId
    * @param array $lineItem line item array
@@ -359,8 +359,6 @@ AND li.entity_id = {$entityId}
    *
    * @param bool $update
    *
-   * @internal param int $contributionId contribution id
-   * @internal param \decimal $initAmount amount
    * @access public
    * @return void
    * @static
@@ -463,7 +461,7 @@ AND li.entity_id = {$entityId}
   }
 
    /**
-   * Function to build line items array.
+   * build line items array.
    * @param array $params form values
    *
    * @param string $entityId entity id

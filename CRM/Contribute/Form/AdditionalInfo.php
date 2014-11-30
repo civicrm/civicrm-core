@@ -35,11 +35,11 @@
 class CRM_Contribute_Form_AdditionalInfo {
 
   /**
-   * Function to build the form for Premium Information.
+   * Build the form object for Premium Information.
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
@@ -86,11 +86,11 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
-   * Function to build the form for Additional Details.
+   * Build the form object for Additional Details.
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
@@ -174,11 +174,11 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * This function is used by  CRM/Pledge/Form/Pledge.php
    *
-   * Function to build the form for PaymentReminders Information.
+   * Build the form object for PaymentReminders Information.
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
@@ -194,11 +194,11 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
-   * Function to process the Premium Information
+   * process the Premium Information
    *
    * @access public
    *
-   * @param $params
+   * @param array $params
    * @param $contributionID
    * @param null $premiumID
    * @param null $options
@@ -254,11 +254,11 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
-   * Function to process the Note
+   * process the Note
    *
    * @access public
    *
-   * @param $params
+   * @param array $params
    * @param $contactID
    * @param $contributionID
    * @param null $contributionNoteID
@@ -282,13 +282,13 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
-   * Function to process the Common data
+   * process the Common data
    *
    * @access public
    *
-   * @param $params
+   * @param array $params
    * @param $formatted
-   * @param $form
+   * @param CRM_Core_Form $form
    * @return void
    */
   static function postProcessCommon(&$params, &$formatted, &$form) {
@@ -338,7 +338,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @form object  of Contribution form.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param array $params (reference ) an assoc array of name/value pairs.
    * @$ccContribution boolen,  is it credit card contribution.
    * @param bool $ccContribution

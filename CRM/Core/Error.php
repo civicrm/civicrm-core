@@ -61,9 +61,6 @@ class CRM_Exception extends PEAR_Exception {
    * @param string exception message
    * @param int $code
    * @param Exception $previous
-   *
-   * @internal param array|\Exception|int|null|\PEAR_Error $exception cause
-   * @internal param int|null $exception code or null
    */
   public function __construct($message = NULL, $code = 0, Exception$previous = NULL) {
     parent::__construct($message, $code, $previous);
@@ -303,18 +300,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * display an error page with an error message describing what happened
    *
-   * @param null $message
-   * @param null $code
-   * @param null $email
+   * @param string $message the error message
+   * @param string $code the error code if any
+   * @param string $email the email address to notify of this situation
    *
    * @throws Exception
-   * @internal param \message $string the error message
-   * @internal param \code $string the error code if any
-   * @internal param \email $string the email address to notify of this situation
    *
    * @return void
    * @static
-   * @acess public
+   * @access public
    */
   static function fatal($message = NULL, $code = NULL, $email = NULL) {
     $vars = array(
@@ -401,7 +395,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @return void
    * @static
-   * @acess public
+   * @access public
    */
   static function handleUnhandledException($exception) {
     $config = CRM_Core_Config::singleton();
@@ -516,15 +510,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Similar to the function debug. Only difference is
    * in the formatting of the output.
    *
-   * @param $variable_name
-   * @param $variable
-   * @param bool $print
-   * @param bool $log
+   * @param string $variable_name
+   * @param mixed $variable
+   * @param bool $print should we use print_r ? (else we use var_dump)
+   * @param bool $log should we log or return the output
    * @param string $comp variable name
-   *
-   * @internal param \reference $mixed to variables that we need a trace of
-   * @internal param \should $bool we use print_r ? (else we use var_dump)
-   * @internal param \should $bool we log or return the output
    *
    * @return string the generated output
    *
@@ -845,7 +835,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Function to reset the error stack
+   * reset the error stack
    *
    * @access public
    * @static

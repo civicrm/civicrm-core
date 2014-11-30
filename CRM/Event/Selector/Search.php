@@ -194,7 +194,6 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     $this->_query->_distinctComponentClause = " civicrm_participant.id";
     $this->_query->_groupByComponentClause = " GROUP BY civicrm_participant.id ";
   }
-  //end of constructor
 
   /**
    * Can be used to alter the number of participation returned from a buildForm hook
@@ -259,15 +258,13 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     }
     return self::$_links;
   }
-  //end of function
 
   /**
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param $params
+   * @param array $params
    *
-   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -283,7 +280,6 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * Returns total number of rows for the query.
@@ -434,13 +430,12 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   }
 
   /**
+   * FIXME: the current internationalisation is bad, but should more or less work
+   * on most of "European" languages
    *
    * @return array              $qill         which contains an array of strings
    * @access public
    */
-
-  // the current internationalisation is bad, but should more or less work
-  // for most of "European" languages
   public function getQILL() {
     return $this->_query->qill();
   }
@@ -535,5 +530,4 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     return ts('CiviCRM Event Search');
   }
 }
-//end of class
 

@@ -52,7 +52,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -64,7 +64,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @param null
    *

@@ -40,7 +40,7 @@
 class CRM_Case_Form_ActivityChangeStatus extends CRM_Core_Form {
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public

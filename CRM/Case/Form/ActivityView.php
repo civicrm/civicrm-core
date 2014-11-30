@@ -40,7 +40,7 @@
 class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
   /**
-   * Function to process the view
+   * process the view
    *
    * @access public
    *

@@ -386,7 +386,7 @@ class CRM_Contact_Form_Search_Criteria {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function activity(&$form) {
     $form->add('hidden', 'hidden_activity', 1);
@@ -394,7 +394,7 @@ class CRM_Contact_Form_Search_Criteria {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function changeLog(&$form) {
     $form->add('hidden', 'hidden_changeLog', 1);
@@ -409,7 +409,7 @@ class CRM_Contact_Form_Search_Criteria {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function task(&$form) {
     $form->add('hidden', 'hidden_task', 1);

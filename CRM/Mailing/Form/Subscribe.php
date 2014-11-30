@@ -78,7 +78,7 @@ SELECT   title, description
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -188,7 +188,6 @@ ORDER BY title";
   }
 
   /**
-   *
    * @access public
    *
    * @return void

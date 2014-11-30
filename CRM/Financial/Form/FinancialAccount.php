@@ -48,7 +48,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -75,7 +75,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -173,7 +173,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -189,7 +189,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    * @return void

@@ -368,12 +368,10 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('custom_group', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
   }
-  /*
-     * main success get function
-     */
 
-
-
+  /**
+   * main success get function
+   */
   public function testGetCustomGroupSuccess() {
 
     $this->callAPISuccess($this->_entity, 'create', $this->_params);

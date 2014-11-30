@@ -135,7 +135,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * Function to set the email address of the user
+   * set the email address of the user
    *
    * @param object $user handle to the user object
    *

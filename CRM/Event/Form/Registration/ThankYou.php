@@ -41,7 +41,7 @@
 class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -84,7 +84,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -239,14 +239,13 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
    * @return void
    */
   public function postProcess() {}
-  //end of function
 
   /**
    * Return a descriptive name for the page, used in wizard header

@@ -60,7 +60,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Function to get existing / build navigation for CiviCRM Admin Menu
+   * get existing / build navigation for CiviCRM Admin Menu
    *
    * @static
    * @return array associated array
@@ -81,7 +81,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Function to add/update navigation record
+   * add/update navigation record
    *
    * @param array associated array of submitted values
    *
@@ -122,16 +122,12 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_BAO_Navigation object on success, null otherwise
+   * @return CRM_Core_BAO_Navigation object on success, null otherwise
    * @access public
    * @static
    */
@@ -257,7 +253,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
   }
 
   /**
-   * Function to build navigation tree
+   * build navigation tree
    *
    * @param array   $navigationTree nested array of menus
    * @param int     $parentID       parent id

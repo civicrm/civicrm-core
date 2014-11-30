@@ -299,7 +299,7 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param null $now
    */
   static function bulkCreate($params, $now = NULL) {

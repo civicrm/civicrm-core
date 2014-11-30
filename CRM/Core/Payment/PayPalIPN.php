@@ -286,8 +286,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   function main() {
-    // CRM_Core_Error::debug_var( 'GET' , $_GET , true, true );
-    // CRM_Core_Error::debug_var( 'POST', $_POST, true, true );
    //@todo - this could be refactored like PayPalProIPN & a test could be added
 
     $objects = $ids = $input = array();

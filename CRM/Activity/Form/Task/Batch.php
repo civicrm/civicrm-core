@@ -98,7 +98,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -203,7 +203,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -302,6 +302,5 @@ WHERE  a.id = %1 ";
       CRM_Core_Session::setStatus("", ts("No Updates Saved"), "info");
     }
   }
-  //end of function
 }
 

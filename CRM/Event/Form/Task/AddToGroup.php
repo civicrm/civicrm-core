@@ -68,9 +68,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
    * @access public
    */
   function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
+    // initialize the task and row fields
     parent::preProcess();
 
     parent::setContactIDs();
@@ -79,7 +77,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -246,6 +244,5 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
     $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
     CRM_Core_Session::setStatus($status, ts('Added Contact to %1', array(1 => $groupName, 'count' => $added, 'plural' => 'Added Contacts to %1')), 'success', array('expires' => 0));
   }
-  //end of function
 }
 

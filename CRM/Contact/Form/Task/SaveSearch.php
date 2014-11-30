@@ -75,7 +75,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form - it consists of
+   * Build the form object - it consists of
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
    *

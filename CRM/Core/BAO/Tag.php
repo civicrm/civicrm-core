@@ -42,11 +42,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params      (reference ) an assoc array of name/value pairs
    * @param array $defaults    (reference ) an assoc array to hold the flattened values
@@ -267,7 +263,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Function to delete the tag
+   * delete the tag
    *
    * @param int $id   tag id
    *
@@ -375,7 +371,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Function to get the tag sets for a entity object
+   * get the tag sets for a entity object
    *
    * @param string $entityTable entity_table
    *
@@ -396,7 +392,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Function to get the tags that are not children of a tagset.
+   * get the tags that are not children of a tagset.
    *
    * @return array $tags associated array of tag name and id@access public
    * @static

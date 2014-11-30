@@ -419,7 +419,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Check deceased contacts are not retrieved
    * Note at time of writing the default is to return default. This should possibly be changed & test added
-   *
    */
   function testGetDeceasedRetrieved() {
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
@@ -428,9 +427,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertFalse(array_key_exists($c2['id'], $result['values']));
   }
 
-  /*
-     * Test that sort works - old syntax
-     */
+  /**
+   * Test that sort works - old syntax
+   */
   function testGetSort() {
     $c1 = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $c2 = $this->callAPISuccess($this->_entity, 'create', array('first_name' => 'bb', 'last_name' => 'ccc', 'contact_type' => 'Individual'));
@@ -496,9 +495,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $countDeleted, 'in line ' . __LINE__);
     $this->assertEquals(1, $countDefault, 'Only active by default in line ' . __LINE__);
   }
-  /*
-     * Test that sort works - new syntax
-     */
+
+  /**
+   * Test that sort works - new syntax
+   */
   function testGetSortNewSYntax() {
     $c1     = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $c2     = $this->callAPISuccess($this->_entity, 'create', array('first_name' => 'bb', 'last_name' => 'ccc', 'contact_type' => 'Individual'));
@@ -523,7 +523,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $c1['id']));
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $c2['id']));
   }
-  /*
+
+  /**
    * Test apostrophe works in get & create
    */
   function testGetApostropheCRM10857() {
@@ -559,12 +560,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
   }
-  /*
-     * check with complete array + custom field
-     * Note that the test is written on purpose without any
-     * variables specific to participant so it can be replicated into other entities
-     * and / or moved to the automated test suite
-     */
+
+  /**
+   * check with complete array + custom field
+   * Note that the test is written on purpose without any
+   * variables specific to participant so it can be replicated into other entities
+   * and / or moved to the automated test suite
+   */
   function testGetWithCustomReturnSyntax() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 

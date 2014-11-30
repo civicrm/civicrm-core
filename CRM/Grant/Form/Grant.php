@@ -58,7 +58,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   protected $_context;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -170,7 +170,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -259,7 +259,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

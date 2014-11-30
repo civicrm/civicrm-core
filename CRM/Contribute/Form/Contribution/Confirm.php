@@ -65,23 +65,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param $contributionPageId
    * @param $nonDeductibleAmount
    * @param $campaignId
-   *
    * @param $isMonetary
-   *
    * @param $pending
    * @param $paymentProcessorOutcome
    * @param $receiptDate
-   *
    * @param $recurringContributionID
    * @param $isTest
-   *
    * @param $addressID
-   *
    * @param $softCreditToID
-   *
    * @param $lineItems
    *
-   * @internal param $financialType
    * @return array
    */
   public static function getContributionParams($params, $contactID, $financialTypeID, $online, $contributionPageId, $nonDeductibleAmount, $campaignId, $isMonetary, $pending,
@@ -166,7 +159,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -445,7 +438,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -657,7 +650,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -1196,7 +1189,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Process the contribution
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param array $params
    * @param array $result
    * @param integer $contactID
@@ -1607,14 +1600,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Function to add on behalf of organization and it's location
+   * add on behalf of organization and it's location
    *
    * @param $behalfOrganization array  array of organization info
    * @param $contactID          int    individual contact id. One
    * who is doing the process of signup / contribution.
    *
    * @param $values             array  form values array
-   * @param $params
+   * @param array $params
    * @param null $fields
    *
    * @return void
@@ -1753,7 +1746,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Function used to se pcp related defaults / params
    * This is used by contribution and also event pcps
    *
-   * @param object $page   form object
+   * @param CRM_Core_Form $page   form object
    * @param array  $params associated array
    *
    * @return array
@@ -1858,8 +1851,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param $priceSetID
    *
-   * @internal param $isQuickConfig
-   * @internal param $priceField
    */
   public function setFormAmountFields($priceSetID) {
     $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_params['priceSetId'], 'is_quick_config');

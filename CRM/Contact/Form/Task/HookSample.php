@@ -74,7 +74,7 @@ AND    c.id IN ( $contactIDs )";
   }
 
   /**
-   * Build the form - it consists of
+   * Build the form object - it consists of
    *
    * @access public
    *

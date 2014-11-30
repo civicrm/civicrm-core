@@ -61,7 +61,7 @@ class Custom extends CiviUnitTestCase {
   /**
    * Helper function to create Custom Field
    * @deprecated use parent object create fn
-   * @param $params
+   * @param array $params
    * @param null $fields
    * @return object of created field
 */

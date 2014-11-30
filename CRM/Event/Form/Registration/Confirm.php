@@ -57,7 +57,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   public $_totalAmount;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -219,7 +219,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -391,7 +391,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -861,13 +861,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
   }
-  //end of function
 
   /**
    * Process the contribution
    *
-   * @param $form
-   * @param $params
+   * @param CRM_Core_Form $form
+   * @param array $params
    * @param $result
    * @param $contactID
    * @param bool $pending
@@ -987,9 +986,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Fix the Location Fields
    *
-   * @param $params
+   * @param array $params
    * @param $fields
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
@@ -1033,12 +1032,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * function to update contact fields
+   * update contact fields
    *
    * @param $contactID
-   * @param $params
+   * @param array $params
    * @param $fields
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
