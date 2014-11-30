@@ -55,6 +55,50 @@
     };
   });
 
+  crmMailing2.factory('crmMsgTemplates', function($q, crmApi) {
+    var tpls = _.map(CRM.crmMailing.mesTemplate, function(tpl){
+      return _.extend({}, tpl, {
+        //id: tpl parseInt(tpl.id)
+      });
+    });
+    window.tpls = tpls;
+    var lastModifiedTpl = null;
+    return {
+      // @return Promise MessageTemplate (per APIv3)
+      get: function get(id) {
+        id = ''+id; // parseInt(id);
+        var dfr = $q.defer();
+        var tpl = _.where(tpls, {id: id});
+        if (id && tpl && tpl[0]) {
+          dfr.resolve(tpl[0]);
+        } else {
+          dfr.reject(id);
+        }
+        return dfr.promise;
+      },
+      // Save a template
+      // @param tpl MessageTemplate (per APIv3) For new templates, omit "id"
+      // @return Promise MessageTemplate (per APIv3)
+      save: function(tpl) {
+        return crmApi('MessageTemplate', 'create', tpl).then(function(response){
+          if (!tpl.id) {
+            tpl.id = ''+response.id; //parseInt(response.id);
+            tpls.push(tpl);
+          }
+          lastModifiedTpl = tpl
+          return tpl;
+        });
+      },
+      // @return Object MessageTemplate (per APIv3)
+      getLastModifiedTpl: function() {
+        return lastModifiedTpl;
+      },
+      getAll: function getAll() {
+        return tpls;
+      }
+    };
+  });
+
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
   crmMailing2.factory('crmMailingMgr', function($q, crmApi, crmFromAddresses) {
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
@@ -212,5 +256,4 @@
       }
     };
   });
-
 })(angular, CRM.$, CRM._);

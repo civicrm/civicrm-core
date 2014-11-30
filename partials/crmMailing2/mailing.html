@@ -3,6 +3,17 @@ Controller: EditMailingCtrl
 Required vars: mailing, crmMailingConst
 FIXME: Don't hardcode table-based layout!
 -->
+<table class="form-layout-compressed" style="background: #bbf; width:100%;">
+  <tbody>
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="msg_template_id">{{ts('Template')}}</label>
+    </td>
+    <td ng-include="partialUrl('field/msg_template_id.html')">
+    </td>
+  </tr>
+  </tbody>
+</table>
 <table class="form-layout-compressed">
   <tbody>
     <tr>

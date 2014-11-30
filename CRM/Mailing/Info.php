@@ -108,7 +108,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'contact_id' => $contactID,
       ));
       $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(  'sequential' => 1,
-        'return' => array("msg_html", "id", "msg_title", "msg_subject"),
+        'return' => array("msg_html", "id", "msg_title", "msg_subject", "msg_text"),
         'workflow_id' => array('IS NULL' => ""),
       ));
     }
