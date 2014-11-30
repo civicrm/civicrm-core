@@ -440,7 +440,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $context
    */
   function _checkFinancialRecords($params, $context) {
@@ -503,7 +503,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $financialTypeId
    */
   function _getFinancialAccountId($financialTypeId) {

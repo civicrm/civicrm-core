@@ -66,14 +66,11 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
   }
 
   /**
-   * function to retrieve names of contact by activity_id
+   * retrieve names of contact by activity_id
    *
-   * @param $activityID
-   * @param $recordTypeID
+   * @param int $activityID
+   * @param int $recordTypeID
    * @param bool $alsoIDs
-   *
-   * @internal param int $id ID of the activity
-   * @internal param string $type type of interaction
    *
    * @return array
    *
@@ -110,12 +107,10 @@ AND        contact_a.is_deleted = 0
   }
 
   /**
-   * function to retrieve id of target contact by activity_id
+   * retrieve id of target contact by activity_id
    *
    * @param $activityID
    * @param $recordTypeID
-   *
-   * @internal param int $id ID of the activity
    *
    * @return mixed
    *

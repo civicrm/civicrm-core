@@ -129,13 +129,11 @@ class CRM_Utils_File {
    * delete a directory given a path name, delete children directories
    * and files if needed
    *
-   * @param $target
+   * @param string $target the path name
    * @param bool $rmdir
    * @param bool $verbose
    *
    * @throws Exception
-   * @internal param string $path the path name
-   *
    * @return void
    * @access public
    * @static

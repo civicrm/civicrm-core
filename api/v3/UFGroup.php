@@ -82,18 +82,15 @@ function civicrm_api3_uf_group_get($params) {
 /**
  * Delete uf group
  *
- * @param $params
+ * @param array $params
  *
- * @internal param int $groupId Valid uf_group id that to be deleted
  *
  * @return true on successful delete or return error
- * @todo doesnt rtn success or error properly
  * @access public
  * {@getfields UFGroup_delete}
  * @example UFGroupDelete.php
  */
 function civicrm_api3_uf_group_delete($params) {
-
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 

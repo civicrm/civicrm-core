@@ -56,7 +56,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *

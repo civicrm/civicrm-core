@@ -65,10 +65,9 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     }
   }
 
-  /*
-     *  Helper function to provide data for custom data import.
-     */
   /**
+   * Helper function to provide data for custom data import.
+   *
    * @param $customDataParams
    * @param $firstName1
    *
@@ -77,30 +76,30 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
   function _individualCustomCSVData($customDataParams, $firstName1) {
 
     $headers = array(
-                     'first_name' => 'First Name',
-                     'last_name' => 'Last Name',
-                     'address_1' => 'Additional Address 1',
-                     'address_2' => 'Additional Address 2',
-                     'city' => 'City',
-                     'state' => 'State',
-                     'country' => 'Country',
-                     );
+      'first_name' => 'First Name',
+      'last_name' => 'Last Name',
+      'address_1' => 'Additional Address 1',
+      'address_2' => 'Additional Address 2',
+      'city' => 'City',
+      'state' => 'State',
+      'country' => 'Country',
+    );
     foreach( $customDataParams['headers'] as $key =>$value){
       $headers[$key] = $value;
     }
 
     $rows = array( 0 =>
 
-                   array(
-                         'first_name' => $firstName1,
-                         'last_name' => 'Anderson',
-                         'address_1' => 'Add 1',
-                         'address_2' => 'Add 2',
-                         'city' => 'Watson',
-                         'state' => 'NY',
-                         'country' => 'United States',
-                         ),
-                   );
+      array(
+        'first_name' => $firstName1,
+        'last_name' => 'Anderson',
+        'address_1' => 'Add 1',
+        'address_2' => 'Add 2',
+        'city' => 'Watson',
+        'state' => 'NY',
+        'country' => 'United States',
+      ),
+    );
     foreach ($customDataParams['rows'][0] as $key => $values) {
       $rows[0][$key] = $values;
     }
@@ -200,7 +199,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $customField6 = 'Customfield_alp_multiselect' . substr(sha1(rand()), 0, 4);
     $customFieldId6 = $this->_createMultipleValueCustomField($customField6,'Multi-Select');
 
-     // create custom field - "alphanumeric advmultiselect"
+    // create custom field - "alphanumeric advmultiselect"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField7 = 'Customfield_alp_advmultiselect' . substr(sha1(rand()), 0, 4);
@@ -243,48 +242,49 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $customFieldId10 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField10']/../../td[8]/span/a@href"));
     $customFieldId10 = $customFieldId10[1];
 
-    return array('headers' =>
-
-                    array("custom_{$customFieldId}" => "$customField :: $customGroupTitle",
-                          "custom_{$customFieldId3}" => "$customField3 :: $customGroupTitle",
-                          "custom_{$customFieldId4}" => "$customField4 :: $customGroupTitle",
-                          "custom_{$customFieldId5}" => "$customField5 :: $customGroupTitle",
-                          "custom_{$customFieldId6}" => "$customField6 :: $customGroupTitle",
-                          "custom_{$customFieldId7}" => "$customField7 :: $customGroupTitle",
-                          "custom_{$customFieldId8}" => "$customField8 :: $customGroupTitle",
-                          "custom_{$customFieldId1}" => "$customField1 :: $customGroupTitle",
-                          "custom_{$customFieldId2}" => "$customField2 :: $customGroupTitle",
-                          "custom_{$customFieldId9}" => "$customField9 :: $customGroupTitle",
-                          "custom_{$customFieldId10}" => "$customField10 :: $customGroupTitle",
-                          ),
-                 'rows' =>
-                 array( 0 => array("custom_{$customFieldId}" => "This is a test field",
-                                   "custom_{$customFieldId3}" => "label1",
-                                   "custom_{$customFieldId4}" => "label1",
-                                   "custom_{$customFieldId5}" => "label1",
-                                   "custom_{$customFieldId6}" => "label1",
-                                   "custom_{$customFieldId7}" => "label1",
-                                   "custom_{$customFieldId8}" => "label1",
-                                   "custom_{$customFieldId1}" => 1,
-                                   "custom_{$customFieldId2}" => 12345,
-                                   "custom_{$customFieldId9}" => 123456,
-                                   "custom_{$customFieldId10}" => "2009-12-31",
-                                   ),
-                        ),
-                 'customFields' => array(
-                                          $customField  => 'This is a test field',
-                                          $customField3 => 'label1',
-                                          $customField4 => 'label1',
-                                          $customField5 => 'label1',
-                                          $customField6 => 'label1',
-                                          $customField7 => 'label1',
-                                          $customField8 => 'label1',
-                                          $customField1 => '1',
-                                          $customField2 => '12345',
-                                          $customField9 => '123,456.00',
-                                          $customField10 => 'December 31st, 2009',
-                                         ),
-                 );
+    return array(
+      'headers' => array(
+        "custom_{$customFieldId}" => "$customField :: $customGroupTitle",
+        "custom_{$customFieldId3}" => "$customField3 :: $customGroupTitle",
+        "custom_{$customFieldId4}" => "$customField4 :: $customGroupTitle",
+        "custom_{$customFieldId5}" => "$customField5 :: $customGroupTitle",
+        "custom_{$customFieldId6}" => "$customField6 :: $customGroupTitle",
+        "custom_{$customFieldId7}" => "$customField7 :: $customGroupTitle",
+        "custom_{$customFieldId8}" => "$customField8 :: $customGroupTitle",
+        "custom_{$customFieldId1}" => "$customField1 :: $customGroupTitle",
+        "custom_{$customFieldId2}" => "$customField2 :: $customGroupTitle",
+        "custom_{$customFieldId9}" => "$customField9 :: $customGroupTitle",
+        "custom_{$customFieldId10}" => "$customField10 :: $customGroupTitle",
+      ),
+      'rows' => array(
+        0 => array(
+          "custom_{$customFieldId}" => "This is a test field",
+          "custom_{$customFieldId3}" => "label1",
+          "custom_{$customFieldId4}" => "label1",
+          "custom_{$customFieldId5}" => "label1",
+          "custom_{$customFieldId6}" => "label1",
+          "custom_{$customFieldId7}" => "label1",
+          "custom_{$customFieldId8}" => "label1",
+          "custom_{$customFieldId1}" => 1,
+          "custom_{$customFieldId2}" => 12345,
+          "custom_{$customFieldId9}" => 123456,
+          "custom_{$customFieldId10}" => "2009-12-31",
+        ),
+      ),
+      'customFields' => array(
+        $customField  => 'This is a test field',
+        $customField3 => 'label1',
+        $customField4 => 'label1',
+        $customField5 => 'label1',
+        $customField6 => 'label1',
+        $customField7 => 'label1',
+        $customField8 => 'label1',
+        $customField1 => '1',
+        $customField2 => '12345',
+        $customField9 => '123,456.00',
+        $customField10 => 'December 31st, 2009',
+      ),
+    );
   }
 
   /**

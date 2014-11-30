@@ -91,7 +91,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

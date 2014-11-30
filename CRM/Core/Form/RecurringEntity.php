@@ -105,7 +105,7 @@ class CRM_Core_Form_RecurringEntity {
   }
 
    /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -311,7 +311,7 @@ class CRM_Core_Form_RecurringEntity {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -473,7 +473,6 @@ class CRM_Core_Form_RecurringEntity {
       }
     }
   }
-  //end of function
 
   /**
    * Return a descriptive name for the page, used in wizard header

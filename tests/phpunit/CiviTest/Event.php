@@ -36,8 +36,7 @@ class Event extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to delete an Event
    *
-   * @param $eventId
-   * @internal param int $eventID id of the event to delete
+   * @param int $eventId
    * @return boolean true if event deleted, false otherwise
    */
   static function delete($eventId) {

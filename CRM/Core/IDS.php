@@ -205,10 +205,8 @@ class CRM_Core_IDS {
    * This function writes an entry about the intrusion
    * to the intrusion database
    *
-   * @param $result
+   * @param array $result
    * @param int $reaction
-   *
-   * @internal param array $results
    *
    * @return boolean
    */

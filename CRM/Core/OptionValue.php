@@ -59,7 +59,7 @@ class CRM_Core_OptionValue {
   static $_fields = NULL;
 
   /**
-   * Function to return option-values of a particular group
+   * return option-values of a particular group
    *
    * @param  array     $groupParams   Array containing group fields whose option-values is to retrieved.
    * @param  string    $orderBy       for orderBy clause
@@ -170,14 +170,13 @@ class CRM_Core_OptionValue {
   }
 
   /**
-   * Function to add/edit option-value of a particular group
+   * add/edit option-value of a particular group
    *
    * @param  array $params Array containing exported values from the invoking form.
    * @param  array $groupParams Array containing group fields whose option-values is to retrieved/saved.
    * @param $action
    * @param  integer $optionValueID has the id of the optionValue being edited, disabled ..etc
    *
-   * @internal param string $orderBy for orderBy clause
    * @return CRM_Core_DAO_OptionValue
    *
    * @access public
@@ -269,12 +268,6 @@ class CRM_Core_OptionValue {
    *
    * @param string $mode
    * @param string $contactType
-   *
-   * @internal param string $value the value of the field we are checking
-   * @internal param string $daoName the dao object name
-   * @internal param string $daoID the id of the object being updated. u can change your name
-   *                          as long as there is no conflict
-   * @internal param string $fieldName the name of the field in the DAO
    *
    * @return boolean     true if object exists
    * @access public
@@ -372,7 +365,7 @@ class CRM_Core_OptionValue {
   }
 
   /**
-   * Function to return option-values of a particular group
+   * return option-values of a particular group
    *
    * @param  array     $groupParams   Array containing group fields
    *                                  whose option-values is to retrieved.

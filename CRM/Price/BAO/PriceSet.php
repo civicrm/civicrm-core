@@ -59,7 +59,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Price_DAO_PriceSet object
+   * @return CRM_Price_DAO_PriceSet object
    * @access public
    * @static
    */
@@ -76,16 +76,12 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Price_DAO_PriceSet object
+   * @return CRM_Price_DAO_PriceSet object
    * @access public
    * @static
    */
@@ -710,7 +706,7 @@ WHERE  id = %1";
 
   /**
    * @param $fields
-   * @param $params
+   * @param array $params
    * @param $lineItem
    * @param string $component
    */
@@ -886,7 +882,7 @@ WHERE  id = %1";
   }
 
   /**
-   * Function to build the price set form.
+   * build the price set form.
    *
    * @param CRM_Core_Form $form
    *
@@ -973,7 +969,7 @@ WHERE  id = %1";
   }
 
   /**
-   * Function to check the current Membership
+   * check the current Membership
    * having end date null.
    */
   static function checkCurrentMembership(&$options, $userid) {
@@ -1003,9 +999,9 @@ WHERE  id = %1";
   }
 
   /**
-   * Function to set daefult the price set fields.
+   * set daefult the price set fields.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $defaults
    *
    * @return array $defaults
@@ -1357,13 +1353,9 @@ WHERE       ps.id = %1
   /**
    * Copy priceSet when event/contibution page is copied
    *
-   * @params string $baoName  BAO name
-   * @params int $id old event/contribution page id
-   * @params int $newId newly created event/contribution page id
-   *
-   * @param string $baoName
-   * @param integer $id
-   * @param integer $newId
+   * @param string $baoName  BAO name
+   * @param int $id old event/contribution page id
+   * @param int $newId newly created event/contribution page id
    */
   static function copyPriceSet($baoName, $id, $newId) {
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($baoName, $id);

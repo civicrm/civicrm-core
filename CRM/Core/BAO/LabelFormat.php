@@ -259,8 +259,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param string $name
    *
-   * @internal param $void
-   *
    * @return int  Group ID (null if Group ID doesn't exist)
    * @access private
    */
@@ -431,7 +429,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param string $groupName
    *
-   * @return object CRM_Core_DAO_OptionValue object
+   * @return CRM_Core_DAO_OptionValue object
    * @access public
    * @static
    */
@@ -541,7 +539,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Function to delete a Label Format
+   * delete a Label Format
    *
    * @param  int  $id     ID of the label format to be deleted.
    * @param  string $groupName group name

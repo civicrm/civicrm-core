@@ -161,7 +161,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *

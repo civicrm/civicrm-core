@@ -70,7 +70,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   protected $_isARFlag = FALSE;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -121,7 +121,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -305,7 +305,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    * @return void

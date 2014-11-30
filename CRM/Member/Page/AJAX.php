@@ -39,7 +39,7 @@
 class CRM_Member_Page_AJAX {
 
   /**
-   * Function to setDefaults according to membership type
+   * setDefaults according to membership type
    */
   static function getMemberTypeDefaults() {
     if (!$_POST['mtype']) {

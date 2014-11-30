@@ -72,7 +72,7 @@ class CRM_Event_Form_Task_SearchTaskHookSample extends CRM_Event_Form_Task {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

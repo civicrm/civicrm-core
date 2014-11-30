@@ -130,11 +130,11 @@ class CRM_Contact_Form_Task_EmailCommon {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
@@ -350,7 +350,7 @@ class CRM_Contact_Form_Task_EmailCommon {
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
@@ -511,5 +511,4 @@ class CRM_Contact_Form_Task_EmailCommon {
       }
     }
   }
-  //end of function
 }

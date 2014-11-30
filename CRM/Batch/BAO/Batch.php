@@ -147,7 +147,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Remove entries from entity batch
    * @param array $params associated array
-   * @return object CRM_Batch_DAO_EntityBatch
+   * @return CRM_Batch_DAO_EntityBatch
    */
   static function removeBatchEntity($params) {
     $entityBatch = new CRM_Batch_DAO_EntityBatch();
@@ -157,7 +157,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * function to delete batch entry
+   * delete batch entry
    *
    * @param int $batchId batch id
    *
@@ -410,7 +410,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Function to define action links
+   * define action links
    *
    * @param null $context
    *
@@ -490,7 +490,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * function to get batch list
+   * get batch list
    *
    * @return array array of all batches
    * excluding batches with data entry in progress

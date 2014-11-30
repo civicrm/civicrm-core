@@ -58,7 +58,7 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *

@@ -105,10 +105,9 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('This is a test field'));
   }
 
-  /*
-     *  Helper function to provide data for custom data import.
-     */
   /**
+   * Helper function to provide data for custom data import.
+   *
    * @param $customDataParams
    * @param $firstName1
    *

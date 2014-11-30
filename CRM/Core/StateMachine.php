@@ -126,7 +126,7 @@ class CRM_Core_StateMachine {
    * Next and Back. The other actions (Cancel, Done, Submit etc) do
    * not need the state machine to figure out where to go
    *
-   * @param  object    $page       CRM_Core_Form the current form-page
+   * @param  CRM_Core_Form    $page     the current form-page
    * @param  string    $actionName Current action name, as one Action object can serve multiple actions
    * @param  string    $type       The type of transition being requested (Next or Back)
    *

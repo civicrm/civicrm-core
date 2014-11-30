@@ -146,7 +146,7 @@ class CRM_Contact_BAO_Query_Hook {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $type
    */
   public function buildAdvancedSearchPaneForm(&$form, $type) {

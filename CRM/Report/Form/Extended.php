@@ -711,7 +711,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   }
 
   /*
-   * function for adding address fields to construct function in reports
+   * adding address fields to construct function in reports
    * @param array $options Options for the report
    * - prefix prefix to add (e.g. 'honor' when getting address details for honor contact
    * - prefix_label optional prefix lable eg. "Honoree " for front end

@@ -50,9 +50,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @internal param array $ids the array that holds all the db ids
-   *
-   * @return object CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field object
    * @access public
    * @static
    */
@@ -76,7 +74,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
    * @access public
    * @static
    */
@@ -156,16 +154,12 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
    * @access public
    * @static
    */
@@ -206,18 +200,16 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   /**
    * This function for building custom fields
    *
-   * @param object $qf form object (reference)
+   * @param CRM_Core_Form $qf form object (reference)
    * @param string $elementName name of the custom field
    * @param $fieldId
    * @param boolean $inactiveNeeded
    * @param boolean $useRequired true if required else false
    * @param string $label label for custom field
-   *
    * @param null $fieldOptions
-   * @param array $feezeOptions
+   * @param array $freezeOptions
    *
    * @return null
-   * @internal param bool $search true if used for search else false
    * @access public
    * @static
    */
@@ -228,7 +220,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     $useRequired  = TRUE,
     $label        = NULL,
     $fieldOptions = NULL,
-    $feezeOptions = array()
+    $freezeOptions = array()
   ) {
 
     $field = new CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field();
@@ -301,7 +293,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
         );
 
         // CRM-6902
-        if (in_array($optionKey, $feezeOptions)) {
+        if (in_array($optionKey, $freezeOptions)) {
           $element->freeze();
         }
 
@@ -347,7 +339,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           $choice[$opId] = $qf->createElement('radio', NULL, '', $opt['label'], $opt['id'], $extra);
 
           // CRM-6902
-          if (in_array($opId, $feezeOptions)) {
+          if (in_array($opId, $freezeOptions)) {
             $choice[$opId]->freeze();
           }
         }
@@ -401,7 +393,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           }
           $selectOption[$opt['id']] = $opt['label'];
 
-          if (!in_array($opt['id'], $feezeOptions)) {
+          if (!in_array($opt['id'], $freezeOptions)) {
             $allowedOptions[] = $opt['id'];
           }
         }
@@ -414,7 +406,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
 
         // CRM-6902
         $button = substr($qf->controller->getButtonName(), -4);
-        if (!empty($feezeOptions) && $button != 'skip') {
+        if (!empty($freezeOptions) && $button != 'skip') {
           $qf->addRule($elementName, ts('Sorry, this option is currently sold out.'), 'regex', "/" . implode('|', $allowedOptions) . "/");
         }
         break;
@@ -439,7 +431,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           );
 
           // CRM-6902
-          if (in_array($opId, $feezeOptions)) {
+          if (in_array($opId, $freezeOptions)) {
             $check[$opId]->freeze();
           }
         }

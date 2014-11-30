@@ -45,7 +45,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @param array $params input parameters
    */
   /**
-   * @param $params
+   * @param array $params
    *
    * @return object
    * @throws API_Exception
@@ -117,8 +117,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @access public
    * @static
    */
-  static function allPhones($id, $updateBlankLocInfo = FALSE, $type = NULL, $filters = array(
-    )) {
+  static function allPhones($id, $updateBlankLocInfo = FALSE, $type = NULL, $filters = array()) {
     if (!$id) {
       return NULL;
     }

@@ -95,7 +95,7 @@ function civicrm_api3_mailing_group_event_subscribe($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return array
  */

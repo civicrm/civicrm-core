@@ -83,11 +83,10 @@ WHERE contact_a.id = %1 AND $permission";
   /**
    * fill the acl contact cache for this contact id if empty
    *
-   * @param $userID
+   * @param int $userID
    * @param int|string $type the type of operation (view|edit)
    * @param boolean $force should we force a recompute
    *
-   * @internal param int $id contact id
    * @return void
    * @access public
    * @static
@@ -150,7 +149,7 @@ ON DUPLICATE KEY UPDATE
   }
 
   /**
-   * Function to check if there are any contacts in cache table
+   * check if there are any contacts in cache table
    *
    * @param int|string $type the type of operation (view|edit)
    * @param int $contactID contact id
@@ -241,16 +240,13 @@ AND    $operationClause LIMIT 1";
   }
 
   /**
-   * Function to get the permission base on its relationship
+   * get the permission base on its relationship
    *
-   * @param $selectedContactID
-   * @param null $contactID
+   * @param int $selectedContactID contact id of selected contact
+   * @param int $contactID contact id of the current contact
    *
-   * @internal param int $selectedContactId contact id of selected contact
-   * @internal param int $contactId contact id of the current contact
-   *
-   * @return booleab true if logged in user has permission to view
-   * selected contact record else false
+   * @return bool true if logged in user has permission to view
+   *   selected contact record else false
    * @static
    */
   static function relationship($selectedContactID, $contactID = NULL) {
@@ -336,7 +332,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
 
   /**
    * @param $contactID
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param bool $redirect
    *
    * @return bool
@@ -390,7 +386,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
 
   /**
    * @param $contactID
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param bool $redirect
    *
    * @return bool

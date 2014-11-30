@@ -579,12 +579,12 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * Function to add the schedules reminders in the db
+   * add the schedules reminders in the db
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
-   * @return object CRM_Core_DAO_ActionSchedule
+   * @return CRM_Core_DAO_ActionSchedule
    * @access public
    * @static
    *
@@ -604,7 +604,7 @@ AND   cas.entity_value = $id AND
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $values (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_DAO_ActionSchedule object on success, null otherwise
+   * @return CRM_Core_DAO_ActionSchedule object on success, null otherwise
    * @access public
    * @static
    */
@@ -627,7 +627,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * Function to delete a Reminder
+   * delete a Reminder
    *
    * @param  int  $id     ID of the Reminder to be deleted.
    *

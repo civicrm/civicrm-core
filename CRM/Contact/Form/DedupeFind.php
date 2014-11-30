@@ -46,7 +46,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
   public $_defaults;
 
   /**
-   * Function to pre processing
+   * pre processing
    *
    * @return void
    * @access public
@@ -56,7 +56,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -86,7 +86,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

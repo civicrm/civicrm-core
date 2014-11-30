@@ -55,7 +55,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   public $_blockCount;
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -142,8 +142,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * @param $values
    * @param $files
    * @param $self
-   *
-   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static

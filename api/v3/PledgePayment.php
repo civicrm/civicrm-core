@@ -144,7 +144,7 @@ function updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds) {
 /**
  * Gets field for civicrm_pledge_payment functions
  *
- * @param $params
+ * @param array $params
  *
  * @return array fields valid for other functions
  */

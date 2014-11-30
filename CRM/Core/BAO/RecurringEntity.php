@@ -133,7 +133,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     self::$status = $status;
   }
   /**
-   * Function to save records in civicrm_recujrring_entity table
+   * save records in civicrm_recujrring_entity table
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -1081,12 +1081,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-  * Update mode column in civicrm_recurring_entity table for event related tabs
-  *
-  * @params int $entityId event id
-  * @params string $linkedEntityTable Linked entity table name for this event
-  * @return array
-  */
+   * Update mode column in civicrm_recurring_entity table for event related tabs
+   *
+   * @param int $entityId event id
+   * @param string $linkedEntityTable Linked entity table name for this event
+   * @return array
+   */
   public static function updateModeLinkedEntity($entityId, $linkedEntityTable, $mainEntityTable) {
     $result = array();
     if ( $entityId && $linkedEntityTable && $mainEntityTable ) {

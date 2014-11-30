@@ -188,9 +188,9 @@ class api_v3_EventTest extends CiviUnitTestCase {
   */
 
 
-  /*
-     * Test 'is.Current' option. Existing event is 'old' so only current should be returned
-     */
+  /**
+   * Test 'is.Current' option. Existing event is 'old' so only current should be returned
+   */
   function testGetIsCurrent() {
     $params = array(
       'isCurrent' => 1,
@@ -209,9 +209,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(3, $allEvents['count'], 'confirm three events exist (ie. two not found) ' . __LINE__);
     $this->assertEquals($currentEvent['id'], $result['id'], '');
   }
-/*
- * There has been a schema change & the api needs to buffer developers from it
- */
+
+  /**
+   * There has been a schema change & the api needs to buffer developers from it
+   */
   function testGetPaymentProcessorId() {
     $params = $this->_params[0];
     $params['payment_processor_id'] = 1;
@@ -230,9 +231,9 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   }
 
-  /*
-     * Test 'is.Current' option. Existing event is 'old' so only current should be returned
-     */
+  /**
+   * Test 'is.Current' option. Existing event is 'old' so only current should be returned
+   */
   function testGetSingleReturnIsFull() {
     $contactID = $this->individualCreate();
     $params = array(
@@ -343,9 +344,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals('2008-06-01 00:00:00', $result['values'][$result['id']]['registration_start_date'], 'start date is not set in line ' . __LINE__);
     $this->assertEquals('2008-10-15 00:00:00', $result['values'][$result['id']]['registration_end_date'], 'end date is not set in line ' . __LINE__);
   }
-  /*
-     * Test that passing in Unique field names works
-     */
+
+  /**
+   * Test that passing in Unique field names works
+   */
   function testCreateEventSuccessUniqueFieldNames() {
     $this->_params[0]['event_start_date'] = $this->_params[0]['start_date'];
     unset($this->_params[1]['start_date']);
@@ -398,9 +400,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Event', 'Delete', $params);
     $this->assertAPISuccess($result, 'in line ' . __LINE__);
   }
-  /*
-     * Trying to delete an event with participants should return error
-     */
+
+  /**
+   * Trying to delete an event with participants should return error
+   */
   function testDeleteWithExistingParticipant() {
     $contactID = $this->individualCreate();
     $participantID = $this->participantCreate(
@@ -505,9 +508,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['title']['api.required'], 'in line ' . __LINE__);
   }
-  /*
-     * test api_action param also works
-     */
+
+  /**
+   * test api_action param also works
+   */
   function testgetfieldsRest() {
     $description = "demonstrate use of getfields to interrogate api";
     $params = array('api_action' => 'create');

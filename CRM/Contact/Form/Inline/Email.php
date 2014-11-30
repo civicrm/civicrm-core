@@ -62,7 +62,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * build the form elements for an email object
+   * Build the form object elements for an email object
    *
    * @return void
    * @access public

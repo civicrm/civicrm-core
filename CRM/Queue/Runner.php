@@ -251,7 +251,6 @@ class CRM_Queue_Runner {
   }
 
   /**
-   *
    * @return array(is_error => bool, is_continue => bool, numberOfItems => int, redirect_url => string)
    */
   public function handleEnd() {
@@ -275,7 +274,6 @@ class CRM_Queue_Runner {
   }
 
   /**
-   *
    * @param $isOK
    * @param null $exception
    *

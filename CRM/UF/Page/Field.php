@@ -283,10 +283,8 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
   /**
    * Preview custom field
    *
-   * @param $fieldId
-   * @param $groupId
-   *
-   * @internal param int $id custom field id
+   * @param int $fieldId custom field id
+   * @param int $groupId
    *
    * @return void
    * @access public

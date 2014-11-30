@@ -70,7 +70,7 @@ class CRM_Event_Badge {
   }
 
   /**
-   * function to create the labels (pdf)
+   * create the labels (pdf)
    * It assumes the participants are from the same event
    *
    * @param   array    $participants
@@ -171,12 +171,9 @@ class CRM_Event_Badge {
   function pdfExtraFormat() {}
 
   /**
-   * function to create labels (pdf)
+   * create labels (pdf)
    *
-   * @param $participants
-   *
-   * @internal param array $contactRows assciated array of contact data
-   * @internal param string $format format in which labels needs to be printed
+   * @param array $participants
    *
    * @return  null
    * @access  public

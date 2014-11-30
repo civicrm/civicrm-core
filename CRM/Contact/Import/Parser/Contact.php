@@ -1096,9 +1096,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   function fini() {}
 
   /**
-   * function to check if an error in custom data
+   * check if an error in custom data
    *
-   * @param $params
+   * @param array $params
    * @param String $errorMessage A string containing all the error-fields.
    *
    * @param null $csType
@@ -1317,9 +1317,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * function to check if an error in Core( non-custom fields ) field
+   * check if an error in Core( non-custom fields ) field
    *
-   * @param $params
+   * @param array $params
    * @param String $errorMessage A string containing all the error-fields.
    *
    * @access public
@@ -1588,7 +1588,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * function to ckeck a value present or not in a array
+   * ckeck a value present or not in a array
    *
    * @param $value
    * @param $valueArray
@@ -2068,7 +2068,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
   /**
    * @param $relKey
-   * @param $params
+   * @param array $params
    *
    * @return bool
    */

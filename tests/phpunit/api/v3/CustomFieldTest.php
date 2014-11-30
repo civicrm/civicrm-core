@@ -162,7 +162,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
  * Can't figure out the point of this?
  */
   /**
-   * @param $params
+   * @param array $params
    */
   function _loopingCustomFieldCreateTest($params) {
     $customField = $this->callAPISuccess('custom_field', 'create', $params);

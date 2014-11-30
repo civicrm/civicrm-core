@@ -35,9 +35,9 @@ class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
-     * Function to test Saved Import Mapping for Individuals.
-     */
+  /**
+   * test Saved Import Mapping for Individuals.
+   */
   function testSaveIndividualMapping() {
 
     // Logging in.
@@ -82,10 +82,9 @@ class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
-     *  Helper function to provide csv data for Individuals contact import.
-     */
   /**
+   * Helper function to provide csv data for Individuals contact import.
+   *
    * @return array
    */
   function _individualCSVData() {

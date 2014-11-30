@@ -358,7 +358,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Function to extract variable values
+   * extract variable values
    *
    * @param  mix $query this is basically url
    *
@@ -447,7 +447,7 @@ class CRM_Utils_String {
 
   /**
    * @param $string
-   * @param $params
+   * @param array $params
    */
   static function extractName($string, &$params) {
     $name = trim($string);

@@ -280,7 +280,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function to test getActivitiesCount BAO method
+   * test getActivitiesCount BAO method
    */
   function testGetActivitiesCountforAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -309,7 +309,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function to test getActivitiesCount BAO method
+   * test getActivitiesCount BAO method
    */
   function testGetActivitiesCountforNonAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -339,7 +339,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function to test getActivitiesCount BAO method
+   * test getActivitiesCount BAO method
    */
   function testGetActivitiesCountforContactSummary() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();

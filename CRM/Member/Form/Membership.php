@@ -207,7 +207,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -362,7 +362,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -732,7 +732,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * Function for validation
+   * validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -973,7 +973,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -1693,13 +1693,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * Function to send email receipt
+   * send email receipt
    *
-   * @param object $form form object
-   * @param $formValues
+   * @param CRM_Core_Form $form form object
+   * @param array $formValues
    * @param object $membership object
    *
-   * @internal param array $values submitted values
    * @return boolean true if mail was sent successfully
    * @static
    */

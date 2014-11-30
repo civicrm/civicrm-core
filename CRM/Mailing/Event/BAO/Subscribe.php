@@ -54,11 +54,10 @@ class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
    *
    * @param int $group_id The group id to subscribe to
    * @param string $email The email address of the (new) contact
-   * @param null $contactId
-   * @param null $context
-   * @params int $contactId       Currently used during event registration/contribution.
-   *                              Specifically to avoid linking group to wrong duplicate contact
-   *                              during event registration.
+   * @param int $contactId Currently used during event registration/contribution.
+   *   Specifically to avoid linking group to wrong duplicate contact
+   *   during event registration.
+   * @param string $context
    *
    * @return int|null $se_id      The id of the subscription event, null on failure
    * @access public
@@ -360,20 +359,14 @@ SELECT     civicrm_email.id as email_id
   }
 
   /**
-   * Function to send subscribe mail
+   * send subscribe mail
    *
-   * @params  array  $groups the list of group ids for subscribe
-   * @params  array  $params the list of email
-   * @params  int    $contactId  Currently used during event registration/contribution.
-   *                             Specifically to avoid linking group to wrong duplicate contact
-   *                             during event registration.
-   *
-   * @public
-   *
-   * @param $groups
-   * @param $params
-   * @param null $contactId
-   * @param null $context
+   * @param  array  $groups the list of group ids for subscribe
+   * @param  array  $params the list of email
+   * @param  int    $contactId  Currently used during event registration/contribution.
+   *  Specifically to avoid linking group to wrong duplicate contact
+   *  during event registration.
+   * @param string $context
    *
    * @return void
    * @static
@@ -401,8 +394,7 @@ SELECT     civicrm_email.id as email_id
         $success = TRUE;
         $groupAdded[] = $title;
 
-        /* Ask the contact for confirmation */
-
+        // Ask the contact for confirmation
         $se->send_confirm_request($params['email']);
       }
       else {
@@ -419,6 +411,5 @@ SELECT     civicrm_email.id as email_id
       CRM_Utils_System::setUFMessage(ts('We had a problem processing your subscription request for %1. You have tried to subscribe to a private group and/or we encountered a database error. Please contact the site administrator.', array(1 => $groupTitle)));
     }
   }
-  //end of function
 }
 

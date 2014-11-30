@@ -82,7 +82,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -166,7 +166,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -264,12 +264,11 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', array('plural' => 'Contact Subtype field of %count contacts has not been updated.', 'count' => $inValidSubtypeCnt)), ts('Invalid Subtype'));
     }
   }
-  //end of function
 
   /**
    * parse street address
    * @param array $contactValues contact values
-   * @param object $form form object
+   * @param CRM_Core_Form $form form object
    */
   public static function parseStreetAddress(&$contactValues, &$form) {
     if (!is_array($contactValues) || !is_array($form->_fields)) {

@@ -92,7 +92,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array  $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
-   * @return object CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution object
    * @access public
    * @static
    */
@@ -247,7 +247,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return mixed
    */
@@ -294,7 +294,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
-   * @return object CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution object
    * @access public
    * @static
    */
@@ -534,7 +534,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *                        in a hierarchical manner
    * @param array $ids      (reference) the array that holds all the db ids
    *
-   * @return object CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution object
    * @access public
    * @static
    */
@@ -834,12 +834,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   /**
    * Check if there is a contribution with the same trxn_id or invoice_id
    *
-   * @param $input
+   * @param array $input an assoc array of name/value pairs
    * @param array $duplicates (reference ) store ids of duplicate contribs
    *
    * @param null $id
    *
-   * @internal param array $params (reference ) an assoc array of name/value pairs
    * @return boolean true if duplicate, false otherwise
    * @access public
    * static
@@ -893,7 +892,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Contribute_BAO_ContributionProduct object
+   * @return CRM_Contribute_BAO_ContributionProduct object
    * @access public
    * @static
    */
@@ -904,7 +903,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-   * Function to get list of contribution fields for profile
+   * get list of contribution fields for profile
    * For now we only allow custom contribution fields to be in
    * profile
    *
@@ -939,7 +938,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-   * Function to add extra fields specific to contribtion
+   * add extra fields specific to contribtion
    *
    * @static
    */
@@ -1003,7 +1002,7 @@ GROUP BY p.id
   }
 
   /**
-   * Function to get list of contribution In Honor of contact Ids
+   * get list of contribution In Honor of contact Ids
    *
    * @param int $honorId In Honor of Contact ID
    *
@@ -1235,12 +1234,10 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   }
 
   /**
-   *  Function to create address associated with contribution record.
+   * Create address associated with contribution record.
    *
    * @param array $params an associated array
-   * @param $billingLocationTypeID
-   *
-   * @internal param int $billingID $billingLocationTypeID
+   * @param int $billingLocationTypeID
    *
    * @return address id
    * @static
@@ -1276,11 +1273,9 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   /**
    * Delete billing address record related contribution
    *
-   * @param null $contributionId
-   * @param null $contactId
+   * @param int $contributionId
+   * @param int $contactId
    *
-   * @internal param int $contact_id contact id
-   * @internal param int $contribution_id contributionId
    * @access public
    * @static
    */

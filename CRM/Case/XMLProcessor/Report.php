@@ -50,7 +50,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
    * @param $clientID
    * @param $caseID
    * @param $activitySetName
-   * @param $params
+   * @param array $params
    *
    * @return mixed
    */
@@ -722,8 +722,7 @@ LIMIT  1
    *
    * @return mixed
    */
-  private function redact($string, $printReport = FALSE, $replaceString = array(
-    )) {
+  private function redact($string, $printReport = FALSE, $replaceString = array()) {
     if ($printReport) {
       return CRM_Utils_String::redaction($string, $replaceString);
     }
@@ -738,8 +737,8 @@ LIMIT  1
    * @param $clientID
    * @param $caseID
    * @param $activitySetName
-   * @param $params
-   * @param $form
+   * @param array $params
+   * @param CRM_Core_Form $form
    *
    * @return mixed
    */

@@ -87,7 +87,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   public $_caseTypeId = NULL;
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -204,7 +204,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -317,7 +317,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    * @param array $values posted values of the form
    *
    * @param $files
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -328,7 +328,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

@@ -202,9 +202,10 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$this->_participantID]['participant_source'], 'Wimbeldon');
     $this->assertEquals($this->_eventID, $result['values'][$this->_participantID]['api.event.get']['id']);
   }
-  /*
-     * Check Participant Get respects return properties
-     */
+
+  /**
+   * Check Participant Get respects return properties
+   */
   function testGetWithReturnProperties() {
     $params = array(
       'contact_id' => $this->_contactID,      'return.status_id' => 1,
@@ -391,9 +392,10 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     // assertDBState compares expected values in $match to actual values in the DB
     $this->assertDBState('CRM_Event_DAO_Participant', $participant['id'], $params);
   }
-  /*
-     * Test to check if receive date is being changed per CRM-9763
-     */
+
+  /**
+   * Test to check if receive date is being changed per CRM-9763
+   */
   function testCreateUpdateReceiveDate() {
     $participant = $this->callAPISuccess('participant', 'create', $this->_params);
     $update = array(
@@ -403,9 +405,10 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->callAPISuccess('participant', 'create', $update);
     $this->getAndCheck(array_merge($this->_params, $update), $participant['id'], 'participant');
   }
-  /*
-     * Test to check if participant fee level is being changed per CRM-9781
-     */
+
+  /**
+   * Test to check if participant fee level is being changed per CRM-9781
+   */
   function testCreateUpdateParticipantFeeLevel() {
     $myParams = $this->_params + array('participant_fee_level' => CRM_Core_DAO::VALUE_SEPARATOR . "fee" . CRM_Core_DAO::VALUE_SEPARATOR);
     $participant = $this->callAPISuccess('participant', 'create', $myParams);
@@ -423,8 +426,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-    * Test the line items for participant fee with multiple price field values.
-    */
+   * Test the line items for participant fee with multiple price field values.
+   */
   function testCreateParticipantLineItems() {
     // Create a price set for this event.
 
@@ -669,9 +672,10 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $participant = $this->callAPIFailure('participant', 'delete', $params);
     $this->assertNotNull($participant['error_message']);
   }
-  /*
-    * delete with a get - a 'criteria delete'
-    */
+
+  /**
+   * delete with a get - a 'criteria delete'
+   */
   function testNestedDelete() {
     $description  = "Criteria delete by nesting a GET & a DELETE";
     $subfile      = "NestedDelete";
@@ -682,9 +686,10 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $check = $this->callAPISuccess('participant', 'getcount', array());
     $this->assertEquals(1, $check,"only one participant should be left. line " . __LINE__);
   }
-  /*
-     * Test creation of a participant with an associated contribution
-     */
+
+  /**
+   * Test creation of a participant with an associated contribution
+   */
   function testCreateParticipantWithPayment() {
     $description = "single function to create contact w partipation & contribution. Note that in the
       case of 'contribution' the 'create' is implied (api.contribution.create)";

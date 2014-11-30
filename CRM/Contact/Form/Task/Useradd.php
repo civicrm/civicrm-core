@@ -66,7 +66,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -85,7 +85,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -122,7 +122,6 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   }
 
   /**
-   *
    * @access public
    *
    * @return void

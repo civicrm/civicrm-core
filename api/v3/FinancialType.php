@@ -41,7 +41,7 @@
  * {@getfields financial_type_create}
  * @example financial_typeCreate.php
  *
- * @param $params
+ * @param array $params
  *
  * @return array of newly created financial_type property values.
  * @access public
@@ -57,7 +57,7 @@ function civicrm_api3_financial_type_create($params) {
  * {@getfields financial_type_get}
  * @example financial_typeCreate.php
  *
- * @param $params
+ * @param array $params
  *
  * @return array of retrieved financial_type property values.
  * @access public
@@ -73,7 +73,7 @@ function civicrm_api3_financial_type_get($params) {
  * {@getfields financial_type_delete}
  * @example financial_typeCreate.php
  *
- * @param $params
+ * @param array $params
  *
  * @return array of deleted values.
  * @access public

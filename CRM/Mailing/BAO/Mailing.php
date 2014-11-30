@@ -915,9 +915,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   /**
    * Generate an event queue for a test job
    *
-   * @params array $params contains form values
-   *
-   * @param $testParams
+   * @param array $testParams contains form values
    *
    * @return void
    * @access public
@@ -1507,7 +1505,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * function to add the mailings
+   * add the mailings
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -1557,7 +1555,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @params array $params        Form values
    *
-   * @param $params
+   * @param array $params
    * @param array $ids
    *
    * @return object $mailing      The new mailing object
@@ -2400,7 +2398,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Function to show detail Mailing report
+   * show detail Mailing report
    *
    * @param int $id
    *
@@ -2498,9 +2496,9 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Function to build the  compose mail form
+   * build the  compose mail form
    *
-   * @param   $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
@@ -2593,7 +2591,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   /**
    * Function to build the  compose PDF letter form
    *
-   * @param   $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
@@ -2759,7 +2757,6 @@ WHERE  civicrm_mailing_job.id = %1
    */
   static function processQueue($mode = NULL) {
     $config = &CRM_Core_Config::singleton();
-    //   CRM_Core_Error::debug_log_message("Beginning processQueue run: {$config->mailerJobsMax}, {$config->mailerJobSize}");
 
     if ($mode == NULL && CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG") {
       throw new CRM_Core_Exception(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in the online user and administrator guide</a>', array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'), 2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/")));
@@ -2806,7 +2803,6 @@ WHERE  civicrm_mailing_job.id = %1
       $cronLock->release();
     }
 
- //   CRM_Core_Error::debug_log_message('Ending processQueue run');
     return TRUE;
   }
 

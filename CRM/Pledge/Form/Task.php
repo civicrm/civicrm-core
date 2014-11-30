@@ -80,7 +80,7 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param bool $useTable
    */
   static function preProcessCommon(&$form, $useTable = FALSE) {
@@ -155,7 +155,6 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form {
    * @param string $backType
    * @param bool $submitOnce
    *
-   * @internal param string $type button type for the form after processing
    *
    * @return void
    * @access public

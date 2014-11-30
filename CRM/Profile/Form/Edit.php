@@ -141,7 +141,7 @@ SELECT module,is_reserved
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -307,7 +307,7 @@ SELECT module,is_reserved
   }
 
   /**
-   * Function to intercept QF validation and do our own redirection
+   * intercept QF validation and do our own redirection
    *
    * We use this to send control back to the user for a user formatted page
    * This allows the user to maintain the same state and display the error messages

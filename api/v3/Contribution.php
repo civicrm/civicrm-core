@@ -202,11 +202,7 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
  *
  * @param  array $params (reference ) input parameters
  *
- * @internal param array $returnProperties Which properties should be included in the
- * returned Contribution object. If NULL, the default
- * set of properties will be included.
- *
- * @return array (reference )        array of contributions, if error an array with an error id and error message
+ * @return array of contributions, if error an array with an error id and error message
  * @static void
  * @access public
  * {@getfields Contribution_get}
@@ -446,7 +442,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
 
 /**
  * provide function metadata
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_contribution_completetransaction_spec(&$params) {
   $params['id'] = array(

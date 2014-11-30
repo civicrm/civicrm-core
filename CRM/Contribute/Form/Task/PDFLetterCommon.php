@@ -161,8 +161,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param $entity
    * @param $textToSearch
    *
-   * @internal param $html
-   *
    * @return bool
    */
   static function isHtmlTokenInTableCell($token, $entity, $textToSearch) {

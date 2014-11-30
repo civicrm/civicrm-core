@@ -385,7 +385,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -715,7 +715,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -1104,14 +1104,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Function to that checks for duplicate contacts
+   * that checks for duplicate contacts
    *
    * @param array $fields fields array which are submitted
    * @param $errors
    * @param int $contactID contact id
    * @param string $contactType contact type
    *
-   * @internal param array $error error message array
    */
   static function checkDuplicateContacts(&$fields, &$errors, $contactID, $contactType) {
     // if this is a forced save, ignore find duplicate rule
@@ -1179,9 +1178,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @return string
    * @access public
    */
-  /**
-   * @return string
-   */
   function getTemplateFileName() {
     if ($this->_contactSubType) {
       $templateFile = "CRM/Contact/Form/Edit/SubType/{$this->_contactSubType}.tpl";
@@ -1199,9 +1195,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * This function either parse street address in to child
    * elements or build street address from child elements.
    *
-   * @params $params an array of key value consist of address  blocks.
-   *
-   * @param $params
+   * @param $params array of key value consist of address  blocks.
    *
    * @return array $parseSuccess as array of sucess/fails for each address block@static
    */

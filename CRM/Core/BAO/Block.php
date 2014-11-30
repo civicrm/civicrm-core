@@ -54,9 +54,6 @@ class CRM_Core_BAO_Block {
    * @param string $blockName name of the above object
    * @param array $params input parameters to find object
    *
-   * @internal param Object $block typically a Phone|Email|IM|OpenID object
-   * @internal param array $values output values of the object
-   *
    * @return array of $block objects.
    * @access public
    * @static
@@ -101,8 +98,6 @@ class CRM_Core_BAO_Block {
    *
    * @param Object $block typically a Phone|Email|IM|OpenID object
    * @param string $blockName name of the above object
-   *
-   * @internal param array $values output values of the object
    *
    * @return array of $block objects.
    * @access public
@@ -167,7 +162,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * Function to get all block ids for a contact
+   * get all block ids for a contact
    *
    * @param string $blockName block name
    * @param int $contactId contact id
@@ -216,8 +211,6 @@ class CRM_Core_BAO_Block {
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param null $entity
    * @param null $contactId
-   *
-   * @internal param array $requiredFields fields that's are required in a block
    *
    * @return object       CRM_Core_BAO_Block object on success, null otherwise
    * @access public
@@ -393,7 +386,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * Function to delete block
+   * delete block
    *
    * @param  string $blockName       block name
    * @param  int    $params          associates array
@@ -509,9 +502,8 @@ class CRM_Core_BAO_Block {
   /**
    * Sort location array so primary element is first
    *
-   * @param $locations
+   * @param array $locations
    *
-   * @internal param Array $location
    */
   static function sortPrimaryFirst(&$locations){
     uasort($locations, 'self::primaryComparison');
@@ -521,7 +513,7 @@ class CRM_Core_BAO_Block {
  * compare 2 locations to see which should go first based on is_primary
  * (sort function for sortPrimaryFirst)
  * @param array $location1
- * @param array_type $location2
+ * @param array $location2
  * @return number
  */
   static function primaryComparison($location1, $location2){
