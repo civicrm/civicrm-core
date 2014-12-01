@@ -46,6 +46,7 @@
             <div class="recurring-dialog-inner-right">{ts}Change applies to all the entities in the series.{/ts}</div>
         </div>
     </div>
+    <div class="status"><div class="icon tip-icon"></div> Changes to date or time will NOT be applied to other entities in the series.</div>
 </div>
 {if $hasParent || $isRepeatingEntity}
 {literal}
