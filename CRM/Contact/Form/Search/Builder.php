@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
   /**
-   * number of columns in where
+   * Number of columns in where
    *
    * @var int
    * @access public
@@ -47,7 +47,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   public $_columnCount;
 
   /**
-   * number of blocks to be shown
+   * Number of blocks to be shown
    *
    * @var int
    * @access public
@@ -137,7 +137,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param $values
    * @param $files

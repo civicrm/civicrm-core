@@ -50,14 +50,14 @@ class CRM_Contribute_Form_Task_Email extends CRM_Contribute_Form_Task {
   public $_noEmails = FALSE;
 
   /**
-   * all the existing templates in the system
+   * All the existing templates in the system
    *
    * @var array
    */
   public $_templates = NULL;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -86,7 +86,7 @@ class CRM_Contribute_Form_Task_Email extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

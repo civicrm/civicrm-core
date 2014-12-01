@@ -63,7 +63,7 @@ function civicrm_setup($filesDirectory) {
 }
 
 /**
- * @param $name
+ * @param string $name
  * @param $buffer
  */
 function civicrm_write_file($name, &$buffer) {
@@ -130,7 +130,7 @@ function civicrm_main(&$config) {
 
 /**
  * @param $dsn
- * @param $fileName
+ * @param string $fileName
  * @param bool $lineMode
  */
 function civicrm_source($dsn, $fileName, $lineMode = FALSE) {

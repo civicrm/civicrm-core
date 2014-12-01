@@ -77,7 +77,7 @@ class CRM_Utils_Sunlight {
   }
 
   /**
-   * @param $peopleID
+   * @param int $peopleID
    *
    * @return array
    */

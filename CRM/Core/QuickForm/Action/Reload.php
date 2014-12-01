@@ -39,7 +39,7 @@
 class CRM_Core_QuickForm_Action_Reload extends CRM_Core_QuickForm_Action {
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @param object $stateMachine reference to state machine object
    *

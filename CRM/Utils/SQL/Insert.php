@@ -35,7 +35,7 @@ class CRM_Utils_SQL_Insert {
   private $rows;
 
   /**
-   * array<string> list of column names
+   * Array<string> list of column names
    */
   private $columns;
 

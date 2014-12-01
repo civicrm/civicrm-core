@@ -35,7 +35,7 @@
 class CRM_Contact_BAO_Contact_Permission {
 
   /**
-   * check if the logged in user has permissions for the operation type
+   * Check if the logged in user has permissions for the operation type
    *
    * @param int $id contact id
    * @param int|string $type the type of operation (view|edit)
@@ -81,7 +81,7 @@ WHERE contact_a.id = %1 AND $permission";
   }
 
   /**
-   * fill the acl contact cache for this contact id if empty
+   * Fill the acl contact cache for this contact id if empty
    *
    * @param int $userID
    * @param int|string $type the type of operation (view|edit)
@@ -149,7 +149,7 @@ ON DUPLICATE KEY UPDATE
   }
 
   /**
-   * check if there are any contacts in cache table
+   * Check if there are any contacts in cache table
    *
    * @param int|string $type the type of operation (view|edit)
    * @param int $contactID contact id
@@ -190,7 +190,7 @@ AND    $operationClause LIMIT 1";
 
   /**
    * @param string $contactAlias
-   * @param null $contactID
+   * @param int $contactID
    *
    * @return array
    */
@@ -240,7 +240,7 @@ AND    $operationClause LIMIT 1";
   }
 
   /**
-   * get the permission base on its relationship
+   * Get the permission base on its relationship
    *
    * @param int $selectedContactID contact id of selected contact
    * @param int $contactID contact id of the current contact
@@ -331,7 +331,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
 
 
   /**
-   * @param $contactID
+   * @param int $contactID
    * @param CRM_Core_Form $form
    * @param bool $redirect
    *
@@ -385,7 +385,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
   }
 
   /**
-   * @param $contactID
+   * @param int $contactID
    * @param CRM_Core_Form $form
    * @param bool $redirect
    *

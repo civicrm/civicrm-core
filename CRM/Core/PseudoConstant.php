@@ -50,7 +50,7 @@
 class CRM_Core_PseudoConstant {
 
   /**
-   * static cache for pseudoconstant arrays
+   * Static cache for pseudoconstant arrays
    * @var array
    * @static
    */
@@ -66,35 +66,35 @@ class CRM_Core_PseudoConstant {
   private static $activityType;
 
   /**
-   * states, provinces
+   * States, provinces
    * @var array
    * @static
    */
   private static $stateProvince;
 
   /**
-   * counties
+   * Counties
    * @var array
    * @static
    */
   private static $county;
 
   /**
-   * states/provinces abbreviations
+   * States/provinces abbreviations
    * @var array
    * @static
    */
   private static $stateProvinceAbbreviation;
 
   /**
-   * country
+   * Country
    * @var array
    * @static
    */
   private static $country;
 
   /**
-   * countryIsoCode
+   * CountryIsoCode
    * @var array
    * @static
    */
@@ -110,42 +110,42 @@ class CRM_Core_PseudoConstant {
   private static $group;
 
   /**
-   * groupIterator
+   * GroupIterator
    * @var mixed
    * @static
    */
   private static $groupIterator;
 
   /**
-   * relationshipType
+   * RelationshipType
    * @var array
    * @static
    */
   private static $relationshipType;
 
   /**
-   * civicrm groups that are not smart groups
+   * Civicrm groups that are not smart groups
    * @var array
    * @static
    */
   private static $staticGroup;
 
   /**
-   * currency codes
+   * Currency codes
    * @var array
    * @static
    */
   private static $currencyCode;
 
   /**
-   * payment processor
+   * Payment processor
    * @var array
    * @static
    */
   private static $paymentProcessor;
 
   /**
-   * payment processor types
+   * Payment processor types
    * @var array
    * @static
    */
@@ -1104,7 +1104,7 @@ WHERE  id = %1";
   }
 
   /**
-   * get all the ISO 4217 currency codes
+   * Get all the ISO 4217 currency codes
    *
    * so far, we use this for validation only, so there's no point of putting this into the database
    *
@@ -1468,7 +1468,7 @@ WHERE  id = %1";
    *
    * @param boolean $all - get payment processors     - default is to get only active ones.
    *
-   * @param null $id
+   * @param int $id
    * @param string $return
    *
    * @return array - array of all payment processor types
@@ -1565,7 +1565,7 @@ WHERE  id = %1";
   }
 
   /**
-   * @param $countryID
+   * @param int $countryID
    * @param string $field
    *
    * @return array
@@ -1620,7 +1620,7 @@ ORDER BY name";
   }
 
   /**
-   * @param $stateID
+   * @param int $stateID
    *
    * @return array
    */
@@ -1824,7 +1824,7 @@ WHERE  id = %1
    *
    * @param boolean $optionGroupName - get All  Option Group values- default is to get only active ones.
    *
-   * @param null $id
+   * @param int $id
    * @param null $condition
    *
    * @return array - array reference of all Option Group Name

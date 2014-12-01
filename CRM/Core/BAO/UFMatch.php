@@ -357,7 +357,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * update the uf_name in the user object
+   * Update the uf_name in the user object
    *
    * @param int    $contactId id of the contact to update
    *
@@ -484,7 +484,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * get the contact_id given a uf_id
+   * Get the contact_id given a uf_id
    *
    * @param int  $ufID  Id of UF for which related contact_id is required
    *
@@ -508,7 +508,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * get the uf_id given a contact_id
+   * Get the uf_id given a contact_id
    *
    * @param int  $contactID   ID of the contact for which related uf_id is required
    *
@@ -540,7 +540,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * get the list of contact_id
+   * Get the list of contact_id
    *
    *
    * @return int    contact_id on success, null otherwise
@@ -558,10 +558,10 @@ AND    domain_id    = %4
   }
 
   /**
-   * see if this user exists, and if so, if they're allowed to login
+   * See if this user exists, and if so, if they're allowed to login
    *
    *
-   * @param $openId
+   * @param int $openId
    *
    * @return bool     true if allowed to login, false otherwise
    * @access public
@@ -578,7 +578,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * get the next unused uf_id value, since the standalone UF doesn't
+   * Get the next unused uf_id value, since the standalone UF doesn't
    * have id's (it uses OpenIDs, which go in a different field)
    *
    *

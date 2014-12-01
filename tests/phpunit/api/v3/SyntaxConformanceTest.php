@@ -1247,7 +1247,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return $returnEntities;
   }
   /**
-   * @param $entityName
+   * @param string $entityName
    * @param int $count
    *
    *

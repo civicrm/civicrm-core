@@ -269,7 +269,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * edit uf group
+   * Edit uf group
    *
    * @param int $id uf group id
    * @param string $action the action to be invoked
@@ -383,7 +383,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * this function is for preview mode for ufoup
+   * This function is for preview mode for ufoup
    *
    * @param int $id uf group id
    *
@@ -401,7 +401,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $action
    */
   function setContext($id, $action) {

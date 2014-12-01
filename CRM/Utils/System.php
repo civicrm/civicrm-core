@@ -1642,7 +1642,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * clean url, replaces first '&' with '?'
+   * Clean url, replaces first '&' with '?'
    *
    * @param string $url
    *

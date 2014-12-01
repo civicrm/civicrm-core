@@ -47,14 +47,14 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   protected $_surveyId;
 
   /**
-   * action
+   * Action
    *
    * @var int
    */
   protected $_action;
 
   /**
-   * surveyTitle
+   * SurveyTitle
    *
    * @var string
    */

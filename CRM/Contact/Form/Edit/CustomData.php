@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Edit_CustomData {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @param CRM_Core_Form $form
    *

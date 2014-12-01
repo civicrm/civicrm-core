@@ -114,7 +114,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

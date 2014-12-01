@@ -37,12 +37,12 @@
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
 
   /**
-   * static holder for the default LT
+   * Static holder for the default LT
    */
   static $_defaultContributionType = null;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct( ) {
     parent::__construct( );
@@ -69,7 +69,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -82,7 +82,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * add the financial types
+   * Add the financial types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -114,7 +114,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * delete financial Types
+   * Delete financial Types
    *
    * @param int $financialTypeId
    *
@@ -161,7 +161,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * to fetch financial type having relationship as Income Account is
+   * To fetch financial type having relationship as Income Account is
    *
    *
    * @return array  all financial type with income account is relationship

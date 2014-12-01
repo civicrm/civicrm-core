@@ -290,7 +290,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   }
 
   /**
-   * validation
+   * Validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *

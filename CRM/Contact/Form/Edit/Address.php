@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Edit_Address {
 
   /**
-   * build form for address input fields
+   * Build form for address input fields
    *
    * @param CRM_Core_Form $form
    * @param int     $addressBlockCount - the index of the address array (if multiple addresses on a page)
@@ -253,7 +253,7 @@ class CRM_Contact_Form_Edit_Address {
   }
 
   /**
-   * check for correct state / country mapping.
+   * Check for correct state / country mapping.
    *
    * @param $fields
    * @param $files
@@ -312,7 +312,7 @@ class CRM_Contact_Form_Edit_Address {
   }
 
   /**
-   * set default values for address block
+   * Set default values for address block
    *
    * @param array  $defaults  defaults associated array
    * @param CRM_Core_Form $form     form object

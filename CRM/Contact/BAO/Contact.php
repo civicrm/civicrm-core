@@ -60,21 +60,21 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     END";
 
   /**
-   * the types of communication preferences
+   * The types of communication preferences
    *
    * @var array
    */
   static $_commPrefs = array('do_not_phone', 'do_not_email', 'do_not_mail', 'do_not_sms', 'do_not_trade');
 
   /**
-   * types of greetings
+   * Types of greetings
    *
    * @var array
    */
   static $_greetingTypes = array('addressee', 'email_greeting', 'postal_greeting');
 
   /**
-   * static field for all the contact information that we can potentially import
+   * Static field for all the contact information that we can potentially import
    *
    * @var array
    * @static
@@ -82,7 +82,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   static $_importableFields = array();
 
   /**
-   * static field for all the contact information that we can potentially export
+   * Static field for all the contact information that we can potentially export
    *
    * @var array
    * @static
@@ -90,7 +90,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   static $_exportableFields = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_Contact_DAO_Contact
@@ -103,7 +103,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * takes an associative array and creates a contact object
+   * Takes an associative array and creates a contact object
    *
    * the function extract all the params it needs to initialize the create a
    * contact object. the params array could contain additional unused name/value
@@ -261,7 +261,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * create contact
+   * Create contact
    * takes an associative array and creates a contact object and all the associated
    * derived objects (i.e. individual, location, email, phone etc)
    *
@@ -730,7 +730,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * get the display name of a contact
+   * Get the display name of a contact
    *
    * @param  int    $id id of the contact
    *
@@ -878,7 +878,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * delete the image of a contact
+   * Delete the image of a contact
    *
    * @param  int $id id of the contact
    *
@@ -934,7 +934,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * function to return proportional height and width of the image
+   * Return proportional height and width of the image
    *
    * @param  Integer $imageWidth  width of image
    *
@@ -1006,7 +1006,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * function to extract contact id from url for deleting contact image
+   * Extract contact id from url for deleting contact image
    */
   public static function processImage() {
 
@@ -1135,7 +1135,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * combine all the importable fields from the lower levels object
+   * Combine all the importable fields from the lower levels object
    *
    * The ordering is important, since currently we do not have a weight
    * scheme. Adding weight is super important
@@ -1330,7 +1330,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * combine all the exportable fields from the lower levels object
+   * Combine all the exportable fields from the lower levels object
    *
    * currentlty we are using importable fields as exportable fields
    *
@@ -1569,7 +1569,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Function to get the all contact details(Hierarchical)
+   * Get the all contact details(Hierarchical)
    *
    * @param int   $contactId contact id
    * @param array $fields fields array
@@ -1595,7 +1595,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * given a set of flat profile style field names, create a hierarchy
+   * Given a set of flat profile style field names, create a hierarchy
    * for query to use and crete the right sql
    *
    * @param $fields
@@ -1662,13 +1662,13 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Function to return the primary location type of a contact
+   * Return the primary location type of a contact
    *
    * $params int     $contactId contact_id
    * $params boolean $isPrimaryExist if true, return primary contact location type otherwise null
    * $params boolean $skipDefaultPriamry if true, return primary contact location type otherwise null
    *
-   * @param $contactId
+   * @param int $contactId
    * @param bool $skipDefaultPriamry
    * @param null $block
    *
@@ -1731,7 +1731,7 @@ WHERE  civicrm_contact.id = %1 ";
   }
 
   /**
-   * function to get the display name, primary email and location type of a contact
+   * Get the display name, primary email and location type of a contact
    *
    * @param  int    $id id of the contact
    *
@@ -1775,7 +1775,7 @@ ORDER BY civicrm_email.is_primary DESC";
   }
 
   /**
-   * function to add/edit/register contacts through profile.
+   * Add/edit/register contacts through profile.
    *
    * @param array $params Array of profile fields to be edited/added.
    * @param array $fields Array of fields from UFGroup
@@ -1884,8 +1884,8 @@ ORDER BY civicrm_email.is_primary DESC";
   /**
    * @param array $params
    * @param $fields
-   * @param null $contactID
-   * @param null $ufGroupId
+   * @param int $contactID
+   * @param int $ufGroupId
    * @param null $ctype
    * @param bool $skipCustom
    *
@@ -2248,7 +2248,7 @@ ORDER BY civicrm_email.is_primary DESC";
   }
 
   /**
-   * Function to find the get contact details
+   * Find the get contact details
    * does not respect ACLs for now, which might need to be rectified at some
    * stage based on how its used
    *
@@ -2302,7 +2302,7 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
   }
 
   /**
-   * Function to find the contact details associated with an OpenID
+   * Find the contact details associated with an OpenID
    *
    * @param string $openId openId of the contact
    * @param string $ctype  contact type
@@ -2558,7 +2558,7 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Function to process greetings and cache
+   * Process greetings and cache
    *
    * @param object  $contact contact object after save
    * @param boolean $useDefaults use default greeting values
@@ -2709,7 +2709,7 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Function to retrieve loc block ids w/ given condition.
+   * Retrieve loc block ids w/ given condition.
    *
    * @param  int    $contactId    contact id.
    * @param  array  $criteria     key => value pair which should be
@@ -2761,9 +2761,9 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Function to build context menu items.
+   * Build context menu items.
    *
-   * @param null $contactId
+   * @param int $contactId
    *
    * @return array of context menu for logged in user.
    * @static
@@ -3021,7 +3021,7 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Function to retrieve display name of contact that address is shared
+   * Retrieve display name of contact that address is shared
    * based on $masterAddressId or $contactId .
    *
    * @param  int    $masterAddressId    master id.
@@ -3058,7 +3058,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   /**
    * Get the creation/modification times for a contact
    *
-   * @param $contactId
+   * @param int $contactId
    *
    * @return array('created_date' => $, 'modified_date' => $)
    */
@@ -3193,7 +3193,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
-   * Function to check if contact is being used in civicrm_domain
+   * Check if contact is being used in civicrm_domain
    * based on $contactId
    *
    * @param  int     $contactId   contact id.

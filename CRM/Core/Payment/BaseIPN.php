@@ -965,8 +965,8 @@ LIMIT 1;";
   // function to copy custom data of the
   // initial contribution into its recurring contributions
   /**
-   * @param $recurId
-   * @param $targetContributionId
+   * @param int $recurId
+   * @param int $targetContributionId
    */
   function copyCustomValues($recurId, $targetContributionId) {
     if ($recurId && $targetContributionId) {
@@ -1010,8 +1010,8 @@ LIMIT 1;";
   // function to copy soft credit record of first recurring contribution
   // and add new soft credit against $targetContributionId
   /**
-   * @param $recurId
-   * @param $targetContributionId
+   * @param int $recurId
+   * @param int $targetContributionId
    */
   function addrecurSoftCredit($recurId, $targetContributionId) {
     $contriID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');

@@ -161,7 +161,7 @@ WHERE  id = %1
   }
 
   /**
-   * delete Option
+   * Delete Option
    *
    * param $optionId integer option id
    *
@@ -280,8 +280,8 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
   }
 
   /**
-   * @param $customFieldID
-   * @param null $optionGroupID
+   * @param int $customFieldID
+   * @param int $optionGroupID
    *
    * @return array
    */

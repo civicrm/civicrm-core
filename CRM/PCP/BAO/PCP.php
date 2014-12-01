@@ -50,7 +50,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   }
 
   /**
-   * add or update either a Personal Campaign Page OR a PCP Block
+   * Add or update either a Personal Campaign Page OR a PCP Block
    *
    * @param array $params reference array contains the values submitted by the form
    * @param bool $pcpBlock if true, create or update PCPBlock, else PCP
@@ -89,7 +89,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   }
 
   /**
-   * get the Display  name of a contact for a PCP
+   * Get the Display  name of a contact for a PCP
    *
    * @param  int $id      id for the PCP
    *
@@ -110,9 +110,9 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
   }
 
   /**
-   * return PCP  Block info for dashboard
+   * Return PCP  Block info for dashboard
    *
-   * @param $contactId
+   * @param int $contactId
    *
    * @return array     array of Pcp if found
    * @access public
@@ -228,7 +228,7 @@ ORDER BY target_entity_type, target_entity_id
   }
 
   /**
-   * function to show the total amount for Personal Campaign Page on thermometer
+   * Show the total amount for Personal Campaign Page on thermometer
    *
    * @param array $pcpId  contains the pcp ID
    *
@@ -250,7 +250,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * function to show the amount, nickname on honor roll
+   * Show the amount, nickname on honor roll
    *
    * @param array $pcpId contains the pcp ID
    *
@@ -348,7 +348,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Function to Delete the campaign page
+   * Delete the campaign page
    *
    * @param int $id campaign page id
    *
@@ -482,7 +482,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * Process a PCP contribution/
    */
   /**
-   * @param $pcpId
+   * @param int $pcpId
    * @param $component
    * @param $entity
    *
@@ -582,7 +582,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Function to Approve / Reject the campaign page
+   * Approve / Reject the campaign page
    *
    * @param int $id campaign page id
    *
@@ -625,7 +625,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Function to send notfication email to supporter
+   * Send notfication email to supporter
    * 1. when their PCP status is changed by site admin.
    * 2. when supporter initially creates a Personal Campaign Page ($isInitial set to true).
    *
@@ -724,7 +724,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Function to Enable / Disable the campaign page
+   * Enable / Disable the campaign page
    *
    * @param int $id campaign page id
    *
@@ -738,7 +738,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Function to get pcp block is active
+   * Get pcp block is active
    *
    * @param int $pcpId
    * @param $component
@@ -762,7 +762,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Function to get pcp block is enabled for component page
+   * Get pcp block is enabled for component page
    *
    * @param int $pageId
    * @param $component
@@ -786,7 +786,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Function to find out if the PCP block is in use by one or more PCP page
+   * Find out if the PCP block is in use by one or more PCP page
    *
    * @param int $id pcp block id
    *
@@ -807,7 +807,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Function to get email is enabled for supporter's profile
+   * Get email is enabled for supporter's profile
    *
    * @param int $profileId supporter's profile id
    *
@@ -830,7 +830,7 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
   }
 
   /**
-   * Function to obtain the title of page associated with a pcp
+   * Obtain the title of page associated with a pcp
    *
    * @param int $pcpId
    * @param $component
@@ -860,7 +860,7 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
   }
 
   /**
-   * Function to get pcp block & entity id given pcp id
+   * Get pcp block & entity id given pcp id
    *
    * @param int $pcpId
    * @param $component
@@ -888,7 +888,7 @@ WHERE pcp.id = %1";
   }
 
   /**
-   * Function to get pcp entity table given a component.
+   * Get pcp entity table given a component.
    *
    * @param $component
    *
@@ -907,7 +907,7 @@ WHERE pcp.id = %1";
   }
 
   /**
-   * Function to get supporter profile id
+   * Get supporter profile id
    *
    * @param int $component_id
    * @param string $component

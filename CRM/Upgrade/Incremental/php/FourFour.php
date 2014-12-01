@@ -353,8 +353,8 @@ ALTER TABLE civicrm_dashboard
 
   /**
    * @param CRM_Queue_TaskContext $ctx
-   * @param $startId
-   * @param $endId
+   * @param int $startId
+   * @param int $endId
    *
    * @return bool
    */
@@ -455,8 +455,8 @@ ALTER TABLE civicrm_dashboard
    * (e.g. "http://example.com/?page=CiviCRM&amp;q=civicrm/contact/imagefile&amp;photo=123.jpg").
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $startId
-   * @param $endId
+   * @param int $startId
+   * @param int $endId
    * @return bool
    */
   static function cleanupBackendImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId) {

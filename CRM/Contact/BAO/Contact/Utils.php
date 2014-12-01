@@ -35,7 +35,7 @@
 class CRM_Contact_BAO_Contact_Utils {
 
   /**
-   * given a contact type, get the contact image
+   * Given a contact type, get the contact image
    *
    * @param string  $contactType contact type
    * @param boolean $urlOnly  if we need to return only image url
@@ -112,7 +112,7 @@ class CRM_Contact_BAO_Contact_Utils {
   }
 
   /**
-   * function check for mix contact ids(individual+household etc...)
+   * Function check for mix contact ids(individual+household etc...)
    *
    * @param array $contactIds array of contact ids
    *
@@ -246,7 +246,7 @@ WHERE  id IN ( $idString )
   }
 
   /**
-   * get the count of  contact loctions
+   * Get the count of  contact loctions
    *
    * @param int $contactId contact id
    *
@@ -350,14 +350,14 @@ UNION
   }
 
   /**
-   * create related memberships for current employer
+   * Create related memberships for current employer
    *
    * @param int $contactID contact id of the individual
    * @param int $employerID contact id of the organization.
    * @param array $relationshipParams relationship params.
    * @param boolean $duplicate are we triggered existing relationship.
    *
-   * @param null $previousEmpID
+   * @param int $previousEmpID
    *
    * @throws CiviCRM_API3_Exception
    * @access public
@@ -390,7 +390,7 @@ UNION
   }
 
   /**
-   * set current employer id and organization name
+   * Set current employer id and organization name
    *
    * @param array $currentEmployerParams associated array of contact id and its employer id
    *
@@ -408,7 +408,7 @@ WHERE contact_a.id ={$contactId} AND contact_b.id={$orgId}; ";
   }
 
   /**
-   * update cached current employer name
+   * Update cached current employer name
    *
    * @param int $organizationId current employer id
    *
@@ -422,7 +422,7 @@ WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
   }
 
   /**
-   * Function to clear cached current employer name
+   * Clear cached current employer name
    *
    * @param int $contactId contact id ( mostly individual contact id)
    * @param int $employerId contact id ( mostly organization contact id)
@@ -468,12 +468,12 @@ WHERE id={$contactId}; ";
   }
 
   /**
-   * Function to build form for related contacts / on behalf of organization.
+   * Build form for related contacts / on behalf of organization.
    *
    * @param CRM_Core_Form $form
    * @param $contactType       string  contact type
-   * @param $countryID
-   * @param $stateID
+   * @param int $countryID
+   * @param int $stateID
    * @param $title             string  fieldset title
    *
    * @static
@@ -543,7 +543,7 @@ WHERE id={$contactId}; ";
   }
 
   /**
-   * Function to clear cache employer name and employer id
+   * Clear cache employer name and employer id
    * of all employee when employer get deleted.
    *
    * @param int $employerId contact id of employer ( organization id )
@@ -669,7 +669,7 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
    * This function retrieve component related contact information.
    *
    * @param array $componentIds array of component Ids.
-   * @param $componentName
+   * @param string $componentName
    * @param array $returnProperties array of return elements.
    *
    * @return array $contactDetails array of contact info.@static
@@ -844,7 +844,7 @@ Group By  componentId";
   }
 
   /**
-   * Function to get the list of contact name give address associated array
+   * Get the list of contact name give address associated array
    *
    * @param array $addresses associated array of
    *
@@ -1094,8 +1094,8 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * @param string $templateString the greeting template string with contact tokens + Smarty syntax
    *
    * @param $contactDetails
-   * @param $contactID
-   * @param $className
+   * @param int $contactID
+   * @param string $className
    *
    * @return void
    * @static

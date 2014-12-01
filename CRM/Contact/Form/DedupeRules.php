@@ -45,7 +45,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   protected $_rgid;
 
   /**
-   * pre processing
+   * Pre processing
    *
    * @return void
    * @access public
@@ -142,7 +142,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

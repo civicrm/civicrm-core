@@ -35,7 +35,7 @@
 class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -62,7 +62,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * delete the mapping
+   * Delete the mapping
    *
    * @param int $id   mapping id
    *
@@ -90,7 +90,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * takes an associative array and creates a contact object
+   * Takes an associative array and creates a contact object
    *
    * The function extract all the params it needs to initialize the create a
    * contact object. the params array could contain additional unused name/value
@@ -111,7 +111,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * get the list of mappings
+   * Get the list of mappings
    *
    * @param string  $mappingTypeId  mapping type id
    *
@@ -133,7 +133,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * get the mapping fields
+   * Get the mapping fields
    *
    * @param int $mappingId  mapping id
    *
@@ -236,7 +236,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * Function to build the mapping form
+   * Build the mapping form
    *
    * @param CRM_Core_Form $form
    * @param string $mappingType (Export/Import/Search Builder)
@@ -1142,7 +1142,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * save the mapping field info for search builder / export given the formvalues
+   * Save the mapping field info for search builder / export given the formvalues
    *
    * @param array $params       asscociated array of formvalues
    * @param int   $mappingId    mapping id

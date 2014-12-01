@@ -62,81 +62,81 @@ abstract class CRM_Import_Parser {
 
 
   /**
-   * total number of non empty lines
+   * Total number of non empty lines
    */
   protected $_totalCount;
 
   /**
-   * running total number of valid lines
+   * Running total number of valid lines
    */
   protected $_validCount;
 
   /**
-   * running total number of invalid rows
+   * Running total number of invalid rows
    */
   protected $_invalidRowCount;
 
   /**
-   * maximum number of non-empty/comment lines to process
+   * Maximum number of non-empty/comment lines to process
    *
    * @var int
    */
   protected $_maxLinesToProcess;
 
   /**
-   * maximum number of invalid rows to store
+   * Maximum number of invalid rows to store
    */
   protected $_maxErrorCount;
 
   /**
-   * array of error lines, bounded by MAX_ERROR
+   * Array of error lines, bounded by MAX_ERROR
    */
   protected $_errors;
 
   /**
-   * total number of conflict lines
+   * Total number of conflict lines
    */
   protected $_conflictCount;
 
   /**
-   * array of conflict lines
+   * Array of conflict lines
    */
   protected $_conflicts;
 
   /**
-   * total number of duplicate (from database) lines
+   * Total number of duplicate (from database) lines
    */
   protected $_duplicateCount;
 
   /**
-   * array of duplicate lines
+   * Array of duplicate lines
    */
   protected $_duplicates;
 
   /**
-   * running total number of warnings
+   * Running total number of warnings
    */
   protected $_warningCount;
 
   /**
-   * maximum number of warnings to store
+   * Maximum number of warnings to store
    */
   protected $_maxWarningCount = self::MAX_WARNINGS;
 
   /**
-   * array of warning lines, bounded by MAX_WARNING
+   * Array of warning lines, bounded by MAX_WARNING
    */
   protected $_warnings;
 
   /**
-   * array of all the fields that could potentially be part
+   * Array of all the fields that could potentially be part
    * of this import process
    * @var array
    */
   protected $_fields;
 
   /**
-   * array of the fields that are actually part of the import process
+   * Array of the fields that are actually part of the import process
    * the position in the array also dictates their position in the import
    * file
    * @var array
@@ -144,42 +144,42 @@ abstract class CRM_Import_Parser {
   protected $_activeFields;
 
   /**
-   * cache the count of active fields
+   * Cache the count of active fields
    *
    * @var int
    */
   protected $_activeFieldCount;
 
   /**
-   * cache of preview rows
+   * Cache of preview rows
    *
    * @var array
    */
   protected $_rows;
 
   /**
-   * filename of error data
+   * Filename of error data
    *
    * @var string
    */
   protected $_errorFileName;
 
   /**
-   * filename of conflict data
+   * Filename of conflict data
    *
    * @var string
    */
   protected $_conflictFileName;
 
   /**
-   * filename of duplicate data
+   * Filename of duplicate data
    *
    * @var string
    */
   protected $_duplicateFileName;
 
   /**
-   * contact type
+   * Contact type
    *
    * @var int
    */
@@ -353,7 +353,7 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * setter function
+   * Setter function
    *
    * @param int $max
    *

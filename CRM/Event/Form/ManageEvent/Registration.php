@@ -41,7 +41,7 @@
 class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent {
 
   /**
-   * what blocks should we show and hide.
+   * What blocks should we show and hide.
    *
    * @var CRM_Core_ShowHideBlocks
    */
@@ -51,7 +51,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   protected $_profilePostMultipleAdd = array();
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -316,7 +316,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * build Registration Block
+   * Build Registration Block
    *
    * @param CRM_Core_Form $form
    *
@@ -391,7 +391,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * build Confirmation Block
+   * Build Confirmation Block
    *
    * @param CRM_Core_Form $form
    *
@@ -419,7 +419,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Function to build Email Block
+   * Build Email Block
    *
    * @param CRM_Core_Form $form
    *
@@ -472,7 +472,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $values
    * @param $files

@@ -40,7 +40,7 @@
 class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
   /**
-   * max number of contacts we will display for membership-organisation
+   * Max number of contacts we will display for membership-organisation
    */
   CONST MAX_CONTACTS = 50;
 
@@ -212,7 +212,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   }
 
   /**
-   * validation
+   * Validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -415,9 +415,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   }
 
   /**
-   * @param $previousID
-   * @param $priceSetId
-   * @param $membershipTypeId
+   * @param int $previousID
+   * @param int $priceSetId
+   * @param int $membershipTypeId
    * @param $optionsIds
    */
   public static function checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, &$optionsIds) {

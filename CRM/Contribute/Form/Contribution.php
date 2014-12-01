@@ -39,7 +39,7 @@
  */
 class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditPayment {
   /**
-   * the id of the contribution that we are processing
+   * The id of the contribution that we are processing
    *
    * @var int
    * @public
@@ -47,7 +47,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_id;
 
   /**
-   * the id of the premium that we are processing
+   * The id of the premium that we are processing
    *
    * @var int
    * @public
@@ -60,7 +60,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_productDAO = NULL;
 
   /**
-   * the id of the note
+   * The id of the note
    *
    * @var int
    * @public
@@ -68,7 +68,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_noteID;
 
   /**
-   * the id of the contact associated with this contribution
+   * The id of the contact associated with this contribution
    *
    * @var int
    * @public
@@ -76,7 +76,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_contactID;
 
   /**
-   * the id of the pledge payment that we are processing
+   * The id of the pledge payment that we are processing
    *
    * @var int
    * @public
@@ -84,7 +84,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_ppID;
 
   /**
-   * the id of the pledge that we are processing
+   * The id of the pledge that we are processing
    *
    * @var int
    * @public
@@ -92,7 +92,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_pledgeID;
 
   /**
-   * is this contribution associated with an online
+   * Is this contribution associated with an online
    * financial transaction
    *
    * @var boolean
@@ -163,7 +163,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_lineItems;
 
   /**
-   * line item
+   * Line item
    * @todo explain why we use lineItem & lineItems
    * @var array
    */
@@ -184,7 +184,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_honoreeProfileType;
 
   /**
-   * array of billing panes to be displayed by billingBlock.tpl - currently this is likely to look like
+   * Array of billing panes to be displayed by billingBlock.tpl - currently this is likely to look like
    * array('Credit Card' => ts('Credit Card') or array('Direct Debit => ts('Direct Debit')
    * @todo billing details (address stuff) to be added when we stop hard coding the panes in billingBlock.tpl
    *
@@ -193,14 +193,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $billingPane = array();
 
   /**
-   * array of the payment fields to be displayed in the payment fieldset (pane) in billingBlock.tpl
+   * Array of the payment fields to be displayed in the payment fieldset (pane) in billingBlock.tpl
    * this contains all the information to describe these fields from quickform. See CRM_Core_Form_Payment getPaymentFormFieldsMetadata
    *
    * @var array
    */
    public $_paymentFields = array();
   /**
-   * logged in user's email
+   * Logged in user's email
    * @var string
    */
   public $userEmail;
@@ -219,7 +219,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_priceSet;
 
   /**
-   * form defaults
+   * Form defaults
    * @todo can we define this a as protected? can we define higher up the chain
    * @var array
    */
@@ -232,7 +232,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public $userDisplayName;
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -936,7 +936,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
@@ -1818,7 +1818,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
-   * @param $paymentParams
+   * @param array $paymentParams
    *
    * @return array
    */

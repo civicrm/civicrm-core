@@ -7,8 +7,8 @@ class Participant extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to create a Participant
    *
-   * @param $contactId
-   * @param $eventId
+   * @param int $contactId
+   * @param int $eventId
    *
    * @return mixed $participant id of created Participant
    */

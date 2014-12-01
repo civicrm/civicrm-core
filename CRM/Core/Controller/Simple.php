@@ -39,7 +39,7 @@
 class CRM_Core_Controller_Simple extends CRM_Core_Controller {
 
   /**
-   * constructor
+   * Constructor
    *
    * @param null $path
    * @param bool $title

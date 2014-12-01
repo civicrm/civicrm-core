@@ -58,7 +58,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   function tearDown() {}
 
    /**
-   * test create function succeeds
+   * Test create function succeeds
    */
   public function testCreate() {
     $result = $this->callAPIAndDocument('MessageTemplate', 'create', $this->params, __FUNCTION__, __FILE__);

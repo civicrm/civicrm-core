@@ -36,7 +36,7 @@
 abstract class CRM_Core_Payment {
 
   /**
-   * how are we getting billing information?
+   * How are we getting billing information?
    *
    * FORM   - we collect it on the same page
    * BUTTON - the processor collects it and sends it back to us via some protocol
@@ -47,7 +47,7 @@ abstract class CRM_Core_Payment {
     BILLING_MODE_NOTIFY = 4;
 
   /**
-   * which payment type(s) are we using?
+   * Which payment type(s) are we using?
    *
    * credit card
    * direct debit
@@ -84,7 +84,7 @@ abstract class CRM_Core_Payment {
   protected $_paymentForm = NULL;
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string  $mode the mode of operation: live or test
    * @param array  $paymentProcessor the details of the payment processor being invoked
@@ -150,7 +150,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * check if capability is supported
+   * Check if capability is supported
    * @param string $capability e.g BackOffice, LiveMode, FutureRecurStartDate
    *
    * @return bool
@@ -164,7 +164,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
    * The intention is to support off-site (other than paypal) & direct debit but that is not all working yet so to reach a 'stable' point we disable
    * @return bool
    */
@@ -178,7 +178,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
    * @return bool
    */
   protected function supportsLiveMode() {
@@ -186,7 +186,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * should the first payment date be configurable when setting up back office recurring payments
+   * Should the first payment date be configurable when setting up back office recurring payments
    * We set this to false for historical consistency but in fact most new processors use tokens for recurring and can support this
    * @return bool
    */
@@ -216,7 +216,7 @@ abstract class CRM_Core_Payment {
   /**
    * Getter for accessing member vars
    *
-   * @param $name
+   * @param string $name
    *
    * @return null
    */
@@ -225,7 +225,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * get name for the payment information type
+   * Get name for the payment information type
    *
    * @return string
    */
@@ -234,7 +234,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * get label for the payment information type
+   * Get label for the payment information type
    *
    * @return string
    */
@@ -243,7 +243,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * get array of fields that should be displayed on the payment form
+   * Get array of fields that should be displayed on the payment form
    * @todo make payment type an option value & use it in the function name - currently on debit & credit card work
    * @return array
    * @throws CiviCRM_API3_Exception
@@ -256,7 +256,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * get array of fields that should be displayed on the payment form for credit cards
+   * Get array of fields that should be displayed on the payment form for credit cards
    *
    * @return array
    */
@@ -270,7 +270,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * get array of fields that should be displayed on the payment form for direct debits
+   * Get array of fields that should be displayed on the payment form for direct debits
    *
    * @return array
    */
@@ -284,7 +284,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * return an array of all the details about the fields potentially required for payment fields
+   * Return an array of all the details about the fields potentially required for payment fields
    * Only those determined by getPaymentFormFields will actually be assigned to the form
    *
    * @return array field metadata
@@ -427,7 +427,7 @@ abstract class CRM_Core_Payment {
   abstract function doDirectPayment(&$params);
 
   /**
-   * process payment - this function wraps around both doTransferPayment and doDirectPayment
+   * Process payment - this function wraps around both doTransferPayment and doDirectPayment
    * it ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms more agnostic
    *
    * @param array $params
@@ -594,7 +594,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * check whether a method is present ( & supported ) by the payment processor object.
+   * Check whether a method is present ( & supported ) by the payment processor object.
    *
    * @param  string $method method to check for.
    *
@@ -606,7 +606,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * @param null $entityID
+   * @param int $entityID
    * @param null $entity
    * @param string $action
    *

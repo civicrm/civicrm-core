@@ -39,35 +39,35 @@
 class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
   /**
-   * the group id, used when editing a group
+   * The group id, used when editing a group
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * the contact_id of domain
+   * The contact_id of domain
    *
    * @var int
    */
   protected $_contactId;
 
   /**
-   * default from email address option value id.
+   * Default from email address option value id.
    *
    * @var int
    */
   protected $_fromEmailId = NULL;
 
   /**
-   * default location type fields
+   * Default location type fields
    *
    * @var array
    */
   protected $_locationDefaults = array();
 
   /**
-   * how many locationBlocks should we display?
+   * How many locationBlocks should we display?
    *
    * @var int
    * @const
@@ -199,7 +199,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

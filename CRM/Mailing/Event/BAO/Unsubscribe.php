@@ -41,7 +41,7 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscribe {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -567,7 +567,7 @@ WHERE  email = %2
   }
 
   /**
-   * @param $queueID
+   * @param int $queueID
    *
    * @return array
    */

@@ -48,7 +48,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -128,7 +128,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param $values
    * @param $files

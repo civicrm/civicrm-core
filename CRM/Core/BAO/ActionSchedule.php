@@ -40,7 +40,7 @@
 class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
   /**
-   * @param null $id
+   * @param int $id
    *
    * @return array
    */
@@ -262,7 +262,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   }
 
   /**
-   * @param null $id
+   * @param int $id
    *
    * @return array
    */
@@ -319,7 +319,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @param bool $namesOnly return simple list of names
    *
    * @param null $entityValue
-   * @param null $id
+   * @param int $id
    *
    * @return array  (reference)   reminder list
    * @static
@@ -414,11 +414,11 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * @param $contactId
+   * @param int $contactId
    * @param $to
-   * @param $scheduleID
+   * @param int $scheduleID
    * @param $from
-   * @param $tokenParams
+   * @param array $tokenParams
    *
    * @return bool|null
    * @throws CRM_Core_Exception
@@ -579,7 +579,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * add the schedules reminders in the db
+   * Add the schedules reminders in the db
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
@@ -627,7 +627,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * delete a Reminder
+   * Delete a Reminder
    *
    * @param  int  $id     ID of the Reminder to be deleted.
    *
@@ -647,7 +647,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -660,7 +660,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * @param $mappingID
+   * @param int $mappingID
    * @param $now
    *
    * @throws CRM_Core_Exception
@@ -895,7 +895,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
   }
 
   /**
-   * @param $mappingID
+   * @param int $mappingID
    * @param $now
    * @param array $params
    *
@@ -1397,8 +1397,8 @@ WHERE     m.owner_membership_id IS NOT NULL AND
   }
 
   /**
-   * @param $id
-   * @param $mappingID
+   * @param int $id
+   * @param int $mappingID
    *
    * @return null|string
    */
@@ -1415,7 +1415,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
   }
 
   /**
-   * @param $mappingID
+   * @param int $mappingID
    * @param $recipientType
    *
    * @return array

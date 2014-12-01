@@ -39,14 +39,14 @@
 class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * add the payment-processor type in the db
+   * Add the payment-processor type in the db
    *
    * @param array $params an assoc array of name/value pairs
    *
@@ -83,7 +83,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field

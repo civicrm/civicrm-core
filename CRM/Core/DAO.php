@@ -45,7 +45,7 @@ require_once 'CRM/Core/I18n.php';
 class CRM_Core_DAO extends DB_DataObject {
 
   /**
-   * a null object so we can pass it as reference if / when needed
+   * A null object so we can pass it as reference if / when needed
    */
   static $_nullObject = NULL;
   static $_nullArray = array();
@@ -69,7 +69,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   static $_testEntitiesToSkip = array();
   /**
-   * the factory class for this application
+   * The factory class for this application
    * @var object
    */
   static $_factory = NULL;
@@ -88,14 +88,14 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * empty definition for virtual function
+   * Empty definition for virtual function
    */
   static function getTableName() {
     return NULL;
   }
 
   /**
-   * initialize the DAO object
+   * Initialize the DAO object
    *
    * @param string $dsn   the database connection string
    *
@@ -112,7 +112,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $fieldDef
    * @param array $params
    *
@@ -268,7 +268,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * reset the DAO object. DAO is kinda crappy in that there is an unwritten
+   * Reset the DAO object. DAO is kinda crappy in that there is an unwritten
    * rule of one query per DAO. We attempt to get around this crappy restricrion
    * by resetting some of DAO's internal fields. Use this with caution
    *
@@ -292,7 +292,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * @param $tableName
+   * @param string $tableName
    *
    * @return string
    */
@@ -398,7 +398,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * returns list of FK relationships
+   * Returns list of FK relationships
    *
    * @static
    * @access public
@@ -410,7 +410,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * returns all the column names of this table
+   * Returns all the column names of this table
    *
    * @access public
    *
@@ -422,7 +422,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * get/set an associative array of table columns
+   * Get/set an associative array of table columns
    *
    * @access public
    * @param  array key=>type array
@@ -570,7 +570,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * create an attribute for this specific field. We only do this for strings and text
+   * Create an attribute for this specific field. We only do this for strings and text
    *
    * @param array $field the field under task
    *
@@ -1085,7 +1085,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * execute a query
+   * Execute a query
    *
    * @param string $query query to be executed
    *
@@ -1139,7 +1139,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * execute a query and get the single result
+   * Execute a query and get the single result
    *
    * @param string $query query to be executed
    * @param array $params
@@ -1388,7 +1388,7 @@ FROM   civicrm_domain
    * since its used for things like send email
    *
    * @param $componentIDs
-   * @param $tableName
+   * @param string $tableName
    *
    * @return array
    */
@@ -1418,7 +1418,7 @@ SELECT contact_id
    *
    * @param string $daoName name of the dao object
    * @param string $fieldIdName
-   * @param $fieldId
+   * @param int $fieldId
    * @param $details
    * @param array $returnProperities an assoc array of fields that need to be returned, eg array( 'first_name', 'last_name')
    *
@@ -1600,7 +1600,7 @@ SELECT contact_id
   }
 
   /**
-   * deletes the this object plus any dependent objects that are associated with it
+   * Deletes the this object plus any dependent objects that are associated with it
    * ONLY USE FOR TESTING
    *
    * @param string $daoName
@@ -2105,7 +2105,7 @@ SELECT contact_id
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @return bool|array
    */
   function getFieldSpec($fieldName) {

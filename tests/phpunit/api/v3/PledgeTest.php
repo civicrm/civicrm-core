@@ -78,7 +78,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   ///////////////// civicrm_pledge_get methods
 
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -133,7 +133,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledge = $this->callAPISuccess('pledge', 'delete', $params2);
   }
   /**
-   * test  'return.pledge_financial_type' => 1 works
+   * Test  'return.pledge_financial_type' => 1 works
    */
   function testGetPledgewithReturn() {
 
@@ -147,7 +147,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals('Donation', $pledge['pledge_financial_type']);
   }
   /**
-   * test  'return.pledge_contribution_type' => 1 works
+   * Test  'return.pledge_contribution_type' => 1 works
    * This is for legacy compatibility
   */
   function testGetPledgewithReturnLegacy() {
@@ -355,7 +355,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   * test that status is set to pending
+   * Test that status is set to pending
    */
   function testCreatePledgeNoStatus() {
 
@@ -472,7 +472,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   * legacy support for pledge_id
+   * Legacy support for pledge_id
    */
   function testDeletePledge() {
 
@@ -484,7 +484,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   * std is to accept id
+   * Std is to accept id
    */
   function testDeletePledgeUseID() {
 
@@ -496,7 +496,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   * test to make sure empty get returns nothing
+   * Test to make sure empty get returns nothing
    * Note that the function gives incorrect results if no pledges exist as it does a
    * contact search instead - test only checks that the get finds the one existing
    */

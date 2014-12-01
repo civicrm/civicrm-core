@@ -20,7 +20,7 @@ class CRM_Utils_FakeObject {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $arguments
    *
    * @throws Exception

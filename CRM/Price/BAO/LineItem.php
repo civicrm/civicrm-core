@@ -108,7 +108,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   }
 
   /**
-   * @param $entityId
+   * @param int $entityId
    * @param $entityTable
    *
    * @return null|string
@@ -124,8 +124,8 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * wrapper for line item retrieval when contribution ID is known
-   * @param $contributionID
+   * Wrapper for line item retrieval when contribution ID is known
+   * @param int $contributionID
    *
    * @return array
    */
@@ -350,9 +350,9 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * process price set and line items.
+   * Process price set and line items.
    *
-   * @param $entityId
+   * @param int $entityId
    * @param array $lineItem line item array
    * @param object $contributionDetails
    * @param string $entityTable entity table
@@ -407,10 +407,10 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * @param $entityId
+   * @param int $entityId
    * @param string $entityTable
    * @param $amount
-   * @param null $otherParams
+   * @param array $otherParams
    */
   public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
     if (!$entityId || CRM_Utils_System::isNull($amount))
@@ -461,7 +461,7 @@ AND li.entity_id = {$entityId}
   }
 
    /**
-   * build line items array.
+   * Build line items array.
    * @param array $params form values
    *
    * @param string $entityId entity id

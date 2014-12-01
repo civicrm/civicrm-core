@@ -40,7 +40,7 @@
 class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityContact {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();

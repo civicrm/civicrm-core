@@ -35,7 +35,7 @@
 class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -129,7 +129,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * add new mail Settings.
+   * Add new mail Settings.
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -164,7 +164,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * takes an associative array and creates a mail settings object
+   * Takes an associative array and creates a mail settings object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
@@ -187,7 +187,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * delete the mail settings.
+   * Delete the mail settings.
    *
    * @param int $id mail settings id
    *

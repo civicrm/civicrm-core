@@ -290,7 +290,7 @@ class civicrm_api3 {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @return bool
    */
   public function is_set($name) {

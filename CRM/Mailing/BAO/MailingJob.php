@@ -42,7 +42,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   CONST MAX_CONTACTS_TO_PROCESS = 1000;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -68,7 +68,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   /**
    * Initiate all pending/ready jobs
    *
-   * @param null $testParams
+   * @param array $testParams
    * @param null $mode
    *
    * @return void
@@ -421,7 +421,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
-   * @param null $testParams
+   * @param array $testParams
    */
   public function queue($testParams = NULL) {
     $mailing = new CRM_Mailing_BAO_Mailing();
@@ -473,7 +473,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
    *
    * @param object $mailer A Mail object to send the messages
    *
-   * @param null $testParams
+   * @param array $testParams
    *
    * @return void
    * @access public
@@ -800,7 +800,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
-   * cancel a mailing
+   * Cancel a mailing
    *
    * @param int $mailingId  the id of the mailing to be canceled
    * @static
@@ -893,8 +893,8 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
   }
 
   /**
-   * @param $deliveredParams
-   * @param $targetParams
+   * @param array $deliveredParams
+   * @param array $targetParams
    * @param $mailing
    * @param $job_date
    *

@@ -198,7 +198,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
   /**
    * @param $validateStrings
-   * @param $sid
+   * @param int $sid
    */
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page

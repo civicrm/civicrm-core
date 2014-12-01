@@ -198,7 +198,7 @@ AND    g.refresh_date IS NULL
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    */
   static function add($groupID) {
     // first delete the current cache
@@ -216,7 +216,7 @@ AND    g.refresh_date IS NULL
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    * @param $values
    */
   static function store(&$groupID, &$values) {
@@ -385,7 +385,7 @@ WHERE  id = %1
   }
 
   /**
-   * load the smart group cache for a saved search
+   * Load the smart group cache for a saved search
    *
    * @param object  $group - the smart group that needs to be loaded
    * @param boolean $force - should we force a search through

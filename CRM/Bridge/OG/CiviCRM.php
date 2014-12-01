@@ -35,7 +35,7 @@
 class CRM_Bridge_OG_CiviCRM {
 
   /**
-   * @param $groupID
+   * @param int $groupID
    * @param $group
    * @param $op
    */
@@ -49,7 +49,7 @@ class CRM_Bridge_OG_CiviCRM {
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    * @param $group
    */
   static function groupAdd($groupID, $group) {
@@ -83,7 +83,7 @@ class CRM_Bridge_OG_CiviCRM {
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    * @param $group
    */
   static function groupDelete($groupID, $group) {
@@ -96,7 +96,7 @@ class CRM_Bridge_OG_CiviCRM {
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    * @param $contactIDs
    * @param $op
    */

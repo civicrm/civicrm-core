@@ -339,7 +339,7 @@ class CRM_Contact_Import_ImportJob {
 
   /**
    * @param $contactIds
-   * @param $newGroupName
+   * @param string $newGroupName
    * @param $newGroupDesc
    *
    * @return array|bool
@@ -392,7 +392,7 @@ class CRM_Contact_Import_ImportJob {
 
   /**
    * @param $contactIds
-   * @param $newTagName
+   * @param string $newTagName
    * @param $newTagDesc
    *
    * @return array|bool

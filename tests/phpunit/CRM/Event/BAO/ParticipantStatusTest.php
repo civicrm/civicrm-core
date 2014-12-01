@@ -131,7 +131,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve() method of participant status type
+   * Retrieve() method of participant status type
    */
   function testRetrieveStatusType() {
 
@@ -159,7 +159,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   }
 
   /**
-   * setIsActive() method of participant status type
+   * SetIsActive() method of participant status type
    */
   function testSetIsActiveStatusType() {
 

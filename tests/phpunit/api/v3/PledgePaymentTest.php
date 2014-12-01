@@ -155,7 +155,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * test checks behaviour when more payments are created than should be possible
+   * Test checks behaviour when more payments are created than should be possible
    */
   function testCreatePledgePaymentAllCreated() {
     $params = array(

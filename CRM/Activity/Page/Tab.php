@@ -162,7 +162,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * perform actions and display for activities.
+   * Perform actions and display for activities.
    *
    * @return void
    *

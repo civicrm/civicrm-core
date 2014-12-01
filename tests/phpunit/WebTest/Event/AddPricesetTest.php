@@ -182,7 +182,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
   /**
    * @param $validateStrings
-   * @param $sid
+   * @param int $sid
    */
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
@@ -498,7 +498,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * test to regiter participant for event with
+   * Test to regiter participant for event with
 
    * multiple price fields in price-set
    * CRM-11986
@@ -746,7 +746,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $expectedLineItems
+   * @param array $expectedLineItems
    */
   function _checkLineItems($expectedLineItems) {
     foreach ($expectedLineItems as $lineKey => $lineValue) {

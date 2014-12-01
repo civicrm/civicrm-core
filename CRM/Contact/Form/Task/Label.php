@@ -40,7 +40,7 @@
 class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -109,7 +109,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -374,7 +374,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     return FALSE;
   }
   /**
-   * create labels (pdf)
+   * Create labels (pdf)
    *
    * @param   array    $contactRows   assciated array of contact data
    * @param   string   $format   format in which labels needs to be printed
@@ -402,7 +402,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   }
 
   /**
-   * create the array of returnProperties
+   * Create the array of returnProperties
    *
    * @param   string   $format   format for which return properties build
    *

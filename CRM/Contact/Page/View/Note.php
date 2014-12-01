@@ -241,7 +241,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   }
 
   /**
-   * delete the note object from the db
+   * Delete the note object from the db
    *
    * @return void
    * @access public

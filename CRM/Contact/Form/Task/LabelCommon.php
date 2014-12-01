@@ -58,7 +58,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     return FALSE;
   }
   /**
-   * create labels (pdf)
+   * Create labels (pdf)
    *
    * @param   array    $contactRows   assciated array of contact data
    * @param   string   $format   format in which labels needs to be printed
@@ -87,7 +87,7 @@ class CRM_Contact_Form_Task_LabelCommon {
 
 
   /**
-   * get the rows for the labels
+   * Get the rows for the labels
    *
    * @param $contactIDs
    * @param integer $locationTypeID
@@ -258,7 +258,7 @@ class CRM_Contact_Form_Task_LabelCommon {
   }
 
   /**
-   * extract the return properties from the mailing format
+   * Extract the return properties from the mailing format
    * @todo I'm placing bets this is a duplicate of code elsewhere - find & merge
    * @param unknown_type $format
    * @return multitype:number

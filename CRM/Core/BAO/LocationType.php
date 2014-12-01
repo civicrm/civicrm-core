@@ -35,13 +35,13 @@
 class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
 
   /**
-   * static holder for the default LT
+   * Static holder for the default LT
    */
   static $_defaultLocationType = NULL;
   static $_billingLocationType = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -68,7 +68,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -83,7 +83,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   }
 
   /**
-   * retrieve the default location_type
+   * Retrieve the default location_type
    *
    * @param NULL
    *
@@ -117,7 +117,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   }
 
   /**
-   * add a Location Type
+   * Add a Location Type
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -145,7 +145,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   }
 
   /**
-   * delete location Types
+   * Delete location Types
    *
    * @param  int  $locationTypeId     ID of the location type to be deleted.
    *

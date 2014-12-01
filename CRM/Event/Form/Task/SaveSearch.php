@@ -41,14 +41,14 @@
 class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
 
   /**
-   * saved search id if any
+   * Saved search id if any
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -103,7 +103,7 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

@@ -70,7 +70,7 @@ class CRM_Core_Component {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param null $attribute
    *
    * @return mixed
@@ -234,7 +234,7 @@ class CRM_Core_Component {
   }
 
   /**
-   * @param $componentName
+   * @param string $componentName
    *
    * @return mixed
    */
@@ -249,7 +249,7 @@ class CRM_Core_Component {
   }
 
   /**
-   * @param $componentID
+   * @param int $componentID
    *
    * @return int|null|string
    */
@@ -285,7 +285,7 @@ class CRM_Core_Component {
 
   /**
    * @param $query
-   * @param $fnName
+   * @param string $fnName
    */
   static function alterQuery(&$query, $fnName) {
     $info = self::_info();
@@ -299,7 +299,7 @@ class CRM_Core_Component {
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $mode
    * @param $side
    *
@@ -361,7 +361,7 @@ class CRM_Core_Component {
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
   static function searchAction(&$row, $id) {
     $info = self::_info();
@@ -417,7 +417,7 @@ class CRM_Core_Component {
   }
 
   /**
-   * handle table dependencies of components
+   * Handle table dependencies of components
    *
    * @param array $tables  array of tables
    *
@@ -437,7 +437,7 @@ class CRM_Core_Component {
   }
 
   /**
-   * get components info from info file
+   * Get components info from info file
    *
    */
   static function getComponentsFromFile($crmFolderDir) {

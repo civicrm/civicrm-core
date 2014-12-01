@@ -39,7 +39,7 @@ class CRM_Logging_Differ {
   private $interval;
 
   /**
-   * @param $log_conn_id
+   * @param int $log_conn_id
    * @param $log_date
    * @param string $interval
    */
@@ -69,7 +69,7 @@ class CRM_Logging_Differ {
 
   /**
    * @param $table
-   * @param null $contactID
+   * @param int $contactID
    *
    * @return array
    */
@@ -152,7 +152,7 @@ WHERE lt.log_conn_id = %1 AND
 
   /**
    * @param $table
-   * @param $id
+   * @param int $id
    *
    * @return array
    */

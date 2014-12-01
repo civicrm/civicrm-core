@@ -119,7 +119,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
   /**
    * @param $campaignTitle
-   * @param $id
+   * @param int $id
    * @param bool $past
    */
   function offlineContributionTest($campaignTitle, $id, $past = FALSE) {
@@ -230,7 +230,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $groupName
+   * @param string $groupName
    */
   function pastCampaignsTest($groupName) {
     $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');

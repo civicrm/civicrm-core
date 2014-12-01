@@ -59,7 +59,7 @@ class CRM_Utils_Cache {
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @return object
    * @static

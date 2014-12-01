@@ -62,7 +62,7 @@ interface CRM_Core_Selector_API {
   function getPagerParams($action, &$params);
 
   /**
-   * returns the sort order array for the given action
+   * Returns the sort order array for the given action
    *
    * @param string action the action being performed
    *
@@ -73,7 +73,7 @@ interface CRM_Core_Selector_API {
   function &getSortOrder($action);
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
    * @param string $action the action being performed
@@ -85,7 +85,7 @@ interface CRM_Core_Selector_API {
   function &getColumnHeaders($action = NULL, $type = NULL);
 
   /**
-   * returns the number of rows for this action
+   * Returns the number of rows for this action
    *
    * @param string action the action being performed
    *
@@ -97,7 +97,7 @@ interface CRM_Core_Selector_API {
   function getTotalCount($action);
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount
    *
    * @param enum   $action   the action being performed
    * @param int    $offset   the row number to start from
@@ -111,7 +111,7 @@ interface CRM_Core_Selector_API {
   function &getRows($action, $offset, $rowCount, $sort, $type = NULL);
 
   /**
-   * return the template (.tpl) filename
+   * Return the template (.tpl) filename
    *
    * @param string $action the action being performed
    *
@@ -122,7 +122,7 @@ interface CRM_Core_Selector_API {
   function getTemplateFileName($action = NULL);
 
   /**
-   * return the filename for the exported CSV
+   * Return the filename for the exported CSV
    *
    * @param string type   the type of export required: csv/xml/foaf etc
    *

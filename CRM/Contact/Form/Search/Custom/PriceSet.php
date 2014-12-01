@@ -155,7 +155,7 @@ WHERE participant_id = $participantID;
   }
 
   /**
-   * @param null $eventID
+   * @param int $eventID
    *
    * @return Object
    */

@@ -40,7 +40,7 @@
 class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
 
   /**
-   * the financial type id saved to the session for an update
+   * The financial type id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -70,7 +70,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   protected $_isARFlag = FALSE;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -232,7 +232,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param $values
    * @param $files

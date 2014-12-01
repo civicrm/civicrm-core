@@ -71,7 +71,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   }
 
   /**
-   * takes an associative array and creates a Survey object
+   * Takes an associative array and creates a Survey object
    *
    * the function extract all the params it needs to initialize the create a
    * survey object.
@@ -117,7 +117,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   }
 
   /**
-   * retrieve surveys for dashboard.
+   * Retrieve surveys for dashboard.
    *
    * @static
    */
@@ -242,7 +242,7 @@ SELECT  survey.id                         as id,
   }
 
   /**
-   * get Surveys
+   * Get Surveys
    *
    * @param boolean $onlyActive  retrieve only active surveys.
    * @param boolean $onlyDefault retrieve only default survey.
@@ -299,7 +299,7 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * get Surveys activity types
+   * Get Surveys activity types
    *
    *
    * @static
@@ -334,7 +334,7 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Function to get Surveys custom groups
+   * Get Surveys custom groups
    *
    * @param $surveyTypes array an array of survey type id.
    *
@@ -374,7 +374,7 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -387,7 +387,7 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Function to delete the survey
+   * Delete the survey
    *
    * @param int $id survey id
    *
@@ -505,7 +505,7 @@ Group By  contact.id";
    * @param int $surveyId survey id.
    * @param array $voterIds voterIds.
    *
-   * @param null $interviewerId
+   * @param int $interviewerId
    * @param array $statusIds
    *
    * @return array $activityDetails array of survey activity.@static
@@ -565,7 +565,7 @@ INNER JOIN  civicrm_activity_contact activityAssignment
    *
    * @param int $surveyId survey id.
    *
-   * @param null $interviewerId
+   * @param int $interviewerId
    * @param null $statusIds
    * @param null $voterIds
    * @param bool $onlyCount
@@ -768,7 +768,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   /**
    * This function return all voter links with respecting permissions
    *
-   * @param $surveyId
+   * @param int $surveyId
    * @param bool $enclosedInUL
    * @param string $extraULName
    * @return array|string $url array of permissioned links@static
@@ -854,7 +854,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * Function to retrieve survey associated profile id.
+   * Retrieve survey associated profile id.
    *
    */
   public static function getSurveyProfileId($surveyId) {
@@ -885,7 +885,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * @param $surveyId
+   * @param int $surveyId
    *
    * @return mixed
    */
@@ -901,7 +901,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * Function to decides the contact type for given survey.
+   * Decides the contact type for given survey.
    *
    */
   public static function getSurveyContactType($surveyId) {
@@ -920,7 +920,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * Function to get survey supportable profile types
+   * Get survey supportable profile types
    *
    */
   public static function surveyProfileTypes() {

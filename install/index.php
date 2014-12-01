@@ -587,7 +587,7 @@ class InstallRequirements {
   }
 
   /**
-   * @param $funcName
+   * @param string $funcName
    * @param $testDetails
    *
    * @return bool
@@ -649,7 +649,7 @@ class InstallRequirements {
   }
 
   /**
-   * @param $filename
+   * @param string $filename
    * @param $testDetails
    * @param bool $absolute
    */
@@ -675,7 +675,7 @@ class InstallRequirements {
   }
 
   /**
-   * @param $filename
+   * @param string $filename
    * @param $testDetails
    */
   function requireNoFile($filename, $testDetails) {
@@ -688,7 +688,7 @@ class InstallRequirements {
   }
 
   /**
-   * @param $filename
+   * @param string $filename
    * @param $testDetails
    */
   function moveFileOutOfTheWay($filename, $testDetails) {
@@ -703,7 +703,7 @@ class InstallRequirements {
   }
 
   /**
-   * @param $filename
+   * @param string $filename
    * @param $testDetails
    * @param bool $absolute
    */
@@ -729,7 +729,7 @@ class InstallRequirements {
   }
 
   /**
-   * @param $moduleName
+   * @param string $moduleName
    * @param $testDetails
    */
   function requireApacheModule($moduleName, $testDetails) {
@@ -741,7 +741,7 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $testDetails
    */
@@ -802,7 +802,7 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $testDetails
@@ -837,7 +837,7 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $testDetails
@@ -867,7 +867,7 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $testDetails
@@ -908,7 +908,7 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $testDetails
@@ -957,7 +957,7 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $testDetails
    */
@@ -989,7 +989,7 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $minValueKB
@@ -1025,7 +1025,7 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $testDetails

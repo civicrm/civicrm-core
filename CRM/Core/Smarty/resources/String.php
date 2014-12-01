@@ -38,7 +38,7 @@ function civicrm_smarty_resource_string_get_template($tpl_name, &$tpl_source, &$
 }
 
 /**
- * @param $tpl_name
+ * @param string $tpl_name
  * @param $tpl_timestamp
  * @param $smarty_obj
  *
@@ -50,7 +50,7 @@ function civicrm_smarty_resource_string_get_timestamp($tpl_name, &$tpl_timestamp
 }
 
 /**
- * @param $tpl_name
+ * @param string $tpl_name
  * @param $smarty_obj
  *
  * @return bool
@@ -60,7 +60,7 @@ function civicrm_smarty_resource_string_get_secure($tpl_name, &$smarty_obj) {
 }
 
 /**
- * @param $tpl_name
+ * @param string $tpl_name
  * @param $smarty_obj
  */
 function civicrm_smarty_resource_string_get_trusted($tpl_name, &$smarty_obj) {}

@@ -40,14 +40,14 @@
 class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * add activity target
+   * Add activity target
    *
    * @param array $params
    *
@@ -65,7 +65,7 @@ class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
   }
 
   /**
-   * retrieve id of target contact by activity_id
+   * Retrieve id of target contact by activity_id
    *
    * @param int $activity_id
    *
@@ -98,7 +98,7 @@ AND        civicrm_contact.is_deleted = 0
   }
 
   /**
-   * retrieve names of target contact by activity_id
+   * Retrieve names of target contact by activity_id
    *
    * @param int $activityID
    *

@@ -40,7 +40,7 @@
 class CRM_Event_Form_Task extends CRM_Core_Form {
 
   /**
-   * the task being performed
+   * The task being performed
    *
    * @var int
    */
@@ -68,7 +68,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
   protected $_participantIds;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @param
    *
@@ -156,7 +156,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * simple shell that derived classes can call to add buttons to
+   * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button

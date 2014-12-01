@@ -53,7 +53,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   public $multilingual = FALSE;
 
   /**
-   * locales available for multilingual upgrade
+   * Locales available for multilingual upgrade
    *
    * @var array
    * @public
@@ -61,7 +61,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   public $locales;
 
   /**
-   * number to string mapper
+   * Number to string mapper
    *
    * @var array
    * @public
@@ -187,7 +187,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
-   * @param $fileName
+   * @param string $fileName
    * @param bool $isQueryString
    */
   function source($fileName, $isQueryString = FALSE) {
@@ -217,7 +217,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
-   * getter function for title. Should be over-ridden by derived class
+   * Getter function for title. Should be over-ridden by derived class
    *
    * @return string
    * @access public

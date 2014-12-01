@@ -53,7 +53,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
   protected $_selfService = FALSE;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public

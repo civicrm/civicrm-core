@@ -35,12 +35,12 @@
 class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
 
   /**
-   * static holder for the default LT
+   * Static holder for the default LT
    */
   static $_defaultPreferencesDate = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -67,7 +67,7 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -82,7 +82,7 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
   }
 
   /**
-   * delete preference dates
+   * Delete preference dates
    *
    * @param  int  $id
    *

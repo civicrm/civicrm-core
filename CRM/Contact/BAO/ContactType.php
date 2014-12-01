@@ -440,7 +440,7 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
   }
 
   /**
-   * check if a given type is a subtype
+   * Check if a given type is a subtype
    *
    * @param string $subType contact subType.
    * @param bool $ignoreCache
@@ -453,7 +453,7 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
   }
 
   /**
-   * retrieve the basic contact type associated with given subType.
+   * Retrieve the basic contact type associated with given subType.
    *
    *@param array/string $subType contact subType.
    *@return array/string of basicTypes.
@@ -508,7 +508,7 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   }
 
   /**
-   * verify if a given subtype is associated with a given basic contact type.
+   * Verify if a given subtype is associated with a given basic contact type.
    *
    * @param  string $subType contact subType
    * @param  string $contactType contact Type
@@ -528,7 +528,7 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   }
 
   /**
-   * create shortcuts menu for contactTypes
+   * Create shortcuts menu for contactTypes
    *
    * @return array  of contactTypes
    * @static
@@ -565,7 +565,7 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   }
 
   /**
-   * delete Contact SubTypes
+   * Delete Contact SubTypes
    *
    * @param  int $contactTypeId ID of the Contact Subtype to be deleted.
    *
@@ -618,7 +618,7 @@ WHERE name = %1";
   }
 
   /**
-   * Function to add or update Contact SubTypes
+   * Add or update Contact SubTypes
    *
    * @param  array $params  an assoc array of name/value pairs
    *
@@ -684,7 +684,7 @@ WHERE name = %1";
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -705,7 +705,7 @@ WHERE name = %1";
   }
 
   /**
-   * @param $typeName
+   * @param string $typeName
    *
    * @return mixed
    */
@@ -719,7 +719,7 @@ WHERE name = %1";
   }
 
   /**
-   * Function to check whether allow to change any contact's subtype
+   * Check whether allow to change any contact's subtype
    * on the basis of custom data and relationship of specific subtype
    * currently used in contact/edit form amd in import validation
    *
@@ -751,7 +751,7 @@ WHERE name = %1";
 
   /**
    * @param $contactType
-   * @param null $contactId
+   * @param int $contactId
    *
    * @return bool
    */
@@ -787,7 +787,7 @@ WHERE name = %1";
 
   /**
    * @todo what does this function do?
-   * @param $contactId
+   * @param int $contactId
    * @param $contactType
    *
    * @return bool
@@ -853,7 +853,7 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
    * Function that does something
    * @todo what does this function do?
    *
-   * @param $contactID
+   * @param int $contactID
    * @param $contactType
    * @param array $oldSubtypeSet
    * @param array $newSubtypeSet

@@ -35,7 +35,7 @@
 class CRM_Core_OptionValue {
 
   /**
-   * static field for all the option value information that we can potentially export
+   * Static field for all the option value information that we can potentially export
    *
    * @var array
    * @static
@@ -43,7 +43,7 @@ class CRM_Core_OptionValue {
   static $_exportableFields = NULL;
 
   /**
-   * static field for all the option value information that we can potentially export
+   * Static field for all the option value information that we can potentially export
    *
    * @var array
    * @static
@@ -51,7 +51,7 @@ class CRM_Core_OptionValue {
   static $_importableFields = NULL;
 
   /**
-   * static field for all the option value information that we can potentially export
+   * Static field for all the option value information that we can potentially export
    *
    * @var array
    * @static
@@ -59,7 +59,7 @@ class CRM_Core_OptionValue {
   static $_fields = NULL;
 
   /**
-   * return option-values of a particular group
+   * Return option-values of a particular group
    *
    * @param  array     $groupParams   Array containing group fields whose option-values is to retrieved.
    * @param  string    $orderBy       for orderBy clause
@@ -170,7 +170,7 @@ class CRM_Core_OptionValue {
   }
 
   /**
-   * add/edit option-value of a particular group
+   * Add/edit option-value of a particular group
    *
    * @param  array $params Array containing exported values from the invoking form.
    * @param  array $groupParams Array containing group fields whose option-values is to retrieved/saved.
@@ -243,7 +243,7 @@ class CRM_Core_OptionValue {
    * @param string $daoName the dao object name
    * @param string $daoID the id of the object being updated. u can change your name
    *                          as long as there is no conflict
-   * @param $optionGroupID
+   * @param int $optionGroupID
    * @param string $fieldName the name of the field in the DAO
    *
    * @return boolean     true if object exists
@@ -338,7 +338,7 @@ class CRM_Core_OptionValue {
   }
 
   /**
-   * build select query in case of option-values
+   * Build select query in case of option-values
    *
    * @param $query
    *
@@ -365,7 +365,7 @@ class CRM_Core_OptionValue {
   }
 
   /**
-   * return option-values of a particular group
+   * Return option-values of a particular group
    *
    * @param  array     $groupParams   Array containing group fields
    *                                  whose option-values is to retrieved.

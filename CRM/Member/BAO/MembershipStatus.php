@@ -35,12 +35,12 @@
 class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
   /**
-   * static holder for the default LT
+   * Static holder for the default LT
    */
   static $_defaultMembershipStatus = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -67,7 +67,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -107,7 +107,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     return $membershipStatusBAO;
   }
   /**
-   * add the membership types
+   * Add the membership types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids array contains the id - this param is deprecated
@@ -165,7 +165,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * get  membership status
+   * Get  membership status
    *
    * @param int $membershipStatusId
    *
@@ -183,7 +183,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * delete membership Types
+   * Delete membership Types
    *
    * @param int $membershipStatusId
    *
@@ -213,7 +213,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Function to find the membership status based on start date, end date, join date & status date.
+   * Find the membership status based on start date, end date, join date & status date.
    *
    * @param  string $startDate start date of the member whose membership status is to be calculated.
    * @param  string $endDate end date of the member whose membership status is to be calculated.

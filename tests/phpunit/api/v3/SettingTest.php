@@ -110,7 +110,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
   /**
   /**
-   * check getfields works
+   * Check getfields works
    */
   function testGetFields() {
     $description = 'Demonstrate return from getfields - see subfolder for variants';
@@ -124,7 +124,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * let's check it's loading from cache by meddling with the cache
+   * Let's check it's loading from cache by meddling with the cache
    */
   function testGetFieldsCaching() {
     $settingsMetadata = array();
@@ -228,7 +228,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * check getfields works
+   * Check getfields works
    */
   function testCreateSetting() {
     $description = "shows setting a variable for a given domain - if no domain is set current is assumed";
@@ -246,7 +246,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * check getfields works
+   * Check getfields works
    */
   function testCreateInvalidSettings() {
     $params = array(
@@ -257,7 +257,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * check invalid settings rejected -
+   * Check invalid settings rejected -
    */
   function testCreateInvalidURLSettings() {
     $params = array(
@@ -273,7 +273,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * check getfields works
+   * Check getfields works
    */
   function testCreateInvalidBooleanSettings() {
     $params = array(
@@ -307,7 +307,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * check getfields works
+   * Check getfields works
    */
   function testCreateSettingMultipleDomains() {
     $description = "shows setting a variable for all domains";
@@ -389,7 +389,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * setting api should set & fetch settings stored in config as well as those in settings table
+   * Setting api should set & fetch settings stored in config as well as those in settings table
    */
   function testSetConfigSetting() {
     $config = CRM_Core_Config::singleton();
@@ -411,7 +411,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * setting api should set & fetch settings stored in config as well as those in settings table
+   * Setting api should set & fetch settings stored in config as well as those in settings table
    */
   function testGetConfigSetting() {
     $settings = $this->callAPISuccess('setting', 'get', array(
@@ -421,7 +421,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * setting api should set & fetch settings stored in config as well as those in settings table
+   * Setting api should set & fetch settings stored in config as well as those in settings table
    */
   function testGetSetConfigSettingMultipleDomains() {
     $settings = $this->callAPISuccess('setting', 'create', array(

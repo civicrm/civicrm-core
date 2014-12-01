@@ -80,7 +80,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $eventType;
 
   /**
-   * event template titles
+   * Event template titles
    * @var array
    */
   private static $eventTemplates;
@@ -97,7 +97,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
+   * @param int $id
    * @param bool $all
    * @param null $condition
    *
@@ -134,7 +134,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
+   * @param int $id
    * @param null $cond
    * @param string $retColumn tells populate() whether to return 'name' (default) or 'label' values
    *
@@ -183,7 +183,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
+   * @param int $id
    * @param null $cond
    *
    * @return array - array reference of all participant roles if any
@@ -216,7 +216,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
+   * @param int $id
    *
    * @return array - array reference of all participant listings if any
    * @static
@@ -239,7 +239,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
+   * @param int $id
    * @return array - array reference of all event types.
    * @static
    */
@@ -257,9 +257,9 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * get event template titles
+   * Get event template titles
    *
-   * @param null $id
+   * @param int $id
    *
    * @return array  of event id → template title pairs
    */
@@ -299,7 +299,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
+   * @param int $id
    * @return array - array reference of all pcp if any
    * @static
    */

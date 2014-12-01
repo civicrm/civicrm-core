@@ -47,7 +47,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   public $_activityId;
 
   /**
-   * store activity ids when multiple activities are created
+   * Store activity ids when multiple activities are created
    *
    * @var int
    */
@@ -816,7 +816,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
@@ -867,8 +867,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @param null $params
-   * @return void
+   * @param array $params
+   * @return array|null
    */
   public function postProcess($params = NULL) {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -1167,9 +1167,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * let injecting activity type file do any processing
+   * Let injecting activity type file do any processing
    * needed, before the activity is added/updated
    *
+   * @param array $params
    */
   function beginPostProcess(&$params) {
     if ($this->_activityTypeFile) {
@@ -1179,14 +1180,16 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * let injecting activity type file do any processing
+   * Let injecting activity type file do any processing
    * needed, after the activity has been added/updated
    *
+   * @param array $params
+   * @param $activity
    */
   function endPostProcess(&$params, &$activity) {
     if ($this->_activityTypeFile) {
       $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
-      $className::endPostProcess($this, $params, $activity );
+      $className::endPostProcess($this, $params, $activity);
     }
   }
 }

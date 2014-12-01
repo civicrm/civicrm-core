@@ -62,27 +62,27 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   public $_activityTypeFile = NULL;
 
   /**
-   * logged in contact Id
+   * Logged in contact Id
    */
   public $_currentUserId = NULL;
 
   /**
-   * activity type Id
+   * Activity type Id
    */
   public $_activityTypeId = NULL;
 
   /**
-   * activity type Id
+   * Activity type Id
    */
   public $_activityId = NULL;
 
   /**
-   * action
+   * Action
    */
   public $_action;
 
   /**
-   * case type id
+   * Case type id
    */
   public $_caseTypeId = NULL;
 
@@ -312,7 +312,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $values posted values of the form
    *

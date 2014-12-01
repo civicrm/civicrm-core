@@ -35,7 +35,7 @@
 class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();

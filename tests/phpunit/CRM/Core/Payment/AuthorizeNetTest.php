@@ -70,7 +70,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   }
 
   /**
-   * create a single post dated payment as a recurring transaction.
+   * Create a single post dated payment as a recurring transaction.
    *
    * Test works but not both due to some form of caching going on in the SmartySingleton
    */
@@ -203,7 +203,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   }
 
   /**
-   * create a single post dated payment as a recurring transaction
+   * Create a single post dated payment as a recurring transaction
    */
   function testCreateSinglePostDated() {
     $start_date = date('Ymd', strtotime("+ 1 week"));

@@ -32,7 +32,7 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
 class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
   /**
-   * download CSV file.
+   * Download CSV file.
    *
    * @param string $selector element selector(download button in most of the cases).
    * @param string  $fileName file name to be download.
@@ -63,7 +63,7 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
   }
 
   /**
-   * read CSV file and fire provided assertions.
+   * Read CSV file and fire provided assertions.
    *
    * @param string $file         file path of CSV file.
    * @param array  $checkColumns check first row of csv

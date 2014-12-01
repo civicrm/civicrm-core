@@ -41,11 +41,11 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   protected $_action;
 
   /**
-   * define all the abstract functions here
+   * Define all the abstract functions here
    */
 
   /**
-   * name of the BAO to perform various DB manipulations
+   * Name of the BAO to perform various DB manipulations
    *
    * @return string
    * @access public
@@ -54,7 +54,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   abstract function getBAOName();
 
   /**
-   * an array of action links
+   * An array of action links
    *
    * @return array (reference)
    * @access public
@@ -62,7 +62,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   abstract function &links();
 
   /**
-   * name of the edit form class
+   * Name of the edit form class
    *
    * @return string
    * @access public
@@ -70,7 +70,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   abstract function editForm();
 
   /**
-   * name of the form
+   * Name of the form
    *
    * @return string
    * @access public
@@ -78,7 +78,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   abstract function editName();
 
   /**
-   * userContext to pop back to
+   * UserContext to pop back to
    *
    * @param int $mode mode that we are in
    *
@@ -88,7 +88,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   abstract function userContext($mode = NULL);
 
   /**
-   * get userContext params
+   * Get userContext params
    *
    * @param int $mode mode that we are in
    *
@@ -100,7 +100,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   }
 
   /**
-   * allow objects to be added based on permission
+   * Allow objects to be added based on permission
    *
    * @param int $id   the id of the object
    * @param int $name the name or title of the object
@@ -113,7 +113,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   }
 
   /**
-   * allows the derived class to add some more state variables to
+   * Allows the derived class to add some more state variables to
    * the controller. By default does nothing, and hence is abstract
    *
    * @param CRM_Core_Controller $controller the controller object
@@ -124,7 +124,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   function addValues($controller) {}
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @param string $title title of the page
    * @param int $mode mode of the page
@@ -193,7 +193,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   }
 
   /**
-   * browse all entities.
+   * Browse all entities.
    *
    * @return void
    * @access public

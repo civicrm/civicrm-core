@@ -42,7 +42,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -267,7 +267,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

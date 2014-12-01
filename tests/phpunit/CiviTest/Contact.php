@@ -22,7 +22,7 @@ class Contact extends CiviUnitTestCase {
    * Helper function to create
    * a contact of type Individual
    *
-   * @param null $params
+   * @param array $params
    * @return int $contactID id of created Individual
    */
   static function createIndividual($params = NULL) {
@@ -44,7 +44,7 @@ class Contact extends CiviUnitTestCase {
    * Helper function to create
    * a contact of type Household
    *
-   * @param null $params
+   * @param array $params
    * @return mixed $contactID id of created Household
    */
   static function createHousehold($params = NULL) {
@@ -65,7 +65,7 @@ class Contact extends CiviUnitTestCase {
    * Helper function to create
    * a contact of type Organisation
    *
-   * @param null $params
+   * @param array $params
    * @return mixed $contactID id of created Organisation
    */
   static function createOrganisation($params = NULL) {

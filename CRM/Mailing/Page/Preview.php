@@ -39,7 +39,7 @@
 class CRM_Mailing_Page_Preview extends CRM_Core_Page {
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */

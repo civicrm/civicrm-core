@@ -69,7 +69,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with no name
+   * Check with no name
    */
   function testCreateWithoutName() {
     $params = array(
@@ -80,7 +80,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * create job with an invalid "run_frequency" value
+   * Create job with an invalid "run_frequency" value
    */
   function testCreateWithInvalidFrequency() {
     $params = array(
@@ -97,7 +97,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * create job
+   * Create job
    */
   function testCreate() {
     $result = $this->callAPIAndDocument('job', 'create', $this->_params, __FUNCTION__, __FILE__);
@@ -110,7 +110,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testDeleteEmpty() {
     $params = array();
@@ -118,14 +118,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with No array
+   * Check with No array
    */
   function testDeleteParamsNotArray() {
     $result = $this->callAPIFailure('job', 'delete', 'string');
   }
 
   /**
-   * check if required fields are not passed
+   * Check if required fields are not passed
    */
   function testDeleteWithoutRequired() {
     $params = array(
@@ -139,7 +139,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with incorrect required fields
+   * Check with incorrect required fields
    */
   function testDeleteWithIncorrectData() {
     $params = array(
@@ -148,7 +148,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * check job delete
+   * Check job delete
    */
   function testDelete() {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
@@ -182,7 +182,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * test the call reminder success sends more than 25 reminders & is not incorrectly limited
+   * Test the call reminder success sends more than 25 reminders & is not incorrectly limited
    * Note that this particular test sends the reminders to the additional recipients only
    * as no real reminder person is configured
    *
@@ -217,7 +217,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * test scheduled reminders respect limit to (since above identified addition_to handling issue)
+   * Test scheduled reminders respect limit to (since above identified addition_to handling issue)
    * We create 3 contacts - 1 is in our group, 1 has our membership & the chosen one has both
    * & check that only the chosen one got the reminder
    */
@@ -285,8 +285,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * @param $op
-   * @param $objectName
-   * @param $id
+   * @param string $objectName
+   * @param int $id
    * @param array $params
    */
   function hookPreRelationship($op, $objectName, $id, &$params ) {
