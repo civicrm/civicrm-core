@@ -48,7 +48,7 @@
 class CRM_Utils_Sort {
 
   /**
-   * constants to determine what direction each variable
+   * Constants to determine what direction each variable
    * is to be sorted
    *
    * @var int
@@ -56,27 +56,27 @@ class CRM_Utils_Sort {
   CONST ASCENDING = 1, DESCENDING = 2, DONTCARE = 4,
 
   /**
-   * the name for the sort GET/POST param
+   * The name for the sort GET/POST param
    *
    * @var string
    */
   SORT_ID = 'crmSID', SORT_DIRECTION = 'crmSortDirection', SORT_ORDER = 'crmSortOrder';
 
   /**
-   * name of the sort function. Used to isolate session variables
+   * Name of the sort function. Used to isolate session variables
    * @var string
    */
   protected $_name;
 
   /**
-   * array of variables that influence the query
+   * Array of variables that influence the query
    *
    * @var array
    */
   public $_vars;
 
   /**
-   * the newly formulated base url to be used as links
+   * The newly formulated base url to be used as links
    * for various table elements
    *
    * @var string
@@ -84,7 +84,7 @@ class CRM_Utils_Sort {
   protected $_link;
 
   /**
-   * what's the name of the sort variable in a REQUEST
+   * What's the name of the sort variable in a REQUEST
    *
    * @var string
    */
@@ -168,7 +168,7 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * create the sortID string to be used in the GET param
+   * Create the sortID string to be used in the GET param
    *
    * @param int $index the field index
    * @param int $dir   the direction of the sort
@@ -182,7 +182,7 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * init the sort ID values in the object
+   * Init the sort ID values in the object
    *
    * @param string $defaultSortOrder the sort order to use by default
    *
@@ -219,7 +219,7 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * init the object
+   * Init the object
    *
    * @param string $defaultSortOrder the sort order to use by default
    *
@@ -255,7 +255,7 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * getter for currentSortID
+   * Getter for currentSortID
    *
    * @return int returns of the current sort id
    * @acccess public
@@ -265,7 +265,7 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * getter for currentSortDirection
+   * Getter for currentSortDirection
    *
    * @return int returns of the current sort direction
    * @acccess public

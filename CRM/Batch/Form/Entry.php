@@ -39,7 +39,7 @@
 class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
-   * maximum profile fields that will be displayed
+   * Maximum profile fields that will be displayed
    *
    */
   protected $_rowCount = 1;
@@ -55,7 +55,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $_batchInfo = array();
 
   /**
-   * store the profile id associated with the batch type
+   * Store the profile id associated with the batch type
    */
   protected $_profileId;
 
@@ -67,7 +67,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   public $_membershipId = null;
   /**
-   * when not to reset sort_name
+   * When not to reset sort_name
    */
   protected $_preserveDefault = TRUE;
 
@@ -86,7 +86,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   public $_fields = array();
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -234,7 +234,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * form validations
+   * Form validations
    *
    * @param array $params   posted values of the form
    * @param array $files    list of errors to be posted back to the form
@@ -336,7 +336,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -372,7 +372,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * process contribution records
+   * Process contribution records
    *
    * @param array $params associated array of submitted values
    *
@@ -516,7 +516,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * process membership records
+   * Process membership records
    *
    * @param array $params associated array of submitted values
    *
@@ -758,7 +758,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * update contact information
+   * Update contact information
    *
    * @param array $value associated array of submitted values
    *

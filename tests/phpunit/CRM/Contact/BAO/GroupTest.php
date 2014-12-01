@@ -56,7 +56,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for add( )
+   * Test case for add( )
    */
   function testAddSimple() {
 

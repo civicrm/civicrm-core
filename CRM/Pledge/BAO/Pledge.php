@@ -35,7 +35,7 @@
 class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
   /**
-   * static field for all the pledge information that we can potentially export
+   * Static field for all the pledge information that we can potentially export
    *
    * @var array
    * @static
@@ -43,7 +43,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   static $_exportableFields = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -74,7 +74,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * add pledge
+   * Add pledge
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -139,7 +139,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * takes an associative array and creates a pledge object
+   * Takes an associative array and creates a pledge object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
@@ -253,7 +253,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * delete the pledge
+   * Delete the pledge
    *
    * @param int $id pledge id
    *
@@ -299,7 +299,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * get the amount details date wise.
+   * Get the amount details date wise.
    *
    * @param string $status
    * @param string $startDate
@@ -442,7 +442,7 @@ GROUP BY  currency
   }
 
   /**
-   * Function to get list of pledges In Honor of contact Ids
+   * Get list of pledges In Honor of contact Ids
    *
    * @param int $honorId In Honor of Contact ID
    *
@@ -487,7 +487,7 @@ GROUP BY  currency
   }
 
   /**
-   * Function to send Acknowledgment and create activity.
+   * Send Acknowledgment and create activity.
    *
    * @param CRM_Core_Form $form form object.
    * @param array $params an assoc array of name/value pairs.
@@ -682,7 +682,7 @@ GROUP BY  currency
   }
 
   /**
-   * combine all the exportable fields from the lower levels object
+   * Combine all the exportable fields from the lower levels object
    *
    * @return array array of exportable Fields
    * @access public
@@ -745,7 +745,7 @@ GROUP BY  currency
   }
 
   /**
-   * Function to get pending or in progress pledges
+   * Get pending or in progress pledges
    *
    * @param int $contactID contact id
    *
@@ -789,9 +789,9 @@ GROUP BY  currency
   }
 
   /**
-   * Function to get pledge record count for a Contact
+   * Get pledge record count for a Contact
    *
-   * @param $contactID
+   * @param int $contactID
    *
    * @return int count of pledge records
    * @access public

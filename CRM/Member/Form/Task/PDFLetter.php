@@ -40,7 +40,7 @@
 class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
 
   /**
-   * all the existing templates in the system
+   * All the existing templates in the system
    *
    * @var array
    */
@@ -51,7 +51,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   public $_cid = NULL;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -86,7 +86,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -103,7 +103,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   }
 
   /**
-   * list available tokens, at time of writing these were
+   * List available tokens, at time of writing these were
    * {membership.id} => Membership ID
    * {membership.status} => Membership Status
    * {membership.type} => Membership Type

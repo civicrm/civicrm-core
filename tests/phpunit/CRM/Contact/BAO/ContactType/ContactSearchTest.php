@@ -97,7 +97,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
   }
 
   /**
-   * search with only type
+   * Search with only type
    * success expected.
    */
   function testSearchWithType() {
@@ -161,7 +161,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
   }
 
   /**
-   * search with only subtype
+   * Search with only subtype
    * success expected.
    */
   function testSearchWithSubype() {
@@ -208,7 +208,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
   }
 
   /**
-   * search with type as well as subtype
+   * Search with type as well as subtype
    * success expected.
    */
   function testSearchWithTypeSubype() {
@@ -255,7 +255,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
   }
 
   /**
-   * search with invalid type or subtype
+   * Search with invalid type or subtype
    */
   function testSearchWithInvalidData() {
     // for invalid type
@@ -289,7 +289,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
   }
 
   /**
-   * search with wrong type or subtype
+   * Search with wrong type or subtype
    */
   function testSearchWithWrongdData() {
 

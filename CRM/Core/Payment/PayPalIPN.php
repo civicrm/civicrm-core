@@ -44,7 +44,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $type
    * @param string $location
    * @param bool $abort

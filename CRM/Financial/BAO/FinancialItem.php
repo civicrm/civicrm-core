@@ -36,7 +36,7 @@
 class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct( ) {
     parent::__construct( );
@@ -63,7 +63,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * add the financial items and financial trxn
+   * Add the financial items and financial trxn
    *
    * @param object $lineItem     line item object
    * @param object $contribution contribution object
@@ -127,7 +127,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * create the financial Items and financial enity trxn
+   * Create the financial Items and financial enity trxn
    *
    * @param array $params  associated array to create financial items
    * @param array $ids financial item ids
@@ -164,7 +164,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * takes an associative array and creates a entity financial transaction object
+   * Takes an associative array and creates a entity financial transaction object
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
@@ -180,7 +180,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * retrive entity financial trxn details
+   * Retrive entity financial trxn details
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param bool $maxId to retrive max id
@@ -216,7 +216,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * check if contact is present in financial_item table
+   * Check if contact is present in financial_item table
    *
    * CRM-12929
    *

@@ -40,17 +40,17 @@
 class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
 
   /**
-   * ids of the contacts to limit the SQL queries (whole-database queries otherwise)
+   * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
    */
   var $contactIds = array();
 
   /**
-   * params to dedupe against (queries against the whole contact set otherwise)
+   * Params to dedupe against (queries against the whole contact set otherwise)
    */
   var $params = array();
 
   /**
-   * if there are no rules in rule group
+   * If there are no rules in rule group
    */
   var $noRules = FALSE;
 

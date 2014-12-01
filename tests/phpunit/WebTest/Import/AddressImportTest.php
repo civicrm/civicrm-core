@@ -68,8 +68,8 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
   /**
    * Helper function to provide data for custom data import.
    *
-   * @param $customDataParams
-   * @param $firstName1
+   * @param array $customDataParams
+   * @param string $firstName1
    *
    * @return array
    */
@@ -288,7 +288,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * @param $customFieldName
+   * @param string $customFieldName
    * @param $type
    *
    * @return array

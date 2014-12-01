@@ -39,28 +39,28 @@
 class CRM_Custom_Form_MoveField extends CRM_Core_Form {
 
   /**
-   * the src group id
+   * The src group id
    *
    * @var int
    */
   protected $_srcGID;
 
   /**
-   * the src field id
+   * The src field id
    *
    * @var int
    */
   protected $_srcFID;
 
   /**
-   * the dst group id
+   * The dst group id
    *
    * @var int
    */
   protected $_dstGID;
 
   /**
-   * the dst field id
+   * The dst field id
    *
    * @var int
    */
@@ -74,7 +74,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
   protected $_srcFieldLabel;
 
   /**
-   * set up variables to build the form
+   * Set up variables to build the form
    *
    * @return void
    * @acess protected

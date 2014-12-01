@@ -35,7 +35,7 @@
 class CRM_Contribute_BAO_Contribution_Utils {
 
   /**
-   * process payment after confirmation
+   * Process payment after confirmation
    *
    * @param CRM_Core_Form $form form object
    * @param array $paymentParams array with payment related key
@@ -369,7 +369,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
   }
   /**
-   * get the contribution details by month
+   * Get the contribution details by month
    * of the year
    *
    * @param int     $param year
@@ -413,7 +413,7 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * get the contribution details by year
+   * Get the contribution details by year
    *
    * @return array associated array
    *
@@ -457,7 +457,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
 
   /**
    * @param array $params
-   * @param $contactID
+   * @param int $contactID
    * @param $mail
    */
   static function createCMSUser(&$params, $contactID, $mail) {
@@ -548,7 +548,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param $apiParams
+   * @param array $apiParams
    * @param $mapper
    * @param string $type
    * @param bool $category
@@ -832,7 +832,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param $contactID
+   * @param int $contactID
    *
    * @return mixed
    */

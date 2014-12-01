@@ -35,7 +35,7 @@
 class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -64,7 +64,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int $id        id of the database record
    * @param boolean $is_active value we want to set the is_active field
@@ -79,7 +79,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * add a name label
+   * Add a name label
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -121,7 +121,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * delete name labels
+   * Delete name labels
    *
    * @param  int $printLabelId ID of the name label to be deleted.
    *
@@ -153,7 +153,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * build layout structure
+   * Build layout structure
    *
    * @param array $params associated array of submitted values
    *
@@ -171,7 +171,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * decode encoded data and return as an array
+   * Decode encoded data and return as an array
    *
    * @param json $jsonData json object
    *

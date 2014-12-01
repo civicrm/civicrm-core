@@ -116,8 +116,8 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
   //moves a field from one field to another
   /**
    * @param $field_to_move
-   * @param $from_group_id
-   * @param $to_group_id
+   * @param int $from_group_id
+   * @param int $to_group_id
    */
   function _moveCustomField($field_to_move, $from_group_id, $to_group_id) {
     //go to the move field page
@@ -162,8 +162,8 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
 
   //Get all custom field values for a given contact and custom group id using the api
   /**
-   * @param $contact_id
-   * @param $group_id
+   * @param int $contact_id
+   * @param int $group_id
    * @param bool $reset_cache
    *
    * @return array
@@ -251,7 +251,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
   //Adds a new custom field to a specfied custom field group, using the given
   //datatype and widget.
   /**
-   * @param $group_id
+   * @param int $group_id
    * @param string $type
    * @param string $widget
    * @param string $prefix
@@ -411,8 +411,8 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
 
   //randomly generates data for a specific custom field
   /**
-   * @param $contact_id
-   * @param $group_id
+   * @param int $contact_id
+   * @param int $group_id
    */
   function _fillCustomDataForContact($contact_id, $group_id) {
     //edit the given contact

@@ -44,29 +44,29 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
    */
 
   /**
-   * imported file size
+   * Imported file size
    */
   protected $_fileSize;
 
   /**
-   * separator being used
+   * Separator being used
    */
   protected $_separator;
 
   /**
-   * total number of lines in file
+   * Total number of lines in file
    */
   protected $_lineCount;
 
   /**
-   * whether the file has a column header or not
+   * Whether the file has a column header or not
    *
    * @var boolean
    */
   protected $_haveColumnHeader;
 
   /**
-   * @param $fileName
+   * @param string $fileName
    * @param string $separator
    * @param int $mapper
    * @param bool $skipColumnHeader
@@ -309,7 +309,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * format the field values for input to the api
+   * Format the field values for input to the api
    *
    * @return array (reference ) associative array of name/value pairs
    * @access public

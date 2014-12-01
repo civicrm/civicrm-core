@@ -609,7 +609,7 @@ GROUP BY  cv.label
    * @param $rows
    * @param $entryFound
    * @param $row
-   * @param $rowId
+   * @param int $rowId
    * @param $rowNum
    * @param $types
    */

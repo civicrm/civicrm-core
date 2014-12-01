@@ -174,7 +174,7 @@ class CRM_Utils_PDF_Utils {
    * @param $orientation
    * @param $html
    * @param $output
-   * @param $fileName
+   * @param string $fileName
    *
    * @return string
    */
@@ -200,7 +200,7 @@ class CRM_Utils_PDF_Utils {
    * @param $margins
    * @param $html
    * @param $output
-   * @param $fileName
+   * @param string $fileName
    */
   static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
     require_once 'packages/snappy/src/autoload.php';
@@ -292,7 +292,7 @@ class CRM_Utils_PDF_Utils {
   }
 
   /**
-   * @param $fileName
+   * @param string $fileName
    * @param $searchPath
    * @param $values
    * @param int $numPages

@@ -367,7 +367,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * Save a payment processor
    *
    * @param $values
-   * @param $domainID
+   * @param int $domainID
    * @param $test
    *
    * @return Void

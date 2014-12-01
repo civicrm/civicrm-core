@@ -35,7 +35,7 @@
 Class CRM_Core_Form_Date {
 
   /**
-   * various Date Formats
+   * Various Date Formats
    */
   CONST DATE_yyyy_mm_dd = 1, DATE_mm_dd_yy = 2, DATE_mm_dd_yyyy = 4, DATE_Month_dd_yyyy = 8, DATE_dd_mon_yy = 16, DATE_dd_mm_yyyy = 32;
 

@@ -51,7 +51,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   );
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -59,7 +59,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   }
 
   /**
-   * @param $exportParams
+   * @param array $exportParams
    */
   function export( $exportParams ) {
     parent::export( $exportParams );
@@ -91,7 +91,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   }
 
   /**
-   * @param $batchId
+   * @param int $batchId
    *
    * @return Object
    */

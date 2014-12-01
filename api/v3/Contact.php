@@ -296,7 +296,7 @@ function civicrm_api3_contact_delete($params) {
  * @param bool $dupeCheck
  * @param bool $dupeErrorArray
  * @param bool $obsoletevalue
- * @param null $dedupeRuleGroupID
+ * @param int $dedupeRuleGroupID
  *
  * @return null
  * @throws API_Exception

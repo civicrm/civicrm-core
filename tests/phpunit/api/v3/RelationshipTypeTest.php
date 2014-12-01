@@ -94,7 +94,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   ///////////////// civicrm_relationship_type_add methods
 
   /**
-   * check with no name
+   * Check with no name
    */
   function testRelationshipTypeCreateWithoutName() {
     $relTypeParams = array(
@@ -107,7 +107,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with no contact type
+   * Check with no contact type
    */
   function testRelationshipTypeCreateWithoutContactType() {
     $relTypeParams = array(
@@ -120,7 +120,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * create relationship type
+   * Create relationship type
    */
   function testRelationshipTypeCreate() {
     $params = array(
@@ -150,7 +150,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check if required fields are not passed
+   * Check if required fields are not passed
    */
   function testRelationshipTypeDeleteWithoutRequired() {
     $params = array(
@@ -165,7 +165,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with incorrect required fields
+   * Check with incorrect required fields
    */
   function testRelationshipTypeDeleteWithIncorrectData() {
     $params = array(
@@ -183,7 +183,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check relationship type delete
+   * Check relationship type delete
    */
   function testRelationshipTypeDelete() {
     $id = $this->_relationshipTypeCreate();
@@ -198,7 +198,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   ///////////////// civicrm_relationship_type_update
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testRelationshipTypeUpdateEmpty() {
     $params = array();
@@ -207,7 +207,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with no contact type
+   * Check with no contact type
    */
   function testRelationshipTypeUpdateWithoutContactType() {
     // create sample relationship type.
@@ -229,7 +229,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with all parameters
+   * Check with all parameters
    */
   function testRelationshipTypeUpdate() {
     // create sample relationship type.
@@ -256,7 +256,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   ///////////////// civicrm_relationship_types_get methods
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testRelationshipTypesGetEmptyParams() {
     $firstRelTypeParams = array(
@@ -287,7 +287,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with params Not Array.
+   * Check with params Not Array.
    */
   function testRelationshipTypesGetParamsNotArray() {
 
@@ -295,7 +295,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with valid params array.
+   * Check with valid params array.
    */
   function testRelationshipTypesGet() {
     $firstRelTypeParams = array(
@@ -333,7 +333,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * create relationship type.
+   * Create relationship type.
    */
   function _relationshipTypeCreate($params = NULL) {
     if (!is_array($params) || empty($params)) {

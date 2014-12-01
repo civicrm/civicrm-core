@@ -35,14 +35,14 @@
 class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
   /**
-   * various constants to indicate different type of relationships
+   * Various constants to indicate different type of relationships
    *
    * @var int
    */
   CONST PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
 
   /**
-   * takes an associative array and creates a relationship object
+   * Takes an associative array and creates a relationship object
    *
    *
    * @param array $params (reference ) an assoc array of name/value pairs
@@ -303,7 +303,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * get get list of relationship type based on the contact type.
+   * Get get list of relationship type based on the contact type.
    *
    * @param int $contactId this is the contact id of the current contact.
    * @param null $contactSuffix
@@ -422,7 +422,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $action
    *
    * @return CRM_Contact_DAO_Relationship
@@ -451,7 +451,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * delete the relationship
+   * Delete the relationship
    *
    * @param int $id relationship id
    *
@@ -500,7 +500,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * disable/enable the relationship
+   * Disable/enable the relationship
    *
    * @param int $id relationship id
    *
@@ -565,7 +565,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Function to get the other contact in a relationship
+   * Get the other contact in a relationship
    *
    * @param int $id relationship id
    *
@@ -587,7 +587,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Function to check if the relationship type selected between two contacts is correct
+   * Check if the relationship type selected between two contacts is correct
    *
    * @param int $contact_a 1st contact id
    * @param int $contact_b 2nd contact id
@@ -628,7 +628,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * this function does the validtion for valid relationship
+   * This function does the validtion for valid relationship
    *
    * @param array $params this array contains the values there are subitted by the form
    * @param array $ids the array that holds all the db ids
@@ -655,7 +655,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * this function checks for duplicate relationship
+   * This function checks for duplicate relationship
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param integer $id this the id of the contact whom we are adding relationship
@@ -732,7 +732,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int $id id of the database record
    * @param boolean $is_active value we want to set the is_active field
@@ -799,14 +799,14 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
   }
 
   /**
-   * helper function to form the sql for relationship retrieval
+   * Helper function to form the sql for relationship retrieval
    *
    * @param int $contactId contact id
    * @param int $status (check const at top of file)
    * @param int $numRelationship no of relationships to display (limit)
    * @param int $count get the no of relationships
    * $param int $relationshipId relationship id
-   * @param $relationshipId
+   * @param int $relationshipId
    * @param string $direction the direction we are interested in a_b or b_a
    * @param array $params array of extra values including relationship_type_id per api spec
    *
@@ -1151,7 +1151,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
   }
 
   /**
-   * Function to get get list of relationship type based on the target contact type.
+   * Get get list of relationship type based on the target contact type.
    *
    * @param string $targetContactType it's valid contact tpye(may be Individual , Organization , Household)
    *
@@ -1172,7 +1172,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
   }
 
   /**
-   * Function to create / update / delete membership for related contacts.
+   * Create / update / delete membership for related contacts.
    *
    * This function will create/update/delete membership for related
    * contact based on 1) contact have active membership 2) that
@@ -1434,7 +1434,7 @@ SELECT count(*)
   }
 
   /**
-   * Function to get Current Employer for Contact
+   * Get Current Employer for Contact
    *
    * @param $contactIds       Contact Ids
    *
@@ -1460,7 +1460,7 @@ WHERE id IN ( {$contacts} )
   }
 
   /**
-   * Function to return list of permissioned employer for a given contact.
+   * Return list of permissioned employer for a given contact.
    *
    * @param $contactID   int     contact id whose employers
    * are to be found.

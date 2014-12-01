@@ -321,7 +321,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPIFailure('contact', 'create', $params);
   }
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -538,7 +538,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -562,7 +562,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -1650,7 +1650,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test that permissions are respected when creating contacts
+   * Test that permissions are respected when creating contacts
    */
   function testContactCreationPermissions() {
     $params = array(
@@ -1738,7 +1738,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test get ref api - gets a list of references to an entity
+   * Test get ref api - gets a list of references to an entity
    */
   function testGetReferenceCounts() {
     $result = $this->callAPISuccess('Contact', 'create', array(

@@ -689,7 +689,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
  * @todo this should be handled by the api wrapper using getfields info - need to check
  * how we add a a pseudoconstant to this pseudo api to make that work
  *
- * @param $profileID
+ * @param int $profileID
  *
  * @return integer|string
  * @throws CiviCRM_API3_Exception

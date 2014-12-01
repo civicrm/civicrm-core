@@ -452,7 +452,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
   /**
-   * validation
+   * Validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -486,7 +486,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * process the renewal form
+   * Process the renewal form
    *
    * @access public
    *

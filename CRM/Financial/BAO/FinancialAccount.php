@@ -37,12 +37,12 @@
 class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAccount {
 
   /**
-   * static holder for the default LT
+   * Static holder for the default LT
    */
   static $_defaultContributionType = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -69,7 +69,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -82,7 +82,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   }
 
   /**
-   * add the financial types
+   * Add the financial types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -116,7 +116,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   }
 
   /**
-   * delete financial Types
+   * Delete financial Types
    *
    * @param int $financialAccountId
    * @static
@@ -152,11 +152,11 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   }
 
   /**
-   * get accounting code for a financial type with account relation Income Account is
+   * Get accounting code for a financial type with account relation Income Account is
    *
    * @financialTypeId int      Financial Type Id
    *
-   * @param $financialTypeId
+   * @param int $financialTypeId
    *
    * @return accounting code
    * @static
@@ -177,7 +177,7 @@ WHERE cft.id = %1
   }
 
   /**
-   * get AR account
+   * Get AR account
    *
    * @param $financialAccountId financial account id
    *

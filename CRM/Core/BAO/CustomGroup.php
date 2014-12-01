@@ -40,14 +40,14 @@
 class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * takes an associative array and creates a custom group object
+   * Takes an associative array and creates a custom group object
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
@@ -226,7 +226,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param  int      $id         id of the database record
    * @param  boolean  $is_active  value we want to set the is_active field
@@ -1480,7 +1480,7 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * generic function to build all the form elements for a specific group tree
+   * Generic function to build all the form elements for a specific group tree
    *
    * @param CRM_Core_Form    $form             the form object
    * @param array     $groupTree        the group tree object
@@ -1516,7 +1516,7 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * extract the get params from the url, validate
+   * Extract the get params from the url, validate
    * and store it in session
    *
    * @param CRM_Core_Form $form the form object
@@ -1611,7 +1611,7 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * check the type of custom field type (eg: Used for Individual, Contribution, etc)
+   * Check the type of custom field type (eg: Used for Individual, Contribution, etc)
    * this function is used to get the custom fields of a type (eg: Used for Individual, Contribution, etc )
    *
    * @param  int     $customFieldId          custom field id
@@ -1794,9 +1794,9 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param CRM_Core_Form $form page object
    * @param array $groupTree associated array
    * @param boolean $returnCount true if customValue count needs to be returned
-   * @param null $gID
+   * @param int $gID
    * @param null $prefix
-   * @param null $customValueId
+   * @param int $customValueId
    *
    * @return array|int
    */
@@ -2222,8 +2222,8 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   }
 
   /**
-   * @param $customGroupId
-   * @param $entityId
+   * @param int $customGroupId
+   * @param int $entityId
    *
    * @return bool
    */

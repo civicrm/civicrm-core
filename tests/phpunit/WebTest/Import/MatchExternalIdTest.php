@@ -235,9 +235,9 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
   /**
    * Helper function to add new contact
    *
-   * @param $firstName
-   * @param $lastName
-   * @param $externalId
+   * @param string $firstName
+   * @param string $lastName
+   * @param int $externalId
    *
    * @return int external id
    */

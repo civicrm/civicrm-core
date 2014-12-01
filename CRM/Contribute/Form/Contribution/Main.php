@@ -57,7 +57,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public $_useForMember;
 
   /**
-   * array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
+   * Array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
    * @var array
    */
   public $_paymentFields = array();
@@ -66,7 +66,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   protected $_snippet;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -185,7 +185,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * set the default values
+   * Set the default values
    *
    * @return void
    * @access public
@@ -628,7 +628,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * build elements to enable pay on behalf of an organization.
+   * Build elements to enable pay on behalf of an organization.
    *
    * @access public
    */
@@ -650,7 +650,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * build elements to collect information for recurring contributions
+   * Build elements to collect information for recurring contributions
    *
    * @access public
    *
@@ -723,7 +723,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any

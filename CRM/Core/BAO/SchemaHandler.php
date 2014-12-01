@@ -245,8 +245,8 @@ class CRM_Core_BAO_SchemaHandler {
   }
 
   /**
-   * @param $tableName
-   * @param $fkTableName
+   * @param string $tableName
+   * @param string $fkTableName
    *
    * @return bool
    */
@@ -276,7 +276,7 @@ ALTER TABLE {$tableName}
    * @param array $params
    * @param $separator
    * @param $prefix
-   * @param $tableName
+   * @param string $tableName
    *
    * @return null|string
    */
@@ -362,7 +362,7 @@ ALTER TABLE {$tableName}
   }
 
   /**
-   * delete a civiCRM-table
+   * Delete a civiCRM-table
    *
    * @param  String  $tableName   name of the table to be created.
    *
@@ -377,8 +377,8 @@ ALTER TABLE {$tableName}
   }
 
   /**
-   * @param $tableName
-   * @param $columnName
+   * @param string $tableName
+   * @param string $columnName
    */
   static function dropColumn($tableName, $columnName) {
     $sql = "ALTER TABLE $tableName DROP COLUMN $columnName";
@@ -386,7 +386,7 @@ ALTER TABLE {$tableName}
   }
 
   /**
-   * @param $tableName
+   * @param string $tableName
    * @param bool $dropUnique
    */
   static function changeUniqueToIndex($tableName, $dropUnique = TRUE) {
@@ -468,9 +468,9 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
   }
 
   /**
-   * @param $customFieldID
-   * @param $tableName
-   * @param $columnName
+   * @param int $customFieldID
+   * @param string $tableName
+   * @param string $columnName
    * @param $length
    *
    * @throws Exception

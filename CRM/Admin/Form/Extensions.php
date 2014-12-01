@@ -40,7 +40,7 @@
 class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
   /**
-   * for pre-processing
+   * For pre-processing
    *
    * @return void
    * @access public
@@ -152,7 +152,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields  the input form values
    * @param array $files   the uploaded files if any

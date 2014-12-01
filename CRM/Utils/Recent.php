@@ -40,7 +40,7 @@
 class CRM_Utils_Recent {
 
   /**
-   * max number of items in queue
+   * Max number of items in queue
    *
    * @int
    */
@@ -55,7 +55,7 @@ class CRM_Utils_Recent {
   static private $_recent = NULL;
 
   /**
-   * initialize this class and set the static variables
+   * Initialize this class and set the static variables
    *
    * @return void
    * @access public
@@ -72,7 +72,7 @@ class CRM_Utils_Recent {
   }
 
   /**
-   * return the recently viewed array
+   * Return the recently viewed array
    *
    * @return array the recently viewed array
    * @access public
@@ -84,14 +84,14 @@ class CRM_Utils_Recent {
   }
 
   /**
-   * add an item to the recent stack
+   * Add an item to the recent stack
    *
    * @param string $title the title to display
    * @param string $url the link for the above title
    * @param string $id object id
    * @param $type
-   * @param $contactId
-   * @param $contactName
+   * @param int $contactId
+   * @param string $contactName
    * @param array $others
    *
    * @return void
@@ -147,7 +147,7 @@ class CRM_Utils_Recent {
   }
 
   /**
-   * delete an item from the recent stack
+   * Delete an item from the recent stack
    *
    * @param array $recentItem array of the recent Item to be removed
    *
@@ -175,7 +175,7 @@ class CRM_Utils_Recent {
   }
 
   /**
-   * delete an item from the recent stack
+   * Delete an item from the recent stack
    *
    * @param string $id  contact id that had to be removed
    *

@@ -58,7 +58,7 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
   }
 
   /**
-   * takes an associative array and adds email
+   * Takes an associative array and adds email
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
@@ -232,7 +232,7 @@ ORDER BY e.is_primary DESC, email_id ASC ";
   }
 
   /**
-   * set / reset hold status for an email
+   * Set / reset hold status for an email
    *
    * @param object $email  email object
    *

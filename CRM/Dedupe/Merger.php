@@ -291,7 +291,7 @@ WHERE
   }
 
   /**
-   * return payment related table.
+   * Return payment related table.
    */
   static function paymentTables() {
     static $tables;
@@ -303,7 +303,7 @@ WHERE
   }
 
   /**
-   * return payment update Query.
+   * Return payment update Query.
    */
   static function paymentSql($tableName, $mainContactId, $otherContactId) {
     $sqls = array();
@@ -349,9 +349,9 @@ INNER JOIN  civicrm_participant participant ON ( participant.id = payment.partic
   }
 
   /**
-   * @param $mainId
-   * @param $otherId
-   * @param $tableName
+   * @param int $mainId
+   * @param int $otherId
+   * @param string $tableName
    * @param array $tableOperations
    * @param string $mode
    *
@@ -537,7 +537,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * batch merge a set of contacts based on rule-group and group.
+   * Batch merge a set of contacts based on rule-group and group.
    *
    * @param  int $rgid rule group id
    * @param  int $gid group id
@@ -579,7 +579,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * merge given set of contacts. Performs core operation.
+   * Merge given set of contacts. Performs core operation.
    *
    * @param  array $dupePairs set of pair of contacts for whom merge is to be done.
    * @param  array $cacheParams prev-next-cache params based on which next pair of contacts are computed.

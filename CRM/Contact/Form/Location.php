@@ -35,7 +35,7 @@
 class CRM_Contact_Form_Location {
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @param CRM_Core_Form $form
    *

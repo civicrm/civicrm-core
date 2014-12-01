@@ -732,7 +732,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * validation
+   * Validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -1693,7 +1693,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * send email receipt
+   * Send email receipt
    *
    * @param CRM_Core_Form $form form object
    * @param array $formValues

@@ -42,7 +42,7 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -359,7 +359,7 @@ SELECT     civicrm_email.id as email_id
   }
 
   /**
-   * send subscribe mail
+   * Send subscribe mail
    *
    * @param  array  $groups the list of group ids for subscribe
    * @param  array  $params the list of email

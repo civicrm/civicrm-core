@@ -40,7 +40,7 @@
 class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public

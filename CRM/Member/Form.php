@@ -182,7 +182,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
-   * extract values from the contact create boxes on the form and assign appropriately  to
+   * Extract values from the contact create boxes on the form and assign appropriately  to
    *
    *  - $this->_contributorEmail,
    *  - $this->_memberEmail &

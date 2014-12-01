@@ -1253,7 +1253,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
  * Function to do a 'standard' api del - when the api is only doing a $bao::del then use this
  * if api::del doesn't exist it will try DAO delete method
  *
- * @param $bao_name
+ * @param string $bao_name
  * @param array $params
  *
  * @return array API result array
@@ -1293,7 +1293,7 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  *
  * @param array $returnArray - array to append custom data too - generally $result[4] where 4 is the entity id.
  * @param string $entity  e.g membership, event
- * @param $entity_id
+ * @param int $entity_id
  * @param int $groupID - per CRM_Core_BAO_CustomGroup::getTree
  * @param int $subType e.g. membership_type_id where custom data doesn't apply to all membership types
  * @param string $subName - Subtype of entity
@@ -1422,7 +1422,7 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
  * we accept 'whatever strtotime accepts'
  *
  * @param string $dateValue
- * @param $fieldName
+ * @param string $fieldName
  * @param $fieldType
  *
  * @throws Exception

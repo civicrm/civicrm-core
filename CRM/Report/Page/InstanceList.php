@@ -176,7 +176,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */

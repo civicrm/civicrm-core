@@ -113,7 +113,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
 
   /**
    * @param $setTitle
-   * @param $batchId
+   * @param int $batchId
    * @param $exportFormat
    */
   function _testExportBatch($setTitle, $batchId, $exportFormat) {

@@ -251,8 +251,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Staff, Student"));
   }
   /**
-   * @param $firstName
-   * @param $lastName
+   * @param string $firstName
+   * @param string $lastName
    * @param $subject
    */
   function addActivity($firstName, $lastName, $subject) {

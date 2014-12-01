@@ -35,7 +35,7 @@
 class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -121,7 +121,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param array $usedFor
    * @param bool $buildSelect
    * @param bool $all
-   * @param null $parentId
+   * @param int $parentId
    *
    * @return array
    */
@@ -181,7 +181,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   /**
    * @param string $usedFor
    * @param array $tags
-   * @param null $parentId
+   * @param int $parentId
    * @param string $separator
    *
    * @return array
@@ -263,7 +263,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * delete the tag
+   * Delete the tag
    *
    * @param int $id   tag id
    *
@@ -296,7 +296,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * takes an associative array and creates a contact object
+   * Takes an associative array and creates a contact object
    *
    * The function extract all the params it needs to initialize the create a
    * contact object. the params array could contain additional unused name/value
@@ -371,7 +371,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * get the tag sets for a entity object
+   * Get the tag sets for a entity object
    *
    * @param string $entityTable entity_table
    *
@@ -392,7 +392,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * get the tags that are not children of a tagset.
+   * Get the tags that are not children of a tagset.
    *
    * @return array $tags associated array of tag name and id@access public
    * @static

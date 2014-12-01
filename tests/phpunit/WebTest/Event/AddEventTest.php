@@ -203,7 +203,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $eventTitle
    * @param $discount
    */
@@ -366,8 +366,8 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   /**
    * @param $eventTitle
    * @param $eventDescription
-   * @param $templateID
-   * @param $eventTypeID
+   * @param int $templateID
+   * @param int $eventTypeID
    */
   function _testAddEventInfoFromTemplate($eventTitle, $eventDescription, $templateID, $eventTypeID) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
@@ -852,7 +852,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $contributionID
+   * @param int $contributionID
    */
   function verifyFinancialRecords($contributionID) {
     // check count for civicrm_contribution and civicrm_financial_item in civicrm_entity_financial_trxn

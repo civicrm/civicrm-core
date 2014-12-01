@@ -24,7 +24,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
   }
 
   /**
-   * add() method (create and update modes)
+   * Add() method (create and update modes)
    */
   function testAdd() {
     $contactId = Contact::createIndividual();
@@ -64,7 +64,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
   }
 
   /**
-   * holdEmail() method (set and reset on_hold condition)
+   * HoldEmail() method (set and reset on_hold condition)
    */
   function testHoldEmail() {
     $contactId = Contact::createIndividual();
@@ -137,7 +137,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
   }
 
   /**
-   * allEmails() method - get all emails for our contact, with primary email first
+   * AllEmails() method - get all emails for our contact, with primary email first
    */
   function testAllEmails() {
     $contactParams = array(

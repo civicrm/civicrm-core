@@ -35,7 +35,7 @@
 class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -66,7 +66,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * takes an associative array and creates a pledgeBlock object
+   * Takes an associative array and creates a pledgeBlock object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
@@ -91,7 +91,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * add pledgeBlock
+   * Add pledgeBlock
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -147,7 +147,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * delete the pledgeBlock
+   * Delete the pledgeBlock
    *
    * @param int $id pledgeBlock id
    *
@@ -174,7 +174,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * return Pledge  Block info in Contribution Pages
+   * Return Pledge  Block info in Contribution Pages
    *
    * @param int $pageID contribution page id
    *
@@ -195,7 +195,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * Function to build Pledge Block in Contribution Pages
+   * Build Pledge Block in Contribution Pages
    *
    * @param CRM_Core_Form $form
    * @static

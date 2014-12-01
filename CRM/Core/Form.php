@@ -74,7 +74,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_action;
 
   /**
-   * the renderer used for this form
+   * The renderer used for this form
    *
    * @var object
    */
@@ -96,7 +96,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_dateFields = array();
 
   /**
-   * cache the smarty template for efficiency reasons
+   * Cache the smarty template for efficiency reasons
    *
    * @var CRM_Core_Smarty
    */
@@ -127,7 +127,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $controller;
 
   /**
-   * constants for attributes for various form elements
+   * Constants for attributes for various form elements
    * attempt to standardize on the number of variations that we
    * use of the below form elements
    *
@@ -205,7 +205,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Add one or more css classes to the form
-   * @param $className
+   * @param string $className
    */
   public function addClass($className) {
     $classes = $this->getAttribute('class');
@@ -213,7 +213,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * register all the standard rules that most forms potentially use
+   * Register all the standard rules that most forms potentially use
    *
    * @return void
    * @access private
@@ -547,7 +547,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for Name
+   * Getter function for Name
    *
    * @return string
    * @access public
@@ -557,7 +557,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for State
+   * Getter function for State
    *
    * @return object
    * @access public
@@ -567,7 +567,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for StateType
+   * Getter function for StateType
    *
    * @return int
    * @access public
@@ -577,7 +577,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for title. Should be over-ridden by derived class
+   * Getter function for title. Should be over-ridden by derived class
    *
    * @return string
    * @access public
@@ -587,7 +587,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * setter function for title.
+   * Setter function for title.
    *
    * @param string $title the title of the form
    *
@@ -611,7 +611,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for link.
+   * Getter function for link.
    *
    * @return string
    * @access public
@@ -624,7 +624,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * boolean function to determine if this is a one form page
+   * Boolean function to determine if this is a one form page
    *
    * @return boolean
    * @access public
@@ -634,7 +634,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for Form Action
+   * Getter function for Form Action
    *
    * @return string
    * @access public
@@ -644,7 +644,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * setter function for Form Action
+   * Setter function for Form Action
    *
    * @param string
    *
@@ -656,7 +656,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * render form and return contents
+   * Render form and return contents
    *
    * @return string
    * @access public
@@ -673,7 +673,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for renderer. If renderer is not set
+   * Getter function for renderer. If renderer is not set
    * create one and initialize it
    *
    * @return object
@@ -778,7 +778,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter for action
+   * Getter for action
    *
    * @return int
    * @access public
@@ -788,7 +788,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * setter for action
+   * Setter for action
    *
    * @param  int  $action the mode we want to set the form
    *
@@ -800,7 +800,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * assign value to name in template
+   * Assign value to name in template
    *
    * @param string $var name of variable
    * @param mixed $value value of variable
@@ -813,7 +813,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * assign value to name in template by reference
+   * Assign value to name in template by reference
    *
    * @param string $var name of variable
    * @param mixed $value value of varaible
@@ -826,7 +826,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * appends values to template variables
+   * Appends values to template variables
    *
    * @param array|string $tpl_var the template variable name(s)
    * @param mixed $value the value to append
@@ -848,7 +848,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $title
    * @param $values
    * @param array $attributes
@@ -877,7 +877,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $title
    * @param bool $allowClear
    * @param null $required
@@ -899,7 +899,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $title
    * @param $values
    * @param null $other
@@ -957,7 +957,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * simple shell that derived classes can call to add buttons to
+   * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button
@@ -991,7 +991,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param string $from
    * @param string $to
    * @param string $label
@@ -1097,7 +1097,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $label
    * @param $attributes
    * @param bool $forceTextarea
@@ -1141,7 +1141,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $title
    * @param null $required
    * @param null $extra
@@ -1157,7 +1157,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $label
    * @param $options
    * @param $attributes
@@ -1357,7 +1357,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * add a currency and money element to the form
+   * Add a currency and money element to the form
    */
   function addMoney($name,
     $label,
@@ -1379,7 +1379,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * add currency element to the form
+   * Add currency element to the form
    */
   function addCurrency($name = 'currency',
     $label           = NULL,
@@ -1591,7 +1591,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * add autoselector field -if user has permission to view contacts
+   * Add autoselector field -if user has permission to view contacts
    * If adding this to a form you also need to add to the tpl e.g
    *
    * {if !empty($selectable)}

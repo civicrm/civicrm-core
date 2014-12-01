@@ -42,7 +42,7 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
   protected $_task;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
@@ -88,7 +88,7 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
   }
 
   /**
-   * return the form name of the task
+   * Return the form name of the task
    *
    * @return string
    * @access public

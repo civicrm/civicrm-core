@@ -39,7 +39,7 @@ class CRM_Core_Session {
   static $_managedNames = NULL;
 
   /**
-   * key is used to allow the application to have multiple top
+   * Key is used to allow the application to have multiple top
    * level scopes rather than a single scope. (avoids naming
    * conflicts). We also extend this idea further and have local
    * scopes within a global scope. Allows us to do cool things
@@ -90,7 +90,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @return CRM_Core_Session
    * @static
@@ -173,7 +173,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * creates a session local scope
+   * Creates a session local scope
    *
    * @param string  prefix local scope name
    * @param boolean isRead is this a read operation, in this case, the session will not be touched
@@ -195,7 +195,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * resets the session local scope
+   * Resets the session local scope
    *
    * @param string local scope name
    * @access public
@@ -341,7 +341,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * adds a userContext to the stack
+   * Adds a userContext to the stack
    *
    * @param string  $userContext the url to return to when done
    * @param boolean $check       should we do a dupe checking with the top element
@@ -381,7 +381,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * replace the userContext of the stack with the passed one
+   * Replace the userContext of the stack with the passed one
    *
    * @param string the url to return to when done
    *
@@ -402,7 +402,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * pops the top userContext stack
+   * Pops the top userContext stack
    *
    * @param void
    *
@@ -416,7 +416,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * reads the top userContext stack
+   * Reads the top userContext stack
    *
    * @param void
    *
@@ -432,7 +432,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * dumps the session to the log
+   * Dumps the session to the log
    */
   function debug($all = 1) {
     $this->initialize();
@@ -525,7 +525,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * @param $names
+   * @param string $names
    */
   static function registerAndRetrieveSessionObjects($names) {
     if (!is_array($names)) {

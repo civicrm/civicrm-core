@@ -35,7 +35,7 @@
 class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -62,7 +62,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -75,7 +75,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * add the Option Group
+   * Add the Option Group
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -107,7 +107,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * delete Option Group
+   * Delete Option Group
    *
    * @param  int  $optionGroupId     Id of the Option Group to be deleted.
    *
@@ -128,7 +128,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * get title of the option group
+   * Get title of the option group
    *
    * @param  int  $optionGroupId     Id of the Option Group.
    *

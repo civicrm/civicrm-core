@@ -78,7 +78,7 @@ class CRM_Contact_Form_Edit_Household {
   }
 
   /**
-   * add rule for household
+   * Add rule for household
    *
    * @param array $fields array of form values
    * @param array $files - unused

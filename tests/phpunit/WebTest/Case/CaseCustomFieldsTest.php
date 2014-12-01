@@ -246,7 +246,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
   /**
    * @param $customGrpId1
-   * @param $customId
+   * @param int $customId
    */
   function _testDeleteCustomData($customGrpId1, $customId) {
     // delete all custom data
@@ -392,9 +392,9 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $customId
-   * @param $custFname
-   * @param $custMname
+   * @param int $customId
+   * @param string $custFname
+   * @param string $custMname
    * @param $custLname
    */
   function _testAdvansearchCaseData($customId, $custFname, $custMname, $custLname) {

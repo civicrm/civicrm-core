@@ -35,7 +35,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_cId_a;
   /**
-   * second individual
+   * Second individual
    * @var integer
    */
   protected $_cId_a_2;
@@ -101,14 +101,14 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   ///////////////// civicrm_relationship_create methods
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testRelationshipCreateEmpty() {
     $this->callAPIFailure('relationship', 'create', array());
   }
 
   /**
-   * check if required fields are not passed
+   * Check if required fields are not passed
    */
   function testRelationshipCreateWithoutRequired() {
     $params = array(
@@ -121,7 +121,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with incorrect required fields
+   * Check with incorrect required fields
    */
   function testRelationshipCreateWithIncorrectData() {
 
@@ -154,7 +154,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check relationship creation with invalid Relationship
+   * Check relationship creation with invalid Relationship
    */
   function testRelationshipCreatInvalidRelationship() {
     // both the contact of type Individual
@@ -181,7 +181,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check relationship already exists
+   * Check relationship already exists
    */
   function testRelationshipCreateAlreadyExists() {
     $params = array(
@@ -207,7 +207,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check relationship already exists
+   * Check relationship already exists
    */
   function testRelationshipCreateUpdateAlreadyExists() {
     $params = array(
@@ -232,7 +232,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * checkupdate doesn't reset stuff badly - CRM-11789
+   * Checkupdate doesn't reset stuff badly - CRM-11789
    */
   function testRelationshipCreateUpdateDoesntMangle() {
     $params = array(
@@ -260,7 +260,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
 
   /**
-   * check relationship creation
+   * Check relationship creation
    */
   function testRelationshipCreate() {
     $params = array(
@@ -293,7 +293,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess('relationship', 'delete', $params);
   }
   /**
-   * ensure disabling works
+   * Ensure disabling works
    */
   function testRelationshipUpdate() {
     $result = $this->callAPISuccess('relationship', 'create', $this->_params);
@@ -309,7 +309,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
   }
   /**
-   * check relationship creation
+   * Check relationship creation
    */
   function testRelationshipCreateEmptyEndDate() {
     $params = array(
@@ -347,7 +347,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check relationship creation with custom data
+   * Check relationship creation with custom data
    */
   function testRelationshipCreateWithCustomData() {
     $customGroup = $this->createCustomGroup();
@@ -382,7 +382,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -515,7 +515,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   ///////////////// civicrm_relationship_delete methods
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testRelationshipDeleteEmpty() {
     $params = array();
@@ -523,7 +523,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check if required fields are not passed
+   * Check if required fields are not passed
    */
   function testRelationshipDeleteWithoutRequired() {
     $params = array(
@@ -536,7 +536,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with incorrect required fields
+   * Check with incorrect required fields
    */
   function testRelationshipDeleteWithIncorrectData() {
     $params = array(
@@ -552,7 +552,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check relationship creation
+   * Check relationship creation
    */
   function testRelationshipDelete() {
     $params = array(
@@ -576,7 +576,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   ///////////////// civicrm_relationship_update methods
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testRelationshipUpdateEmpty() {
     $result = $this->callAPIFailure('relationship', 'create', array(),
@@ -584,11 +584,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check if required fields are not passed
+   * Check if required fields are not passed
    */
 
   /**
-   * check relationship update
+   * Check relationship update
    */
   function testRelationshipCreateDuplicate() {
     $relParams = array(
@@ -628,7 +628,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with valid params array.
+   * Check with valid params array.
    */
   function testRelationshipsGet() {
     $relParams = array(
@@ -662,7 +662,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with valid params array.
+   * Check with valid params array.
    * (The get function will behave differently without 'contact_id' passed
    */
   function testRelationshipsGetGeneric() {
@@ -803,7 +803,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   }
   /**
-   * check with invalid relationshipType Id
+   * Check with invalid relationshipType Id
    */
   function testRelationshipTypeAddInvalidId() {
     $relTypeParams = array(
@@ -818,7 +818,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with valid data with contact_b
+   * Check with valid data with contact_b
    */
   function testGetRelationshipWithContactB() {
     $relParams = array(
@@ -846,7 +846,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with valid data with relationshipTypes
+   * Check with valid data with relationshipTypes
    */
   function testGetRelationshipWithRelTypes() {
     $relParams = array(

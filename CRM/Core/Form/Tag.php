@@ -41,7 +41,7 @@ class CRM_Core_Form_Tag {
   public $_entityTagValues;
 
   /**
-   * build tag widget if correct parent is passed
+   * Build tag widget if correct parent is passed
    *
    * @param CRM_Core_Form $form form object
    * @param string $parentNames parent name ( tag name)
@@ -116,7 +116,7 @@ class CRM_Core_Form_Tag {
   }
 
   /**
-   * save entity tags when it is not save used AJAX
+   * Save entity tags when it is not save used AJAX
    *
    * @param array   $params      associated array
    * @param int     $entityId    entity id, eg: contact id, activity id, case id, file id

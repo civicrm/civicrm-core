@@ -40,7 +40,7 @@
 class CRM_Case_Form_Activity_OpenCase {
 
   /**
-   * the id of the client associated with this case
+   * The id of the client associated with this case
    *
    * @var int
    * @public
@@ -251,7 +251,7 @@ class CRM_Case_Form_Activity_OpenCase {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param $fields
    * @param $files

@@ -40,28 +40,28 @@
 class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * mailing templates
+   * Mailing templates
    * @var array
    * @static
    */
   private static $template;
 
   /**
-   * completed mailings
+   * Completed mailings
    * @var array
    * @static
    */
   private static $completed;
 
   /**
-   * mailing components
+   * Mailing components
    * @var array
    * @static
    */
   private static $component;
 
   /**
-   * default component id's, indexed by component type
+   * Default component id's, indexed by component type
    */
   private static $defaultComponent;
 

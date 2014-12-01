@@ -40,7 +40,7 @@
 class CRM_Contact_Page_View extends CRM_Core_Page {
 
   /**
-   * the id of the object being viewed (note/relationship etc)
+   * The id of the object being viewed (note/relationship etc)
    *
    * @int
    * @access protected
@@ -48,7 +48,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   protected $_id;
 
   /**
-   * the contact id of the contact being viewed
+   * The contact id of the contact being viewed
    *
    * @int
    * @access protected
@@ -259,7 +259,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   /**
    * Get meta details of the contact.
    *
-   * @param $contactId
+   * @param int $contactId
    *
    * @return array contact fields in fixed order
    * @access public
@@ -278,7 +278,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
 
   /**
    * @param $page
-   * @param null $contactID
+   * @param int $contactID
    */
   static function checkUserPermission($page, $contactID = NULL) {
     // check for permissions
@@ -316,7 +316,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   }
 
   /**
-   * @param $contactId
+   * @param int $contactId
    * @param bool $isDeleted
    *
    * @return string

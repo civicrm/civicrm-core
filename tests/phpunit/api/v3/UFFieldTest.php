@@ -92,7 +92,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * create / updating field
+   * Create / updating field
    */
   public function testCreateUFField() {
     $params = $this->_params; // copy
@@ -139,7 +139,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * deleting field
+   * Deleting field
    */
   public function testDeleteUFField() {
     $ufField = $this->callAPISuccess('uf_field', 'create', $this->_params);
@@ -156,7 +156,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * create / updating field
+   * Create / updating field
    */
   public function testReplaceUFFields() {
     $baseFields = array();

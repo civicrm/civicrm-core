@@ -201,7 +201,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param   array  $fields   posted values of the form
    *

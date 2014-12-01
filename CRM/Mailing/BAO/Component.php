@@ -35,7 +35,7 @@
 class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -62,7 +62,7 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field

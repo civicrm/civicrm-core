@@ -35,7 +35,7 @@
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -62,7 +62,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -75,7 +75,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * add the event
+   * Add the event
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -115,7 +115,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * create the event
+   * Create the event
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -174,7 +174,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * delete the event
+   * Delete the event
    *
    * @param int $id event id
    *
@@ -224,7 +224,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * Function to delete the location block associated with an event,
+   * Delete the location block associated with an event,
    * if not being used by any other event.
    *
    * @param $locBlockId location block id to be deleted
@@ -248,7 +248,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * Function to get current/future Events
+   * Get current/future Events
    *
    * @param $all              int     0 returns current and future events
    *                                  1 if events all are required
@@ -310,7 +310,7 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
   }
 
   /**
-   * Function to get events Summary
+   * Get events Summary
    *
    * @static
    *
@@ -574,9 +574,9 @@ $event_summary_limit
   }
 
   /**
-   * Function to get participant count
+   * Get participant count
    *
-   * @param $eventId
+   * @param int $eventId
    * @param  boolean $considerStatus consider status for participant count.
    * @param  boolean $status consider counted participant.
    * @param  boolean $considerRole consider role for participant count.
@@ -635,7 +635,7 @@ $event_summary_limit
   }
 
   /**
-   * function to get the information to map a event
+   * Get the information to map a event
    *
    * @param int $id for which we want map info
    *
@@ -699,7 +699,7 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
   }
 
   /**
-   * function to get the complete information for one or more events
+   * Get the complete information for one or more events
    *
    * @param  date    $start      get events with start date >= this date
    * @param  integer $type       get events on the a specific event type (by event_type_id)
@@ -1039,9 +1039,9 @@ WHERE civicrm_event.is_active = 1
   /**
    * Process that send e-mails
    *
-   * @param $contactID
+   * @param int $contactID
    * @param $values
-   * @param $participantId
+   * @param int $participantId
    * @param bool $isTest
    * @param bool $returnMessageText
    *
@@ -1224,14 +1224,14 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * Function to add the custom fields OR array of participant's
+   * Add the custom fields OR array of participant's
    * profile info
    *
-   * @param $id
-   * @param $name
-   * @param $cid
+   * @param int $id
+   * @param string $name
+   * @param int $cid
    * @param $template
-   * @param $participantId
+   * @param int $participantId
    * @param $isTest
    * @param bool $isCustomProfile
    * @param array $participantParams
@@ -1409,7 +1409,7 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * Function to build the array for display the profile fields
+   * Build the array for display the profile fields
    *
    * @param array $params key value.
    * @param int $gid profile Id
@@ -1673,7 +1673,7 @@ WHERE  id = $cfID
   }
 
   /**
-   * Function to build the array for Additional participant's information  array of priamry and additional Ids
+   * Build the array for Additional participant's information  array of priamry and additional Ids
    *
    * @param int $participantId id of Primary participant
    * @param array $values key/value event info
@@ -1822,7 +1822,7 @@ ORDER BY sp.name, ca.city, ca.street_address ASC
   }
 
   /**
-   * @param $locBlockId
+   * @param int $locBlockId
    *
    * @return int|null|string
    */
@@ -1951,7 +1951,7 @@ WHERE  ce.loc_block_id = $locBlockId";
   }
 
   /**
-   * make sure that the user has permission to access this event
+   * Make sure that the user has permission to access this event
    *
    * @param int $eventId
    * @param int $type
@@ -2049,7 +2049,7 @@ WHERE  ce.loc_block_id = $locBlockId";
   }
 
   /**
-   * Function to calculate event total seats occupied.
+   * Calculate event total seats occupied.
    *
    * @param int    $eventId          event id.
    * @param sting  $extraWhereClause extra filter on participants.
@@ -2124,7 +2124,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
   }
 
   /**
-   * @param $event_id
+   * @param int $event_id
    *
    * @return object
    */

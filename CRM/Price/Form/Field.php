@@ -44,7 +44,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   CONST NUM_OPTION = 15;
 
   /**
-   * the custom set id saved to the session for an update
+   * The custom set id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -68,13 +68,13 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   protected $_extendComponentId;
 
   /**
-   * variable is set if price set is used for membership
+   * Variable is set if price set is used for membership
    * @access protected
    */
   protected $_useForMember;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @param null
    *
@@ -389,7 +389,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

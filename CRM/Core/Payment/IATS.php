@@ -293,7 +293,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
   }
 
   /**
-   * @param $error_id
+   * @param int $error_id
    *
    * @return string
    */

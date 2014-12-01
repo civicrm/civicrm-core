@@ -49,7 +49,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   public $_component = NULL;
 
   /**
-   * are we in single form mode or wizard mode?
+   * Are we in single form mode or wizard mode?
    *
    * @var boolean
    * @access protected
@@ -57,7 +57,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   public $_single;
 
   /**
-   * the default values for the form
+   * The default values for the form
    *
    * @var array
    * @protected
@@ -223,7 +223,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any

@@ -38,21 +38,21 @@ class CRM_Core_BAO_CustomQuery {
   CONST PREFIX = 'custom_value_';
 
   /**
-   * the set of custom field ids
+   * The set of custom field ids
    *
    * @var array
    */
   protected $_ids;
 
   /**
-   * the select clause
+   * The select clause
    *
    * @var array
    */
   public $_select;
 
   /**
-   * the name of the elements that are in the select clause
+   * The name of the elements that are in the select clause
    * used to extract the values
    *
    * @var array
@@ -60,7 +60,7 @@ class CRM_Core_BAO_CustomQuery {
   public $_element;
 
   /**
-   * the tables involved in the query
+   * The tables involved in the query
    *
    * @var array
    */
@@ -68,7 +68,7 @@ class CRM_Core_BAO_CustomQuery {
   public $_whereTables;
 
   /**
-   * the where clause
+   * The where clause
    *
    * @var array
    */
@@ -130,7 +130,7 @@ class CRM_Core_BAO_CustomQuery {
   );
 
   /**
-   * class constructor
+   * Class constructor
    *
    * Takes in a set of custom field ids andsets up the data structures to
    * generate a query
@@ -255,7 +255,7 @@ SELECT label, value
   }
 
   /**
-   * generate the select clause and the associated tables
+   * Generate the select clause and the associated tables
    * for the from clause
    *
    * @param  NULL
@@ -323,7 +323,7 @@ SELECT label, value
   }
 
   /**
-   * generate the where clause and also the english language
+   * Generate the where clause and also the english language
    * equivalent
    *
    * @param NULL
@@ -553,7 +553,7 @@ SELECT label, value
   }
 
   /**
-   * function that does the actual query generation
+   * Function that does the actual query generation
    * basically ties all the above functions together
    *
    * @param NULL
@@ -586,10 +586,10 @@ SELECT label, value
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $label
    * @param $type
-   * @param $fieldName
+   * @param string $fieldName
    * @param $value
    * @param $grouping
    */

@@ -124,7 +124,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * check if the current block object has any valid data
+   * Check if the current block object has any valid data
    *
    * @param array  $blockFields   array of fields that are of interest for this object
    * @param array  $params        associated array of submitted fields
@@ -143,7 +143,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * check if the current block exits
+   * Check if the current block exits
    *
    * @param string  $blockName   bloack name
    * @param array   $params      associated array of submitted fields
@@ -162,7 +162,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * get all block ids for a contact
+   * Get all block ids for a contact
    *
    * @param string $blockName block name
    * @param int $contactId contact id
@@ -205,12 +205,12 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * takes an associative array and creates a block
+   * Takes an associative array and creates a block
    *
    * @param string $blockName block name
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param null $entity
-   * @param null $contactId
+   * @param int $contactId
    *
    * @return object       CRM_Core_BAO_Block object on success, null otherwise
    * @access public
@@ -386,7 +386,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * delete block
+   * Delete block
    *
    * @param  string $blockName       block name
    * @param  int    $params          associates array

@@ -40,7 +40,7 @@
 class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
 
   /**
-   * build all the data structures needed to build the form.
+   * Build all the data structures needed to build the form.
    *
    * @return void
    * @access public

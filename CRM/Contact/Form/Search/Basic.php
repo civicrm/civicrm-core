@@ -147,7 +147,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   }
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later
    *
    * @return void
    * @access public
@@ -166,7 +166,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   }
 
   /**
-   * this method is called for processing a submitted search form
+   * This method is called for processing a submitted search form
    *
    * @return void
    * @access public
@@ -217,7 +217,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   }
 
   /**
-   * normalize the form values to make it look similar to the advanced form values
+   * Normalize the form values to make it look similar to the advanced form values
    * this prevents a ton of work downstream and allows us to use the same code for
    * multiple purposes (queries, save/edit etc)
    *

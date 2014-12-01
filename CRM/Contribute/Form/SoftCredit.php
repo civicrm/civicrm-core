@@ -39,7 +39,7 @@
 class CRM_Contribute_Form_SoftCredit {
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @param CRM_Core_Form $form
    *
@@ -192,7 +192,7 @@ class CRM_Contribute_Form_SoftCredit {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    *

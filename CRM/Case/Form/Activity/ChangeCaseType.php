@@ -99,7 +99,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $values posted values of the form
    *

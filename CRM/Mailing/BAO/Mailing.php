@@ -89,15 +89,15 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   private $_domain = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * @param $job_id
-   * @param null $mailing_id
+   * @param int $job_id
+   * @param int $mailing_id
    * @param null $mode
    *
    * @return int
@@ -112,8 +112,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   // note that $job_id is used only as a variable in the temp table construction
   // and does not play a role in the queries generated
   /**
-   * @param $job_id
-   * @param null $mailing_id
+   * @param int $job_id
+   * @param int $mailing_id
    * @param null $offset
    * @param null $limit
    * @param bool $storeRecipients
@@ -1021,7 +1021,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * static wrapper for getting verp and urls
+   * Static wrapper for getting verp and urls
    *
    * @param int $job_id ID of the Job associated with this message
    * @param int $event_queue_id ID of the EventQueue
@@ -1043,7 +1043,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * get verp, urls and headers
+   * Get verp, urls and headers
    *
    * @param int $job_id ID of the Job associated with this message
    * @param int $event_queue_id ID of the EventQueue
@@ -1505,7 +1505,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * add the mailings
+   * Add the mailings
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -1705,7 +1705,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * get hash value of the mailing
+   * Get hash value of the mailing
    *
    */
   public static function getMailingHash($id) {
@@ -2214,7 +2214,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @throws Exception
    */
@@ -2256,7 +2256,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * returns all the mailings that this user can access. This is dependent on
+   * Returns all the mailings that this user can access. This is dependent on
    * all the groups that the user has access to.
    * However since most civi installs dont use ACL's we special case the condition
    * where the user has access to ALL groups, and hence ALL mailings and return a
@@ -2311,7 +2311,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @param string $sort The sql string that describes the sort order
    *
    * @param null $additionalClause
-   * @param null $additionalParams
+   * @param array $additionalParams
    *
    * @return array            The rows
    * @access public
@@ -2398,7 +2398,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * show detail Mailing report
+   * Show detail Mailing report
    *
    * @param int $id
    *
@@ -2496,7 +2496,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * build the  compose mail form
+   * Build the  compose mail form
    *
    * @param CRM_Core_Form $form
    *
@@ -2589,7 +2589,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Function to build the  compose PDF letter form
+   * Build the  compose PDF letter form
    *
    * @param CRM_Core_Form $form
    *
@@ -2729,7 +2729,7 @@ SELECT  $mailing.id as mailing_id
   }
 
   /**
-   * @param $jobID
+   * @param int $jobID
    *
    * @return mixed
    */
@@ -2807,7 +2807,7 @@ WHERE  civicrm_mailing_job.id = %1
   }
 
   /**
-   * @param $mailingID
+   * @param int $mailingID
    */
   private static function addMultipleEmails($mailingID) {
     $sql = "
@@ -2857,7 +2857,7 @@ ORDER BY civicrm_mailing.name";
   }
 
   /**
-   * @param $mid
+   * @param int $mid
    *
    * @return null|string
    */
@@ -2962,7 +2962,7 @@ AND        m.id = %1
   }
 
   /**
-   * Function to retrieve contact mailing
+   * Retrieve contact mailing
    *
    * @param array $params associated array
    *
@@ -2982,7 +2982,7 @@ AND        m.id = %1
   }
 
   /**
-   * Function to retrieve contact mailing count
+   * Retrieve contact mailing count
    *
    * @param array $params associated array
    *

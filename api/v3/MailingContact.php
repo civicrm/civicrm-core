@@ -96,7 +96,7 @@ function _civicrm_api3_mailing_contact_get_spec(&$params) {
 
 /**
  * @param $type
- * @param $contactID
+ * @param int $contactID
  * @param $offset
  * @param $limit
  * @param $selectFields
@@ -210,7 +210,7 @@ LIMIT %2, %3
 }
 
 /**
- * @param $contactID
+ * @param int $contactID
  * @param $offset
  * @param $limit
  * @param $sort
@@ -250,7 +250,7 @@ AND        meb.id IS NULL
 }
 
 /**
- * @param $contactID
+ * @param int $contactID
  * @param $offset
  * @param $limit
  * @param $sort

@@ -40,14 +40,14 @@
 class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * takes an associative array and creates a price set object
+   * Takes an associative array and creates a price set object
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
@@ -79,7 +79,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int $id id of the database record
    * @param bool $isActive value we want to set the is_active field
@@ -547,10 +547,10 @@ WHERE  id = %1";
 
   /**
    * @param CRM_Core_Form $form
-   * @param $id
+   * @param int $id
    * @param string $entityTable
    * @param bool $validOnly
-   * @param null $priceSetId
+   * @param int $priceSetId
    *
    * @return bool|false|int|null
    */
@@ -756,7 +756,7 @@ WHERE  id = %1";
   }
 
   /**
-   * build the price set form.
+   * Build the price set form.
    *
    * @param CRM_Core_Form $form
    *
@@ -865,7 +865,7 @@ return FALSE;
 }
 
   /**
-   * set daefult the price set fields.
+   * Set daefult the price set fields.
    *
    * @param CRM_Core_Form $form
    * @param $defaults
@@ -1090,7 +1090,7 @@ return 0;
 }
 
   /**
-   * Function to retrieve auto renew frequency and interval
+   * Retrieve auto renew frequency and interval
    *
    * @param int $priceSetId price set id
    *
@@ -1122,7 +1122,7 @@ return 0;
   }
 
   /**
-   * update the is_quick_config flag in the db
+   * Update the is_quick_config flag in the db
    *
    * @param  int      $id             id of the database record
    * @param  boolean  $isQuickConfig  value we want to set the is_quick_config field

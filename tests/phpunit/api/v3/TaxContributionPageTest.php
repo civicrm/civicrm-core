@@ -238,7 +238,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * online and offline contrbution from above created contrbution page
+   * Online and offline contrbution from above created contrbution page
    */
   function testCreateContributionOnline() {
     $this->setUpContributionPage();
@@ -408,7 +408,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $contId
+   * @param int $contId
    *
    * @return null|string
    */
@@ -424,7 +424,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $contId
+   * @param int $contId
    *
    * @return null|string
    */
@@ -504,7 +504,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
   /**
    * @param array $params
-   * @param $financialTypeId
+   * @param int $financialTypeId
    */
   function _getFinancialAccountId($financialTypeId) {
     $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));

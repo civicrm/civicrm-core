@@ -44,7 +44,7 @@ class CRM_Grant_BAO_Query {
   }
 
   /**
-   * build select for CiviGrant
+   * Build select for CiviGrant
    *
    * @param $query
    *
@@ -277,7 +277,7 @@ class CRM_Grant_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
@@ -314,7 +314,7 @@ class CRM_Grant_BAO_Query {
   }
 
   /**
-   * getter for the qill object
+   * Getter for the qill object
    *
    * @return string
    * @access public
@@ -353,7 +353,7 @@ class CRM_Grant_BAO_Query {
   }
 
   /**
-   * add all the elements shared between grant search and advanaced search
+   * Add all the elements shared between grant search and advanaced search
    *
    * @access public
    *
@@ -425,7 +425,7 @@ class CRM_Grant_BAO_Query {
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
   static function searchAction(&$row, $id) {}
 

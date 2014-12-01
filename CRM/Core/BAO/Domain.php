@@ -156,7 +156,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Save the values of a domain
    *
    * @param array $params
-   * @param $id
+   * @param int $id
    *
    * @return array domain
    * @access public
@@ -229,7 +229,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * @param $contactID
+   * @param int $contactID
    *
    * @return bool|null|object|string
    */
@@ -287,7 +287,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * @param $groupId
+   * @param int $groupId
    *
    * @return bool
    */
@@ -311,7 +311,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * retrieve a list of contact-ids that belongs to current domain/site.
+   * Retrieve a list of contact-ids that belongs to current domain/site.
    *
    * @return array
    */

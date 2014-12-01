@@ -34,13 +34,13 @@
  */
 class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
   /**
-   * add the membership Blocks
+   * Add the membership Blocks
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -61,7 +61,7 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
   }
 
   /**
-   * delete membership Blocks
+   * Delete membership Blocks
    *
    * @param int $id
    *

@@ -43,7 +43,7 @@ s | under the terms of the GNU Affero General Public License           |
 class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later
    *
    * @return void
    * @access public
@@ -329,7 +329,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   }
 
   /**
-   * normalize the form values to make it look similar to the advanced form values
+   * Normalize the form values to make it look similar to the advanced form values
    * this prevents a ton of work downstream and allows us to use the same code for
    * multiple purposes (queries, save/edit etc)
    *
@@ -392,7 +392,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   }
 
   /**
-   * normalize default values for multiselect plugins
+   * Normalize default values for multiselect plugins
    *
    * @param $defaults array
    * @return array

@@ -50,7 +50,7 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
   public $_clientID = NULL;
 
   /**
-   * activity set name
+   * Activity set name
    */
   public $_activitySetName = NULL;
 

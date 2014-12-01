@@ -94,8 +94,8 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
    * @param int $subscribe_id The id of the subscription event
    * @param string $hash The hash
    *
-   * @param $activity_id
-   * @param $petition_id
+   * @param int $activity_id
+   * @param int $petition_id
    *
    * @return boolean              True on success
    * @access public

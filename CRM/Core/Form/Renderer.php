@@ -50,7 +50,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   static private $_singleton = NULL;
 
   /**
-   * the converter from array size to css class
+   * The converter from array size to css class
    *
    * @var array
    * @static

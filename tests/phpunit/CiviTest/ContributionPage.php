@@ -8,7 +8,7 @@ class ContributionPage extends PHPUnit_Framework_Testcase {
    * Helper function to create
    * a Contribution Page
    *
-   * @param null $id
+   * @param int $id
    *
    * @return mixed $contributionPage id of created Contribution Page
    */

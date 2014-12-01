@@ -50,7 +50,7 @@
  */
 function civicrm_api3_address_create(&$params) {
   /**
-   * if street_parsing, street_address has to be parsed into
+   * If street_parsing, street_address has to be parsed into
    * separate parts
    */
   if (array_key_exists('street_parsing', $params)) {

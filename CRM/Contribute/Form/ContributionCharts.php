@@ -99,7 +99,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

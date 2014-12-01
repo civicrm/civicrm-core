@@ -88,7 +88,7 @@ class CRM_Utils_Tree {
   /**
    * Constructor for the tree.
    *
-   * @param $nodeName
+   * @param string $nodeName
    *
    * @internal param string $rootNode
    *
@@ -145,7 +145,7 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * check if node is a leaf node.
+   * Check if node is a leaf node.
    * Currently leaf nodes are strings and non-leaf nodes are arrays
    *
    * @param array(
@@ -230,7 +230,7 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * print the tree
+   * Print the tree
    *
    * @param none
    *

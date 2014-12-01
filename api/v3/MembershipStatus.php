@@ -132,7 +132,7 @@ function civicrm_api3_membership_status_delete($params) {
  * This API is used for deriving Membership Status of a given Membership
  * record using the rules encoded in the membership_status table.
  *
- * @param $membershipParams
+ * @param array $membershipParams
  *
  * @throws API_Exception
  *

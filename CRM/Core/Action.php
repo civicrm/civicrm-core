@@ -72,7 +72,7 @@ class CRM_Core_Action {
   //make sure MAX_ACTION = 2^n - 1 ( n = total number of actions )
 
   /**
-   * map the action names to the relevant constant. We perform
+   * Map the action names to the relevant constant. We perform
    * bit manipulation operations so we can perform multiple
    * actions on the same object if needed
    *
@@ -103,7 +103,7 @@ class CRM_Core_Action {
   );
 
   /**
-   * the flipped version of the names array, initialized when used
+   * The flipped version of the names array, initialized when used
    *
    * @var array
    * @static
@@ -111,7 +111,7 @@ class CRM_Core_Action {
   static $_description;
 
   /**
-   * called by the request object to translate a string into a mask
+   * Called by the request object to translate a string into a mask
    *
    * @param string $str the action to be resolved
    *
@@ -188,7 +188,7 @@ class CRM_Core_Action {
   }
 
   /**
-   * given a set of links and a mask, return the html action string for
+   * Given a set of links and a mask, return the html action string for
    * the links associated with the mask
    *
    * @param array $links the set of link items
@@ -199,7 +199,7 @@ class CRM_Core_Action {
    *
    * @param null $op
    * @param null $objectName
-   * @param null $objectId
+   * @param int $objectId
    *
    * @return string       the html string
    * @access public
@@ -305,7 +305,7 @@ class CRM_Core_Action {
   }
 
   /**
-   * given a string and an array of values, substitute the real values
+   * Given a string and an array of values, substitute the real values
    * in the placeholder in the str in the CiviCRM format
    *
    * @param string $str    the string to be replaced
@@ -323,7 +323,7 @@ class CRM_Core_Action {
   }
 
   /**
-   * get the mask for a permission (view, edit or null)
+   * Get the mask for a permission (view, edit or null)
    *
    * @param string the permission
    *

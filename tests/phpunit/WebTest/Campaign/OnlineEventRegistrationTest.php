@@ -114,7 +114,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
 
   /**
    * @param $campaignTitle
-   * @param $id
+   * @param int $id
    */
   function onlineParticipantAddTest($campaignTitle, $id) {
     // Use default payment processor
@@ -150,7 +150,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $eventTitle
    * @param $eventDescription
    */
@@ -210,7 +210,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
   /**
    * @param bool $discount
    * @param bool $priceSet
-   * @param $processorId
+   * @param int $processorId
    */
   function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorId) {
     // Go to Fees tab

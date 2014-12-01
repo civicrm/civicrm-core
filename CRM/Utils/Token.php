@@ -185,7 +185,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * get< the regex for token replacement
+   * Get< the regex for token replacement
    *
    * @param string $token_type a string indicating the the type of token to be used in the expression
    *
@@ -198,7 +198,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * escape the string so a malicious user cannot inject smarty code into the template
+   * Escape the string so a malicious user cannot inject smarty code into the template
    *
    * @param string $string    a string that needs to be escaped from smarty parsing
    *
@@ -1079,7 +1079,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * gives required details of contacts in an indexed array format so we
+   * Gives required details of contacts in an indexed array format so we
    * can iterate in a nice loop and do token evaluation
    *
    * @param $contactIDs
@@ -1240,7 +1240,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * gives required details of contribuion in an indexed array format so we
+   * Gives required details of contribuion in an indexed array format so we
    * can iterate in a nice loop and do token evaluation
    *
    * @param array $contributionIDs
@@ -1312,7 +1312,7 @@ class CRM_Utils_Token {
     return $memberships['values'];
   }
   /**
-   * replace greeting tokens exists in message/subject
+   * Replace greeting tokens exists in message/subject
    *
    * @access public
    */
@@ -1485,7 +1485,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * store membership tokens on the static _tokens array
+   * Store membership tokens on the static _tokens array
    */
   protected static function _buildMembershipTokens() {
     $key = 'membership';

@@ -36,7 +36,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * check for Valid Street Address
+   * Check for Valid Street Address
    */
   function testValidStreetAddressParsing() {
     $this->webtestLogin();
@@ -91,7 +91,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * check for Invalid Street Address
+   * Check for Invalid Street Address
    */
   function testInvalidStreetAddressParsing() {
     $this->webtestLogin();

@@ -338,7 +338,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
 
   /**
-   * get the contribution
+   * Get the contribution
    * page id from the membership record
    */
   function testgetContributionPageId() {

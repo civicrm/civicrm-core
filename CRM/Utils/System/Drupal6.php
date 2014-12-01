@@ -39,7 +39,7 @@
 class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
   /**
-   * if we are using a theming system, invoke theme, else just print the
+   * If we are using a theming system, invoke theme, else just print the
    * content
    *
    * @param string  $content the content that will be themed
@@ -73,7 +73,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * create a user in Drupal.
+   * Create a user in Drupal.
    *
    * @param array  $params associated array
    * @param string $mail email id for cms user
@@ -125,8 +125,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *  @param string $ufName User name
    */
   /**
-   * @param $ufID
-   * @param $ufName
+   * @param int $ufID
+   * @param string $ufName
    */
   function updateCMSName($ufID, $ufName) {
     // CRM-5555
@@ -211,7 +211,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * get the drupal destination string. When this is passed in the
+   * Get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
    * @param CRM_Core_Form $form Form object representing the 'current' form - to which the user will be returned
@@ -249,7 +249,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * sets the title of the page
+   * Sets the title of the page
    *
    * @param string $title
    * @param null $pageTitle
@@ -396,7 +396,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * rewrite various system urls to https
+   * Rewrite various system urls to https
    *
    * @param null
    *
@@ -409,7 +409,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * figure out the post url for the form
+   * Figure out the post url for the form
    *
    * @param mix $action the default action if one is pre-specified
    *
@@ -521,7 +521,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Determine the native ID of the CMS user
    *
-   * @param $username
+   * @param string $username
    * @return int|NULL
    */
   function getUfId($username) {
@@ -596,7 +596,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * load drupal bootstrap
+   * Load drupal bootstrap
    *
    * @param array $params Either uid, or name & pass.
    * @param boolean $loadUser boolean Require CMS user load.
@@ -756,7 +756,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * check is user logged in.
+   * Check is user logged in.
    *
    * @return boolean true/false.
    */

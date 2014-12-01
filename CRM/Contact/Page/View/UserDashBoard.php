@@ -42,7 +42,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   public $_contactId = NULL;
 
   /**
-   * always show public groups
+   * Always show public groups
    * @var bool
    */
   public $_onlyPublicGroups = TRUE;
@@ -110,7 +110,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   }
 
   /**
-   * build user dashboard
+   * Build user dashboard
    *
    * @return void
    * @access public
@@ -201,7 +201,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   }
 
   /**
-   * perform actions and display for user dashboard
+   * Perform actions and display for user dashboard
    *
    * @return void
    *
