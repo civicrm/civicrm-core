@@ -70,6 +70,7 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
     // https://github.com/jwstadler/angular-jquery-dialog-service
     $angularModules['dialogService'] = array('ext' => 'civicrm' , 'js' => array('packages/bower_components/angular-jquery-dialog-service/dialog-service.js'));
     $angularModules['crmUi'] = array('ext' => 'civicrm', 'js' => array('js/angular-crm-ui.js'));
+    $angularModules['crmUtil'] = array('ext' => 'civicrm', 'js' => array('js/angular-crm-util.js'));
 
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {
       $angularModules = array_merge($angularModules, $component->getAngularModules());
