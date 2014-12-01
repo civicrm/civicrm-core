@@ -128,6 +128,7 @@
 
   crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls) {
     $scope.partialUrl = partialUrl;
+    var ts = $scope.ts = CRM.ts('CiviCase');
 
     $scope.activityStatuses = _.values(apiCalls.actStatuses.values);
     $scope.activityTypes = apiCalls.actTypes.values;

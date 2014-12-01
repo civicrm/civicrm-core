@@ -1,14 +1,10 @@
 <!--
 Controller: EditMailingCtrl
 Required vars: mailing
-FIXME: Don't hardcode table-based layout!
 -->
-<table class="form-layout-compressed">
-  <tr>
-    <td class="label">
-      <label crm-ui-label crm-for="visibility">{{ts('Mailing Visibility')}}</label>
-    </td>
-    <td>
+<div class="crm-block">
+  <div class="crm-group">
+    <div crm-ui-field="visibility" crm-title="ts('Mailing Visibility')">
       <select
         name="visibility"
         ui-jq="select2"
@@ -18,6 +14,6 @@ FIXME: Don't hardcode table-based layout!
         required
         >
       </select>
-    </td>
-    </tbody>
-</table>
+    </div>
+  </div>
+</div>
