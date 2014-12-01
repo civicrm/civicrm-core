@@ -53,7 +53,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_recurPaymentProcessors;
 
   /**
-   * array of processor options in the format id => array($id => $label)
+   * Array of processor options in the format id => array($id => $label)
    * WARNING it appears that the format used to differ to this and there are places in the code that
    * expect the old format. $this->_paymentProcessors provides the additional data which this
    * array seems to have provided in the past
@@ -62,12 +62,12 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_processors;
 
   /**
-   * available payment processors with full details including the key 'object' indexed by their id
+   * Available payment processors with full details including the key 'object' indexed by their id
    * @var array
    */
   protected $_paymentProcessors = array();
   /**
-   * the id of the contribution that we are processing
+   * The id of the contribution that we are processing
    *
    * @var int
    * @public
@@ -75,7 +75,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_id;
 
   /**
-   * the id of the premium that we are proceessing
+   * The id of the premium that we are proceessing
    *
    * @var int
    * @public
@@ -88,7 +88,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_productDAO = NULL;
 
   /**
-   * the id of the note
+   * The id of the note
    *
    * @var int
    * @public
@@ -96,7 +96,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_noteID;
 
   /**
-   * the id of the contact associated with this contribution
+   * The id of the contact associated with this contribution
    *
    * @var int
    * @public
@@ -104,7 +104,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_contactID;
 
   /**
-   * the id of the pledge payment that we are processing
+   * The id of the pledge payment that we are processing
    *
    * @var int
    * @public
@@ -112,7 +112,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_ppID;
 
   /**
-   * the id of the pledge that we are processing
+   * The id of the pledge that we are processing
    *
    * @var int
    * @public
@@ -120,7 +120,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_pledgeID;
 
   /**
-   * is this contribution associated with an online
+   * Is this contribution associated with an online
    * financial transaction
    *
    * @var boolean
@@ -137,7 +137,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_options;
 
   /**
-   * stores the honor id
+   * Stores the honor id
    *
    * @var int
    * @public
@@ -187,7 +187,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   protected $_cdType;
 
   /**
-   * array of fields to display on billingBlock.tpl - this is not fully implemented but basically intent is the panes/fieldsets on this page should
+   * Array of fields to display on billingBlock.tpl - this is not fully implemented but basically intent is the panes/fieldsets on this page should
    * be all in this array in order like
    *  'credit_card' => array('credit_card_number' ...
    *  'billing_details' => array('first_name' ...
@@ -198,7 +198,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $billingFieldSets = array();
 
   /**
-   * @param $id
+   * @param int $id
    */
   public function showRecordLinkMesssage($id) {
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $id, 'contribution_status_id');
@@ -213,7 +213,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $values
    */
   public function buildValuesAndAssignOnline_Note_Type($id, &$values) {
@@ -262,7 +262,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @todo - this function is a long way, non standard of saying $dao = new CRM_Contribute_DAO_ContributionProduct(); $dao->id = $id; $dao->find();
    */
   public function assignPremiumProduct($id) { //to get Premium id
@@ -464,7 +464,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * @param $financialTypeId
+   * @param int $financialTypeId
    *
    * @return array
    */
@@ -480,8 +480,8 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * @param $financialTypeId
-   * @param $relationTypeId
+   * @param int $financialTypeId
+   * @param int $relationTypeId
    *
    * @return mixed
    */
@@ -600,7 +600,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * common block for setting up the parts of a form that relate to credit / debit card
+   * Common block for setting up the parts of a form that relate to credit / debit card
    * @throws Exception
    */
   protected function assignPaymentRelatedVariables() {

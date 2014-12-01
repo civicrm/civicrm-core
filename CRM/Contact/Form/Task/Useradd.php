@@ -39,7 +39,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   protected $_contactId;
 
   /**
-   * contact.display_name of contact for whom we are adding user
+   * Contact.display_name of contact for whom we are adding user
    *
    * @var int
    * @public
@@ -47,7 +47,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   public $_displayName;
 
   /**
-   * primary email of contact for whom we are adding user
+   * Primary email of contact for whom we are adding user
    *
    * @var int
    * @public

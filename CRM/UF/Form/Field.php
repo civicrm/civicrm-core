@@ -39,7 +39,7 @@
 class CRM_UF_Form_Field extends CRM_Core_Form {
 
   /**
-   * the uf group id saved to the session for an update
+   * The uf group id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -63,7 +63,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   protected $_fields;
 
   /**
-   * the title for field
+   * The title for field
    *
    * @var int
    * @access protected
@@ -79,7 +79,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   protected $_selectFields;
 
   /**
-   * to store fields with if locationtype exits status
+   * To store fields with if locationtype exits status
    *
    * @var array
    * @access protected
@@ -87,7 +87,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   protected $_hasLocationTypes;
 
   /**
-   * is this profile has searchable field
+   * Is this profile has searchable field
    * or is any field having in selector true.
    *
    * @var boolean.
@@ -96,7 +96,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   protected $_hasSearchableORInSelector;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -617,7 +617,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * validation rule for subtype.
+   * Validation rule for subtype.
    *
    * @param array $groupType contains all groupTypes.
    *
@@ -661,7 +661,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * validation rule for custom data extends entity column values.
+   * Validation rule for custom data extends entity column values.
    *
    * @param Object  $customField Custom field
    * @param Integer $gid         Group Id.
@@ -746,7 +746,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

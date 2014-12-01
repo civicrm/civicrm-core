@@ -39,13 +39,13 @@
  */
 class CRM_Case_Form_CaseView extends CRM_Core_Form {
   /**
-   * check for merge cases.
+   * Check for merge cases.
    * @var bool
    */
   private $_mergeCases = FALSE;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public

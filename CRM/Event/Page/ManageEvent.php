@@ -241,7 +241,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   }
 
   /**
-   * browse all events
+   * Browse all events
    *
    * @return void
    */
@@ -530,7 +530,7 @@ ORDER BY start_date desc
 
   /**
    * @param $whereClause
-   * @param $whereParams
+   * @param array $whereParams
    */
   function pager($whereClause, $whereParams) {
 
@@ -556,7 +556,7 @@ SELECT count(id)
 
   /**
    * @param $whereClause
-   * @param $whereParams
+   * @param array $whereParams
    */
   function pagerAtoZ($whereClause, $whereParams) {
 

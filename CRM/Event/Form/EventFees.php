@@ -40,7 +40,7 @@
 class CRM_Event_Form_EventFees {
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @param CRM_Core_Form $form
    *
@@ -255,8 +255,8 @@ class CRM_Event_Form_EventFees {
    *
    * @access public
    *
-   * @param $participantID
-   * @param null $eventID
+   * @param int $participantID
+   * @param int $eventID
    * @param bool $includeQtyZero
    *
    * @return void

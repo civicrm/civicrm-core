@@ -204,7 +204,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
   }
 
   /**
-   * edit CiviCRM Profile data.
+   * Edit CiviCRM Profile data.
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *

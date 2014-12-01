@@ -230,9 +230,9 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
    * If we are retrieving total paid we need to define the inclusion of pledge_payment
    */
   /**
-   * @param $tableName
+   * @param string $tableName
    * @param $tableKey
-   * @param $fieldName
+   * @param string $fieldName
    * @param $field
    *
    * @return bool|string

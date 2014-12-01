@@ -38,7 +38,7 @@
  */
 class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
-   * add Dashboard
+   * Add Dashboard
    *
    * @param array $params values
    *
@@ -186,7 +186,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
 
   /**
-   * check dashlet permission for current user
+   * Check dashlet permission for current user
    *
    * @param string $permission comma separated list
    * @param string $operator
@@ -260,7 +260,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * get details of each dashlets
+   * Get details of each dashlets
    *
    * @param int $dashletID widget ID
    *
@@ -329,11 +329,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Function to save changes made by use to the Dashlet
+   * Save changes made by use to the Dashlet
    *
    * @param array $columns associated array
    *
-   * @param null $contactID
+   * @param int $contactID
    *
    * @throws RuntimeException
    * @return void
@@ -398,7 +398,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Function to add dashlets
+   * Add dashlets
    *
    * @param array $params associated array
    *
@@ -533,7 +533,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Function to reset dashlet cache
+   * Reset dashlet cache
    *
    * @param int $contactID reset cache only for specific contact
    *
@@ -554,7 +554,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Delete Dashlet
    *
-   * @param $dashletID
+   * @param int $dashletID
    *
    * @return void
    * @static

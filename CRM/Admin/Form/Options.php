@@ -56,7 +56,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   protected $_gLabel;
 
   /**
-   * pre-process
+   * Pre-process
    *
    * @return void
    * @access public
@@ -321,7 +321,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files  the uploaded files if any

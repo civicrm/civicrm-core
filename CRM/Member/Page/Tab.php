@@ -369,7 +369,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
   /**
    * @param CRM_Core_Form $form
-   * @param null $contactId
+   * @param int $contactId
    */
   public static function setContext(&$form, $contactId = NULL) {
     $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search' );
@@ -552,7 +552,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * define action links for membership types of related organization
+   * Define action links for membership types of related organization
    *
    * @return array self::$_membershipTypesLinks array of action links
    * @access public

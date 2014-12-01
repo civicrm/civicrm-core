@@ -67,7 +67,7 @@ class CRM_Contact_Form_Inline_Lock {
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
-   * @param null $contactID
+   * @param int $contactID
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -90,7 +90,7 @@ class CRM_Contact_Form_Inline_Lock {
   /**
    * Return any post-save data
    *
-   * @param $contactID
+   * @param int $contactID
    *
    * @return array extra options to return in JSON
    */

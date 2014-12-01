@@ -76,7 +76,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id         id of the database record
    * @param boolean  $is_active  value we want to set the is_active field
@@ -120,7 +120,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * check duplicate for duplicate field in a group
+   * Check duplicate for duplicate field in a group
    *
    * @param array $params an associative array with field and values
    * @param $ids
@@ -194,7 +194,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * add the UF Field
+   * Add the UF Field
    *
    * @param array $params (reference) array containing the values submitted by the form
    * @param array $ids array containing the id
@@ -268,7 +268,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * enable/disable profile field given a custom field id
+   * Enable/disable profile field given a custom field id
    *
    * @param int      $customFieldId     custom field id
    * @param boolean  $is_active         set the is_active field
@@ -290,7 +290,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Function to copy existing profile fields to
+   * Copy existing profile fields to
    * new profile from the already built profile
    *
    * @param int      $old_id  from which we need to copy
@@ -313,7 +313,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Function to delete profile field given a custom field
+   * Delete profile field given a custom field
    *
    * @param int   $customFieldId      ID of the custom field to be deleted
    *
@@ -335,7 +335,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Function to enable/disable profile field given a custom group id
+   * Enable/disable profile field given a custom group id
    *
    * @param int      $customGroupId custom group id
    * @param boolean  $is_active value we want to set the is_active field
@@ -360,7 +360,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Function to check the status of custom field used in uf fields
+   * Check the status of custom field used in uf fields
    *
    * @param int $UFFieldId
    *
@@ -389,7 +389,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Function to find out whether given profile group using Activity
+   * Find out whether given profile group using Activity
    * Profile fields with contact fields
    */
   static function checkContactActivityProfileType($ufGroupId) {
@@ -445,7 +445,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Function to find out whether given profile group uses $required
+   * Find out whether given profile group uses $required
    * and/or $optional profile types
    *
    * @param integer $ufGroupId  profile id
@@ -559,7 +559,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * function to get the profile type (eg: individual/organization/household)
+   * Get the profile type (eg: individual/organization/household)
    *
    * @param int $ufGroupId     uf group id
    * @param boolean $returnMixType this is true, then field type of  mix profile field is returned
@@ -583,7 +583,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * function to get the profile type (eg: individual/organization/household)
+   * Get the profile type (eg: individual/organization/household)
    *
    * @param string $ufGroupType
    * @param boolean $returnMixType this is true, then field type of  mix profile field is returned
@@ -690,7 +690,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * function to check for mix profiles groups (eg: individual + other contact types)
+   * Check for mix profiles groups (eg: individual + other contact types)
    *
    * @param $ctype
    *

@@ -47,13 +47,13 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   public $_defaults = array();
 
   /**
-   * pre-registered additional participant id.
+   * Pre-registered additional participant id.
    *
    */
   public $additionalParticipantId = NULL;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -364,7 +364,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
@@ -746,7 +746,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   }
 
   /**
-   * check whether call current participant is last one
+   * Check whether call current participant is last one
    *
    * @param bool $isButtonJs
    *
@@ -821,7 +821,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   }
 
   /**
-   * @param $elementName
+   * @param string $elementName
    * @param array $optionIds
    */
   function resetSubmittedValue($elementName, $optionIds = array()) {

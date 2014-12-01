@@ -40,7 +40,7 @@
 class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
 
   /**
-   * all the existing templates in the system
+   * All the existing templates in the system
    *
    * @var array
    */
@@ -53,7 +53,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   public $_activityId = NULL;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -123,7 +123,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

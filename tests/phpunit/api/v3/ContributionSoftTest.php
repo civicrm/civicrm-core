@@ -100,7 +100,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   /**
-   * test get methods
+   * Test get methods
    * @todo - this might be better broken down into more smaller tests
    */
   function testGetContributionSoft() {

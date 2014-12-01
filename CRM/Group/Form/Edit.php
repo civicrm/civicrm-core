@@ -39,14 +39,14 @@
 class CRM_Group_Form_Edit extends CRM_Core_Form {
 
   /**
-   * the group id, used when editing a group
+   * The group id, used when editing a group
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * the group object, if an id is present
+   * The group object, if an id is present
    *
    * @var object
    */
@@ -67,21 +67,21 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   protected $_groupValues;
 
   /**
-   * what blocks should we show and hide.
+   * What blocks should we show and hide.
    *
    * @var CRM_Core_ShowHideBlocks
    */
   protected $_showHide;
 
   /**
-   * the civicrm_group_organization table id
+   * The civicrm_group_organization table id
    *
    * @var int
    */
   protected $_groupOrganizationID;
 
   /**
-   * set up variables to build the form
+   * Set up variables to build the form
    *
    * @return void
    * @acess protected
@@ -308,10 +308,10 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
-   * @param $fileParams
+   * @param array $fileParams
    * @param $options
    *
    * @return array list of errors to be posted back to the form

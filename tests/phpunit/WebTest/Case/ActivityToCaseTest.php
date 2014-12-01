@@ -187,7 +187,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($LinkCaseActivityData);
   }
   /**
-   * @param $firstName
+   * @param string $firstName
    * @param $caseSubject
    * @param $customGroupTitle
    * @param $contactName

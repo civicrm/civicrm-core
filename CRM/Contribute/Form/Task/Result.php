@@ -41,7 +41,7 @@
 class CRM_Contribute_Form_Task_Result extends CRM_Contribute_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public

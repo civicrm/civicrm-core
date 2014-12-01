@@ -235,7 +235,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->setPageTitle(ts('Scheduled Reminder'));
   }
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields  the input form values
    *

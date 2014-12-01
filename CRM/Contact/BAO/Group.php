@@ -35,7 +35,7 @@
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -67,7 +67,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * delete the group and all the object that connect to
+   * Delete the group and all the object that connect to
    * this group. Incredibly destructive
    *
    * @param int $id group id
@@ -201,7 +201,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Get the list of member for a group id
    *
-   * @param $groupID
+   * @param int $groupID
    * @param bool $useCache
    *
    * @return array $aMembers this array contains the list of members for this group id
@@ -303,7 +303,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * make sure that the user has permission to access this group
+   * Make sure that the user has permission to access this group
    *
    * @param int $id   the id of the object
    *
@@ -503,7 +503,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * given a saved search compute the clause and the tables
+   * Given a saved search compute the clause and the tables
    * and store it for future use
    */
   function buildClause() {
@@ -552,7 +552,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $isActive  value we want to set the is_active field
@@ -565,7 +565,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * build the condition to retrieve groups.
+   * Build the condition to retrieve groups.
    *
    * @param string $groupType type of group(Access/Mailing) OR the key of the group
    * @param bool|\boolen $excludeHidden exclude hidden groups.
@@ -604,7 +604,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * get permission relevant clauses
+   * Get permission relevant clauses
    * CRM-12209
    *
    * @param bool $force
@@ -1226,7 +1226,7 @@ WHERE {$whereClause}";
   }
 
   /**
-   * define action links
+   * Define action links
    *
    * @return array $links array of action links
    * @access public
@@ -1268,7 +1268,7 @@ WHERE {$whereClause}";
 
   /**
    * @param $whereClause
-   * @param $whereParams
+   * @param array $whereParams
    *
    * @return string
    */

@@ -42,7 +42,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   protected $_options;
 
   /**
-   * takes an associative array and creates a price field object
+   * Takes an associative array and creates a price field object
    *
    * the function extract all the params it needs to initialize the create a
    * price field object. the params array could contain additional unused name/value
@@ -68,7 +68,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   }
 
   /**
-   * takes an associative array and creates a price field object
+   * Takes an associative array and creates a price field object
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
@@ -182,7 +182,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id         Id of the database record
    * @param boolean  $is_active  Value we want to set the is_active field
@@ -216,7 +216,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *
    * @param CRM_Core_Form $qf form object (reference)
    * @param string $elementName name of the custom field
-   * @param $fieldId
+   * @param int $fieldId
    * @param boolean $inactiveNeeded
    * @param boolean $useRequired true if required else false
    * @param string $label label for custom field
@@ -560,7 +560,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
   /**
    * @param $optionLabel
-   * @param $fid
+   * @param int $fid
    *
    * @return mixed
    */

@@ -35,7 +35,7 @@
 
 class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_Financial_DAO_FinancialTrxn
@@ -48,7 +48,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   }
 
   /**
-   * takes an associative array and creates a financial transaction object
+   * Takes an associative array and creates a financial transaction object
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
@@ -93,8 +93,8 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   }
 
   /**
-   * @param $contributionId
-   * @param null $contributionFinancialTypeId
+   * @param int $contributionId
+   * @param int $contributionFinancialTypeId
    *
    * @return array
    */
@@ -292,7 +292,7 @@ WHERE lt.entity_id = %1 ";
   /**
    * Delete financial transaction
    *
-   * @param $entity_id
+   * @param int $entity_id
    * @return true on success, false otherwise
    * @access public
    * @static
@@ -311,7 +311,7 @@ WHERE ceft.entity_id = %1";
   }
 
   /**
-   * create financial transaction for premium
+   * Create financial transaction for premium
    *
    * @access public
    * @static
@@ -359,7 +359,7 @@ WHERE ceft.entity_id = %1";
   }
 
   /**
-   * create financial trxn and items when fee is charged
+   * Create financial trxn and items when fee is charged
    *
    * @param array $params to create trxn entries
    *
@@ -421,7 +421,7 @@ WHERE ceft.entity_id = %1";
    * payment type  : 'amount_owed' or 'refund_due'
    */
   /**
-   * @param $entityId
+   * @param int $entityId
    * @param string $entityName
    * @param bool $returnType
    * @param null $lineItemTotal

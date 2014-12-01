@@ -39,7 +39,7 @@
 class CRM_Export_Form_Map extends CRM_Core_Form {
 
   /**
-   * mapper fields
+   * Mapper fields
    *
    * @var array
    * @access protected
@@ -47,7 +47,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   protected $_mapperFields;
 
   /**
-   * number of columns in import file
+   * Number of columns in import file
    *
    * @var int
    * @access protected
@@ -55,7 +55,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   protected $_exportColumnCount;
 
   /**
-   * loaded mapping ID
+   * Loaded mapping ID
    *
    * @var int
    * @access protected
@@ -108,12 +108,12 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *
    * @param $values
-   * @param $mappingTypeId
+   * @param int $mappingTypeId
    *
    * @return array list of errors to be posted back to the form
    * @static

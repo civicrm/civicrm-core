@@ -33,7 +33,7 @@ require_once 'CRM/Utils/Array.php';
 class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
   /**
-   * test csv import for each component.
+   * Test csv import for each component.
    *
    * @param string $component   component name ( Event, Contribution, Membership, Activity etc)
    * @param array  $headers     csv data headers
@@ -159,7 +159,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
   }
 
   /**
-   * test contact import.
+   * Test contact import.
    *
    * @param array  $headers     csv data headers
    * @param array  $rows        csv data rows

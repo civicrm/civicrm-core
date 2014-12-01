@@ -35,7 +35,7 @@
 class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -210,7 +210,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * @param int $rowCount Number of rows
    * @param array $sort sort array
    *
-   * @param null $contact_id
+   * @param int $contact_id
    *
    * @return array                Result set
    * @access public

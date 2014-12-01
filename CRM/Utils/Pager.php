@@ -51,12 +51,12 @@ require_once 'Pager/Sliding.php';
 class CRM_Utils_Pager extends Pager_Sliding {
 
   /**
-   * constants for static parameters of the pager
+   * Constants for static parameters of the pager
    */
   CONST ROWCOUNT = 50, PAGE_ID = 'crmPID', PAGE_ID_TOP = 'crmPID', PAGE_ID_BOTTOM = 'crmPID_B', PAGE_ROWCOUNT = 'crmRowCount';
 
   /**
-   * the output of the pager. This is a name/value array with various keys
+   * The output of the pager. This is a name/value array with various keys
    * that an application could use to display the pager
    * @var array
    */
@@ -129,7 +129,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   }
 
   /**
-   * helper function to assign remaining pager options as good default
+   * Helper function to assign remaining pager options as good default
    * values
    *
    * @param array   $params      the set of options needed to initialize the parent

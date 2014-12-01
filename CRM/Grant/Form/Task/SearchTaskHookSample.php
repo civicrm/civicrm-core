@@ -39,7 +39,7 @@
 class CRM_Grant_Form_Task_SearchTaskHookSample extends CRM_Grant_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public

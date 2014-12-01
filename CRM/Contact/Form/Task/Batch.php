@@ -39,37 +39,37 @@
 class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
-   * the title of the group
+   * The title of the group
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * maximum contacts that should be allowed to update
+   * Maximum contacts that should be allowed to update
    *
    */
   protected $_maxContacts = 100;
 
   /**
-   * maximum profile fields that will be displayed
+   * Maximum profile fields that will be displayed
    *
    */
   protected $_maxFields = 9;
 
   /**
-   * variable to store redirect path
+   * Variable to store redirect path
    *
    */
   protected $_userContext;
 
   /**
-   * when not to reset sort_name
+   * When not to reset sort_name
    */
   protected $_preserveDefault = TRUE;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -196,7 +196,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields  the input form values
    *
@@ -224,7 +224,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -266,7 +266,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * parse street address
+   * Parse street address
    * @param array $contactValues contact values
    * @param CRM_Core_Form $form form object
    */

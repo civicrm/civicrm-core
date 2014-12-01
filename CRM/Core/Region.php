@@ -42,7 +42,7 @@ class CRM_Core_Region {
   var $_isSorted;
 
   /**
-   * @param $name
+   * @param string $name
    */
   public function __construct($name) {
     // Templates injected into regions should normally be file names, but sometimes inline notation is handy.
@@ -126,7 +126,7 @@ class CRM_Core_Region {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $snippet
    */
   public function update($name, $snippet) {
@@ -135,7 +135,7 @@ class CRM_Core_Region {
   }
 
   /**
-   * @param $name
+   * @param string $name
    *
    * @return mixed
    */

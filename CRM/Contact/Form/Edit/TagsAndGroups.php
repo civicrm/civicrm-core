@@ -35,7 +35,7 @@
 class CRM_Contact_Form_Edit_TagsAndGroups {
 
   /**
-   * constant to determine which forms we are generating
+   * Constant to determine which forms we are generating
    *
    * Used by both profile and edit contact
    */
@@ -195,7 +195,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
   }
 
   /**
-   * set defaults for relevant form elements
+   * Set defaults for relevant form elements
    *
    * @param int $id the contact id
    * @param array $defaults the defaults array to store the values in

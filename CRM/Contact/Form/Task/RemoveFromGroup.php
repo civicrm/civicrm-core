@@ -73,7 +73,7 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

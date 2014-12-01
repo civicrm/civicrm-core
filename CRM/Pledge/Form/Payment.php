@@ -40,7 +40,7 @@
 class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
   /**
-   * the id of the pledge payment that we are proceessing
+   * The id of the pledge payment that we are proceessing
    *
    * @var int
    * @public
@@ -48,7 +48,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
   public $_id;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public

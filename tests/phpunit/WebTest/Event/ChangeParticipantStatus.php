@@ -96,7 +96,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $firstName
+   * @param string $firstName
    */
   function addParticipant($firstName) {
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", '_qf_Participant_upload-bottom');

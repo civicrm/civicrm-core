@@ -74,7 +74,7 @@ class RequestTest extends \CiviUnitTestCase {
   }
 
   /**
-   * @param $inputParams
+   * @param array $inputParams
    * @param $expectedOptions
    * @param $expectedData
    * @param $expectedChains

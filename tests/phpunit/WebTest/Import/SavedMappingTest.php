@@ -36,7 +36,7 @@ class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * test Saved Import Mapping for Individuals.
+   * Test Saved Import Mapping for Individuals.
    */
   function testSaveIndividualMapping() {
 

@@ -48,7 +48,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   private $_dataSourceClass;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -374,7 +374,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    * Returns the name of the primary key and status columns
    *
    * @param $db
-   * @param $importTableName
+   * @param string $importTableName
    *
    * @return array
    * @access private

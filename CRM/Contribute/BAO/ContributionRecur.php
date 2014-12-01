@@ -35,7 +35,7 @@
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
   /**
-   * create recurring contribution
+   * Create recurring contribution
    *
    * @param array  $params           (reference ) an assoc array of name/value pairs
    *
@@ -153,7 +153,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $mode
    *
    * @return array|null
@@ -176,7 +176,7 @@ SELECT r.payment_processor_id
   }
 
   /**
-   * get the number of installment done/completed for each recurring contribution
+   * Get the number of installment done/completed for each recurring contribution
    *
    * @param array  $ids (reference ) an array of recurring contribution ids
    *
@@ -205,7 +205,7 @@ SELECT r.payment_processor_id
   /**
    * Delete Recurring contribution.
    *
-   * @param $recurId
+   * @param int $recurId
    *
    * @return bool
    * @access public
@@ -323,7 +323,7 @@ SELECT r.payment_processor_id
   }
 
   /**
-   * get list of recurring contribution of contact Ids
+   * Get list of recurring contribution of contact Ids
    *
    * @param int $contactId Contact ID
    *
@@ -360,7 +360,7 @@ SELECT r.payment_processor_id
   }
 
   /**
-   * @param $entityID
+   * @param int $entityID
    * @param string $entity
    *
    * @return null|Object

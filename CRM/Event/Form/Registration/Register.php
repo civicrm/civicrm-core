@@ -77,13 +77,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_noFees;
 
   /**
-   * array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
+   * Array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
    * @var array
    */
   public $_paymentFields = array();
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -543,7 +543,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * build the radio/text form elements for the amount field
+   * Build the radio/text form elements for the amount field
    *
    * @param CRM_Core_Form   $form form object
    * @param boolean  $required  true if you want to add formRule
@@ -800,7 +800,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
@@ -1220,7 +1220,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    */
   /**
    * @param array $params
-   * @param null $contactID
+   * @param int $contactID
    */
   public function processRegistration($params, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();

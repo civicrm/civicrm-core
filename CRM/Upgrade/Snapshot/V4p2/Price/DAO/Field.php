@@ -187,7 +187,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
     public $visibility_id;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field

@@ -129,8 +129,8 @@ function civicrm_api3_pledge_payment_get($params) {
 }
 
 /**
- * @param $pledgeId
- * @param $paymentStatusId
+ * @param int $pledgeId
+ * @param int $paymentStatusId
  * @param $paymentIds
  *
  * @return mixed

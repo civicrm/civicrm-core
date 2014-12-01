@@ -42,7 +42,7 @@
 class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
   /**
-   * array of supported links, currenly view and edit
+   * Array of supported links, currenly view and edit
    *
    * @var array
    * @static
@@ -50,7 +50,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   static $_links = NULL;
 
   /**
-   * we use desc to remind us what that column is, name is used in the tpl
+   * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    * @static
@@ -66,7 +66,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   protected $_params;
 
   /**
-   * the public visible fields to be shown to the user
+   * The public visible fields to be shown to the user
    *
    * @var array
    * @access protected
@@ -74,7 +74,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   protected $_fields;
 
   /**
-   * the custom fields for this domain
+   * The custom fields for this domain
    *
    * @var array
    * @access protected
@@ -82,7 +82,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   protected $_customFields;
 
   /**
-   * cache the query object
+   * Cache the query object
    *
    * @var object
    * @access protected
@@ -90,7 +90,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   protected $_query;
 
   /**
-   * cache the expanded options list if any
+   * Cache the expanded options list if any
    *
    * @var object
    * @access protected
@@ -277,7 +277,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   }
 
   /**
-   * getter for array of the parameters required for creating pager.
+   * Getter for array of the parameters required for creating pager.
    *
    * @param $action
    * @param array $params
@@ -296,7 +296,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   }
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
    * @param string $action the action being performed
@@ -432,7 +432,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   }
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount
    *
    * @param enum   $action   the action being performed
    * @param int    $offset   the row number to start from
@@ -725,7 +725,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   }
 
   /**
-   * name of export file.
+   * Name of export file.
    *
    * @param string $output type of output
    *

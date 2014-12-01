@@ -44,7 +44,7 @@
 class CRM_Profile_Form_Search extends CRM_Profile_Form {
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * @param
    *

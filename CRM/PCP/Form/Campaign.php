@@ -147,7 +147,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any

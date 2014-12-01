@@ -40,7 +40,7 @@
 class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * tell a friend id in db
+   * Tell a friend id in db
    *
    * @var int
    */

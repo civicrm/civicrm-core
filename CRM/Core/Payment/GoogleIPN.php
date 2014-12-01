@@ -51,14 +51,14 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   static private $_singleton = NULL;
 
   /**
-   * mode of operation: live or test
+   * Mode of operation: live or test
    *
    * @var object
    */
   protected $_mode = NULL;
 
   /**
-   * @param $name
+   * @param string $name
    * @param $type
    * @param $object
    * @param bool $abort
@@ -392,7 +392,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string $mode the mode of operation: live or test
    *

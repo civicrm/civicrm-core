@@ -40,7 +40,7 @@
 class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
   /**
-   * pre  process the form
+   * Pre  process the form
    *
    * @access public
    *
@@ -355,8 +355,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    *
    * @access private
    *
-   * @param $filename
-   * @param $resizedName
+   * @param string $filename
+   * @param string $resizedName
    * @param $width
    * @param $height
    *

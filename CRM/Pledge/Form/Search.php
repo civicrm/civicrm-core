@@ -39,7 +39,7 @@
 class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * the params that are sent to the query
+   * The params that are sent to the query
    *
    * @var array
    * @access protected
@@ -47,7 +47,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   protected $_queryParams;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -55,7 +55,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -63,7 +63,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   protected $_limit = NULL;
 
   /**
-   * prefix for the controller
+   * Prefix for the controller
    *
    */
   protected $_prefix = "pledge_";
@@ -71,7 +71,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   protected $_defaults;
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later
    *
    * @return void
    * @access public
@@ -300,7 +300,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

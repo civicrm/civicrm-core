@@ -39,7 +39,7 @@
 class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_ContributionBase {
 
   /**
-   * the id of the contact associated with this contribution
+   * The id of the contact associated with this contribution
    *
    * @var int
    * @public
@@ -60,20 +60,20 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param array $params
    * @param integer $contactID
-   * @param $financialTypeID
+   * @param int $financialTypeID
    * @param $online
-   * @param $contributionPageId
+   * @param int $contributionPageId
    * @param $nonDeductibleAmount
-   * @param $campaignId
+   * @param int $campaignId
    * @param $isMonetary
    * @param $pending
    * @param $paymentProcessorOutcome
    * @param $receiptDate
-   * @param $recurringContributionID
+   * @param int $recurringContributionID
    * @param $isTest
-   * @param $addressID
-   * @param $softCreditToID
-   * @param $lineItems
+   * @param int $addressID
+   * @param int $softCreditToID
+   * @param array $lineItems
    *
    * @return array
    */
@@ -159,7 +159,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -634,7 +634,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * overwrite action, since we are only showing elements in frozen mode
+   * Overwrite action, since we are only showing elements in frozen mode
    * no help display needed
    *
    * @return int
@@ -1044,7 +1044,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Pledges are not relevant to the membership code so that portion will not go onto the membership form.
    *
    * Comments from previous refactor indicate doubt as to what was going on
-   * @param $contributionTypeId
+   * @param int $contributionTypeId
    *
    * @return null|string
    */
@@ -1064,7 +1064,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Process the form
    *
-   * @param $premiumParams
+   * @param array $premiumParams
    * @param $contribution
    *
    * @return void
@@ -1600,7 +1600,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * add on behalf of organization and it's location
+   * Add on behalf of organization and it's location
    *
    * @param $behalfOrganization array  array of organization info
    * @param $contactID          int    individual contact id. One
@@ -1849,7 +1849,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * And under certain circumstances sets
    * $this->_params['amount'] = null;
    *
-   * @param $priceSetID
+   * @param int $priceSetID
    *
    */
   public function setFormAmountFields($priceSetID) {
@@ -1949,7 +1949,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * Helper function for static submit function - set relevant params - help us to build up an array that we can pass in
-   * @param $id
+   * @param int $id
    * @param array $params
    *
    * @return array

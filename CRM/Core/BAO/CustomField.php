@@ -122,7 +122,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * takes an associative array and creates a custom field object
+   * Takes an associative array and creates a custom field object
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
@@ -327,7 +327,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id         Id of the database record
    * @param boolean  $is_active  Value we want to set the is_active field
@@ -718,7 +718,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @param CRM_Core_Form $qf form object (reference)
    * @param string $elementName name of the custom field
-   * @param $fieldId
+   * @param int $fieldId
    * @param boolean $inactiveNeeded -deprecated
    * @param bool $useRequired true if required else false
    * @param boolean $search true if used for search else false
@@ -1079,8 +1079,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param int $id the custom field id
    * @param int $options the assoc array of option name/value pairs
    *
-   * @param null $contactID
-   * @param null $fieldID
+   * @param int $contactID
+   * @param int $fieldID
    *
    * @return  string   the display value
    *
@@ -1110,8 +1110,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param $html_type
    * @param $data_type
    * @param null $format
-   * @param null $contactID
-   * @param null $fieldID
+   * @param int $contactID
+   * @param int $fieldID
    *
    * @return array|mixed|null|string
    */
@@ -1310,7 +1310,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * set default values for custom data used in profile
+   * Set default values for custom data used in profile
    *
    * @param int    $customFieldId custom field id
    * @param string $elementName   custom field name
@@ -1423,17 +1423,17 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * @param $contactID
-   * @param $cfID
-   * @param null $fileID
+   * @param int $contactID
+   * @param int $cfID
+   * @param int $fileID
    * @param bool $absolute
    *
    * @return array
    */
   /**
-   * @param $contactID
-   * @param $cfID
-   * @param null $fileID
+   * @param int $contactID
+   * @param int $cfID
+   * @param int $fileID
    * @param bool $absolute
    *
    * @return array
@@ -2026,7 +2026,7 @@ AND    cf.id = %1";
   }
 
   /**
-   * get custom option groups
+   * Get custom option groups
    *
    * @param array $includeFieldIds ids of custom fields for which
    * option groups must be included.
@@ -2073,7 +2073,7 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
   }
 
   /**
-   * fix orphan groups
+   * Fix orphan groups
    *
    * @param int $customFieldId custom field id
    * @param int $optionGroupId option group id
@@ -2100,7 +2100,7 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
   }
 
   /**
-   * Function to check if option group is related to more than one
+   * Check if option group is related to more than one
    * custom field
    *
    * @param int $optionGroupId option group id
@@ -2123,7 +2123,7 @@ WHERE  option_group_id = {$optionGroupId}";
   }
 
   /**
-   * @param $optionGroupId
+   * @param int $optionGroupId
    * @param $htmlType
    *
    * @return null|string
@@ -2172,7 +2172,7 @@ ORDER BY html_type";
   /**
    * @param array $params
    * @param $customFields
-   * @param $entityID
+   * @param int $entityID
    * @param $customFieldExtends
    * @param bool $inline
    *
@@ -2438,7 +2438,7 @@ WHERE      f.id IN ($ids)";
   }
 
   /**
-   * @param $customId
+   * @param int $customId
    *
    * @return bool
    */

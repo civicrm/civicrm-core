@@ -48,7 +48,7 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
   static $_links = NULL;
 
   /**
-   * delete a saved search.
+   * Delete a saved search.
    *
    * @param int $id - id of saved search
    *
@@ -125,7 +125,7 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */

@@ -44,7 +44,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   CONST NUM_OPTION = 11;
 
   /**
-   * the custom group id saved to the session for an update
+   * The custom group id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -68,7 +68,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   protected $_defaultDataType;
 
   /**
-   * array of custom field values if update mode
+   * Array of custom field values if update mode
    */
   protected $_values;
 
@@ -86,7 +86,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   private static $_dataToLabels = NULL;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @param null
    *
@@ -559,7 +559,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

@@ -143,11 +143,11 @@ class CRM_Contact_Form_Edit_Individual {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
-   * @param null $contactID
+   * @param int $contactID
    *
    * @return true if no errors, else array of errors
    * @access public

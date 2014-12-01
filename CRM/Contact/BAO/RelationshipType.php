@@ -35,7 +35,7 @@
 class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -63,7 +63,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -76,7 +76,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
   }
 
   /**
-   * add the relationship type in the db
+   * Add the relationship type in the db
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
@@ -131,7 +131,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
   }
 
   /**
-   * delete Relationship Types
+   * Delete Relationship Types
    *
    * @param int $relationshipTypeId
    *

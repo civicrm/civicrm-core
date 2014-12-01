@@ -329,7 +329,7 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * @param $name
+   * @param string $name
    *
    * @return bool
    */

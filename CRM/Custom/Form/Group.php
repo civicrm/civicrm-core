@@ -39,7 +39,7 @@
 class CRM_Custom_Form_Group extends CRM_Core_Form {
 
   /**
-   * the set id saved to the session for an update
+   * The set id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -55,7 +55,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   protected $_isGroupEmpty = TRUE;
 
   /**
-   * array of existing subtypes set for a custom set
+   * Array of existing subtypes set for a custom set
    *
    * @var array
    * @access protected
@@ -63,7 +63,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   protected $_subtypes = array();
 
   /**
-   * array of default params
+   * Array of default params
    *
    * @var array
    * @access protected
@@ -71,7 +71,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   protected $_defaults = array();
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @param null
    *
@@ -110,7 +110,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any

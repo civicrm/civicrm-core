@@ -92,7 +92,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   }
 
   /**
-   * create() method
+   * Create() method
    * create various elements of location block
    * without civicrm_loc_block entry
    */
@@ -216,7 +216,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   }
 
   /**
-   * create() method
+   * Create() method
    * create various elements of location block
    * with civicrm_loc_block
    */
@@ -363,7 +363,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   }
 
   /**
-   * deleteLocBlock() method
+   * DeleteLocBlock() method
    * delete the location block
    * created with various elements.
    *
@@ -457,7 +457,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   }
 
   /**
-   * getValues() method
+   * GetValues() method
    * get the values of various location elements
    */
   function testLocBlockgetValues() {

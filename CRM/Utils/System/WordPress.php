@@ -237,7 +237,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * rewrite various system urls to https
+   * Rewrite various system urls to https
    *
    * @param null
    *
@@ -251,7 +251,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * figure out the post url for the form
+   * Figure out the post url for the form
    *
    * @param mix $action the default action if one is pre-specified
    *
@@ -481,7 +481,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * load wordpress bootstrap
+   * Load wordpress bootstrap
    *
    * @param $name string  optional username for login
    * @param $pass string  optional password for login
@@ -663,7 +663,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * check is user logged in.
+   * Check is user logged in.
    *
    * @return boolean true/false.
    */
@@ -764,7 +764,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * get timezone as a string
+   * Get timezone as a string
    * @return string Timezone e.g. 'America/Los_Angeles'
    */
   function getTimeZoneString() {

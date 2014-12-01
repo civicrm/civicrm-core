@@ -49,7 +49,7 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
   protected $_rows;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -143,7 +143,7 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -229,7 +229,7 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * declaration of common variables for Invoice and PDF
+   * Declaration of common variables for Invoice and PDF
    *
    * @access public
    *

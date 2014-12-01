@@ -46,7 +46,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   }
 
   /**
-   * sets the title of the page
+   * Sets the title of the page
    *
    * @param string $title
    * @param null $pageTitle
@@ -133,7 +133,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   }
 
   /**
-   * figure out the post url for the form
+   * Figure out the post url for the form
    *
    * @param mix $action the default action if one is pre-specified
    *

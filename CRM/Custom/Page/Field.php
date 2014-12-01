@@ -200,7 +200,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
   }
 
   /**
-   * edit custom data.
+   * Edit custom data.
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *

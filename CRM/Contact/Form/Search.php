@@ -52,7 +52,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   static $_validContext = NULL;
 
   /**
-   * list of values used when we want to display other objects
+   * List of values used when we want to display other objects
    *
    * @var array
    * @static
@@ -68,7 +68,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_contextMenu;
 
   /**
-   * the groupId retrieved from the GET vars
+   * The groupId retrieved from the GET vars
    *
    * @var int
    * @access public
@@ -76,7 +76,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   public $_groupID;
 
   /**
-   * the Group ID belonging to Add Member to group ID
+   * The Group ID belonging to Add Member to group ID
    * retrieved from the GET vars
    *
    * @var int
@@ -85,7 +85,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_amtgID;
 
   /**
-   * the saved search ID retrieved from the GET vars
+   * The saved search ID retrieved from the GET vars
    *
    * @var int
    * @access protected
@@ -93,7 +93,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_ssID;
 
   /**
-   * the group elements
+   * The group elements
    *
    * @var array
    * @access public
@@ -103,7 +103,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   public $_groupIterator;
 
   /**
-   * the tag elements
+   * The tag elements
    *
    * @var array
    * @access protected
@@ -144,7 +144,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_ufGroupID;
 
   /**
-   * csv - common search values
+   * Csv - common search values
    *
    * @var array
    * @access protected
@@ -166,7 +166,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_modeValue;
 
   /**
-   * name of the selector to use
+   * Name of the selector to use
    */
   static $_selectorName = 'CRM_Contact_Selector';
   protected $_customSearchID = NULL;
@@ -175,7 +175,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_openedPanes = array();
 
   /**
-   * define the set of valid contexts that the search form operates on
+   * Define the set of valid contexts that the search form operates on
    *
    * @return array the valid context set and the titles
    * @access protected
@@ -478,7 +478,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later
    *
    * @return void
    * @access public

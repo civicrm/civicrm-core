@@ -226,7 +226,7 @@ class CRM_Core_Form_RecurringEntity {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

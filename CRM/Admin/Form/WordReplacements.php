@@ -175,7 +175,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $values posted values of the form
    *

@@ -42,7 +42,7 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
   }
 
   /**
-   * @param $event_id
+   * @param int $event_id
    *
    * @return array
    */
@@ -81,9 +81,9 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
   }
 
   /**
-   * @param $event_id
-   * @param $participant_id
-   * @param $field_name
+   * @param int $event_id
+   * @param int $participant_id
+   * @param string $field_name
    *
    * @return string
    */
@@ -92,7 +92,7 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
   }
 
   /**
-   * @param $field_name
+   * @param string $field_name
    *
    * @return string
    */

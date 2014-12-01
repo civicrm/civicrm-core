@@ -42,7 +42,7 @@ class CRM_Case_Task {
   CONST DELETE_CASES = 1, PRINT_CASES = 2, EXPORT_CASES = 3, RESTORE_CASES = 4;
 
   /**
-   * the task array
+   * The task array
    *
    * @var array
    * @static
@@ -50,7 +50,7 @@ class CRM_Case_Task {
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array
    *
    * @var array
    * @static
@@ -132,7 +132,7 @@ class CRM_Case_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level
    * of the user
    *
    * @param int $permission

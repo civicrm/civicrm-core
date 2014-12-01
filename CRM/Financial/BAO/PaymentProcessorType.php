@@ -35,12 +35,12 @@
 class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentProcessorType {
 
   /**
-   * static holder for the default payment processor
+   * Static holder for the default payment processor
    */
   static $_defaultPaymentProcessorType = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -67,7 +67,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -82,7 +82,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * retrieve the default payment processor
+   * Retrieve the default payment processor
    *
    * @param NULL
    *
@@ -101,7 +101,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * add the payment-processor type in the db
+   * Add the payment-processor type in the db
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
@@ -170,7 +170,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * delete payment processor
+   * Delete payment processor
    *
    * @param  int $paymentProcessorTypeId ID of the processor to be deleted.
    *

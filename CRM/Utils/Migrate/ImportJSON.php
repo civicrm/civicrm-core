@@ -280,7 +280,7 @@ class CRM_Utils_Migrate_ImportJSON {
   }
 
   /**
-   * @param $tableName
+   * @param string $tableName
    */
   function populateCache($tableName) {
     if (isset($this->_lookupCache[$tableName])) {

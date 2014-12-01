@@ -39,25 +39,25 @@
 class CRM_Core_State {
 
   /**
-   * state name
+   * State name
    * @var string
    */
   protected $_name;
 
   /**
-   * this is a combination "OR" of the STATE_* constants defined below
+   * This is a combination "OR" of the STATE_* constants defined below
    * @var int
    */
   protected $_type;
 
   /**
-   * the state that precedes this state
+   * The state that precedes this state
    * @var CRM_Core_State
    */
   protected $_back;
 
   /**
-   * the state that succeeds this state
+   * The state that succeeds this state
    * @var CRM_Core_State
    */
   protected $_next;
@@ -77,7 +77,7 @@ class CRM_Core_State {
   CONST START = 1, FINISH = 2, SIMPLE = 4;
 
   /**
-   * constructor
+   * Constructor
    *
    * @param string $name internal name of the state
    * @param int $type state type
@@ -181,7 +181,7 @@ class CRM_Core_State {
   }
 
   /**
-   * getter for name
+   * Getter for name
    *
    * @return string
    * @access public
@@ -191,7 +191,7 @@ class CRM_Core_State {
   }
 
   /**
-   * setter for name
+   * Setter for name
    *
    * @param string
    *
@@ -203,7 +203,7 @@ class CRM_Core_State {
   }
 
   /**
-   * getter for type
+   * Getter for type
    *
    * @return int
    * @access public

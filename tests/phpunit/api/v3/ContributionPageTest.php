@@ -372,7 +372,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * set up membership contribution page
+   * Set up membership contribution page
    * @param bool $isSeparatePayment
    */
   function setUpMembershipContributionPage($isSeparatePayment = FALSE) {
@@ -427,7 +427,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * help function to set up contribution page with some defaults
+   * Help function to set up contribution page with some defaults
    */
   function setUpContributionPage() {
     $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);

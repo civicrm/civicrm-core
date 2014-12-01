@@ -98,7 +98,7 @@ class CRM_Bridge_OG_Drupal {
   }
 
   /**
-   * @param $aclParams
+   * @param array $aclParams
    * @param $op
    */
   static function updateCiviACLTables($aclParams, $op) {

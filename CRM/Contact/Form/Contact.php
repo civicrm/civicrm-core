@@ -65,21 +65,21 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public $_contactId;
 
   /**
-   * the default group id passed in via the url
+   * The default group id passed in via the url
    *
    * @var int
    */
   public $_gid;
 
   /**
-   * the default tag id passed in via the url
+   * The default tag id passed in via the url
    *
    * @var int
    */
   public $_tid;
 
   /**
-   * name of de-dupe button
+   * Name of de-dupe button
    *
    * @var string
    * @access protected
@@ -87,7 +87,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   protected $_dedupeButtonName;
 
   /**
-   * name of optional save duplicate button
+   * Name of optional save duplicate button
    *
    * @var string
    * @access protected
@@ -118,7 +118,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public $_parseStreetAddress;
 
   /**
-   * check contact has a subtype or not
+   * Check contact has a subtype or not
    */
   public $_isContactSubType;
 
@@ -130,7 +130,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public $_preEditValues;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -454,7 +454,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * do the set default related to location type id,
+   * Do the set default related to location type id,
    * primary location,  default country
    *
    */
@@ -584,7 +584,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    * @param array $errors list of errors to be posted back to the form
@@ -1060,7 +1060,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * is there any real significant data in the hierarchical location array
+   * Is there any real significant data in the hierarchical location array
    *
    * @param array $fields the hierarchical value representation of this location
    *
@@ -1104,7 +1104,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * that checks for duplicate contacts
+   * That checks for duplicate contacts
    *
    * @param array $fields fields array which are submitted
    * @param $errors
@@ -1277,7 +1277,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * check parse result and if some address block fails then this
+   * Check parse result and if some address block fails then this
    * function return the status message for all address blocks.
    *
    * @param  $parseResult an array of address blk instance and its status.

@@ -64,7 +64,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * takes an associative array and creates a entityTag object
+   * Takes an associative array and creates a entityTag object
    *
    * the function extract all the params it needs to initialize the create a
    * group object. the params array could contain additional unused name/value
@@ -112,7 +112,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * delete the tag for a contact
+   * Delete the tag for a contact
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
@@ -218,11 +218,11 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * takes an associative array and creates tag entity record for all tag entities
+   * Takes an associative array and creates tag entity record for all tag entities
    *
    * @param array $params (reference)  an assoc array of name/value pairs
    * @param $entityTable
-   * @param $entityID
+   * @param int $entityID
    *
    * @return void
    * @access public
@@ -282,7 +282,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * get contact tags
+   * Get contact tags
    */
   static function getContactTags($contactID, $count = FALSE) {
     $contactTags = array();
@@ -315,7 +315,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * get child contact tags given parentId
+   * Get child contact tags given parentId
    */
   static function getChildEntityTags($parentId, $entityId, $entityTable = 'civicrm_contact') {
     $entityTags = array();
@@ -337,7 +337,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Function to merge two tags: tag B into tag A.
+   * Merge two tags: tag B into tag A.
    */
   function mergeTags($tagAId, $tagBId) {
     $queryParams = array(1 => array($tagBId, 'Integer'),

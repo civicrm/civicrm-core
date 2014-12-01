@@ -39,7 +39,7 @@
 class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
   /**
-   * array of supported links, currenly null
+   * Array of supported links, currenly null
    *
    * @var array
    * @static
@@ -47,7 +47,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   static $_links = NULL;
 
   /**
-   * we use desc to remind us what that column is, name is used in the tpl
+   * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    * @static
@@ -78,7 +78,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   }
 
   /**
-   * getter for array of the parameters required for creating pager.
+   * Getter for array of the parameters required for creating pager.
    *
    * @param $action
    * @param array $params
@@ -94,7 +94,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   }
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
    * @param string $action the action being performed
@@ -210,7 +210,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
   }
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount
    *
    * @param enum   $action   the action being performed
    * @param int    $offset   the row number to start from
@@ -415,7 +415,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
   }
 
   /**
-   * name of export file.
+   * Name of export file.
    *
    * @param string $output type of output
    *

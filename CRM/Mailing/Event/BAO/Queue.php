@@ -35,7 +35,7 @@
 class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -270,7 +270,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * @param $queueID
+   * @param int $queueID
    *
    * @return array
    */

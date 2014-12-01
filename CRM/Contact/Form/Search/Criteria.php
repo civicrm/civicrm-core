@@ -34,7 +34,7 @@
  */
 class CRM_Contact_Form_Search_Criteria {
   /**
-   * @param $form CRM_Core_Form
+   * @param CRM_Core_Form $form
    */
   static function basic(&$form) {
     $form->addElement('hidden', 'hidden_basic', 1);

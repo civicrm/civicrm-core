@@ -75,7 +75,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string $mode the mode of operation: live or test
    *
@@ -95,7 +95,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
    * @return bool
    */
   protected function supportsBackOffice() {
@@ -105,7 +105,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return FALSE;
   }
   /**
-   * express checkout code. Check PayPal documentation for more information
+   * Express checkout code. Check PayPal documentation for more information
    *
    * @param  array $params assoc array of input parameters for this transaction
    *
@@ -149,7 +149,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * get details from paypal. Check PayPal documentation for more information
+   * Get details from paypal. Check PayPal documentation for more information
    *
    * @param  string $token the key associated with this transaction
    *
@@ -190,7 +190,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * do the express checkout at paypal. Check PayPal documentation for more information
+   * Do the express checkout at paypal. Check PayPal documentation for more information
    *
    * @param array $params
    *
@@ -437,7 +437,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * check whether a method is present ( & supported ) by the payment processor object.
+   * Check whether a method is present ( & supported ) by the payment processor object.
    *
    * @param  string $method method to check for.
    *
@@ -716,7 +716,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * hash_call: Function to perform the API call to PayPal using API signature
+   * Hash_call: Function to perform the API call to PayPal using API signature
    * @methodName is name of API  method.
    * @nvpStr is nvp string.
    * returns an associtive array containing the response from the server.

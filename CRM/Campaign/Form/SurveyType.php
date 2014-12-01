@@ -49,21 +49,21 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   protected $_gName;
 
   /**
-   * id
+   * Id
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * action
+   * Action
    *
    * @var int
    */
   protected $_action;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @param null
    *

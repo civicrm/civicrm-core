@@ -89,7 +89,7 @@ class CRM_Contact_Form_Edit_Organization {
   /**
    * @param $fields
    * @param $files
-   * @param null $contactID
+   * @param int $contactID
    *
    * @return array|bool
    */

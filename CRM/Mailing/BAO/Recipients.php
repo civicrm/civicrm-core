@@ -35,14 +35,14 @@
 class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * @param $mailingID
+   * @param int $mailingID
    *
    * @return null|string
    */
@@ -57,7 +57,7 @@ WHERE  mailing_id = %1
   }
 
   /**
-   * @param $mailingID
+   * @param int $mailingID
    * @param null $offset
    * @param null $limit
    *

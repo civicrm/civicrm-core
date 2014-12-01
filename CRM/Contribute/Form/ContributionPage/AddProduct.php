@@ -43,7 +43,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
   protected $_pid;
 
   /**
-   * pre  process the form
+   * Pre  process the form
    *
    * @access public
    *

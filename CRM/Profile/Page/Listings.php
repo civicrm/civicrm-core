@@ -42,7 +42,7 @@
 class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
   /**
-   * all the fields that are listings related
+   * All the fields that are listings related
    *
    * @var array
    * @access protected
@@ -50,7 +50,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   protected $_fields;
 
   /**
-   * the custom fields for this domain
+   * The custom fields for this domain
    *
    * @var array
    * @access protected
@@ -73,7 +73,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   protected $_gid;
 
   /**
-   * state whether to display search form or not
+   * State whether to display search form or not
    *
    * @var int
    */
@@ -93,7 +93,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   protected $_profileIds = array();
 
   /**
-   * extracts the parameters from the request and constructs information for
+   * Extracts the parameters from the request and constructs information for
    * the selector object to do a query
    *
    * @return void
@@ -275,7 +275,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */
@@ -398,9 +398,9 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   }
 
   /**
-   * get the list of contacts for a profile
+   * Get the list of contacts for a profile
    *
-   * @param $gid
+   * @param int $gid
    *
    * @return array
    * @access public

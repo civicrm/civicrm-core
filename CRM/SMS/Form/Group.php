@@ -40,7 +40,7 @@
 class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -308,7 +308,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

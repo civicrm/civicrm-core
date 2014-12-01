@@ -75,7 +75,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * given a string, replace all non alpha numeric characters and
+   * Given a string, replace all non alpha numeric characters and
    * spaces with the replacement character
    *
    * @param string $name the name to be worked on
@@ -103,7 +103,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * convert possibly underscore separated words to camel case with special handling for 'UF'
+   * Convert possibly underscore separated words to camel case with special handling for 'UF'
    * e.g
    * membership_payment returns MembershipPayment
    * @param string $string
@@ -139,7 +139,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * takes a string and returns the last tuple of the string.
+   * Takes a string and returns the last tuple of the string.
    * useful while converting file names to class names etc
    *
    * @param string $string the input string
@@ -161,7 +161,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * appends a name to a string and seperated by delimiter.
+   * Appends a name to a string and seperated by delimiter.
    * does the right thing for an empty string
    *
    * @param string $str   the string to be appended to
@@ -201,7 +201,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * determine if the string is composed only of ascii characters
+   * Determine if the string is composed only of ascii characters
    *
    * @param string  $str input string
    * @param boolean $utf8 attempt utf8 match on failure (default yes)
@@ -243,7 +243,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * determine the string replacements for redaction
+   * Determine the string replacements for redaction
    * on the basis of the regular expressions
    *
    * @param string $str        input string
@@ -333,7 +333,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * determine if two href's are equivalent (fuzzy match)
+   * Determine if two href's are equivalent (fuzzy match)
    *
    * @param string $url1 the first url to be matched
    * @param string $url2 the second url to be matched against
@@ -358,7 +358,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * extract variable values
+   * Extract variable values
    *
    * @param  mix $query this is basically url
    *
@@ -383,7 +383,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * translate a true/false/yes/no string to a 0 or 1 value
+   * Translate a true/false/yes/no string to a 0 or 1 value
    *
    * @param string $str  the string to be translated
    *
@@ -403,7 +403,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * returns string '1' for a true/yes/1 string, and '0' for no/false/0 else returns false
+   * Returns string '1' for a true/yes/1 string, and '0' for no/false/0 else returns false
    *
    * @param string $str  the string to be translated
    *
@@ -541,7 +541,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * strip leading, trailing, double spaces from string
+   * Strip leading, trailing, double spaces from string
    * used for postal/greeting/addressee
    *
    * @param string  $string input string to be cleaned
@@ -682,7 +682,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * this function will mask part of the the user portion of an Email address (everything before the @)
+   * This function will mask part of the the user portion of an Email address (everything before the @)
    *
    * @param string $email the email address to be masked
    * @param string $maskChar the character used for masking
@@ -704,7 +704,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * this function compares two strings
+   * This function compares two strings
    *
    * @param string $strOne string one
    * @param string $strTwo string two

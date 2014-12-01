@@ -49,7 +49,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   }
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @access public
    */

@@ -39,14 +39,14 @@
 class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
 
   /**
-   * the title of the group
+   * The title of the group
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * variable to store redirect path
+   * Variable to store redirect path
    *
    */
   private $_userContext;
@@ -70,7 +70,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
   private $_allowAjaxReleaseButton;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -444,7 +444,7 @@ WHERE {$clause}
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

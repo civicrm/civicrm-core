@@ -366,7 +366,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
   /**
-   * @param $entityId
+   * @param int $entityId
    * @param null $from
    * @param null $to
    * @param null $cost
@@ -400,7 +400,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
   /**
-   * @param $contId
+   * @param int $contId
    *
    * @return null|string
    */function _getFinancialTrxnAmount($contId) {
@@ -415,7 +415,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
   /**
-   * @param $contId
+   * @param int $contId
    *
    * @return null|string
    */function _getFinancialItemAmount($contId) {
@@ -430,7 +430,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
   /**
-   * @param $contId
+   * @param int $contId
    *
    * @return null|string
    */function _getTotalContributedAmount($contId) {

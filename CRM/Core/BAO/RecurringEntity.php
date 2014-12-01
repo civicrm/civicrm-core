@@ -133,7 +133,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     self::$status = $status;
   }
   /**
-   * save records in civicrm_recujrring_entity table
+   * Save records in civicrm_recujrring_entity table
    *
    * @param array $params reference array contains the values submitted by the form
    *

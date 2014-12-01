@@ -45,7 +45,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   static $ufClass = NULL;
 
   /**
-   * sets the title of the page
+   * Sets the title of the page
    *
    * @param string $title title  for page
    * @param $pageTitle
@@ -60,7 +60,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * given a permission string, check for access requirements
+   * Given a permission string, check for access requirements
    *
    * @param string $str the permission to check
    *
@@ -123,7 +123,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * figure out the post url for the form
+   * Figure out the post url for the form
    *
    * @param the default action if one is pre-specified
    *
@@ -135,7 +135,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * set the email address of the user
+   * Set the email address of the user
    *
    * @param object $user handle to the user object
    *

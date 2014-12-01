@@ -40,7 +40,7 @@
 class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
 
   /**
-   * tell a friend id in db
+   * Tell a friend id in db
    *
    * @var int
    */

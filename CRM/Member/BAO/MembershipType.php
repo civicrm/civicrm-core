@@ -35,14 +35,14 @@
 class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
   /**
-   * static holder for the default LT
+   * Static holder for the default LT
    */
   static $_defaultMembershipType = NULL;
 
   static $_membershipTypeInfo = array();
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -69,7 +69,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -82,7 +82,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * add the membership types
+   * Add the membership types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids array contains the id (deprecated)
@@ -131,7 +131,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * delete membership Types
+   * Delete membership Types
    *
    * @param int $membershipTypeId
    *
@@ -188,7 +188,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * convert membership Type's 'start day' & 'rollover day' to human readable formats.
+   * Convert membership Type's 'start day' & 'rollover day' to human readable formats.
    *
    * @param array $membershipType an array of membershipType-details.
    * @static
@@ -229,7 +229,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Function to get membership Types
+   * Get membership Types
    *
    * @param bool $public
    *
@@ -253,7 +253,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Function to get membership Type Details
+   * Get membership Type Details
    *
    * @param int $membershipTypeId
    *
@@ -277,7 +277,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Function to calculate start date and end date for new membership
+   * Calculate start date and end date for new membership
    *
    * @param int $membershipTypeId membership type id
    * @param date $joinDate member since ( in mysql date format )
@@ -454,7 +454,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Function to calculate start date and end date for renewal membership
+   * Calculate start date and end date for renewal membership
    *
    * @param int $membershipId
    * @param $changeToday
@@ -563,7 +563,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Function to retrieve all Membership Types associated
+   * Retrieve all Membership Types associated
    * with an Organization
    *
    * @param int $orgID  Id of Organization
@@ -584,7 +584,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Function to retrieve all Membership Types with Member of Contact id
+   * Retrieve all Membership Types with Member of Contact id
    *
    * @param array membership types
    *
@@ -658,8 +658,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
   /**
    * @param array $params
-   * @param $previousID
-   * @param $membershipTypeId
+   * @param int $previousID
+   * @param int $membershipTypeId
    */
   public static function createMembershipPriceField($params, $previousID, $membershipTypeId) {
 

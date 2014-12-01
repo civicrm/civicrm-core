@@ -39,7 +39,7 @@
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_Core_DAO_WordReplacement
@@ -92,7 +92,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * Save the values of a WordReplacement
    *
    * @param array $params
-   * @param $id
+   * @param int $id
    *
    * @return WordReplacement array
    * @access public

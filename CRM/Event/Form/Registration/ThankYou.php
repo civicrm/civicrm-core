@@ -41,7 +41,7 @@
 class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -68,7 +68,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   }
 
   /**
-   * overwrite action, since we are only showing elements in frozen mode
+   * Overwrite action, since we are only showing elements in frozen mode
    * no help display needed
    *
    * @return int

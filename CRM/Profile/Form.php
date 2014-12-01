@@ -91,14 +91,14 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_title;
 
   /**
-   * the fields needed to build this form
+   * The fields needed to build this form
    *
    * @var array
    */
   public $_fields;
 
   /**
-   * to store contact details
+   * To store contact details
    *
    * @var array
    */
@@ -157,7 +157,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_recordId = NULL;
 
   /**
-   * action for multi record profile (create/edit/delete)
+   * Action for multi record profile (create/edit/delete)
    *
    * @var string
    */
@@ -177,7 +177,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_session       = NULL;
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * gets session variables for table name, id of entity in table, type of entity and stores them.
    *
@@ -867,7 +867,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array  $fields the input form values
    * @param array  $files  the uploaded files if any

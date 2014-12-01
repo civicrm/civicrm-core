@@ -81,7 +81,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   }
 
   /**
-   * normalize the form values to make it look similar to the advanced form values
+   * Normalize the form values to make it look similar to the advanced form values
    * this prevents a ton of work downstream and allows us to use the same code for
    * multiple purposes (queries, save/edit etc)
    *

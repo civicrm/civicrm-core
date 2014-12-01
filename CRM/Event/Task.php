@@ -46,7 +46,7 @@ class CRM_Event_Task {
   LABEL_CONTACTS = 16, GROUP_CONTACTS = 20;
 
   /**
-   * the task array
+   * The task array
    *
    * @var array
    * @static
@@ -54,7 +54,7 @@ class CRM_Event_Task {
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array
    *
    * @var array
    * @static
@@ -184,7 +184,7 @@ class CRM_Event_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level
    * of the user
    *
    * @param int $permission

@@ -52,7 +52,7 @@ class CRM_Utils_ReCAPTCHA {
   static private $_singleton = NULL;
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string the key to permit session scope's
    *

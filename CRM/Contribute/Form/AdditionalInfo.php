@@ -194,13 +194,13 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
-   * process the Premium Information
+   * Process the Premium Information
    *
    * @access public
    *
    * @param array $params
-   * @param $contributionID
-   * @param null $premiumID
+   * @param int $contributionID
+   * @param int $premiumID
    * @param null $options
    * @return void
    */
@@ -254,14 +254,14 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
-   * process the Note
+   * Process the Note
    *
    * @access public
    *
    * @param array $params
-   * @param $contactID
-   * @param $contributionID
-   * @param null $contributionNoteID
+   * @param int $contactID
+   * @param int $contributionID
+   * @param int $contributionNoteID
    *
    * @return void
    */
@@ -282,7 +282,7 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
-   * process the Common data
+   * Process the Common data
    *
    * @access public
    *
@@ -334,7 +334,7 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
-   * Function to send email receipt.
+   * Send email receipt.
    *
    * @form object  of Contribution form.
    *

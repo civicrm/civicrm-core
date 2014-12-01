@@ -218,7 +218,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $roleid
+   * @param int $roleid
    *
    * @return string
    */

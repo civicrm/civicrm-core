@@ -39,7 +39,7 @@
 class CRM_Custom_Form_Option extends CRM_Core_Form {
 
   /**
-   * the custom field id saved to the session for an update
+   * The custom field id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -47,7 +47,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   protected $_fid;
 
   /**
-   * the custom group id saved to the session for an update
+   * The custom group id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -68,7 +68,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @param null
    *
@@ -243,7 +243,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

@@ -217,7 +217,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
    * @param $validateString
    * @param bool $dateSpecificFields
    * @param $title
-   * @param $sid
+   * @param int $sid
    * @param $contributionType
    *
    * @return array
@@ -284,7 +284,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
   /**
    * @param $validateStrings
-   * @param $sid
+   * @param int $sid
    */
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
@@ -299,8 +299,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
   }
 
   /**
-   * @param $pageId
-   * @param $contactParams
+   * @param int $pageId
+   * @param array $contactParams
    * @param $memTypeTitle1
    * @param $memTypeTitle2
    * @param bool $renew
@@ -409,8 +409,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
   }
 
   /**
-   * @param $pageId
-   * @param $contactParams
+   * @param int $pageId
+   * @param array $contactParams
    * @param $memTypeTitle1
    * @param $term
    * @param bool $renew

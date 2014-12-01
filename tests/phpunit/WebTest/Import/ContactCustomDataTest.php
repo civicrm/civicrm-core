@@ -108,8 +108,8 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
   /**
    * Helper function to provide data for custom data import.
    *
-   * @param $customDataParams
-   * @param $firstName1
+   * @param array $customDataParams
+   * @param string $firstName1
    *
    * @return array
    */

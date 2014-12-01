@@ -42,7 +42,7 @@ class CRM_Core_BAO_PrevNextCache extends CRM_Core_DAO_PrevNextCache {
    * @param $cacheKey
    * @param $id1
    * @param $id2
-   * @param null $mergeId
+   * @param int $mergeId
    * @param null $join
    * @param null $where
    * @param bool $flip
@@ -112,7 +112,7 @@ WHERE  cacheKey     = %3 AND
   }
 
   /**
-   * @param null $id
+   * @param int $id
    * @param null $cacheKey
    * @param string $entityTable
    */
@@ -248,8 +248,8 @@ WHERE cacheKey $op %1
   }
 
   /**
-   * @param null $rgid
-   * @param null $gid
+   * @param int $rgid
+   * @param int $gid
    * @param null $cacheKeyString
    */
   static function refillCache($rgid = NULL, $gid = NULL, $cacheKeyString = NULL) {
@@ -395,7 +395,7 @@ WHERE  cacheKey LIKE %1 AND is_selected = 1
   }
 
   /**
-   * get the selections
+   * Get the selections
    *
    * @param string $cacheKey cache key
    * @param string $action action

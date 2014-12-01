@@ -91,7 +91,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * test add methods with valid data
+   * Test add methods with valid data
    * success expected
    */
   function testContactCreate() {
@@ -135,7 +135,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
 
 
   /**
-   * test add with invalid data
+   * Test add with invalid data
    */
   function testContactAddInvalidData() {
 
@@ -159,7 +159,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
 
 
   /**
-   * test update with no subtype to valid subtype
+   * Test update with no subtype to valid subtype
    * success expected
    */
   function testContactUpdateNoSubtypeValid() {
@@ -225,7 +225,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
 
 
   /**
-   * test update with no subtype to invalid subtype
+   * Test update with no subtype to invalid subtype
    */
   function testContactUpdateNoSubtypeInvalid() {
 
@@ -272,7 +272,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * test update with no subtype to valid subtype
+   * Test update with no subtype to valid subtype
    * success expected
    */
   function testContactUpdateSubtypeValid() {
@@ -362,7 +362,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * test update with no subtype to invalid subtype
+   * Test update with no subtype to invalid subtype
    */
   function testContactUpdateSubtypeInvalid() {
 

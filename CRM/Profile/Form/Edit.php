@@ -50,7 +50,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   protected $_prefix;
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * @param
    *
@@ -307,7 +307,7 @@ SELECT module,is_reserved
   }
 
   /**
-   * intercept QF validation and do our own redirection
+   * Intercept QF validation and do our own redirection
    *
    * We use this to send control back to the user for a user formatted page
    * This allows the user to maintain the same state and display the error messages

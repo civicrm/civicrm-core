@@ -94,7 +94,7 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
   }
 
   /**
-   * test checks that all v3 API return a standardised error message when
+   * Test checks that all v3 API return a standardised error message when
    * the $params passed in is not an array.
    */
   function testParamsNotArray() {

@@ -40,7 +40,7 @@
 class CRM_Contribute_StateMachine_Contribution extends CRM_Core_StateMachine {
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @param CRM_Contact_Import_Controller $controller
    * @param \const|int $action

@@ -97,7 +97,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * is_primary should be set as a default
+   * Is_primary should be set as a default
    */
   public function testCreateAddressTestDefaults() {
     $params = $this->_params;
@@ -115,7 +115,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    }
 
   /**
-   * is_primary shoule be set as a default. ie. create the address, unset the params & recreate.
+   * Is_primary shoule be set as a default. ie. create the address, unset the params & recreate.
    * is_primary should be 0 before & after the update. ie - having no other address
    * is_primary is invalid
    */

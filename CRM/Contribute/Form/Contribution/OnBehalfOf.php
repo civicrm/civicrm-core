@@ -35,7 +35,7 @@
 class CRM_Contribute_Form_Contribution_OnBehalfOf {
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @param CRM_Core_Form $form
    *
@@ -123,7 +123,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
   }
 
   /**
-   * build form for related contacts / on behalf of organization.
+   * Build form for related contacts / on behalf of organization.
    *
    * @param CRM_Core_Form $form
    *

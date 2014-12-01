@@ -39,7 +39,7 @@
 class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * page title
+   * Page title
    *
    * @var string
    * @protected
@@ -53,7 +53,7 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
   protected $_relatedContributions;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public

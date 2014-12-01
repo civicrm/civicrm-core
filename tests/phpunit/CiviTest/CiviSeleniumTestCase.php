@@ -328,7 +328,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * @param $option_group_name
+   * @param string $option_group_name
    *
    * @return array|int
    */
@@ -997,7 +997,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param bool $pledges
    * @param bool $recurring
    * @param bool $membershipTypes
-   * @param null $memPriceSetId
+   * @param int $memPriceSetId
    * @param bool $friend
    * @param int $profilePreId
    * @param int $profilePostId
@@ -1331,7 +1331,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * update default strict rule.
+   * Update default strict rule.
    *
    * @param string $contactType
    * @param array $fields Fields to be set for strict rule
@@ -1640,7 +1640,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   // Request a record from the DB by id. Success if row not found.
   /**
    * @param string $daoName
-   * @param $id
+   * @param int $id
    * @param $message
    */
   function assertDBRowNotExist($daoName, $id, $message) {
@@ -1675,7 +1675,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   // Compare all values in a single retrieved DB record to an array of expected values
   /**
    * @param string $daoName
-   * @param $searchParams
+   * @param array $searchParams
    * @param $expectedValues
    */
   function assertDBCompareValues($daoName, $searchParams, $expectedValues) {
@@ -2007,7 +2007,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $sku
    * @param $amount
    * @param $price
@@ -2196,7 +2196,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * type and select first occurance of autocomplete
+   * Type and select first occurance of autocomplete
    */
   function select2($fieldName,$label, $multiple = FALSE, $xpath=FALSE) {
     // In the case of chainSelect, wait for options to load
@@ -2228,7 +2228,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * select multiple options
+   * Select multiple options
    */
   function multiselect2($fieldid, $params) {
     // In the case of chainSelect, wait for options to load
@@ -2264,7 +2264,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * function to enable or disable Pop-ups via Display Preferences
+   * Enable or disable Pop-ups via Display Preferences
    */
   function enableDisablePopups($enabled = TRUE) {
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1');

@@ -134,7 +134,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * test that using option_group_name returns more than 1 & less than all
+   * Test that using option_group_name returns more than 1 & less than all
    */
   public function testGetOptionGroupByName() {
     $activityTypesParams = array('option_group_name' => 'activity_type', 'option.limit' => 100);
@@ -288,7 +288,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
 
 
   /**
-   * update option value with 'id' paramter and the value to update
+   * Update option value with 'id' paramter and the value to update
    * and not passing option group id
    */
   public function testUpdateOptionValueNoGroupId() {
@@ -307,7 +307,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * update option value with 'id' paramter and the value to update
+   * Update option value with 'id' paramter and the value to update
    * and as well as option group id
    */
   public function testUpdateOptionValueWithGroupId() {

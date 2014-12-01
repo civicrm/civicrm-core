@@ -58,7 +58,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   protected $_cdType;
 
   /**
-   * entity sub type of the table id
+   * Entity sub type of the table id
    *
    * @var string
    * @access protected
@@ -66,7 +66,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   protected $_subTypeID;
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * gets session variables for table name, id of entity in table, type of entity and stores them.
    *

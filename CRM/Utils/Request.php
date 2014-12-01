@@ -50,7 +50,7 @@ class CRM_Utils_Request {
   static private $_singleton = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {}
 

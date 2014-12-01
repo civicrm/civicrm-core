@@ -77,7 +77,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   }
 
   /**
-   * @param $event_id
+   * @param int $event_id
    *
    * @return bool|int|null|string
    */
@@ -140,7 +140,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   }
 
   /**
-   * @param null $registeringContactID
+   * @param int $registeringContactID
    * @param array $fields
    *
    * @return int|mixed|null
@@ -166,7 +166,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   }
 
   /**
-   * @param $page_name
+   * @param string $page_name
    *
    * @return mixed
    */

@@ -40,7 +40,7 @@
 class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
 
   /**
-   * static field for default price set details
+   * Static field for default price set details
    *
    * @var array
    * @static
@@ -48,14 +48,14 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   static $_defaultPriceSet = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * takes an associative array and creates a price set object
+   * Takes an associative array and creates a price set object
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
@@ -90,7 +90,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param  int $id id of the database record
    * @param $isActive
@@ -476,7 +476,7 @@ WHERE     ct.id = cp.financial_type_id AND
    *
    * An array containing price set details (including price fields) is returned
    *
-   * @param $setID
+   * @param int $setID
    * @param bool $required
    * @param bool $validOnly
    *
@@ -605,10 +605,10 @@ WHERE  id = %1";
 
   /**
    * @param CRM_Core_Form $form
-   * @param $id
+   * @param int $id
    * @param string $entityTable
    * @param bool $validOnly
-   * @param null $priceSetId
+   * @param int $priceSetId
    *
    * @return bool|false|int|null
    */
@@ -882,7 +882,7 @@ WHERE  id = %1";
   }
 
   /**
-   * build the price set form.
+   * Build the price set form.
    *
    * @param CRM_Core_Form $form
    *
@@ -969,7 +969,7 @@ WHERE  id = %1";
   }
 
   /**
-   * check the current Membership
+   * Check the current Membership
    * having end date null.
    */
   static function checkCurrentMembership(&$options, $userid) {
@@ -999,7 +999,7 @@ WHERE  id = %1";
   }
 
   /**
-   * set daefult the price set fields.
+   * Set daefult the price set fields.
    *
    * @param CRM_Core_Form $form
    * @param $defaults
@@ -1217,7 +1217,7 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * Function to check if auto renew option should be shown
+   * Check if auto renew option should be shown
    *
    * @param int $priceSetId price set id
    *
@@ -1264,7 +1264,7 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * Function to retrieve auto renew frequency and interval
+   * Retrieve auto renew frequency and interval
    *
    * @param int $priceSetId price set id
    *
@@ -1296,7 +1296,7 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * update the is_quick_config flag in the db
+   * Update the is_quick_config flag in the db
    *
    * @param  int      $id             id of the database record
    * @param  boolean  $isQuickConfig  value we want to set the is_quick_config field

@@ -8,7 +8,7 @@ class Event extends PHPUnit_Framework_Testcase {
    * Helper function to create
    * an Event
    *
-   * @param $contactId
+   * @param int $contactId
    *
    * @return mixed $event id of created Event
    */

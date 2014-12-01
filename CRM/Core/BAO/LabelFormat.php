@@ -40,7 +40,7 @@
 class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
 
   /**
-   * static holder for the Label Formats Option Group ID
+   * Static holder for the Label Formats Option Group ID
    */
   private static $_gid = NULL;
 
@@ -319,7 +319,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * retrieve the default Label Format values
+   * Retrieve the default Label Format values
    *
    * @param string $groupName label format group name
    *
@@ -539,7 +539,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * delete a Label Format
+   * Delete a Label Format
    *
    * @param  int  $id     ID of the label format to be deleted.
    * @param  string $groupName group name
