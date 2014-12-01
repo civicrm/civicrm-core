@@ -201,7 +201,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    */
   static function formRule($fields, $files, $form) {

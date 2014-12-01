@@ -9,7 +9,7 @@ class CRM_Case_Audit_Audit {
 
   /**
    * @param $xmlString
-   * @param $confFilename
+   * @param string $confFilename
    */
   public function __construct($xmlString, $confFilename) {
     $this->xmlString = $xmlString;
@@ -211,8 +211,8 @@ class CRM_Case_Audit_Audit {
 
   /**
    * @param $xmlString
-   * @param $clientID
-   * @param $caseID
+   * @param int $clientID
+   * @param int $caseID
    * @param bool $printReport
    *
    * @return mixed

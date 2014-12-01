@@ -95,7 +95,7 @@ class CRM_Utils_File {
   }
 
   /**
-   * create a directory given a path name, creates parent directories
+   * Create a directory given a path name, creates parent directories
    * if needed
    *
    * @param string $path  the path name
@@ -126,7 +126,7 @@ class CRM_Utils_File {
   }
 
   /**
-   * delete a directory given a path name, delete children directories
+   * Delete a directory given a path name, delete children directories
    * and files if needed
    *
    * @param string $target the path name
@@ -265,7 +265,7 @@ class CRM_Utils_File {
 
   /**
    * @param $dsn
-   * @param $fileName
+   * @param string $fileName
    * @param null $prefix
    * @param bool $isQueryString
    * @param bool $dieOnErrors
@@ -359,7 +359,7 @@ class CRM_Utils_File {
   }
 
   /**
-   * remove the 32 bit md5 we add to the fileName
+   * Remove the 32 bit md5 we add to the fileName
    * also remove the unknown tag if we added it
    */
   static function cleanFileName($name) {
@@ -369,7 +369,7 @@ class CRM_Utils_File {
   }
 
   /**
-   * @param $name
+   * @param string $name
    *
    * @return string
    */

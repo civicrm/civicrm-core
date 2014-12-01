@@ -41,7 +41,7 @@ class CRM_Campaign_BAO_Query {
     CIVICRM_ACTIVITY_ASSIGNMENT = 'civicrm_survey_activity_assignment';
 
   /**
-   * static field for all the campaign fields
+   * Static field for all the campaign fields
    *
    * @var array
    * @static
@@ -65,7 +65,7 @@ class CRM_Campaign_BAO_Query {
   }
 
   /**
-   * if survey, campaign are involved, add the specific fields.
+   * If survey, campaign are involved, add the specific fields.
    *
    * @param $query
    *
@@ -215,7 +215,7 @@ class CRM_Campaign_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
@@ -312,7 +312,7 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
   static function searchAction(&$row, $id) {}
 
@@ -335,7 +335,7 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
   }
 
   /**
-   * add all the elements shared between,
+   * Add all the elements shared between,
    * normal voter search and voter listing (GOTV form)
    *
    * @access public

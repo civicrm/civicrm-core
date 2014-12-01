@@ -40,7 +40,7 @@
 class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public

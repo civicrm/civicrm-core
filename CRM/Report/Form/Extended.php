@@ -1323,7 +1323,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    * @param $value
    * @param $row
    * @param $selectedfield
-   * @param $criteriaFieldName
+   * @param string $criteriaFieldName
    *
    * @return array
    */
@@ -1341,7 +1341,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    * @param $value
    * @param $row
    * @param $selectedfield
-   * @param $criteriaFieldName
+   * @param string $criteriaFieldName
    *
    * @return array
    */
@@ -1359,7 +1359,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    * @param $value
    * @param $row
    * @param $selectedfield
-   * @param $criteriaFieldName
+   * @param string $criteriaFieldName
    *
    * @return array
    */
@@ -1377,7 +1377,7 @@ WHERE   line_item_civireport.id IS NOT NULL
   /**
    * @param $value
    * @param $row
-   * @param $fieldname
+   * @param string $fieldname
    *
    * @return mixed
    */

@@ -117,7 +117,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
 
   /**
    * @param $campaignTitle
-   * @param $id
+   * @param int $id
    */
   function onlineContributionAddTest($campaignTitle, $id) {
     // Use default payment processor

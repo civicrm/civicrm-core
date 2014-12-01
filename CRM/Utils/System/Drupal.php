@@ -39,7 +39,7 @@
 class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
   /**
-   * create a user in Drupal.
+   * Create a user in Drupal.
    *
    * @param array  $params associated array
    * @param string $mail email id for cms user
@@ -105,8 +105,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *  @param string $ufName User name
    */
   /**
-   * @param $ufID
-   * @param $ufName
+   * @param int $ufID
+   * @param string $ufName
    */
   function updateCMSName($ufID, $ufName) {
     // CRM-5555
@@ -232,7 +232,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
 
   /**
-   * sets the title of the page
+   * Sets the title of the page
    *
    * @param string $title
    * @param null $pageTitle
@@ -414,7 +414,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * rewrite various system urls to https
+   * Rewrite various system urls to https
    *
    * @param null
    *
@@ -427,7 +427,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * figure out the post url for the form
+   * Figure out the post url for the form
    *
    * @param mix $action the default action if one is pre-specified
    *
@@ -531,7 +531,7 @@ AND    u.status = 1
    * Load user into session
    */
   /**
-   * @param $username
+   * @param string $username
    *
    * @return bool
    */
@@ -570,7 +570,7 @@ AND    u.status = 1
   /**
    * Determine the native ID of the CMS user
    *
-   * @param $username
+   * @param string $username
    * @return int|NULL
    */
   function getUfId($username) {
@@ -654,7 +654,7 @@ AND    u.status = 1
   }
 
   /**
-   * load drupal bootstrap
+   * Load drupal bootstrap
    *
    * @param array $params Either uid, or name & pass.
    * @param boolean $loadUser boolean Require CMS user load.
@@ -811,7 +811,7 @@ AND    u.status = 1
   }
 
   /**
-   * check is user logged in.
+   * Check is user logged in.
    *
    * @return boolean true/false.
    */

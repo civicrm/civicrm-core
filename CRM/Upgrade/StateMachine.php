@@ -40,7 +40,7 @@
 class CRM_Upgrade_StateMachine extends CRM_Core_StateMachine {
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @param object $controller
    * @param const $pages

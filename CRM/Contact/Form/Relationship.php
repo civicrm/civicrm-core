@@ -85,7 +85,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public $_relationshipTypeId;
 
   /**
-   * an array of all relationship names
+   * An array of all relationship names
    *
    * @var array
    */
@@ -112,7 +112,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public $_values;
 
   /**
-   * casid if it called from case context
+   * Casid if it called from case context
    */
   public $_caseId;
 
@@ -541,7 +541,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * date validation
+   * Date validation
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *

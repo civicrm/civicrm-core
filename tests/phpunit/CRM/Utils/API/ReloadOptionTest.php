@@ -90,8 +90,8 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
    * Implementation of hook_civicrm_post used with all our test cases
    *
    * @param $op
-   * @param $objectName
-   * @param $objectId
+   * @param string $objectName
+   * @param int $objectId
    * @param $objectRef
    */
   function onPost($op, $objectName, $objectId, &$objectRef) {

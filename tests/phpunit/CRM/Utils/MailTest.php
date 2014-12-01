@@ -21,7 +21,7 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for add( )
+   * Test case for add( )
    * test with empty params.
    */
   function testFormatRFC822() {

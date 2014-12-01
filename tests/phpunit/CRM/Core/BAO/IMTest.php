@@ -22,7 +22,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
   }
 
   /**
-   * add() method (create and update modes)
+   * Add() method (create and update modes)
    */
   function testAdd() {
     $contactId = Contact::createIndividual();

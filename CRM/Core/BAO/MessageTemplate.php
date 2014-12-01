@@ -61,7 +61,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -74,7 +74,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * add the Message Templates
+   * Add the Message Templates
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -96,12 +96,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * delete the Message Templates
+   * Delete the Message Templates
    *
    * @access public
    * @static
    *
-   * @param $messageTemplatesID
+   * @param int $messageTemplatesID
    *
    * @return object
    */
@@ -126,7 +126,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * get the Message Templates
+   * Get the Message Templates
    *
    * @access public
    * @static
@@ -154,9 +154,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * @param $contactId
+   * @param int $contactId
    * @param $email
-   * @param $messageTemplateID
+   * @param int $messageTemplateID
    * @param $from
    *
    * @return bool|null

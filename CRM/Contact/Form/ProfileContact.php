@@ -37,7 +37,7 @@ class CRM_Contact_Form_ProfileContact {
   protected $_mode;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @param CRM_Core_Form $form
    *
@@ -75,7 +75,7 @@ class CRM_Contact_Form_ProfileContact {
   }
 
   /**
-   * build form for honoree contact / on behalf of organization.
+   * Build form for honoree contact / on behalf of organization.
    *
    * @param CRM_Core_Form $form
    *

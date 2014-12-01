@@ -60,7 +60,7 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
   }
 
   /**
-   * delete an extension
+   * Delete an extension
    *
    * @param  int  $id     Id of the extension to be deleted.
    *

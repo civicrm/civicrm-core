@@ -204,7 +204,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
   }
 
   /**
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $confirm_password
    */

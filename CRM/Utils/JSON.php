@@ -49,7 +49,7 @@ class CRM_Utils_JSON {
   }
 
   /**
-   * create JSON object
+   * Create JSON object
    * @deprecated
    *
    * @param  array  $params     associated array, that needs to be
@@ -72,7 +72,7 @@ class CRM_Utils_JSON {
   }
 
   /**
-   * encode json format for flexigrid, NOTE: "id" should be present in $params for each row
+   * Encode json format for flexigrid, NOTE: "id" should be present in $params for each row
    *
    * @param array $params associated array of values rows
    * @param int $page page no for selector

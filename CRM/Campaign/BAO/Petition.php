@@ -43,7 +43,7 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   }
 
   /**
-   * get Petition Details for dashboard.
+   * Get Petition Details for dashboard.
    *
    * @static
    */
@@ -171,7 +171,7 @@ SELECT  petition.id                         as id,
   }
 
   /**
-   * takes an associative array and creates a petition signature activity
+   * Takes an associative array and creates a petition signature activity
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
@@ -229,9 +229,9 @@ SELECT  petition.id                         as id,
   }
 
   /**
-   * @param $activity_id
-   * @param $contact_id
-   * @param $petition_id
+   * @param int $activity_id
+   * @param int $contact_id
+   * @param int $petition_id
    *
    * @return bool
    */
@@ -279,7 +279,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * get Petition Signature Total
+   * Get Petition Signature Total
    *
    * @param int $surveyId
    *
@@ -322,7 +322,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * get Petition Signature Total
+   * Get Petition Signature Total
    *
    * @param int $surveyId
    *
@@ -352,7 +352,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
 
 
   /**
-   * @param null $surveyId
+   * @param int $surveyId
    *
    * @return array
    */
@@ -383,7 +383,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Function to get Petition Signature Details
+   * Get Petition Signature Details
    *
    * @param int $surveyId
    * @param int $status_id
@@ -481,7 +481,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Function to check if contact has signed this petition
+   * Check if contact has signed this petition
    *
    * @param int $surveyId
    * @param int $contactId
@@ -534,7 +534,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * takes an associative array and sends a thank you or email verification email
+   * Takes an associative array and sends a thank you or email verification email
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *

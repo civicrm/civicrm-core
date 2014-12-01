@@ -50,7 +50,7 @@ abstract class CRM_Import_DataSource {
   abstract public function getInfo();
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @access public
    */

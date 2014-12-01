@@ -51,7 +51,7 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form
    *
    * @return array
    * @access public
@@ -82,7 +82,7 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
   }
 
   /**
-   * process the form
+   * Process the form
    *
    * @return void
    * @access public

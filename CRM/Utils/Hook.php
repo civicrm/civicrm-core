@@ -109,7 +109,7 @@ abstract class CRM_Utils_Hook {
   );
 
   /**
-   * @param $numParams
+   * @param array $numParams
    * @param $arg1
    * @param $arg2
    * @param $arg3
@@ -161,7 +161,7 @@ abstract class CRM_Utils_Hook {
   /**
    * @param $civiModules
    * @param $fnSuffix
-   * @param $numParams
+   * @param array $numParams
    * @param $arg1
    * @param $arg2
    * @param $arg3
@@ -921,7 +921,7 @@ abstract class CRM_Utils_Hook {
 
   /**
    * @param $recordBAO
-   * @param $recordID
+   * @param int $recordID
    * @param $isActive
    *
    * @return mixed

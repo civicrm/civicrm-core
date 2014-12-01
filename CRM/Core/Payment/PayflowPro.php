@@ -45,7 +45,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string $mode the mode of operation: live or test
    *
@@ -626,8 +626,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   //end submit_transaction
 
   /**
-   * @param $recurringProfileID
-   * @param $processorID
+   * @param int $recurringProfileID
+   * @param int $processorID
    *
    * @throws Exception
    */

@@ -7,7 +7,7 @@
 class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -154,7 +154,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   }
 
   /**
-   * check that the token only appears in a table cell. The '</td><td>' separator cannot otherwise work
+   * Check that the token only appears in a table cell. The '</td><td>' separator cannot otherwise work
    * Calculate the number of times it appears IN the cell & the number of times it appears - should be the same!
    *
    * @param $token
@@ -296,7 +296,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param array $contact
    * @param array $contributions
    * @param $groupBy
-   * @param $groupByID
+   * @param int $groupByID
    */
   static function assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID) {
     if (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY) {

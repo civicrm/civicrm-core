@@ -35,14 +35,14 @@
 class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
 
   /**
-   * product information
+   * Product information
    * @var array
    * @static
    */
   private static $productInfo;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -69,7 +69,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -82,9 +82,9 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * delete financial Types
+   * Delete financial Types
    *
-   * @param $premiumID
+   * @param int $premiumID
    *
    * @static
    */
@@ -98,12 +98,12 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * build Premium Block im Contribution Pages
+   * Build Premium Block im Contribution Pages
    *
-   * @param $form CRM_Core_Form
-   * @param $pageID
+   * @param CRM_Core_Form $form
+   * @param int $pageID
    * @param bool $formItems
-   * @param null $selectedProductID
+   * @param int $selectedProductID
    * @param null $selectedOption
    *
    * @static
@@ -167,7 +167,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * build Premium B im Contribution Pages
+   * Build Premium B im Contribution Pages
    *
    * @param CRM_Core_Form $form
    * @param int $productID
@@ -208,9 +208,9 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Function to delete premium associated w/ contribution page.
+   * Delete premium associated w/ contribution page.
    *
-   * @param $contributionPageID
+   * @param int $contributionPageID
    *
    * @static
    */
@@ -242,7 +242,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Function to retrieve premium product and their options
+   * Retrieve premium product and their options
    *
    * @return array product and option arrays
    * @static

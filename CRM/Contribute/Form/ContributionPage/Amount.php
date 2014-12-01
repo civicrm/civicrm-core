@@ -39,7 +39,7 @@
 class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * contribution amount block.
+   * Contribution amount block.
    *
    * @var array
    * @access protected
@@ -272,7 +272,7 @@ SELECT id
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any

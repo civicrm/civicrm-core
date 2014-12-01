@@ -41,7 +41,7 @@
 class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   /**
-   * how many locationBlocks should we display?
+   * How many locationBlocks should we display?
    *
    * @var int
    * @const
@@ -49,7 +49,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   CONST LOCATION_BLOCKS = 1;
 
   /**
-   * the id of the event we are proceessing
+   * The id of the event we are proceessing
    *
    * @var int
    * @protected
@@ -57,7 +57,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_eventId;
 
   /**
-   * the array of ids of all the participant we are proceessing
+   * The array of ids of all the participant we are proceessing
    *
    * @var int
    * @protected
@@ -65,7 +65,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   protected $_participantIDS = NULL;
 
   /**
-   * the id of the participant we are proceessing
+   * The id of the participant we are proceessing
    *
    * @var int
    * @protected
@@ -73,7 +73,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   protected $_participantId;
 
   /**
-   * is participant able to walk registration wizard.
+   * Is participant able to walk registration wizard.
    *
    * @var Boolean
    * @protected
@@ -81,7 +81,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_allowConfirmation;
 
   /**
-   * is participant requires approval
+   * Is participant requires approval
    *
    * @var Boolean
    * @public
@@ -89,7 +89,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_requireApproval;
 
   /**
-   * is event configured for waitlist.
+   * Is event configured for waitlist.
    *
    * @var Boolean
    * @public
@@ -97,7 +97,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_allowWaitlist;
 
   /**
-   * store additional participant ids
+   * Store additional participant ids
    * when there are pre-registered.
    *
    * @var array
@@ -106,7 +106,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_additionalParticipantIds;
 
   /**
-   * the mode that we are in
+   * The mode that we are in
    *
    * @var string
    * @protect
@@ -114,7 +114,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_mode;
 
   /**
-   * the values for the contribution db object
+   * The values for the contribution db object
    *
    * @var array
    * @protected
@@ -122,7 +122,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_values;
 
   /**
-   * the paymentProcessor attributes for this page
+   * The paymentProcessor attributes for this page
    *
    * @var array
    * @protected
@@ -190,7 +190,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_isBillingAddressRequiredForPayLater;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -475,7 +475,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * assign the minimal set of variables to the template
+   * Assign the minimal set of variables to the template
    *
    * @return void
    * @access public
@@ -571,10 +571,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * add the custom fields
+   * Add the custom fields
    *
-   * @param $id
-   * @param $name
+   * @param int $id
+   * @param string $name
    * @param bool $viewOnly
    *
    * @return void
@@ -676,7 +676,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   /**
    * @param CRM_Core_Form $form
-   * @param $eventID
+   * @param int $eventID
    *
    * @throws Exception
    */
@@ -733,9 +733,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * handle process after the confirmation of payment by User
+   * Handle process after the confirmation of payment by User
    *
-   * @param null $contactID
+   * @param int $contactID
    * @param null $contribution
    * @param null $payment
    *
@@ -839,7 +839,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Process the participant
    *
    * @param array $params
-   * @param $contactID
+   * @param int $contactID
    *
    * @return void
    * @access public
@@ -1346,7 +1346,7 @@ WHERE  v.option_group_id = g.id
 
   // set the first participant ID if not set, CRM-10032
   /**
-   * @param $participantID
+   * @param int $participantID
    */
   function processFirstParticipant($participantID) {
     $this->_participantId = $participantID;

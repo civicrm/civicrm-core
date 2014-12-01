@@ -56,44 +56,44 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
   public $_noEmails = FALSE;
 
   /**
-   * all the existing templates in the system
+   * All the existing templates in the system
    *
    * @var array
    */
   public $_templates = NULL;
 
   /**
-   * store "to" contact details
+   * Store "to" contact details
    * @var array
    */
   public $_toContactDetails = array();
 
   /**
-   * store all selected contact id's, that includes to, cc and bcc contacts
+   * Store all selected contact id's, that includes to, cc and bcc contacts
    * @var array
    */
   public $_allContactIds = array();
 
   /**
-   * store only "to" contact ids
+   * Store only "to" contact ids
    * @var array
    */
   public $_toContactIds = array();
 
   /**
-   * store only "cc" contact ids
+   * Store only "cc" contact ids
    * @var array
    */
   public $_ccContactIds = array();
 
   /**
-   * store only "bcc" contact ids
+   * Store only "bcc" contact ids
    * @var array
    */
   public $_bccContactIds = array();
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -164,7 +164,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

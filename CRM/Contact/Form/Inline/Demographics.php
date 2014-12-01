@@ -50,7 +50,7 @@ class CRM_Contact_Form_Inline_Demographics extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
+   * Process the form
    *
    * @return void
    * @access public

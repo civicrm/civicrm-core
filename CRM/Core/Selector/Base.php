@@ -39,7 +39,7 @@
 class CRM_Core_Selector_Base {
 
   /**
-   * the sort order which is computed from the columnHeaders
+   * The sort order which is computed from the columnHeaders
    *
    * @var array
    */
@@ -99,7 +99,7 @@ class CRM_Core_Selector_Base {
   }
 
   /**
-   * compose the template file name from the class name
+   * Compose the template file name from the class name
    *
    * @param string $action the action being performed
    *
@@ -111,7 +111,7 @@ class CRM_Core_Selector_Base {
   }
 
   /**
-   * getter for the sorting direction for the fields which will be displayed on the form.
+   * Getter for the sorting direction for the fields which will be displayed on the form.
    *
    * @param string action the action being performed
    *
@@ -148,7 +148,7 @@ class CRM_Core_Selector_Base {
   }
 
   /**
-   * setter for permission
+   * Setter for permission
    *
    * @var string
    * @access public
@@ -158,7 +158,7 @@ class CRM_Core_Selector_Base {
   }
 
   /**
-   * get the display text in plain language for the search
+   * Get the display text in plain language for the search
    * to display on the results page
    *
    * @return string

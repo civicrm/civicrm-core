@@ -42,7 +42,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     LISTINGS_VISIBILITY = 4;
 
   /**
-   * cache the match clause used in this transaction
+   * Cache the match clause used in this transaction
    *
    * @var string
    */
@@ -108,7 +108,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id           id of the database record
    * @param boolean  $is_active    value we want to set the is_active field
@@ -122,7 +122,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * get all the registration fields
+   * Get all the registration fields
    *
    * @param int $action what action are we doing
    * @param int $mode mode
@@ -177,7 +177,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * get all the listing fields
+   * Get all the listing fields
    *
    * @param int $action what action are we doing
    * @param int $visibility visibility of fields we are interested in
@@ -682,7 +682,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * check the data validity
+   * Check the data validity
    *
    * @param int $userID the user id that we are actually editing
    * @param string $title the title of the group we are interested in
@@ -724,7 +724,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * get the html for the form that represents this particular group
+   * Get the html for the form that represents this particular group
    *
    * @param int $userID the user id that we are actually editing
    * @param string $title the title of the group we are interested in
@@ -876,7 +876,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * searches for a contact in the db with similar attributes
+   * Searches for a contact in the db with similar attributes
    *
    * @param array $params the list of values to be used in the where clause
    * @param int $id the current contact id (hence excluded from matching)
@@ -902,7 +902,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * Given a contact id and a field set, return the values from the db
    * for this contact
    *
-   * @param $cid
+   * @param int $cid
    * @param array $fields the profile fields of interest
    * @param array $values the values for the above fields
    * @param boolean $searchable searchable or not
@@ -1375,7 +1375,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * add the UF Group
+   * Add the UF Group
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -1418,7 +1418,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * make uf join entries for an uf group
+   * Make uf join entries for an uf group
    *
    * @param array $params       (reference) an assoc array of name/value pairs
    * @param int   $ufGroupId    ufgroup id
@@ -1488,7 +1488,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * get the UF Join records for an ufgroup id
+   * Get the UF Join records for an ufgroup id
    *
    * @param int $ufGroupId uf group id
    * @param int $displayName if set return display name in array
@@ -1552,7 +1552,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to delete the uf join record for an uf group
+   * Delete the uf join record for an uf group
    *
    * @param array  $params    (reference) an assoc array of name/value pairs
    *
@@ -1567,7 +1567,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to get the weight for ufjoin record
+   * Get the weight for ufjoin record
    *
    * @param int $ufGroupId     if $ufGroupId get update weight or add weight
    *
@@ -1597,7 +1597,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to get the uf group for a module
+   * Get the uf group for a module
    *
    * @param string $moduleName module name
    * @param int $count no to increment the weight
@@ -1673,7 +1673,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to filter ufgroups based on logged in user contact type
+   * Filter ufgroups based on logged in user contact type
    *
    * @param int $ufGroupId uf group id (profile id)
    * @param int $contactID
@@ -1715,7 +1715,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to add profile field to a form
+   * Add profile field to a form
    *
    * @param CRM_Core_Form $form
    * @param array $field properties
@@ -2220,7 +2220,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to set profile defaults
+   * Set profile defaults
    *
    * @param int     $contactId      contact id
    * @param array   $fields         associative array of fields
@@ -2474,7 +2474,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to get profiles by type  eg: pure Individual etc
+   * Get profiles by type  eg: pure Individual etc
    *
    * @param array   $types      associative array of types eg: types('Individual')
    * @param boolean $onlyPure   true if only pure profiles are required
@@ -2502,7 +2502,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to check whether a profile is valid combination of
+   * Check whether a profile is valid combination of
    * required and/or optional profile types
    *
    * @param array   $required   array of types those are required
@@ -2533,7 +2533,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to check whether a profile is valid combination of
+   * Check whether a profile is valid combination of
    * required profile fields
    *
    * @param array   $ufId       integer id of the profile
@@ -2576,7 +2576,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to get default value for Register.
+   * Get default value for Register.
    *
    * @param $fields
    * @param $defaults
@@ -2754,7 +2754,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to assign uf fields to template
+   * Assign uf fields to template
    *
    * @param int $gid group id
    * @param array $values
@@ -2776,7 +2776,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @param array $params associated array
    *
-   * @param null $contactId
+   * @param int $contactId
    *
    * @return array $data assoicated formatted array
    * @access public
@@ -2907,7 +2907,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * calculate the profile type 'group_type' as per profile fields.
+   * Calculate the profile type 'group_type' as per profile fields.
    *
    * @param int $gId profile id
    * @param bool $includeTypeValues
@@ -2922,7 +2922,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * calculate the profile type 'group_type' as per profile fields.
+   * Calculate the profile type 'group_type' as per profile fields.
    *
    * @param $ufFields
    * @param bool $includeTypeValues
@@ -3263,7 +3263,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to retrieve groups of  profiles
+   * Retrieve groups of  profiles
    *
    * @param integer $profileID id of the profile
    *
@@ -3281,7 +3281,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to alter contact params by filtering existing subscribed groups and returns
+   * Alter contact params by filtering existing subscribed groups and returns
    * unsubscribed groups array for subscription.
    *
    * @param  array  $params             contact params
@@ -3355,7 +3355,7 @@ SELECT  group_id
   }
 
   /**
-   * Function to check if we are rendering mixed profiles
+   * Check if we are rendering mixed profiles
    *
    * @param array $profileIds associated array of profile ids
    *
@@ -3408,7 +3408,7 @@ SELECT  group_id
   }
 
   /**
-   * Function to determine of we show overlay profile or not
+   * Determine of we show overlay profile or not
    *
    * @return boolean true if profile should be shown else false
    * @static
@@ -3433,7 +3433,7 @@ SELECT  group_id
   }
 
   /**
-   * function to get group type values of the profile
+   * Get group type values of the profile
    *
    * @param int $profileId
    * @param string $groupType
@@ -3510,7 +3510,7 @@ SELECT  group_id
   }
 
   /**
-   * get profiles used for batch entry
+   * Get profiles used for batch entry
    *
    * @return array profileIds profile ids
    * @static

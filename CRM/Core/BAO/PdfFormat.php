@@ -40,7 +40,7 @@
 class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
 
   /**
-   * static holder for the PDF Page Formats Option Group ID
+   * Static holder for the PDF Page Formats Option Group ID
    */
   private static $_gid = NULL;
 
@@ -385,7 +385,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * delete a PDF Page Format
+   * Delete a PDF Page Format
    *
    * @param  int  $id     ID of the PDF Page Format to be deleted.
    *

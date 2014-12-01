@@ -98,7 +98,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -124,7 +124,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   ///////////////// civicrm_participant_get methods
 
   /**
-   * check with wrong params type
+   * Check with wrong params type
    */
   function testGetWrongParamsType() {
     $params = 'a string';
@@ -139,7 +139,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with participant_id
+   * Check with participant_id
    */
   function testGetParticipantIdOnly() {
     $params = array(
@@ -168,7 +168,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with params id
+   * Check with params id
    */
   function testGetParamsAsIdOnly() {
     $params = array(
@@ -182,7 +182,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with params id
+   * Check with params id
    */
   function testGetNestedEventGet() {
     //create a second event & add participant to it.
@@ -217,7 +217,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with contact_id
+   * Check with contact_id
    */
   function testGetContactIdOnly() {
     $params = array(
@@ -242,7 +242,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with event_id
+   * Check with event_id
    * fetch first record
    */
   function testGetMultiMatchReturnFirst() {
@@ -255,7 +255,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with event_id
+   * Check with event_id
    * in v3 this should return all participants
    */
   function testGetMultiMatchNoReturnFirst() {
@@ -279,7 +279,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with participant_id
+   * Check with participant_id
    */
   function testSearchParticipantIdOnly() {
     $params = array(
@@ -292,7 +292,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with contact_id
+   * Check with contact_id
    */
   function testSearchContactIdOnly() {
     // Should get 2 participant records for this contact.
@@ -305,7 +305,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with event_id
+   * Check with event_id
    */
   function testSearchByEvent() {
     // Should get >= 3 participant records for this event. Also testing that last_name and event_title are returned.
@@ -324,7 +324,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with event_id
+   * Check with event_id
    * fetch with limit
    */
   function testSearchByEventWithLimit() {
@@ -349,7 +349,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with event_id
+   * Check with event_id
    */
   function testCreateMissingContactID() {
     $params = array(
@@ -359,7 +359,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with contact_id
+   * Check with contact_id
    * without event_id
    */
   function testCreateMissingEventID() {
@@ -370,7 +370,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with contact_id & event_id
+   * Check with contact_id & event_id
    */
   function testCreateEventIdOnly() {
     $params = array(
@@ -382,7 +382,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with complete array
+   * Check with complete array
    */
   function testCreateAllParams() {
     $params = $this->_params;
@@ -519,7 +519,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with complete array
+   * Check with complete array
    */
   function testUpdate() {
     $participantId = $this->participantCreate(array(
@@ -572,7 +572,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testUpdateEmptyParams() {
     $params = array();
@@ -581,7 +581,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check without event_id
+   * Check without event_id
    */
   function testUpdateWithoutEventId() {
     $participantId = $this->participantCreate(array('contactID' => $this->_individualId, 'eventID' => $this->_eventID));
@@ -599,7 +599,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with Invalid participantId
+   * Check with Invalid participantId
    */
   function testUpdateWithWrongParticipantId() {
     $params = array(
@@ -613,7 +613,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with Invalid ContactId
+   * Check with Invalid ContactId
    */
   function testUpdateWithWrongContactId() {
     $participantId = $this->participantCreate(array(
@@ -651,7 +651,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with participant_id
+   * Check with participant_id
    */
   function testParticipantDelete() {
     $params = array(
@@ -662,7 +662,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * check without participant_id
+   * Check without participant_id
    * and with event_id
    * This should return an error because required param is missing..
    */
@@ -674,7 +674,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * delete with a get - a 'criteria delete'
+   * Delete with a get - a 'criteria delete'
    */
   function testNestedDelete() {
     $description  = "Criteria delete by nesting a GET & a DELETE";

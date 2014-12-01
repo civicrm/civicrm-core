@@ -35,7 +35,7 @@
 class CRM_Core_BAO_CustomValueTable {
 
   /**
-   * @param $customParams
+   * @param array $customParams
    *
    * @throws Exception
    */
@@ -251,7 +251,7 @@ class CRM_Core_BAO_CustomValueTable {
   }
 
   /**
-   * given a field return the mysql data type associated with it
+   * Given a field return the mysql data type associated with it
    *
    * @param string $type the civicrm type string
    *
@@ -308,7 +308,7 @@ class CRM_Core_BAO_CustomValueTable {
   /**
    * @param array $params
    * @param $entityTable
-   * @param $entityID
+   * @param int $entityID
    */
   static function store(&$params, $entityTable, $entityID) {
     $cvParams = array();
@@ -355,7 +355,7 @@ class CRM_Core_BAO_CustomValueTable {
    * @param array $params
    * @param $customFields
    * @param $entityTable
-   * @param $entityID
+   * @param int $entityID
    * @param $customFieldExtends
    */
   static function postProcess(&$params, &$customFields, $entityTable, $entityID, $customFieldExtends) {
@@ -484,7 +484,7 @@ AND    $cond
   }
 
   /**
-   * take in an array of entityID, custom_XXX => value
+   * Take in an array of entityID, custom_XXX => value
    * and set the value in the appropriate table. Should also be able
    * to set the value to null. Follows api parameter/return conventions
    *
@@ -623,7 +623,7 @@ AND    cf.id IN ( $fieldIDList )
   }
 
   /**
-   * take in an array of entityID, custom_ID
+   * Take in an array of entityID, custom_ID
    * and gets the value from the appropriate table.
    *
    * To get the values of custom fields with IDs 13 and 43 for contact ID 1327, use:

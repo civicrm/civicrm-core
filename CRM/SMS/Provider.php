@@ -46,7 +46,7 @@ abstract class CRM_SMS_Provider {
   CONST MAX_SMS_CHAR = 460;
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param array $providerParams
    * @param bool $force
@@ -96,7 +96,7 @@ abstract class CRM_SMS_Provider {
   abstract function send($recipients, $header, $message, $dncID = NULL);
 
   /**
-   * return message text. Child class could override this function to have better control over the message being sent.
+   * Return message text. Child class could override this function to have better control over the message being sent.
    *
    * @access public
    */
@@ -120,11 +120,11 @@ abstract class CRM_SMS_Provider {
   }
 
   /**
-   * @param $apiMsgID
+   * @param int $apiMsgID
    * @param $message
    * @param array $headers
-   * @param null $jobID
-   * @param null $userID
+   * @param int $jobID
+   * @param int $userID
    *
    * @return $this|null|object
    * @throws CRM_Core_Exception
@@ -165,7 +165,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $type
    * @param bool $abort
    * @param null $default
@@ -190,7 +190,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    * @param $from
    * @param $body
    * @param null $to
-   * @param null $trackID
+   * @param int $trackID
    *
    * @return $this|null|object
    * @throws CRM_Core_Exception

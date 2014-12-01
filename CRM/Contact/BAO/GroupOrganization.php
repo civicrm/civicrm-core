@@ -35,14 +35,14 @@
 class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganization {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * takes an associative array and creates a groupOrganization object
+   * Takes an associative array and creates a groupOrganization object
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
@@ -108,7 +108,7 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    * @param $defaults
    */
   static function retrieve($groupID, &$defaults) {
@@ -140,7 +140,7 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   }
 
   /**
-   * delete Group Organization
+   * Delete Group Organization
    *
    * @param int $groupOrganizationID group organization id that needs to be deleted
    *

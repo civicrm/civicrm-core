@@ -44,7 +44,7 @@
 class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * @param
    *
@@ -95,7 +95,7 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any

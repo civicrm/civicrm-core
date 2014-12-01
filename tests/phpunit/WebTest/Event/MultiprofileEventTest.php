@@ -316,7 +316,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $eventPageId
+   * @param int $eventPageId
    */
   function _testRemoveProfile($eventPageId) {
     $this->openCiviPage("event/manage/settings", "reset=1&action=update&id=$eventPageId");
@@ -333,7 +333,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $customId
+   * @param int $customId
    *
    * @return array
    */
@@ -555,7 +555,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $profileId
+   * @param int $profileId
    *
    * @return null
    */
@@ -627,12 +627,12 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $eventPageId
-   * @param $customId
-   * @param $firstName
-   * @param $lastName
-   * @param $participantfname
-   * @param $participantlname
+   * @param int $eventPageId
+   * @param int $customId
+   * @param string $firstName
+   * @param string $lastName
+   * @param string $participantfname
+   * @param string $participantlname
    * @param $email1
    * @param $email2
    */
@@ -720,11 +720,11 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $eventPageId
-   * @param $customId
-   * @param $firstName2
-   * @param $lastName2
-   * @param $participantfname2
+   * @param int $eventPageId
+   * @param int $customId
+   * @param string $firstName2
+   * @param string $lastName2
+   * @param string $participantfname2
    * @param $participantlname2
    * @param $email3
    * @param $email4
@@ -817,7 +817,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $cfId
+   * @param int $cfId
    */
   function _removeEmailField($cfId) {
     $this->openCiviPage("admin/uf/group/field", "action=delete&id={$cfId}");

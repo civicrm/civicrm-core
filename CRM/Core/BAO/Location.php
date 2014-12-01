@@ -44,7 +44,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   static $blocks = array('phone', 'email', 'im', 'openid', 'address');
 
   /**
-   * create various elements of location block
+   * Create various elements of location block
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param boolean $fixAddress true if you need to fix (format) address values
@@ -130,7 +130,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   }
 
   /**
-   * takes an entity array and finds the existing location block
+   * Takes an entity array and finds the existing location block
    * @access public
    * @static
    */
@@ -151,7 +151,7 @@ WHERE e.id = %1";
   }
 
   /**
-   * takes an associative array and adds location block
+   * Takes an associative array and adds location block
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *

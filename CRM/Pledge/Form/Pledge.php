@@ -41,7 +41,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   public $_action;
 
   /**
-   * the id of the pledge that we are proceessing
+   * The id of the pledge that we are proceessing
    *
    * @var int
    * @public
@@ -49,7 +49,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   public $_id;
 
   /**
-   * the id of the contact associated with this pledge
+   * The id of the contact associated with this pledge
    *
    * @var int
    * @public
@@ -69,13 +69,13 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   public $_freqUnits;
 
   /**
-   * is current pledge pending.
+   * Is current pledge pending.
    * @public
    */
   public $_isPending = FALSE;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -446,7 +446,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any

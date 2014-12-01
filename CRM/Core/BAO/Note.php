@@ -39,13 +39,13 @@
 class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
 
   /**
-   * const the max number of notes we display at any given time
+   * Const the max number of notes we display at any given time
    * @var int
    */
   CONST MAX_NOTES = 3;
 
   /**
-   * given a note id, retrieve the note text
+   * Given a note id, retrieve the note text
    *
    * @param int  $id   id of the note to retrieve
    *
@@ -59,7 +59,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * given a note id, retrieve the note subject
+   * Given a note id, retrieve the note subject
    *
    * @param int  $id   id of the note to retrieve
    *
@@ -73,7 +73,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * given a note id, decide if the note should be displayed based on privacy setting
+   * Given a note id, decide if the note should be displayed based on privacy setting
    *
    * @param object  $note Either the id of the note to retrieve, or the CRM_Core_DAO_Note object itself
    *
@@ -125,7 +125,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * takes an associative array and creates a note object
+   * Takes an associative array and creates a note object
    *
    * the function extract all the params it needs to initialize the create a
    * note object. the params array could contain additional unused name/value
@@ -279,7 +279,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * delete the notes
+   * Delete the notes
    *
    * @param int $id note id
    * @param boolean $showStatus do we need to set status or not
@@ -328,7 +328,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * delete all records for this contact id
+   * Delete all records for this contact id
    *
    * @param int  $id ID of the contact for which note needs to be deleted.
    *
@@ -351,7 +351,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * retrieve all records for this entity-id
+   * Retrieve all records for this entity-id
    *
    * @param int $id ID of the relationship for which records needs to be retrieved.
    *
@@ -385,7 +385,7 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * get log record count for a Contact
+   * Get log record count for a Contact
    *
    * @param int $contactID
    *
@@ -409,7 +409,7 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * get all descendent notes of the note with given ID
+   * Get all descendent notes of the note with given ID
    *
    * @param int $parentId ID of the note to start from
    * @param int $maxDepth Maximum number of levels to descend into the tree; if not given, will include all descendents.
@@ -514,7 +514,7 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * given a note id, get a list of the ids of all notes that are descendents of that note
+   * Given a note id, get a list of the ids of all notes that are descendents of that note
    *
    * @param int $parentId Id of the given note
    * @param array $ids (reference) one-dimensional array to store found descendent ids
@@ -536,7 +536,7 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * function to delete all note related to contact when contact is deleted
+   * Delete all note related to contact when contact is deleted
    *
    * @param int $contactID contact id whose notes to be deleted
    *

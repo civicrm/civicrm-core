@@ -39,7 +39,7 @@
 class CRM_Price_Form_Set extends CRM_Core_Form {
 
   /**
-   * the set id saved to the session for an update
+   * The set id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -47,7 +47,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   protected $_sid;
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @param null
    *
@@ -79,7 +79,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields  the input form values
    * @param array $files   the uploaded files if any

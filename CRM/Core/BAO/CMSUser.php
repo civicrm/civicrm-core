@@ -45,7 +45,7 @@ require_once 'DB.php';
 class CRM_Core_BAO_CMSUser {
 
   /**
-   * synchronizing cms users with CiviCRM contacts
+   * Synchronizing cms users with CiviCRM contacts
    *
    * @param bool $is_interactive whether to show statuses & perform redirects
    *   This behavior is misplaced in the BAO layer, but we'll preserve it to avoid
@@ -221,7 +221,7 @@ class CRM_Core_BAO_CMSUser {
   }
 
   /**
-   * create CMS user using Profile
+   * Create CMS user using Profile
    *
    * @param array  $params associated array
    * @param string $mail email id for cms user
@@ -255,7 +255,7 @@ class CRM_Core_BAO_CMSUser {
   }
 
   /**
-   * create Form for CMS user using Profile
+   * Create Form for CMS user using Profile
    *
    * @param CRM_Core_Form $form
    * @param integer $gid id of group of profile
@@ -418,7 +418,7 @@ class CRM_Core_BAO_CMSUser {
   }
 
   /**
-   * Function to check if a cms user already exists.
+   * Check if a cms user already exists.
    *
    * @param  Array $contact array of contact-details
    *

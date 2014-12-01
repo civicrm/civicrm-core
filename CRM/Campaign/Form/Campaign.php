@@ -40,28 +40,28 @@
 class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
   /**
-   * action
+   * Action
    *
    * @var int
    */
   protected $_action;
 
   /**
-   * context
+   * Context
    *
    * @var string
    */
   protected $_context;
 
   /**
-   * object values.
+   * Object values.
    *
    * @var array
    */
   protected $_values;
 
   /**
-   * the id of the campaign we are proceessing
+   * The id of the campaign we are proceessing
    *
    * @var int
    * @protected

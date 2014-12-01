@@ -66,7 +66,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
   }
 
   /**
-   * takes an associative array and adds phone
+   * Takes an associative array and adds phone
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *

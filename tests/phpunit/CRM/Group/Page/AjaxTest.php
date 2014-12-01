@@ -81,7 +81,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $_REQUEST = $this->_params;
   }
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContacts() {
     $this->setPermissionAndRequest('view all contacts');
@@ -92,7 +92,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve groups as 'view all contacts' permissioned user
+   * Retrieve groups as 'view all contacts' permissioned user
    * Without setting params the default is both enabled & disabled
    * (if you do set default it is enabled only)
    */
@@ -106,7 +106,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsNotFoundTitle() {
     $this->_params['title'] = 'z';
@@ -115,7 +115,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals(0, $total);
   }
   /**
-   * retrieve groups as 'edit all contacts'
+   * Retrieve groups as 'edit all contacts'
    */
   function testGroupListEditAllContacts() {
     $this->setPermissionAndRequest('edit all contacts');
@@ -126,7 +126,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsEnabled() {
     $this->_params['status'] = 1;
@@ -138,7 +138,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsDisabled() {
     $this->_params['status'] = 2;
@@ -150,7 +150,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsDisabledNotFoundTitle() {
     $this->_params['status'] = 2;
@@ -162,7 +162,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsDisabledFoundTitle() {
     $this->_params['status'] = 2;
@@ -174,7 +174,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsAll() {
     $this->_params['status'] = 3;
@@ -189,7 +189,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
 
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRM() {
     $this->setPermissionAndRequest('access CiviCRM');
@@ -200,7 +200,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
   }
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRMEnabled() {
     $this->_params['status'] = 1;
@@ -210,7 +210,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
   }
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRMDisabled() {
     $this->_params['status'] = 2;
@@ -221,7 +221,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRMAll() {
     $this->_params['status'] = 2;
@@ -232,7 +232,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRMFound() {
     $this->_params['title'] = 'p';
@@ -243,7 +243,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRMNotFound() {
     $this->_params['title'] = 'z';

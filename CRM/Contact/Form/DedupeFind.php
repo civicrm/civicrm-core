@@ -40,13 +40,13 @@
 class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
   /**
-   * defined defaults
+   * Defined defaults
    *
    */
   public $_defaults;
 
   /**
-   * pre processing
+   * Pre processing
    *
    * @return void
    * @access public

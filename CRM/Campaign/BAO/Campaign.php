@@ -35,7 +35,7 @@
 Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
 
   /**
-   * takes an associative array and creates a campaign object
+   * Takes an associative array and creates a campaign object
    *
    * the function extract all the params it needs to initialize the create a
    * contact object. the params array could contain additional unused name/value
@@ -99,7 +99,7 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   }
 
   /**
-   * delete the campaign
+   * Delete the campaign
    *
    * @param  int $id id of the campaign
    *
@@ -308,7 +308,7 @@ Order By  camp.title";
   }
 
   /**
-   * retrieve campaigns for dashboard.
+   * Retrieve campaigns for dashboard.
    *
    * @static
    */
@@ -465,7 +465,7 @@ SELECT  campaign.id               as id,
   }
 
   /**
-   * get Campaigns groups
+   * Get Campaigns groups
    *
    * @param int $campaignId campaign id
    *
@@ -499,7 +499,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -536,7 +536,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    */
   /**
    * @param CRM_Core_Form $form
-   * @param null $connectedCampaignId
+   * @param int $connectedCampaignId
    */
   public static function addCampaign(&$form, $connectedCampaignId = NULL) {
     //some forms do set default and freeze.

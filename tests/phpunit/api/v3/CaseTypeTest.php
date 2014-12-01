@@ -73,14 +73,14 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   }
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testCaseTypeCreateEmpty() {
     $this->callAPIFailure('CaseType', 'create', array());
   }
 
   /**
-   * check if required fields are not passed
+   * Check if required fields are not passed
    */
   function testCaseTypeCreateWithoutRequired() {
     $params = array(
@@ -96,7 +96,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   }
 
   /**
-   * test create methods with valid data
+   * Test create methods with valid data
    * success expected
    */
   function testCaseTypeCreate() {
@@ -181,7 +181,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   }
 
   /**
-   * test create methods with xml file
+   * Test create methods with xml file
    * success expected
    */
   function testCaseTypeCreateWithDefinition() {

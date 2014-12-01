@@ -36,7 +36,7 @@
 class CRM_Report_Utils_Report {
 
   /**
-   * @param null $instanceID
+   * @param int $instanceID
    *
    * @return null|string
    */
@@ -63,7 +63,7 @@ class CRM_Report_Utils_Report {
   }
 
   /**
-   * @param null $instanceID
+   * @param int $instanceID
    *
    * @return array|bool
    */
@@ -123,7 +123,7 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
    * @param $urlValue
    * @param string $query
    * @param bool $absolute
-   * @param null $instanceID
+   * @param int $instanceID
    * @param array $drilldownReport
    *
    * @return bool|string
@@ -174,7 +174,7 @@ WHERE  inst.report_id = %1";
 
   /**
    * @param $fileContent
-   * @param null $instanceID
+   * @param int $instanceID
    * @param string $outputMode
    * @param array $attachments
    *
@@ -325,7 +325,7 @@ WHERE  inst.report_id = %1";
   }
 
   /**
-   * @param $instanceId
+   * @param int $instanceId
    *
    * @return bool
    */
@@ -357,7 +357,7 @@ WHERE  inst.report_id = %1";
    *
    * @instanceId string $str the report instance to check
    *
-   * @param $instanceId
+   * @param int $instanceId
    *
    * @return boolean true if yes, else false
    * @static

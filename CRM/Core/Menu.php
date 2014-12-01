@@ -42,7 +42,7 @@ require_once 'CRM/Core/I18n.php';
 class CRM_Core_Menu {
 
   /**
-   * the list of menu items
+   * The list of menu items
    *
    * @var array
    * @static
@@ -50,7 +50,7 @@ class CRM_Core_Menu {
   static $_items = NULL;
 
   /**
-   * the list of permissioned menu items
+   * The list of permissioned menu items
    *
    * @var array
    * @static
@@ -103,7 +103,7 @@ class CRM_Core_Menu {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $menu
    *
    * @throws Exception

@@ -40,7 +40,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
   static $_processed = NULL;
 
   /**
-   * @param $id
+   * @param int $id
    * @param string $table
    *
    * @return array|null
@@ -67,7 +67,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
   }
 
   /**
-   * add log to civicrm_log table
+   * Add log to civicrm_log table
    *
    * @param array $params  array of name-value pairs of log table.
    *
@@ -81,10 +81,10 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
   }
 
   /**
-   * @param $contactID
-   * @param $tableName
-   * @param $tableID
-   * @param null $userID
+   * @param int $contactID
+   * @param string $tableName
+   * @param int $tableID
+   * @param int $userID
    */
   static function register($contactID,
     $tableName,
@@ -151,7 +151,7 @@ UPDATE civicrm_log
   }
 
   /**
-   * get log record count for a Contact
+   * Get log record count for a Contact
    *
    * @param int $contactID
    *

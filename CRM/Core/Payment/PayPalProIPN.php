@@ -44,7 +44,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   protected $_inputParameters = array();
 
   /**
-   * store for the variables from the invoice string
+   * Store for the variables from the invoice string
    * @var array
    */
   protected $_invoiceData = array();
@@ -61,7 +61,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   protected $_component = 'contribute';
 
   /**
-   * constructor function
+   * Constructor function
    *
    * @param array $inputData contents of HTTP REQUEST
    *
@@ -74,7 +74,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * function exists to get the values from the rp_invoice_id string
+   * Function exists to get the values from the rp_invoice_id string
    *
    * @param string $name e.g. i, values are stored in the string with letter codes
    * @param boolean $abort fatal if not found?

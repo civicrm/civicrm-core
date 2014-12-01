@@ -106,8 +106,8 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
    * Helper function to provide data for custom data import.
    *
    * @param $customGroupTitle
-   * @param $firstName1
-   * @param $firstName2
+   * @param string $firstName1
+   * @param string $firstName2
    * @param $id1
    * @param $id2
    *

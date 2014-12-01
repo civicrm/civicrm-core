@@ -46,14 +46,14 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   public $_single = FALSE;
 
   /**
-   * gives all the statues for conribution
+   * Gives all the statues for conribution
    *
    * @access public
    */
   public $_contributionStatusId;
 
   /**
-   * gives the HTML template of PDF Invoice
+   * Gives the HTML template of PDF Invoice
    *
    * @access public
    */
@@ -67,12 +67,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   public $_invoiceTemplate;
 
   /**
-   * selected output
+   * Selected output
    */
   public $_selectedOutput;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -227,7 +227,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $values
    *
@@ -246,7 +246,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

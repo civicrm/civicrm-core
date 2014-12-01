@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
 
   /**
-   * location block no
+   * Location block no
    */
   private $_locBlockNo;
 
@@ -49,17 +49,17 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   public $_parseStreetAddress;
 
   /**
-   * store address values
+   * Store address values
    */
   public $_values;
 
   /**
-   * form action
+   * Form action
    */
   public $_action;
 
   /**
-   * address id
+   * Address id
    */
   public $_addressId;
 
@@ -76,7 +76,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * call preprocess
+   * Call preprocess
    */
   public function preProcess() {
     parent::preProcess();
@@ -131,7 +131,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form
    *
    * @return array
    * @access public
@@ -161,7 +161,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
+   * Process the form
    *
    * @return void
    * @access public

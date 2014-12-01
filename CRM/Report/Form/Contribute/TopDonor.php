@@ -373,7 +373,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    */
   function add2group($groupID) {
     if (is_numeric($groupID)) {

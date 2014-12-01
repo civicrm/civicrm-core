@@ -35,14 +35,14 @@
 class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * takes an associative array and creates a groupContact object
+   * Takes an associative array and creates a groupContact object
    *
    * the function extract all the params it needs to initialize the create a
    * group object. the params array could contain additional unused name/value
@@ -266,7 +266,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   }
 
   /**
-   * get list of all the groups and groups for a contact
+   * Get list of all the groups and groups for a contact
    *
    * @param  int $contactId contact id
    *
@@ -309,7 +309,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   }
 
   /**
-   * get the list of groups for contact based on status of group membership
+   * Get the list of groups for contact based on status of group membership
    *
    * @param int $contactId contact id
    * @param string $status state of membership
@@ -494,7 +494,7 @@ SELECT    *
   }
 
   /**
-   * takes an associative array and creates / removes
+   * Takes an associative array and creates / removes
    * contacts from the groups
    *
    *
@@ -557,8 +557,8 @@ SELECT    *
   }
 
   /**
-   * @param $contactID
-   * @param $groupID
+   * @param int $contactID
+   * @param int $groupID
    *
    * @return bool
    */

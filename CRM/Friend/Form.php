@@ -45,7 +45,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   CONST NUM_OPTION = 3;
 
   /**
-   * the id of the entity that we are proceessing
+   * The id of the entity that we are proceessing
    *
    * @var int
    * @protected
@@ -53,7 +53,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   protected $_entityId;
 
   /**
-   * the table name of the entity that we are proceessing
+   * The table name of the entity that we are proceessing
    *
    * @var string
    * @protected
@@ -63,7 +63,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   protected $_campaignId;
 
   /**
-   * the contact ID
+   * The contact ID
    *
    * @var int
    * @protected
@@ -229,7 +229,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * validation
+   * Validation
    *
    * @param array $fields
    *

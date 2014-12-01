@@ -53,7 +53,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * create() method (create and update modes)
+   * Create() method (create and update modes)
    */
   function testCreate() {
     $contactId = Contact::createIndividual();
@@ -100,7 +100,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * create() method with custom data
+   * Create() method with custom data
    */
   function testCreateWithCustomData() {
     $contactId = Contact::createIndividual();
@@ -172,7 +172,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * deleteContribution() method
+   * DeleteContribution() method
    */
   function testDeleteContribution() {
     $contactId = Contact::createIndividual();
@@ -211,7 +211,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * create honor-contact method
+   * Create honor-contact method
    */
   function testcreateAndGetHonorContact() {
     $firstName = 'John_' . substr(sha1(rand()), 0, 7);
@@ -295,7 +295,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * display sort name during
+   * Display sort name during
    * contribution batch update through profile
    * sortName();
    */

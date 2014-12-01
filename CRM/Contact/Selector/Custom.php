@@ -50,7 +50,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   static $_links = NULL;
 
   /**
-   * we use desc to remind us what that column is, name is used in the tpl
+   * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    * @static
@@ -65,7 +65,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   static $_properties = array('contact_id', 'contact_type', 'display_name');
 
   /**
-   * formValues is the array returned by exportValues called on
+   * FormValues is the array returned by exportValues called on
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
@@ -74,7 +74,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   public $_formValues;
 
   /**
-   * params is the array in a value used by the search query creator
+   * Params is the array in a value used by the search query creator
    *
    * @var array
    * @access protected
@@ -82,7 +82,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   public $_params;
 
   /**
-   * represent the type of selector
+   * Represent the type of selector
    *
    * @var int
    * @access protected
@@ -92,7 +92,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   protected $_query;
 
   /**
-   * the public visible fields to be shown to the user
+   * The public visible fields to be shown to the user
    *
    * @var array
    * @access protected
@@ -207,7 +207,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * getter for array of the parameters required for creating pager.
+   * Getter for array of the parameters required for creating pager.
    *
    * @param $action
    * @param array $params
@@ -224,7 +224,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
    * @param string $action the action being performed
@@ -269,7 +269,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount
    *
    * @param enum   $action   the action being performed
    * @param int    $offset   the row number to start from
@@ -394,7 +394,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * name of export file.
+   * Name of export file.
    *
    * @param string $output type of output
    *
@@ -414,7 +414,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   /**
    * @param array $params
    * @param $action
-   * @param $sortID
+   * @param int $sortID
    * @param null $displayRelationshipType
    * @param string $queryOperator
    *

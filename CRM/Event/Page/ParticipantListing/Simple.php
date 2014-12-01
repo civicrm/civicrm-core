@@ -110,7 +110,7 @@ LIMIT    $offset, $rowCount";
   /**
    * @param $fromClause
    * @param $whereClause
-   * @param $whereParams
+   * @param array $whereParams
    */
   function pager($fromClause, $whereClause, $whereParams) {
 

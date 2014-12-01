@@ -64,7 +64,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return bool
    */
@@ -105,7 +105,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $isActive
    *
    * @return bool

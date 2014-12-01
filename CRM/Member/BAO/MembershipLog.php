@@ -35,7 +35,7 @@
 class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
 
   /**
-   * add the membership log record
+   * Add the membership log record
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -56,7 +56,7 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
   }
 
   /**
-   * delete membership log record
+   * Delete membership log record
    *
    * @param int $membershipID
    *
@@ -71,7 +71,7 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
   }
 
   /**
-   * @param $contactID
+   * @param int $contactID
    */
   static function resetModifiedID($contactID) {
     $query = "

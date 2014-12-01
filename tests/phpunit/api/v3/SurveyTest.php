@@ -77,7 +77,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   }
 
   /**
-   * test create function succeeds
+   * Test create function succeeds
    */
   public function testCreateSurvey() {
     $result = $this->callAPIAndDocument('survey', 'create', $this->params, __FUNCTION__, __FILE__);
@@ -109,7 +109,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   }
 
   /**
-   * test & document chained delete pattern. Note that explanation of the pattern
+   * Test & document chained delete pattern. Note that explanation of the pattern
    * is best put in the $description variable as it will then be displayed in the
    * test generated examples. (these are to be found in the api/examples folder)
    *

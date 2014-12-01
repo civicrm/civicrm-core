@@ -36,19 +36,19 @@
 class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
 
   /**
-   * the template to display the required "red" asterick
+   * The template to display the required "red" asterick
    * @var string
    */
   static $_requiredTemplate = NULL;
 
   /**
-   * the template to display error messages inline with the form element
+   * The template to display error messages inline with the form element
    * @var string
    */
   static $_errorTemplate = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @param object $stateMachine reference to state machine object
    *
@@ -186,7 +186,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * set the various rendering templates
+   * Set the various rendering templates
    *
    * @param CRM_Core_Form  $page the CRM_Core_Form page
    *
@@ -205,7 +205,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * initialize the various templates
+   * Initialize the various templates
    *
    * @return void
    * @access public

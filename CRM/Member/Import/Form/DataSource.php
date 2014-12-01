@@ -39,7 +39,7 @@
 class CRM_Member_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public

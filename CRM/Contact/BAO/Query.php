@@ -58,7 +58,7 @@ class CRM_Contact_BAO_Query {
     MODE_MAILING = 16384;
 
   /**
-   * the default set of return properties
+   * The default set of return properties
    *
    * @var array
    * @static
@@ -66,7 +66,7 @@ class CRM_Contact_BAO_Query {
   static $_defaultReturnProperties = NULL;
 
   /**
-   * the default set of hier return properties
+   * The default set of hier return properties
    *
    * @var array
    * @static
@@ -74,7 +74,7 @@ class CRM_Contact_BAO_Query {
   static $_defaultHierReturnProperties;
 
   /**
-   * the set of input params
+   * The set of input params
    *
    * @var array
    */
@@ -86,21 +86,21 @@ class CRM_Contact_BAO_Query {
 
   public $_sort;
   /**
-   * the set of output params
+   * The set of output params
    *
    * @var array
    */
   public $_returnProperties;
 
   /**
-   * the select clause
+   * The select clause
    *
    * @var array
    */
   public $_select;
 
   /**
-   * the name of the elements that are in the select clause
+   * The name of the elements that are in the select clause
    * used to extract the values
    *
    * @var array
@@ -108,28 +108,28 @@ class CRM_Contact_BAO_Query {
   public $_element;
 
   /**
-   * the tables involved in the query
+   * The tables involved in the query
    *
    * @var array
    */
   public $_tables;
 
   /**
-   * the table involved in the where clause
+   * The table involved in the where clause
    *
    * @var array
    */
   public $_whereTables;
 
   /**
-   * the where clause
+   * The where clause
    *
    * @var array
    */
   public $_where;
 
   /**
-   * the where string
+   * The where string
    *
    * @var string
    *
@@ -137,7 +137,7 @@ class CRM_Contact_BAO_Query {
   public $_whereClause;
 
   /**
-   * additional permission Where Clause
+   * Additional permission Where Clause
    *
    * @var string
    *
@@ -145,7 +145,7 @@ class CRM_Contact_BAO_Query {
   public $_permissionWhereClause;
 
   /**
-   * the from string
+   * The from string
    *
    * @var string
    *
@@ -153,7 +153,7 @@ class CRM_Contact_BAO_Query {
   public $_fromClause;
 
   /**
-   * additional permission from clause
+   * Additional permission from clause
    *
    * @var string
    *
@@ -161,7 +161,7 @@ class CRM_Contact_BAO_Query {
   public $_permissionFromClause;
 
   /**
-   * the from clause for the simple select and alphabetical
+   * The from clause for the simple select and alphabetical
    * select
    *
    * @var string
@@ -169,7 +169,7 @@ class CRM_Contact_BAO_Query {
   public $_simpleFromClause;
 
   /**
-   * the having values
+   * The having values
    *
    * @var string
    *
@@ -199,28 +199,28 @@ class CRM_Contact_BAO_Query {
   public $_options;
 
   /**
-   * are we in search mode
+   * Are we in search mode
    *
    * @var boolean
    */
   public $_search = TRUE;
 
   /**
-   * should we skip permission checking
+   * Should we skip permission checking
    *
    * @var boolean
    */
   public $_skipPermission = FALSE;
 
   /**
-   * should we skip adding of delete clause
+   * Should we skip adding of delete clause
    *
    * @var boolean
    */
   public $_skipDeleteClause = FALSE;
 
   /**
-   * are we in strict mode (use equality over LIKE)
+   * Are we in strict mode (use equality over LIKE)
    *
    * @var boolean
    */
@@ -243,7 +243,7 @@ class CRM_Contact_BAO_Query {
   public $_primaryLocation = TRUE;
 
   /**
-   * are contact ids part of the query
+   * Are contact ids part of the query
    *
    * @var boolean
    */
@@ -264,14 +264,14 @@ class CRM_Contact_BAO_Query {
   public $_displayRelationshipType = NULL;
 
   /**
-   * reference to the query object for custom values
+   * Reference to the query object for custom values
    *
    * @var Object
    */
   public $_customQuery;
 
   /**
-   * should we enable the distinct clause, used if we are including
+   * Should we enable the distinct clause, used if we are including
    * more than one group
    *
    * @var boolean
@@ -284,7 +284,7 @@ class CRM_Contact_BAO_Query {
   public $_useGroupBy = FALSE;
 
   /**
-   * the relationship type direction
+   * The relationship type direction
    *
    * @var array
    * @static
@@ -292,7 +292,7 @@ class CRM_Contact_BAO_Query {
   static $_relType;
 
   /**
-   * the activity role
+   * The activity role
    *
    * @var array
    * @static
@@ -318,7 +318,7 @@ class CRM_Contact_BAO_Query {
   static $_withContactActivitiesOnly;
 
   /**
-   * use distinct component clause for component searches
+   * Use distinct component clause for component searches
    *
    * @var string
    */
@@ -327,7 +327,7 @@ class CRM_Contact_BAO_Query {
   public $_rowCountClause;
 
   /**
-   * use groupBy component clause for component searches
+   * Use groupBy component clause for component searches
    *
    * @var string
    */
@@ -405,7 +405,7 @@ class CRM_Contact_BAO_Query {
   public $_pseudoConstantsSelect = array();
 
   /**
-   * class constructor which also does all the work
+   * Class constructor which also does all the work
    *
    * @param array $params
    * @param array $returnProperties
@@ -476,7 +476,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * function which actually does all the work for the constructor
+   * Function which actually does all the work for the constructor
    *
    * @return void
    * @access private
@@ -1264,7 +1264,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * generate the query based on what type of query we need
+   * Generate the query based on what type of query we need
    *
    * @param boolean $count
    * @param boolean $sortByChar
@@ -1383,7 +1383,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $grouping
    *
    * @return null
@@ -1480,7 +1480,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $values
    * @param int $wildcard
    * @param bool $useEquals
@@ -2308,7 +2308,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * getter for tables array
+   * Getter for tables array
    *
    * @return array
    * @access public
@@ -2328,7 +2328,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * generate the where clause (used in match contacts and permissions)
+   * Generate the where clause (used in match contacts and permissions)
    *
    * @param array $params
    * @param array $fields
@@ -2352,7 +2352,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * create the from clause
+   * Create the from clause
    *
    * @param array $tables tables that need to be included in this from clause
    *                      if null, return mimimal from clause (i.e. civicrm_contact)
@@ -2620,7 +2620,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * where / qill clause for contact_type
+   * Where / qill clause for contact_type
    *
    * @param $values
    *
@@ -2688,7 +2688,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * where / qill clause for contact_sub_type
+   * Where / qill clause for contact_sub_type
    *
    * @param $values
    *
@@ -2727,7 +2727,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * where / qill clause for groups
+   * Where / qill clause for groups
    *
    * @param $values
    *
@@ -2841,7 +2841,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * where / qill clause for smart groups
+   * Where / qill clause for smart groups
    *
    * @param $values
    *
@@ -2907,7 +2907,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for cms users
+   * Where / qill clause for cms users
    *
    * @param $values
    *
@@ -2931,7 +2931,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * all tag search specific
+   * All tag search specific
    *
    * @param $values
    *
@@ -2999,7 +2999,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for tag
+   * Where / qill clause for tag
    *
    * @param $values
    *
@@ -3086,7 +3086,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where/qill clause for notes
+   * Where/qill clause for notes
    *
    * @param $values
    *
@@ -3134,7 +3134,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $op
    * @param $grouping
    *
@@ -3164,7 +3164,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for sort_name
+   * Where / qill clause for sort_name
    *
    * @param $values
    *
@@ -3323,7 +3323,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for email
+   * Where / qill clause for email
    *
    * @param $values
    *
@@ -3366,7 +3366,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for phone number
+   * Where / qill clause for phone number
    *
    * @param $values
    *
@@ -3389,7 +3389,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for phone type/location
+   * Where / qill clause for phone type/location
    *
    * @param $values
    *
@@ -3407,7 +3407,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for street_address
+   * Where / qill clause for street_address
    *
    * @param $values
    *
@@ -3442,7 +3442,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for street_unit
+   * Where / qill clause for street_unit
    *
    * @param $values
    *
@@ -3477,7 +3477,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for sorting by character
+   * Where / qill clause for sorting by character
    *
    * @param $values
    *
@@ -3494,7 +3494,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for including contact ids
+   * Where / qill clause for including contact ids
    *
    * @return void
    * @access public
@@ -3516,7 +3516,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for postal code
+   * Where / qill clause for postal code
    *
    * @param $values
    *
@@ -3558,7 +3558,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for location type
+   * Where / qill clause for location type
    *
    * @param $values
    * @param null $status
@@ -3678,7 +3678,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for county (if present)
+   * Where / qill clause for county (if present)
    *
    * @param $values
    * @param null $status
@@ -3747,7 +3747,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for state/province AND country (if present)
+   * Where / qill clause for state/province AND country (if present)
    *
    * @param $values
    * @param null $status
@@ -3842,7 +3842,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for change log
+   * Where / qill clause for change log
    *
    * @param $values
    *
@@ -4023,7 +4023,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * where / qill clause for relationship
+   * Where / qill clause for relationship
    *
    * @param $values
    *
@@ -4237,7 +4237,7 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
-   * default set of return properties
+   * Default set of return properties
    *
    * @param int $mode
    *
@@ -4319,7 +4319,7 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
-   * get primary condition for a sql clause
+   * Get primary condition for a sql clause
    *
    * @param int $value
    *
@@ -4335,7 +4335,7 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
-   * wrapper for a simple search query
+   * Wrapper for a simple search query
    *
    * @param array $params
    * @param array $returnProperties
@@ -4452,7 +4452,7 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
-   * create and query the db for an contact search
+   * Create and query the db for an contact search
    *
    * @param int $offset the offset for the query
    * @param int $rowCount the number of rows to return
@@ -4865,7 +4865,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
   }
 
   /**
-   * getter for the qill object
+   * Getter for the qill object
    *
    * @return string
    * @access public
@@ -4875,7 +4875,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
   }
 
   /**
-   * default set of return default hier return properties
+   * Default set of return default hier return properties
    *
    * @return array
    * @access public
@@ -4960,9 +4960,9 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
 
   /**
    * @param $values
-   * @param $tableName
-   * @param $fieldName
-   * @param $dbFieldName
+   * @param string $tableName
+   * @param string $fieldName
+   * @param string $dbFieldName
    * @param $fieldTitle
    * @param bool $appendTimeStamp
    */
@@ -5073,9 +5073,9 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
 
   /**
    * @param $values
-   * @param $tableName
-   * @param $fieldName
-   * @param $dbFieldName
+   * @param string $tableName
+   * @param string $fieldName
+   * @param string $dbFieldName
    * @param $fieldTitle
    * @param null $options
    */
@@ -5463,7 +5463,7 @@ AND   displayRelType.is_active = 1
   }
 
   /**
-   * check and explode a user defined numeric string into an array
+   * Check and explode a user defined numeric string into an array
    * this was the protocol used by search builder in the old old days before we had
    * super nice js widgets to do the hard work
    *
@@ -5505,7 +5505,7 @@ AND   displayRelType.is_active = 1
   }
 
   /**
-   * convert the pseudo constants id's to their names
+   * Convert the pseudo constants id's to their names
    *
    * @param CRM_Core_DAO dao
    * @param bool $return
@@ -5581,7 +5581,7 @@ AND   displayRelType.is_active = 1
   }
 
   /**
-   * include pseudo fields LEFT JOIN
+   * Include pseudo fields LEFT JOIN
    * @param string|array $sort  can be a object or string
    *
    * @return array

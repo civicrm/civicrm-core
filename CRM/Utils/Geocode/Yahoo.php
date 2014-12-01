@@ -40,7 +40,7 @@
 class CRM_Utils_Geocode_Yahoo {
 
   /**
-   * server to retrieve the lat/long
+   * Server to retrieve the lat/long
    *
    * @var string
    * @static
@@ -48,7 +48,7 @@ class CRM_Utils_Geocode_Yahoo {
   static protected $_server = 'query.yahooapis.com';
 
   /**
-   * uri of service
+   * Uri of service
    *
    * @var string
    * @static
@@ -56,7 +56,7 @@ class CRM_Utils_Geocode_Yahoo {
   static protected $_uri = '/v1/public/yql';
 
   /**
-   * function that takes an address array and gets the latitude / longitude
+   * Function that takes an address array and gets the latitude / longitude
    * and postal code for this address. Note that at a later stage, we could
    * make this function also clean up the address into a more valid format
    *

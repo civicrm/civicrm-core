@@ -64,7 +64,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string $mode the mode of operation: live or test
    * @param object  $paymentProcessor the details of the payment processor being invoked
@@ -84,7 +84,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * should the first payment date be configurable when setting up back office recurring payments
+   * Should the first payment date be configurable when setting up back office recurring payments
    * In the case of Authorize.net this is an option
    * @return bool
    */

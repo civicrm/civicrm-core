@@ -64,7 +64,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * test contactTypes() and subTypes() methods with valid data
+   * Test contactTypes() and subTypes() methods with valid data
    * success expected
    */
   function testGetMethods() {
@@ -123,7 +123,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * test subTypes() methods with invalid data
+   * Test subTypes() methods with invalid data
    */
   function testGetMethodsInvalid() {
 
@@ -137,7 +137,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * test add() methods with valid data
+   * Test add() methods with valid data
    * success expected
    */
   function testAdd() {
@@ -170,7 +170,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * test add() with invalid data
+   * Test add() with invalid data
    */
   function testAddInvalid1() {
 
@@ -210,7 +210,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * test del() with valid data
+   * Test del() with valid data
    * success expected
    */
   function testDel() {
@@ -230,7 +230,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * test del() with invalid data
+   * Test del() with invalid data
    */
   function testDelInvalid() {
 

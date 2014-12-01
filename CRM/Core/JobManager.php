@@ -117,7 +117,7 @@ class CRM_Core_JobManager {
   }
 
   /**
-   * @param $id
+   * @param int $id
    */
   public function executeJobById($id) {
     $job = $this->_getJob($id);
@@ -186,7 +186,7 @@ class CRM_Core_JobManager {
    *
    */
   /**
-   * @param null $id
+   * @param int $id
    * @param null $entity
    * @param null $action
    *

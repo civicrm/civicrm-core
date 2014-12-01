@@ -38,14 +38,14 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   const CACHE_KEY_STRLEN = 8;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -60,7 +60,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * get existing / build navigation for CiviCRM Admin Menu
+   * Get existing / build navigation for CiviCRM Admin Menu
    *
    * @static
    * @return array associated array
@@ -81,7 +81,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * add/update navigation record
+   * Add/update navigation record
    *
    * @param array associated array of submitted values
    *
@@ -211,7 +211,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
   }
 
   /**
-   * helper function for getNavigationList( )
+   * Helper function for getNavigationList( )
    *
    * @param array $list menu info
    * @param array $navigations navigation menus
@@ -232,7 +232,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
   }
 
   /**
-   * helper function for getNavigationList( )
+   * Helper function for getNavigationList( )
    *
    * @param string $val menu name
    * @param array $pidGroups parent menus
@@ -253,7 +253,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
   }
 
   /**
-   * build navigation tree
+   * Build navigation tree
    *
    * @param array   $navigationTree nested array of menus
    * @param int     $parentID       parent id
@@ -306,7 +306,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Function to build menu
+   * Build menu
    *
    * @param boolean $json by default output is html
    * @param boolean $navigationMenu true when called for building top navigation menu
@@ -450,7 +450,7 @@ ORDER BY parent_id, weight";
    * Get Menu name
    *
    * @param $value
-   * @param $skipMenuItems
+   * @param array $skipMenuItems
    * @return bool|string
    */
   static function getMenuName(&$value, &$skipMenuItems) {
@@ -559,7 +559,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Function to create navigation for CiviCRM Admin Menu
+   * Create navigation for CiviCRM Admin Menu
    *
    * @param int $contactID contact id
    *
@@ -659,7 +659,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Function to process navigation
+   * Process navigation
    *
    * @param array $params associated array, $_GET
    *
@@ -693,7 +693,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Function to process move action
+   * Process move action
    *
    * @param $nodeID node that is being moved
    * @param $referenceID parent id where node is moved. 0 mean no parent
@@ -758,7 +758,7 @@ ORDER BY parent_id, weight";
   /**
    *  Function to process rename action for tree
    *
-   * @param $nodeID
+   * @param int $nodeID
    * @param $label
    */
   static function processRename($nodeID, $label) {
@@ -766,9 +766,9 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Function to process delete action for tree
+   * Process delete action for tree
    *
-   * @param $nodeID
+   * @param int $nodeID
    */
   static function processDelete($nodeID) {
     $query = "DELETE FROM civicrm_navigation WHERE id = {$nodeID}";
@@ -776,7 +776,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Function to get the info on navigation item
+   * Get the info on navigation item
    *
    * @param int $navigationID  navigation id
    *
@@ -795,7 +795,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Function to update menu
+   * Update menu
    *
    * @param array  $params
    * @param array  $newParams new value of params
@@ -811,7 +811,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * @param $cid
+   * @param int $cid
    *
    * @return object|string
    */

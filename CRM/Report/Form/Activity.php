@@ -566,7 +566,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    *
    * @throws Exception
    */

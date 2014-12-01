@@ -40,7 +40,7 @@
 class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * the type of pcp component.
+   * The type of pcp component.
    *
    * @var int
    * @protected
@@ -100,7 +100,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * validation
+   * Validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *

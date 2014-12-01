@@ -40,7 +40,7 @@
 class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -82,7 +82,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

@@ -39,7 +39,7 @@
 class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * store membership price set id
+   * Store membership price set id
    */
   protected $_memPriceSetId = NULL;
 
@@ -212,12 +212,12 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
   }
 
   /**
-   * validation
+   * Validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
    * @param $files
-   * @param null $contributionPageId
+   * @param int $contributionPageId
    *
    * @return mixed true or array of errors
    * @access public

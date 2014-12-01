@@ -115,7 +115,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * check without contribution_id
+   * Check without contribution_id
    */
   function testPaymentCreateMissingContributionId() {
     //Without Payment EntityID
@@ -126,7 +126,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with valid array
+   * Check with valid array
    */
   function testPaymentCreate() {
     //Create Contribution & get contribution ID
@@ -158,7 +158,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testPaymentUpdateEmpty() {
     $params = array();
@@ -166,7 +166,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with missing participant_id
+   * Check with missing participant_id
    */
   function testPaymentUpdateMissingParticipantId() {
     //WithoutParticipantId
@@ -177,7 +177,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with missing contribution_id
+   * Check with missing contribution_id
    */
   function testPaymentUpdateMissingContributionId() {
     $params = array(
@@ -186,7 +186,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * check financial records for offline Participants
+   * Check financial records for offline Participants
    */
   function testPaymentOffline() {
 
@@ -212,7 +212,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * check financial records for online Participant
+   * Check financial records for online Participant
    */
   function testPaymentOnline() {
 
@@ -245,7 +245,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * check financial records for online Participant pay later scenario
+   * Check financial records for online Participant pay later scenario
    */
   function testPaymentPayLaterOnline() {
 
@@ -290,7 +290,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testPaymentDeleteWithEmptyParams() {
     $params = array();
@@ -299,7 +299,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with wrong id
+   * Check with wrong id
    */
   function testPaymentDeleteWithWrongID() {
     $params = array(
@@ -309,7 +309,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with valid array
+   * Check with valid array
    */
   function testPaymentDelete() {
 

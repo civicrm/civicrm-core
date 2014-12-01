@@ -158,7 +158,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set extends CRM_Core_DAO
     public $is_reserved;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set

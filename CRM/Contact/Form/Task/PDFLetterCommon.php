@@ -40,7 +40,7 @@
 class CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @param CRM_Core_Form $form
    *
@@ -65,7 +65,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
    * @param CRM_Core_Form $form
-   * @param $cid
+   * @param int $cid
    */
   static function preProcessSingle(&$form, $cid) {
     $form->_contactIds = array($cid);
@@ -202,7 +202,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * form rule
+   * Form rule
    *
    * @param array $fields    the input form values
    * @param array $dontCare
@@ -236,7 +236,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * part of the post process which prepare and extract information from the template
+   * Part of the post process which prepare and extract information from the template
    *
    * @access protected
    *
@@ -311,7 +311,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

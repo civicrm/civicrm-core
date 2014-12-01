@@ -155,8 +155,8 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
   }
 
   /**
-   * @param $firstName
-   * @param $lastName
+   * @param string $firstName
+   * @param string $lastName
    *
    * @return bool
    */
@@ -197,8 +197,8 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
   }
 
   /**
-   * @param $firstName
-   * @param $lastName
+   * @param string $firstName
+   * @param string $lastName
    * @param $options
    */
   function _addIndividual($firstName, $lastName, $options) {

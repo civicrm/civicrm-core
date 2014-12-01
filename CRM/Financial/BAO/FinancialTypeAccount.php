@@ -36,14 +36,14 @@
 class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFinancialAccount {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct( ) {
     parent::__construct( );
   }
 
   /**
-   * financial account
+   * Financial account
    * @var array
    * @static
    */
@@ -73,7 +73,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * add the financial types
+   * Add the financial types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -102,7 +102,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * delete financial Types
+   * Delete financial Types
    *
    * @param int $financialTypeAccountId
    * @param int $accountId
@@ -158,7 +158,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * get Financial Account Name
+   * Get Financial Account Name
    *
    * @param int $entityId
    *
@@ -186,7 +186,7 @@ AND entity_id = %2";
   }
 
   /**
-   * Function to financial Account for payment instrument
+   * Financial Account for payment instrument
    *
    * @param int $paymentInstrumentValue payment instrument value
    *
@@ -218,7 +218,7 @@ WHERE cog.name = 'payment_instrument' ";
   }
 
   /**
-   * Function to create default entity financial accounts
+   * Create default entity financial accounts
    * for financial type
    * CRM-12470
    *

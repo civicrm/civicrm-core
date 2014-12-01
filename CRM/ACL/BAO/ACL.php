@@ -674,7 +674,7 @@ SELECT $acl.*
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -691,7 +691,7 @@ SELECT $acl.*
 
   /**
    * @param $str
-   * @param $contactID
+   * @param int $contactID
    *
    * @return bool
    */
@@ -725,7 +725,7 @@ SELECT count( a.id )
    * @param $type
    * @param $tables
    * @param $whereTables
-   * @param null $contactID
+   * @param int $contactID
    *
    * @return null|string
    */
@@ -847,7 +847,7 @@ SELECT g.*
 
   /**
    * @param int $type
-   * @param null $contactID
+   * @param int $contactID
    * @param string $tableName
    * @param null $allGroups
    * @param null $includedGroups
@@ -963,7 +963,7 @@ ORDER BY a.object_id
   }
 
   /**
-   * delete ACL records
+   * Delete ACL records
    *
    * @param  int  $aclId     ID of the ACL record to be deleted.
    *

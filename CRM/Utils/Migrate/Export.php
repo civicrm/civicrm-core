@@ -396,7 +396,7 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
-   * @param $groupName
+   * @param string $groupName
    * @param string $daoName
    * @param null $sql
    */

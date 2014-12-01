@@ -17,7 +17,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    */
   protected $_params = array();
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
     parent::__construct();
@@ -30,7 +30,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * the initializer code, called before the processing
+   * The initializer code, called before the processing
    *
    * @return void
    * @access public
@@ -50,7 +50,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * handle the values in mapField mode
+   * Handle the values in mapField mode
    *
    * @param array $values the array of values belonging to this line
    *
@@ -62,7 +62,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * handle the values in preview mode
+   * Handle the values in preview mode
    *
    * @param array $values the array of values belonging to this line
    *
@@ -122,7 +122,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * handle the values in import mode
+   * Handle the values in import mode
    *
    * @param int $onDuplicate the code for what action to take on duplicates
    * @param array $values the array of values belonging to this line
@@ -198,7 +198,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * the initializer code, called before the processing
+   * The initializer code, called before the processing
    *
    * @return void
    * @access public

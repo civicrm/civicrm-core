@@ -1331,7 +1331,7 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
  * @param bool $dupeCheck
  * @param bool $dupeErrorArray
  * @param bool $requiredCheck
- * @param null $dedupeRuleGroupID
+ * @param int $dedupeRuleGroupID
  *
  * @return array|null
  */
@@ -1465,7 +1465,7 @@ function _civicrm_api3_deprecated_contact_check_params(
 /**
  *
  * @param $result
- * @param $activityTypeID
+ * @param int $activityTypeID
  *
  * @return array <type> $params
  */

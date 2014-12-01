@@ -47,7 +47,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method add()
+   * Check method add()
    */
   function testAdd() {
     $ids = array();
@@ -72,7 +72,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method retrieve( )
+   * Check method retrieve( )
    */
   function testRetrieve() {
     $ids = array();
@@ -94,7 +94,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method setIsActive( )
+   * Check method setIsActive( )
    */
   function testSetIsActive() {
     $ids = array();
@@ -120,7 +120,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method del( )
+   * Check method del( )
    */
   function testDel() {
     $ids = array();

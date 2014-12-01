@@ -75,7 +75,7 @@ class CRM_Core_Config_Defaults {
   }
 
   /**
-   * format size
+   * Format size
    *
    * @access public
    * @static
@@ -106,7 +106,7 @@ class CRM_Core_Config_Defaults {
   }
 
   /**
-   * set the default values
+   * Set the default values
    *
    * @param array $defaults associated array of form elements
    * @param bool|\boolena $formMode this funtion is called to set default

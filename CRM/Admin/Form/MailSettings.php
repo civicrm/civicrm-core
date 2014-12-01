@@ -103,7 +103,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

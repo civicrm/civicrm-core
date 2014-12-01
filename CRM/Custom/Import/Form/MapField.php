@@ -8,12 +8,12 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
   protected $_mappingType = 'Import Multi value custom data';
   protected $_highlightedFields = array();
   /**
-   * entity being imported to
+   * Entity being imported to
    * @var string
    */
   protected $_entity;
   /**
-   * set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -57,7 +57,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
    }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

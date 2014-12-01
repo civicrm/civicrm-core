@@ -52,7 +52,7 @@ class CRM_Case_BAO_Query {
   }
 
   /**
-   * build select for Case
+   * Build select for Case
    *
    * @param $query
    *
@@ -244,7 +244,7 @@ class CRM_Case_BAO_Query {
   }
 
   /**
-   * where clause for a single field
+   * Where clause for a single field
    *
    * @param $values
    * @param $query
@@ -530,7 +530,7 @@ class CRM_Case_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
@@ -604,7 +604,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   }
 
   /**
-   * getter for the qill object
+   * Getter for the qill object
    *
    * @return string
    * @access public
@@ -696,7 +696,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   }
 
   /**
-   * add all the elements shared between case search and advanaced search
+   * Add all the elements shared between case search and advanaced search
    *
    * @access public
    *
@@ -773,7 +773,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
   static function searchAction(&$row, $id) {}
 }

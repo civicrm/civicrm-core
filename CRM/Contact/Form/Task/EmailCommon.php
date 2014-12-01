@@ -317,7 +317,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   }
 
   /**
-   * form rule
+   * Form rule
    *
    * @param array $fields    the input form values
    * @param array $dontCare
@@ -346,7 +346,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

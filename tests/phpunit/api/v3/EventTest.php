@@ -276,7 +276,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   ///////////////// civicrm_event_create methods
 
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -392,7 +392,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * check event_id still supported for delete
+   * Check event_id still supported for delete
    */
   function testDeleteWithEventId() {
     $params = array(
@@ -510,7 +510,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * test api_action param also works
+   * Test api_action param also works
    */
   function testgetfieldsRest() {
     $description = "demonstrate use of getfields to interrogate api";

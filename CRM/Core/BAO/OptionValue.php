@@ -35,7 +35,7 @@
 class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -142,7 +142,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -155,7 +155,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * add an Option Value
+   * Add an Option Value
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -222,7 +222,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * delete Option Value
+   * Delete Option Value
    *
    * @param int $optionValueId
    *
@@ -242,7 +242,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * retrieve activity type label and description
+   * Retrieve activity type label and description
    *
    * @param int     $activityTypeId  activity type id
    *
@@ -280,7 +280,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * updates contacts affected by the option value passed.
+   * Updates contacts affected by the option value passed.
    *
    * @param Integer $optionValueId     the option value id.
    * @param int     $action            the action describing whether prefix/suffix was UPDATED or DELETED
@@ -409,7 +409,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * updates options values weights.
+   * Updates options values weights.
    *
    * @param int $opGroupId
    * @param array $opWeights options value , weight pair

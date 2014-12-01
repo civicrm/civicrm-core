@@ -130,7 +130,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param bool $convert
    *
    * @return float|int|mixed

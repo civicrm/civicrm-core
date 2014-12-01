@@ -58,7 +58,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Membership extends CRM_Contact_For
   }
 
   /**
-   * get membership ids in entity tables.
+   * Get membership ids in entity tables.
    *
    * @param string $queryText
    * @param string $entityIDTableName

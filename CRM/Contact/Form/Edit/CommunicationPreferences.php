@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Edit_CommunicationPreferences {
 
   /**
-   * greetings
+   * Greetings
    * @var array
    * @static
    */
@@ -131,7 +131,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
