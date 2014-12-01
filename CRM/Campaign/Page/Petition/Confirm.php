@@ -44,7 +44,10 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
     $subscribe_id = CRM_Utils_Request::retrieve('sid', 'Integer', CRM_Core_DAO::$_nullObject);
     $hash         = CRM_Utils_Request::retrieve('h', 'String', CRM_Core_DAO::$_nullObject);
     $activity_id  = CRM_Utils_Request::retrieve('a', 'String', CRM_Core_DAO::$_nullObject);
-    $petition_id  = CRM_Utils_Request::retrieve('p', 'String', CRM_Core_DAO::$_nullObject);
+    $petition_id  = CRM_Utils_Request::retrieve('pid', 'String', CRM_Core_DAO::$_nullObject);
+    if (!$petition_id) {
+      $petition_id  = CRM_Utils_Request::retrieve('p', 'String', CRM_Core_DAO::$_nullObject);
+    }
 
     if (!$contact_id ||
       !$subscribe_id ||
