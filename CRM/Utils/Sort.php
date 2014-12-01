@@ -275,17 +275,23 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * Universal callback function for sorting by weight
+   * Universal callback function for sorting by weight or id
    *
    * @param $a
    * @param $b
    *
-   * @return array of items sorted by weight
+   * @return array of items sorted by weight (or id if weights are the same)
    * @access public
    */
   static function cmpFunc($a, $b) {
     if($a['weight'] == $b['weight']) {
-      return strcmp($a['title'], $b['title']);
+      $result = strcmp($a['id'], $b['id']);
+      // return -1 for equal ids to keep the behavior
+      // of the original function for equal weights
+      if ($result == 0) {
+        return -1;
+      }
+      return $result;
     }
     return ($a['weight'] <= $b['weight']) ? -1 : 1;
   }
