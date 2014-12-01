@@ -284,7 +284,9 @@ class CRM_Utils_Sort {
    * @access public
    */
   static function cmpFunc($a, $b) {
+    if($a['weight'] == $b['weight']) {
+      return strcmp($a['title'], $b['title']);
+    }
     return ($a['weight'] <= $b['weight']) ? -1 : 1;
   }
 }
-
