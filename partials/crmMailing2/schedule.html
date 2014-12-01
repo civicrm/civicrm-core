@@ -1,1 +1,13 @@
-schedule.html
+<div style="width: 98%" ng-controller="EditScheduleCtrl">
+  <div style="width: 40em; text-align: left; margin: auto;">
+    <div>
+      <input ng-model="schedule.mode" type="radio" name="send" value="now" id="schedule-send-now"/>
+      <label for="schedule-send-now">{{ts('Send immediately')}}</label>
+    </div>
+    <div>
+      <input ng-model="schedule.mode" type="radio" name="send" value="at" id="schedule-send-at"/>
+      <label for="schedule-send-at">{{ts('Send at:')}}</label>
+      <span crm-ui-date-time="schedule.datetime"></span>
+    </div>
+  </div>
+</div>
