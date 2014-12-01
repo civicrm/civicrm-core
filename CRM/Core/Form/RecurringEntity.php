@@ -238,7 +238,7 @@ class CRM_Core_Form_RecurringEntity {
     $errors = array();
     //Process this function only when you get this variable
     if ($values['allowRepeatConfigToSubmit'] == 1) {
-      $dayOfTheWeek = array(monday,tuesday,wednesday,thursday,friday,saturday,sunday);
+      $dayOfTheWeek = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
       //Repeats
       if (!CRM_Utils_Array::value('repetition_frequency_unit', $values)) {
         $errors['repetition_frequency_unit'] = ts('This is a required field');
@@ -337,7 +337,8 @@ class CRM_Core_Form_RecurringEntity {
         }
 
         //Save post params to the schedule reminder table
-        $dbParams = CRM_Core_BAO_RecurringEntity::mapFormValuesToDB($params);
+        $recurobj = new CRM_Core_BAO_RecurringEntity();
+        $dbParams = $recurobj->mapFormValuesToDB($params);
 
         //Delete repeat configuration and rebuild
         if (CRM_Utils_Array::value('id', $params)) {
@@ -459,7 +460,9 @@ class CRM_Core_Form_RecurringEntity {
           $recursion->excludeDates = $excludeDateList;
           $recursion->excludeDateRangeColumns = $params['excludeDateRangeColumns'];
         }
-        $recursion->intervalDateColumns = $params['intervalDateColumns'];
+        if (CRM_Utils_Array::value('intervalDateColumns', $params)) {
+          $recursion->intervalDateColumns = $params['intervalDateColumns'];
+        }
         $recursion->entity_id = $params['entity_id'];
         $recursion->entity_table = $params['entity_table'];
         if (!empty($linkedEntities)) {
