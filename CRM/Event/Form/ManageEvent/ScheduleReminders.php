@@ -49,7 +49,6 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
   function preProcess() {
     parent::preProcess();
     $setTab = CRM_Utils_Request::retrieve('setTab', 'Int', $this, FALSE, 0);
-    $component = CRM_Utils_Request::retrieve('component', 'String', $this);
 
     $field = 'civicrm_event';
     if ($this->_isTemplate) {
@@ -85,7 +84,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
 
     $this->assign('rows', $reminderList);
     $this->assign('setTab' , $setTab);
-    $this->assign('component' , $component);
+    $this->assign('component' , 'event');
 
     // Update tab "disabled" css class
     $this->ajaxResponse['tabValid'] = is_array($reminderList) && (count($reminderList) > 0);
