@@ -134,34 +134,8 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    * @static
    */
   function browse($action = NULL) {
-    $links = self::links();
-
     // Get list of configured reminders
-    $component = CRM_Utils_Request::retrieve('component', 'String', $this);
-    $id =  CRM_Utils_Request::retrieve('id', 'Integer', $this);
-    $field = NULL;
-    if (!empty($id)) {
-      $setTab = CRM_Utils_Request::retrieve('setTab', 'Integer', $this);
-      //TODO : Native tasks related to chosen $component can be handled via switch cases
-      //Tasks like - setting tabHeader, title etc.
-      switch ($component) {
-        case 'event':
-          $title = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'title');
-          CRM_Utils_System::setTitle(ts('Configure Event - %1', $title));
-          if ($setTab) {
-            $this->setVar('_id', $id);
-            CRM_Event_Form_ManageEvent_TabHeader::build($this);
-          }
-          break;
-      }
-      $field = "civicrm_{$component}";
-      $links[CRM_Core_Action::DELETE]['qs'] .= "&context={$component}&compId={$id}";
-      $links[CRM_Core_Action::UPDATE]['qs'] .= "&context={$component}&compId={$id}";
-      $this->assign('component', $component);
-      $this->assign('compId', $id);
-    }
-
-    $reminderList = CRM_Core_BAO_ActionSchedule::getList(FALSE, $field, $id);
+    $reminderList = CRM_Core_BAO_ActionSchedule::getList();
 
     if (is_array($reminderList)) {
       // Add action links to each of the reminders
@@ -174,7 +148,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
           $action -= CRM_Core_Action::DISABLE;
         }
         $format['action'] = CRM_Core_Action::formLink(
-          $links,
+          self::links(),
           $action,
           array('id' => $format['id']),
           ts('more'),

@@ -335,15 +335,16 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
     else {
       $defaults = $this->_values;
-      $entityValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        CRM_Utils_Array::value('entity_value', $defaults)
-      );
-      $entityStatus = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        CRM_Utils_Array::value('entity_status', $defaults)
-      );
-      $defaults['entity'][0] = CRM_Utils_Array::value('mapping_id', $defaults);
-      $defaults['entity'][1] = $entityValue;
-      $defaults['entity'][2] = $entityStatus;
+      $entityValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('entity_value', $defaults));
+      $entityStatus = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('entity_status', $defaults));
+      if (empty($this->_context)) {
+        $defaults['entity'][0] = CRM_Utils_Array::value('mapping_id', $defaults);
+        $defaults['entity'][1] = $entityValue;
+        $defaults['entity'][2] = $entityStatus;
+      }
+      else {
+        $defaults['entity'] = $entityStatus;
+      }
       if ($absoluteDate = CRM_Utils_Array::value('absolute_date', $defaults)) {
         list($date, $time) = CRM_Utils_Date::setDateDefaults($absoluteDate);
         $defaults['absolute_date'] = $date;
@@ -602,7 +603,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
 
       if ($this->_context == 'event' && $this->_compId) {
-        $url = CRM_Utils_System::url('civicrm/event/manage/reminder', "reset=1&action=browse&id={$this->_compId}&component={$this->_context}");
+        $url = CRM_Utils_System::url('civicrm/event/manage/reminder', "reset=1&action=browse&id={$this->_compId}&component={$this->_context}&setTab=1");
         $session = CRM_Core_Session::singleton();
         $session->pushUserContext($url);
       }

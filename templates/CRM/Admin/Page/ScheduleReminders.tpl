@@ -25,9 +25,10 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is for configuring Scheduled Reminders *}
-
-{if $tabHeader}
-  {include file="CRM/common/TabHeader.tpl"}
+{if $setTab eq 1}
+  {if $component eq 'event'}
+     {include file="CRM/Event/Form/ManageEvent/Tab.tpl"}
+  {/if}
 {else}
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
    {include file="CRM/Admin/Form/ScheduleReminders.tpl"}
@@ -55,12 +56,13 @@
     </div>
   {/if}
   <div class="action-link">
+    {assign var='link' value="civicrm/admin/scheduleReminders"}
     {if $component}
-      {assign var='urlParams' value="action=add&context=$component&compId=$compId&reset=1"}
+      {assign var='urlParams' value="action=add&context=$component&compId=$id&reset=1"}
     {else}
       {assign var='urlParams' value="action=add&reset=1"}
     {/if}
-    <a href="{crmURL q=$urlParams}" id="newScheduleReminder" class="button"><span><div class="icon add-icon"></div>{ts}Add Reminder{/ts}</span></a>
+    <a href="{crmURL p=$link q=$urlParams}" id="newScheduleReminder" class="button"><span><div class="icon add-icon"></div>{ts}Add Reminder{/ts}</span></a>
   </div>
 {/if}
 {/if}

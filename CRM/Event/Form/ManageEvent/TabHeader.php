@@ -166,7 +166,6 @@ WHERE      e.id = %1
 
       case 'ScheduleReminders':
         $class = 'reminder';
-        $action = 'browse';
         break;
 
       default:
@@ -190,8 +189,12 @@ WHERE      e.id = %1
           $tabs[$key]['qfKey'] = NULL;
         }
 
+        if ($key == 'reminder') {
+          $action = 'browse';
+        }
+
         $tabs[$key]['link'] = CRM_Utils_System::url("civicrm/event/manage/{$key}",
-          "{$reset}action={$action}&id={$eventID}&component=event{$new}{$tabs[$key]['qfKey']}"
+          "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}"
         );
       }
     }
