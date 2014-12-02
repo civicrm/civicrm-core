@@ -29,7 +29,7 @@
 
     // example: <input crm-ui-date="myobj.datefield" />
     // example: <input crm-ui-date="myobj.datefield" crm-ui-date-format="yy-mm-dd" />
-    .directive('crmUiDate', function ($parse, $timeout, crmWatcher) {
+    .directive('crmUiDate', function ($parse, $timeout) {
       return {
         restrict: 'AE',
         scope: {
@@ -39,7 +39,6 @@
         link: function (scope, element, attrs) {
           var fmt = attrs.crmUiDateFormat ? $parse(attrs.crmUiDateFormat)() : "yy-mm-dd";
           var model = $parse(attrs.crmUiDate);
-          var watcher = crmWatcher();
 
           element.addClass('dateplugin');
           $(element).datepicker({
@@ -47,9 +46,9 @@
           });
 
           var updateChildren = (function() {
-            watcher.suspend('children', function(){
-              $(element).datepicker('setDate', model(scope.$parent));
-            });
+            element.off('change', updateParent);
+            $(element).datepicker('setDate', model(scope.$parent));
+            element.on('change', updateParent);
           });
           var updateParent = (function() {
             $timeout(function () {
@@ -58,19 +57,14 @@
           });
 
           updateChildren();
-          watcher.setup('parent', function(){
-            return scope.$parent.$watch(attrs.crmUiDate, updateChildren);
-          });
-          watcher.setup('children', function(){
-            element.on('change', updateParent);
-            return function(){ element.off('change', updateParent); }
-          });
+          scope.$parent.$watch(attrs.crmUiDate, updateChildren);
+          element.on('change', updateParent);
         }
       };
     })
 
     // example: <div crm-ui-date-time="myobj.mydatetimefield"></div>
-    .directive('crmUiDateTime', function ($parse, crmWatcher) {
+    .directive('crmUiDateTime', function ($parse) {
       return {
         restrict: 'AE',
         scope: {
@@ -79,7 +73,6 @@
         template: '<input crm-ui-date="dtparts.date" placeholder="{{dateLabel}}"/> <input crm-ui-time="dtparts.time" placeholder="{{timeLabel}}"/>',
         link: function (scope, element, attrs) {
           var model = $parse(attrs.crmUiDateTime);
-          var watcher = crmWatcher();
           scope.dateLabel = ts('Date');
           scope.timeLabel = ts('Time');
 
@@ -94,21 +87,13 @@
             }
           });
           var updateParent = (function () {
-            watcher.suspend('parent', function () {
-              model.assign(scope.$parent, scope.dtparts.date + " " + scope.dtparts.time);
-            });
+            model.assign(scope.$parent, scope.dtparts.date + " " + scope.dtparts.time);
           });
 
           updateChildren();
-          watcher.setup('parent', function () {
-            return scope.$parent.$watch(attrs.crmUiDateTime, updateChildren);
-          });
-          watcher.setup('children', function () {
-            return [
-              scope.$watch('dtparts.date', updateParent),
-              scope.$watch('dtparts.time', updateParent)
-            ];
-          });
+          scope.$parent.$watch(attrs.crmUiDateTime, updateChildren);
+          scope.$watch('dtparts.date', updateParent),
+          scope.$watch('dtparts.time', updateParent)
         }
       };
     })
@@ -369,7 +354,7 @@
     })
 
     // example: <input crm-ui-time="myobj.mytimefield" />
-    .directive('crmUiTime', function ($parse, $timeout, crmWatcher) {
+    .directive('crmUiTime', function ($parse, $timeout) {
       return {
         restrict: 'AE',
         scope: {
@@ -377,15 +362,14 @@
         },
         link: function (scope, element, attrs) {
           var model = $parse(attrs.crmUiTime);
-          var watcher = crmWatcher();
 
           element.addClass('crm-form-text six');
           $(element).timeEntry({show24Hours: true});
 
           var updateChildren = (function() {
-            watcher.suspend('children', function () {
-              $(element).timeEntry('setTime', model(scope.$parent));
-            });
+            element.off('change', updateParent);
+            $(element).timeEntry('setTime', model(scope.$parent));
+            element.on('change', updateParent);
           });
           var updateParent = (function () {
             $timeout(function () {
@@ -394,15 +378,8 @@
           });
 
           updateChildren();
-          watcher.setup('parent', function () {
-            return scope.$parent.$watch(attrs.crmUiTime, updateChildren);
-          });
-          watcher.setup('children', function () {
-            element.on('change', updateParent);
-            return function () {
-              element.off('change', updateParent);
-            }
-          });
+          scope.$parent.$watch(attrs.crmUiTime, updateChildren);
+          element.on('change', updateParent);
         }
       }
     })
