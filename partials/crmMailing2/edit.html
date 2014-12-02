@@ -45,8 +45,10 @@
         </div>
         <div crm-ui-accordion crm-title="ts('Schedule')">
           <div ng-include="partialUrl('schedule.html')" />
-          <button ng-click="submit().then(leave)">{{ts('Schedule')}}</button>
         </div>
+        <center>
+          <a class="crmMailing2-submit-button" ng-click="submit().then(leave)"><div>{{ts('Submit Mailing')}}</div></a>
+        </center>
       </div>
 
       <span crm-ui-wizard-buttons style="float:right;">
