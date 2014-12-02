@@ -133,7 +133,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     $country = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
     $form->add('select', 'country_id', ts('Country'), $country, TRUE);
 
-    $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::group();
+    $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::nestedGroup();
     $form->addElement('select', 'group', ts('Group'), $group);
 
     $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));

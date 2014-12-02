@@ -164,7 +164,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     $this->addElement('text', 'ActivityType', ts('Activity Type'));
     $this->addElement('text', 'newGroupName', ts('Name for new group'));
     $this->addElement('text', 'newGroupDesc', ts('Description of new group'));
-    $groups = CRM_Core_PseudoConstant::group();
+    $groups = CRM_Core_PseudoConstant::nestedGroup();
     $hasExistingGroups = FALSE;
     if (is_array($groups) && !empty($groups)) {
       $hasExistingGroups = TRUE;

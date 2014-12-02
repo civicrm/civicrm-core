@@ -1240,7 +1240,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         'title' => ts('Group'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'group' => TRUE,
-        'options' => CRM_Core_PseudoConstant::group(),
+        'options' => CRM_Core_PseudoConstant::nestedGroup(),
       ),
     );
     if (empty($this->_columns['civicrm_group']['dao'])) {

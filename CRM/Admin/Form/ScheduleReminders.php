@@ -212,7 +212,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'group_id',
       ts('Group'),
       // CRM-13577
-      CRM_Core_PseudoConstant::group()
+      CRM_Core_PseudoConstant::nestedGroup()
     );
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);
