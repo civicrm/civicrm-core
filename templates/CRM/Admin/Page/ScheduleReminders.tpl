@@ -48,11 +48,7 @@
   {else}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-      {if $component}
-        {ts}No Scheduled Reminders have been created for this {$component}.{/ts}
-      {else}
-        {ts}None found.{/ts}
-      {/if}
+      {ts}None found.{/ts}
     </div>
   {/if}
   <div class="action-link">
