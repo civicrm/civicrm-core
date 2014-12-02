@@ -3172,17 +3172,16 @@ WHERE  id IN ( $groupIDs )
    * @access public
    */
   function sortName(&$values) {
-    list($name, $op, $value, $grouping, $wildcard) = $values;
+    list($fieldName, $op, $value, $grouping, $wildcard) = $values;
 
     // handle IS NULL / IS NOT NULL / IS EMPTY / IS NOT EMPTY
-    if ( $this->nameNullOrEmptyOp( $name, $op, $grouping ) ) {
+    if ($this->nameNullOrEmptyOp($fieldName, $op, $grouping)) {
       return;
     }
 
-    $newName = $name;
-    $name = trim($value);
+    $input = $value = trim($value);
 
-    if (empty($name)) {
+    if (!strlen($value)) {
       return;
     }
 
@@ -3194,24 +3193,23 @@ WHERE  id IN ( $groupIDs )
     $subGlue = ' OR ';
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-    $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
-    if (substr($name, 0, 1) == '"' &&
-      substr($name, -1, 1) == '"'
-    ) {
-      //If name is encased in double quotes, the value should be taken to be the string in entirety and the
-      $value = substr($name, 1, -1);
-      $value = $strtolower(CRM_Core_DAO::escapeString($value));
-      $wc = ($newName == 'sort_name') ? 'LOWER(contact_a.sort_name)' : 'LOWER(contact_a.display_name)';
-      $sub[] = " ( $wc = '$value' ) ";
-      if ($config->includeEmailInName) {
-        $sub[] = " ( civicrm_email.email = '$value' ) ";
-      }
+    $firstChar = substr($value, 0, 1);
+    $lastChar = substr($value, -1, 1);
+    $quotes = array("'", '"');
+    // If string is quoted, strip quotes and otherwise don't alter it
+    if ((strlen($value) > 2) && in_array($firstChar, $quotes) && in_array($lastChar, $quotes)) {
+      $value = trim($value, implode('', $quotes));
     }
-    elseif (strpos($name, ',') !== FALSE) {
-      // if we have a comma in the string, search for the entire string
-      $value = $strtolower(CRM_Core_DAO::escapeString($name));
-      if ($wildcard) {
+    // Replace spaces with wildcards for a LIKE operation
+    // UNLESS string contains a comma (this exception is a tiny bit questionable)
+    elseif ($op == 'LIKE' && strpos($value, ',') === FALSE) {
+      $value = str_replace(' ', '%', $value);
+    }
+    $value = $strtolower(CRM_Core_DAO::escapeString(trim($value)));
+    if (strlen($value)) {
+      $fieldsub = array();
+      if ($wildcard && $op == 'LIKE') {
         if ($config->includeWildCardInName) {
           $value = "'%$value%'";
         }
@@ -3223,91 +3221,21 @@ WHERE  id IN ( $groupIDs )
       else {
         $value = "'$value'";
       }
-      if ($newName == 'sort_name') {
+      if ($fieldName == 'sort_name') {
         $wc = self::caseImportant($op) ? "LOWER(contact_a.sort_name)" : "contact_a.sort_name";
       }
       else {
         $wc = self::caseImportant($op) ? "LOWER(contact_a.display_name)" : "contact_a.display_name";
       }
-      $sub[] = " ( $wc $op $value )";
+      $fieldsub[] = " ( $wc $op $value )";
       if ($config->includeNickNameInName) {
         $wc = self::caseImportant($op) ? "LOWER(contact_a.nick_name)" : "contact_a.nick_name";
-        $sub[] = " ( $wc $op $value )";
+        $fieldsub[] = " ( $wc $op $value )";
       }
       if ($config->includeEmailInName) {
-        $sub[] = " ( civicrm_email.email $op $value ) ";
+        $fieldsub[] = " ( civicrm_email.email $op $value ) ";
       }
-    }
-    else {
-      // the string should be treated as a series of keywords to be matched with match ANY OR
-      // match ALL depending on Civi config settings (see CiviAdmin)
-
-      // The Civi configuration setting can be overridden if the string *starts* with the case
-      // insenstive strings 'AND:' or 'OR:'TO THINK ABOUT: what happens when someone searches
-      // for the following "AND: 'a string in quotes'"? - probably nothing - it would make the
-      // AND OR variable reduntant because there is only one search string?
-
-      // Check to see if the $subGlue is overridden in the search text
-      if (strtolower(substr($name, 0, 4)) == 'and:') {
-        $name = substr($name, 4);
-        $subGlue = ' AND ';
-      }
-      if (strtolower(substr($name, 0, 3)) == 'or:') {
-        $name = substr($name, 3);
-        $subGlue = ' OR ';
-      }
-
-      $firstChar = substr($name, 0, 1);
-      $lastChar = substr($name, -1, 1);
-      $quotes = array("'", '"');
-      if ((strlen($name) > 2) && in_array($firstChar, $quotes) &&
-        in_array($lastChar, $quotes)
-      ) {
-        $name = substr($name, 1);
-        $name = substr($name, 0, -1);
-        $pieces = array($name);
-      }
-      else {
-        $pieces = explode(' ', $name);
-      }
-      foreach ($pieces as $piece) {
-        $value = $strtolower(CRM_Core_DAO::escapeString(trim($piece)));
-        if (strlen($value)) {
-          // Added If as a sanitization - without it, when you do an OR search, any string with
-          // double spaces (i.e. "  ") or that has a space after the keyword (e.g. "OR: ") will
-          // return all contacts because it will include a condition similar to "OR contact
-          // name LIKE '%'".  It might be better to replace this with array_filter.
-          $fieldsub = array();
-          if ($wildcard) {
-            if ($config->includeWildCardInName) {
-              $value = "'%$value%'";
-            }
-            else {
-              $value = "'$value%'";
-            }
-            $op = 'LIKE';
-          }
-          else {
-            $value = "'$value'";
-          }
-          if ($newName == 'sort_name') {
-            $wc = self::caseImportant($op) ? "LOWER(contact_a.sort_name)" : "contact_a.sort_name";
-          }
-          else {
-            $wc = self::caseImportant($op) ? "LOWER(contact_a.display_name)" : "contact_a.display_name";
-          }
-          $fieldsub[] = " ( $wc $op $value )";
-          if ($config->includeNickNameInName) {
-            $wc = self::caseImportant($op) ? "LOWER(contact_a.nick_name)" : "contact_a.nick_name";
-            $fieldsub[] = " ( $wc $op $value )";
-          }
-          if ($config->includeEmailInName) {
-            $fieldsub[] = " ( civicrm_email.email $op $value ) ";
-          }
-          $sub[] = ' ( ' . implode(' OR ', $fieldsub) . ' ) ';
-          // I seperated the glueing in two.  The first stage should always be OR because we are searching for matches in *ANY* of these fields
-        }
-      }
+      $sub[] = ' ( ' . implode(' OR ', $fieldsub) . ' ) ';
     }
 
     $sub = ' ( ' . implode($subGlue, $sub) . ' ) ';
@@ -3315,10 +3243,10 @@ WHERE  id IN ( $groupIDs )
     $this->_where[$grouping][] = $sub;
     if ($config->includeEmailInName) {
       $this->_tables['civicrm_email'] = $this->_whereTables['civicrm_email'] = 1;
-      $this->_qill[$grouping][] = ts('Name or Email') . " $op - '$name'";
+      $this->_qill[$grouping][] = ts('Name or Email') . " $op - '$input'";
     }
     else {
-      $this->_qill[$grouping][] = ts('Name like') . " - '$name'";
+      $this->_qill[$grouping][] = ts('Name') . " $op - '$input'";
     }
   }
 
