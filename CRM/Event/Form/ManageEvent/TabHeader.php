@@ -151,6 +151,8 @@ WHERE      e.id = %1
     $fullName  = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);
     $new       = '';
+    $action = 'update';
+
     // hack for special cases.
     switch ($className) {
       case 'Event':
@@ -164,7 +166,6 @@ WHERE      e.id = %1
 
       case 'ScheduleReminders':
         $class = 'reminder';
-        $new = !empty($_GET['new']) ? '&new=1' : '';
         break;
 
       default:
@@ -188,8 +189,12 @@ WHERE      e.id = %1
           $tabs[$key]['qfKey'] = NULL;
         }
 
+        if ($key == 'reminder') {
+          $action = 'browse';
+        }
+
         $tabs[$key]['link'] = CRM_Utils_System::url("civicrm/event/manage/{$key}",
-          "{$reset}action=update&id={$eventID}&component=event{$new}{$tabs[$key]['qfKey']}"
+          "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}"
         );
       }
     }
@@ -230,4 +235,3 @@ WHERE      e.id = %1
     return $current;
   }
 }
-
