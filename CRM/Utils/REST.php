@@ -146,7 +146,7 @@ class CRM_Utils_REST {
     }
 
     if (CRM_Utils_Array::value('json', $requestParams)) {
-      header('Content-Type: text/javascript');
+      header('Content-Type: application/json');
       $json = json_encode(array_merge($result));
       if (CRM_Utils_Array::value('prettyprint', $requestParams)) {
         return self::jsonFormated($json);
