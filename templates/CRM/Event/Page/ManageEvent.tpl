@@ -111,7 +111,7 @@
                     {if NOT $row.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
                       {if $k eq 'reminder'}
                         <li><a title="{$v.title}" class="action-item crm-hover-button {$status}"
-                           href="{crmURL p="`$v.url`" q="reset=1&action=browse&component=event&setTab=1&id=`$row.id`"}">{$v.title}</a>
+                           href="{crmURL p="`$v.url`" q="reset=1&action=browse&setTab=1&id=`$row.id`"}">{$v.title}</a>
                       {else}
                         <li><a title="{$v.title}" class="action-item crm-hover-button {$status}"
                            href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$row.id`"}">{$v.title}</a></li>
