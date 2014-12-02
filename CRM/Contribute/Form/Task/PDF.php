@@ -119,6 +119,8 @@ AND    {$this->_componentClause}";
     $this->add('select', 'pdf_format_id', ts('Page Format'),
       array(0 => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE)
     );
+    $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
+    $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do no email / Do not mail)'), FALSE);
 
     $this->addButtons(array(
         array(
@@ -139,7 +141,7 @@ AND    {$this->_componentClause}";
    */
   function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
-    return array('pdf_format_id' => $defaultFormat['id']);
+    return array('pdf_format_id' => $defaultFormat['id'], 'receipt_update' => 1, 'override_privacy' => 0);
   }
 
   /**
@@ -180,7 +182,7 @@ AND    {$this->_componentClause}";
       $suppressedEmails = 0;
       foreach ($contactDetails as $id => $values) {
         if (empty($values['email']) ||
-          CRM_Utils_Array::value('do_not_email', $values) ||
+          (empty($params['override_privacy']) && CRM_Utils_Array::value('do_not_email', $values)) ||
           CRM_Utils_Array::value('is_deceased', $values) ||
           CRM_Utils_Array::value('on_hold', $values)
         ) {
@@ -231,6 +233,7 @@ AND    {$this->_componentClause}";
       $values = array();
       $mail = $baseIPN->sendMail($input, $ids, $objects, $values, FALSE, $createPdf);
 
+
       if ($mail['html']) {
         $message[] = $mail['html'];
       }
@@ -240,6 +243,10 @@ AND    {$this->_componentClause}";
 
       // reset template values before processing next transactions
       $template->clearTemplateVars();
+      if (!empty($params['receipt_update'])) {
+        $objects['contribution']->receipt_date = date('Y-m-d H-i-s');
+        $objects['contribution']->save();
+      }
     }
     if ($createPdf) {
       CRM_Utils_PDF_Utils::html2pdf($message,
