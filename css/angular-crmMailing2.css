@@ -63,3 +63,18 @@ input[name=preview_test_email]:-ms-input-placeholder {
 .crmMailing2-inactive {
   text-decoration: line-through;
 }
+a.crmMailing2-submit-button div {
+  color: black;
+  background: #bfb;
+  border: 1px solid #8a8;
+  padding: 1em;
+  margin: 1em;
+  width: 15em;
+}
+a.crmMailing2-submit-button div:hover {
+  background: #afa;
+  border: 1px solid #7a7;
+}
+a.crmMailing2-submit-button:hover {
+  text-decoration: none;
+}
