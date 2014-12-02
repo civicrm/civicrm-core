@@ -4160,6 +4160,12 @@ civicrm_relationship.start_date > {$today}
       $this->_qill[$grouping][] = ts('Relationship - Inactive or not Current');
     }
 
+    $onlyDeleted = 0;
+    if (in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params)) {
+      $onlyDeleted = 1;
+    }
+    $where[$grouping][] = "(contact_b.is_deleted = {$onlyDeleted})";
+
     //check for permissioned, non-permissioned and all permissioned relations
     if ($relPermission[2] == 1) {
       $where[$grouping][] = "(
