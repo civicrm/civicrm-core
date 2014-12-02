@@ -221,7 +221,7 @@ function setLocationDetails(contactID , reset) {
     success     : function(data, status) {
       for (var ele in data) {
         if (cj("#"+ ele).hasClass('crm-chain-select-target')) {
-          cj("#"+ ele).data('newVal', data[ele].value).off('.autofill').on('crmOptionsUpdated.autofill', function() {console.log(this.id, cj(this).data('newVal'));
+          cj("#"+ ele).data('newVal', data[ele].value).off('.autofill').on('crmOptionsUpdated.autofill', function() {
             cj(this).off('.autofill').val(cj(this).data('newVal')).change();
           });
         }
