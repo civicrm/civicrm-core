@@ -891,7 +891,6 @@ WHERE  id = %1";
    */
   static function buildPriceSet(&$form) {
     $priceSetId = $form->get('priceSetId');
-    $userid = $form->getVar('_userID');
     if (!$priceSetId) {
       return;
     }
@@ -948,6 +947,7 @@ WHERE  id = %1";
       ) {
         $options = CRM_Utils_Array::value('options', $field);
         if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component = 'membership') {
+          $userid = $form->getVar('_membershipContactID');
           $checklifetime = self::checkCurrentMembership($options, $userid);
           if ($checklifetime) {
             $form->assign('ispricelifetime', TRUE);
