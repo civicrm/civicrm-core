@@ -243,7 +243,7 @@ class CRM_Core_JobManager {
     if ($this->currentJob) {
       $dao->job_id  = $this->currentJob->id;
       $dao->name    = $this->currentJob->name;
-      $dao->command = ts("Entity:") . " " + $this->currentJob->api_entity + " " . ts("Action:") . " " + $this->currentJob->api_action;
+      $dao->command = ts("Entity:") . " " . $this->currentJob->api_entity . " " . ts("Action:") . " " . $this->currentJob->api_action;
       $data         = "";
       if (!empty($this->currentJob->parameters)) {
         $data .= "\n\nParameters raw (from db settings): \n" . $this->currentJob->parameters;
