@@ -120,6 +120,18 @@
       var o = $(event.target);
       var data = o.data('edit-params');
       var errorTag = o.find('.update_oplock_ts');
+      $('#crm-notification-container')
+        .off('.opLock')
+        .on('click.opLock', '.crm-lock-button-save', function(e){
+          CRM.closeAlertByChild(this);
+          $(form).find('input[name=oplock_ts]').val(errorTag.attr('data:update_oplock_ts'));
+          $(form).find('.form-submit.default').first().click();
+          return false;
+        })
+        .on('click.opLock', '.crm-lock-button-reload', function(){
+          window.location.reload();
+          return false;
+        });
       if (errorTag.length > 0) {
         $('<span>')
           .addClass('crm-lock-button')
@@ -127,23 +139,13 @@
 
         var buttonContainer = o.find('.crm-lock-button');
         $('<button>')
-          .addClass('crm-button')
+          .addClass('crm-button crm-lock-button-save')
           .text(options.saveAnywayLabel)
-          .click(function() {
-            $(form).find('input[name=oplock_ts]').val(errorTag.attr('data:update_oplock_ts'));
-            errorTag.parent().hide();
-            $(this).closest('form').find('.form-submit.default').first().click();
-            return false;
-          })
           .appendTo(buttonContainer)
           ;
         $('<button>')
-          .addClass('crm-button')
+          .addClass('crm-button crm-lock-button-reload')
           .text(options.reloadLabel)
-          .click(function() {
-            window.location.reload();
-            return false;
-          })
           .appendTo(buttonContainer)
           ;
       }
