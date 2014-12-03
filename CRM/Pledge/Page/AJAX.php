@@ -91,8 +91,11 @@ WHERE {$whereClause}
     * for batch entry pledges
     */
   function getPledgeDefaults() {
-    $pledgeID = CRM_Utils_Type::escape($_POST['pid'], 'Integer');
-    $details = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);
+    $details = array();
+    if (!empty($_POST['pid'])) {
+      $pledgeID = CRM_Utils_Type::escape($_POST['pid'], 'Integer');
+      $details = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);
+    }
     echo json_encode($details);
     CRM_Utils_System::civiExit();
   }
