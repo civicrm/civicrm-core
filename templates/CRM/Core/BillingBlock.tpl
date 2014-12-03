@@ -226,7 +226,7 @@ CRM.$(function($) {
   }
   if(checked) {
     $('#billingcheckbox').prop('checked', true);
-    if (CRM.billing.billingProfileIsHideable) {
+    if (!CRM.billing || CRM.billing.billingProfileIsHideable) {
       $('.billing_name_address-group').hide();
     }
   }
@@ -266,7 +266,7 @@ CRM.$(function($) {
   // toggle show/hide
   $('#billingcheckbox').click(function(){
     if(this.checked) {
-      if (CRM.billing.billingProfileIsHideable) {
+      if (!CRM.billing || CRM.billing.billingProfileIsHideable) {
         $('.billing_name_address-group').hide(200);
       }
 
