@@ -57,7 +57,6 @@ CRM.$(function($) {
   $('select[id*="_membership_type_0"]').change(function () {
     setPaymentBlock($(this), null);
   });
-
   $('select[id*="_membership_type_1"]').change(function () {
     setPaymentBlock($(this), $(this).val());
   });
@@ -74,76 +73,6 @@ CRM.$(function($) {
 });
 
 
-function updateContactInfo(blockNo, prefix) {
-  var contactHiddenElement = 'input[name="' + prefix + 'contact_select_id[' + blockNo + ']"]';
-  var contactId = cj(contactHiddenElement).val();
-
-  var profileFields = CRM.contact.fieldmap;
-
-  CRM.api('Contact', 'get', {
-      'sequential': '1',
-      'contact_id': contactId,
-      'return': CRM.contact.return },
-    { success: function (data) {
-      cj.each(data.values[0], function (key, value) {
-        // set the values
-        var actualFldName = profileFields[key];
-        if (key == 'country' || key == 'state_province') {
-          idFldName = key + '_id';
-          value = data.values[0][idFldName];
-        }
-        setFieldValue(actualFldName, value, blockNo)
-      });
-
-      // for membership batch entry based on contact we need to enable / disable
-      // add membership select
-      if(CRM.batch.type_id == 2) {
-      CRM.api('Membership', 'get', {
-          'sequential': '1',
-          'contact_id': contactId
-        },
-        { success: function (data) {
-          if (data.count > 0) {
-            //get the information on membership type
-            var membershipTypeId = data.values[0].membership_type_id;
-            var membershipJoinDate = data.values[0].join_date;
-            CRM.api('MembershipType', 'get', {
-                'sequential': '1',
-                'id': membershipTypeId
-              },
-              { success: function (data) {
-                var memTypeContactId = data.values[0].member_of_contact_id;
-                cj('select[id="member_option_' + blockNo + '"]').prop('disabled', false).val(2);
-                cj('select[id="field_' + blockNo + '_membership_type_0"]').val(memTypeContactId).change();
-                cj('select[id="field_' + blockNo + '_membership_type_1"]').val(membershipTypeId).change();
-                setDateFieldValue('join_date', membershipJoinDate, blockNo)
-              }
-              });
-          }
-        }
-        });
-      }
-      if (CRM.batch.type_id == 3) {
-	 CRM.api('Pledge', 'get', {
-	  'q': 'civicrm/ajax/rest',
-	  'sequential': 1,
-	 'contact_id': contactId
-	 },
-	{success: function(data) {
-	 cj.each(data['values'], function(key, value) {
-	  if (value['pledge_status']!='Completed'){
-	    cj('#open_pledges_'+ blockNo).append(cj('<option>', {
-		value: value['pledge_id'],
-		text: value['pledge_next_pay_date']+" "+value['pledge_next_pay_amount']
-		}));
-	     }
-	   });
-	 }
-        });
-       }
-      }
-      });
-     }
 
 function setPaymentBlock(form, memType) {
   var rowID = form.closest('div.crm-grid-row').attr('entity_id');

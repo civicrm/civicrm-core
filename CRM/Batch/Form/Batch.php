@@ -65,9 +65,6 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
 
     $batchTypes = CRM_Batch_BAO_Batch::buildOptions('type_id');
 
-    // unset non-related types
-    //unset($batchTypes[3]);
-    //unset($batchTypes[4]);
     $type = $this->add('select', 'type_id', ts('Type'), $batchTypes);
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
