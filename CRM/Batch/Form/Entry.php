@@ -128,17 +128,17 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $this->addElement('hidden', 'batch_id', $this->_batchId);
 
-    $batchValue = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id',array('flip' => 1));
+    $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id',array('flip' => 1), 'validate');
     // get the profile information
-    if ($this->_batchInfo['type_id'] == $batchValue['Contribution']) {
+    if ($this->_batchInfo['type_id'] == $batchTypes['Contribution']) {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Contributions'));
       $customFields = CRM_Core_BAO_CustomField::getFields('Contribution');
     }
-   elseif ($this->_batchInfo['type_id'] == $batchValue['Membership']) {
+   elseif ($this->_batchInfo['type_id'] == $batchTypes['Membership']) {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Memberships'));
       $customFields = CRM_Core_BAO_CustomField::getFields('Membership');
     }
-   else {
+   elseif ($this->_batchInfo['type_id'] == $batchTypes['Pledge']) {
      CRM_Utils_System::setTitle(ts('Batch Data Entry for Pledges'));
      $customFields = CRM_Core_BAO_CustomField::getFields('Contribution');
    }
@@ -208,7 +208,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         );
         $this->add('select', "member_option[$rowNumber]", '', $options);
       }
-      if ($this->_batchInfo['type_id'] == $batchValue['Pledge']) {
+      if ($this->_batchInfo['type_id'] == $batchTypes['Pledge']) {
         $options =  array('' => '-select-');
         $optionTypes = array(
           '1' => ts('Adjust Pledge Payment Schedule?'),
@@ -366,16 +366,16 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
     $params['actualBatchTotal'] = 0;
-      // get the profile information
-    if ($this->_batchInfo['type_id'] == 1) {
+
+    // get the profile information
+    $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
+    if (in_array($this->_batchInfo['type_id'], array($batchTypes['Pledge'], $batchTypes['Contribution']))) {
       $this->processContribution($params);
     }
-    elseif ($this->_batchInfo['type_id'] == 2) {
+    elseif ($this->_batchInfo['type_id'] == $batchTypes['Membership']) {
       $this->processMembership($params);
     }
-    else {
-      $this->processContribution($params);
-    }
+
     // update batch to close status
     $paramValues = array(
       'id' => $this->_batchId,
@@ -499,8 +499,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         //finally call contribution create for all the magic
         $contribution = CRM_Contribute_BAO_Contribution::create($value, CRM_Core_DAO::$_nullArray);
         $pledgeId = $params['open_pledges'][$key];
-        $batchValue = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id',array('flip' => 1));
-        if ($this->_batchInfo['type_id'] == $batchValue['Pledge'] && is_numeric($pledgeId)) {
+        $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
+        if ($this->_batchInfo['type_id'] == $batchTypes['Pledge'] && is_numeric($pledgeId)) {
           $adjustTotalAmount = FALSE;
           if ($params['option_type'][$key] == 2) {
             $adjustTotalAmount=TRUE;
