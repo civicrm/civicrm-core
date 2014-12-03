@@ -701,9 +701,10 @@ AND   cas.entity_value = $id AND
       }
 
       if ($mapping->entity == 'civicrm_activity') {
+        $compInfo = CRM_Core_Component::getEnabledComponents();
         $tokenEntity = 'activity';
         $tokenFields = array('activity_id', 'activity_type', 'subject', 'details', 'activity_date_time');
-        $extraSelect = ', ov.label as activity_type, e.id as activity_id, civicrm_case_activity.case_id as case_id';
+        $extraSelect = ', ov.label as activity_type, e.id as activity_id';
         $extraJoin   = "
 INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
 INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
@@ -713,10 +714,14 @@ INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.optio
 LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'
 LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
         }
-        
+
         //join for caseId
-        $extraJoin .= "
+        // if CiviCase component is enabled
+        if (array_key_exists('CiviCase', $compInfo)) {
+          $extraSelect .= ", civicrm_case_activity.case_id as case_id";
+          $extraJoin .= "
             LEFT JOIN `civicrm_case_activity` ON `e`.`id` = `civicrm_case_activity`.`activity_id`";
+        }
       }
 
       if ($mapping->entity == 'civicrm_participant') {
