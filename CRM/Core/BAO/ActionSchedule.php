@@ -735,7 +735,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         CRM_Core_BAO_ActionLog::create($logParams);
 
         // insert activity log record if needed
-        if ($actionSchedule->record_activity) {
+        if ($actionSchedule->record_activity && !$isError) {
           $activityParams = array(
             'subject' => $actionSchedule->title,
             'details' => $actionSchedule->body_html,
@@ -747,7 +747,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             'activity_type_id' => $activityTypeID,
             'source_record_id' => $dao->entityID,
           );
-          $activity = CRM_Activity_BAO_Activity::create($activityParams);
+          CRM_Activity_BAO_Activity::create($activityParams);
         }
       }
 
