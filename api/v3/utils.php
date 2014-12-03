@@ -41,6 +41,8 @@
  */
 function _civicrm_api3_initialize() {
   require_once 'CRM/Core/ClassLoader.php';
+  require_once 'CRM/Core/DAO/permissions.php';
+
   CRM_Core_ClassLoader::singleton()->register();
   CRM_Core_Config::singleton();
 }
@@ -437,6 +439,9 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
   }
   unset($params['id']);
 
+  // Check permissions for call to check if check_permission been modified
+  _civicrm_api3_permissions($entity, 'get', $params);
+
   $options = _civicrm_api3_get_options_from_params($params, TRUE);
 
   $inputParams = array_merge(
@@ -523,6 +528,9 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
  * @return CRM_Core_DAO query object
  */
 function _civicrm_api3_get_query_object($params, $mode, $entity) {
+  // Check permissions for call to check if check_permission been modified
+  _civicrm_api3_permissions($entity, 'get', $params);
+
   $options          = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');
   $sort             = CRM_Utils_Array::value('sort', $options, NULL);
   $offset           = CRM_Utils_Array::value('offset', $options);
