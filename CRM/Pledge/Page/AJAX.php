@@ -90,26 +90,9 @@ WHERE {$whereClause}
     * Function to setDefaults according to Pledge Id
     * for batch entry pledges
     */
-  function getPledgeDefaults($config) {
-    if (!$_POST['mtype']) {
-      $details['scheduled_amount'] = '';
-      echo json_encode($details);
-      CRM_Utils_System::civiExit();
-    }
-    $memType = CRM_Utils_Type::escape($_POST['mtype'], 'Integer');
-    $query = "SELECT min(id),scheduled_amount
-  FROM civicrm_pledge_payment
-  WHERE pledge_id = %1 and status_id != 1";
-    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($memType, 'Positive')));
-    $properties = array( 'scheduled_amount');
-    while ($dao->fetch()) {
-      foreach ($properties as $property) {
-        $details[$property] = $dao->$property;
-      }
-    }
-    $details['total_amount_numeric'] = $details['total_amount'];
-    // fix the display of the monetary value, CRM-4038
-    $details['scheduled_amount'] = CRM_Utils_Money::format($details['scheduled_amount'], NULL, '%a');
+  function getPledgeDefaults() {
+    $pledgeID = CRM_Utils_Type::escape($_POST['pid'], 'Integer');
+    $details = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);
     echo json_encode($details);
     CRM_Utils_System::civiExit();
   }
