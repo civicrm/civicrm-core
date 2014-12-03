@@ -275,24 +275,27 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * Universal callback function for sorting by weight or id
+   * Universal callback function for sorting by weight, id, title or name
    *
    * @param $a
    * @param $b
    *
-   * @return array of items sorted by weight (or id if weights are the same)
+   * @return one of [-1, 0, 1]
    * @access public
    */
   static function cmpFunc($a, $b) {
-    if($a['weight'] == $b['weight']) {
-      $result = strcmp($a['id'], $b['id']);
-      // return -1 for equal ids to keep the behavior
-      // of the original function for equal weights
-      if ($result == 0) {
-        return -1;
+    $cmp_order = array('weight', 'id', 'title', 'name');
+    foreach ($cmp_order as $attribute) {
+      if (isset($a[$attribute]) && isset($b[$attribute])) {
+        if ($a[$attribute] < $b[$attribute]) {
+          return -1;
+        } elseif ($a[$attribute] > $b[$attribute]) {
+          return 1;
+        } // else: $a and $b are equal wrt to this attribute, try next...
       }
-      return $result;
     }
-    return ($a['weight'] <= $b['weight']) ? -1 : 1;
+    // if we get here, $a and $b es equal for all we know
+    // however, as I understand we don't want equality here:
+    return -1;
   }
 }
