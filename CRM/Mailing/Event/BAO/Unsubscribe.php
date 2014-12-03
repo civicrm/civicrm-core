@@ -559,7 +559,8 @@ WHERE  email = %2
       $results[] = array(
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
-        'org' => $dao->org_unsubscribe ? ts('Yes') : ts('No'),
+        // Next value displays in selector under either Unsubscribe OR Optout column header, so always s/b Yes.
+        'unsubOrOptout' => ts('Yes'),
         'date' => CRM_Utils_Date::customFormat($dao->date),
       );
     }
