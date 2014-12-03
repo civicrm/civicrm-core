@@ -1994,6 +1994,13 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 
     // update participant fee_amount column
     $partUpdateFeeAmt['id'] = $participantId;
+    foreach ($lineItems as $lineValue) {
+      if ($lineValue['price_field_value_id']) {
+        $line[$lineValue['price_field_value_id']] = $lineValue['label'] . ' - '. $lineValue['qty']; 
+      } 
+    }
+
+    $partUpdateFeeAmt['fee_level'] = implode(', ', $line);
     $partUpdateFeeAmt['fee_amount'] = $params['amount'];
     self::add($partUpdateFeeAmt);
 
