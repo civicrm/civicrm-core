@@ -280,7 +280,7 @@ class CRM_Utils_Sort {
    * @param $a
    * @param $b
    *
-   * @return one of [-1, 0, 1]
+   * @return int (-1 or 1)
    * @access public
    */
   static function cmpFunc($a, $b) {
