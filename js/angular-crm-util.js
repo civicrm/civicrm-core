@@ -2,6 +2,14 @@
 (function (angular, $, _) {
   angular.module('crmUtil', []);
 
+  // Adapter for CRM.status which supports Angular promises (instead of jQuery promises)
+  // example: crmStatus('Saving', crmApi(...)).then(function(result){...})
+  angular.module('crmUtil').factory('crmStatus', function($q){
+    return function(options, aPromise){
+      return CRM.toAPromise($q, CRM.status(options, CRM.toJqPromise(aPromise)));
+    };
+  });
+
   // crmWatcher allows one to setup event listeners and temporarily suspend
   // them en masse.
   //

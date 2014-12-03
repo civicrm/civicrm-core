@@ -3,7 +3,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/crmMailing2/' + relPath;
   };
 
-  var crmMailing2 = angular.module('crmMailing2', ['ngRoute', 'ui.utils', 'crmUi', 'dialogService']); // TODO ngSanitize, unsavedChanges
+  var crmMailing2 = angular.module('crmMailing2', ['crmUtil', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService']); // TODO ngSanitize, unsavedChanges
 
   // Time to wait before triggering AJAX update to recipients list
   var RECIPIENTS_DEBOUNCE_MS = 100;
@@ -55,7 +55,7 @@
     });
   });
 
-  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmFromAddresses, $q) {
+  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmFromAddresses, crmStatus) {
     $scope.mailing = selectedMail;
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.crmFromAddresses = crmFromAddresses;
@@ -65,24 +65,21 @@
 
     // @return Promise
     $scope.submit = function submit() {
-       // CRM.status doesn't work with Angular promises, so do backflips
-       var p = crmMailingMgr.submit($scope.mailing);
-       var p2 = CRM.status(null, CRM.toJqPromise(p));
-       return CRM.toAPromise($q, p2);
+      return crmStatus({start: ts('Submitting...'), success: ts('Submitted')},
+        crmMailingMgr.submit($scope.mailing)
+      );
     };
     // @return Promise
     $scope.save = function save() {
-      // CRM.status doesn't work with Angular promises, so do backflips
-      var p = crmMailingMgr.save($scope.mailing);
-      var p2 = CRM.status(null, CRM.toJqPromise(p));
-      return CRM.toAPromise($q, p2);
+      return crmStatus(null,
+        crmMailingMgr.save($scope.mailing)
+      );
     };
     // @return Promise
     $scope.delete = function cancel() {
-      // CRM.status doesn't work with Angular promises, so do backflips
-      var p = crmMailingMgr.delete($scope.mailing);
-      var p2 = CRM.status({start: ts('Deleting...'), success: ts('Deleted')}, CRM.toJqPromise(p));
-      return CRM.toAPromise($q, p2);
+      return crmStatus({start: ts('Deleting...'), success: ts('Deleted')},
+        crmMailingMgr.delete($scope.mailing)
+      );
     };
     $scope.leave = function leave() {
       window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
