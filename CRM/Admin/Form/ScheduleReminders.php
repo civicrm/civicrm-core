@@ -473,7 +473,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['mapping_id'] = $values['entity'][0];
       $entity_value = $values['entity'][1];
       $entity_status = $values['entity'][2];
-      if ($entity_value == 1) {
+      if ($params['mapping_id'] == 1) {
         $params['limit_to'] = 1;
       }
 
