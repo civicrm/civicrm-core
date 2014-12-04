@@ -109,23 +109,19 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     elseif ( CRM_Core_OptionGroup::getValue('activity_type','WalkList') == $this->_surveyDetails['activity_type_id'] ) {
       $orderByParams =
         array(
-          1 =>
-          array(
+          1 => array(
             'column' => 'civicrm_address.street_name',
             'order'  => 'ASC',
           ),
-          2 =>
-          array(
+          2 => array(
             'column' => 'civicrm_address.street_number%2',
             'order' => 'ASC',
           ),
-          3 =>
-          array(
+          3 => array(
             'column' => 'civicrm_address.street_number',
             'order' => 'ASC',
           ),
-          4 =>
-          array(
+          4 => array(
             'column' => 'contact_a.sort_name',
             'order' => 'ASC',
           ),
@@ -408,23 +404,19 @@ WHERE {$clause}
     if ( CRM_Core_OptionGroup::getValue('activity_type','WalkList') == $this->_surveyDetails['activity_type_id'] ) {
       $defaults['order_bys'] =
         array(
-          1 =>
-          array(
+          1 => array(
             'column' => 'civicrm_address.street_name',
             'order'  => 'ASC',
           ),
-          2 =>
-          array(
+          2 => array(
             'column' => 'civicrm_address.street_number%2',
             'order' => 'ASC',
           ),
-          3 =>
-          array(
+          3 => array(
             'column' => 'civicrm_address.street_number',
             'order' => 'ASC',
           ),
-          4 =>
-          array(
+          4 => array(
             'column' => 'contact_a.sort_name',
             'order' => 'ASC',
           ),

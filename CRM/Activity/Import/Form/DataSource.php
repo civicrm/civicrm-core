@@ -102,8 +102,7 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
     }
 
     $this->setDefaults(array(
-      'onDuplicate' =>
-        CRM_Import_Parser::DUPLICATE_SKIP,
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       ));
 
     //build date formats

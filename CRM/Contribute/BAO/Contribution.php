@@ -652,8 +652,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       );
 
       $contributionRecurId = array(
-        'contribution_recur_id' =>
-        array(
+        'contribution_recur_id' => array(
           'title' => ts('Recurring Contributions ID'),
           'name' => 'contribution_recur_id',
           'where' => 'civicrm_contribution.contribution_recur_id',

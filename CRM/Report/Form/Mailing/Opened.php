@@ -41,7 +41,12 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
 
   protected $_phoneField = FALSE;
 
-  protected $_customGroupExtends = array('Contact', 'Individual', 'Household', 'Organization');
+  protected $_customGroupExtends = array(
+    'Contact',
+    'Individual',
+    'Household',
+    'Organization'
+  );
 
   protected $_charts = array(
     '' => 'Tabular',
@@ -65,8 +70,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
           'title' => ts('Contact ID'),
           'required' => TRUE,
         ),
-        'sort_name' =>
-        array(
+        'sort_name' => array(
           'title' => ts('Contact Name'),
           'required' => TRUE,
         ),
@@ -84,18 +88,19 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
           'no_display' => TRUE,
         ),
       ),
-      'order_bys' =>
-      array(
-        'sort_name' =>
-        array('title' => ts('Contact Name'), 'default' => TRUE, 'default_order' => 'ASC'),
+      'order_bys' => array(
+        'sort_name' => array(
+          'title' => ts('Contact Name'),
+          'default' => TRUE,
+          'default_order' => 'ASC'
+        ),
       ),
       'grouping' => 'contact-fields',
     );
 
     $this->_columns['civicrm_mailing'] = array(
       'dao' => 'CRM_Mailing_DAO_Mailing',
-      'fields' =>
-      array(
+      'fields' => array(
         'mailing_name' => array(
           'name' => 'name',
           'title' => ts('Mailing'),
@@ -117,10 +122,8 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
           'operator' => 'like',
         ),
       ),
-      'order_bys' =>
-      array(
-        'mailing_name' =>
-        array(
+      'order_bys' => array(
+        'mailing_name' => array(
           'name' => 'name',
           'title' => ts('Mailing'),
         ),
@@ -137,10 +140,8 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
           'required' => TRUE,
         ),
       ),
-      'order_bys' =>
-      array(
-        'email' =>
-        array('title' => ts('Email'), 'default_order' => 'ASC'),
+      'order_bys' => array(
+        'email' => array('title' => ts('Email'), 'default_order' => 'ASC'),
       ),
       'grouping' => 'contact-fields',
     );
@@ -167,7 +168,9 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (!empty($field['required']) ||
+            !empty($this->_params['fields'][$fieldName])
+          ) {
             if ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
             }
@@ -269,7 +272,8 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
       return;
     }
 
-    $chartInfo = array('legend' => ts('Mail Opened Report'),
+    $chartInfo = array(
+      'legend' => ts('Mail Opened Report'),
       'xname' => ts('Mailing'),
       'yname' => ts('Opened'),
       'xLabelAngle' => 20,

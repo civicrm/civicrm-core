@@ -49,101 +49,89 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
     asort($this->activityTypes);
 
     $this->_columns = array(
-      'civicrm_contact' =>
-      array(
+      'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' =>
-        array(
-          'sort_name' =>
-          array('title' => ts('Modified By'),
+        'fields' => array(
+          'sort_name' => array(
+            'title' => ts('Modified By'),
             'required' => TRUE,
           ),
-          'id' =>
-          array(
+          'id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
           ),
         ),
-        'filters' =>
-        array(
-          'sort_name' =>
-          array('title' => ts('Modified By'),
+        'filters' => array(
+          'sort_name' => array(
+            'title' => ts('Modified By'),
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_contact_touched' =>
-      array(
+      'civicrm_contact_touched' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' =>
-        array(
-          'sort_name_touched' =>
-          array('title' => ts('Touched Contact'),
+        'fields' => array(
+          'sort_name_touched' => array(
+            'title' => ts('Touched Contact'),
             'name' => 'sort_name',
             'required' => TRUE,
           ),
-          'id' =>
-          array(
+          'id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
           ),
         ),
-        'filters' =>
-        array(
-          'sort_name_touched' =>
-          array('title' => ts('Touched Contact'),
+        'filters' => array(
+          'sort_name_touched' => array(
+            'title' => ts('Touched Contact'),
             'name' => 'sort_name',
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_activity' =>
-      array(
+      'civicrm_activity' => array(
         'dao' => 'CRM_Activity_DAO_Activity',
-        'fields' =>
-        array('id' => array('title' => ts('Activity ID'),
+        'fields' => array(
+          'id' => array(
+            'title' => ts('Activity ID'),
             'no_display' => TRUE,
             'required' => TRUE,
           ),
-          'subject' => array('title' => ts('Touched Activity'),
+          'subject' => array(
+            'title' => ts('Touched Activity'),
             'required' => TRUE,
           ),
-          'activity_type_id' => array('title' => ts('Activity Type'),
+          'activity_type_id' => array(
+            'title' => ts('Activity Type'),
             'required' => TRUE,
           ),
         ),
       ),
-      'civicrm_activity_source' =>
-      array(
+      'civicrm_activity_source' => array(
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' =>
-        array(
-          'contact_id' =>
-          array(
+        'fields' => array(
+          'contact_id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
           ),
         ),
       ),
-      'civicrm_log' =>
-      array(
+      'civicrm_log' => array(
         'dao' => 'CRM_Core_DAO_Log',
-        'fields' =>
-        array(
-          'modified_date' =>
-          array('title' => ts('Modified Date'),
+        'fields' => array(
+          'modified_date' => array(
+            'title' => ts('Modified Date'),
             'required' => TRUE,
           ),
-          'data' =>
-          array('title' => ts('Description'),
+          'data' => array(
+            'title' => ts('Description'),
           ),
         ),
-        'filters' =>
-        array(
-          'modified_date' =>
-          array('title' => ts('Modified Date'),
+        'filters' => array(
+          'modified_date' => array(
+            'title' => ts('Modified Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
             'default' => 'this.week',
@@ -165,7 +153,9 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (!empty($field['required']) ||
+            !empty($this->_params['fields'][$fieldName])
+          ) {
 
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
@@ -211,10 +201,12 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          if (CRM_Utils_Array::value('operatorType', $field) & CRM_Report_Form::OP_DATE) {
+          if (CRM_Utils_Array::value('operatorType', $field) &
+            CRM_Report_Form::OP_DATE
+          ) {
             $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
+            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
 
             $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to);
           }
@@ -285,7 +277,9 @@ ORDER BY {$this->_aliases['civicrm_log']}.modified_date DESC, {$this->_aliases['
         $row['civicrm_activity_subject'] !== ''
       ) {
         $url = CRM_Utils_System::url('civicrm/contact/view/activity',
-          'reset=1&action=view&id=' . $row['civicrm_activity_id'] . '&cid=' . $row['civicrm_activity_source_contact_id'] . '&atype=' . $row['civicrm_activity_activity_type_id'],
+          'reset=1&action=view&id=' . $row['civicrm_activity_id'] . '&cid=' .
+          $row['civicrm_activity_source_contact_id'] . '&atype=' .
+          $row['civicrm_activity_activity_type_id'],
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_activity_subject_link'] = $url;

@@ -139,8 +139,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
     );
 
     $this->setDefaults(array(
-      'contactType' =>
-        CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
       ));
 
     //build date formats
