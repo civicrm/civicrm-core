@@ -937,6 +937,22 @@ FROM   civicrm_domain
   }
 
   /**
+   * Find a DAO object for the given ID and return it.
+   *
+   * @param int $id Id of the DAO object being searched for.
+   *
+   * @return object Object of the type of the class that called this function.
+   */
+  static function findById($id) {
+    $object = new static();
+    $object->id = $id;
+    if (!$object->find(TRUE)) {
+      throw new Exception("Unable to find a " . get_called_class() . " with id {$id}.");
+    }
+    return $object;
+  }
+
+  /**
    * Given a DAO name, a column name and a column value, find the record and GET the value of another column in that record
    *
    * @param string  $daoName       Name of the DAO (Example: CRM_Contact_DAO_Contact to retrieve value from a contact)
