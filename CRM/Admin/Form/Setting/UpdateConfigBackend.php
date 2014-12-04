@@ -43,7 +43,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
   protected $_oldSiteName;
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public

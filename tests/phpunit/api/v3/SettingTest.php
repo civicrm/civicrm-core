@@ -71,7 +71,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     parent::setUp();
     $params = array(
       'name' => 'Default Domain Name',
-         );
+    );
     $result = $this->callAPISuccess( 'domain','get',$params);
     if(empty($result['id'])){
       $result = $this->callAPISuccess( 'domain','create',$params );
@@ -110,7 +110,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
   /**
   /**
-   * check getfields works
+   * Check getfields works
    */
   function testGetFields() {
     $description = 'Demonstrate return from getfields - see subfolder for variants';
@@ -124,7 +124,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * let's check it's loading from cache by meddling with the cache
+   * Let's check it's loading from cache by meddling with the cache
    */
   function testGetFieldsCaching() {
     $settingsMetadata = array();
@@ -228,14 +228,14 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * check getfields works
+   * Check getfields works
    */
   function testCreateSetting() {
     $description = "shows setting a variable for a given domain - if no domain is set current is assumed";
 
     $params = array(
-        'domain_id' => $this->_domainID2,
-        'uniq_email_per_site' => 1,
+      'domain_id' => $this->_domainID2,
+      'uniq_email_per_site' => 1,
     );
     $result = $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__);
 
@@ -246,81 +246,75 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * check getfields works
+   * Check getfields works
    */
   function testCreateInvalidSettings() {
-
     $params = array(
-        'domain_id' => $this->_domainID2,
-        'invalid_key' => 1,
+      'domain_id' => $this->_domainID2,
+      'invalid_key' => 1,
     );
     $result = $this->callAPIFailure('setting', 'create', $params);
-   }
-
-   /**
-    * check invalid settings rejected -
-    */
-
-   function testCreateInvalidURLSettings() {
-
-     $params = array(
-         'domain_id' => $this->_domainID2,
-         'userFrameworkResourceURL' => 'dfhkdhfd',
-     );
-     $result = $this->callAPIFailure('setting', 'create', $params);
-     $params = array(
-         'domain_id' => $this->_domainID2,
-         'userFrameworkResourceURL' => 'http://blah.com',
-     );
-     $result = $this->callAPISuccess('setting', 'create', $params);
-   }
-
-   /**
-    * check getfields works
-    */
-   function testCreateInvalidBooleanSettings() {
-
-     $params = array(
-         'domain_id' => $this->_domainID2,
-         'track_civimail_replies' => 'dfhkdhfd',
-     );
-     $result = $this->callAPIFailure('setting', 'create', $params);
-
-     $params = array('track_civimail_replies' => '0',);
-     $result = $this->callAPISuccess('setting', 'create', $params);
-     $getResult = $this->callAPISuccess('setting','get',$params);
-     $this->assertEquals(0, $getResult['values'][$this->_currentDomain]['track_civimail_replies']);
-
-     $getResult = $this->callAPISuccess('setting','get',$params);
-     $this->assertEquals(0, $getResult['values'][$this->_currentDomain]['track_civimail_replies']);
-     $params = array(       'domain_id' => $this->_domainID2,
-       'track_civimail_replies' => '1',
-     );
-     $result = $this->callAPISuccess('setting', 'create', $params);
-     $getResult = $this->callAPISuccess('setting','get',$params);
-     $this->assertEquals(1, $getResult['values'][$this->_domainID2]['track_civimail_replies']);
-
-     $params = array(
-         'domain_id' => $this->_domainID2,
-         'track_civimail_replies' => 'TRUE',
-     );
-     $result = $this->callAPISuccess('setting', 'create', $params);
-     $getResult = $this->callAPISuccess('setting','get',$params);
-
-     $this->assertEquals(1, $getResult['values'][$this->_domainID2]['track_civimail_replies'], "check TRUE is converted to 1");
-
-
-   }
+  }
 
   /**
-   * check getfields works
+   * Check invalid settings rejected -
+   */
+  function testCreateInvalidURLSettings() {
+    $params = array(
+      'domain_id' => $this->_domainID2,
+      'userFrameworkResourceURL' => 'dfhkdhfd',
+    );
+    $result = $this->callAPIFailure('setting', 'create', $params);
+    $params = array(
+      'domain_id' => $this->_domainID2,
+      'userFrameworkResourceURL' => 'http://blah.com',
+    );
+    $result = $this->callAPISuccess('setting', 'create', $params);
+  }
+
+  /**
+   * Check getfields works
+   */
+  function testCreateInvalidBooleanSettings() {
+    $params = array(
+      'domain_id' => $this->_domainID2,
+      'track_civimail_replies' => 'dfhkdhfd',
+    );
+    $result = $this->callAPIFailure('setting', 'create', $params);
+
+    $params = array('track_civimail_replies' => '0',);
+    $result = $this->callAPISuccess('setting', 'create', $params);
+    $getResult = $this->callAPISuccess('setting','get',$params);
+    $this->assertEquals(0, $getResult['values'][$this->_currentDomain]['track_civimail_replies']);
+
+    $getResult = $this->callAPISuccess('setting','get',$params);
+    $this->assertEquals(0, $getResult['values'][$this->_currentDomain]['track_civimail_replies']);
+    $params = array(       'domain_id' => $this->_domainID2,
+      'track_civimail_replies' => '1',
+    );
+    $result = $this->callAPISuccess('setting', 'create', $params);
+    $getResult = $this->callAPISuccess('setting','get',$params);
+    $this->assertEquals(1, $getResult['values'][$this->_domainID2]['track_civimail_replies']);
+
+    $params = array(
+      'domain_id' => $this->_domainID2,
+      'track_civimail_replies' => 'TRUE',
+    );
+    $result = $this->callAPISuccess('setting', 'create', $params);
+    $getResult = $this->callAPISuccess('setting','get',$params);
+
+    $this->assertEquals(1, $getResult['values'][$this->_domainID2]['track_civimail_replies'], "check TRUE is converted to 1");
+  }
+
+  /**
+   * Check getfields works
    */
   function testCreateSettingMultipleDomains() {
     $description = "shows setting a variable for all domains";
 
     $params = array(
-        'domain_id' => 'all',
-        'uniq_email_per_site' => 1,
+      'domain_id' => 'all',
+      'uniq_email_per_site' => 1,
     );
     $result = $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__,$description, 'CreateAllDomains');
 
@@ -330,8 +324,8 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values'][3]['uniq_email_per_site'], 'failed to set setting for domain 3.');
 
     $params = array(
-        'domain_id' => 'all',
-        'return' => 'uniq_email_per_site'
+      'domain_id' => 'all',
+      'return' => 'uniq_email_per_site'
     );
     // we'll check it with a 'get'
     $description = "shows getting a variable for all domains";
@@ -342,8 +336,8 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values'][3]['uniq_email_per_site']);
 
     $params = array(
-        'domain_id' => array(1,3),
-        'uniq_email_per_site' => 0,
+      'domain_id' => array(1,3),
+      'uniq_email_per_site' => 0,
     );
     $description = "shows setting a variable for specified domains";
     $result = $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__,$description, 'CreateSpecifiedDomains');
@@ -351,8 +345,8 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['values'][3]['uniq_email_per_site']);
     $this->assertEquals(0, $result['values'][1]['uniq_email_per_site']);
     $params = array(
-        'domain_id' => array(1,2),
-        'return' => array('uniq_email_per_site'),
+      'domain_id' => array(1,2),
+      'return' => array('uniq_email_per_site'),
     );
     $description = "shows getting a variable for specified domains";
     $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__,$description, 'GetSpecifiedDomains', 'Get');
@@ -362,7 +356,6 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   function testGetSetting() {
-
     $params = array(
       'domain_id' => $this->_domainID2,
       'return' => 'uniq_email_per_site',
@@ -394,9 +387,10 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('setting', 'getvalue', array('name' => 'test_key', 'group' => 'Test Settings'));
     $this->assertEquals('keyset', $result);
   }
-/**
- * setting api should set & fetch settings stored in config as well as those in settings table
- */
+
+  /**
+   * Setting api should set & fetch settings stored in config as well as those in settings table
+   */
   function testSetConfigSetting() {
     $config = CRM_Core_Config::singleton();
     $this->assertFalse($config->debug == 1);
@@ -415,28 +409,29 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $dao->fetch();
     $this->assertEquals($dao->c, 0);
   }
+
   /**
-   * setting api should set & fetch settings stored in config as well as those in settings table
+   * Setting api should set & fetch settings stored in config as well as those in settings table
    */
   function testGetConfigSetting() {
     $settings = $this->callAPISuccess('setting', 'get', array(
-      'name' => 'defaultCurrency',      'sequential' => 1,)
+        'name' => 'defaultCurrency',      'sequential' => 1,)
     );
     $this->assertEquals('USD', $settings['values'][0]['defaultCurrency']);
   }
 
   /**
-   * setting api should set & fetch settings stored in config as well as those in settings table
+   * Setting api should set & fetch settings stored in config as well as those in settings table
    */
   function testGetSetConfigSettingMultipleDomains() {
     $settings = $this->callAPISuccess('setting', 'create', array(
-      'defaultCurrency' => 'USD',      'domain_id' => $this->_currentDomain)
+        'defaultCurrency' => 'USD',      'domain_id' => $this->_currentDomain)
     );
     $settings = $this->callAPISuccess('setting', 'create', array(
-      'defaultCurrency' => 'CAD',      'domain_id' => $this->_domainID2)
+        'defaultCurrency' => 'CAD',      'domain_id' => $this->_domainID2)
     );
     $settings = $this->callAPISuccess('setting', 'get', array(
-      'return' => 'defaultCurrency',      'domain_id' => 'all',
+        'return' => 'defaultCurrency',      'domain_id' => 'all',
       )
     );
     $this->assertEquals('USD', $settings['values'][$this->_currentDomain]['defaultCurrency']);
@@ -445,9 +440,9 @@ class api_v3_SettingTest extends CiviUnitTestCase {
 
   }
 
-/*
- * Use getValue against a config setting
- */
+  /**
+   * Use getValue against a config setting
+   */
   function testGetValueConfigSetting() {
     $params = array(      'name' => 'monetaryThousandSeparator',
       'group' => 'Localization Setting',
@@ -479,11 +474,11 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertEquals("{contact.addressee}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['mailing_format']);
     $this->assertArrayHasKey(CRM_Core_Config::domainID(), $result['values']);
   }
-  /*
+
+  /**
    * Function tests reverting a specific parameter
    */
   function testRevert() {
-
     $params = array(      'address_format' => 'xyz',
       'mailing_format' => 'bcs',
     );
@@ -505,13 +500,13 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     //make sure it's unchanged
     $this->assertEquals('bcs', $result['values'][CRM_Core_Config::domainID()]['mailing_format']);
   }
-  /*
+
+  /**
    * Tests reverting ALL parameters (specific domain)
    */
   function testRevertAll() {
-
     $params = array(        'address_format' => 'xyz',
-        'mailing_format' => 'bcs',
+      'mailing_format' => 'bcs',
     );
     $result = $this->callAPISuccess('setting', 'create', $params);
     $revertParams = array(    );
@@ -526,20 +521,20 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertEquals("{contact.addressee}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['mailing_format']);
   }
 
-  /*
+  /**
    * Tests filling missing params
-  */
+   */
   function testFill() {
     $domparams = array(
       'name' => 'B Team Domain',
-         );
+    );
     $dom = $this->callAPISuccess('domain', 'create', $domparams);
     $params = array(      'domain_id' => 'all',
     );
     $result = $this->callAPISuccess('setting', 'get', $params);
     $params = array(        'address_format' => 'xyz',
-        'mailing_format' => 'bcs',
-        'domain_id' => $this->_domainID2,
+      'mailing_format' => 'bcs',
+      'domain_id' => $this->_domainID2,
     );
     $result = $this->callAPISuccess('setting', 'create', $params);
     $params = array(      'domain_id' => $dom['id'],

@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -51,7 +51,7 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @access public
    *
@@ -112,7 +112,7 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -170,7 +170,7 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
         $status[] = ts('%count relationship was not created because the contact is not of the right type for this relationship', array('count' => $invalid, 'plural' => '%count relationships were not created because the contact is not of the right type for this relationship'));
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts('Relationship Created', array('count' => $valid, 'plural' => 'Relationships Created')), 'success', array('expires' => 0));
+      CRM_Core_Session::setStatus($status, ts('Relationship created.', array('count' => $valid, 'plural' => 'Relationships created.')), 'success', array('expires' => 0));
     }
   }
 

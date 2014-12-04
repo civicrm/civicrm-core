@@ -72,11 +72,11 @@ class CRM_Core_Action {
   //make sure MAX_ACTION = 2^n - 1 ( n = total number of actions )
 
   /**
-   * map the action names to the relevant constant. We perform
+   * Map the action names to the relevant constant. We perform
    * bit manipulation operations so we can perform multiple
    * actions on the same object if needed
    *
-   * @var array  _names  tupe of variable name to action constant
+   * @var array $_names  type of variable name to action constant
    *
    * @access private
    * @static
@@ -103,7 +103,7 @@ class CRM_Core_Action {
   );
 
   /**
-   * the flipped version of the names array, initialized when used
+   * The flipped version of the names array, initialized when used
    *
    * @var array
    * @static
@@ -111,12 +111,9 @@ class CRM_Core_Action {
   static $_description;
 
   /**
+   * Called by the request object to translate a string into a mask
    *
-   * called by the request object to translate a string into a mask
-   *
-   * @param $str
-   *
-   * @internal param string $action the action to be resolved
+   * @param string $str the action to be resolved
    *
    * @return int the action mask corresponding to the input string
    * @access public
@@ -135,7 +132,7 @@ class CRM_Core_Action {
    * Given a string or an array of strings, determine the bitmask
    * for this set of actions
    *
-   * @param mixed either a single string or an array of strings
+   * @param mixed $item either a single string or an array of strings
    *
    * @return int the action mask corresponding to the input args
    * @access public
@@ -159,7 +156,7 @@ class CRM_Core_Action {
   /**
    * Given a string determine the bitmask for this specific string
    *
-   * @param string the input action to process
+   * @param string $item the input action to process
    *
    * @return int the action mask corresponding to the input string
    * @access public
@@ -175,7 +172,7 @@ class CRM_Core_Action {
    *
    * Given an action mask, find the corresponding description
    *
-   * @param int the action mask
+   * @param int $mask the action mask
    *
    * @return string the corresponding action description
    * @access public
@@ -191,7 +188,7 @@ class CRM_Core_Action {
   }
 
   /**
-   * given a set of links and a mask, return the html action string for
+   * Given a set of links and a mask, return the html action string for
    * the links associated with the mask
    *
    * @param array $links the set of link items
@@ -202,7 +199,7 @@ class CRM_Core_Action {
    *
    * @param null $op
    * @param null $objectName
-   * @param null $objectId
+   * @param int $objectId
    *
    * @return string       the html string
    * @access public
@@ -308,7 +305,7 @@ class CRM_Core_Action {
   }
 
   /**
-   * given a string and an array of values, substitute the real values
+   * Given a string and an array of values, substitute the real values
    * in the placeholder in the str in the CiviCRM format
    *
    * @param string $str    the string to be replaced
@@ -326,7 +323,7 @@ class CRM_Core_Action {
   }
 
   /**
-   * get the mask for a permission (view, edit or null)
+   * Get the mask for a permission (view, edit or null)
    *
    * @param string the permission
    *

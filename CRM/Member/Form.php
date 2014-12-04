@@ -47,19 +47,41 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   public $_id;
 
   /**
-   * The name of the BAO object for this form
-   *
-   * @var string
+   * Membership Type ID
+   * @var
    */
-  protected $_BAOName;
+  protected $_memType;
+
+  /**
+   * Array of from email ids
+   * @var array
+   */
+  protected $_fromEmails = array();
 
   function preProcess() {
-    $this->_id = $this->get('id');
-    $this->_BAOName = $this->get('BAOName');
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String',$this, FALSE, 'add');
+    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+
+    $this->assign('context', $this->_context);
+    $this->assign('membershipMode', $this->_mode);
+    $this->assign('contactID', $this->_contactID);
+
+    if ($this->_mode) {
+      $this->assignPaymentRelatedVariables();
+    }
+
+    if ($this->_id) {
+      $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
+      $this->_membershipIDs[] = $this->_id;
+    }
+    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
   }
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -68,11 +90,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   function setDefaultValues() {
     $defaults = array();
-
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
-      $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $defaults);
+      CRM_Member_BAO_Membership::retrieve($params, $defaults);
     }
 
     if (isset($defaults['minimum_fee'])) {
@@ -98,12 +118,20 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
    */
   public function buildQuickForm() {
+    if ($this->_mode) {
+      $this->add('select', 'payment_processor_id',
+        ts('Payment Processor'),
+        $this->_processors, TRUE,
+        array('onChange' => "buildAutoRenew( null, this.value );")
+      );
+      CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, TRUE);
+    }
     if ($this->_action & CRM_Core_Action::RENEW) {
       $this->addButtons(array(
           array(
@@ -153,12 +181,12 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
   }
 
-  /*
-   * Function to extract values from the contact create boxes on the form and assign appropriatley  to
+  /**
+   * Extract values from the contact create boxes on the form and assign appropriately  to
    *
    *  - $this->_contributorEmail,
    *  - $this->_memberEmail &
-   *  - $this->_contributonName
+   *  - $this->_contributionName
    *  - $this->_memberName
    *  - $this->_contactID (effectively memberContactId but changing might have spin-off effects)
    *  - $this->_contributorContactId - id of the contributor
@@ -170,9 +198,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @param $formValues array values from form. The important values we are looking for are
    *  - contact_id
    *  - soft_credit_contact_id
-   */
-  /**
-   * @param $formValues
    */
   function storeContactFields($formValues){
     // in a 'standalone form' (contact id not in the url) the contact will be in the form values

@@ -35,7 +35,7 @@
 class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
   /**
-   * static field for all the pledge information that we can potentially export
+   * Static field for all the pledge information that we can potentially export
    *
    * @var array
    * @static
@@ -43,7 +43,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   static $_exportableFields = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -59,7 +59,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Pledge_BAO_Pledge object
+   * @return CRM_Pledge_BAO_Pledge object
    * @access public
    * @static
    */
@@ -74,7 +74,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * function to add pledge
+   * Add pledge
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -139,11 +139,11 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * takes an associative array and creates a pledge object
+   * Takes an associative array and creates a pledge object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Pledge_BAO_Pledge object
+   * @return CRM_Pledge_BAO_Pledge object
    * @access public
    * @static
    */
@@ -253,7 +253,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * Function to delete the pledge
+   * Delete the pledge
    *
    * @param int $id pledge id
    *
@@ -299,7 +299,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * function to get the amount details date wise.
+   * Get the amount details date wise.
    *
    * @param string $status
    * @param string $startDate
@@ -417,7 +417,6 @@ GROUP BY  currency
  GROUP BY  cp.currency
 ";
     if ($select) {
-      // CRM_Core_Error::debug($status . ' start:' . $startDate . '- end:' . $endDate, $query);
       $dao    = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
       $amount = array();
       $count  = 0;
@@ -443,7 +442,7 @@ GROUP BY  currency
   }
 
   /**
-   * Function to get list of pledges In Honor of contact Ids
+   * Get list of pledges In Honor of contact Ids
    *
    * @param int $honorId In Honor of Contact ID
    *
@@ -488,10 +487,10 @@ GROUP BY  currency
   }
 
   /**
-   * Function to send Acknowledgment and create activity.
+   * Send Acknowledgment and create activity.
    *
-   * @param object $form form object.
-   * @param array  $params (reference ) an assoc array of name/value pairs.
+   * @param CRM_Core_Form $form form object.
+   * @param array $params an assoc array of name/value pairs.
    * @access public
    *
    * @return void.
@@ -534,7 +533,6 @@ GROUP BY  currency
         }
       }
     }
-    //end
 
     //assign pledge fields value to template.
     $pledgeFields = array(
@@ -653,6 +651,7 @@ GROUP BY  currency
     );
     $config = CRM_Core_Config::singleton();
 
+    // FIXME: Translate
     $details = 'Total Amount ' . CRM_Utils_Money::format($params['total_pledge_amount'], CRM_Utils_Array::value('currency', $params)) . ' To be paid in ' . $params['installments'] . ' installments of ' . CRM_Utils_Money::format($params['scheduled_amount'], CRM_Utils_Array::value('currency', $params)) . ' every ' . $params['frequency_interval'] . ' ' . $params['frequency_unit'] . '(s)';
 
     if (!$activity->find()) {
@@ -683,7 +682,7 @@ GROUP BY  currency
   }
 
   /**
-   * combine all the exportable fields from the lower levels object
+   * Combine all the exportable fields from the lower levels object
    *
    * @return array array of exportable Fields
    * @access public
@@ -746,7 +745,7 @@ GROUP BY  currency
   }
 
   /**
-   * Function to get pending or in progress pledges
+   * Get pending or in progress pledges
    *
    * @param int $contactID contact id
    *
@@ -790,11 +789,9 @@ GROUP BY  currency
   }
 
   /**
-   * Function to get pledge record count for a Contact
+   * Get pledge record count for a Contact
    *
-   * @param $contactID
-   *
-   * @internal param int $contactId Contact ID
+   * @param int $contactID
    *
    * @return int count of pledge records
    * @access public
@@ -806,7 +803,7 @@ GROUP BY  currency
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */

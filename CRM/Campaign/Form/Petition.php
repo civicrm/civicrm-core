@@ -121,7 +121,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null
@@ -253,7 +253,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    */
   static function formRule($fields, $files, $form) {

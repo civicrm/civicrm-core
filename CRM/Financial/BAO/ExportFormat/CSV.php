@@ -48,14 +48,14 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
   );
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * @param $exportParams
+   * @param array $exportParams
    */
   function export($exportParams) {
     $export = parent::export($exportParams);
@@ -75,7 +75,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
   }
 
   /**
-   * @param $batchId
+   * @param int $batchId
    *
    * @return Object
    */

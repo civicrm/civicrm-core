@@ -33,7 +33,6 @@
  *
  */
 
-
 abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
 
   /**
@@ -44,79 +43,74 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
 
   protected $_fileName;
 
-  /**#@+
-   * @access protected
-   * @var integer
-   */
-
   /**
-   * imported file size
+   * Imported file size
    */
   protected $_fileSize;
 
   /**
-   * seperator being used
+   * Seperator being used
    */
   protected $_seperator;
 
   /**
-   * total number of lines in file
+   * Total number of lines in file
    */
   protected $_lineCount;
 
   /**
-   * running total number of valid soft credit rows
+   * Running total number of valid soft credit rows
    */
   protected $_validSoftCreditRowCount;
 
   /**
-   * running total number of invalid soft credit rows
+   * Running total number of invalid soft credit rows
    */
   protected $_invalidSoftCreditRowCount;
 
   /**
-   * running total number of valid pledge payment rows
+   * Running total number of valid pledge payment rows
    */
   protected $_validPledgePaymentRowCount;
 
   /**
-   * running total number of invalid pledge payment rows
+   * Running total number of invalid pledge payment rows
    */
   protected $_invalidPledgePaymentRowCount;
 
   /**
-   * array of pledge payment error lines, bounded by MAX_ERROR
+   * Array of pledge payment error lines, bounded by MAX_ERROR
    */
   protected $_pledgePaymentErrors;
 
   /**
-   * array of pledge payment error lines, bounded by MAX_ERROR
+   * Array of pledge payment error lines, bounded by MAX_ERROR
    */
   protected $_softCreditErrors;
 
   /**
-   * filename of pledge payment error data
+   * Filename of pledge payment error data
    *
    * @var string
    */
   protected $_pledgePaymentErrorsFileName;
 
   /**
-   * filename of soft credit error data
+   * Filename of soft credit error data
    *
    * @var string
    */
   protected $_softCreditErrorsFileName;
 
   /**
-   * whether the file has a column header or not
+   * Whether the file has a column header or not
    *
    * @var boolean
    */
   protected $_haveColumnHeader;
 
   /**
-   * @param $fileName
+   * @param string $fileName
    * @param string $seperator
    * @param $mapper
    * @param bool $skipColumnHeader
@@ -401,7 +395,6 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
     return $this->fini();
   }
 
@@ -411,7 +404,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    *
    * @param array mapped array of values
    *
-pppp   * @return void
+   * @return void
    * @access public
    */
   function setActiveFields($fieldKeys) {
@@ -427,7 +420,7 @@ pppp   * @return void
   }
 
   /**
-   * @param $elements
+   * @param array $elements
    */
   function setActiveFieldSoftCredit($elements) {
     for ($i = 0; $i < count($elements); $i++) {
@@ -436,15 +429,16 @@ pppp   * @return void
   }
 
   /**
-   * @param $elements
+   * @param array $elements
    */
   function setActiveFieldSoftCreditType($elements) {
     for ($i = 0; $i < count($elements); $i++) {
       $this->_activeFields[$i]->_softCreditType = $elements[$i];
     }
   }
+
   /**
-   * function to format the field values for input to the api
+   * Format the field values for input to the api
    *
    * @return array (reference ) associative array of name/value pairs
    * @access public
@@ -474,7 +468,7 @@ pppp   * @return void
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $title
    * @param int $type
    * @param string $headerPattern
@@ -564,17 +558,15 @@ pppp   * @return void
         $store->set('duplicatesFileName', $this->_duplicateFileName);
       }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
   }
 
   /**
    * Export data to a CSV file
    *
-   * @param $fileName
+   * @param string $fileName
    * @param array $header
-   * @param data $data
+   * @param array $data
    *
-   * @internal param string $filename
    * @return void
    * @access public
    */
@@ -611,12 +603,7 @@ pppp   * @return void
   /**
    * Determines the file extension based on error code
    *
-   * @var $type error code constant
-   * @return string
-   * @static
-   */
-  /**
-   * @param error $type
+   * @param int $type error code constant
    *
    * @return string
    */
@@ -649,12 +636,7 @@ pppp   * @return void
   /**
    * Determines the file name based on error code
    *
-   * @var $type error code constant
-   * @return string
-   * @static
-   */
-  /**
-   * @param error $type
+   * @param int $type error code constant
    *
    * @return string
    */

@@ -679,9 +679,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * @dataProvider entities_getlimit
    *
-   * @param $entityName
+   * @param string $entityName
    *
-   * @internal param string $entity
    */
   function testLimit($entityName) {
     $cases = array(); // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
@@ -746,9 +745,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * @dataProvider entities_getSqlOperators
    *
-   * @param $entityName
+   * @param string $entityName
    *
-   * @internal param string $entity
    */
   function testSqlOperators($entityName) {
     $baoString = _civicrm_api3_get_BAO($entityName);
@@ -1249,10 +1247,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return $returnEntities;
   }
   /**
-   * @param $entityName
+   * @param string $entityName
    * @param int $count
    *
-   * @internal param $entityName
    *
    * @return array
    */

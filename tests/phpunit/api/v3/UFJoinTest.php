@@ -77,7 +77,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
   }
 
   /**
-   * find uf join group id
+   * Find uf join group id
    */
   public function testFindUFGroupId() {
     $params = array(
@@ -124,7 +124,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
   }
 
   /**
-   * create/update uf join
+   * Create/update uf join
    */
   public function testCreateUFJoin() {
     $params = array(
@@ -180,7 +180,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
   }
 
   /**
-   * find uf join id
+   * Find uf join id
    */
   public function testGetUFJoinId() {
     $params = array(

@@ -84,7 +84,7 @@ function civicrm_api3_pledge_delete($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_pledge_delete_spec(&$params) {
   // set as not required as pledge_id also acceptable & no either/or std yet
@@ -159,12 +159,8 @@ function _civicrm_api3_pledge_get_defaults() {
  * convert it into the same format that we use in QF and BAO object
  *
  * @param array $values The reformatted properties that we can use internally
- *                            '
- *
  * @param bool $create
  *
- * @internal param array $params Associative array of property name/value
- *                             pairs to insert in new contact.
  * @return array|CRM_Error
  * @access public
  */

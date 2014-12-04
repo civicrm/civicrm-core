@@ -326,14 +326,12 @@ function civicrm_api3_activity_delete($params) {
 }
 
 /**
- * Function to check for required params
+ * Check for required params
  *
  * @param array $params associated array of fields
  *
  * @throws API_Exception
  * @throws Exception
- * @internal param bool $addMode true for add mode
- *
  * @return array $error array with errors
  */
 function _civicrm_api3_activity_check_params(&$params) {

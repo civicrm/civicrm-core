@@ -52,7 +52,7 @@ class CRM_Core_Page {
   protected $_name;
 
   /**
-   * the title associated with this page
+   * The title associated with this page
    *
    * @var object
    * @access protected
@@ -87,7 +87,7 @@ class CRM_Core_Page {
   protected $_print = FALSE;
 
   /**
-   * cache the smarty template for efficiency reasons
+   * Cache the smarty template for efficiency reasons
    *
    * @var CRM_Core_Smarty
    * @access protected
@@ -96,7 +96,7 @@ class CRM_Core_Page {
   static protected $_template;
 
   /**
-   * cache the session for efficiency reasons
+   * Cache the session for efficiency reasons
    *
    * @var CRM_Core_Session
    * @access protected
@@ -125,7 +125,7 @@ class CRM_Core_Page {
   public $useLivePageJS;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @param string $title title of the page
    * @param int    $mode  mode of the page
@@ -228,7 +228,7 @@ class CRM_Core_Page {
     if ($this->useLivePageJS &&
       CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajaxPopupsEnabled', NULL, TRUE))
     {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
       $this->assign('includeWysiwygEditor', TRUE);
     }
 
@@ -277,12 +277,11 @@ class CRM_Core_Page {
   }
 
   /**
-   * assign value to name in template
+   * Assign value to name in template
    *
-   * @param $var
+   * @param string $var
    * @param mixed $value value of varaible
    *
-   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -291,12 +290,11 @@ class CRM_Core_Page {
   }
 
   /**
-   * assign value to name in template by reference
+   * Assign value to name in template by reference
    *
-   * @param $var
+   * @param string $var
    * @param mixed $value (reference) value of varaible
    *
-   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -305,7 +303,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * appends values to template variables
+   * Appends values to template variables
    *
    * @param array|string $tpl_var the template variable name(s)
    * @param mixed $value the value to append
@@ -320,7 +318,6 @@ class CRM_Core_Page {
    *
    * @param string $name
    *
-   * @internal param string $type
    * @return array
    */
   function get_template_vars($name=null) {
@@ -328,7 +325,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * function to destroy all the session state of this page.
+   * Destroy all the session state of this page.
    *
    * @access public
    *
@@ -373,7 +370,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * setter for embedded
+   * Setter for embedded
    *
    * @param boolean $embedded
    *
@@ -385,7 +382,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * getter for embedded
+   * Getter for embedded
    *
    * @return boolean return the embedded value
    * @access public
@@ -395,7 +392,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * setter for print
+   * Setter for print
    *
    * @param boolean $print
    *
@@ -407,7 +404,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * getter for print
+   * Getter for print
    *
    * @return boolean return the print value
    * @access public
@@ -424,7 +421,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * @param $name
+   * @param string $name
    *
    * @return null
    */
@@ -433,7 +430,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $value
    */
   function setVar($name, $value) {

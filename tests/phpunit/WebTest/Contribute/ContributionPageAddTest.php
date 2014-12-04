@@ -140,7 +140,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * check CRM-7943
+   * Check CRM-7943
    */
   function testContributionPageSeparatePayment() {
     // open browser, login
@@ -185,7 +185,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * check CRM-7949
+   * Check CRM-7949
    */
   function testContributionPageSeparatePaymentPayLater() {
     // open browser, login

@@ -90,10 +90,10 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
   }
 
   /**
-   * @param $firstName
-   * @param $lastName
+   * @param string $firstName
+   * @param string $lastName
    * @param $email
-   * @param $groupName
+   * @param string $groupName
    * @param bool $deceased
    */
   function _testAddContact($firstName, $lastName, $email, $groupName, $deceased = FALSE) {

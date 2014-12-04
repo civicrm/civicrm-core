@@ -40,9 +40,9 @@
 class CRM_Event_Form_EventFees {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
@@ -73,7 +73,7 @@ class CRM_Event_Form_EventFees {
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
@@ -255,8 +255,8 @@ class CRM_Event_Form_EventFees {
    *
    * @access public
    *
-   * @param $participantID
-   * @param null $eventID
+   * @param int $participantID
+   * @param int $eventID
    * @param bool $includeQtyZero
    *
    * @return void
@@ -339,9 +339,9 @@ SELECT  id, html_type
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
@@ -410,7 +410,7 @@ SELECT  id, html_type
         }
       }
       if ($form->_mode) {
-        CRM_Core_Payment_Form::buildCreditCard($form, TRUE);
+        CRM_Core_Payment_Form::buildPaymentForm($form, $form->_processor, FALSE);
       }
       elseif (!$form->_mode) {
         $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,

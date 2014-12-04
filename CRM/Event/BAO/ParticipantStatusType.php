@@ -34,7 +34,7 @@
  */
 class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatusType {
   /**
-   * @param $params
+   * @param array $params
    *
    * @return $this|null
    */
@@ -48,7 +48,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return $this|null
    */
@@ -64,7 +64,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return bool
    */
@@ -86,7 +86,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $defaults
    *
    * @return CRM_Event_DAO_ParticipantStatusType|null
@@ -105,7 +105,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $isActive
    *
    * @return bool
@@ -115,7 +115,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */

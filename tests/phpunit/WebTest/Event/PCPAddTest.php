@@ -116,12 +116,12 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $processorName
+   * @param string $processorName
    * @param $campaignType
-   * @param null $contributionPageId
-   * @param $firstName
-   * @param $lastName
-   * @param $middleName
+   * @param int $contributionPageId
+   * @param string $firstName
+   * @param string $lastName
+   * @param string $middleName
    * @param $email
    */
   function _testAddEventForPCP($processorName, $campaignType, $contributionPageId = NULL, $firstName, $lastName, $middleName, $email) {
@@ -265,10 +265,10 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
   /**
    * @param $eventTitle
-   * @param $pageId
-   * @param $firstName
-   * @param $lastName
-   * @param $middleName
+   * @param int $pageId
+   * @param string $firstName
+   * @param string $lastName
+   * @param string $middleName
    * @param $email
    * @param int $numberRegistrations
    * @param $campaignType
@@ -435,7 +435,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
   /**
    * @param $campaignType
-   * @param $contributionPageId
+   * @param int $contributionPageId
    *
    * @return null
    */
@@ -477,11 +477,11 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $eventName
-   * @param $lastNameDonar
-   * @param $firstNameDonar
-   * @param $firstNameCreator
-   * @param $lastNameCreator
+   * @param string $eventName
+   * @param string $lastNameDonar
+   * @param string $firstNameDonar
+   * @param string $firstNameCreator
+   * @param string $lastNameCreator
    * @param $amount
    */
   function _testParticipantSearchEventName($eventName, $lastNameDonar, $firstNameDonar, $firstNameCreator, $lastNameCreator, $amount) {
@@ -507,7 +507,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $firstName
+   * @param string $firstName
    * @param $lastName
    * @param $pcpCreatorFirstName
    * @param $pcpCreatorLastName

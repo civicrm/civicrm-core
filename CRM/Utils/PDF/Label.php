@@ -130,7 +130,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param bool $convert
    *
    * @return float|int|mixed
@@ -151,7 +151,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   }
 
   /*
-   * Function to initialize label format settings
+   * initialize label format settings
    */
   /**
    * @param $format
@@ -184,7 +184,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   }
 
   /*
-   * function to Generate the pdf of one label (can be modified using SetGenerator)
+   * Generate the pdf of one label (can be modified using SetGenerator)
    */
   /**
    * @param $text
@@ -231,7 +231,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   }
 
   /*
-   * function to Print a label
+   * Print a label
    */
   /**
    * @param $texte

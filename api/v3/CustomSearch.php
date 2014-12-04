@@ -5,9 +5,7 @@
  *
  * FIXME This is a bare-minimum placeholder
  *
- * @param $params
- *
- * @internal param $array $ params input parameters
+ * @param array $params
  *
  * {@example OptionValueGet.php 0}
  * @example OptionValueGet.php
@@ -31,7 +29,7 @@ function civicrm_api3_custom_search_get($params) {
  *
  * {@example OptionValueCreate.php}
  *
- * @param $params
+ * @param array $params
  *
  * @return array of newly created option_value property values.
  * {@getfields OptionValue_create}

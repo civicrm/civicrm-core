@@ -74,7 +74,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null
@@ -98,7 +98,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @param null
    *
@@ -112,7 +112,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       $optionTypes = array('1' => ts('Create new result set'));
     }
     else {
-      $optionTypes = array('1' => ts('Create a new result set'),
+      $optionTypes = array('1' => ts('Create new result set'),
         '2' => ts('Use existing result set'),
       );
       $this->add('select',
@@ -201,7 +201,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    */
   static function formRule($fields, $files, $form) {

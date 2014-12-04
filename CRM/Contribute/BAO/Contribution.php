@@ -35,7 +35,7 @@
 class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
   /**
-   * static field for all the contribution information that we can potentially import
+   * Static field for all the contribution information that we can potentially import
    *
    * @var array
    * @static
@@ -43,7 +43,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   static $_importableFields = NULL;
 
   /**
-   * static field for all the contribution information that we can potentially export
+   * Static field for all the contribution information that we can potentially export
    *
    * @var array
    * @static
@@ -51,13 +51,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   static $_exportableFields = NULL;
 
   /**
-   * field for all the objects related to this contribution
+   * Field for all the objects related to this contribution
    * @var array of objects (e.g membership object, participant object)
    */
   public $_relatedObjects = array();
 
   /**
-   * field for the component - either 'event' (participant) or 'contribute'
+   * Field for the component - either 'event' (participant) or 'contribute'
    * (any item related to a contribution page e.g. membership, pledge, contribution)
    * This is used for composing messages because they have dependency on the
    * contribution_page or event page - although over time we may eliminate that
@@ -70,7 +70,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * construct method
    */
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_Contribute_DAO_Contribution
@@ -83,7 +83,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * takes an associative array and creates a contribution object
+   * Takes an associative array and creates a contribution object
    *
    * the function extract all the params it needs to initialize the create a
    * contribution object. the params array could contain additional unused name/value
@@ -92,7 +92,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array  $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
-   * @return object CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution object
    * @access public
    * @static
    */
@@ -102,7 +102,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
     //per http://wiki.civicrm.org/confluence/display/CRM/Database+layer we are moving away from $ids array
     $contributionID = CRM_Utils_Array::value('contribution', $ids, CRM_Utils_Array::value('id', $params));
-
     $duplicates = array();
     if (self::checkDuplicate($params, $duplicates, $contributionID)) {
       $error = CRM_Core_Error::singleton();
@@ -248,7 +247,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return mixed
    */
@@ -290,12 +289,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * takes an associative array and creates a contribution object
+   * Takes an associative array and creates a contribution object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
-   * @return object CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution object
    * @access public
    * @static
    */
@@ -535,7 +534,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *                        in a hierarchical manner
    * @param array $ids      (reference) the array that holds all the db ids
    *
-   * @return object CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution object
    * @access public
    * @static
    */
@@ -545,7 +544,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * combine all the importable fields from the lower levels object
+   * Combine all the importable fields from the lower levels object
    *
    * The ordering is important, since currently we do not have a weight
    * scheme. Adding weight is super important and should be done in the
@@ -763,7 +762,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   /**
    * Delete the indirect records associated with this contribution first
    *
-   * @param $id
+   * @param int $id
    *
    * @return mixed|null $results no of deleted Contribution on success, false otherwise@access public
    * @static
@@ -835,12 +834,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   /**
    * Check if there is a contribution with the same trxn_id or invoice_id
    *
-   * @param $input
+   * @param array $input an assoc array of name/value pairs
    * @param array $duplicates (reference ) store ids of duplicate contribs
    *
-   * @param null $id
+   * @param int $id
    *
-   * @internal param array $params (reference ) an assoc array of name/value pairs
    * @return boolean true if duplicate, false otherwise
    * @access public
    * static
@@ -886,7 +884,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-   * takes an associative array and creates a contribution_product object
+   * Takes an associative array and creates a contribution_product object
    *
    * the function extract all the params it needs to initialize the create a
    * contribution_product object. the params array could contain additional unused name/value
@@ -894,7 +892,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Contribute_BAO_ContributionProduct object
+   * @return CRM_Contribute_BAO_ContributionProduct object
    * @access public
    * @static
    */
@@ -905,7 +903,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-   * Function to get list of contribution fields for profile
+   * Get list of contribution fields for profile
    * For now we only allow custom contribution fields to be in
    * profile
    *
@@ -940,7 +938,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-   * Function to add extra fields specific to contribtion
+   * Add extra fields specific to contribtion
    *
    * @static
    */
@@ -976,7 +974,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-   * @param $pageID
+   * @param int $pageID
    *
    * @return array
    */
@@ -1004,7 +1002,7 @@ GROUP BY p.id
   }
 
   /**
-   * Function to get list of contribution In Honor of contact Ids
+   * Get list of contribution In Honor of contact Ids
    *
    * @param int $honorId In Honor of Contact ID
    *
@@ -1042,7 +1040,7 @@ GROUP BY p.id
   }
 
   /**
-   * function to get the sort name of a contact for a particular contribution
+   * Get the sort name of a contact for a particular contribution
    *
    * @param  int    $id      id of the contribution
    *
@@ -1063,7 +1061,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
   }
 
   /**
-   * @param $contactID
+   * @param int $contactID
    *
    * @return array
    */
@@ -1172,7 +1170,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
   }
 
   /**
-   * Function to get the contribution details for component export
+   * Get the contribution details for component export
    *
    * @param int     $exportMode export mode
    * @param string  $componentIds  component ids
@@ -1236,12 +1234,10 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   }
 
   /**
-   *  Function to create address associated with contribution record.
+   * Create address associated with contribution record.
    *
    * @param array $params an associated array
-   * @param $billingLocationTypeID
-   *
-   * @internal param int $billingID $billingLocationTypeID
+   * @param int $billingLocationTypeID
    *
    * @return address id
    * @static
@@ -1277,11 +1273,9 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   /**
    * Delete billing address record related contribution
    *
-   * @param null $contributionId
-   * @param null $contactId
+   * @param int $contributionId
+   * @param int $contactId
    *
-   * @internal param int $contact_id contact id
-   * @internal param int $contribution_id contributionId
    * @access public
    * @static
    */
@@ -1768,7 +1762,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   }
 
   /**
-   * @param $contactId
+   * @param int $contactId
    * @param bool $includeSoftCredit
    *
    * @return null|string
@@ -1802,7 +1796,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   }
 
   /**
-   * Function to get individual id for onbehalf contribution
+   * Get individual id for onbehalf contribution
    *
    * @param int $contributionId contribution id
    * @param int $contributorId  contributor id
@@ -2541,7 +2535,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Function to check whether payment processor supports
+   * Check whether payment processor supports
    * cancellation of contribution subscription
    *
    * @param int $contributionId contribution id
@@ -2575,7 +2569,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Function to check whether subscription is already cancelled
+   * Check whether subscription is already cancelled
    *
    * @param int $contributionId contribution id
    *
@@ -2599,7 +2593,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Function to create all financial accounts entry
+   * Create all financial accounts entry
    *
    * @param array $params contribution object, line item array and params for trxn
    *
@@ -2886,7 +2880,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Function to update all financial accounts entry
+   * Update all financial accounts entry
    *
    * @param array $params contribution object, line item array and params for trxn
    *
@@ -3053,7 +3047,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Function to check status validation on update of a contribution
+   * Check status validation on update of a contribution
    *
    * @param array $values previous form values before submit
    *
@@ -3087,7 +3081,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Function to delete contribution of contact
+   * Delete contribution of contact
    *
    * CRM-12155
    *
@@ -3131,12 +3125,19 @@ WHERE  contribution_id = %1 ";
           $types = (array) CRM_Utils_Array::value('payment_processor', $page, 0);
           $params['condition'] = 'id IN (' . implode(',', $types) . ')';
         }
+        break;
+      // CRM-13981 This field was combined with soft_credits in 4.5 but the api still supports it
+      case 'honor_type_id':
+        $className = 'CRM_Contribute_BAO_ContributionSoft';
+        $fieldName = 'soft_credit_type_id';
+        $params['condition'] = "v.name IN ('in_honor_of','in_memory_of')";
+        break;
     }
     return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
   }
 
   /**
-   * Function to validate financial type
+   * Validate financial type
    *
    * CRM-13231
    *
@@ -3167,10 +3168,10 @@ WHERE  contribution_id = %1 ";
    * @param string $paymentType 'owed' for purpose of recording partial payments, 'refund' for purpose of recording refund payments
    */
   /**
-   * @param $contributionId
+   * @param int $contributionId
    * @param $trxnsData
    * @param string $paymentType
-   * @param null $participantId
+   * @param int $participantId
    *
    * @return null|object
    */
@@ -3337,7 +3338,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    * @param $trxnObj
    * @param $activityType
    * @param $component
-   * @param $contributionId
+   * @param int $contributionId
    *
    * @throws CRM_Core_Exception
    */
@@ -3380,9 +3381,9 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   }
 
   /**
-   * function to get list of payments displayed by Contribute_Page_PaymentInfo
+   * Get list of payments displayed by Contribute_Page_PaymentInfo
    *
-   * @param $id
+   * @param int $id
    * @param $component
    * @param bool $getTrxnInfo
    * @param bool $usingLineTotal
@@ -3493,10 +3494,10 @@ WHERE con.id = {$contributionId}
   }
 
   /**
-   * Function to get financial account id has 'Sales Tax Account is'
+   * Get financial account id has 'Sales Tax Account is'
    * account relationship with financial type
    *
-   * @param $financialTypeId
+   * @param int $financialTypeId
    *
    * @return FinancialAccountId
    */

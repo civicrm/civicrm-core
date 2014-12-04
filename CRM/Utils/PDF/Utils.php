@@ -174,7 +174,7 @@ class CRM_Utils_PDF_Utils {
    * @param $orientation
    * @param $html
    * @param $output
-   * @param $fileName
+   * @param string $fileName
    *
    * @return string
    */
@@ -200,7 +200,7 @@ class CRM_Utils_PDF_Utils {
    * @param $margins
    * @param $html
    * @param $output
-   * @param $fileName
+   * @param string $fileName
    */
   static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
     require_once 'packages/snappy/src/autoload.php';
@@ -225,7 +225,7 @@ class CRM_Utils_PDF_Utils {
   }
 
   /*
-   * function to convert value from one metric to another
+   * convert value from one metric to another
    */
   /**
    * @param $value
@@ -292,7 +292,7 @@ class CRM_Utils_PDF_Utils {
   }
 
   /**
-   * @param $fileName
+   * @param string $fileName
    * @param $searchPath
    * @param $values
    * @param int $numPages
@@ -373,13 +373,6 @@ class CRM_Utils_PDF_Utils {
             'embedding encoding=winansi'
           );
 
-          /**
-           if ( $res == 0 ) {
-           CRM_Core_Error::debug( "$key, $value: $res", $pdf->get_errmsg( ) );
-           } else {
-           CRM_Core_Error::debug( "SUCCESS: $key, $value", null );
-           }
-           **/
         }
 
         $pdf->end_page_ext('');

@@ -155,7 +155,7 @@ function civicrm_api3_contact_get($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return int
  */
@@ -292,11 +292,11 @@ function civicrm_api3_contact_delete($params) {
 
 
 /**
- * @param $params
+ * @param array $params
  * @param bool $dupeCheck
  * @param bool $dupeErrorArray
  * @param bool $obsoletevalue
- * @param null $dedupeRuleGroupID
+ * @param int $dedupeRuleGroupID
  *
  * @return null
  * @throws API_Exception
@@ -330,7 +330,7 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
 
   if (!empty($params['contact_sub_type']) && !empty($params['contact_type'])) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type']))) {
-        throw new API_Exception("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$params['contact_sub_type']));
+        throw new API_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array)$params['contact_sub_type']));
       }
     }
 
@@ -396,7 +396,7 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
  * @param array $params (reference ) an assoc array of name/value pairs
  * @param  int     $contactID        if present the contact with that ID is updated
  *
- * @return object CRM_Contact_BAO_Contact object
+ * @return CRM_Contact_BAO_Contact object
  * @access public
  * @static
  */
@@ -881,7 +881,7 @@ function civicrm_api3_contact_merge($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_contact_proximity_spec(&$params) {
   $params['latitude']['api.required'] = 1;
@@ -893,7 +893,7 @@ function _civicrm_api3_contact_proximity_spec(&$params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return array
  * @throws Exception
@@ -982,8 +982,7 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   $request['params']['options']['sort'] = 'sort_name';
   // Contact api doesn't support array(LIKE => 'foo') syntax
   if (!empty($request['input'])) {
-    // CRM-15442 - change spaces to % wildcards when searching by name
-    $request['params'][$request['search_field']] = strpos($request['search_field'], 'name') ? str_replace(' ', '%', $request['input']) : $request['input'];
+    $request['params'][$request['search_field']] = $request['input'];
   }
 }
 

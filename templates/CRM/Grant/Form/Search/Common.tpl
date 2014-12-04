@@ -29,11 +29,11 @@
         {$form.grant_report_received.html}
     </td>
     <td>
-        {$form.grant_status_id.label}<br />
+        <label>{ts}Grant Status(s){/ts}</label>
         {$form.grant_status_id.html}
     </td>
     <td>
-        {$form.grant_type_id.label}<br />
+        <label>{ts}Grant Type(s){/ts}</label>
         {$form.grant_type_id.html}
     </td>
 </tr>

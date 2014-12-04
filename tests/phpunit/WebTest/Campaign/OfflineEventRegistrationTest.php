@@ -81,7 +81,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
 
     $this->openCiviPage("campaign", "reset=1", "link=Add Campaign");
 
-    if ($this->isTextPresent('No campaigns found.')) {
+    if ($this->isTextPresent('None found.')) {
       $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
       $this->assertTrue($this->isTextPresent('There are currently no active Campaigns.'));
     }
@@ -121,7 +121,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
 
   /**
    * @param $campaignTitle
-   * @param $id
+   * @param int $id
    */
   function offlineParticipantAddTest($campaignTitle, $id) {
     // connect campaign with event
@@ -209,7 +209,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->click("remove");
     $this->click("_qf_Component_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Changes Saved."));
+    $this->assertTrue($this->isTextPresent("Changes Saved"));
 
     $this->openCiviPage("event/search", "reset=1", "_qf_Search_refresh");
 

@@ -23,9 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{capture assign=docLink}{docURL page="user/contributions/payment-processors"}{/capture}
 <div id="help">
-    {ts}You can configure one or more Payment Processors for your CiviCRM installation. You must then assign an active Payment Processor to each <strong>Online Contribution Page</strong> and each paid <strong>Event</strong>.{/ts} {help id='proc-type'} {$docLink}
+    {ts}You can configure one or more Payment Processors for your CiviCRM installation. You must then assign an active Payment Processor to each <strong>Online Contribution Page</strong> and each paid <strong>Event</strong>.{/ts} {help id='proc-type'}
 </div>
 
 {if $action eq 1 or $action eq 2 or $action eq 8}
@@ -64,7 +63,7 @@
 
         {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1&pp=2"}" id="newPaymentProcessor" class="button"><span><div class="icon add-icon"></div>{ts}Add Payment Processor{/ts}</span></a>
+          <a href="{crmURL q="action=add&reset=1&pp=$defaultPaymentProcessorType"}" id="newPaymentProcessor" class="button"><span><div class="icon add-icon"></div>{ts}Add Payment Processor{/ts}</span></a>
         </div>
         {/if}
 </div>
@@ -74,7 +73,7 @@
         {ts}There are no Payment Processors entered.{/ts}
      </div>
      <div class="action-link">
-       <a href="{crmURL p='civicrm/admin/paymentProcessor' q="action=add&reset=1&pp=2"}" id="newPaymentProcessor" class="button"><span><div class="icon add-icon"></div>{ts}Add Payment Processor{/ts}</span></a>
+       <a href="{crmURL p='civicrm/admin/paymentProcessor' q="action=add&reset=1&pp=$defaultPaymentProcessorType"}" id="newPaymentProcessor" class="button"><span><div class="icon add-icon"></div>{ts}Add Payment Processor{/ts}</span></a>
      </div>
 {/if}
 {/if}

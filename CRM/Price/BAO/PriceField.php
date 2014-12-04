@@ -42,17 +42,15 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   protected $_options;
 
   /**
-   * takes an associative array and creates a price field object
+   * Takes an associative array and creates a price field object
    *
    * the function extract all the params it needs to initialize the create a
    * price field object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @internal param array $ids the array that holds all the db ids
-   *
-   * @return object CRM_Price_BAO_PriceField object
+   * @return CRM_Price_BAO_PriceField object
    * @access public
    * @static
    */
@@ -70,13 +68,13 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   }
 
   /**
-   * takes an associative array and creates a price field object
+   * Takes an associative array and creates a price field object
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Price_DAO_PriceField object
+   * @return CRM_Price_DAO_PriceField object
    * @access public
    * @static
    */
@@ -170,16 +168,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Price_DAO_PriceField object
+   * @return CRM_Price_DAO_PriceField object
    * @access public
    * @static
    */
@@ -188,7 +182,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id         Id of the database record
    * @param boolean  $is_active  Value we want to set the is_active field
@@ -222,7 +216,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *
    * @param CRM_Core_Form $qf form object (reference)
    * @param string $elementName name of the custom field
-   * @param $fieldId
+   * @param int $fieldId
    * @param boolean $inactiveNeeded
    * @param boolean $useRequired true if required else false
    * @param string $label label for custom field
@@ -345,8 +339,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $type = 'money';
         }
         else {
-          $message = ts('%1 must be an integer (whole number).', array(1 => $label));
-          $type = 'positiveInteger';
+          $message = ts('%1 must be a number (with or without decimal point).', array(1 => $label));
+          $type = 'numeric';
         }
         // integers will have numeric rule applied to them.
         $qf->addRule($elementName, $message, $type);
@@ -566,7 +560,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
   /**
    * @param $optionLabel
-   * @param $fid
+   * @param int $fid
    *
    * @return mixed
    */

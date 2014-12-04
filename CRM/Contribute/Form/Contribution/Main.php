@@ -56,11 +56,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   public $_useForMember;
 
-  protected $_ppType;
+  /**
+   * Array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
+   * @var array
+   */
+  public $_paymentFields = array();
+
+  protected $_paymentProcessorID;
   protected $_snippet;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -179,7 +185,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * set the default values
+   * Set the default values
    *
    * @return void
    * @access public
@@ -368,7 +374,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -388,7 +394,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     // Build payment processor form
-    if (($this->_ppType || $this->_isBillingAddressRequiredForPayLater) && empty($_GET['onbehalf'])) {
+    if (empty($_GET['onbehalf'])) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
       // Return if we are in an ajax callback
       if ($this->_snippet) {
@@ -414,6 +420,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     );
     $this->addRule("email-{$this->_bltID}", ts('Email is not valid.'), 'email');
     $pps = array();
+    //@todo - this should be replaced by a check as to whether billing fields are set
     $onlinePaymentProcessorEnabled = FALSE;
     if (!empty($this->_paymentProcessors)) {
       foreach ($this->_paymentProcessors as $key => $name) {
@@ -621,7 +628,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * build elements to enable pay on behalf of an organization.
+   * Build elements to enable pay on behalf of an organization.
    *
    * @access public
    */
@@ -643,7 +650,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * build elements to collect information for recurring contributions
+   * Build elements to collect information for recurring contributions
    *
    * @access public
    *
@@ -716,13 +723,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
    * @param $self
    *
-   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -1085,8 +1091,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * @param $params
-   * @param $form
+   * @param array $params
+   * @param CRM_Core_Form $form
    *
    * @return int|mixed|null|string
    */
@@ -1121,7 +1127,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -1383,24 +1389,24 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Handle Payment Processor switching
    * For contribution and event registration forms
-   * @param CRM_Core_Form $form
+   * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register $form
    * @param bool $noFees
    */
   static function preProcessPaymentOptions(&$form, $noFees = FALSE) {
     $form->_snippet = CRM_Utils_Array::value('snippet', $_GET);
 
     $form->_paymentProcessors = $noFees ? array() : $form->get('paymentProcessors');
-    $form->_ppType = NULL;
+    $form->_paymentProcessorID = NULL;
     if ($form->_paymentProcessors) {
       // Fetch type during ajax request
       if (isset($_GET['type']) && $form->_snippet) {
-        $form->_ppType = $_GET['type'];
+        $form->_paymentProcessorID = CRM_Utils_Request::retrieve('type', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, 0);
       }
       // Remember type during form post
       elseif (!empty($form->_submitValues)) {
-        $form->_ppType = CRM_Utils_Array::value('payment_processor', $form->_submitValues);
-        $form->_paymentProcessor = CRM_Utils_Array::value($form->_ppType, $form->_paymentProcessors);
-        $form->set('type', $form->_ppType);
+        $form->_paymentProcessorID = CRM_Utils_Array::value('payment_processor', $form->_submitValues);
+        $form->_paymentProcessor = CRM_Utils_Array::value($form->_paymentProcessorID, $form->_paymentProcessors);
+        $form->set('type', $form->_paymentProcessorID);
         $form->set('mode', $form->_mode);
         $form->set('paymentProcessor', $form->_paymentProcessor);
       }
@@ -1408,13 +1414,16 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       else {
         foreach ($form->_paymentProcessors as $values) {
           if (!empty($values['is_default']) || count($form->_paymentProcessors) == 1) {
-            $form->_ppType = $values['id'];
+            $form->_paymentProcessorID = $values['id'];
             break;
           }
         }
       }
-      if ($form->_ppType) {
+      if ($form->_paymentProcessorID) {
         CRM_Core_Payment_ProcessorForm::preProcess($form);
+      }
+      else {
+        $form->_paymentProcessor = array();
       }
 
       //get payPal express id and make it available to template
@@ -1435,7 +1444,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';');
       }
     }
-    $form->assign('ppType', $form->_ppType);
+    $form->assign('paymentProcessorID', $form->_paymentProcessorID);
   }
 }
 

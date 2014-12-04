@@ -47,7 +47,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -75,12 +75,12 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
     }
 
     $this->add('textarea', 'description', ts('Description'), $attributes['description']);
-    $this->add('text', 'item_count', ts('Number of items'), $attributes['item_count'], TRUE);
+    $this->add('text', 'item_count', ts('Number of Items'), $attributes['item_count'], TRUE);
     $this->add('text', 'total', ts('Total Amount'), $attributes['total'], TRUE);
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -100,7 +100,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -136,6 +136,5 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/batch/entry', "id={$batch->id}&reset=1"));
     }
   }
-  //end of function
 }
 

@@ -48,7 +48,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   public $_freqUnits;
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -57,13 +57,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     parent::buildQuickForm();
     $this->_mappingID = $mappingID = NULL;
     $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
+    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     if ($this->_action & (CRM_Core_Action::DELETE)) {
-      $reminderName =
-        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'title');
-      $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+      $reminderName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'title');
       if ($this->_context == 'event') {
-        $this->_eventId = CRM_Utils_Request::retrieve('eventId', 'Integer', $this);
+        $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
       }
       $this->assign('reminderName', $reminderName);
       return;
@@ -71,18 +70,31 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     elseif ($this->_action & (CRM_Core_Action::UPDATE)) {
       $this->_mappingID =
         CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'mapping_id');
-      $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
       if ($this->_context == 'event') {
-        $this->_eventId = CRM_Utils_Request::retrieve('eventId', 'Integer', $this);
+        $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
+      }
+    }
+    elseif (!empty($this->_context)) {
+      if ($this->_context == 'event') {
+        $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
+        $field = 'civicrm_event';
+        $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_compId, 'is_template');
+        if ($isTemplate) {
+          $field = 'event_template';
+        }
+        $this->_mappingID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', $field, 'id', 'entity_value');
+        if (!$this->_mappingID) {
+          CRM_Core_Error::fatal('Could not find mapping for event scheduled reminders.');
+        }
       }
     }
 
-    if (!empty($_POST) && !empty($_POST['entity'])) {
-      $mappingID = $_POST['entity'][0];
-    }
-    elseif ($this->_mappingID) {
-      $mappingID = $this->_mappingID;
-    }
+      if (!empty($_POST) && !empty($_POST['entity']) && empty($this->_context)) {
+        $mappingID = $_POST['entity'][0];
+      }
+      elseif ($this->_mappingID) {
+        $mappingID = $this->_mappingID;
+      }
 
     $this->add(
       'text',
@@ -94,35 +106,44 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection($mappingID);
     extract($selectionOptions);
-
-    if (empty($sel1)) {
-      CRM_Core_Error::fatal('Could not find mapping for scheduled reminders.');
-    }
     $this->assign('entityMapping', json_encode($entityMapping));
     $this->assign('recipientMapping', json_encode($recipientMapping));
 
-    $sel = & $this->add(
-      'hierselect',
-      'entity',
-      ts('Entity'),
-      array(
-        'name' => 'entity[0]',
-        'style' => 'vertical-align: top;',
-      ),
-      TRUE
-    );
-    $sel->setOptions(array($sel1, $sel2, $sel3));
+    if (empty($this->_context)) {
+      if (empty($sel1)) {
+        CRM_Core_Error::fatal('Could not find mapping for scheduled reminders.');
+      }
 
-    if (is_a($sel->_elements[1], 'HTML_QuickForm_select')) {
-      // make second selector a multi-select -
-      $sel->_elements[1]->setMultiple(TRUE);
-      $sel->_elements[1]->setSize(5);
+      $sel = & $this->add(
+        'hierselect',
+          'entity',
+          ts('Entity'),
+          array(
+            'name' => 'entity[0]',
+            'style' => 'vertical-align: top;',
+          ),
+        TRUE
+      );
+      $sel->setOptions(array($sel1, $sel2, $sel3));
+
+      if (is_a($sel->_elements[1], 'HTML_QuickForm_select')) {
+        // make second selector a multi-select -
+        $sel->_elements[1]->setMultiple(TRUE);
+        $sel->_elements[1]->setSize(5);
+      }
+
+      if (is_a($sel->_elements[2], 'HTML_QuickForm_select')) {
+        // make third selector a multi-select -
+        $sel->_elements[2]->setMultiple(TRUE);
+        $sel->_elements[2]->setSize(5);
+      }
     }
-
-    if (is_a($sel->_elements[2], 'HTML_QuickForm_select')) {
-      // make third selector a multi-select -
-      $sel->_elements[2]->setMultiple(TRUE);
-      $sel->_elements[2]->setSize(5);
+    else {
+      $options = $sel3[$this->_mappingID][0];
+      $attributes = array('multiple' => 'multiple', 'class' => 'crm-select2 huge', 'placeholder' => $options[0]);
+      unset($options[0]);
+      $this->add('select', 'entity', ts('Recipient(s)'), $options, TRUE, $attributes);
+      $this->assign('context', $this->_context);
     }
 
     //get the frequency units.
@@ -196,27 +217,36 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       );
     }
 
-    $limitOptions = array(1 => ts('Limit to'), 0 => ts('Also include'));
-    $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions);
+    $limitOptions = array('' => '-neither-', 1 => ts('Limit to'), 0 => ts('Also include'));
 
-    $this->add('select', 'recipient', ts('Recipients'), $sel5[$recipient],
+    $recipientLabels = array('activity' => ts('Recipients'), 'other' => ts('Limit or Add Recipients'));
+    $this->assign('recipientLabels', $recipientLabels);
+
+    $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions, FALSE, array('onChange' => "showHideByValue('limit_to','','recipient', 'select','select',true);"));
+
+    $this->add('select', 'recipient', $recipientLabels['other'], $sel5[$recipient],
       FALSE, array('onchange' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
 
-    if (!empty($_POST['is_recipient_listing'])) {
-      $recipientListingOptions = CRM_Core_BAO_ActionSchedule::getRecipientListing($_POST['entity'][0], $_POST['recipient']);
+    if (!empty($this->_submitValues['recipient_listing'])) {
+      if (!empty($this->_context)) {
+        $recipientListingOptions = CRM_Core_BAO_ActionSchedule::getRecipientListing($this->_mappingID, $this->_submitValues['recipient']);
+      }
+      else {
+        $recipientListingOptions = CRM_Core_BAO_ActionSchedule::getRecipientListing($_POST['entity'][0], $_POST['recipient']);
+      }
     }
     elseif (!empty($this->_values['recipient_listing'])) {
       $recipientListingOptions = CRM_Core_BAO_ActionSchedule::getRecipientListing($this->_values['mapping_id'], $this->_values['recipient']);
     }
+
     $this->add('select', 'recipient_listing', ts('Recipient Roles'), $recipientListingOptions, FALSE,
       array('multiple' => TRUE, 'class' => 'crm-select2 huge', 'placeholder' => TRUE));
-    $this->add('hidden', 'is_recipient_listing', (int) !empty($recipientListingOptions));
 
     $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), array('multiple' => TRUE, 'create' => TRUE));
 
     $this->add('select', 'group_id', ts('Group'),
-      CRM_Core_PseudoConstant::nestedGroup(), FALSE, array('class' => 'crm-select2 huge')
+      CRM_Core_PseudoConstant::nestedGroup('Mailing'), FALSE, array('class' => 'crm-select2 huge')
     );
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);
@@ -227,12 +257,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $this->add('checkbox', 'is_active', $isActive);
 
-    $this->addFormRule(array('CRM_Admin_Form_ScheduleReminders', 'formRule'));
+    $this->addFormRule(array('CRM_Admin_Form_ScheduleReminders', 'formRule'), $this);
 
     $this->setPageTitle(ts('Scheduled Reminder'));
   }
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields  the input form values
    *
@@ -240,7 +270,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * @access public
    * @static
    */
-  static function formRule($fields) {
+  static function formRule($fields, $files, $self) {
     $errors = array();
     if ((array_key_exists(1, $fields['entity']) && $fields['entity'][1][0] === 0) ||
       (array_key_exists(2, $fields['entity']) && $fields['entity'][2][0] == 0)
@@ -263,7 +293,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $errors['subject'] = ts('Subject is a required field.');
     }
 
-    if (CRM_Utils_System::isNull(CRM_Utils_Array::value(1, $fields['entity']))) {
+    if (empty($self->_context) && CRM_Utils_System::isNull(CRM_Utils_Array::value(1, $fields['entity']))) {
       $errors['entity'] = ts('Please select entity value');
     }
 
@@ -271,6 +301,20 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       if (CRM_Utils_Date::format(CRM_Utils_Date::processDate($fields['absolute_date'], NULL)) < CRM_Utils_Date::format(date('Ymd'))) {
         $errors['absolute_date'] = ts('Absolute date cannot be earlier than the current time.');
       }
+    }
+
+    $recipientKind = array(
+      'participant_role' => array(
+        'name' => 'participant role',
+        'target_id' => 'recipient_listing'
+      ),
+      'manual' => array(
+        'name' => 'recipient',
+        'target_id' => 'recipient_manual_id'
+      )
+    );
+    if (!empty($fields['limit_to']) && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
+      $errors[$recipientKind[$fields['recipient']]['target_id']] = ts('If "Also include" or "Limit to" are selected, you must specify at least one %1', array(1 => $recipientKind[$fields['recipient']]['name']));
     }
 
     if (!empty($errors)) {
@@ -291,15 +335,16 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
     else {
       $defaults = $this->_values;
-      $entityValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        CRM_Utils_Array::value('entity_value', $defaults)
-      );
-      $entityStatus = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        CRM_Utils_Array::value('entity_status', $defaults)
-      );
-      $defaults['entity'][0] = CRM_Utils_Array::value('mapping_id', $defaults);
-      $defaults['entity'][1] = $entityValue;
-      $defaults['entity'][2] = $entityStatus;
+      $entityValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('entity_value', $defaults));
+      $entityStatus = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('entity_status', $defaults));
+      if (empty($this->_context)) {
+        $defaults['entity'][0] = CRM_Utils_Array::value('mapping_id', $defaults);
+        $defaults['entity'][1] = $entityValue;
+        $defaults['entity'][2] = $entityStatus;
+      }
+      else {
+        $defaults['entity'] = $entityStatus;
+      }
       if ($absoluteDate = CRM_Utils_Array::value('absolute_date', $defaults)) {
         list($date, $time) = CRM_Utils_Date::setDateDefaults($absoluteDate);
         $defaults['absolute_date'] = $date;
@@ -328,7 +373,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -339,9 +384,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       // delete reminder
       CRM_Core_BAO_ActionSchedule::del($this->_id);
       CRM_Core_Session::setStatus(ts('Selected Reminder has been deleted.'), ts('Record Deleted'), 'success');
-      if ($this->_context == 'event' && $this->_eventId) {
+      if ($this->_context == 'event' && $this->_compId) {
         $url = CRM_Utils_System::url('civicrm/event/manage/reminder',
-          "reset=1&action=update&id={$this->_eventId}"
+          "reset=1&action=browse&id={$this->_compId}&component={$this->_context}&setTab=1"
         );
         $session = CRM_Core_Session::singleton();
         $session->pushUserContext($url);
@@ -366,6 +411,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params[$key] = CRM_Utils_Array::value($key, $values);
     }
 
+    $params['is_repeat'] = CRM_Utils_Array::value('is_repeat', $values, 0);
+
     $moreKeys = array(
       'start_action_offset',
       'start_action_unit',
@@ -381,6 +428,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     if ($absoluteDate = CRM_Utils_Array::value('absolute_date', $params)) {
       $params['absolute_date'] = CRM_Utils_Date::processDate($absoluteDate);
+      $params['is_repeat'] = 0;
       foreach ($moreKeys as $mkey) {
         $params[$mkey] = 'null';
       }
@@ -404,7 +452,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['group_id'] = $values['group_id'];
       $params['recipient_manual'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }
-    elseif (!CRM_Utils_System::isNull($values['recipient_listing'])) {
+    elseif (!CRM_Utils_System::isNull($values['recipient_listing']) && !CRM_Utils_System::isNull($values['limit_to'])) {
       $params['recipient'] = CRM_Utils_Array::value('recipient', $values);
       $params['recipient_listing'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
         CRM_Utils_Array::value('recipient_listing', $values)
@@ -416,17 +464,25 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['group_id'] = $params['recipient_manual'] = $params['recipient_listing'] = 'null';
     }
 
-    $params['mapping_id'] = $values['entity'][0];
-    $entity_value = $values['entity'][1];
-    $entity_status = $values['entity'][2];
+    if (!empty($this->_mappingID) && !empty($this->_compId)) {
+      $params['mapping_id']   = $this->_mappingID;
+      $params['entity_value'] = $this->_compId;
+      $params['entity_status'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $values['entity']);
+    }
+    else {
+      $params['mapping_id'] = $values['entity'][0];
+      $entity_value = $values['entity'][1];
+      $entity_status = $values['entity'][2];
+      if ($entity_value == 1) {
+        $params['limit_to'] = 1;
+      }
 
-    foreach (array(
-      'entity_value', 'entity_status') as $key) {
-      $params[$key] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $$key);
+      foreach (array('entity_value', 'entity_status') as $key) {
+        $params[$key] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $$key);
+      }
     }
 
     $params['is_active'] = CRM_Utils_Array::value('is_active', $values, 0);
-    $params['is_repeat'] = CRM_Utils_Array::value('is_repeat', $values, 0);
 
     if (CRM_Utils_Array::value('is_repeat', $values) == 0) {
       $params['repetition_frequency_unit'] = 'null';
@@ -538,15 +594,16 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $status = ts("Your new Reminder titled %1 has been saved.",
       array(1 => "<strong>{$values['title']}</strong>")
     );
-    if ($this->_action & CRM_Core_Action::UPDATE) {
-      $status = ts("Your Reminder titled %1 has been updated.",
-        array(1 => "<strong>{$values['title']}</strong>")
-      );
 
-      if ($this->_context == 'event' && $this->_eventId) {
-        $url = CRM_Utils_System::url('civicrm/event/manage/reminder',
-          "reset=1&action=update&id={$this->_eventId}"
+    if ($this->_action) {
+      if ($this->_action & CRM_Core_Action::UPDATE) {
+        $status = ts("Your Reminder titled %1 has been updated.",
+                  array(1 => "<strong>{$values['title']}</strong>")
         );
+      }
+
+      if ($this->_context == 'event' && $this->_compId) {
+        $url = CRM_Utils_System::url('civicrm/event/manage/reminder', "reset=1&action=browse&id={$this->_compId}&component={$this->_context}&setTab=1");
         $session = CRM_Core_Session::singleton();
         $session->pushUserContext($url);
       }
@@ -554,4 +611,3 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
   }
 }
-

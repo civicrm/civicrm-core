@@ -35,7 +35,7 @@
  */
 
 /**
- * Build the form for disable mail feature
+ * Build the form object for disable mail feature
  *
  * @param
  *
@@ -58,7 +58,7 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
 
     // check for action permissions.
     if (!CRM_Core_Permission::checkActionPermission('CiviMail', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
     $mailing     = new CRM_Mailing_BAO_Mailing();
@@ -71,7 +71,7 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -93,7 +93,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
   }
 
   /**
-   *
    * @access public
    *
    * @return void
@@ -110,6 +109,5 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
       CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingId, 'is_archived', TRUE);
     }
   }
-  //end of function
 }
 

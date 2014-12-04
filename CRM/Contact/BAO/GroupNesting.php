@@ -50,7 +50,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   private $_alreadyStyled = FALSE;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct($styleLabels = FALSE, $styleIndent = "&nbsp;--&nbsp;") {
     parent::__construct();
@@ -277,14 +277,11 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Adds a new child group identified by $childGroupId to the group
    * identified by $groupId
    *
-   * @param $parentID
-   * @param $childID
+   * @param int $parentID id of the group to add the child to
+   * @param int $childID id of the new child group
    *
-   * @internal param \The $groupId id of the group to add the child to
-   * @internal param \The $childGroupId id of the new child group
    *
-   * @return           void
-   *
+   * @return void
    * @access public
    */
   static function add($parentID, $childID) {
@@ -317,9 +314,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * identified by $groupId; does not delete child group, just the
    * association between the two
    *
-   * @param            $childID          The id of the child group being removed
+   * @param int $childID The id of the child group being removed
    *
-   * @internal param \The $parentID id of the group to remove the child from
    * @return           void
    *
    * @access public
@@ -699,8 +695,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   }
 
   /**
-   * @param $contactId
-   * @param $parentGroupId
+   * @param int $contactId
+   * @param int $parentGroupId
    *
    * @return array
    */

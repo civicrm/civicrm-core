@@ -36,7 +36,7 @@
 class CRM_Activity_BAO_Query {
 
   /**
-   * build select for Case
+   * Build select for Case
    *
    * @param $query
    *
@@ -183,7 +183,7 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * where clause for a single field
+   * Where clause for a single field
    *
    * @param $values
    * @param $query
@@ -395,7 +395,7 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
@@ -452,7 +452,7 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * getter for the qill object
+   * Getter for the qill object
    *
    * @return string
    * @access public
@@ -462,11 +462,11 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * add all the elements shared between case activity search  and advanaced search
+   * Add all the elements shared between case activity search and advanced search
    *
    * @access public
    *
-   * @param $form CRM_Core_Form
+   * @param CRM_Core_Form $form
    * @return void
    * @static
    */
@@ -631,7 +631,7 @@ class CRM_Activity_BAO_Query {
    * @param $pseudoconstantType
    * @param $op
    * @param $grouping
-   * @param $params
+   * @param array $params
    *
    * @return array
    */

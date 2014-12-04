@@ -41,7 +41,7 @@
  * {@getfields financial_account_create}
  * @example financial_accountCreate.php
  *
- * @param $params
+ * @param array $params
  *
  * @return array of newly created financial_account property values.
  * @access public
@@ -57,7 +57,7 @@ function civicrm_api3_financial_account_create($params) {
  * {@getfields financial_account_get}
  * @example financial_accountCreate.php
  *
- * @param $params
+ * @param array $params
  *
  * @return array of retrieved financial_account property values.
  * @access public
@@ -73,7 +73,7 @@ function civicrm_api3_financial_account_get($params) {
  * {@getfields financial_account_delete}
  * @example financial_accountCreate.php
  *
- * @param $params
+ * @param array $params
  *
  * @return array of deleted values.
  * @access public

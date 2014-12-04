@@ -88,7 +88,9 @@ class CRM_Core_Form_RecurringEntity {
         self::$_parentEntityId = self::$_entityId;
         self::$_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId(self::$_entityId, $entityTable);
       }
-      self::$_scheduleReminderID = self::$_scheduleReminderDetails->id;
+      if (property_exists(self::$_scheduleReminderDetails, 'id')) {
+        self::$_scheduleReminderID = self::$_scheduleReminderDetails->id;
+      }
     }
     if ($entityTable) {
       CRM_Core_OptionValue::getValues(array('name' => $entityTable.'_repeat_exclude_dates_'.self::$_parentEntityId), $optionValue);
@@ -103,7 +105,7 @@ class CRM_Core_Form_RecurringEntity {
   }
 
    /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -146,6 +148,12 @@ class CRM_Core_Form_RecurringEntity {
   }
 
   static function buildQuickForm(&$form) {
+    if (self::$_entityTable) {
+      $entityType = explode("_", self::$_entityTable);
+      if ($entityType[1]) {
+        $form->assign('entityType', ucwords($entityType[1]));
+      }
+    }
     $form->assign('currentEntityId', self::$_entityId);
     $form->assign('entityTable', self::$_entityTable);
     $form->assign('scheduleReminderId', self::$_scheduleReminderID);
@@ -218,7 +226,7 @@ class CRM_Core_Form_RecurringEntity {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *
@@ -230,7 +238,7 @@ class CRM_Core_Form_RecurringEntity {
     $errors = array();
     //Process this function only when you get this variable
     if ($values['allowRepeatConfigToSubmit'] == 1) {
-      $dayOfTheWeek = array(monday,tuesday,wednesday,thursday,friday,saturday,sunday);
+      $dayOfTheWeek = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
       //Repeats
       if (!CRM_Utils_Array::value('repetition_frequency_unit', $values)) {
         $errors['repetition_frequency_unit'] = ts('This is a required field');
@@ -303,7 +311,7 @@ class CRM_Core_Form_RecurringEntity {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -329,7 +337,8 @@ class CRM_Core_Form_RecurringEntity {
         }
 
         //Save post params to the schedule reminder table
-        $dbParams = CRM_Core_BAO_RecurringEntity::mapFormValuesToDB($params);
+        $recurobj = new CRM_Core_BAO_RecurringEntity();
+        $dbParams = $recurobj->mapFormValuesToDB($params);
 
         //Delete repeat configuration and rebuild
         if (CRM_Utils_Array::value('id', $params)) {
@@ -434,8 +443,13 @@ class CRM_Core_Form_RecurringEntity {
               }
             }
           }
-          // lets delete current entity from recurring-entity table, which is going to be a new parent
-          CRM_Core_BAO_RecurringEntity::delEntity($params['entity_id'], $params['entity_table'], TRUE);
+
+          // find all entities from the recurring set. At this point we 'll get entities which were not deleted 
+          // for e.g due to participants being present. We need to delete them from recurring tables anyway.
+          $pRepeatingEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['entity_id'], $params['entity_table']);
+          foreach($pRepeatingEntities as $val) {
+            CRM_Core_BAO_RecurringEntity::delEntity($val['id'], $val['table'], TRUE);
+          }
         }
 
         $recursion = new CRM_Core_BAO_RecurringEntity();
@@ -446,7 +460,9 @@ class CRM_Core_Form_RecurringEntity {
           $recursion->excludeDates = $excludeDateList;
           $recursion->excludeDateRangeColumns = $params['excludeDateRangeColumns'];
         }
-        $recursion->intervalDateColumns = $params['intervalDateColumns'];
+        if (CRM_Utils_Array::value('intervalDateColumns', $params)) {
+          $recursion->intervalDateColumns = $params['intervalDateColumns'];
+        }
         $recursion->entity_id = $params['entity_id'];
         $recursion->entity_table = $params['entity_table'];
         if (!empty($linkedEntities)) {
@@ -460,7 +476,6 @@ class CRM_Core_Form_RecurringEntity {
       }
     }
   }
-  //end of function
 
   /**
    * Return a descriptive name for the page, used in wizard header

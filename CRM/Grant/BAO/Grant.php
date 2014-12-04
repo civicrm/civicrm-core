@@ -35,21 +35,21 @@
 class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
 
   /**
-   * static field for all the grant information that we can potentially export
+   * Static field for all the grant information that we can potentially export
    * @var array
    * @static
    */
   static $_exportableFields = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * Function to get events Summary
+   * Get events Summary
    *
    * @static
    *
@@ -89,7 +89,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Function to get events Summary
+   * Get events Summary
    *
    * @static
    *
@@ -111,7 +111,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Function to retrieve statistics for grants.
+   * Retrieve statistics for grants.
    *
    * @static
    *
@@ -124,16 +124,12 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Grant_BAO_ManageGrant object
+   * @return CRM_Grant_BAO_ManageGrant object
    * @access public
    * @static
    */
@@ -148,7 +144,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * function to add grant
+   * Add grant
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -249,7 +245,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * function to create the event
+   * Create the event
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids reference array contains the id
@@ -312,12 +308,11 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Function to delete the Contact
+   * Delete the Contact
    *
-   * @param $id
+   * @param int $id contact id
    *
    * @return bool
-   * @internal param int $cid contact id
    *
    * @access public
    * @static
@@ -330,7 +325,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Function to delete the grant
+   * Delete the grant
    *
    * @param int $id grant id
    *
@@ -363,7 +358,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * combine all the exportable fields from the lower levels object
+   * Combine all the exportable fields from the lower levels object
    *
    * @return array array of exportable Fields
    * @access public
@@ -418,11 +413,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Function to get grant record count for a Contact
+   * Get grant record count for a Contact
    *
-   * @param $contactID
-   *
-   * @internal param int $contactId Contact ID
+   * @param int $contactID
    *
    * @return int count of grant records
    * @access public

@@ -49,8 +49,8 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
     $this->_columns = array(
       ts('Contact ID') => 'contact_id',
       ts('Name') => 'sort_name',
-      ts('Donation Count') => 'donation_count',
-      ts('Donation Amount') => 'donation_amount',
+      ts('Contribution Count') => 'donation_count',
+      ts('Contribution Amount') => 'donation_amount',
     );
 
     // define component access permission needed
@@ -58,7 +58,7 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   function buildForm(&$form) {
 
@@ -246,8 +246,8 @@ civicrm_contact AS contact_a
   }
 
   /*
-     * Functions below generally don't need to be modified
-     */
+   * Functions below generally don't need to be modified
+   */
   function count() {
     $sql = $this->all();
 

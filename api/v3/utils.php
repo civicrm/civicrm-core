@@ -65,7 +65,7 @@ function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions
 }
 
 /**
- * Function to check mandatory fields are included
+ * check mandatory fields are included
  *
  * @param array $params array of fields to check
  * @param array $daoName string DAO to check for required fields (create functions only)
@@ -270,7 +270,7 @@ function _civicrm_api3_load_DAO($entity) {
 }
 
 /**
- * Function to return the DAO of the function or Entity
+ * return the DAO of the function or Entity
  * @param String $name  either a function of the api (civicrm_{entity}_create or the entity name
  * return the DAO name to manipulate this function
  * eg. "civicrm_api3_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
@@ -333,7 +333,7 @@ function _civicrm_api3_get_DAO($name) {
 }
 
 /**
- * Function to return the DAO of the function or Entity
+ * return the DAO of the function or Entity
  * @param String $name is either a function of the api (civicrm_{entity}_create or the entity name
  * return the DAO name to manipulate this function
  * eg. "civicrm_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
@@ -829,16 +829,13 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
 /**
  * Converts an DAO object to an array
  *
- * @param  object $dao (reference )object to convert
- * @param null $params
+ * @param CRM_Core_DAO $dao object to convert
+ * @param array $params
  * @param bool $uniqueFields
  * @param string $entity
- *
  * @param bool $autoFind
  *
  * @return array
- *
- * @params array of arrays (key = id) of array of fields
  *
  * @static void
  * @access public
@@ -887,7 +884,7 @@ function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, 
  * && it can take custom fields & there is the string 'custom' in their return request we get them all, they are filtered on the way out
  * @todo filter so only required fields are queried
  *
- * @param $params
+ * @param array $params
  * @param string $entity - entity name in CamelCase
  *
  * @return bool
@@ -959,11 +956,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
       if ($checkCheckBoxField && !empty($fields['custom_' . $customFieldID]) && $fields['custom_' . $customFieldID]['html_type'] == 'CheckBox') {
         formatCheckBoxField($value, 'custom_' . $customFieldID, $entity);
       }
-      // update custom field using get api, temporary value has to Overwrite
-      // get api return custom_customFieldID and custom_customFieldID_customValueID
-      if ($customValueID) {
-        $value = $params['custom_'.$customFieldID];
-      }
+      
       CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $values['custom'],
         $value, $extends, $customValueID, $entityId, FALSE, FALSE, TRUE
       );
@@ -972,7 +965,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
 }
 
 /**
- * @param $params
+ * @param array $params
  * @param $entity
  */
 function _civicrm_api3_format_params_for_create(&$params, $entity) {
@@ -1094,7 +1087,7 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  *
  * @param array $params       Associative array of property name/value
  *                             pairs to insert in new history.
- * @param $daoName
+ * @param string $daoName
  * @param bool $return
  *
  * @daoName string DAO to check params agains
@@ -1260,8 +1253,8 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
  * Function to do a 'standard' api del - when the api is only doing a $bao::del then use this
  * if api::del doesn't exist it will try DAO delete method
  *
- * @param $bao_name
- * @param $params
+ * @param string $bao_name
+ * @param array $params
  *
  * @return array API result array
  * @throws API_Exception
@@ -1300,7 +1293,7 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  *
  * @param array $returnArray - array to append custom data too - generally $result[4] where 4 is the entity id.
  * @param string $entity  e.g membership, event
- * @param $entity_id
+ * @param int $entity_id
  * @param int $groupID - per CRM_Core_BAO_CustomGroup::getTree
  * @param int $subType e.g. membership_type_id where custom data doesn't apply to all membership types
  * @param string $subName - Subtype of entity
@@ -1429,13 +1422,10 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
  * we accept 'whatever strtotime accepts'
  *
  * @param string $dateValue
- * @param $fieldName
+ * @param string $fieldName
  * @param $fieldType
  *
  * @throws Exception
- * @internal param $fieldInfo
- *
- * @internal param $params
  * @return mixed
  */
 function _civicrm_api3_getValidDate($dateValue, $fieldName, $fieldType) {
@@ -1568,7 +1558,7 @@ function _civicrm_api3_generic_replace($entity, $params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return mixed
  */

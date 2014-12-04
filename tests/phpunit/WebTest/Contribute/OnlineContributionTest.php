@@ -252,7 +252,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $pageId
+   * @param int $pageId
    * @param bool $priceSet
    */
   function _doContributionAndVerifyData($pageId, $priceSet = FALSE) {

@@ -457,7 +457,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
   }
 
   /**
-   * @param $optionGroupName
+   * @param string $optionGroupName
    * @param $optionValue
    *
    * @return array|int

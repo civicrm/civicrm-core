@@ -143,37 +143,20 @@ function civicrm_api3_custom_field_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
-/*
- * Helper function to validate custom field values
- *
- * @params Array   $params             Custom fields with values
- * @params Array   $errors             Reference fields to be check with
- * @params Boolean $checkForDisallowed Check for disallowed elements
- *                                     in params
- * @params Boolean $checkForRequired   Check for non present required elements
- *                                     in params
- * @return Array  Validation errors
- */
-
 /**
  * Helper function to validate custom field value
+ * @deprecated
  *
- * @params String $fieldName    Custom field name (eg: custom_8 )
- * @params Mixed  $value        Field value to be validate
- * @params Array  $fieldDetails Field Details
- * @params Array  $errors       Collect validation  errors
+ * @param String $fieldName    Custom field name (eg: custom_8 )
+ * @param Mixed  $value        Field value to be validate
+ * @param Array  $fieldDetails Field Details
+ * @param Array  $errors       Collect validation  errors
  *
- * @param $fieldName
- * @param $value
- * @param $fieldDetails
- * @param array $errors
- *
- * @return Array  Validation errors
+ * @return array  Validation errors
  * @todo remove this function - not in use but need to review functionality before
  * removing as it might be useful in wrapper layer
  */
-function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDetails, &$errors = array(
-  )) {
+function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDetails, &$errors = array()) {
     return;
     //see comment block
   if (!$value) {

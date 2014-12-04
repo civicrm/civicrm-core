@@ -211,7 +211,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
   }
 
   /**
-   * @param $id
+   * @param int $id
    */
   function delete($id) {
     $ruleDao = new CRM_Dedupe_DAO_Rule();

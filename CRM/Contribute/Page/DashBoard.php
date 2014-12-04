@@ -127,7 +127,7 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
     $chartForm->setEmbedded(TRUE);
     $chartForm->process();
     $chartForm->run();
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Contribute/Page/DashBoard.js');
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Contribute/Page/DashBoard.js', 1, 'html-header');
 
     return parent::run();
   }

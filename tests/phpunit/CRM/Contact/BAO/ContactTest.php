@@ -23,7 +23,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for add( )
+   * Test case for add( )
    * test with empty params.
    */
   function testAddWithEmptyParams() {
@@ -35,7 +35,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for add( )
+   * Test case for add( )
    * test with names
    * (create and update modes)
    */
@@ -76,7 +76,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for add( )
+   * Test case for add( )
    * test with all contact params
    * (creat and update modes)
    */
@@ -227,7 +227,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for add( )
+   * Test case for add( )
    * test with All contact types.
    */
   function testAddWithAllContactTypes() {
@@ -300,7 +300,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for create( )
+   * Test case for create( )
    * test with missing params.
    */
   function testCreateWithEmptyParams() {
@@ -315,7 +315,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for create( )
+   * Test case for create( )
    * test with all params.
    * ( create and update modes ).
    */
@@ -509,7 +509,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for resolveDefaults( )
+   * Test case for resolveDefaults( )
    * test all pseudoConstant, stateProvince, country.
    */
   function testResolveDefaults() {
@@ -546,7 +546,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for retrieve( )
+   * Test case for retrieve( )
    * test with all values.
    */
   function testRetrieve() {
@@ -646,7 +646,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for deleteContact( )
+   * Test case for deleteContact( )
    */
   function testDeleteContact() {
     $contactParams = $this->contactParams();
@@ -731,7 +731,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for createProfileContac( )
+   * Test case for createProfileContac( )
    * test with all params.
    * ( create and update modes )
    */
@@ -1120,7 +1120,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for getContactDetails( )
+   * Test case for getContactDetails( )
    */
   function testGetContactDetails() {
     //get the contact params
@@ -1146,7 +1146,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for
+   * Test case for
    * importableFields( ) and exportableFields( )
    */
   function testFields() {
@@ -1172,7 +1172,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for getPrimaryEmail( )
+   * Test case for getPrimaryEmail( )
    *
    */
   function testGetPrimaryEmail() {
@@ -1196,7 +1196,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for getPrimaryOpenId( )
+   * Test case for getPrimaryOpenId( )
    *
    */
   function testGetPrimaryOpenId() {
@@ -1221,7 +1221,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for matchContactOnEmail( )
+   * Test case for matchContactOnEmail( )
    *
    */
   function testMatchContactOnEmail() {
@@ -1243,7 +1243,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for getContactType( )
+   * Test case for getContactType( )
    *
    */
   function testGetContactType() {
@@ -1263,7 +1263,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for displayName( )
+   * Test case for displayName( )
    *
    */
   function testDisplayName() {
@@ -1291,7 +1291,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for getDisplayAndImage( )
+   * Test case for getDisplayAndImage( )
    *
    */
   function testGetDisplayAndImage() {
@@ -1338,7 +1338,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   //    }
 
   /**
-   * function to build common params
+   * Build common params
    *
    */
   private function contactParams() {

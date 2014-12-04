@@ -127,7 +127,6 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
   }
 
   /**
-   *
    * @return void
    * @access public
    * @static

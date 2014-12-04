@@ -47,7 +47,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   public $_activityId;
 
   /**
-   * store activity ids when multiple activities are created
+   * Store activity ids when multiple activities are created
    *
    * @var int
    */
@@ -111,12 +111,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   protected $_crmDir = 'Activity';
 
-  /*
-     * Survey activity
-     *
-     * @var boolean
-     */
-
+  /**
+   * Survey activity
+   *
+   * @var boolean
+   */
   protected $_isSurveyActivity;
 
   protected $_values = array();
@@ -179,12 +178,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       ),
       'assignee_contact_id' => array(
         'type' => 'entityRef',
-        'label' => ts('Assigned To'),
+        'label' => ts('Assigned to'),
         'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
       ),
       'followup_assignee_contact_id' => array(
         'type' => 'entityRef',
-        'label' => ts('Assigned To'),
+        'label' => ts('Assigned to'),
         'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
       ),
       'followup_activity_type_id' => array(
@@ -211,7 +210,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -259,7 +258,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       if (!CRM_Core_Permission::check('delete activities')) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
     }
 
@@ -437,7 +436,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       if ($this->_compContext == 'advanced' ) {
         $urlString = 'civicrm/contact/search/advanced';
       }
-      elseif ($path == 'civicrm/contact/search'
+      elseif ($path == 'civicrm/group/search'
+	|| $path == 'civicrm/contact/search'
         || $path == 'civicrm/contact/search/advanced'
         || $path == 'civicrm/contact/search/custom'
         || $path == 'civicrm/group/search') {
@@ -510,7 +510,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -816,13 +816,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
    * @param $self
-   *
-   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -865,12 +863,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
-   * @param null $params
-   * @return void
+   * @param array $params
+   * @return array|null
    */
   public function postProcess($params = NULL) {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -977,7 +975,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $params['parent_entity_id'] = $params['entity_id'];
         $scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($params['entity_id'], $params['entity_table']);
       }
-      $params['schedule_reminder_id'] = $scheduleReminderDetails->id;
+      if (property_exists($scheduleReminderDetails, 'id')) {
+        $params['schedule_reminder_id'] = $scheduleReminderDetails->id;
+      }
     }
     $params['dateColumns'] = array('activity_date_time');
 
@@ -1167,9 +1167,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to let injecting activity type file do any processing
+   * Let injecting activity type file do any processing
    * needed, before the activity is added/updated
    *
+   * @param array $params
    */
   function beginPostProcess(&$params) {
     if ($this->_activityTypeFile) {
@@ -1179,14 +1180,16 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to let injecting activity type file do any processing
+   * Let injecting activity type file do any processing
    * needed, after the activity has been added/updated
    *
+   * @param array $params
+   * @param $activity
    */
   function endPostProcess(&$params, &$activity) {
     if ($this->_activityTypeFile) {
       $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
-      $className::endPostProcess($this, $params, $activity );
+      $className::endPostProcess($this, $params, $activity);
     }
   }
 }

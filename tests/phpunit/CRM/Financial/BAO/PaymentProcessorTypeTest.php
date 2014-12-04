@@ -50,7 +50,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method create()
+   * Check method create()
    */
   function testCreate() {
     $params = array(
@@ -70,7 +70,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method retrieve()
+   * Check method retrieve()
    */
   function testRetrieve() {
     $params = array(
@@ -85,7 +85,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method setIsActive()
+   * Check method setIsActive()
    */
   function testSetIsActive() {
     $params = array(
@@ -110,7 +110,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method getDefault()
+   * Check method getDefault()
    */
   function testGetDefault() {
     $params = array('is_default' => 1);
@@ -122,7 +122,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method del()
+   * Check method del()
    */
   function testDel() {
     $params = array(

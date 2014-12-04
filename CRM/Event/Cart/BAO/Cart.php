@@ -10,7 +10,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     );
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return $this
    */
@@ -22,7 +22,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $event_id
+   * @param int $event_id
    *
    * @return mixed
    */
@@ -56,7 +56,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return $this
    * @throws Exception
@@ -77,7 +77,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return bool|CRM_Event_Cart_BAO_Cart
    */
@@ -86,7 +86,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return bool|CRM_Event_Cart_BAO_Cart
    */
@@ -142,7 +142,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return bool|CRM_Event_Cart_BAO_Cart
    */
@@ -151,7 +151,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $user_id
+   * @param int $user_id
    *
    * @return bool|CRM_Event_Cart_BAO_Cart
    */
@@ -174,7 +174,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $main_conference_event_id
+   * @param int $main_conference_event_id
    *
    * @return array
    */
@@ -231,7 +231,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $event_id
+   * @param int $event_id
    *
    * @return mixed
    */
@@ -240,7 +240,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $event_in_cart_id
+   * @param int $event_in_cart_id
    *
    * @return null
    */
@@ -277,7 +277,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $event_in_cart_id
+   * @param int $event_in_cart_id
    *
    * @return bool|CRM_Event_Cart_BAO_EventInCart
    */
@@ -295,7 +295,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $participant_id
+   * @param int $participant_id
    *
    * @return int
    */
@@ -313,7 +313,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $values
    *
    * @return mixed
@@ -330,7 +330,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
 
 
   /**
-   * @param $from_cart_id
+   * @param int $from_cart_id
    */
   public function adopt_participants($from_cart_id) {
     $params = array(

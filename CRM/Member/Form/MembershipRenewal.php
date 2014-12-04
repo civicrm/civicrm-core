@@ -91,25 +91,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       return CRM_Custom_Form_CustomData::preProcess($this);
     }
 
+    parent::preProcess();
     // check for edit permission
     if (!CRM_Core_Permission::check('edit memberships')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
-    }
-    // action
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String',
-      $this, FALSE, 'add'
-    );
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String',
-      $this, FALSE, 'membership'
-    );
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this
-    );
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive',
-      $this
-    );
-    if ($this->_id) {
-      $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
     $this->assign('endDate', CRM_Utils_Date::customFormat(CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
@@ -125,24 +110,15 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       )
     );
 
-    //using credit card :: CRM-2759
-    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
     if ($this->_mode) {
       $membershipFee = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee');
       if (!$membershipFee) {
-        $statusMsg = ts('Membership Renewal using a credit card requires a Membership fee. Since there is no fee associated with the selected memebership type, you can use the normal renewal mode.');
+        $statusMsg = ts('Membership Renewal using a credit card requires a Membership fee. Since there is no fee associated with the selected membership type, you can use the normal renewal mode.');
         CRM_Core_Session::setStatus($statusMsg, '', 'info');
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
             "reset=1&action=renew&cid={$this->_contactID}&id={$this->_id}&context=membership"
           ));
       }
-      $this->assign('membershipMode', $this->_mode);
-      $this->assignPaymentRelatedVariables();
-      $validProcessors = array();
-      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'billing_mode IN ( 1, 3 )');
-    }
-    else {
-      $this->assign('membershipMode', FALSE);
     }
 
     // when custom data is included in this page
@@ -152,15 +128,13 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
-    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
-
     CRM_Utils_System::setTitle(ts('Renew Membership'));
 
     parent::preProcess();
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -171,7 +145,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
-    $defaults       = array();
+
     $defaults       = parent::setDefaultValues();
     $this->_memType = $defaults['membership_type_id'];
 
@@ -270,7 +244,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -282,7 +256,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     parent::buildQuickForm();
 
-    $defaults       = array();
     $defaults       = parent::setDefaultValues();
     $this->_memType = $defaults['membership_type_id'];
     $this->assign('customDataType', 'Membership');
@@ -450,11 +423,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     $this->add('textarea', 'receipt_text_renewal', ts('Renewal Message'));
 
-    if ($this->_mode) {
-      $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, TRUE);
-      CRM_Core_Payment_Form::buildCreditCard($this, TRUE);
-    }
-
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     list($this->_contributorDisplayName,
       $this->_contributorEmail
@@ -484,7 +452,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
   /**
-   * Function for validation
+   * Validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -518,7 +486,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * Function to process the renewal form
+   * Process the renewal form
    *
    * @access public
    *

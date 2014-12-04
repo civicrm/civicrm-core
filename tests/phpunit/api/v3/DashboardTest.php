@@ -79,7 +79,7 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $oldCount
    */
   function DashboardDelete($id, $oldCount) {

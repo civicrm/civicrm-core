@@ -44,7 +44,7 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * test the payment method is adequately logged - we don't expect the processing to succeed
+   * Test the payment method is adequately logged - we don't expect the processing to succeed
    */
   function testHandlePaymentMethodLogging() {
     $params = array('processor_name' => 'Paypal', 'data' => 'blah');

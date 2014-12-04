@@ -182,7 +182,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $roleid
+   * @param int $roleid
    *
    * @return string
    */

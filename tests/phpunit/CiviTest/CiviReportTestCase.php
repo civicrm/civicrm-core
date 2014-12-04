@@ -48,7 +48,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
 
   /**
    * @param $reportClass
-   * @param $inputParams
+   * @param array $inputParams
    *
    * @return string
    * @throws Exception

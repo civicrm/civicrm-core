@@ -41,7 +41,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
   const FIELD_ROWCOUNT = 6;
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -58,7 +58,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
         'kcfinderPath' => $config->userFrameworkResourceURL .'packages' .DIRECTORY_SEPARATOR
       )
     );
-    $resources->addScriptFile('civicrm', 'templates/CRM/Badge/Form/Layout.js');
+    $resources->addScriptFile('civicrm', 'templates/CRM/Badge/Form/Layout.js', 1, 'html-header');
 
     $this->applyFilter('__ALL__', 'trim');
 
@@ -156,7 +156,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   }
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -185,7 +185,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -223,7 +223,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   }
 
   /**
-   * @param $params
+   * @param array $params
    */
   public function buildPreview(&$params) {
     // get a max participant id

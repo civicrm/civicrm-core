@@ -41,7 +41,7 @@
 class CRM_Core_Block {
 
   /**
-   * the following blocks are supported
+   * The following blocks are supported
    *
    * @var int
    */
@@ -55,18 +55,18 @@ class CRM_Core_Block {
     FULLTEXT_SEARCH = 7;
 
   /**
-   * template file names for the above blocks
+   * Template file names for the above blocks
    */
   static $_properties = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    *
    */
   function __construct() {}
 
   /**
-   * initialises the $_properties array
+   * Initialises the $_properties array
    *
    * @return void
    */
@@ -180,13 +180,10 @@ class CRM_Core_Block {
   }
 
   /**
-   * returns the desired property from the $_properties array
+   * Returns the desired property from the $_properties array
    *
-   * @params int    $id        one of the class constants (ADD, SEARCH, etc.)
-   * @params string $property  the desired property
-   *
-   * @param $id
-   * @param $property
+   * @param int $id one of the class constants (ADD, SEARCH, etc.)
+   * @param string $property the desired property
    *
    * @return string  the value of the desired property
    */
@@ -198,15 +195,12 @@ class CRM_Core_Block {
   }
 
   /**
-   * sets the desired property in the $_properties array
+   * Sets the desired property in the $_properties array
    *
-   * @params int    $id        one of the class constants (ADD, SEARCH, etc.)
-   * @params string $property  the desired property
-   * @params string $value     the value of the desired property
+   * @param int    $id        one of the class constants (ADD, SEARCH, etc.)
+   * @param string $property  the desired property
+   * @param string $value     the value of the desired property
    *
-   * @param $id
-   * @param $property
-   * @param $value
    * @return void
    */
   static function setProperty($id, $property, $value) {
@@ -217,7 +211,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * returns the whole $_properties array
+   * Returns the whole $_properties array
    *
    * @return array  the $_properties array
    */
@@ -281,12 +275,12 @@ class CRM_Core_Block {
   }
 
   /**
-   * set the post action values for the block.
+   * Set the post action values for the block.
    *
    * php is lame and u cannot call functions from static initializers
    * hence this hack
    *
-   * @param $id
+   * @param int $id
    *
    * @return void
    * @access private
@@ -338,7 +332,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * create the list of options to create New objects for the application and format is as a block
+   * Create the list of options to create New objects for the application and format is as a block
    *
    * @return void
    * @access private
@@ -455,7 +449,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * create the list of dashboard links
+   * Create the list of dashboard links
    *
    * @return void
    * @access private
@@ -491,7 +485,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * create the list of mail urls for the application and format is as a block
+   * Create the list of mail urls for the application and format is as a block
    *
    * @return void
    * @access private
@@ -524,7 +518,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * create the list of shortcuts for the application and format is as a block
+   * Create the list of shortcuts for the application and format is as a block
    *
    * @return void
    * @access private
@@ -540,7 +534,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * create the event blocks for upcoming events
+   * Create the event blocks for upcoming events
    *
    * @return void
    * @access private

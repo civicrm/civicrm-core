@@ -39,7 +39,7 @@
 class CRM_Custom_Form_Option extends CRM_Core_Form {
 
   /**
-   * the custom field id saved to the session for an update
+   * The custom field id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -47,7 +47,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   protected $_fid;
 
   /**
-   * the custom group id saved to the session for an update
+   * The custom group id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -68,7 +68,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @param null
    *
@@ -104,7 +104,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null
@@ -153,7 +153,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @param null
    *
@@ -243,12 +243,12 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *
    * @param $files
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -342,7 +342,7 @@ SELECT data_type
         case 'Float':
           //     case 'Money':
           if (!CRM_Utils_Rule::numeric($fields["value"])) {
-            $errors['value'] = ts('Please enter a valid number value.');
+            $errors['value'] = ts('Please enter a valid number.');
           }
           break;
 

@@ -42,7 +42,7 @@
 class CRM_Core_Selector_Controller {
 
   /**
-   * constants to determine if we should store
+   * Constants to determine if we should store
    * the output in the session or template
    * @var int
    */
@@ -51,67 +51,60 @@ class CRM_Core_Selector_Controller {
   TRANSFER = 4, EXPORT = 8, SCREEN = 16, PDF = 32;
 
   /**
-   * a CRM Object that implements CRM_Core_Selector_API
+   * A CRM Object that implements CRM_Core_Selector_API
    * @var object
    */
   protected $_object;
 
-  /*
-     * the CRM_Utils_Sort object
-     * @var object
-     */
-
+  /**
+   * @var CRM_Utils_Sort
+   */
   protected $_sort;
 
-  /*
-     * the current column to sort on
-     * @var int
-     */
-
+  /**
+   * The current column to sort on
+   * @var int
+   */
   protected $_sortID;
 
-  /*
-     * the sortOrder array
-     * @var array
-     */
-
+  /**
+   * The sortOrder array
+   * @var array
+   */
   protected $_sortOrder;
 
-  /*
-     * the CRM_Utils_Pager object
-     * @var object
-     */
-
+  /**
+   * @var CRM_Utils_Pager
+   */
   protected $_pager;
 
-  /*
-     * the pageID
-     * @var int
-     */
-
+  /**
+   * The pageID
+   * @var int
+   */
   protected $_pageID;
 
-  /*
-     * offset
-     * @var int
-     */
-
+  /**
+   * Offset
+   * @var int
+   */
   protected $_pagerOffset;
 
   /**
-   * number of rows to return
+   * Number of rows to return
    * @var int
    */
   protected $_pagerRowCount;
 
   /**
-   * total number of rows
+   * Total number of rows
    * @var int
    */
   protected $_total;
 
-  /* the objectAction for the WebObject */
-
+  /**
+   * The objectAction for the WebObject
+   */
   protected $_action;
 
   /**
@@ -160,7 +153,7 @@ class CRM_Core_Selector_Controller {
   protected $_prefix;
 
   /**
-   * cache the smarty template for efficiency reasons
+   * Cache the smarty template for efficiency reasons
    *
    * @var CRM_Core_Smarty
    */
@@ -257,7 +250,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * have the GET vars changed, i.e. pageId or sortId that forces us to recompute the search values
+   * Have the GET vars changed, i.e. pageId or sortId that forces us to recompute the search values
    *
    * @param int $reset are we being reset
    *
@@ -390,9 +383,9 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * function to retrieve rows.
+   * Retrieve rows.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array of rows
    * @access public
@@ -410,7 +403,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * default function for qill, if needed to be implemented, we
+   * Default function for qill, if needed to be implemented, we
    * expect the subclass to do it
    *
    * @return string the status message
@@ -428,9 +421,9 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * getter for pager
+   * Getter for pager
    *
-   * @return object CRM_Utils_Pager
+   * @return CRM_Utils_Pager
    * @access public
    */
   function getPager() {
@@ -438,9 +431,9 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * getter for sort
+   * Getter for sort
    *
-   * @return object CRM_Utils_Sort
+   * @return CRM_Utils_Sort
    * @access public
    */
   function getSort() {
@@ -491,7 +484,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * setter for embedded
+   * Setter for embedded
    *
    * @param boolean $embedded
    *
@@ -503,7 +496,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * getter for embedded
+   * Getter for embedded
    *
    * @return boolean return the embedded value
    * @access public
@@ -513,7 +506,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * setter for print
+   * Setter for print
    *
    * @param boolean $print
    *
@@ -525,7 +518,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * getter for print
+   * Getter for print
    *
    * @return boolean return the print value
    * @access public

@@ -355,7 +355,7 @@ ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $entity
    * @param $logDate
    *
@@ -402,8 +402,8 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
   }
 
   /**
-   * @param $id
-   * @param $connId
+   * @param int $id
+   * @param int $connId
    * @param $entity
    * @param $oldAction
    *

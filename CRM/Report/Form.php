@@ -142,13 +142,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_customGroupJoin    = 'LEFT JOIN';
 
   /**
-   * build tags filter
+   * Build tags filter
    *
    */
   protected $_tagFilter = FALSE;
 
   /**
-   * build groups filter
+   * Build groups filter
    *
    */
   protected $_groupFilter = FALSE;
@@ -261,7 +261,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_selectedTables;
 
   /**
-   * outputmode e.g 'print', 'csv', 'pdf'
+   * Outputmode e.g 'print', 'csv', 'pdf'
    * @var string
    */
   protected $_outputMode;
@@ -278,7 +278,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_havingClauses = array();
 
   /**
-   * dashBoardRowCount Dashboard row count
+   * DashBoardRowCount Dashboard row count
    * @var Integer
    */
   public $_dashBoardRowCount;
@@ -773,7 +773,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * @param $group
-   * @param $grpFieldName
+   * @param string $grpFieldName
    *
    * @return bool
    */
@@ -798,9 +798,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * Setter for $_id
    *
-   * @param $instanceid
-   *
-   * @internal param int $id
+   * @param int $instanceid
    */
   function setID($instanceid) {
     $this->_id = $instanceid;
@@ -808,8 +806,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Setter for $_force
-   * @param $isForce
-   * @internal param bool $force
+   * @param bool $isForce
 */
   function setForce($isForce) {
     $this->_force = $isForce;
@@ -1523,7 +1520,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $relative
    * @param $from
    * @param $to
@@ -2100,9 +2097,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $tableName
+   * @param string $tableName
    * @param $tableKey
-   * @param $fieldName
+   * @param string $fieldName
    * @param $field
    *
    * @return bool
@@ -2287,7 +2284,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * beginPostProcess function run in both report mode and non-report mode (api)
+   * BeginPostProcess function run in both report mode and non-report mode (api)
    */
   function beginPostProcessCommon() {
 
@@ -3439,7 +3436,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @deprecated - use getAddressColumns which is a more accurate description
    * and also accepts an array of options rather than a long list
    *
-   * function for adding address fields to construct function in reports
+   * adding address fields to construct function in reports
    *
    * @param bool $groupBy Add GroupBy? Not appropriate for detail report
    * @param bool $orderBy Add GroupBy? Not appropriate for detail report
@@ -3663,7 +3660,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *  Adjusts dates passed in to YEAR() for fiscal year.
    */
   /**
-   * @param $fieldName
+   * @param string $fieldName
    *
    * @return string
    */
@@ -3763,7 +3760,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    */
   function add2group($groupID) {
     if (is_numeric($groupID) && isset($this->_aliases['civicrm_contact'])) {

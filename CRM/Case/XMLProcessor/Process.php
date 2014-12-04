@@ -35,7 +35,7 @@
 class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   /**
    * @param $caseType
-   * @param $params
+   * @param array $params
    *
    * @throws Exception
    */
@@ -89,7 +89,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param $xml
-   * @param $params
+   * @param array $params
    *
    * @throws Exception
    */
@@ -142,7 +142,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param $activitySetXML
-   * @param $params
+   * @param array $params
    */
   function processStandardTimeline($activitySetXML, &$params) {
     if ('Change Case Type' == CRM_Utils_Array::value('activityTypeName', $params)
@@ -160,7 +160,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param $activitySetXML
-   * @param $params
+   * @param array $params
    */
   function processActivitySet($activitySetXML, &$params) {
     foreach ($activitySetXML->ActivityTypes as $activityTypesXML) {
@@ -202,8 +202,8 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   }
 
   /**
-   * @param $relationshipTypeName
-   * @param $params
+   * @param string $relationshipTypeName
+   * @param array $params
    *
    * @return bool
    * @throws Exception
@@ -245,7 +245,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return bool
    */
@@ -355,7 +355,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   }
 
   /**
-   * @param $params
+   * @param array $params
    */
   function deleteEmptyActivity(&$params) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
@@ -375,7 +375,7 @@ AND    a.is_current_revision = 1
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return bool
    */
@@ -403,7 +403,7 @@ AND        a.is_deleted = 0
 
   /**
    * @param $activityTypeXML
-   * @param $params
+   * @param array $params
    *
    * @return bool
    * @throws CRM_Core_Exception

@@ -3284,12 +3284,6 @@ div.crm-container form {
   -webkit-overflow-scrolling: touch;
 }
 
-.crm-container .top, .bottom {
-  padding: 15px;
-  background-color: #F5F5F5;
-  border: 1px solid #CCCCCC;
-}
-
 .crm-container .top .dataTables_info {
   float: none;
 }
@@ -4561,4 +4555,7 @@ span.crm-status-icon {
   border-radius: 2px;
   cursor: pointer;
   font-size: 11px !important;
+}
+.crm-container table.mergecontact thead th {
+  width:30%;
 }

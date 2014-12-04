@@ -52,7 +52,7 @@ class CRM_Financial_BAO_ExportFormat {
   static protected $_template;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     if ( !isset( self::$_template ) ) {
@@ -62,7 +62,7 @@ class CRM_Financial_BAO_ExportFormat {
 
   // Override to assemble the appropriate subset of financial data for the specific export format
   /**
-   * @param $exportParams
+   * @param array $exportParams
    *
    * @return mixed
    */
@@ -177,7 +177,7 @@ class CRM_Financial_BAO_ExportFormat {
 
   /**
    * @param $batchIds
-   * @param $fileName
+   * @param string $fileName
    *
    * @throws CRM_Core_Exception
    */
@@ -194,7 +194,7 @@ class CRM_Financial_BAO_ExportFormat {
       $paymentInstrument = array_flip(CRM_Contribute_PseudoConstant::paymentInstrument('label'));
       $values['payment_instrument_id'] = array_search($values['payment_instrument_id'], $paymentInstrument);
     }
-    $details = '<p>' . ts('Record: ') . $values['title'] . '</p><p>' . ts('Description: ') . '</p><p>' . ts('Created By: ') . $createdBy . '</p><p>' . ts('Created Date: ') . $values['created_date'] . '</p><p>' . ts('Last Modified By: ') . $modifiedBy . '</p><p>' . ts('Payment Instrument: ') . $values['payment_instrument_id'] . '</p>';
+    $details = '<p>' . ts('Record:') . ' ' . $values['title'] . '</p><p>' . ts('Description:') . '</p><p>' . ts('Created By:') . " $createdBy" . '</p><p>' . ts('Created Date:') . ' ' . $values['created_date'] . '</p><p>' . ts('Last Modified By:') . ' ' . $modifiedBy . '</p><p>' . ts('Payment Instrument:') . ' ' . $values['payment_instrument_id'] . '</p>';
     $subject = '';
     if (!empty($values['total'])) {
       $subject .= ts('Total') . '['. CRM_Utils_Money::format($values['total']) .'],';

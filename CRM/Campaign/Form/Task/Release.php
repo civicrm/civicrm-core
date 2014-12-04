@@ -40,21 +40,21 @@
 class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
 
   /**
-   * survet id
+   * Survet id
    *
    * @var int
    */
   protected $_surveyId;
 
   /**
-   * number of voters
+   * Number of voters
    *
    * @var int
    */
   protected $_interviewerId;
 
   /**
-   * survey details
+   * Survey details
    *
    * @var object
    */
@@ -63,7 +63,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
   protected $_surveyActivities;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -132,7 +132,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *

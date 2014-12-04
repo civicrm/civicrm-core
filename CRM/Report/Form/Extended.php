@@ -324,7 +324,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
         array('participant_id' => array('title' => 'Participant ID'),
           'participant_record' => array(
             'name' => 'id',
-            'title' => 'Participant Id',
+            'title' => ts('Participant ID'),
           ),
           'event_id' => array('title' => ts('Event ID'),
             'type' => CRM_Utils_Type::T_STRING,
@@ -711,7 +711,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   }
 
   /*
-   * function for adding address fields to construct function in reports
+   * adding address fields to construct function in reports
    * @param array $options Options for the report
    * - prefix prefix to add (e.g. 'honor' when getting address details for honor contact
    * - prefix_label optional prefix lable eg. "Honoree " for front end
@@ -1323,7 +1323,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    * @param $value
    * @param $row
    * @param $selectedfield
-   * @param $criteriaFieldName
+   * @param string $criteriaFieldName
    *
    * @return array
    */
@@ -1341,7 +1341,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    * @param $value
    * @param $row
    * @param $selectedfield
-   * @param $criteriaFieldName
+   * @param string $criteriaFieldName
    *
    * @return array
    */
@@ -1359,7 +1359,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    * @param $value
    * @param $row
    * @param $selectedfield
-   * @param $criteriaFieldName
+   * @param string $criteriaFieldName
    *
    * @return array
    */
@@ -1377,7 +1377,7 @@ WHERE   line_item_civireport.id IS NOT NULL
   /**
    * @param $value
    * @param $row
-   * @param $fieldname
+   * @param string $fieldname
    *
    * @return mixed
    */

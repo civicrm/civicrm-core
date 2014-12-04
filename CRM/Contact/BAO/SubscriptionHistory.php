@@ -38,7 +38,7 @@
  */
 class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHistory {
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_Contact_DAO_SubscriptionHistory

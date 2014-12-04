@@ -36,32 +36,28 @@
 class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFinancialAccount {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct( ) {
     parent::__construct( );
   }
 
   /**
-   * financial account
+   * Financial account
    * @var array
    * @static
    */
   private static $financialAccount;
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @param array $allValues
    *
-   * @return object CRM_Contribute_BAO_ContributionType object
+   * @return CRM_Contribute_BAO_ContributionType object
    * @access public
    * @static
    */
@@ -77,7 +73,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * function to add the financial types
+   * Add the financial types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -106,12 +102,11 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * Function to delete financial Types
+   * Delete financial Types
    *
-   * @param $financialTypeAccountId
-   * @param null $accountId
+   * @param int $financialTypeAccountId
+   * @param int $accountId
    *
-   * @internal param int $contributionTypeId
    * @static
    */
   static function del($financialTypeAccountId, $accountId = null) {
@@ -163,7 +158,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * Function to get Financial Account Name
+   * Get Financial Account Name
    *
    * @param int $entityId
    *
@@ -191,7 +186,7 @@ AND entity_id = %2";
   }
 
   /**
-   * Function to financial Account for payment instrument
+   * Financial Account for payment instrument
    *
    * @param int $paymentInstrumentValue payment instrument value
    *
@@ -223,15 +218,13 @@ WHERE cog.name = 'payment_instrument' ";
   }
 
   /**
-   * Function to create default entity financial accounts
+   * Create default entity financial accounts
    * for financial type
    * CRM-12470
    *
    * @param $financialType
    *
    * @return array
-   * @internal param int $financialTypeId financial type id
-   *
    * @static
    */
   static function createDefaultFinancialAccounts($financialType) {

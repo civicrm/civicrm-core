@@ -305,7 +305,7 @@ class CRM_Utils_Mail {
 
   /**
    * @param $message
-   * @param null $params
+   * @param array $params
    *
    * @return mixed
    */
@@ -327,7 +327,7 @@ class CRM_Utils_Mail {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $email
    * @param bool $useQuote
    *
@@ -389,7 +389,6 @@ class CRM_Utils_Mail {
   }
 
   /**
-   *
    * @param string $fileName
    * @param string $html
    * @param string $format
