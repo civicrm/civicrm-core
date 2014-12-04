@@ -91,7 +91,11 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'description')
       );
 
-      $this->add('checkbox', 'is_selectable', ts('Selectable?'));
+      $selectable = $this->add('checkbox', 'is_selectable', ts('Selectable?'));
+      // Selectable should be checked by default when creating a new tag
+      if ($this->_action == CRM_Core_Action::ADD) {
+        $selectable->setValue(1);        
+      }
 
       $isReserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
