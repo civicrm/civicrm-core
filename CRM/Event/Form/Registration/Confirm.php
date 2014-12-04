@@ -41,7 +41,7 @@
 class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
   /**
-   * the values for the contribution db object
+   * The values for the contribution db object
    *
    * @var array
    * @protected
@@ -49,7 +49,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   public $_values;
 
   /**
-   * the total amount
+   * The total amount
    *
    * @var float
    * @public
@@ -57,7 +57,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   public $_totalAmount;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -203,7 +203,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * overwrite action, since we are only showing elements in frozen mode
+   * Overwrite action, since we are only showing elements in frozen mode
    * no help display needed
    *
    * @return int
@@ -219,7 +219,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -391,7 +391,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -861,15 +861,14 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
   }
-  //end of function
 
   /**
    * Process the contribution
    *
-   * @param $form
-   * @param $params
+   * @param CRM_Core_Form $form
+   * @param array $params
    * @param $result
-   * @param $contactID
+   * @param int $contactID
    * @param bool $pending
    * @param bool $isAdditionalAmount
    *
@@ -987,9 +986,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Fix the Location Fields
    *
-   * @param $params
+   * @param array $params
    * @param $fields
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
@@ -1033,12 +1032,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * function to update contact fields
+   * Update contact fields
    *
-   * @param $contactID
-   * @param $params
+   * @param int $contactID
+   * @param array $params
    * @param $fields
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public

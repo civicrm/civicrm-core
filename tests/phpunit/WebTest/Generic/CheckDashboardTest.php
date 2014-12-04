@@ -51,7 +51,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $widgetConfigureID
+   * @param int $widgetConfigureID
    * @param $widgetEnabledSelector
    * @param $widgetTitle
    */
@@ -98,7 +98,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $widgetConfigureID
+   * @param int $widgetConfigureID
    * @param $widgetEnabledSelector
    */
   function _testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector) {

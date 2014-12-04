@@ -40,7 +40,7 @@
 class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
 
   /**
-   * tell a friend id in db
+   * Tell a friend id in db
    *
    * @var int
    */
@@ -51,7 +51,7 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -89,7 +89,7 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -107,7 +107,7 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

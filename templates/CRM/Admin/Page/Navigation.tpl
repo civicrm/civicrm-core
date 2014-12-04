@@ -130,7 +130,7 @@
           $("#navigation-tree").jstree('refresh');
           return false;
         }
-        var deleteMsg = {/literal}"{ts escape='js'}Are you sure you want to delete this menu item:{/ts}" + " "{literal} + menuName + {/literal}" ? {ts}This action can not be undone.{/ts}"{literal};
+        var deleteMsg = {/literal}"{ts escape='js'}Are you sure you want to delete this menu item:{/ts}" + " "{literal} + menuName + {/literal}" ? {ts}This action cannot be undone.{/ts}"{literal};
         var isDelete  = confirm( deleteMsg );
         if ( isDelete ) {
           var postURL = {/literal}"{crmURL p='civicrm/ajax/menutree' h=0 q='key='}{crmKey name='civicrm/ajax/menutree'}"{literal};

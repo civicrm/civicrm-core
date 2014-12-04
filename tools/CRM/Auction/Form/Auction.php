@@ -57,7 +57,7 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
   protected $_numbers;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -67,7 +67,7 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     if (!CRM_Core_Permission::checkActionPermission('CiviAuction', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
     if (($this->_action & CRM_Core_Action::VIEW ||
@@ -81,7 +81,7 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -105,7 +105,7 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return None
    * @access public
@@ -212,7 +212,6 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
    * @param array $files the uploaded files if any
    * @param $self
    *
-   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -227,7 +226,7 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

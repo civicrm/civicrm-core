@@ -61,7 +61,7 @@
         else {
           civiComponent = 'Contribution';
         }
-        CRM.alert(ts('The selected profile is using a custom field which is not assigned to the '+civiComponent+' being configured.'),ts('Warning'));
+        CRM.alert(ts('The selected profile is using a custom field which is not assigned to the "%1" being configured.', {1: civiComponent}), ts('Warning'));
       }
       var view = new CRM.ProfileSelector.View({
         ufGroupId: $select.val(),

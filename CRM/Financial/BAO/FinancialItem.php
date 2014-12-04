@@ -36,23 +36,19 @@
 class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct( ) {
     parent::__construct( );
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Contribute_BAO_FinancialItem object
+   * @return CRM_Contribute_BAO_FinancialItem object
    * @access public
    * @static
    */
@@ -67,7 +63,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * function to add the financial items and financial trxn
+   * Add the financial items and financial trxn
    *
    * @param object $lineItem     line item object
    * @param object $contribution contribution object
@@ -131,7 +127,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * function to create the financial Items and financial enity trxn
+   * Create the financial Items and financial enity trxn
    *
    * @param array $params  associated array to create financial items
    * @param array $ids financial item ids
@@ -168,11 +164,11 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * takes an associative array and creates a entity financial transaction object
+   * Takes an associative array and creates a entity financial transaction object
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Core_BAO_FinancialTrxn object
+   * @return CRM_Core_BAO_FinancialTrxn object
    * @access public
    * @static
    */
@@ -184,13 +180,10 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * retrive entity financial trxn details
+   * Retrive entity financial trxn details
    *
    * @param array $params (reference ) an assoc array of name/value pairs
-   *
-   * @param bool $maxId
-   *
-   * @internal param bool $maxID to retrive max id
+   * @param bool $maxId to retrive max id
    *
    * @return array
    * @access public
@@ -223,7 +216,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * check if contact is present in financial_item table
+   * Check if contact is present in financial_item table
    *
    * CRM-12929
    *

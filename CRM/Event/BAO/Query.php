@@ -56,7 +56,7 @@ class CRM_Event_BAO_Query {
   }
 
   /**
-   * build select for CiviEvent
+   * Build select for CiviEvent
    *
    * @param $query
    *
@@ -454,11 +454,7 @@ class CRM_Event_BAO_Query {
         return;
 
       case 'participant_id':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_participant.id",
-          $op,
-          $value,
-          "Integer"
-        );
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_participant.id", $op, $value, "Integer");
         $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         return;
 
@@ -504,7 +500,7 @@ class CRM_Event_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
@@ -550,7 +546,7 @@ class CRM_Event_BAO_Query {
   }
 
   /**
-   * getter for the qill object
+   * Getter for the qill object
    *
    * @return string
    * @access public
@@ -683,7 +679,7 @@ class CRM_Event_BAO_Query {
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
   static function searchAction(&$row, $id) {}
 

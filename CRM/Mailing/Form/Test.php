@@ -39,7 +39,7 @@
 class CRM_Mailing_Form_Test extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -57,7 +57,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -172,11 +172,10 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
   /**
    * Form rule to send out a test mailing.
    *
-   * @param $testParams
+   * @param aray $testParams
    * @param array $files Any files posted to the form
    * @param array $self an current this object
    *
-   * @internal param array $params Array of the form values
    * @return boolean          true on successful SMTP handoff
    * @access public
    */
@@ -216,7 +215,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
           $testParams['emails'][] = $email;
           $emails .= $emails ? ",'$email'" : "'$email'";
           if (!CRM_Utils_Rule::email($email)) {
-            CRM_Core_Session::setStatus(ts('Please enter a valid email addresses.'), ts('Test not sent.'), 'error');
+            CRM_Core_Session::setStatus(ts('Please enter a valid email address.'), ts('Test not sent.'), 'error');
             $error = TRUE;
           }
         }

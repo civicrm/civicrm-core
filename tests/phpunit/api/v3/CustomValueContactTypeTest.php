@@ -47,7 +47,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   function get_info() {
     return array(
       'name' => 'Custom Data For Contact Subtype',
-      'description' => 'Test Custom Data for Contact subtype.',
+      'description' => 'Test Custom Data for Contact Subtype.',
       'group' => 'CiviCRM API Tests',
     );
   }

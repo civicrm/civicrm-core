@@ -42,7 +42,7 @@ class CRM_Grant_Task {
   CONST DELETE_GRANTS = 1, PRINT_GRANTS = 2, EXPORT_GRANTS = 3, UPDATE_GRANTS = 4;
 
   /**
-   * the task array
+   * The task array
    *
    * @var array
    * @static
@@ -50,7 +50,7 @@ class CRM_Grant_Task {
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array
    *
    * @var array
    * @static
@@ -117,7 +117,7 @@ class CRM_Grant_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level
    * of the user
    *
    * @param int $permission

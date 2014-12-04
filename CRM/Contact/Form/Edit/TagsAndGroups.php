@@ -35,7 +35,7 @@
 class CRM_Contact_Form_Edit_TagsAndGroups {
 
   /**
-   * constant to determine which forms we are generating
+   * Constant to determine which forms we are generating
    *
    * Used by both profile and edit contact
    */
@@ -45,7 +45,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * This function is to build form elements
    * params object $form object of the form
    *
-   * @param Object $form the form object that we are operating on
+   * @param CRM_Core_Form $form the form object that we are operating on
    * @param int $contactId contact id
    * @param int $type what components are we interested in
    * @param boolean $visibility visibility of the field
@@ -195,7 +195,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
   }
 
   /**
-   * set defaults for relevant form elements
+   * Set defaults for relevant form elements
    *
    * @param int $id the contact id
    * @param array $defaults the defaults array to store the values in
@@ -245,12 +245,12 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $defaults
    *
    * @return void

@@ -36,7 +36,7 @@
 class CRM_Core_QuickForm_Action_Jump extends CRM_Core_QuickForm_Action {
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @param object $stateMachine reference to state machine object
    *
@@ -50,7 +50,7 @@ class CRM_Core_QuickForm_Action_Jump extends CRM_Core_QuickForm_Action {
   /**
    * Processes the request.
    *
-   * @param  object    $page       CRM_Core_Form the current form-page
+   * @param  CRM_Core_Form    $page       CRM_Core_Form the current form-page
    * @param  string    $actionName Current action name, as one Action object can serve multiple actions
    *
    * @return void

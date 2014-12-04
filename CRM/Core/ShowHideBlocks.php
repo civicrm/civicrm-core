@@ -56,7 +56,7 @@ class CRM_Core_ShowHideBlocks {
   protected $_hide;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @param array $show initial value of show array
    * @param array $hide initial value of hide array
@@ -80,7 +80,7 @@ class CRM_Core_ShowHideBlocks {
   }
 
   /**
-   * load icon vars used in hide and show links
+   * Load icon vars used in hide and show links
    *
    * @return void
    * @access public
@@ -95,7 +95,7 @@ class CRM_Core_ShowHideBlocks {
   }
 
   /**
-   * add the values from this class to the template
+   * Add the values from this class to the template
    *
    * @return void
    * @access public
@@ -157,7 +157,7 @@ class CRM_Core_ShowHideBlocks {
   }
 
   /**
-   * create a well formatted html link from the smaller pieces
+   * Create a well formatted html link from the smaller pieces
    *
    * @param string $name name of the link
    * @param string $href

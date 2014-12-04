@@ -44,7 +44,7 @@
 class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
   /**
-   * various predefined settings that have been migrated to the setting table
+   * Various predefined settings that have been migrated to the setting table
    */
   CONST
     ADDRESS_STANDARDIZATION_PREFERENCES_NAME = 'Address Standardization Preferences',
@@ -72,7 +72,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param int $contactID If set, this is a contactID specific setting, else its a global setting
    * @param bool|int $load if true, load from local cache (typically memcache)
    *
-   * @param null $domainID
+   * @param int $domainID
    * @param bool $force
    *
    * @return boolean true if item is already in cache
@@ -123,9 +123,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * @param $values
    * @param $group
-   * @param null $componentID
-   * @param null $contactID
-   * @param null $domainID
+   * @param int $componentID
+   * @param int $contactID
+   * @param int $domainID
    *
    * @return string
    */
@@ -152,9 +152,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * @param $group
    * @param null $name
-   * @param null $componentID
-   * @param null $contactID
-   * @param null $domainID
+   * @param int $componentID
+   * @param int $contactID
+   * @param int $domainID
    *
    * @return CRM_Core_DAO_Domain|CRM_Core_DAO_Setting
    */
@@ -203,7 +203,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param string $defaultValue The default value to return for this setting if not present in DB
    * @param int $contactID If set, this is a contactID specific setting, else its a global setting
    *
-   * @param null $domainID
+   * @param int $domainID
    *
    * @return mixed The data if present in the setting table, else null
    * @static
@@ -324,10 +324,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param string $group (required) The group name of the item
    * @param string $name (required) The name of the setting
    * @param int $componentID The optional component ID (so componenets can share the same name space)
-   * @param null $contactID
+   * @param int $contactID
    * @param int $createdID An optional ID to assign the creator to. If not set, retrieved from session
    *
-   * @param null $domainID
+   * @param int $domainID
    *
    * @return void
    * @static
@@ -360,11 +360,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param array $metadata metadata describing this field
    * @param $value
    * @param $group
-   * @param $name
-   * @param null $componentID
-   * @param null $contactID
-   * @param null $createdID
-   * @param null $domainID
+   * @param string $name
+   * @param int $componentID
+   * @param int $contactID
+   * @param int $createdID
+   * @param int $domainID
    */
   static function _setItem(
     $metadata,
@@ -504,7 +504,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * gets metadata about the settings fields (from getfields) based on the fields being passed in
+   * Gets metadata about the settings fields (from getfields) based on the fields being passed in
    *
    * This function filters on the fields like 'version' & 'debug' that are not settings
    *
@@ -599,35 +599,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Delete some or all of the items in the settings table
-   *
-   * @param string $group The group name of the entries to be deleted
-   * @param string $name  The name of the setting to be deleted
-   * @param int    $componentID The optional component ID (so componenets can share the same name space)
-   *
-   * @return void
-   * @static
-   * @access public
-   *
-  static function deleteItem($group, $name = NULL, $componentID = NULL, $contactID = NULL) {
-    $dao = self::dao($group, $name, $componentID, $contactID);
-    $dao->delete();
-
-    // also reset memory cache if any
-    CRM_Utils_System::flushCache();
-
-    $cacheKey = self::inCache($group, $name, $componentID, $contactID, FALSE);
-    if ($cacheKey) {
-      if ($name) {
-        unset(self::$_cache[$cacheKey][$name]);
-      }
-      else {
-        unset(self::$_cache[$cacheKey]);
-      }
-    }
-  }*/
-
-  /**
    * This provides information about the setting - similar to the fields concept for DAO information.
    * As the setting is serialized code creating validation setting input needs to know the data type
    * This also helps move information out of the form layer into the data layer where people can interact with
@@ -641,12 +612,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * The following params will filter the result. If none are passed all settings will be returns
    *
-   * @params string $name Name of specific setting e.g customCSSURL
-   * @params integer $componentID id of relevant component.
-   *
-   * @param null $componentID
+   * @param int $componentID id of relevant component
    * @param array $filters
-   * @param null $domainID
+   * @param int $domainID
    * @param null $profile
    *
    * @return array $result - the following information as appropriate for each setting
@@ -789,7 +757,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * move an item from being in the config array to being stored as a setting
+   * Move an item from being in the config array to being stored as a setting
    * remove from config - as appropriate based on metadata
    *
    * Note that where the key name is being changed the 'legacy_key' will give us the old name
@@ -831,9 +799,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
   /**
    * @param $group
-   * @param $name
+   * @param string $name
    * @param bool $system
-   * @param null $userID
+   * @param int $userID
    * @param bool $localize
    * @param string $returnField
    * @param bool $returnNameANDLabels
@@ -893,10 +861,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
   /**
    * @param $group
-   * @param $name
+   * @param string $name
    * @param $value
    * @param bool $system
-   * @param null $userID
+   * @param int $userID
    * @param string $keyField
    */
   static function setValueOption($group,
@@ -936,8 +904,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * @param $params
-   * @param null $domainID
+   * @param array $params
+   * @param int $domainID
    */
   static function fixAndStoreDirAndURL(&$params, $domainID = NULL) {
     if (self::isUpgradeFromPreFourOneAlpha1()) {
@@ -1011,7 +979,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $group
    */
   static function storeDirectoryOrURLPreferences(&$params, $group) {
@@ -1024,7 +992,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param bool $setInConfig
    */
   static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
@@ -1099,7 +1067,7 @@ AND domain_id = %3
    * for a setting.
    *
    * @param $group
-   * @param $name
+   * @param string $name
    * @param $default
    *
    * @return mixed, NULL or an overriden value
@@ -1115,7 +1083,7 @@ AND domain_id = %3
   }
 
   /**
-   * civicrm_setting didn't exist before 4.1.alpha1 and this function helps taking decisions during upgrade
+   * Civicrm_setting didn't exist before 4.1.alpha1 and this function helps taking decisions during upgrade
    *
    * @return boolean
    */

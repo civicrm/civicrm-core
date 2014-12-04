@@ -42,7 +42,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   public $_contributeMode = 'direct';
 
   /**
-   * related component whose financial payment is being processed
+   * Related component whose financial payment is being processed
    *
    * @var string
    * @public
@@ -50,7 +50,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   protected $_component = NULL;
 
   /**
-   * id of the component entity
+   * Id of the component entity
    */
   public $_id = NULL;
 
@@ -138,12 +138,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
 
-    if (!$this->_refund) {
-      $this->assignProcessors();
-      // also check for billing information
-      // get the billing location type
-      $this->assignBillingType();
-    }
+    $this->assignPaymentRelatedVariables();
 
     $this->assign('contributionMode', $this->_mode);
     $this->assign('contactId', $this->_contactId);
@@ -151,8 +146,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('paymentAmt', abs($paymentAmt));
 
     $this->setPageTitle($this->_refund ? ts('Refund') : ts('Payment'));
-
-    $this->_paymentProcessor = array('billing_mode' => 1);
   }
 
   /**
@@ -256,14 +249,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
           'id' => $type
         );
 
-        if ($type == 'CreditCard') {
-          $this->add('hidden', 'hidden_CreditCard', 1);
-          CRM_Core_Payment_Form::buildCreditCard($this, TRUE);
-        }
-        elseif ($type == 'DirectDebit') {
-          $this->add('hidden', 'hidden_DirectDebit', 1);
-          CRM_Core_Payment_Form::buildDirectDebit($this, TRUE);
-        }
+        CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE);
+
         $qfKey = $this->controller->_key;
         $this->assign('qfKey', $qfKey);
         $this->assign('allPanes', $allPanes);
@@ -441,13 +428,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     //Get the rquire fields value only.
     $params = $this->_params = $submittedValues;
 
-    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id'],
-      $this->_mode
-    );
-
     //get the payment processor id as per mode.
+    //@todo unclear relevance of mode - seems like a lot of duplicated params here!
     $this->_params['payment_processor'] = $params['payment_processor_id'] =
-      $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
+    $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
 
     $now = date('YmdHis');
     $fields = array();
@@ -644,7 +628,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return mixed
    */

@@ -36,7 +36,7 @@
 class CRM_Report_Utils_Report {
 
   /**
-   * @param null $instanceID
+   * @param int $instanceID
    *
    * @return null|string
    */
@@ -63,7 +63,7 @@ class CRM_Report_Utils_Report {
   }
 
   /**
-   * @param null $instanceID
+   * @param int $instanceID
    *
    * @return array|bool
    */
@@ -123,7 +123,7 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
    * @param $urlValue
    * @param string $query
    * @param bool $absolute
-   * @param null $instanceID
+   * @param int $instanceID
    * @param array $drilldownReport
    *
    * @return bool|string
@@ -174,14 +174,13 @@ WHERE  inst.report_id = %1";
 
   /**
    * @param $fileContent
-   * @param null $instanceID
+   * @param int $instanceID
    * @param string $outputMode
    * @param array $attachments
    *
    * @return bool
    */
-  static function mailReport($fileContent, $instanceID = NULL, $outputMode = 'html', $attachments = array(
-    )) {
+  static function mailReport($fileContent, $instanceID = NULL, $outputMode = 'html', $attachments = array()) {
     if (!$instanceID) {
       return FALSE;
     }
@@ -216,7 +215,7 @@ WHERE  inst.report_id = %1";
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $rows
    */
   static function export2csv(&$form, &$rows) {
@@ -326,7 +325,7 @@ WHERE  inst.report_id = %1";
   }
 
   /**
-   * @param $instanceId
+   * @param int $instanceId
    *
    * @return bool
    */
@@ -358,7 +357,7 @@ WHERE  inst.report_id = %1";
    *
    * @instanceId string $str the report instance to check
    *
-   * @param $instanceId
+   * @param int $instanceId
    *
    * @return boolean true if yes, else false
    * @static
@@ -390,7 +389,7 @@ WHERE  inst.report_id = %1";
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */
@@ -463,8 +462,7 @@ WHERE  inst.report_id = %1";
    *
    * @return string URL query string
    */
-  static function getPreviewCriteriaQueryParams($defaults = array(
-    ), $params = array()) {
+  static function getPreviewCriteriaQueryParams($defaults = array(), $params = array()) {
     static $query_string;
     if (!isset($query_string)) {
       if (!empty($params)) {

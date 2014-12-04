@@ -32,15 +32,11 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
 class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
   /**
-   * Function to download CSV file.
+   * Download CSV file.
    *
-   * @params string $selector element selector(download button in most of the cases).
-   * @params sting  $fileName file name to be download.
-   * @params string $downloadDir download dir.
-   *
-   * @param $selector
-   * @param string $fileName
-   * @param string $downloadDir
+   * @param string $selector element selector(download button in most of the cases).
+   * @param string  $fileName file name to be download.
+   * @param string $downloadDir download dir.
    *
    * @return string downloaded file path.
    */
@@ -67,12 +63,12 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
   }
 
   /**
-   * Function to read CSV file and fire provided assertions.
+   * Read CSV file and fire provided assertions.
    *
-   * @params string $file         file path of CSV file.
-   * @params array  $checkHeaders check first row of csv
+   * @param string $file         file path of CSV file.
+   * @param array  $checkColumns check first row of csv
    *                              independent of index.
-   * @params array  $checkRows    array of header and rows according to row index
+   * @param array  $checkRows    array of header and rows according to row index
    *                              eg: array(
    *                                    1 => array(
       // Row index 1
@@ -86,11 +82,10 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *                                      'Last Name'  => 'mayekar'
    *                                    ),
    *                                   );
-   * @params int   $rowCount count rows (excluding header row).
-   * @params array $settings used for override settings.
+   * @param int   $rowCount count rows (excluding header row).
+   * @param array $settings used for override settings.
    */
-  function reviewCSV($file, $checkColumns = array(
-    ), $checkRows = array(), $rowCount = 0, $settings = array()) {
+  function reviewCSV($file, $checkColumns = array(), $checkRows = array(), $rowCount = 0, $settings = array()) {
     // Check file exists before proceed.
     $this->assertTrue(($file && file_exists($file)), "Not able to locate {$file}.");
 

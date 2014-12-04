@@ -153,8 +153,8 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
    * Execute a basic XML test case. Each test case creates a custom-group and
    * custom-field then compares the output to a pre-defined XML file.
    *
-   * @param $customGroupParams
-   * @param $fieldParams
+   * @param array $customGroupParams
+   * @param array $fieldParams
    * @param $expectedXmlFilePath
    * @dataProvider basicXmlTestCases
    */
@@ -181,9 +181,6 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
    * @param $inputXmlFilePath
    *
    * @throws CRM_Core_Exception
-   * @internal param $customGroupParams
-   * @internal param $fieldParams
-   * @internal param $expectedXmlFilePath
    * @dataProvider basicXmlTestCases
    */
   function testBasicXMLImports($expectCustomGroup, $expectCustomField, $inputXmlFilePath) {

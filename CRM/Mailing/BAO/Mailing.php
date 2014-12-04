@@ -89,15 +89,15 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   private $_domain = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * @param $job_id
-   * @param null $mailing_id
+   * @param int $job_id
+   * @param int $mailing_id
    * @param null $mode
    *
    * @return int
@@ -112,8 +112,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   // note that $job_id is used only as a variable in the temp table construction
   // and does not play a role in the queries generated
   /**
-   * @param $job_id
-   * @param null $mailing_id
+   * @param int $job_id
+   * @param int $mailing_id
    * @param null $offset
    * @param null $limit
    * @param bool $storeRecipients
@@ -915,9 +915,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   /**
    * Generate an event queue for a test job
    *
-   * @params array $params contains form values
-   *
-   * @param $testParams
+   * @param array $testParams contains form values
    *
    * @return void
    * @access public
@@ -1023,7 +1021,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * static wrapper for getting verp and urls
+   * Static wrapper for getting verp and urls
    *
    * @param int $job_id ID of the Job associated with this message
    * @param int $event_queue_id ID of the EventQueue
@@ -1045,7 +1043,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * get verp, urls and headers
+   * Get verp, urls and headers
    *
    * @param int $job_id ID of the Job associated with this message
    * @param int $event_queue_id ID of the EventQueue
@@ -1507,7 +1505,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * function to add the mailings
+   * Add the mailings
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -1527,7 +1525,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       CRM_Utils_Hook::pre('create', 'Mailing', NULL, $params);
     }
 
-    $mailing            = new CRM_Mailing_DAO_Mailing();
+    $mailing            = new static();
     $mailing->id        = $id;
     $mailing->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
 
@@ -1557,7 +1555,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @params array $params        Form values
    *
-   * @param $params
+   * @param array $params
    * @param array $ids
    *
    * @return object $mailing      The new mailing object
@@ -1707,7 +1705,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * get hash value of the mailing
+   * Get hash value of the mailing
    *
    */
   public static function getMailingHash($id) {
@@ -2216,7 +2214,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @throws Exception
    */
@@ -2258,7 +2256,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * returns all the mailings that this user can access. This is dependent on
+   * Returns all the mailings that this user can access. This is dependent on
    * all the groups that the user has access to.
    * However since most civi installs dont use ACL's we special case the condition
    * where the user has access to ALL groups, and hence ALL mailings and return a
@@ -2313,7 +2311,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @param string $sort The sql string that describes the sort order
    *
    * @param null $additionalClause
-   * @param null $additionalParams
+   * @param array $additionalParams
    *
    * @return array            The rows
    * @access public
@@ -2400,7 +2398,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Function to show detail Mailing report
+   * Show detail Mailing report
    *
    * @param int $id
    *
@@ -2498,9 +2496,9 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Function to build the  compose mail form
+   * Build the  compose mail form
    *
-   * @param   $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
@@ -2527,14 +2525,14 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
     $templates = array();
 
-    $textFields = array('text_message' => ts('HTML format'), 'sms_text_message' => ts('SMS Message'));
+    $textFields = array('text_message' => ts('HTML Format'), 'sms_text_message' => ts('SMS Message'));
     $modePrefixes = array('Mail' => NULL, 'SMS' => 'SMS');
 
     if ($className != 'CRM_SMS_Form_Upload' && $className != 'CRM_Contact_Form_Task_SMS' &&
       $className != 'CRM_Contact_Form_Task_SMS'
     ) {
       $form->addWysiwyg('html_message',
-        ts('HTML format'),
+        ts('HTML Format'),
         array(
           'cols' => '80', 'rows' => '8',
           'onkeyup' => "return verify(this)",
@@ -2591,9 +2589,9 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Function to build the  compose PDF letter form
+   * Build the  compose PDF letter form
    *
-   * @param   $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
@@ -2731,7 +2729,7 @@ SELECT  $mailing.id as mailing_id
   }
 
   /**
-   * @param $jobID
+   * @param int $jobID
    *
    * @return mixed
    */
@@ -2759,7 +2757,6 @@ WHERE  civicrm_mailing_job.id = %1
    */
   static function processQueue($mode = NULL) {
     $config = &CRM_Core_Config::singleton();
-    //   CRM_Core_Error::debug_log_message("Beginning processQueue run: {$config->mailerJobsMax}, {$config->mailerJobSize}");
 
     if ($mode == NULL && CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG") {
       throw new CRM_Core_Exception(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in the online user and administrator guide</a>', array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'), 2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/")));
@@ -2806,12 +2803,11 @@ WHERE  civicrm_mailing_job.id = %1
       $cronLock->release();
     }
 
- //   CRM_Core_Error::debug_log_message('Ending processQueue run');
     return TRUE;
   }
 
   /**
-   * @param $mailingID
+   * @param int $mailingID
    */
   private static function addMultipleEmails($mailingID) {
     $sql = "
@@ -2861,7 +2857,7 @@ ORDER BY civicrm_mailing.name";
   }
 
   /**
-   * @param $mid
+   * @param int $mid
    *
    * @return null|string
    */
@@ -2966,7 +2962,7 @@ AND        m.id = %1
   }
 
   /**
-   * Function to retrieve contact mailing
+   * Retrieve contact mailing
    *
    * @param array $params associated array
    *
@@ -2986,7 +2982,7 @@ AND        m.id = %1
   }
 
   /**
-   * Function to retrieve contact mailing count
+   * Retrieve contact mailing count
    *
    * @param array $params associated array
    *

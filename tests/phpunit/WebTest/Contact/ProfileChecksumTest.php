@@ -144,7 +144,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
 
   /**
    * @param $fields
-   * @param $profileName
+   * @param string $profileName
    *
    * @return null
    */

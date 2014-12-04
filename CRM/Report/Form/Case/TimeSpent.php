@@ -324,7 +324,6 @@ GROUP BY {$this->_aliases['civicrm_contact']}.id,
     ) {
       $errors['fields'] = ts('To view totals please select all of activity id, date and duration.');
     }
-    //        CRM_Core_Error::debug('xx', print_r($fields, true));
     return $errors;
   }
 

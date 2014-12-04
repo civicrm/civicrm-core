@@ -261,7 +261,7 @@ ORDER BY start_date desc
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param bool $sortBy
    * @param $force
    *

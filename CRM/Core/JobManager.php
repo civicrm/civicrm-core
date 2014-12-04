@@ -117,7 +117,7 @@ class CRM_Core_JobManager {
   }
 
   /**
-   * @param $id
+   * @param int $id
    */
   public function executeJobById($id) {
     $job = $this->_getJob($id);
@@ -186,7 +186,7 @@ class CRM_Core_JobManager {
    *
    */
   /**
-   * @param null $id
+   * @param int $id
    * @param null $entity
    * @param null $action
    *
@@ -212,7 +212,7 @@ class CRM_Core_JobManager {
   /**
    * @param $entity
    * @param $job
-   * @param $params
+   * @param array $params
    * @param null $source
    */
   public function setSingleRunParams($entity, $job, $params, $source = NULL) {
@@ -243,7 +243,7 @@ class CRM_Core_JobManager {
     if ($this->currentJob) {
       $dao->job_id  = $this->currentJob->id;
       $dao->name    = $this->currentJob->name;
-      $dao->command = ts("Entity:") . " " + $this->currentJob->api_entity + " " . ts("Action:") . " " + $this->currentJob->api_action;
+      $dao->command = ts("Entity:") . " " . $this->currentJob->api_entity . " " . ts("Action:") . " " . $this->currentJob->api_action;
       $data         = "";
       if (!empty($this->currentJob->parameters)) {
         $data .= "\n\nParameters raw (from db settings): \n" . $this->currentJob->parameters;

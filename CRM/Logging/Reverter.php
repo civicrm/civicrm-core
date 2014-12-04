@@ -38,7 +38,7 @@ class CRM_Logging_Reverter {
   private $log_date;
 
   /**
-   * @param $log_conn_id
+   * @param int $log_conn_id
    * @param $log_date
    */
   function __construct($log_conn_id, $log_date) {

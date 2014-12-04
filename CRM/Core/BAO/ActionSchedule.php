@@ -40,7 +40,7 @@
 class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
   /**
-   * @param null $id
+   * @param int $id
    *
    * @return array
    */
@@ -93,7 +93,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @access public
    */
   static function getSelection($id = NULL) {
-    $mapping = self::getMapping($id);
+    $mapping = self::getMapping();
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $activityType   = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
 
@@ -112,7 +112,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $sel1 = $sel2 = $sel3 = $sel4 = $sel5 = array();
     $options = array(
       'manual' => ts('Choose Recipient(s)'),
-      'group' => ts('Select a Group'),
+      'group' => ts('Select Group'),
     );
 
     $entityMapping = array();
@@ -192,9 +192,9 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
             break;
 
           case 'event_contacts':
-            $eventContacts = CRM_Core_OptionGroup::values('event_contacts');
+            $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
             $sel5[$entityRecipient] = $eventContacts + $options;
-            $recipientMapping += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+            $recipientMapping += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
             break;
 
           case NULL:
@@ -262,7 +262,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   }
 
   /**
-   * @param null $id
+   * @param int $id
    *
    * @return array
    */
@@ -271,7 +271,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $sel4 = $sel5 = array();
     $options = array(
       'manual' => ts('Choose Recipient(s)'),
-      'group' => ts('Select a Group'),
+      'group' => ts('Select Group'),
     );
 
     $recipientMapping = array_combine(array_keys($options), array_keys($options));
@@ -295,9 +295,9 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
           break;
 
         case 'event_contacts':
-          $eventContacts = CRM_Core_OptionGroup::values('event_contacts');
+          $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
           $sel5[$id] = $eventContacts + $options;
-          $recipientMapping += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+          $recipientMapping += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
           break;
 
         case NULL:
@@ -319,7 +319,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @param bool $namesOnly return simple list of names
    *
    * @param null $entityValue
-   * @param null $id
+   * @param int $id
    *
    * @return array  (reference)   reminder list
    * @static
@@ -414,11 +414,11 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * @param $contactId
+   * @param int $contactId
    * @param $to
-   * @param $scheduleID
+   * @param int $scheduleID
    * @param $from
-   * @param $tokenParams
+   * @param array $tokenParams
    *
    * @return bool|null
    * @throws CRM_Core_Exception
@@ -579,12 +579,12 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * Function to add the schedules reminders in the db
+   * Add the schedules reminders in the db
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
-   * @return object CRM_Core_DAO_ActionSchedule
+   * @return CRM_Core_DAO_ActionSchedule
    * @access public
    * @static
    *
@@ -604,7 +604,7 @@ AND   cas.entity_value = $id AND
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $values (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_DAO_ActionSchedule object on success, null otherwise
+   * @return CRM_Core_DAO_ActionSchedule object on success, null otherwise
    * @access public
    * @static
    */
@@ -627,7 +627,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * Function to delete a Reminder
+   * Delete a Reminder
    *
    * @param  int  $id     ID of the Reminder to be deleted.
    *
@@ -647,7 +647,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -660,7 +660,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * @param $mappingID
+   * @param int $mappingID
    * @param $now
    *
    * @throws CRM_Core_Exception
@@ -895,7 +895,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
   }
 
   /**
-   * @param $mappingID
+   * @param int $mappingID
    * @param $now
    * @param array $params
    *
@@ -934,7 +934,12 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $anniversary = false;
 
       if (!CRM_Utils_System::isNull($mapping->entity_recipient)) {
-        $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
+        if ($mapping->entity_recipient == 'event_contacts') {
+          $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
+        }
+        else {
+          $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
+        }
       }
       $from = "{$mapping->entity} e";
 
@@ -946,24 +951,26 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
-        if ($limitTo == 0) {
-          // including the activity target contacts if 'in addition' is defined
-          $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
-        }
-        else {
-          switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
-            case 'Activity Assignees':
-              $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$assigneeID}";
-              break;
+        if (!is_null($limitTo)) {
+          if ($limitTo == 0) {
+            // including the activity target contacts if 'in addition' is defined
+            $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
+          }
+          else {
+            switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
+              case 'Activity Assignees':
+                $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$assigneeID}";
+                break;
 
-            case 'Activity Source':
-              $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$sourceID}";
-              break;
+              case 'Activity Source':
+                $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$sourceID}";
+                break;
 
-            default:
-            case 'Activity Targets':
-              $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
-              break;
+              default:
+              case 'Activity Targets':
+                $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
+                break;
+            }
           }
         }
         // build where clause
@@ -1131,7 +1138,7 @@ WHERE      $group.id = {$actionSchedule->group_id}
           $where[] = "{$contactField} IN ({$rList})";
         }
       }
-      else {
+      elseif (!is_null($limitTo)) {
         $addGroup = $addWhere = '';
         if ($actionSchedule->group_id) {
           // CRM-13577 If smart group then use Cache table
@@ -1209,7 +1216,7 @@ LEFT JOIN {$reminderJoinClause}
 ";
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
-      if ($limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) {
+      if (!is_null($limitTo) && $limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) {
         $additionWhere = ' WHERE ';
         if ($actionSchedule->start_action_date) {
           $additionWhere = $whereClause . ' AND ';
@@ -1297,7 +1304,7 @@ INNER JOIN {$reminderJoinClause}
           CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
         }
 
-        if ($limitTo == 0) {
+        if (!is_null($limitTo) && $limitTo == 0) {
           $addSelect .= ', MAX(reminder.action_date_time) as latest_log_time';
           $sqlEndEventCheck = "
 SELECT * FROM {$table}
@@ -1390,8 +1397,8 @@ WHERE     m.owner_membership_id IS NOT NULL AND
   }
 
   /**
-   * @param $id
-   * @param $mappingID
+   * @param int $id
+   * @param int $mappingID
    *
    * @return null|string
    */
@@ -1408,7 +1415,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
   }
 
   /**
-   * @param $mappingID
+   * @param int $mappingID
    * @param $recipientType
    *
    * @return array
@@ -1423,7 +1430,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
 
     switch ($mapping['entity']) {
       case 'civicrm_participant':
-        $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+        $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
         if (empty($eventContacts[$recipientType])) {
           return $options;
         }

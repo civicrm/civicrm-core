@@ -47,7 +47,7 @@ class CRM_ACL_API {
   CONST ALL = 6;
 
   /**
-   * given a permission string, check for access requirements
+   * Given a permission string, check for access requirements
    *
    * @param string $str       the permission to check
    * @param int    $contactID the contactID for whom the check is made
@@ -135,7 +135,7 @@ class CRM_ACL_API {
   }
 
   /**
-   * get all the groups the user has access to for the given operation
+   * Get all the groups the user has access to for the given operation
    *
    * @param int $type the type of permission needed
    * @param int $contactID the contactID for whom the check is made
@@ -168,10 +168,10 @@ class CRM_ACL_API {
   }
 
   /**
-   * check if the user has access to this group for operation $type
+   * Check if the user has access to this group for operation $type
    *
    * @param int $type the type of permission needed
-   * @param $groupID
+   * @param int $groupID
    * @param int $contactID the contactID for whom the check is made
    *
    * @param string $tableName

@@ -92,7 +92,7 @@
   <field>
     <name>qty</name>
     <title>Line Item Quantity</title>
-    <type>int unsigned</type>
+    <type>decimal</type>
     <required>true</required>
     <comment>How many items ordered</comment>
     <add>1.7</add>

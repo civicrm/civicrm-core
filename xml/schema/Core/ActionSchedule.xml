@@ -43,7 +43,6 @@
   <field>
     <name>limit_to</name>
     <type>boolean</type>
-    <default>1</default>
     <comment>Is this the recipient criteria limited to OR in addition to?</comment>
     <add>4.4</add>
   </field>

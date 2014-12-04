@@ -155,7 +155,7 @@ WHERE participant_id = $participantID;
   }
 
   /**
-   * @param null $eventID
+   * @param int $eventID
    *
    * @return Object
    */
@@ -186,7 +186,7 @@ AND    p.entity_id    = e.id
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @throws Exception
    */
@@ -224,7 +224,7 @@ AND    p.entity_id    = e.id
   function setColumns() {
     $this->_columns = array(
       ts('Contact ID') => 'contact_id',
-      ts('Participant Id') => 'participant_id',
+      ts('Participant ID') => 'participant_id',
       ts('Name') => 'display_name',
     );
 

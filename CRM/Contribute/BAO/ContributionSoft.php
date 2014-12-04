@@ -35,14 +35,14 @@
 class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft {
 
   /**
-   * construct method
+   * Construct method
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * function to add contribution soft credit record
+   * Add contribution soft credit record
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
@@ -63,16 +63,12 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Contribute_BAO_ContributionSoft object
+   * @return CRM_Contribute_BAO_ContributionSoft object
    * @access public
    * @static
    */
@@ -87,11 +83,10 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Function to delete soft credits
+   * Delete soft credits
    *
-   * @param $params
+   * @param array $params
    *
-   * @internal param int $contributionTypeId
    * @static
    */
   static function del($params) {
@@ -104,7 +99,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * @param $contact_id
+   * @param int $contact_id
    * @param int $isTest
    *
    * @return array
@@ -145,12 +140,11 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   *  Function to retrieve soft contributions for contribution record.
+   * Retrieve soft contributions for contribution record.
    *
-   * @param $contributionID
+   * @param int $contributionID
    * @param boolean $all include PCP data
    *
-   * @internal param array $params an associated array
    * @return array of soft contribution ids, amounts, and associated contact ids
    * @static
    */
@@ -204,7 +198,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * @param $contributionID
+   * @param int $contributionID
    * @param bool $isPCP
    *
    * @return array
@@ -319,10 +313,10 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    */
 
   /**
-   * @param $form
-   * @param $params
-   * @param $honoreeprofileId
-   * @param null $honorId
+   * @param CRM_Core_Form $form
+   * @param array $params
+   * @param int $honoreeprofileId
+   * @param int $honorId
    */
   static function formatHonoreeProfileFields($form, $params, $honoreeprofileId, $honorId = NULL) {
     $profileContactType = CRM_Core_BAO_UFGroup::getContactType($honoreeprofileId);

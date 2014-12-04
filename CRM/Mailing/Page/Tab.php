@@ -58,7 +58,7 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
   }
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public

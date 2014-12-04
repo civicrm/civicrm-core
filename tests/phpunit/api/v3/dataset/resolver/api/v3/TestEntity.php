@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return array
  */

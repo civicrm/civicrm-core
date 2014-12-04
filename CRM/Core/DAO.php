@@ -45,7 +45,7 @@ require_once 'CRM/Core/I18n.php';
 class CRM_Core_DAO extends DB_DataObject {
 
   /**
-   * a null object so we can pass it as reference if / when needed
+   * A null object so we can pass it as reference if / when needed
    */
   static $_nullObject = NULL;
   static $_nullArray = array();
@@ -69,7 +69,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   static $_testEntitiesToSkip = array();
   /**
-   * the factory class for this application
+   * The factory class for this application
    * @var object
    */
   static $_factory = NULL;
@@ -88,14 +88,14 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * empty definition for virtual function
+   * Empty definition for virtual function
    */
   static function getTableName() {
     return NULL;
   }
 
   /**
-   * initialize the DAO object
+   * Initialize the DAO object
    *
    * @param string $dsn   the database connection string
    *
@@ -112,9 +112,9 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $fieldDef
-   * @param $params
+   * @param array $params
    *
    */
   protected function assignTestFK($fieldName, $fieldDef, $params) {
@@ -268,7 +268,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * reset the DAO object. DAO is kinda crappy in that there is an unwritten
+   * Reset the DAO object. DAO is kinda crappy in that there is an unwritten
    * rule of one query per DAO. We attempt to get around this crappy restricrion
    * by resetting some of DAO's internal fields. Use this with caution
    *
@@ -292,7 +292,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * @param $tableName
+   * @param string $tableName
    *
    * @return string
    */
@@ -398,7 +398,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * returns list of FK relationships
+   * Returns list of FK relationships
    *
    * @static
    * @access public
@@ -410,7 +410,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * returns all the column names of this table
+   * Returns all the column names of this table
    *
    * @access public
    *
@@ -422,7 +422,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * get/set an associative array of table columns
+   * Get/set an associative array of table columns
    *
    * @access public
    * @param  array key=>type array
@@ -570,7 +570,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * create an attribute for this specific field. We only do this for strings and text
+   * Create an attribute for this specific field. We only do this for strings and text
    *
    * @param array $field the field under task
    *
@@ -808,7 +808,6 @@ LIKE %1
    * @param array $tables
    *
    * @throws Exception
-   * @internal param string $tableName
    *
    * @return boolean true if CONSTRAINT keyword exists, false otherwise
    */
@@ -828,10 +827,10 @@ LIKE %1
       }
 
       $result = preg_match("/\bCONSTRAINT\b\s/i", $show[$tableName]) ? TRUE : FALSE;
-      if($result == TRUE){
+      if ($result == TRUE){
         continue;
       }
-      else{
+      else {
         return FALSE;
       }
     }
@@ -1055,11 +1054,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param string $daoName  name of the dao object
    * @param array  $params   (reference ) an assoc array of name/value pairs
@@ -1106,7 +1101,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * execute a query
+   * Execute a query
    *
    * @param string $query query to be executed
    *
@@ -1117,7 +1112,7 @@ FROM   civicrm_domain
    * @param bool $i18nRewrite
    * @param bool $trapException
    *
-   * @return Object CRM_Core_DAO object that holds the results of the query
+   * @return CRM_Core_DAO object that holds the results of the query
    * @static
    * @access public
    */
@@ -1131,7 +1126,6 @@ FROM   civicrm_domain
     $trapException = FALSE
   ) {
     $queryStr = self::composeQuery($query, $params, $abort);
-    //CRM_Core_Error::debug( 'q', $queryStr );
 
     if (!$daoName) {
       $dao = new CRM_Core_DAO();
@@ -1161,7 +1155,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * execute a query and get the single result
+   * Execute a query and get the single result
    *
    * @param string $query query to be executed
    * @param array $params
@@ -1201,7 +1195,7 @@ FROM   civicrm_domain
 
   /**
    * @param $query
-   * @param $params
+   * @param array $params
    * @param bool $abort
    *
    * @return string
@@ -1256,15 +1250,6 @@ FROM   civicrm_domain
    */
   static function freeResult($ids = NULL) {
     global $_DB_DATAOBJECT;
-
-    /***
-     $q = array( );
-     foreach ( array_keys( $_DB_DATAOBJECT['RESULTS'] ) as $id ) {
-     $q[] = $_DB_DATAOBJECT['RESULTS'][$id]->query;
-     }
-     CRM_Core_Error::debug( 'k', $q );
-     return;
-     ***/
 
     if (!$ids) {
       if (!$_DB_DATAOBJECT ||
@@ -1419,7 +1404,7 @@ FROM   civicrm_domain
    * since its used for things like send email
    *
    * @param $componentIDs
-   * @param $tableName
+   * @param string $tableName
    *
    * @return array
    */
@@ -1445,20 +1430,14 @@ SELECT contact_id
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param string $daoName name of the dao object
    * @param string $fieldIdName
-   * @param $fieldId
+   * @param int $fieldId
    * @param $details
    * @param array $returnProperities an assoc array of fields that need to be returned, eg array( 'first_name', 'last_name')
    *
-   * @internal param array $params (reference ) an assoc array of name/value pairs
-   * @internal param array $defaults (reference ) an assoc array to hold the flattened values
    * @return object an object of type referenced by daoName
    * @access public
    * @static
@@ -1511,6 +1490,20 @@ SELECT contact_id
     static $_dao = NULL;
 
     if (!$_dao) {
+      // If this is an atypical case (e.g. preparing .sql files
+      // before Civi has been installed), then we fallback to
+      // DB-less escaping helper (mysql_real_escape_string).
+      // Note: In typical usage, escapeString() will only
+      // check one conditional ("if !$_dao") rather than
+      // two conditionals ("if !defined(DSN)")
+      if (!defined('CIVICRM_DSN')) {
+        if (function_exists('mysql_real_escape_string')) {
+          return mysql_real_escape_string($string);
+        } else {
+          throw new CRM_Core_Exception("Cannot generate SQL. \"mysql_real_escape_string\" is missing. Have you installed PHP \"mysql\" extension?");
+        }
+      }
+
       $_dao = new CRM_Core_DAO();
     }
 
@@ -1562,7 +1555,7 @@ SELECT contact_id
    * createOnly: only create in database, do not store or return the objects (useful for perf testing)
    * ONLY USE FOR TESTING
    *
-   * @param $daoName
+   * @param string $daoName
    * @param array $params
    * @param int $numObjects
    * @param bool $createOnly
@@ -1637,14 +1630,13 @@ SELECT contact_id
   }
 
   /**
-   * deletes the this object plus any dependent objects that are associated with it
+   * Deletes the this object plus any dependent objects that are associated with it
    * ONLY USE FOR TESTING
    *
-   * @param $daoName
+   * @param string $daoName
    * @param array $params
    */
-  static function deleteTestObjects($daoName, $params = array(
-    )) {
+  static function deleteTestObjects($daoName, $params = array()) {
     //this is a test function  also backtrace is set for the test suite it sometimes unsets itself
     // so we re-set here in case
     $config = CRM_Core_Config::singleton();
@@ -1686,7 +1678,7 @@ SELECT contact_id
    * Set defaults when creating new entity
    * (don't call this set defaults as already in use with different signature in some places)
    *
-   * @param $params
+   * @param array $params
    * @param $defaults
    */
   static function setCreateDefaults(&$params, $defaults) {
@@ -1809,7 +1801,7 @@ SELECT contact_id
     $logging->dropTriggers($tableName);
 
     // now create the set of new triggers
-    self::createTriggers($info);
+    self::createTriggers($info, $tableName);
   }
 
   /**
@@ -2143,7 +2135,7 @@ SELECT contact_id
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @return bool|array
    */
   function getFieldSpec($fieldName) {
@@ -2169,7 +2161,7 @@ SELECT contact_id
    * $field => array('LIKE' => array('%me%))
    * etc
    *
-   * @param $fieldName
+   * @param string $fieldName name of fields
    * @param $filter array filter to be applied indexed by operator
    * @param $type String type of field (not actually used - nor in api @todo )
    * @param $alias String alternative field name ('as') @todo- not actually used
@@ -2177,7 +2169,7 @@ SELECT contact_id
    *  this is primarily so we can add filters @ the api level to the Query object based fields
    *
    * @throws Exception
-   * @internal param string $fieldname name of fields
+   *
    * @todo a better solution would be for the query object to apply these filters based on the
    *  api supported format (but we don't want to risk breakage in alpha stage & query class is scary
    * @todo @time of writing only IN & NOT IN are supported for the array style syntax (as test is
@@ -2197,10 +2189,10 @@ SELECT contact_id
           // unary operators
           case 'IS NULL':
           case 'IS NOT NULL':
-            if(!$returnSanitisedArray) {
+            if (!$returnSanitisedArray) {
               return (sprintf('%s %s', $fieldName, $operator));
             }
-            else{
+            else {
               return (sprintf('%s %s ', $fieldName, $operator));
             }
             break;
@@ -2211,10 +2203,10 @@ SELECT contact_id
             if (empty($criteria[0]) || empty($criteria[1])) {
               throw new Exception("invalid criteria for $operator");
             }
-            if(!$returnSanitisedArray) {
+            if (!$returnSanitisedArray) {
               return (sprintf('%s ' . $operator . ' "%s" AND "%s"', $fieldName, CRM_Core_DAO::escapeString($criteria[0]), CRM_Core_DAO::escapeString($criteria[1])));
             }
-            else{
+            else {
               return NULL;  // not yet implemented (tests required to implement)
             }
             break;
@@ -2229,7 +2221,7 @@ SELECT contact_id
               'CRM_Core_DAO',
               'escapeString'
             ), $criteria);
-            if(!$returnSanitisedArray) {
+            if (!$returnSanitisedArray) {
               return (sprintf('%s %s ("%s")', $fieldName, $operator, implode('", "', $escapedCriteria)));
             }
             return $escapedCriteria;
@@ -2238,10 +2230,10 @@ SELECT contact_id
           // binary operators
 
           default:
-            if(!$returnSanitisedArray) {
+            if (!$returnSanitisedArray) {
               return(sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
             }
-            else{
+            else {
               return NULL; // not yet implemented (tests required to implement)
             }
         }
@@ -2280,7 +2272,7 @@ SELECT contact_id
     }
 
     // easy return for calls that dont need a randomized uniq string
-    if (! $makeRandom) {
+    if (!$makeRandom) {
       return substr($string, 0, $length);
     }
 
@@ -2293,7 +2285,7 @@ SELECT contact_id
   }
 
   /**
-   * @param $params
+   * @param array $params
    */
   function setApiFilter(&$params) {}
 

@@ -35,7 +35,7 @@
 class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -50,7 +50,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
    * @param string $body The full text of the message body, including any
    *               Mime parts, etc.
    *
-   * @param null $job_id
+   * @param int $job_id
    *
    * @internal param mixed $recipients Either a comma-seperated list of recipients
    *              (RFC822 compliant), or an array of recipients,

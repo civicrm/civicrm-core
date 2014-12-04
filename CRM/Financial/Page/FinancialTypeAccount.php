@@ -197,7 +197,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
   }
 
   /**
-   * edit CiviCRM Financial Type Account data.
+   * Edit CiviCRM Financial Type Account data.
    *
    * editing would involved modifying existing financial Account Type + adding data
    * to new financial Account Type.

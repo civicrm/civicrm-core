@@ -54,7 +54,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * add() method (add and edit modes of participant)
+   * Add() method (add and edit modes of participant)
    */
   function testAdd() {
     $params = array(
@@ -101,7 +101,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * getValues() method (fetch value of participant)
+   * GetValues() method (fetch value of participant)
    */
   function testgetValuesWithValidParams() {
     $participantId = Participant::create($this->_contactId, $this->_eventId);
@@ -145,7 +145,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * getValues() method (checking for behavior when params are empty )
+   * GetValues() method (checking for behavior when params are empty )
    */
   function testgetValuesWithoutValidParams() {
     $params           = $values = $ids = array();
@@ -158,7 +158,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * eventFull() method (checking the event for full )
+   * EventFull() method (checking the event for full )
    */
   function testEventFull() {
     $eventParams = array(
@@ -170,7 +170,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $participantId = Participant::create($this->_contactId, $this->_eventId);
     $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId);
 
-    $this->assertEquals($eventFull, 'This event is full !!!', 'Checking if Event is full.');
+    $this->assertEquals($eventFull, 'This event is full.', 'Checking if Event is full.');
 
     Participant::delete($participantId);
     Contact::delete($this->_contactId);
@@ -178,7 +178,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * importableFields() method ( Checking the Event's Importable Fields )
+   * ImportableFields() method ( Checking the Event's Importable Fields )
    */
   function testimportableFields() {
     $importableFields = CRM_Event_BAO_Participant::importableFields();
@@ -189,7 +189,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * participantDetails() method ( Checking the Participant Details )
+   * ParticipantDetails() method ( Checking the Participant Details )
    */
   function testparticipantDetails() {
     $participantId = Participant::create($this->_contactId, $this->_eventId);
@@ -207,7 +207,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * deleteParticipant() method ( Delete a Participant )
+   * DeleteParticipant() method ( Delete a Participant )
    */
   function testdeleteParticipant() {
     $params = array(
@@ -241,7 +241,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * checkDuplicate() method ( Checking for Duplicate Participant returns array of participant id)
+   * CheckDuplicate() method ( Checking for Duplicate Participant returns array of participant id)
    */
   function testcheckDuplicate() {
     $duplicate = array();
@@ -271,7 +271,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * create() method (create and updation of participant)
+   * Create() method (create and updation of participant)
    */
   function testCreate() {
     $params = array(
@@ -340,7 +340,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * exportableFields() method ( Exportable Fields for Participant)
+   * ExportableFields() method ( Exportable Fields for Participant)
    */
   function testexportableFields() {
     $exportableFields = CRM_Event_BAO_Participant::exportableFields();
@@ -351,7 +351,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * fixEventLevel() method (Setting ',' values), resolveDefaults(assinging value to array) method
+   * FixEventLevel() method (Setting ',' values), resolveDefaults(assinging value to array) method
    */
   function testfixEventLevel() {
 

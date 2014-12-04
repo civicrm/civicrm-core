@@ -37,7 +37,7 @@
 class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
   /**
-   * static field for all the participant information that we can potentially import
+   * Static field for all the participant information that we can potentially import
    *
    * @var array
    * @static
@@ -45,7 +45,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
   static $_importableFields = NULL;
 
   /**
-   * static field for all the participant information that we can potentially export
+   * Static field for all the participant information that we can potentially export
    *
    * @var array
    * @static
@@ -53,7 +53,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
   static $_exportableFields = NULL;
 
   /**
-   * static array for valid status transitions rules
+   * Static array for valid status transitions rules
    *
    * @var array
    * @static
@@ -75,7 +75,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
   }
 
   /**
-   * takes an associative array and creates a participant object
+   * Takes an associative array and creates a participant object
    *
    * the function extract all the params it needs to initialize the create a
    * participant object. the params array could contain additional unused name/value
@@ -83,9 +83,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @internal param array $ids the array that holds all the db ids
-   *
-   * @return object CRM_Event_BAO_Participant object
+   * @return CRM_Event_BAO_Participant object
    * @access public
    * @static
    */
@@ -186,13 +184,11 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
   }
 
   /**
-   * takes an associative array and creates a participant object
+   * Takes an associative array and creates a participant object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @internal param array $ids the array that holds all the db ids
-   *
-   * @return object CRM_Event_BAO_Participant object
+   * @return CRM_Event_BAO_Participant object
    * @access public
    * @static
    */
@@ -406,7 +402,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
             {$whereClause}";
 
-      $eventFullText = ts('This event is full!!!');
+      $eventFullText = ts('This event is full.');
       $participants = CRM_Core_DAO::executeQuery($query, $eventParams);
       while ($participants->fetch()) {
         //oops here event is full and we don't want waiting count.
@@ -433,7 +429,7 @@ INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
             {$whereClause}";
 
     $eventMaxSeats = NULL;
-    $eventFullText = ts('This event is full !!!');
+    $eventFullText = ts('This event is full.');
     $participants  = CRM_Core_DAO::executeQuery($query, $eventParams);
     while ($participants->fetch()) {
       if ($participants->event_full_text) {
@@ -487,13 +483,10 @@ SELECT  event.event_full_text,
    * with total participant count that field going to carry.
    *
    * @param int $eventId event id.
-   * @param array $skipParticipantIds
+   * @param array $skipParticipantIds an array of participant ids those we should skip.
    * @param bool $considerCounted
    * @param bool $considerWaiting
    * @param bool $considerTestParticipants
-   *
-   * @internal param array $skipParticipants an array of participant ids those we should skip.
-   * @internal param int $isTest would you like to consider test participants.
    *
    * @return array $optionsCount an array of each option id and total count
    * @static
@@ -617,7 +610,7 @@ GROUP BY  participant.event_id
   }
 
   /**
-   * combine all the importable fields from the lower levels object
+   * Combine all the importable fields from the lower levels object
    *
    * @param string $contactType
    * @param bool $status
@@ -730,7 +723,7 @@ GROUP BY  participant.event_id
   }
 
   /**
-   * combine all the exportable fields from the lower levels object
+   * Combine all the exportable fields from the lower levels object
    *
    * @return array array of exportable Fields
    * @access public
@@ -783,7 +776,7 @@ GROUP BY  participant.event_id
   }
 
   /**
-   * function to get the event name/sort name for a particular participation / participant
+   * Get the event name/sort name for a particular participation / participant
    *
    * @param  int    $participantId  id of the participant
 
@@ -925,7 +918,7 @@ WHERE  civicrm_participant.id = {$participantId}
    * @param array $input an assosiative array of name /value pairs
    * from other function
    *
-   * @return object CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution object
    * @access public
    * @static
    */
@@ -963,7 +956,7 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
-   * fix the event level
+   * Fix the event level
    *
    * When price sets are used as event fee, fee_level is set as ^A
    * separated string. We need to change that string to comma
@@ -998,12 +991,12 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
-   * get the additional participant ids.
+   * Get the additional participant ids.
    *
    * @param int $primaryParticipantId primary partycipant Id
    * @param boolean $excludeCancel do not include participant those are cancelled.
    *
-   * @param null $oldStatusId
+   * @param int $oldStatusId
    *
    * @return array $additionalParticipantIds
    * @static
@@ -1136,14 +1129,11 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * Function for update primary and additional participant status
    *
    * @param  int $participantID primary participant's id
-   * @param $oldStatusID
-   * @param null $newStatusID
+   * @param int $oldStatusID
+   * @param int $newStatusID
    * @param bool $updatePrimaryStatus
    *
-   * @internal param int $statusId status id for participant
-   * return void
-   *
-   * @return bool
+   * @return bool|void
    * @access public
    * @static
    */
@@ -1177,9 +1167,8 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @param  int $participantIds array of participant ids
    * @param  int $statusId status     id for participant
    * @param bool $updateRegisterDate
-   * @params boolean $updateRegisterDate  way to track when status changed.
    *
-   * return void
+   * @return void
    *
    * @access public
    * @static
@@ -1440,7 +1429,7 @@ UPDATE  civicrm_participant
   }
 
   /**
-   * Function to send mail and create activity
+   * Send mail and create activity
    * when participant status changed.
    *
    * @param  int $participantId participant id.
@@ -1550,11 +1539,11 @@ UPDATE  civicrm_participant
   }
 
   /**
-   * get participant status change message.
+   * Get participant status change message.
    *
-   * @param $participantId
+   * @param int $participantId
    * @param $statusChangeTo
-   * @param $fromStatusId
+   * @param int $fromStatusId
    *
    * @return string
    * @access public
@@ -1588,10 +1577,10 @@ UPDATE  civicrm_participant
   }
 
   /**
-   * get event full and waiting list message.
+   * Get event full and waiting list message.
    *
-   * @param $eventId
-   * @param null $participantId
+   * @param int $eventId
+   * @param int $participantId
    *
    * @return string
    * @access public
@@ -1650,9 +1639,9 @@ UPDATE  civicrm_participant
   }
 
   /**
-   * check for whether participant is primary or not
+   * Check for whether participant is primary or not
    *
-   * @param $participantId
+   * @param int $participantId
    *
    * @return true if participant is primary
    * @access public
@@ -1669,7 +1658,7 @@ UPDATE  civicrm_participant
   }
 
   /**
-   * get additional participant Ids for cascading with primary participant status
+   * Get additional participant Ids for cascading with primary participant status
    *
    * @param  int  $participantId   participant id.
    * @param  int  $oldStatusId     previous status
@@ -1698,11 +1687,9 @@ UPDATE  civicrm_participant
   }
 
   /**
-   * Function to get participant record count for a Contact
+   * Get participant record count for a Contact
    *
-   * @param $contactID
-   *
-   * @internal param int $contactId Contact ID
+   * @param int $contactID
    *
    * @return int count of participant records
    * @access public
@@ -1717,7 +1704,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   }
 
   /**
-   * Function to get participant ids by contribution id
+   * Get participant ids by contribution id
    *
    * @param int  $contributionId     Contribution Id
    * @param bool $excludeCancelled   Exclude cancelled additional participant
@@ -1749,11 +1736,9 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   }
 
   /**
-   * Function to get additional Participant edit & view url .
+   * Get additional Participant edit & view url .
    *
-   * @param $participantIds
-   *
-   * @internal param array $paticipantIds an array of additional participant ids.
+   * @param array $participantIds an array of additional participant ids.
    *
    * @return array of Urls.
    * @access public
@@ -1776,7 +1761,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   }
 
   /**
-   * to create trxn entry if an event has discount.
+   * To create trxn entry if an event has discount.
    *
    * @param int $eventID event id
    * @param array $contributionParams contribution params.
@@ -1813,7 +1798,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
   }
 
   /**
-   * Function to delete participants of contact
+   * Delete participants of contact
    *
    * CRM-12155
    *
@@ -1832,13 +1817,13 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
   }
 
   /**
-   * @param $params
-   * @param $participantId
-   * @param $contributionId
+   * @param array $params
+   * @param int $participantId
+   * @param int $contributionId
    * @param $feeBlock
-   * @param $lineItems
+   * @param array $lineItems
    * @param $paidAmount
-   * @param $priceSetId
+   * @param int $priceSetId
    */
   static function changeFeeSelections($params, $participantId, $contributionId, $feeBlock, $lineItems, $paidAmount, $priceSetId) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -2009,6 +1994,13 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 
     // update participant fee_amount column
     $partUpdateFeeAmt['id'] = $participantId;
+    foreach ($lineItems as $lineValue) {
+      if ($lineValue['price_field_value_id']) {
+        $line[$lineValue['price_field_value_id']] = $lineValue['label'] . ' - '. $lineValue['qty']; 
+      } 
+    }
+
+    $partUpdateFeeAmt['fee_level'] = implode(', ', $line);
     $partUpdateFeeAmt['fee_amount'] = $params['amount'];
     self::add($partUpdateFeeAmt);
 
@@ -2019,7 +2011,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
   /**
    * @param $updatedAmount
    * @param $paidAmount
-   * @param $contributionId
+   * @param int $contributionId
    */
   static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount = NULL) {
     $balanceAmt = $updatedAmount - $paidAmount;
@@ -2083,7 +2075,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
   }
 
   /**
-   * @param $participantId
+   * @param int $participantId
    * @param $activityType
    *
    * @throws CRM_Core_Exception
@@ -2124,5 +2116,29 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       $activityParams['target_contact_id'][] = $targetCid;
     }
     CRM_Activity_BAO_Activity::create($activityParams);
+  }
+
+  /**
+   * Get options for a given field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
+   * @param Array $props : whatever is known about this dao object
+   *
+   * @return Array|bool
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array('condition' => array());
+
+    if ($fieldName == 'status_id' && $context != 'validate') {
+      // Get rid of cart-related option if disabled
+      // FIXME: Why does this option even exist if cart is disabled?
+      if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME, 'enable_cart')) {
+        $params['condition'][] = "name <> 'Pending in cart'";
+      }
+    }
+
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 }

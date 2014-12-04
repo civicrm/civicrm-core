@@ -134,9 +134,9 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     }
   }
 
-  /*
-     * Test verify mandatory - includes DAO & passed as well as empty & NULL fields
-     */
+  /**
+   * Test verify mandatory - includes DAO & passed as well as empty & NULL fields
+   */
   function testVerifyMandatory() {
     _civicrm_api3_initialize(TRUE);
     $params = array(
@@ -158,9 +158,9 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->fail('An expected exception has not been raised.');
   }
 
-  /*
-     * Test verify one mandatory - includes DAO & passed as well as empty & NULL fields
-     */
+  /**
+   * Test verify one mandatory - includes DAO & passed as well as empty & NULL fields
+   */
   function testVerifyOneMandatory() {
     _civicrm_api3_initialize(TRUE);
     $params = array(
@@ -183,9 +183,9 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->fail('An expected exception has not been raised.');
   }
 
-  /*
-     * Test verify one mandatory - includes DAO & passed as well as empty & NULL fields
-     */
+  /**
+   * Test verify one mandatory - includes DAO & passed as well as empty & NULL fields
+   */
   function testVerifyOneMandatoryOneSet() {
     _civicrm_api3_initialize(TRUE);
     $params = array('version' => 3, 'entity_table' => 'civicrm_contact', 'note' => 'note', 'contact_id' => $this->_contactID, 'modified_date' => '2011-01-31', 'subject' => NULL);
@@ -199,7 +199,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   }
 
 
-  /*
+  /**
    * Test GET DAO function returns DAO
    */
   function testGetDAO() {
@@ -218,7 +218,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       $this->assertEquals($expected, $result);
     }
   }
-  /*
+
+  /**
    * Test GET BAO function returns BAO when it exists
    */
   function testGetBAO() {

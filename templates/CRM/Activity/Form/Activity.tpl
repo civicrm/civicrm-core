@@ -218,10 +218,15 @@
                 $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
                 $('#repetition_start_date_time').val($('#activity_date_time_time').val());
               }
-              $('#activity_date_time_display').blur(function() {
+
+              $('#activity_date_time_display').change(function() {
                 $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
+              });
+
+              $('#activity_date_time_time').change(function() {
                 $('#repetition_start_date_time').val($('#activity_date_time_time').val());
               });
+
               if ($('#start_action_offset').val() == "" && $('#repeat_absolute_date_display').val() == "") {
                 $('#recurring-entity-block').addClass('collapsed');
               }
@@ -318,7 +323,7 @@
     {/if}
   {/if}
   {if $action eq 4 and call_user_func(array('CRM_Case_BAO_Case','checkPermission'), $activityId, 'File On Case', $atype)}
-    <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts}File On Case{/ts}"><span><div class="icon ui-icon-clipboard"></div>{ts}File On Case{/ts}</span></a>
+    <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts}File On Case{/ts}"><span><div class="icon ui-icon-clipboard"></div>{ts}File on Case{/ts}</span></a>
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>

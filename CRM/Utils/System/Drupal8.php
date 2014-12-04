@@ -39,7 +39,7 @@
 class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
   /**
-   * Function to create a user in Drupal.
+   * Create a user in Drupal.
    *
    * @param array  $params associated array
    * @param string $mail email id for cms user
@@ -173,10 +173,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Function to get the drupal destination string. When this is passed in the
+   * Get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
-   * @param object $form Form object representing the 'current' form - to which the user will be returned
+   * @param CRM_Core_Form $form Form object representing the 'current' form - to which the user will be returned
    * @return string $destination destination value for URL
    *
    */
@@ -225,7 +225,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
 
   /**
-   * sets the title of the page
+   * Sets the title of the page
    *
    * @param string $title
    * @param string $pageTitle
@@ -496,7 +496,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Determine the native ID of the CMS user
    *
-   * @param $username
+   * @param string $username
    * @return int|NULL
    */
   function getUfId($username) {
@@ -529,7 +529,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * load drupal bootstrap
+   * Load drupal bootstrap
    *
    * @param array $params Either uid, or name & pass.
    * @param boolean $loadUser boolean Require CMS user load.

@@ -56,7 +56,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * create() method (create Contribution Page)
+   * Create() method (create Contribution Page)
    */
   function testCreate() {
 
@@ -107,7 +107,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * test setValues() method
+   * Test setValues() method
    */
   function testSetValues() {
 
@@ -130,7 +130,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * test copy() method
+   * Test copy() method
    */
   function testcopy() {
     $params = array(
@@ -162,7 +162,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * test checkRecurPaymentProcessor() method
+   * Test checkRecurPaymentProcessor() method
    */
   function testcheckRecurPaymentProcessor() {
     //@todo paypalpro create seems to fail silently without causing this class to fail

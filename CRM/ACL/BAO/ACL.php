@@ -92,14 +92,13 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Construct a WHERE clause to handle permissions to $object_*
    *
-   * @param $tables
+   * @param array $tables -   Any tables that may be needed in the FROM
    * @param string $operation -   The operation being attempted
    * @param string $object_table -    The table of the object in question
    * @param int $object_id -   The ID of the object in question
    * @param int $acl_id -       If it's a grant/revoke operation, the ACL ID
    * @param boolean $acl_role -  For grant operations, this flag determines if we're granting a single acl (false) or an entire group.
    *
-   * @internal param \ref $array $tables -   Any tables that may be needed in the FROM
    * @return string           -   The WHERE clause, or 0 on failure
    * @access public
    * @static
@@ -330,9 +329,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @param string $table -   The table owning the object
    * @param int $id -       The ID of the object
-   * @param $tables
-   *
-   * @internal param \ref $array $tables - Tables that will be needed in the FROM
+   * @param array $tables - Tables that will be needed in the FROM
    *
    * @return string|null  -   WHERE-style clause to filter results,
    * or null if $table or $id is null
@@ -657,7 +654,7 @@ SELECT $acl.*
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return CRM_ACL_DAO_ACL
    */
@@ -669,7 +666,7 @@ SELECT $acl.*
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $defaults
    */
   static function retrieve(&$params, &$defaults) {
@@ -677,7 +674,7 @@ SELECT $acl.*
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -694,7 +691,7 @@ SELECT $acl.*
 
   /**
    * @param $str
-   * @param $contactID
+   * @param int $contactID
    *
    * @return bool
    */
@@ -728,13 +725,12 @@ SELECT count( a.id )
    * @param $type
    * @param $tables
    * @param $whereTables
-   * @param null $contactID
+   * @param int $contactID
    *
    * @return null|string
    */
   public static function whereClause($type, &$tables, &$whereTables, $contactID = NULL) {
     $acls = CRM_ACL_BAO_Cache::build($contactID);
-    //CRM_Core_Error::debug( "a: $contactID", $acls );
 
     $whereClause = NULL;
     $clauses = array();
@@ -850,8 +846,8 @@ SELECT g.*
   }
 
   /**
-   * @param $type
-   * @param null $contactID
+   * @param int $type
+   * @param int $contactID
    * @param string $tableName
    * @param null $allGroups
    * @param null $includedGroups
@@ -921,7 +917,7 @@ ORDER BY a.object_id
   }
 
   /**
-   * @param $type
+   * @param int $type
    * @param $operation
    *
    * @return bool
@@ -967,7 +963,7 @@ ORDER BY a.object_id
   }
 
   /**
-   * Function to delete ACL records
+   * Delete ACL records
    *
    * @param  int  $aclId     ID of the ACL record to be deleted.
    *

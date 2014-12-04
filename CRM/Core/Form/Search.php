@@ -38,7 +38,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $_force;
 
   /**
-   * name of search button
+   * Name of search button
    *
    * @var string
    * @access protected
@@ -46,7 +46,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $_searchButtonName;
 
   /**
-   * name of action button
+   * Name of action button
    *
    * @var string
    * @access protected
@@ -54,7 +54,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $_actionButtonName;
 
   /**
-   * form values that we will be using
+   * Form values that we will be using
    *
    * @var array
    * @access public
@@ -62,7 +62,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   public $_formValues;
 
   /**
-   * have we already done this search
+   * Have we already done this search
    *
    * @access protected
    * @var boolean
@@ -70,7 +70,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $_done;
 
   /**
-   * what context are we being invoked from
+   * What context are we being invoked from
    *
    * @access protected
    * @var string
@@ -88,7 +88,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $this->assign('includeWysiwygEditor', TRUE);
     }
 
-    $resources->addScriptFile('civicrm', 'js/crm.searchForm.js');
+    $resources->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
 
     $this->addButtons(array(
       array(

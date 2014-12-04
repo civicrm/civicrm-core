@@ -64,11 +64,11 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string $mode the mode of operation: live or test
    * @param object  $paymentProcessor the details of the payment processor being invoked
-   * @param object  $paymentForm      reference to the form object if available
+   * @param CRM_Core_Form  $paymentForm      reference to the form object if available
    * @param boolean $force            should we force a reload of this payment object
    *
    * @return object
@@ -84,7 +84,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * should the first payment date be configurable when setting up back office recurring payments
+   * Should the first payment date be configurable when setting up back office recurring payments
    * In the case of Authorize.net this is an option
    * @return bool
    */
@@ -648,8 +648,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * @return bool|object
    */
-  function cancelSubscription(&$message = '', $params = array(
-    )) {
+  function cancelSubscription(&$message = '', $params = array()) {
     $template = CRM_Core_Smarty::singleton();
 
     $template->assign('subscriptionType', 'cancel');
@@ -696,8 +695,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * @return bool|object
    */
-  function updateSubscriptionBillingInfo(&$message = '', $params = array(
-    )) {
+  function updateSubscriptionBillingInfo(&$message = '', $params = array()) {
     $template = CRM_Core_Smarty::singleton();
     $template->assign('subscriptionType', 'updateBilling');
 
@@ -756,8 +754,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * @return bool|object
    */
-  function changeSubscriptionAmount(&$message = '', $params = array(
-    )) {
+  function changeSubscriptionAmount(&$message = '', $params = array()) {
     $template = CRM_Core_Smarty::singleton();
 
     $template->assign('subscriptionType', 'update');

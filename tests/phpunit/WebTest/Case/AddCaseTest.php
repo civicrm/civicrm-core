@@ -176,7 +176,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
 
   /**
    * @param $caseRoles
-   * @param $creatorName
+   * @param string $creatorName
    */
   function _testVerifyCaseRoles($caseRoles, $creatorName) {
     $id = $this->urlArg('id');
@@ -222,8 +222,8 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $firstName
-   * @param $lastName
+   * @param string $firstName
+   * @param string $lastName
    * @param $action
    */
   function _testSearchbyDate($firstName, $lastName, $action) {
@@ -271,8 +271,8 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $firstName
-   * @param $lastName
+   * @param string $firstName
+   * @param string $lastName
    * @param $caseTypeLabel
    *
    * test for assign case to another client

@@ -36,19 +36,19 @@
 class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
 
   /**
-   * the template to display the required "red" asterick
+   * The template to display the required "red" asterick
    * @var string
    */
   static $_requiredTemplate = NULL;
 
   /**
-   * the template to display error messages inline with the form element
+   * The template to display error messages inline with the form element
    * @var string
    */
   static $_errorTemplate = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @param object $stateMachine reference to state machine object
    *
@@ -62,7 +62,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   /**
    * Processes the request.
    *
-   * @param  object    $page       CRM_Core_Form the current form-page
+   * @param  CRM_Core_Form    $page       CRM_Core_Form the current form-page
    * @param  string    $actionName Current action name, as one Action object can serve multiple actions
    *
    * @return void
@@ -101,12 +101,10 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * render the page using a custom templating
-   * system
+   * Render the page using a custom templating system
    *
-   * @param object $page the CRM_Core_Form page
+   * @param CRM_Core_Form $page the CRM_Core_Form page
    *
-   * @internal param bool $ret should we echo or return output
    *
    * @return void
    * @access public
@@ -188,9 +186,9 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * set the various rendering templates
+   * Set the various rendering templates
    *
-   * @param object  $page the CRM_Core_Form page
+   * @param CRM_Core_Form  $page the CRM_Core_Form page
    *
    * @return void
    * @access public
@@ -207,9 +205,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * initialize the various templates
-   *
-   * @internal param object $page the CRM_Core_Form page
+   * Initialize the various templates
    *
    * @return void
    * @access public

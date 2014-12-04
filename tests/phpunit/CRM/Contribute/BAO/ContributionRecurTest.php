@@ -67,7 +67,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   /**
-   * test that an object can be retrieved & saved (per CRM-14986)
+   * Test that an object can be retrieved & saved (per CRM-14986)
    * this has been causing a DB error so we are checking for absence of error
    */
   function testFindSave() {
@@ -80,7 +80,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   /**
-   * test cancellation works per CRM-14986
+   * Test cancellation works per CRM-14986
    * we are checking for absence of error
    */
   function testCancelRecur() {

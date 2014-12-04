@@ -51,7 +51,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Function to create a user of Joomla.
+   * Create a user of Joomla.
    *
    * @param array  $params associated array
    * @param string $mail email id for cms user
@@ -120,15 +120,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Check if username and email exists in the Joomla! db
+   * Check if username and email exists in the drupal db
    *
-   * @params $params    array   array of name and mail values
-   * @params $errors    array   array of errors
-   * @params $emailName string  field label for the 'email'
-   *
-   * @param $params
-   * @param $errors
-   * @param string $emailName
+   * @param array $params array of name and mail values
+   * @param array $errors array of errors
+   * @param string $emailName  field label for the 'email'
    *
    * @return void
    */
@@ -179,7 +175,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * sets the title of the page
+   * Sets the title of the page
    *
    * @param string $title title to set
    * @param string $pageTitle
@@ -415,7 +411,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * rewrite various system urls to https
+   * Rewrite various system urls to https
    *
    * @return void
    * access public
@@ -426,7 +422,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * figure out the post url for the form
+   * Figure out the post url for the form
    *
    * @param $action the default action if one is pre-specified
    *
@@ -444,7 +440,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Function to set the email address of the user
+   * Set the email address of the user
    *
    * @param object $user handle to the user object
    *
@@ -594,7 +590,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
   }
 
   function logout() {
@@ -630,7 +626,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * load joomla bootstrap
+   * Load joomla bootstrap
    *
    * @param $params array with uid or name and password
    * @param $loadUser boolean load cms user?
@@ -687,7 +683,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * check is user logged in.
+   * Check is user logged in.
    *
    * @return boolean true/false.
    */
@@ -779,7 +775,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   public function getLoginDestination(&$form) {
     $args = NULL;
@@ -867,7 +863,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * output code from error function
+   * Output code from error function
    * @param string $content
    */
   function outputError($content) {

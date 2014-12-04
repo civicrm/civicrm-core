@@ -43,7 +43,7 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * if membership are involved, add the specific membership fields
+   * If membership are involved, add the specific membership fields
    *
    * @param $query
    *
@@ -253,11 +253,9 @@ class CRM_Member_BAO_Query {
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause(
             "ccr.contribution_status_id",
             $op,
-            CRM_Core_DAO::getFieldValue(
-              'CRM_Core_DAO_OptionValue',
-              'Cancelled',
-              'value',
-              'name'
+            array_search(
+              'Cancelled', 
+              CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
             ),
             "Integer"
           );
@@ -350,7 +348,7 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
@@ -435,7 +433,7 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function buildSearchForm(&$form) {
     foreach (CRM_Member_PseudoConstant::membershipType() as $id => $Name) {
@@ -486,7 +484,7 @@ class CRM_Member_BAO_Query {
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
   static function searchAction(&$row, $id) {}
 

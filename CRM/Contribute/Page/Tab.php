@@ -46,8 +46,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   public $_contactId = NULL;
   public $_crid = NULL;
 
-  //end of function
-
   /**
    * This method returns the links that are given for recur search row.
    * currently the links added for each row are:

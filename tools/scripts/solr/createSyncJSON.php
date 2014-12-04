@@ -454,7 +454,7 @@ function appendValue(&$values, $id, $name, $value, $ignored = FALSE) {
 }
 
 /**
- * @param $daoName
+ * @param string $daoName
  *
  * @return mixed
  */

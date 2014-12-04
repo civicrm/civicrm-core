@@ -44,7 +44,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
   protected $_cc = NULL;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -91,7 +91,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -164,7 +164,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -201,7 +201,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
         $statusMessage = ts("%1 Event registration(s) have been cancelled.", array(1 => count($participantIds)));
       }
       else {
-        $statusMessage = ts("Your event registration has been cancelled.");
+        $statusMessage = ts("Your Event Registration has been cancelled.");
       }
 
       if (!empty($results['mailedParticipants'])) {

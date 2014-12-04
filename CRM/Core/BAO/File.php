@@ -41,8 +41,8 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   static $_signableFields = array('entityTable', 'entityID', 'fileID');
 
   /**
-   * @param $fileID
-   * @param $entityID
+   * @param int $fileID
+   * @param int $entityID
    * @param null $entityTable
    *
    * @return array
@@ -74,9 +74,9 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
   /**
    * @param $data
-   * @param $fileTypeID
+   * @param int $fileTypeID
    * @param $entityTable
-   * @param $entityID
+   * @param int $entityID
    * @param $entitySubtype
    * @param bool $overwrite
    * @param null|array $fileParams
@@ -218,7 +218,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   } */
 
   /**
-   * delete all the files and associated object associated with this
+   * Delete all the files and associated object associated with this
    * combination
    */
   static function deleteEntityFile($entityTable, $entityID, $fileTypeID = NULL, $fileID = NULL) {
@@ -271,7 +271,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   }
 
   /**
-   * get all the files and associated object associated with this
+   * Get all the files and associated object associated with this
    * combination
    */
   static function getEntityFile($entityTable, $entityID, $addDeleteArgs = FALSE) {
@@ -325,8 +325,8 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   /**
    * @param string $entityTable table-name or "*" (to reference files directly by file-id)
    * @param int $entityID
-   * @param null $fileTypeID
-   * @param null $fileID
+   * @param int $fileTypeID
+   * @param int $fileID
    *
    * @return array
    */
@@ -381,7 +381,7 @@ AND       CEF.entity_id    = %2";
   /**
    * @param CRM_Core_Form $form
    * @param string $entityTable
-   * @param null $entityID
+   * @param int $entityID
    * @param null $numAttachments
    * @param bool $ajaxDelete
    */
@@ -457,7 +457,7 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * Function to return a clean url string and the number of attachment for a
+   * Return a clean url string and the number of attachment for a
    * given entityTable, entityID
    *
    * @param $entityTable string The entityTable to which the file is attached
@@ -485,9 +485,9 @@ AND       CEF.entity_id    = %2";
 
   /**
    * @param $formValues
-   * @param $params
+   * @param array $params
    * @param $entityTable
-   * @param null $entityID
+   * @param int $entityID
    */
   static function formatAttachment(
     &$formValues,
@@ -538,9 +538,9 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $entityTable
-   * @param $entityID
+   * @param int $entityID
    */
   static function processAttachment(&$params, $entityTable, $entityID) {
     $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
@@ -580,14 +580,14 @@ AND       CEF.entity_id    = %2";
   }
 
   /*
-   * Function to copy/attach an existing file to a different entity
+   * copy/attach an existing file to a different entity
    * table and id.
    */
   /**
    * @param $oldEntityTable
-   * @param $oldEntityId
+   * @param int $oldEntityId
    * @param $newEntityTable
-   * @param $newEntityId
+   * @param int $newEntityId
    */
   static function copyEntityFile($oldEntityTable, $oldEntityId, $newEntityTable, $newEntityId) {
     $oldEntityFile = new CRM_Core_DAO_EntityFile();
@@ -606,8 +606,8 @@ AND       CEF.entity_id    = %2";
 
   /**
    * @param $entityTable
-   * @param $entityID
-   * @param $fileID
+   * @param int $entityID
+   * @param int $fileID
    *
    * @return string
    */
@@ -622,7 +622,7 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * function to delete a file attachment from an entity table / entity ID
+   * Delete a file attachment from an entity table / entity ID
    *
    * @static
    * @access public
@@ -645,7 +645,7 @@ AND       CEF.entity_id    = %2";
 
 
   /**
-   * function to display paper icon for a file attachment -- CRM-13624
+   * Display paper icon for a file attachment -- CRM-13624
    *
    * @param $entityTable string  The entityTable to which the file is attached. eg "civicrm_contact", "civicrm_note", "civicrm_activity"
    *                             If you have the ID of a specific row in civicrm_file, use $entityTable='*'

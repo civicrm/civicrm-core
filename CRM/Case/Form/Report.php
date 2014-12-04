@@ -50,14 +50,14 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
   public $_clientID = NULL;
 
   /**
-   * activity set name
+   * Activity set name
    */
   public $_activitySetName = NULL;
 
   public $_report = NULL;
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -118,7 +118,7 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

@@ -42,7 +42,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
    */
   protected $ids = array();
   /**
-   * tag id
+   * Tag id
    * @var integer
    */
   protected $tag = array();

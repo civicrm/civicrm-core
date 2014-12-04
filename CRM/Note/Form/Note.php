@@ -87,7 +87,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -114,7 +114,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -160,7 +160,6 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
   }
 
   /**
-   *
    * @access public
    *
    * @return void

@@ -74,7 +74,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_action;
 
   /**
-   * the renderer used for this form
+   * The renderer used for this form
    *
    * @var object
    */
@@ -96,7 +96,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_dateFields = array();
 
   /**
-   * cache the smarty template for efficiency reasons
+   * Cache the smarty template for efficiency reasons
    *
    * @var CRM_Core_Smarty
    */
@@ -127,7 +127,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $controller;
 
   /**
-   * constants for attributes for various form elements
+   * Constants for attributes for various form elements
    * attempt to standardize on the number of variations that we
    * use of the below form elements
    *
@@ -205,7 +205,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Add one or more css classes to the form
-   * @param $className
+   * @param string $className
    */
   public function addClass($className) {
     $classes = $this->getAttribute('class');
@@ -213,7 +213,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * register all the standard rules that most forms potentially use
+   * Register all the standard rules that most forms potentially use
    *
    * @return void
    * @access private
@@ -435,6 +435,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $this->preProcess();
 
+    CRM_Utils_Hook::preProcess(get_class($this), $this);
+
     $this->assign('translatePermission', CRM_Core_Permission::check('translate CiviCRM'));
 
     if (
@@ -545,7 +547,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for Name
+   * Getter function for Name
    *
    * @return string
    * @access public
@@ -555,7 +557,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for State
+   * Getter function for State
    *
    * @return object
    * @access public
@@ -565,7 +567,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for StateType
+   * Getter function for StateType
    *
    * @return int
    * @access public
@@ -575,7 +577,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for title. Should be over-ridden by derived class
+   * Getter function for title. Should be over-ridden by derived class
    *
    * @return string
    * @access public
@@ -585,7 +587,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * setter function for title.
+   * Setter function for title.
    *
    * @param string $title the title of the form
    *
@@ -609,7 +611,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for link.
+   * Getter function for link.
    *
    * @return string
    * @access public
@@ -622,7 +624,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * boolean function to determine if this is a one form page
+   * Boolean function to determine if this is a one form page
    *
    * @return boolean
    * @access public
@@ -632,7 +634,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for Form Action
+   * Getter function for Form Action
    *
    * @return string
    * @access public
@@ -642,7 +644,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * setter function for Form Action
+   * Setter function for Form Action
    *
    * @param string
    *
@@ -654,7 +656,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * render form and return contents
+   * Render form and return contents
    *
    * @return string
    * @access public
@@ -671,7 +673,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter function for renderer. If renderer is not set
+   * Getter function for renderer. If renderer is not set
    * create one and initialize it
    *
    * @return object
@@ -776,7 +778,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * getter for action
+   * Getter for action
    *
    * @return int
    * @access public
@@ -786,7 +788,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * setter for action
+   * Setter for action
    *
    * @param  int  $action the mode we want to set the form
    *
@@ -798,12 +800,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * assign value to name in template
+   * Assign value to name in template
    *
-   * @param $var
-   * @param mixed $value value of varaible
+   * @param string $var name of variable
+   * @param mixed $value value of variable
    *
-   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -812,12 +813,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * assign value to name in template by reference
+   * Assign value to name in template by reference
    *
-   * @param $var
+   * @param string $var name of variable
    * @param mixed $value value of varaible
    *
-   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -826,7 +826,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * appends values to template variables
+   * Appends values to template variables
    *
    * @param array|string $tpl_var the template variable name(s)
    * @param mixed $value the value to append
@@ -841,7 +841,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param string $name
    *
-   * @internal param string $type
    * @return array
    */
   function get_template_vars($name=null) {
@@ -849,7 +848,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $title
    * @param $values
    * @param array $attributes
@@ -878,7 +877,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $title
    * @param bool $allowClear
    * @param null $required
@@ -900,7 +899,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $title
    * @param $values
    * @param null $other
@@ -958,15 +957,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * simple shell that derived classes can call to add buttons to
+   * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button
-   * @param string $nextType
+   * @param string $nextType button type for the form after processing
    * @param string $backType
    * @param bool|string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
    *
-   * @internal param string $type button type for the form after processing
    * @return void
    * @access public
    */
@@ -993,7 +991,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param string $from
    * @param string $to
    * @param string $label
@@ -1033,12 +1031,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset($props['field'])) {
       $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
-    $info = civicrm_api3($props['entity'], 'getoptions', array(
-        'field' => $props['field'],
-        'options' => array('metadata' => array('fields'))
-      )
-    );
-    $options = $info['values'];
+    // Fetch options from the api unless passed explicitly
+    if (isset($props['options'])) {
+      $options = $props['options'];
+    }
+    else {
+      $info = civicrm_api3($props['entity'], 'getoptions', array('field' => $props['field']));
+      $options = $info['values'];
+    }
     if (!array_key_exists('placeholder', $props)) {
       $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
     }
@@ -1051,7 +1051,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     // Core field
     else {
-      foreach($info['metadata']['fields'] as $uniqueName => $fieldSpec) {
+      $info = civicrm_api3($props['entity'], 'getfields');
+      foreach($info['values'] as $uniqueName => $fieldSpec) {
         if (
           $uniqueName === $props['field'] ||
           CRM_Utils_Array::value('name', $fieldSpec) === $props['field'] ||
@@ -1066,7 +1067,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
     $props['data-api-entity'] = $props['entity'];
     $props['data-api-field'] = $props['field'];
-    CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url');
+    CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url', 'options');
     return $this->add('select', $name, $label, $options, $required, $props);
   }
 
@@ -1096,7 +1097,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $label
    * @param $attributes
    * @param bool $forceTextarea
@@ -1140,7 +1141,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $title
    * @param null $required
    * @param null $extra
@@ -1156,7 +1157,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $label
    * @param $options
    * @param $attributes
@@ -1249,16 +1250,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   *  Function to add date
-   *  @param string $name   name of the element
-   *  @param string $label  label of the element
-   *  @param array  $attributes key / value pair
+   * Add date
+   * @param string $name   name of the element
+   * @param string $label  label of the element
+   * @param array  $attributes key / value pair
    *
-   // if you need time
-   *  $attributes = array ( 'addTime' => true,
-   *                        'formatType' => 'relative' or 'birth' etc check advanced date settings
-   *                      );
-   *  @param boolean $required  true if required
+   * // if you need time
+   * $attributes = array(
+   *   'addTime' => true,
+   *   'formatType' => 'relative' or 'birth' etc check advanced date settings
+   * );
+   * @param boolean $required  true if required
    *
    */
   function addDate($name, $label, $required = FALSE, $attributes = NULL) {
@@ -1355,7 +1357,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * add a currency and money element to the form
+   * Add a currency and money element to the form
    */
   function addMoney($name,
     $label,
@@ -1377,7 +1379,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * add currency element to the form
+   * Add currency element to the form
    */
   function addCurrency($name = 'currency',
     $label           = NULL,
@@ -1589,7 +1591,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * add autoselector field -if user has permission to view contacts
+   * Add autoselector field -if user has permission to view contacts
    * If adding this to a form you also need to add to the tpl e.g
    *
    * {if !empty($selectable)}
@@ -1604,7 +1606,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $profiles ids of profiles that are on the form (to be autofilled)
    * @param array $autoCompleteField
    *
-   * @internal param array $field metadata of field to use as selector including
    *  - name_field
    *  - id_field
    *  - url (for ajax lookup)
@@ -1623,7 +1624,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->assign('selectable', $autoCompleteField['id_field']);
       $this->addEntityRef($autoCompleteField['id_field'], NULL, array('placeholder' => $autoCompleteField['placeholder'], 'api' => $autoCompleteField['api']));
 
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js')
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js', 1, 'html-header')
       ->addSetting(array(
       'form' => array('autocompletes' => $autoCompleteField),
       'ids' => array('profile' => $profiles),

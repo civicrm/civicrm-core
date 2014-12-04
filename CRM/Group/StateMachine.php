@@ -35,7 +35,7 @@
 class CRM_Group_StateMachine extends CRM_Core_StateMachine {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
@@ -51,7 +51,7 @@ class CRM_Group_StateMachine extends CRM_Core_StateMachine {
   }
 
   /**
-   * return the form name of the task. This is
+   * Return the form name of the task. This is
    *
    * @return string
    * @access public

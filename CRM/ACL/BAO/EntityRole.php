@@ -53,7 +53,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return CRM_ACL_DAO_EntityRole
    */
@@ -65,7 +65,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $defaults
    */
   static function retrieve(&$params, &$defaults) {
@@ -73,7 +73,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -86,7 +86,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   }
 
   /**
-   * Function to delete Entity Role records
+   * Delete Entity Role records
    *
    * @param  int  $entityRoleId ID of the EntityRole record to be deleted.
    *

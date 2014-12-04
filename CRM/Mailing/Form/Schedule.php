@@ -39,7 +39,7 @@
 class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -69,7 +69,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     }
   }
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -89,7 +89,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
   }
 
   /**
-   * Build the form for the last step of the mailing wizard
+   * Build the form object for the last step of the mailing wizard
    *
    * @param
    *

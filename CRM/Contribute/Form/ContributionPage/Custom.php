@@ -39,7 +39,7 @@
 class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -77,7 +77,7 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -89,7 +89,7 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
 
     if ($this->_id) {
       $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-      CRM_Utils_System::setTitle(ts('Include Profiles (%1)', array(1 => $title)));
+      CRM_Utils_System::setTitle(ts('Include Profiles') . " ($title)");
     }
 
 
@@ -162,12 +162,12 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    *
    * @param $files
-   * @param $contributionPageId
+   * @param int $contributionPageId
    *
    * @return true if no errors, else array of errors
    * @access public

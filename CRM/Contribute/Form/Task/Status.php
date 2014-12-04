@@ -49,7 +49,7 @@ class CRM_Contribute_Form_Task_Status extends CRM_Contribute_Form_Task {
   protected $_rows;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -88,7 +88,7 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -183,7 +183,7 @@ AND    co.id IN ( $contribIDs )";
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *
@@ -215,7 +215,7 @@ AND    co.id IN ( $contribIDs )";
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

@@ -40,12 +40,12 @@
 class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
 
   /**
-   * ids of the contacts to limit the SQL queries (whole-database queries otherwise)
+   * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
    */
   var $contactIds = array();
 
   /**
-   * params to dedupe against (queries against the whole contact set otherwise)
+   * Params to dedupe against (queries against the whole contact set otherwise)
    */
   var $params = array();
 
@@ -209,8 +209,8 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
   }
 
   /**
-   * @param $cid
-   * @param $oid
+   * @param int $cid
+   * @param int $oid
    *
    * @return bool
    */

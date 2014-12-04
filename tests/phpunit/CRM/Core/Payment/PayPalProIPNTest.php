@@ -69,7 +69,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * test IPN response updates contribution_recur & contribution for first & second contribution
+   * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
   function testIPNPaymentRecurSuccess() {
     $this->setupRecurringPaymentProcessorTransaction();
@@ -90,7 +90,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * test IPN response updates contribution_recur & contribution for first & second contribution
+   * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
   function testIPNPaymentMembershipRecurSuccess() {
     $this->setupMembershipRecurringPaymentProcessorTransaction();
@@ -144,7 +144,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * check a payment express IPN call does not throw any errors
+   * Check a payment express IPN call does not throw any errors
    * At this stage nothing it supposed to happen so it's a pretty blunt test
    * but at least it should be e-notice free
 
@@ -178,7 +178,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * get PaymentExpress IPN for a single transaction
+   * Get PaymentExpress IPN for a single transaction
    * @return array array representing a Paypal IPN POST
    */
   function getPaypalExpressTransactionIPN() {

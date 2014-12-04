@@ -120,7 +120,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * generate batch name
+   * Generate batch name
    *
    * @return batch name
    * @static
@@ -132,7 +132,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * create entity batch entry
+   * Create entity batch entry
    * @param array $params associated array
    * @return batch array
    * @access public
@@ -147,7 +147,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Remove entries from entity batch
    * @param array $params associated array
-   * @return object CRM_Batch_DAO_EntityBatch
+   * @return CRM_Batch_DAO_EntityBatch
    */
   static function removeBatchEntity($params) {
     $entityBatch = new CRM_Batch_DAO_EntityBatch();
@@ -157,7 +157,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * function to delete batch entry
+   * Delete batch entry
    *
    * @param int $batchId batch id
    *
@@ -410,7 +410,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Function to define action links
+   * Define action links
    *
    * @param null $context
    *
@@ -490,7 +490,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * function to get batch list
+   * Get batch list
    *
    * @return array array of all batches
    * excluding batches with data entry in progress
@@ -625,12 +625,12 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Function to retrieve financial items assigned for a batch
+   * Retrieve financial items assigned for a batch
    *
    * @param int $entityID
    * @param array $returnValues
    * @param null $notPresent
-   * @param null $params
+   * @param array $params
    * @param bool $getCount
    *
    * @return Object
@@ -763,7 +763,7 @@ WHERE  {$where}
   }
 
   /**
-   * function to get batch names
+   * Get batch names
    * @param string $batchIds
    *
    * @return array array of batches
