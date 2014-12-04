@@ -274,18 +274,15 @@ function civicrm_api3_generic_getoptions($apiRequest) {
   unset($apiRequest['params']['context'], $apiRequest['params']['field']);
 
   $baoName = _civicrm_api3_get_BAO($apiRequest['entity']);
-  $options = $output = $baoName::buildOptions($fieldName, $context, $apiRequest['params']);
+  $options = $baoName::buildOptions($fieldName, $context, $apiRequest['params']);
   if ($options === FALSE) {
     return civicrm_api3_create_error("The field '{$fieldName}' has no associated option list.");
   }
   // Support 'sequential' output as a non-associative array
   if (!empty($apiRequest['params']['sequential'])) {
-    $output = array();
-    foreach ($options as $key => $val) {
-      $output[] = array('key' => $key, 'value' => $val);
-    }
+    $options = CRM_Utils_Array::makeNonAssociative($options);
   }
-  return civicrm_api3_create_success($output, $apiRequest['params'], $apiRequest['entity'], 'getoptions');
+  return civicrm_api3_create_success($options, $apiRequest['params'], $apiRequest['entity'], 'getoptions');
 }
 
 /**
