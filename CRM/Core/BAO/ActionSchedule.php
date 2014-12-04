@@ -684,6 +684,9 @@ AND   cas.entity_value = $id AND
     while ($actionSchedule->fetch()) {
       $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
 
+      if ($actionSchedule->from_email)
+        $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
+
       $activityTypeID = false;
       $activityStatusID = false;
       if ($actionSchedule->record_activity) {
