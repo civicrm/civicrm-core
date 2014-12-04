@@ -227,12 +227,14 @@ function setLocationDetails(contactID , reset) {
         }
         if (data[ele].type == 'Radio') {
           if (data[ele].value) {
-            cj("input[name='"+ ele +"']").filter("[value=" + data[ele].value + "]").prop('checked', true);
+            var fldName = ele.replace('onbehalf_', '');
+            cj("input[name='onbehalf["+ fldName +"]']").filter("[value='" + data[ele].value + "']").prop('checked', true);
           }
         }
         else if (data[ele].type == 'CheckBox') {
-          if (data[ele].value) {
-            cj("input[name='"+ ele +"']").prop('checked','checked');
+          for (var selectedOption in data[ele].value) {
+            var fldName = ele.replace('onbehalf_', '');
+            cj("input[name='onbehalf["+ fldName+"]["+ selectedOption +"]']").prop('checked','checked');
           }
         }
         else if (data[ele].type == 'Multi-Select') {
@@ -258,7 +260,10 @@ function setLocationDetails(contactID , reset) {
           }
         }
         else {
-          cj('#' + ele ).val(data[ele].value).change();
+          // do not set defaults to file type fields
+          if (cj('#' + ele).attr('type') != 'file') {
+            cj('#' + ele ).val(data[ele].value).change();
+          }
         }
       }
     },
