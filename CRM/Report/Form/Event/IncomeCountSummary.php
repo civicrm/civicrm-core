@@ -117,20 +117,18 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
           'participant_count' => array(
             'title' => ts('Participants'),
             'default' => TRUE,
-            'statistics' =>
-              array(
-                'count' => ts('Participants'),
-              ),
+            'statistics' => array(
+              'count' => ts('Participants'),
+            ),
           ),
           'line_total' => array(
             'title' => ts('Income Statistics'),
             'type' => CRM_Utils_Type::T_MONEY,
             'default' => TRUE,
-            'statistics' =>
-              array(
-                'sum' => ts('Income'),
-                'avg' => ts('Average'),
-              ),
+            'statistics' => array(
+              'sum' => ts('Income'),
+              'avg' => ts('Average'),
+            ),
           ),
         ),
       ),
@@ -168,7 +166,9 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (!empty($field['required']) ||
+            !empty($this->_params['fields'][$fieldName])
+          ) {
             if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
@@ -322,18 +322,26 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
     while ($dao->fetch()) {
       $row = array();
       foreach ($this->_columnHeaders as $key => $value) {
-        if (($key == 'civicrm_event_start_date') || ($key == 'civicrm_event_end_date')) {
+        if (($key == 'civicrm_event_start_date') ||
+          ($key == 'civicrm_event_end_date')
+        ) {
           //get event start date and end date in custom datetime format
           $row[$key] = CRM_Utils_Date::customFormat($dao->$key);
         }
         elseif ($key == 'civicrm_participant_fee_amount_avg') {
-          if ($dao->civicrm_participant_fee_amount_sum && $dao->civicrm_line_item_participant_count_count) {
-            $row[$key] = $dao->civicrm_participant_fee_amount_sum / $dao->civicrm_line_item_participant_count_count;
+          if ($dao->civicrm_participant_fee_amount_sum &&
+            $dao->civicrm_line_item_participant_count_count
+          ) {
+            $row[$key] = $dao->civicrm_participant_fee_amount_sum /
+              $dao->civicrm_line_item_participant_count_count;
           }
         }
         elseif ($key == 'civicrm_line_item_line_total_avg') {
-          if ($dao->civicrm_line_item_line_total_sum && $dao->civicrm_line_item_participant_count_count) {
-            $row[$key] = $dao->civicrm_line_item_line_total_sum / $dao->civicrm_line_item_participant_count_count;
+          if ($dao->civicrm_line_item_line_total_sum &&
+            $dao->civicrm_line_item_participant_count_count
+          ) {
+            $row[$key] = $dao->civicrm_line_item_line_total_sum /
+              $dao->civicrm_line_item_participant_count_count;
           }
         }
         else {
@@ -366,7 +374,8 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
         if ($value['civicrm_event_id']) {
           $graphRows['totalParticipants'][] = ($rows[$key]['civicrm_line_item_participant_count_count']);
           $graphRows[$this->_interval][] =
-            substr($rows[$key]['civicrm_event_title'], 0, 12) . "..(" . $rows[$key]['civicrm_event_id'] . ") ";
+            substr($rows[$key]['civicrm_event_title'], 0, 12) . "..(" .
+            $rows[$key]['civicrm_event_id'] . ") ";
           $graphRows['value'][] = ($rows[$key]['civicrm_line_item_participant_count_count']);
         }
       }

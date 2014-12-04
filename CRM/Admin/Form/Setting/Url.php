@@ -85,8 +85,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
       );
       if (!CRM_Utils_System::checkURL($url, TRUE)) {
         $errors = array(
-          'enableSSL' =>
-          ts('You need to set up a secure server before you can use the Force Secure URLs option'),
+          'enableSSL' => ts('You need to set up a secure server before you can use the Force Secure URLs option'),
         );
         return $errors;
       }

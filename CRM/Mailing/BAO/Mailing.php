@@ -1743,8 +1743,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'delivered' => CRM_Mailing_Event_BAO_Delivered::getTableName(),
       'opened' => CRM_Mailing_Event_BAO_Opened::getTableName(),
       'reply' => CRM_Mailing_Event_BAO_Reply::getTableName(),
-      'unsubscribe' =>
-      CRM_Mailing_Event_BAO_Unsubscribe::getTableName(),
+      'unsubscribe' => CRM_Mailing_Event_BAO_Unsubscribe::getTableName(),
       'bounce' => CRM_Mailing_Event_BAO_Bounce::getTableName(),
       'forward' => CRM_Mailing_Event_BAO_Forward::getTableName(),
       'url' => CRM_Mailing_BAO_TrackableURL::getTableName(),

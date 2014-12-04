@@ -48,8 +48,7 @@ class CRM_Admin_Form_Preferences_Event extends CRM_Admin_Form_Preferences {
       $optionValues[$i] = $i;
     }
     $this->_varNames = array(
-      CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME => array(
         'enable_cart' => array(
           'html_type' => 'checkbox',
           'title' => ts('Use Shopping Cart Style Event Registration'),

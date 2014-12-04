@@ -41,7 +41,8 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   public $_drilldownReport = array('pledge/summary' => 'Link to Detail Report');
 
   protected $_customGroupExtends = array(
-    'Pledge');
+    'Pledge'
+  );
 
   /**
    *
@@ -61,88 +62,76 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     }
 
     $this->_columns = array(
-      'civicrm_contact' =>
-      array(
+      'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' =>
-        array(
-          'sort_name' =>
-          array('title' => ts('Constituent Name'),
+        'fields' => array(
+          'sort_name' => array(
+            'title' => ts('Constituent Name'),
             'required' => TRUE,
             'no_repeat' => TRUE,
           ),
-          'id' =>
-          array(
+          'id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
           ),
         ),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_pledge' =>
-      array(
+      'civicrm_pledge' => array(
         'dao' => 'CRM_Pledge_DAO_Pledge',
-        'fields' =>
-        array(
-          'pledge_create_date' =>
-          array('title' => ts('Pledge Made'),
+        'fields' => array(
+          'pledge_create_date' => array(
+            'title' => ts('Pledge Made'),
             'required' => TRUE,
           ),
-          'financial_type_id' =>
-          array('title' => ts('Financial Type'),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
             'requried' => TRUE,
           ),
-          'amount' =>
-          array('title' => ts('Amount'),
+          'amount' => array(
+            'title' => ts('Amount'),
             'required' => TRUE,
             'type' => CRM_Utils_Type::T_MONEY,
           ),
-          'currency' =>
-          array(
+          'currency' => array(
             'required' => TRUE,
             'no_display' => TRUE,
           ),
-          'status_id' =>
-          array('title' => ts('Status'),
+          'status_id' => array(
+            'title' => ts('Status'),
           ),
         ),
-        'filters' =>
-        array(
-          'pledge_create_date' =>
-          array(
+        'filters' => array(
+          'pledge_create_date' => array(
             'title' => ts('Pledge Made'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
-          'currency' =>
-          array('title' => 'Currency',
+          'currency' => array(
+            'title' => 'Currency',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
           ),
-          'financial_type_id' =>
-          array( 'title'   => ts('Financial Type'),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options'      => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
         ),
         'grouping' => 'pledge-fields',
       ),
-      'civicrm_pledge_payment' =>
-      array(
+      'civicrm_pledge_payment' => array(
         'dao' => 'CRM_Pledge_DAO_PledgePayment',
-        'fields' =>
-        array(
+        'fields' => array(
           'scheduled_date' => array(
             'title' => ts('Next Payment Due'),
             'type' => CRM_Utils_Type::T_DATE,
             'required' => TRUE,
           ),
         ),
-        'filters' =>
-        array(
-          'scheduled_date' =>
-          array(
+        'filters' => array(
+          'scheduled_date' => array(
             'title' => ts('Next Payment Due'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
@@ -150,39 +139,32 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
         ),
         'grouping' => 'pledge-fields',
       ),
-      'civicrm_address' =>
-      array(
+      'civicrm_address' => array(
         'dao' => 'CRM_Core_DAO_Address',
-        'fields' =>
-        array(
+        'fields' => array(
           'street_address' => NULL,
           'city' => NULL,
           'postal_code' => NULL,
-          'state_province_id' =>
-          array('title' => ts('State/Province'),
+          'state_province_id' => array(
+            'title' => ts('State/Province'),
           ),
-          'country_id' =>
-          array('title' => ts('Country'),
+          'country_id' => array(
+            'title' => ts('Country'),
             'default' => TRUE,
           ),
         ),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_email' =>
-      array(
+      'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' =>
-        array('email' => NULL),
+        'fields' => array('email' => NULL),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_group' =>
-      array(
+      'civicrm_group' => array(
         'dao' => 'CRM_Contact_DAO_Group',
         'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
+        'filters' => array(
+          'gid' => array(
             'name' => 'group_id',
             'title' => ts('Group'),
             'group' => TRUE,
@@ -199,7 +181,8 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
         'title' => 'Campaign',
         'default' => 'false',
       );
-      $this->_columns['civicrm_pledge']['filters']['campaign_id'] = array('title' => ts('Campaign'),
+      $this->_columns['civicrm_pledge']['filters']['campaign_id'] = array(
+        'title' => ts('Campaign'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
       );
@@ -221,7 +204,9 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (!empty($field['required']) ||
+            !empty($this->_params['fields'][$fieldName])
+          ) {
             // to include optional columns address and email, only if checked
             if ($tableName == 'civicrm_address') {
               $this->_addressField = TRUE;
@@ -246,7 +231,10 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $pendingStatus = array_search('Pending', $allStatus);
     foreach (array(
-      'Pending', 'In Progress', 'Overdue') as $statusKey) {
+               'Pending',
+               'In Progress',
+               'Overdue'
+             ) as $statusKey) {
       if ($key = CRM_Utils_Array::key($statusKey, $allStatus)) {
         $unpaidStatus[] = $key;
       }
@@ -305,8 +293,8 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
    */
   function alterDisplay(&$rows) {
     // custom code to alter rows
-    $entryFound   = FALSE;
-    $checkList    = array();
+    $entryFound = FALSE;
+    $checkList = array();
     $display_flag = $prev_cid = $cid = 0;
 
     foreach ($rows as $rowNum => $row) {
@@ -344,7 +332,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
       if (array_key_exists('civicrm_pledge_financial_type_id', $row)) {
         if ($value = $row['civicrm_pledge_financial_type_id']) {
           $rows[$rowNum]['civicrm_pledge_financial_type_id'] =
-            CRM_Contribute_PseudoConstant::financialType($value, false);
+            CRM_Contribute_PseudoConstant::financialType($value, FALSE);
         }
         $entryFound = TRUE;
       }

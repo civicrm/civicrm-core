@@ -130,8 +130,7 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
     $this->addGroup($contactOptions, 'contactType', ts('Contact Type'));
 
     $this->setDefaults(array(
-      'contactType' =>
-        CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
       )
     );
 
