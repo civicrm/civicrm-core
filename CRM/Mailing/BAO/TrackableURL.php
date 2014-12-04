@@ -90,12 +90,9 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
       }
       $id = $tracker->id;
       $tracker->free();
-
-      $redirect = $config->userFrameworkResourceURL . "extern/url.php?u=$id";
-      $urlCache[$url] = $redirect;
     }
 
-    $returnUrl = "{$urlCache[$url]}&qid={$queue_id}";
+    $returnUrl = CRM_Utils_System::url("extern/url.php", "u=$id" . "&qid={$queue_id}", TRUE, NULL,TRUE);
 
     if ($hrefExists) {
       $returnUrl = "href='{$returnUrl}'";
