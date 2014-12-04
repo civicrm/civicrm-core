@@ -302,7 +302,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         if (!empty($qf->_quickConfig) && !empty($qf->_contributionAmount)) {
           foreach($fieldOptions as &$fieldOption) {
             if ($fieldOption['name'] == 'other_amount') {
-              $fieldOption['label'] = $fieldOption['label'] . '  ' . $currencySymbol;
+              $fieldOption['label'] = $fieldOption['label'] . ' ' . $currencySymbol;
             }
           }
           $qf->assign('priceset', $elementName);
@@ -450,12 +450,11 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
 
           if ($field->is_display_amounts) {
-            $opt['label'] .= '&nbsp;-&nbsp;';
             if (isset($taxAmount)  && $invoicing) {
-              $opt['label'] .= self::getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm);
+              $opt['label'] = self::getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm) . ' ' . $opt['label']; 
             }
             else {
-              $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
+              $opt['label'] = CRM_Utils_Money::format($opt[$valueFieldName]) . ' ' . $opt['label']; 
             }
           }
           $selectOption[$opt['id']] = $opt['label'];
@@ -491,12 +490,11 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
 
           if ($field->is_display_amounts) {
-            $opt['label'] .= '&nbsp;-&nbsp;';
             if (isset($taxAmount) && $invoicing) {
-              $opt['label'] .= self::getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm);
+              $opt['label'] = '<span class="crm-price-amount-amount">' . self::getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
             }
             else {
-              $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
+              $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
             }
           }
           $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
