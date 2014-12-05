@@ -540,7 +540,6 @@ WHERE   cas.entity_value = $id AND
 
         CRM_Activity_BAO_Activity::sendSMSMessage($contactId,
           $sms_text,
-          $html,
           $smsParams,
           $activity->id,
           $userID
