@@ -869,6 +869,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $rows = $elements = $relTableElements = $migrationInfo = array();
 
+    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+
     foreach ($diffs['contact'] as $field) {
       foreach (array('main', 'other') as $moniker) {
         $contact = &$$moniker;
@@ -903,6 +905,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $label = CRM_Utils_Array::value('individual_suffix', $contact);
           $value = CRM_Utils_Array::value('suffix_id', $contact);
           $field = 'suffix_id';
+        }
+        elseif ($field == 'gender_id' && !empty($value)) {
+          $label = $genders[$value];
+        }
+        elseif ($field == 'current_employer_id' && !empty($value)) {
+          $label = "$value (" . CRM_Contact_BAO_Contact::displayName($value) . ")";
         }
         $rows["move_$field"][$moniker] = $label;
         if ($moniker == 'other') {
