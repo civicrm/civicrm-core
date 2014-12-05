@@ -1386,16 +1386,12 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       $userID = $session->get('userID');
     }
 
-    $text = &$activityParams['text_message'];
-    $html = &$activityParams['html_message'];
+    $text = &$activityParams['sms_text_message'];
 
     // CRM-4575
     // token replacement of addressee/email/postal greetings
     // get the tokens added in subject and message
     $messageToken = CRM_Utils_Token::getTokens($text);
-    $messageToken = array_merge($messageToken,
-      CRM_Utils_Token::getTokens($html)
-    );
 
     //create the meta level record first ( sms activity )
     $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
@@ -1403,13 +1399,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       'name'
     );
 
-    // CRM-6265: save both text and HTML parts in details (if present)
-    if ($html and $text) {
-      $details = "-ALTERNATIVE ITEM 0-\n$html\n-ALTERNATIVE ITEM 1-\n$text\n-ALTERNATIVE END-\n";
-    }
-    else {
-      $details = $html ? $html : $text;
-    }
+    $details = $text;
 
     $activitySubject = $activityParams['activity_subject'];
     $activityParams = array(
@@ -1465,9 +1455,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       $tokenText = CRM_Utils_Token::replaceContactTokens($text, $values, FALSE, $messageToken, FALSE, $escapeSmarty);
       $tokenText = CRM_Utils_Token::replaceHookTokens($tokenText, $values, $categories, FALSE, $escapeSmarty);
 
-      $tokenHtml = CRM_Utils_Token::replaceContactTokens($html, $values, TRUE, $messageToken, FALSE, $escapeSmarty);
-      $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $values, $categories, TRUE, $escapeSmarty);
-
       // Only send if the phone is of type mobile
       $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
       if ($values['phone_type_id'] == CRM_Utils_Array::value('Mobile', $phoneTypes)) {
@@ -1480,7 +1467,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       $sendResult = self::sendSMSMessage(
         $contactId,
         $tokenText,
-        $tokenHtml,
         $smsParams,
         $activityID,
         $userID
@@ -1525,7 +1511,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    */
   static function sendSMSMessage($toID,
     &$tokenText,
-    &$tokenHtml,
     $smsParams = array(),
     $activityID,
     $userID = null
@@ -1558,13 +1543,12 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       );
     }
 
-    $message = $tokenHtml ? $tokenHtml : $tokenText;
     $recipient = $smsParams['To'];
     $smsParams['contact_id'] = $toID;
     $smsParams['parent_activity_id'] = $activityID;
 
     $providerObj = CRM_SMS_Provider::singleton(array('provider_id' => $smsParams['provider_id']));
-    $sendResult = $providerObj->send($recipient, $smsParams, $message, NULL, $userID);
+    $sendResult = $providerObj->send($recipient, $smsParams, $tokenText, NULL, $userID);
     if (PEAR::isError($sendResult)) {
       return $sendResult;
     }
