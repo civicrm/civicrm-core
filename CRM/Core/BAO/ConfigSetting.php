@@ -319,8 +319,7 @@ class CRM_Core_BAO_ConfigSetting {
       }
 
       if (empty($lcMessages)) {
-        // if a single-lang site, use default
-        //CRM-11993
+        //CRM-11993 - if a single-lang site, use default
         $lcMessages = CRM_Utils_Array::value('lcMessages', $defaults);
       }
 
