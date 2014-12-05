@@ -3,6 +3,27 @@
     return CRM.resourceUrls['civicrm'] + '/partials/crmMailing2/' + relPath;
   };
 
+  // FIXME: surely there's already some helper which can do this in one line?
+  // @return string "YYYY-MM-DD hh:mm:ss"
+  var createNow = function () {
+    var currentdate = new Date();
+    var yyyy = currentdate.getFullYear();
+    var mm = currentdate.getMonth() + 1;
+    mm = mm < 10 ? '0' + mm : mm;
+    var dd = currentdate.getDate();
+    dd = dd < 10 ? '0' + dd : dd;
+    var hh = currentdate.getHours();
+    hh = hh < 10 ? '0' + hh : hh;
+    var min = currentdate.getMinutes();
+    min = min < 10 ? '0' + min : min;
+    var sec = currentdate.getSeconds();
+    sec = sec < 10 ? '0' + sec : sec;
+    return yyyy + "-" + mm + "-" + dd + " " + hh + ":" + min + ":" + sec;
+  };
+
+  // FIXME: Load status ids from DB
+  var APPROVAL_STATUSES = { Approved: "1", Rejected: "2", None: "3" };
+
   var crmMailing2 = angular.module('crmMailing2');
 
   // The representation of from/reply-to addresses is inconsistent in the mailing data-model,
@@ -20,7 +41,7 @@
     });
     function first(array) {
       return (array.length == 0) ? null : array[0];
-    };
+    }
 
     return {
       getAll: function getAll() {
@@ -55,9 +76,52 @@
     };
   });
 
+  crmMailing2.factory('crmMsgTemplates', function($q, crmApi) {
+    var tpls = _.map(CRM.crmMailing.mesTemplate, function(tpl){
+      return _.extend({}, tpl, {
+        //id: tpl parseInt(tpl.id)
+      });
+    });
+    window.tpls = tpls;
+    var lastModifiedTpl = null;
+    return {
+      // @return Promise MessageTemplate (per APIv3)
+      get: function get(id) {
+        id = ''+id; // parseInt(id);
+        var dfr = $q.defer();
+        var tpl = _.where(tpls, {id: id});
+        if (id && tpl && tpl[0]) {
+          dfr.resolve(tpl[0]);
+        } else {
+          dfr.reject(id);
+        }
+        return dfr.promise;
+      },
+      // Save a template
+      // @param tpl MessageTemplate (per APIv3) For new templates, omit "id"
+      // @return Promise MessageTemplate (per APIv3)
+      save: function(tpl) {
+        return crmApi('MessageTemplate', 'create', tpl).then(function(response){
+          if (!tpl.id) {
+            tpl.id = ''+response.id; //parseInt(response.id);
+            tpls.push(tpl);
+          }
+          lastModifiedTpl = tpl
+          return tpl;
+        });
+      },
+      // @return Object MessageTemplate (per APIv3)
+      getLastModifiedTpl: function() {
+        return lastModifiedTpl;
+      },
+      getAll: function getAll() {
+        return tpls;
+      }
+    };
+  });
+
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
   crmMailing2.factory('crmMailingMgr', function($q, crmApi, crmFromAddresses) {
-    window.f = crmFromAddresses; // REVERT
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
         component_type:type,
@@ -135,7 +199,7 @@
         var params = _.extend({}, mailing, {
           options:  {force_rollback: 1},
           'api.Mailing.preview': {
-            id: '$value.id',
+            id: '$value.id'
           }
         });
         return crmApi('Mailing', 'create', params).then(function(result){
@@ -166,14 +230,22 @@
         });
       },
 
+      // Save a (draft) mailing
       // @param mailing Object (per APIv3)
       // @return Promise
       save: function(mailing) {
         var params = _.extend({}, mailing, {
           'api.mailing_job.create': 0 // note: exact match to API default
         });
+
+        // WORKAROUND: Mailing.create (aka CRM_Mailing_BAO_Mailing::create()) interprets scheduled_date
+        // as an *intent* to schedule and creates tertiary records. Saving a draft with a scheduled_date
+        // is therefore not allowed. Remove this after fixing Mailing.create's contract.
+        delete params.scheduled_date;
+
         return crmApi('Mailing', 'create', params).then(function(result){
           if (result.id && !mailing.id) mailing.id = result.id;  // no rollback, so update mailing.id
+          // Perhaps we should reload mailing based on result?
           return result.values[result.id];
         });
       },
@@ -181,15 +253,22 @@
       // Schedule/send the mailing
       // @param mailing Object (per APIv3)
       // @return Promise
-      submit: function(mailing) {
-        throw 'Not implemented: crmMailingMgr.submit';
-//        var params = _.extend({}, mailing, {
-//          'api.mailing_job.create': 1 // note: exact match to API default
-//        });
-//        return crmApi('Mailing', 'create', params).then(function(result){
-//          if (result.id && !mailing.id) mailing.id = result.id;  // no rollback, so update mailing.id
-//          return result.values[result.id];
-//        });
+      submit: function (mailing) {
+        var changes = {
+          approval_date: createNow(),
+          approver_id: CRM.crmMailing.contactid,
+          approval_status_id: APPROVAL_STATUSES.Approved,
+          scheduled_date: mailing.scheduled_date ? mailing.scheduled_date : createNow(),
+          scheduled_id: CRM.crmMailing.contactid
+        };
+        var params = _.extend({}, mailing, changes, {
+          'api.mailing_job.create': 0 // note: exact match to API default
+        });
+        return crmApi('Mailing', 'create', params).then(function (result) {
+          if (result.id && !mailing.id) mailing.id = result.id; // no rollback, so update mailing.id
+          _.extend(mailing, changes); // Perhaps we should reload mailing based on result?
+          return result.values[result.id];
+        });
       },
 
       // Immediately send a test message
@@ -199,13 +278,19 @@
       // @return Promise for a list of delivery reports
       sendTest: function(mailing, testEmail, testGroup) {
         var params = _.extend({}, mailing, {
-          // options:  {force_rollback: 1},
+          // options:  {force_rollback: 1}, // Test mailings include tracking features, so the mailing must be persistent
           'api.Mailing.send_test': {
             mailing_id: '$value.id',
             test_email: testEmail,
             test_group: testGroup
           }
         });
+
+        // WORKAROUND: Mailing.create (aka CRM_Mailing_BAO_Mailing::create()) interprets scheduled_date
+        // as an *intent* to schedule and creates tertiary records. Saving a draft with a scheduled_date
+        // is therefore not allowed. Remove this after fixing Mailing.create's contract.
+        delete params.scheduled_date;
+
         return crmApi('Mailing', 'create', params).then(function(result){
           if (result.id && !mailing.id) mailing.id = result.id;  // no rollback, so update mailing.id
           return result.values[result.id]['api.Mailing.send_test'].values;
@@ -213,5 +298,4 @@
       }
     };
   });
-
 })(angular, CRM.$, CRM._);

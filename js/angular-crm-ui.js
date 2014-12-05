@@ -27,6 +27,156 @@
       };
     })
 
+    // example: <input crm-ui-date="myobj.datefield" />
+    // example: <input crm-ui-date="myobj.datefield" crm-ui-date-format="yy-mm-dd" />
+    .directive('crmUiDate', function ($parse, $timeout) {
+      return {
+        restrict: 'AE',
+        scope: {
+          crmUiDate: '@', // expression, model binding
+          crmUiDateFormat: '@' // expression, date format (default: "yy-mm-dd")
+        },
+        link: function (scope, element, attrs) {
+          var fmt = attrs.crmUiDateFormat ? $parse(attrs.crmUiDateFormat)() : "yy-mm-dd";
+          var model = $parse(attrs.crmUiDate);
+
+          element.addClass('dateplugin');
+          $(element).datepicker({
+            dateFormat: fmt
+          });
+
+          var updateChildren = (function() {
+            element.off('change', updateParent);
+            $(element).datepicker('setDate', model(scope.$parent));
+            element.on('change', updateParent);
+          });
+          var updateParent = (function() {
+            $timeout(function () {
+              model.assign(scope.$parent, $(element).val());
+            });
+          });
+
+          updateChildren();
+          scope.$parent.$watch(attrs.crmUiDate, updateChildren);
+          element.on('change', updateParent);
+        }
+      };
+    })
+
+    // example: <div crm-ui-date-time="myobj.mydatetimefield"></div>
+    .directive('crmUiDateTime', function ($parse) {
+      return {
+        restrict: 'AE',
+        scope: {
+          crmUiDateTime: '@'
+        },
+        template: '<input crm-ui-date="dtparts.date" placeholder="{{dateLabel}}"/> <input crm-ui-time="dtparts.time" placeholder="{{timeLabel}}"/>',
+        link: function (scope, element, attrs) {
+          var model = $parse(attrs.crmUiDateTime);
+          scope.dateLabel = ts('Date');
+          scope.timeLabel = ts('Time');
+
+          var updateChildren = (function () {
+            var value = model(scope.$parent);
+            if (value) {
+              var dtparts = value.split(/ /);
+              scope.dtparts = {date: dtparts[0], time: dtparts[1]};
+            }
+            else {
+              scope.dtparts = {date: '', time: ''};
+            }
+          });
+          var updateParent = (function () {
+            model.assign(scope.$parent, scope.dtparts.date + " " + scope.dtparts.time);
+          });
+
+          updateChildren();
+          scope.$parent.$watch(attrs.crmUiDateTime, updateChildren);
+          scope.$watch('dtparts.date', updateParent),
+          scope.$watch('dtparts.time', updateParent)
+        }
+      };
+    })
+
+    // Display a field/row in a field list
+    // example: <div crm-ui-field crm-title="My Field"> {{mydata}} </div>
+    // example: <div crm-ui-field="myfield" crm-title="My Field"> <input name="myfield" /> </div>
+    // example: <div crm-ui-field="myfield" crm-title="My Field"> <input name="myfield" required /> </div>
+    .directive('crmUiField', function() {
+      function createReqStyle(req) {
+        return {visibility: req ? 'inherit' : 'hidden'};
+      }
+      // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
+      var templateUrls = {
+        default: partialUrl('field.html'),
+        checkbox: partialUrl('field-cb.html')
+      };
+
+      return {
+        scope: {
+          crmUiField: '@', // string, name of an HTML form element
+          crmLayout: '@', // string, "default" or "checkbox"
+          crmTitle: '@' // expression, printable title for the field
+        },
+        templateUrl: function(tElement, tAttrs){
+          var layout = tAttrs.crmLayout ? tAttrs.crmLayout : 'default';
+          return templateUrls[layout];
+        },
+        transclude: true,
+        link: function (scope, element, attrs) {
+          $(element).addClass('crm-section');
+          scope.crmTitle = attrs.crmTitle;
+          scope.crmUiField = attrs.crmUiField;
+          scope.cssClasses = {};
+          scope.crmRequiredStyle = createReqStyle(false);
+
+          // 0. Ensure that a target field has been specified
+
+          if (!attrs.crmUiField) return;
+          if (attrs.crmUiField == 'name') {
+            throw new Error('Validation monitoring does not work for field name "name"');
+          }
+
+          // 1. Figure out form and input elements
+
+          var form = $(element).closest('form');
+          var formCtrl = scope.$parent.$eval(form.attr('name'));
+          var input = $('input[name="' + attrs.crmUiField + '"],select[name="' + attrs.crmUiField + '"],textarea[name="' + attrs.crmUiField + '"]', form);
+          var label = $('>div.label >label, >label', element);
+          if (form.length != 1 || input.length != 1 || label.length != 1) {
+            if (console.log) console.log('Label cannot be matched to input element. Expected to find one form and one input[name='+attrs.crmUiField+'].', form.length, input.length, label.length);
+            return;
+          }
+
+          // 2. Make sure that inputs are well-defined (with name+id).
+
+          if (!input.attr('id')) {
+            input.attr('id', 'crmUi_' + (++idCount));
+          }
+          $(label).attr('for', input.attr('id'));
+
+          // 3. Monitor is the "required" and "$valid" properties
+
+          if (input.attr('ng-required')) {
+            scope.crmRequiredStyle = createReqStyle(scope.$parent.$eval(input.attr('ng-required')));
+            scope.$parent.$watch(input.attr('ng-required'), function(isRequired) {
+              scope.crmRequiredStyle = createReqStyle(isRequired);
+            });
+          } else {
+            scope.crmRequiredStyle = createReqStyle(input.prop('required'));
+          }
+
+          var inputCtrl = form.attr('name') + '.' + input.attr('name');
+          scope.$parent.$watch(inputCtrl + '.$valid', function(newValue) {
+            scope.cssClasses['crm-error'] = !scope.$parent.$eval(inputCtrl + '.$valid') && !scope.$parent.$eval(inputCtrl + '.$pristine');
+          });
+          scope.$parent.$watch(inputCtrl + '.$pristine', function(newValue) {
+            scope.cssClasses['crm-error'] = !scope.$parent.$eval(inputCtrl + '.$valid') && !scope.$parent.$eval(inputCtrl + '.$pristine');
+          });
+        }
+      };
+    })
+
     // example: <iframe crm-ui-iframe="getHtmlContent()"></iframe>
     .directive('crmUiIframe', function ($parse) {
       return {
@@ -57,69 +207,6 @@
 
           scope.$parent.$watch(attrs.crmUiIframe, refresh);
           //setTimeout(function () { refresh(); }, 50);
-        }
-      };
-    })
-
-    // example: <form name="myForm">...<label crm-ui-label crm-for="myField">My Field</span>...<input name="myField"/>...</form>
-    //
-    // Label adapts based on <input required>, <input ng-required>, or any other validation.
-    //
-    // Note: This should work in the normal case where <label> and <input> are in roughly the same scope,
-    // but if the scopes are materially different then problems could arise.
-    .directive('crmUiLabel', function($parse) {
-      return {
-        scope: {
-          name: '@'
-        },
-        transclude: true,
-        template: '<span ng-class="cssClasses"><span ng-transclude></span> <span ng-show="crmRequired" class="crm-marker" title="This field is required.">*</span></span>',
-        link: function(scope, element, attrs) {
-          if (attrs.crmFor == 'name') {
-            throw new Error('Validation monitoring does not work for field name "name"');
-          }
-
-          // 1. Figure out form and input elements
-
-          var form = $(element).closest('form');
-          var formCtrl = scope.$parent.$eval(form.attr('name'));
-          var input = $('input[name="' + attrs.crmFor + '"],select[name="' + attrs.crmFor + '"],textarea[name="' + attrs.crmFor + '"]', form);
-          if (form.length != 1 || input.length != 1) {
-            if (console.log) console.log('Label cannot be matched to input element. Expected to find one form and one input[name='+attrs.crmFor+'].', form.length, input.length);
-            return;
-          }
-
-          // 2. Make sure that inputs are well-defined (with name+id).
-
-          if (!input.attr('id')) {
-            input.attr('id', 'crmUi_' + (++idCount));
-          }
-          $(element).attr('for', input.attr('id'));
-
-          // 3. Monitor is the "required" and "$valid" properties
-
-          if (input.attr('ng-required')) {
-            scope.crmRequired = scope.$parent.$eval(input.attr('ng-required'));
-            scope.$parent.$watch(input.attr('ng-required'), function(isRequired) {
-              scope.crmRequired = isRequired;
-            });
-          } else {
-            scope.crmRequired = input.prop('required');
-          }
-
-          var inputCtrl = form.attr('name') + '.' + input.attr('name');
-          scope.cssClasses = {};
-          scope.$parent.$watch(inputCtrl + '.$valid', function(newValue) {
-            //scope.cssClasses['ng-valid'] = newValue;
-            //scope.cssClasses['ng-invalid'] = !newValue;
-            scope.cssClasses['crm-error'] = !scope.$parent.$eval(inputCtrl + '.$valid') && !scope.$parent.$eval(inputCtrl + '.$pristine');
-          });
-          scope.$parent.$watch(inputCtrl + '.$pristine', function(newValue) {
-            //scope.cssClasses['ng-pristine'] = newValue;
-            //scope.cssClasses['ng-dirty'] = !newValue;
-            scope.cssClasses['crm-error'] = !scope.$parent.$eval(inputCtrl + '.$valid') && !scope.$parent.$eval(inputCtrl + '.$pristine');
-          });
-
         }
       };
     })
@@ -186,6 +273,47 @@
       };
     })
 
+    // usage: <select crm-ui-select="{placeholder:'Something',allowClear:true,...}" crm-ui-select-model="myobj.field"><option...></select>
+    .directive('crmUiSelect', function ($parse) {
+      return {
+        scope: {
+          crmUiSelect: '@',
+          crmUiSelectModel: '@',
+          crmUiSelectChange: '@'
+        },
+        link: function (scope, element, attrs) {
+          var model = $parse(attrs.crmUiSelectModel);
+
+          // In cases where UI initiates update, there may be an extra
+          // call to refreshUI, but it doesn't create a cycle.
+
+          function refreshUI() {
+            $(element).select2('val', model(scope.$parent));
+          }
+          function refreshModel() {
+            var oldValue = model(scope.$parent), newValue = $(element).select2('val');
+            if (oldValue != newValue) {
+              scope.$parent.$apply(function(){
+                model.assign(scope.$parent, newValue);
+              });
+              if (attrs.crmUiSelectChange) {
+                scope.$parent.$eval(attrs.crmUiSelectChange);
+              }
+            }
+          }
+          function init() {
+            // TODO watch select2-options
+            var options = attrs.crmUiSelect ? scope.$parent.$eval(attrs.crmUiSelect) : {};
+            $(element).select2(options);
+            $(element).on('change', refreshModel);
+            setTimeout(refreshUI, 0);
+            scope.$parent.$watch(attrs.crmUiSelectModel, refreshUI);
+          }
+          init();
+        }
+      };
+    })
+
     // example <div crm-ui-tab crm-title="ts('My Title')">...content...</div>
     // WISHLIST: use a full Angular component instead of an incomplete jQuery wrapper
     .directive('crmUiTab', function($parse) {
@@ -223,6 +351,37 @@
         },
         link: function (scope, element, attrs) {}
       };
+    })
+
+    // example: <input crm-ui-time="myobj.mytimefield" />
+    .directive('crmUiTime', function ($parse, $timeout) {
+      return {
+        restrict: 'AE',
+        scope: {
+          crmUiTime: '@'
+        },
+        link: function (scope, element, attrs) {
+          var model = $parse(attrs.crmUiTime);
+
+          element.addClass('crm-form-text six');
+          $(element).timeEntry({show24Hours: true});
+
+          var updateChildren = (function() {
+            element.off('change', updateParent);
+            $(element).timeEntry('setTime', model(scope.$parent));
+            element.on('change', updateParent);
+          });
+          var updateParent = (function () {
+            $timeout(function () {
+              model.assign(scope.$parent, element.val());
+            });
+          });
+
+          updateChildren();
+          scope.$parent.$watch(attrs.crmUiTime, updateChildren);
+          element.on('change', updateParent);
+        }
+      }
     })
 
     // example: <div crm-ui-wizard="myWizardCtrl"><div crm-ui-wizard-step crm-title="ts('Step 1')">...</div><div crm-ui-wizard-step crm-title="ts('Step 2')">...</div></div>

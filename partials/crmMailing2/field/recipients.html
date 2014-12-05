@@ -8,9 +8,9 @@ Required vars: mailing, crmMailingConst
       <a href="" ng-click="previewRecipients()">{{getRecipientsEstimate()}}</a>
     </div>
     <div>
-      <input name='dedupe_email' type='checkbox' ng-model='mailing.dedupe_email'  ng-true-value="1" ng-false-value="0" />
-      <label crm-ui-label crm-for='dedupe_email'>
-        Dedupe
+      <input name='dedupe_email' type='checkbox' ng-model='mailing.dedupe_email'  ng-true-value="1" ng-false-value="0" id="recipients-dedupe-email" />
+      <label for="recipients-dedupe-email">
+        {{ts('Dedupe')}}
       </label>
     </div>
   </div>

@@ -1,0 +1,10 @@
+<div class="label">
+  <label>
+    <span ng-class="cssClasses">
+      {{$parent.$eval(crmTitle)}}
+      <span ng-style="crmRequiredStyle" class="crm-marker" title="This field is required.">*</span>
+    </span>
+  </label>
+</div>
+<div class="content" ng-transclude></div>
+<div class="clear"></div>
