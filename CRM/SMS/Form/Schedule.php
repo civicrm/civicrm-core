@@ -141,8 +141,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
           $params['start_date_time']
         )) < CRM_Utils_Date::format(date('YmdHi00'))) {
       return array(
-        'start_date' =>
-        ts('Start date cannot be earlier than the current time.'),
+        'start_date' => ts('Start date cannot be earlier than the current time.'),
       );
     }
     return TRUE;

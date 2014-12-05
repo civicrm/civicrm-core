@@ -46,8 +46,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
       '' => '- select -') + CRM_Core_SelectValues::addressProvider();
 
     $this->_varNames = array(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
         'address_options' => array(
           'html_type' => 'checkboxes',
           'title' => ts('Address Fields'),
@@ -66,8 +65,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
           'weight' => 3,
         ),
       ),
-      CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME => array(
         'address_standardization_provider' => array(
           'html_type' => 'select',
           'title' => ts('Provider'),

@@ -388,15 +388,12 @@ HAVING COUNT(cpse.price_set_id) > 1 AND MIN(cpse1.id) <> cpse.id ";
    */
   static function task_4_2_alpha1_createPriceSets(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
-    $daoName =
-      array(
-        'civicrm_contribution_page' =>
-        array(
+    $daoName = array(
+        'civicrm_contribution_page' => array(
           'CRM_Contribute_BAO_ContributionPage',
           CRM_Core_Component::getComponentID('CiviContribute')
         ),
-        'civicrm_event' =>
-        array(
+        'civicrm_event' => array(
           'CRM_Event_BAO_Event',
           CRM_Core_Component::getComponentID('CiviEvent')
         ),
