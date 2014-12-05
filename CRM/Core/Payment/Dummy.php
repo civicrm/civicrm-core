@@ -119,6 +119,10 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       $params['trxn_id'] = sprintf('live_%08d', $trxn_id);
     }
     $params['gross_amount'] = $params['amount'];
+    // Add a fee_amount so we can make sure fees are handled properly in underlying classes.
+    $params['fee_amount'] = 1.50;
+    $params['net_amount'] = $params['gross_amount'] - $params['fee_amount'];
+
     return $params;
   }
 
