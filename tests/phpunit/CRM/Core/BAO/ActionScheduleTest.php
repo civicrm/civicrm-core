@@ -261,6 +261,36 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'month',
       'subject' => 'subject sched_membership_end_2month',
     );
+    $this->fixtures['sched_membership_end_limit_to_none'] = array( // create()
+      'name' => 'limit to none',
+      'title' => 'limit to none',
+      'absolute_date' => '',
+      'body_html' => '<p>body sched_membership_end_2month</p>',
+      'body_text' => 'body sched_membership_end_2month',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '4',
+      'end_frequency_unit' => 'month',
+      'entity_status' => '',
+      'entity_value' => '',
+      'limit_to' => 0,
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '1',
+      'mapping_id' => 4,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '4',
+      'repetition_frequency_unit' => 'week',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'membership_end_date',
+      'start_action_offset' => '2',
+      'start_action_unit' => 'month',
+      'subject' => 'limit to none',
+    );
 
 
     $this->_setUp();
@@ -519,7 +549,37 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ),
     ));
   }
+  /**
+   * Check that limit_to + an empty recipients doesn't sent to multiple contacts
+   */
+  function testMembershipLimitToNone() {
+    // creates membership with end_date = 20120615
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
 
+    $this->assertTrue(is_numeric($membership->id));
+    $result = $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $membership->contact_id,
+      'email' => 'member@example.com',
+    ));
+    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
+    $this->callAPISuccess('contact', 'create', array('email' => 'b@c.com', 'contact_type' => 'Individual'));
+
+    $this->assertAPISuccess($result);
+
+    $actionSchedule = $this->fixtures['sched_membership_end_limit_to_none'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    // end_date=2012-06-15 ; schedule is 2 weeks before end_date
+    $this->assertCronRuns(array(
+      array( // Before the 2-week mark, no email
+        'time' => '2012-05-31 01:00:00',
+        // 'time' => '2012-06-01 01:00:00', // FIXME: Is this the right boundary?
+        'recipients' => array(),
+      ),
+    ));
+  }
 
   /**
   * For contacts/members which match schedule based on end date,

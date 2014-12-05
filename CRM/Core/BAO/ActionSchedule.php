@@ -775,6 +775,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       // 'limit to' option
       $select = $join = $where = $limitWhere = array();
       $limitTo = $actionSchedule->limit_to;
+      $isSendToAdditionalContacts = (!is_null($limitTo) && $limitTo == 0 && (!empty($actionSchedule->group_id) || !empty($actionSchedule->recipient_manual))) ? TRUE : FALSE;
       $value = explode(CRM_Core_DAO::VALUE_SEPARATOR,
         trim($actionSchedule->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)
       );
@@ -1017,8 +1018,7 @@ LEFT JOIN {$reminderJoinClause}
 {$whereClause} {$limitWhereClause} AND {$dateClause} {$notINClause}
 ";
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
-
-      if ($limitTo == 0) {
+      if ($isSendToAdditionalContacts) {
         $additionWhere = ' WHERE ';
         if ($actionSchedule->start_action_date) {
           $additionWhere = $whereClause . ' AND ';
@@ -1107,7 +1107,7 @@ INNER JOIN {$reminderJoinClause}
           CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
         }
 
-        if ($limitTo == 0) {
+        if ($isSendToAdditionalContacts) {
           $addSelect .= ', MAX(reminder.action_date_time) as latest_log_time';
           $sqlEndEventCheck = "
 SELECT * FROM {$table}
