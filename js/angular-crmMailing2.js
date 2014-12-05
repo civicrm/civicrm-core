@@ -3,7 +3,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/crmMailing2/' + relPath;
   };
 
-  var crmMailing2 = angular.module('crmMailing2', ['ngRoute', 'ui.utils', 'crmUi', 'dialogService']); // TODO ngSanitize, unsavedChanges
+  var crmMailing2 = angular.module('crmMailing2', ['crmUtil', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService']); // TODO ngSanitize, unsavedChanges
 
   // Time to wait before triggering AJAX update to recipients list
   var RECIPIENTS_DEBOUNCE_MS = 100;
@@ -46,7 +46,7 @@
     }
   ]);
 
-  crmMailing2.controller('ListMailingsCtrl', function ListMailingsCtrl($scope) {
+  crmMailing2.controller('ListMailingsCtrl', function ListMailingsCtrl() {
     // We haven't implemented this in Angular, but some users may get clever
     // about typing URLs, so we'll provide a redirect.
     window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
@@ -55,34 +55,31 @@
     });
   });
 
-  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmFromAddresses, $q) {
+  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmFromAddresses, crmStatus) {
     $scope.mailing = selectedMail;
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.crmFromAddresses = crmFromAddresses;
 
     $scope.partialUrl = partialUrl;
-    $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts('CiviMail');
 
     // @return Promise
     $scope.submit = function submit() {
-       // CRM.status doesn't work with Angular promises, so do backflips
-       var p = crmMailingMgr.submit($scope.mailing);
-       var p2 = CRM.status(null, CRM.toJqPromise(p));
-       return CRM.toAPromise($q, p2);
+      return crmStatus({start: ts('Submitting...'), success: ts('Submitted')},
+        crmMailingMgr.submit($scope.mailing)
+      );
     };
     // @return Promise
     $scope.save = function save() {
-      // CRM.status doesn't work with Angular promises, so do backflips
-      var p = crmMailingMgr.save($scope.mailing);
-      var p2 = CRM.status(null, CRM.toJqPromise(p));
-      return CRM.toAPromise($q, p2);
+      return crmStatus(null,
+        crmMailingMgr.save($scope.mailing)
+      );
     };
     // @return Promise
     $scope.delete = function cancel() {
-      // CRM.status doesn't work with Angular promises, so do backflips
-      var p = crmMailingMgr.delete($scope.mailing);
-      var p2 = CRM.status({start: $scope.ts('Deleting...'), success: $scope.ts('Deleted')}, CRM.toJqPromise(p));
-      return CRM.toAPromise($q, p2);
+      return crmStatus({start: ts('Deleting...'), success: ts('Deleted')},
+        crmMailingMgr.delete($scope.mailing)
+      );
     };
     $scope.leave = function leave() {
       window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
@@ -118,7 +115,7 @@
   //  - [input] mailing: object
   //  - [output] recipients: array of recipient records
   crmMailing2.controller('EditRecipCtrl', function EditRecipCtrl($scope, dialogService, crmApi, crmMailingMgr) {
-    // TODO load & live update real recipients list
+    var ts = $scope.ts = CRM.ts('CiviMail');
     $scope.recipients = null;
     $scope.getRecipientsEstimate = function () {
       var ts = $scope.ts;
@@ -132,6 +129,41 @@
         return ts('>%1 recipients', {1: RECIPIENTS_PREVIEW_LIMIT});
       return ts('~%1 recipients', {1: $scope.recipients.length});
     };
+    $scope.getIncludesAsString = function() {
+      var first = true;
+      var names = '';
+      _.each($scope.mailing.groups.include, function(id){
+        if (!first) names = names + ', ';
+        var group = _.where(CRM.crmMailing.groupNames, {id: ''+id});
+        names = names + group[0].title;
+        first = false;
+      });
+      _.each($scope.mailing.mailings.include, function(id){
+        if (!first) names = names + ', ';
+        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: ''+id});
+        names = names + oldMailing[0].name;
+        first = false;
+      });
+      return names;
+    };
+    $scope.getExcludesAsString = function() {
+      var first = true;
+      var names = '';
+      _.each($scope.mailing.groups.exclude, function(id){
+        if (!first) names = names + ', ';
+        var group = _.where(CRM.crmMailing.groupNames, {id: ''+id});
+        names = names + group[0].title;
+        first = false;
+      });
+      _.each($scope.mailing.mailings.exclude, function(id){
+        if (!first) names = names + ', ';
+        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: ''+id});
+        names = names + oldMailing[0].name;
+        first = false;
+      });
+      return names;
+    };
+
     // We monitor four fields -- use debounce so that changes across the
     // four fields can settle-down before AJAX.
     var refreshRecipients = _.debounce(function () {
@@ -156,7 +188,7 @@
         modal: true,
         title: ts('Preview (%1)', {
           1: $scope.getRecipientsEstimate()
-        }),
+        })
       };
       dialogService.open('recipDialog', partialUrl('dialog/recipients.html'), model, options);
     };
@@ -173,7 +205,8 @@
   // Note: Expects $scope.model to be an object with properties:
   //   - mailing: object
   crmMailing2.controller('PreviewMailingCtrl', function ($scope, dialogService, crmMailingMgr) {
-    $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts('CiviMail');
+
     $scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
     $scope.testGroup = {gid: null};
 
@@ -230,6 +263,200 @@
   //   - "body_text"
   crmMailing2.controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope, crmMailingMgr) {
     $scope.ts = CRM.ts('CiviMail');
+  });
+
+  // Controller for the "Preview Mailing Component" segment
+  // which displays header/footer/auto-responder
+  crmMailing2.controller('PreviewComponentCtrl', function PreviewMailingDialogCtrl($scope, dialogService) {
+    var ts = $scope.ts = CRM.ts('CiviMail');
+
+    $scope.previewComponent = function previewComponent(title, componentId) {
+      var component = _.where(CRM.crmMailing.headerfooterList, {id: ""+componentId});
+      if (!component || !component[0]) {
+        CRM.alert(ts('Invalid component ID (%1)', {
+          1: componentId
+        }));
+        return;
+      }
+      var options = {
+        autoOpen: false,
+        modal: true,
+        title: title // component[0].name
+      };
+      dialogService.open('previewComponentDialog', partialUrl('dialog/previewComponent.html'), component[0], options);
+    };
+  });
+
+  // Controller for the "Preview Mailing" dialog
+  // Note: Expects $scope.model to be an object with properties:
+  //   - "name"
+  //   - "subject"
+  //   - "body_html"
+  //   - "body_text"
+  crmMailing2.controller('PreviewComponentDialogCtrl', function PreviewMailingDialogCtrl($scope) {
+    $scope.ts = CRM.ts('CiviMail');
+  });
+
+  // Controller for the in-place msg-template management
+  // Scope members:
+  //  - [input] mailing: object
+  crmMailing2.controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService, $parse) {
+    var ts = $scope.ts = CRM.ts('CiviMail');
+    $scope.crmMsgTemplates = crmMsgTemplates;
+
+    // @return Promise MessageTemplate (per APIv3)
+    $scope.saveTemplate = function saveTemplate() {
+      var model = {
+        selected_id: $scope.mailing.msg_template_id,
+        tpl: {
+          msg_title: '',
+          msg_subject: $scope.mailing.subject,
+          msg_text: $scope.mailing.body_text,
+          msg_html: $scope.mailing.body_html
+        }
+      };
+      var options = {
+        autoOpen: false,
+        modal: true,
+        title: ts('Save Template')
+      };
+      return dialogService.open('saveTemplateDialog', partialUrl('dialog/saveTemplate.html'), model, options)
+        .then(function(item){
+          $parse('mailing.msg_template_id').assign($scope, item.id);
+          return item;
+        });
+    };
+
+    // @param int id
+    // @return Promise
+    $scope.loadTemplate = function loadTemplate(id) {
+      return crmMsgTemplates.get(id).then(function (tpl) {
+        $scope.mailing.subject = tpl.msg_subject;
+        $scope.mailing.body_text = tpl.msg_text;
+        $scope.mailing.body_html = tpl.msg_html;
+      });
+    };
+  });
+
+  // Controller for the "Save Message Template" dialog
+  // Scope members:
+  //   - [input] "model": Object
+  //     - "selected_id": int
+  //     - "tpl": Object
+  //       - "msg_subject": string
+  //       - "msg_text": string
+  //       - "msg_html": string
+  crmMailing2.controller('SaveMsgTemplateDialogCtrl', function SaveMsgTemplateDialogCtrl($scope, crmMsgTemplates, dialogService) {
+    var ts = $scope.ts = CRM.ts('CiviMail');
+    $scope.saveOpt = {mode: '', newTitle: ''};
+    $scope.selected = null;
+
+    $scope.save = function save() {
+      var tpl = _.extend({}, $scope.model.tpl);
+      switch ($scope.saveOpt.mode) {
+        case 'add':
+          tpl.msg_title = $scope.saveOpt.newTitle;
+          break;
+        case 'update':
+          tpl.id = $scope.selected.id;
+          tpl.msg_title = $scope.selected.msg_title;
+          break;
+        default:
+          throw 'SaveMsgTemplateDialogCtrl: Unrecognized mode: ' + $scope.saveOpt.mode;
+      }
+      return crmMsgTemplates.save(tpl)
+        .then(function (item) {
+          CRM.status(ts('Saved'));
+          return item;
+        });
+    };
+
+    function scopeApply(f) {
+      return function () {
+        var args = arguments;
+        $scope.$apply(function () {
+          f.apply(args);
+        });
+      };
+    }
+
+    function init() {
+      crmMsgTemplates.get($scope.model.selected_id).then(
+        function (tpl) {
+          $scope.saveOpt.mode = 'update';
+          $scope.selected = tpl;
+        },
+        function () {
+          $scope.saveOpt.mode = 'add';
+          $scope.selected = null;
+        }
+      );
+      // When using dialogService with a button bar, the major button actions
+      // need to be registered with the dialog widget (and not embedded in
+      // the body of the dialog).
+      var buttons = {};
+      buttons[ts('Save')] = function () {
+        $scope.save().then(function (item) {
+          dialogService.close('saveTemplateDialog', item);
+        });
+      };
+      buttons[ts('Cancel')] = function () {
+        dialogService.cancel('saveTemplateDialog');
+      };
+      dialogService.setButtons('saveTemplateDialog', buttons);
+    }
+    setTimeout(scopeApply(init), 0);
+  });
+
+  // Controller for schedule-editing widget.
+  // Scope members:
+  //  - [input] mailing: object
+  //     - scheduled_date: null|string(YYYY-MM-DD hh:mm)
+  crmMailing2.controller('EditScheduleCtrl', function EditScheduleCtrl($scope, $parse) {
+    var schedModelExpr = 'mailing.scheduled_date';
+    var schedModel = $parse(schedModelExpr);
+
+    $scope.schedule = {
+      mode: 'now',
+      datetime: ''
+    };
+    var updateChildren = (function () {
+      var sched = schedModel($scope);
+      if (sched) {
+        $scope.schedule.mode = 'at';
+        $scope.schedule.datetime = sched;
+      }
+      else {
+        $scope.schedule.mode = 'now';
+      }
+    });
+    var updateParent = (function () {
+      switch ($scope.schedule.mode) {
+        case 'now':
+          schedModel.assign($scope, null);
+          break;
+        case 'at':
+          schedModel.assign($scope, $scope.schedule.datetime);
+          break;
+        default:
+          throw 'Unrecognized schedule mode: ' + $scope.schedule.mode;
+      }
+    });
+
+    $scope.$watch(schedModelExpr, updateChildren);
+    $scope.$watch('schedule.mode', updateParent);
+    $scope.$watch('schedule.datetime', function (newValue, oldValue) {
+      // automatically switch mode based on datetime entry
+      if (oldValue != newValue) {
+        if (!newValue || newValue == " ") {
+          $scope.schedule.mode = 'now';
+        }
+        else {
+          $scope.schedule.mode = 'at';
+        }
+      }
+      updateParent();
+    });
   });
 
 })(angular, CRM.$, CRM._);
