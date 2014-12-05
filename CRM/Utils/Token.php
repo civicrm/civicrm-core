@@ -104,8 +104,7 @@ class CRM_Utils_Token {
     if (self::$_requiredTokens == NULL) {
       self::$_requiredTokens = array(
         'domain.address' => ts("Domain address - displays your organization's postal address."),
-        'action.optOutUrl or action.unsubscribeUrl' =>
-        array(
+        'action.optOutUrl or action.unsubscribeUrl' => array(
           'action.optOut' => ts("'Opt out via email' - displays an email address for recipients to opt out of receiving emails from your organization."),
           'action.optOutUrl' => ts("'Opt out via web page' - creates a link for recipients to click if they want to opt out of receiving emails from your organization. Alternatively, you can include the 'Opt out via email' token."),
           'action.unsubscribe' => ts("'Unsubscribe via email' - displays an email address for recipients to unsubscribe from the specific mailing list used to send this message."),

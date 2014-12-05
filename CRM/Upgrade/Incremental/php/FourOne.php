@@ -58,16 +58,21 @@ class CRM_Upgrade_Incremental_php_FourOne {
    *
    * @param $postUpgradeMessage string, alterable
    * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
+   *
    * @return void
    */
   function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.1.alpha1') {
-      $postUpgradeMessage .= '<br />' . ts('WARNING! CiviCRM 4.1 introduces an improved way of handling cron jobs. However the new method is NOT backwards compatible. <strong>Please notify your system administrator that all CiviCRM related cron jobs will cease to work, and will need to be re-configured (this includes sending CiviMail mailings, updating membership statuses, etc.).</strong> Refer to the <a href="%1">online documentation</a> for detailed instructions.', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC41/Managing+Scheduled+Jobs'));
-      $postUpgradeMessage .= '<br />' . ts('The CiviCRM Administration menu structure has been re-organized during this upgrade to make it easier to find things and reduce the number of keystrokes. If you have customized this portion of the navigation menu - you should take a few minutes to review the changes. You may need to reimplement or move your customizations.');
+      $postUpgradeMessage .= '<br />' .
+        ts('WARNING! CiviCRM 4.1 introduces an improved way of handling cron jobs. However the new method is NOT backwards compatible. <strong>Please notify your system administrator that all CiviCRM related cron jobs will cease to work, and will need to be re-configured (this includes sending CiviMail mailings, updating membership statuses, etc.).</strong> Refer to the <a href="%1">online documentation</a> for detailed instructions.', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC41/Managing+Scheduled+Jobs'));
+      $postUpgradeMessage .= '<br />' .
+        ts('The CiviCRM Administration menu structure has been re-organized during this upgrade to make it easier to find things and reduce the number of keystrokes. If you have customized this portion of the navigation menu - you should take a few minutes to review the changes. You may need to reimplement or move your customizations.');
 
-      $postUpgradeMessage .= '<br />' . ts('Yahoo recently discontinued their geocoding and mapping API service. If you previously used Yahoo, you will need to select and configure an alternate service in order to continue using geocoding/mapping tools.');
+      $postUpgradeMessage .= '<br />' .
+        ts('Yahoo recently discontinued their geocoding and mapping API service. If you previously used Yahoo, you will need to select and configure an alternate service in order to continue using geocoding/mapping tools.');
 
-      $postUpgradeMessage .= '<br />' . ts('We have integrated KCFinder with CKEditor and TinyMCE, which enables user to upload images. Note that all the images uploaded using KCFinder will be public.');
+      $postUpgradeMessage .= '<br />' .
+        ts('We have integrated KCFinder with CKEditor and TinyMCE, which enables user to upload images. Note that all the images uploaded using KCFinder will be public.');
     }
   }
 
@@ -83,8 +88,14 @@ class CRM_Upgrade_Incremental_php_FourOne {
         if ($afterUpgradeMessage = $template->get_template_vars('afterUpgradeMessage')) {
           $afterUpgradeMessage .= "<br/><br/>";
         }
-        $afterUpgradeMessage .= '<div class="crm-upgrade-case-views-error" style="background-color: #E43D2B; padding: 10px;">' . ts("There was a problem creating CiviCase database views. Please create the following views manually before using CiviCase:");
-        $afterUpgradeMessage .= '<div class="crm-upgrade-case-views-query"><div>' . CRM_Case_BAO_Case::createCaseViewsQuery('upcoming') . '</div><div>' . CRM_Case_BAO_Case::createCaseViewsQuery('recent') . '</div>' . '</div></div>';
+        $afterUpgradeMessage .=
+          '<div class="crm-upgrade-case-views-error" style="background-color: #E43D2B; padding: 10px;">' .
+          ts("There was a problem creating CiviCase database views. Please create the following views manually before using CiviCase:");
+        $afterUpgradeMessage .=
+          '<div class="crm-upgrade-case-views-query"><div>' .
+          CRM_Case_BAO_Case::createCaseViewsQuery('upcoming') . '</div><div>' .
+          CRM_Case_BAO_Case::createCaseViewsQuery('recent') . '</div>' .
+          '</div></div>';
         $template->assign('afterUpgradeMessage', $afterUpgradeMessage);
       }
     }
@@ -130,7 +141,6 @@ class CRM_Upgrade_Incremental_php_FourOne {
         'mailing_backend',
       ),
     );
-
 
 
     $userColumnNames = array(
@@ -206,43 +216,43 @@ VALUES
 
   function createNewSettings() {
     $domainColumns = array(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME =>
-      array(array('contact_ajax_check_similar', 1),
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
+        array('contact_ajax_check_similar', 1),
         array('activity_assignee_notification', 1),
       ),
-      CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME =>
-      array(array('tag_unconfirmed', 'Unconfirmed'),
+      CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME => array(
+        array('tag_unconfirmed', 'Unconfirmed'),
         array('petition_contacts', 'Petition Contacts'),
       ),
-      CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME =>
-      array(array('enable_cart', 0),
+      CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME => array(
+        array('enable_cart', 0),
       ),
-      CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME =>
-      array(array('profile_double_optin', 1),
+      CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME => array(
+        array('profile_double_optin', 1),
         array('profile_add_to_group_double_optin', 0),
         array('track_civimail_replies', 0),
         array('civimail_workflow', 0),
         array('civimail_server_wide_lock', 0),
       ),
-      CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME =>
-      array(array('default_renewal_contribution_page', NULL),
+      CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME => array(
+        array('default_renewal_contribution_page', NULL),
       ),
-      CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME =>
-      array(array('is_enabled', 0),
+      CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME => array(
+        array('is_enabled', 0),
         array('uniq_email_per_site', 0),
         array('domain_group_id', 0),
         array('event_price_set_domain_id', 0),
       ),
-      CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME =>
-      array(array('uploadDir', NULL),
+      CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME => array(
+        array('uploadDir', NULL),
         array('imageUploadDir', NULL),
         array('customFileUploadDir', NULL),
         array('customTemplateDir', NULL),
         array('customPHPPathDir', NULL),
         array('extensionsDir', NULL),
       ),
-      CRM_Core_BAO_Setting::URL_PREFERENCES_NAME =>
-      array(array('userFrameworkResourceURL', NULL),
+      CRM_Core_BAO_Setting::URL_PREFERENCES_NAME => array(
+        array('userFrameworkResourceURL', NULL),
         array('imageUploadURL', NULL),
         array('customCSSURL', NULL),
       ),
@@ -257,7 +267,9 @@ VALUES
     foreach ($domainColumns as $groupName => $settings) {
       foreach ($settings as $setting) {
 
-        if (isset($dbSettings[$groupName][$setting[0]]) && !empty($dbSettings[$groupName][$setting[0]])) {
+        if (isset($dbSettings[$groupName][$setting[0]]) &&
+          !empty($dbSettings[$groupName][$setting[0]])
+        ) {
           $setting[1] = $dbSettings[$groupName][$setting[0]];
         }
 
@@ -311,13 +323,13 @@ AND    v.is_active = 1
    * @param $rev
    */
   function upgrade_4_1_alpha2($rev) {
-    $dao             = new CRM_Core_DAO_Setting();
+    $dao = new CRM_Core_DAO_Setting();
     $dao->group_name = 'Directory Preferences';
-    $dao->name       = 'customTemplateDir';
+    $dao->name = 'customTemplateDir';
     if (!($dao->find(TRUE))) {
-      $dao->domain_id    = CRM_Core_Config::domainID();
+      $dao->domain_id = CRM_Core_Config::domainID();
       $dao->created_date = date('YmdHis');
-      $dao->is_domain    = 0;
+      $dao->is_domain = 0;
       $dao->save();
     }
     $dao->free();
@@ -338,41 +350,34 @@ AND    v.is_active = 1
     }
 
     $domainCols = array(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
         'contact_ajax_check_similar',
         'activity_assignee_notification',
       ),
-      CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME => array(
         'tag_unconfirmed',
         'petition_contacts',
       ),
-      CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME => array(
         'enable_cart',
       ),
-      CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME => array(
         'profile_double_optin',
         'profile_add_to_group_double_optin',
         'track_civimail_replies',
         'civimail_workflow',
         'civimail_server_wide_lock',
       ),
-      CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME => array(
         'default_renewal_contribution_page',
       ),
-      CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME => array(
         'is_enabled',
         'uniq_email_per_site',
         'domain_group_id',
         'event_price_set_domain_id',
       ),
-      CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME => array(
         'uploadDir',
         'imageUploadDir',
         'customFileUploadDir',
@@ -380,8 +385,7 @@ AND    v.is_active = 1
         'customPHPPathDir',
         'extensionsDir',
       ),
-      CRM_Core_BAO_Setting::URL_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::URL_PREFERENCES_NAME => array(
         'userFrameworkResourceURL',
         'imageUploadURL',
         'customCSSURL',
@@ -389,8 +393,8 @@ AND    v.is_active = 1
     );
 
     $arrGroupNames = array_keys($domainCols);
-    $groupNames    = implode("','", $arrGroupNames);
-    $arrNames      = array();
+    $groupNames = implode("','", $arrGroupNames);
+    $arrNames = array();
     foreach ($domainCols as $groupName => $names) {
       $arrNames[] = implode("','", $names);
     }

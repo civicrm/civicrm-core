@@ -41,8 +41,7 @@ class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
   function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviMember Component Settings'));
     $this->_varNames = array(
-      CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME => array(
         'default_renewal_contribution_page' => array(
           'html_type' => 'select',
           'title' => ts('Default online membership renewal page'),

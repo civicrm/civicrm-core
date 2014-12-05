@@ -145,8 +145,11 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     foreach ($this->_columns as $tablename => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $field => $specs) {
-          if (in_array($tablename . '_' . $field, $selectedFields) && array_key_exists('alter_display', $specs)) {
-            $alterfunctions[$tablename . '_' . $field] = $specs['alter_display'];
+          if (in_array($tablename . '_' . $field, $selectedFields) &&
+            array_key_exists('alter_display', $specs)
+          ) {
+            $alterfunctions[$tablename . '_' .
+            $field] = $specs['alter_display'];
             $altermap[$tablename . '_' . $field] = $field;
           }
         }
@@ -171,53 +174,46 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    */
   function getLineItemColumns() {
     return array(
-      'civicrm_line_item' =>
-      array(
+      'civicrm_line_item' => array(
         'dao' => 'CRM_Price_BAO_LineItem',
-        'fields' =>
-        array(
-          'qty' =>
-          array('title' => ts('Quantity'),
+        'fields' => array(
+          'qty' => array(
+            'title' => ts('Quantity'),
             'type' => CRM_Utils_Type::T_INT,
-            'statistics' =>
-            array('sum' => ts('Total Quantity Selected')),
+            'statistics' => array('sum' => ts('Total Quantity Selected')),
           ),
-          'unit_price' =>
-          array('title' => ts('Unit Price'),
+          'unit_price' => array(
+            'title' => ts('Unit Price'),
           ),
-          'line_total' =>
-          array('title' => ts('Line Total'),
+          'line_total' => array(
+            'title' => ts('Line Total'),
             'type' => CRM_Utils_Type::T_MONEY,
-            'statistics' =>
-            array('sum' => ts('Total of Line Items')),
+            'statistics' => array('sum' => ts('Total of Line Items')),
           ),
         ),
-        'participant_count' =>
-        array('title' => ts('Participant Count'),
-          'statistics' =>
-          array('sum' => ts('Total Participants')),
+        'participant_count' => array(
+          'title' => ts('Participant Count'),
+          'statistics' => array('sum' => ts('Total Participants')),
         ),
-        'filters' =>
-        array(
-          'qty' =>
-          array('title' => ts('Quantity'),
+        'filters' => array(
+          'qty' => array(
+            'title' => ts('Quantity'),
             'type' => CRM_Utils_Type::T_INT,
             'operator' => CRM_Report_Form::OP_INT,
           ),
         ),
-        'group_bys' =>
-        array(
-          'price_field_id' =>
-          array('title' => ts('Price Field'),
+        'group_bys' => array(
+          'price_field_id' => array(
+            'title' => ts('Price Field'),
           ),
-          'price_field_value_id' =>
-          array('title' => ts('Price Field Option'),
+          'price_field_value_id' => array(
+            'title' => ts('Price Field Option'),
           ),
-          'line_item_id' =>
-          array('title' => ts('Individual Line Item'),
+          'line_item_id' => array(
+            'title' => ts('Individual Line Item'),
             'name' => 'id',
+          ),
         ),
-      ),
       ),
     );
   }
@@ -227,41 +223,37 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    */
   function getPriceFieldValueColumns() {
     return array(
-      'civicrm_price_field_value' =>
-      array(
+      'civicrm_price_field_value' => array(
         'dao' => 'CRM_Price_BAO_PriceFieldValue',
         'fields' => array(
-          'price_field_value_label' =>
-          array('title' => ts('Price Field Value Label'),
+          'price_field_value_label' => array(
+            'title' => ts('Price Field Value Label'),
             'name' => 'label',
           ),
         ),
-        'filters' =>
-        array(
-          'price_field_value_label' =>
-          array('title' => ts('Price Fields Value Label'),
+        'filters' => array(
+          'price_field_value_label' => array(
+            'title' => ts('Price Fields Value Label'),
             'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
             'name' => 'label',
           ),
         ),
-        'order_bys' =>
-        array(
-          'label' =>
-          array('title' => ts('Price Field Value Label'),
+        'order_bys' => array(
+          'label' => array(
+            'title' => ts('Price Field Value Label'),
           ),
         ),
-        'group_bys' =>
-        //note that we have a requirement to group by label such that all 'Promo book' lines
+        'group_bys' =>        //note that we have a requirement to group by label such that all 'Promo book' lines
         // are grouped together across price sets but there may be a separate need to group
         // by id so that entries in one price set are distinct from others. Not quite sure what
         // to call the distinction for end users benefit
-        array(
-          'price_field_value_label' =>
-          array('title' => ts('Price Field Value Label'),
-            'name' => 'label',
+          array(
+            'price_field_value_label' => array(
+              'title' => ts('Price Field Value Label'),
+              'name' => 'label',
+            ),
           ),
-        ),
       ),
     );
   }
@@ -271,36 +263,31 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    */
   function getPriceFieldColumns() {
     return array(
-      'civicrm_price_field' =>
-      array(
+      'civicrm_price_field' => array(
         'dao' => 'CRM_Price_BAO_PriceField',
-        'fields' =>
-        array(
-          'price_field_label' =>
-          array('title' => ts('Price Field Label'),
+        'fields' => array(
+          'price_field_label' => array(
+            'title' => ts('Price Field Label'),
             'name' => 'label',
           ),
         ),
-        'filters' =>
-        array(
-          'price_field_label' =>
-          array('title' => ts('Price Field Label'),
+        'filters' => array(
+          'price_field_label' => array(
+            'title' => ts('Price Field Label'),
             'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
             'name' => 'label',
           ),
         ),
-        'order_bys' =>
-        array(
-          'price_field_label' =>
-          array('title' => ts('Price Field Label'),
-                'name' => 'label',
+        'order_bys' => array(
+          'price_field_label' => array(
+            'title' => ts('Price Field Label'),
+            'name' => 'label',
           ),
         ),
-        'group_bys' =>
-        array(
-          'price_field_label' =>
-          array('title' => ts('Price Field Label'),
+        'group_bys' => array(
+          'price_field_label' => array(
+            'title' => ts('Price Field Label'),
             'name' => 'label',
           ),
         ),
@@ -317,23 +304,25 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
       CRM_Core_PseudoConstant::populate($_events['all'], 'CRM_Event_DAO_Event', FALSE, 'title', 'is_active', "is_template IS NULL OR is_template = 0", 'end_date DESC');
     }
     return array(
-      'civicrm_participant' =>
-      array(
+      'civicrm_participant' => array(
         'dao' => 'CRM_Event_DAO_Participant',
-        'fields' =>
-        array('participant_id' => array('title' => 'Participant ID'),
+        'fields' => array(
+          'participant_id' => array('title' => 'Participant ID'),
           'participant_record' => array(
             'name' => 'id',
             'title' => ts('Participant ID'),
           ),
-          'event_id' => array('title' => ts('Event ID'),
+          'event_id' => array(
+            'title' => ts('Event ID'),
             'type' => CRM_Utils_Type::T_STRING,
             'alter_display' => 'alterEventID',
           ),
-          'status_id' => array('title' => ts('Status'),
+          'status_id' => array(
+            'title' => ts('Status'),
             'alter_display' => 'alterParticipantStatus',
           ),
-          'role_id' => array('title' => ts('Role'),
+          'role_id' => array(
+            'title' => ts('Role'),
             'alter_display' => 'alterParticipantRole',
           ),
           'participant_fee_level' => NULL,
@@ -341,9 +330,9 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
           'participant_register_date' => array('title' => ts('Registration Date')),
         ),
         'grouping' => 'event-fields',
-        'filters' =>
-        array(
-          'event_id' => array('name' => 'event_id',
+        'filters' => array(
+          'event_id' => array(
+            'name' => 'event_id',
             'title' => ts('Event'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $_events['all'],
@@ -365,15 +354,15 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
         ),
-        'order_bys' =>
-        array(
-          'event_id' =>
-          array('title' => ts('Event'), 'default_weight' => '1', 'default_order' => 'ASC'),
+        'order_bys' => array(
+          'event_id' => array(
+            'title' => ts('Event'),
+            'default_weight' => '1',
+            'default_order' => 'ASC'
+          ),
         ),
-        'group_bys' =>
-        array(
-          'event_id' =>
-          array('title' => ts('Event')),
+        'group_bys' => array(
+          'event_id' => array('title' => ts('Event')),
         ),
       ),
     );
@@ -449,24 +438,27 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     return array(
       'civicrm_event' => array(
         'dao' => 'CRM_Event_DAO_Event',
-        'fields' =>
-        array(
+        'fields' => array(
           'id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
           ),
-          'title' => array('title' => ts('Event Title'),
+          'title' => array(
+            'title' => ts('Event Title'),
             'required' => TRUE,
           ),
-          'event_type_id' => array('title' => ts('Event Type'),
+          'event_type_id' => array(
+            'title' => ts('Event Type'),
             'required' => TRUE,
             'alter_display' => 'alterEventType',
           ),
           'fee_label' => array('title' => ts('Fee Label')),
-          'event_start_date' => array('title' => ts('Event Start Date'),
-        ),
+          'event_start_date' => array(
+            'title' => ts('Event Start Date'),
+          ),
           'event_end_date' => array('title' => ts('Event End Date')),
-          'max_participants' => array('title' => ts('Capacity'),
+          'max_participants' => array(
+            'title' => ts('Capacity'),
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
@@ -493,8 +485,8 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
         ),
         'group_bys' => array(
           'event_type_id' => array(
-          'title' => ts('Event Type'),
-      ),
+            'title' => ts('Event Type'),
+          ),
         ),
       ),
     );
@@ -505,19 +497,19 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    */
   function getContributionColumns() {
     return array(
-      'civicrm_contribution' =>
-      array(
+      'civicrm_contribution' => array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
-        'fields' =>
-        array(
+        'fields' => array(
           'contribution_id' => array(
             'name' => 'id',
           ),
-          'financial_type_id' => array('title' => ts('Financial Type'),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
             'default' => TRUE,
             'alter_display' => 'alterContributionType',
           ),
-          'payment_instrument_id' => array('title' => ts('Payment Instrument'),
+          'payment_instrument_id' => array(
+            'title' => ts('Payment Instrument'),
             'alter_display' => 'alterPaymentType',
           ),
           'source' => array('title' => 'Contribution Source'),
@@ -526,52 +518,46 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
           'receipt_date' => NULL,
           'fee_amount' => NULL,
           'net_amount' => NULL,
-          'total_amount' => array('title' => ts('Amount'),
-            'statistics' =>
-            array('sum' => ts('Total Amount')),
+          'total_amount' => array(
+            'title' => ts('Amount'),
+            'statistics' => array('sum' => ts('Total Amount')),
             'type' => CRM_Utils_Type::T_MONEY,
           ),
         ),
-        'filters' =>
-        array(
-          'receive_date' =>
-          array('operatorType' => CRM_Report_Form::OP_DATE),
-          'financial_type_id' =>
-          array('title' => ts('Financial Type'),
+        'filters' => array(
+          'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
-          'payment_instrument_id' =>
-          array('title' => ts('Payment Type'),
+          'payment_instrument_id' => array(
+            'title' => ts('Payment Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
           ),
-          'contribution_status_id' =>
-          array('title' => ts('Contribution Status'),
+          'contribution_status_id' => array(
+            'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
           ),
-          'total_amount' =>
-          array('title' => ts('Contribution Amount')),
+          'total_amount' => array('title' => ts('Contribution Amount')),
         ),
-        'order_bys' =>
-        array(
-          'payment_instrument_id' =>
-          array('title' => ts('Payment Instrument'),
+        'order_bys' => array(
+          'payment_instrument_id' => array(
+            'title' => ts('Payment Instrument'),
           ),
-         'financial_type_id' =>
-          array('title' => ts('Financial Type'),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
+          ),
         ),
-        ),
-        'group_bys' =>
-        array('financial_type_id' =>
-          array('title' => ts('Financial Type')),
-          'payment_instrument_id' =>
-          array('title' => ts('Payment Instrument')),
-          'contribution_id' =>
-          array('title' => ts('Individual Contribution'),
+        'group_bys' => array(
+          'financial_type_id' => array('title' => ts('Financial Type')),
+          'payment_instrument_id' => array('title' => ts('Payment Instrument')),
+          'contribution_id' => array(
+            'title' => ts('Individual Contribution'),
             'name' => 'id',
-        ),
+          ),
           'source' => array('title' => 'Contribution Source'),
         ),
         'grouping' => 'contribution-fields',
@@ -609,7 +595,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
           'id' => array(
             'title' => ts('Contact ID'),
           )
-          ,
+        ,
           'sort_name' => array(
             'title' => ts('Contact Name'),
           ),
@@ -637,39 +623,39 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
         'fields' => array(
           'id' => array(
             'title' => ts('Case ID'),
-            'required' => false
+            'required' => FALSE
           ),
           'subject' => array(
             'title' => ts('Case Subject'),
-            'default' => true
+            'default' => TRUE
           ),
           'status_id' => array(
             'title' => ts('Status'),
-            'default' => true
+            'default' => TRUE
           ),
           'case_type_id' => array(
             'title' => ts('Case Type'),
-            'default' => true
+            'default' => TRUE
           ),
           'case_start_date' => array(
             'title' => ts('Case Start Date'),
             'name' => 'start_date',
-            'default' => true
+            'default' => TRUE
           ),
           'case_end_date' => array(
             'title' => ts('Case End Date'),
             'name' => 'end_date',
-            'default' => true
+            'default' => TRUE
           ),
           'case_duration' => array(
             'name' => 'duration',
             'title' => ts('Duration (Days)'),
-            'default' => false
+            'default' => FALSE
           ),
           'case_is_deleted' => array(
             'name' => 'is_deleted',
             'title' => ts('Case Deleted?'),
-            'default' => false,
+            'default' => FALSE,
             'type' => CRM_Utils_Type::T_INT
           )
         ),
@@ -723,9 +709,11 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    */
   /**
    * Get address columns to add to array
+   *
    * @param array $options
    *  - prefix Prefix to add to table (in case of more than one instance of the table)
    *  - prefix_label Label to give columns from this address table instance
+   *
    * @return array address columns definition
    */
   /**
@@ -737,15 +725,15 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     $defaultOptions = array(
       'prefix' => '',
       'prefix_label' => '',
-      'group_by' => false,
-      'order_by' => true,
-      'filters' => true,
+      'group_by' => FALSE,
+      'order_by' => TRUE,
+      'filters' => TRUE,
       'defaults' => array(
         'country_id' => TRUE
       ),
-     );
+    );
 
-    $options = array_merge($defaultOptions,$options);
+    $options = array_merge($defaultOptions, $options);
 
     $addressFields = array(
       $options['prefix'] . 'civicrm_address' => array(
@@ -764,12 +752,14 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
             'name' => 'street_address',
           ),
           $options['prefix'] . 'supplemental_address_1' => array(
-            'title' => ts($options['prefix_label'] . 'Supplementary Address Field 1'),
+            'title' => ts($options['prefix_label'] .
+              'Supplementary Address Field 1'),
             'default' => CRM_Utils_Array::value('supplemental_address_1', $options['defaults'], FALSE),
             'name' => 'supplemental_address_1',
           ),
           $options['prefix'] . 'supplemental_address_2' => array(
-            'title' => ts($options['prefix_label'] . 'Supplementary Address Field 2'),
+            'title' => ts($options['prefix_label'] .
+              'Supplementary Address Field 2'),
             'default' => CRM_Utils_Array::value('supplemental_address_2', $options['defaults'], FALSE),
             'name' => 'supplemental_address_2',
           ),
@@ -814,7 +804,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
             'title' => ts($options['prefix_label'] . 'State/Province'),
             'default' => CRM_Utils_Array::value('state_province_id', $options['defaults'], FALSE),
             'alter_display' => 'alterStateProvinceID',
-            'name' =>  'state_province_id',
+            'name' => 'state_province_id',
           ),
           $options['prefix'] . 'country_id' => array(
             'title' => ts($options['prefix_label'] . 'Country'),
@@ -828,7 +818,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
 
     if ($options['filters']) {
-      $addressFields[$options['prefix'] .'civicrm_address']['filters'] = array(
+      $addressFields[$options['prefix'] . 'civicrm_address']['filters'] = array(
         $options['prefix'] . 'street_number' => array(
           'title' => ts($options['prefix_label'] . 'Street Number'),
           'type' => 1,
@@ -874,7 +864,8 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     }
 
     if ($options['order_by']) {
-      $addressFields[$options['prefix'] . 'civicrm_address']['order_bys'] = array(
+      $addressFields[$options['prefix'] .
+      'civicrm_address']['order_bys'] = array(
         $options['prefix'] . 'street_name' => array(
           'title' => ts($options['prefix_label'] . 'Street Name'),
           'name' => 'street_name',
@@ -1027,9 +1018,12 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @param string $prefix
    */
-  function joinAddressFromContact( $prefix = '') {
-    $this->_from .= " LEFT JOIN civicrm_address {$this->_aliases[$prefix . 'civicrm_address']}
-      ON {$this->_aliases[$prefix . 'civicrm_address']}.contact_id = {$this->_aliases[$prefix . 'civicrm_contact']}.id";
+  function joinAddressFromContact($prefix = '') {
+    $this->_from .= " LEFT JOIN civicrm_address {$this->_aliases[$prefix .
+    'civicrm_address']}
+      ON {$this->_aliases[$prefix .
+    'civicrm_address']}.contact_id = {$this->_aliases[$prefix .
+    'civicrm_contact']}.id";
   }
 
   function joinPriceFieldValueFromLineItem() {
@@ -1241,7 +1235,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    * @return string
    */
   function alterNickName($value, &$row) {
-    if(empty($row['civicrm_contact_id'])){
+    if (empty($row['civicrm_contact_id'])) {
       return;
     }
     $contactID = $row['civicrm_contact_id'];
@@ -1330,9 +1324,10 @@ WHERE   line_item_civireport.id IS NOT NULL
   function alterCountryID($value, &$row, $selectedfield, $criteriaFieldName) {
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
-    $row[$selectedfield . '_hover'] = ts("%1 for this country.", array(1 => $value));
-    $countries =  CRM_Core_PseudoConstant::country($value, FALSE);
-    if(!is_array($countries)){
+    $row[$selectedfield .
+    '_hover'] = ts("%1 for this country.", array(1 => $value));
+    $countries = CRM_Core_PseudoConstant::country($value, FALSE);
+    if (!is_array($countries)) {
       return $countries;
     }
   }
@@ -1345,12 +1340,13 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return array
    */
-  function alterCountyID($value, &$row,$selectedfield, $criteriaFieldName) {
+  function alterCountyID($value, &$row, $selectedfield, $criteriaFieldName) {
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
-    $row[$selectedfield . '_hover'] = ts("%1 for this county.", array(1 => $value));
+    $row[$selectedfield .
+    '_hover'] = ts("%1 for this county.", array(1 => $value));
     $counties = CRM_Core_PseudoConstant::county($value, FALSE);
-    if(!is_array($counties)){
+    if (!is_array($counties)) {
       return $counties;
     }
   }
@@ -1366,10 +1362,11 @@ WHERE   line_item_civireport.id IS NOT NULL
   function alterStateProvinceID($value, &$row, $selectedfield, $criteriaFieldName) {
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
-    $row[$selectedfield . '_hover'] = ts("%1 for this state.", array(1 => $value));
+    $row[$selectedfield .
+    '_hover'] = ts("%1 for this state.", array(1 => $value));
 
-    $states =  CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-    if(!is_array($states)){
+    $states = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
+    if (!is_array($states)) {
       return $states;
     }
   }
@@ -1382,7 +1379,8 @@ WHERE   line_item_civireport.id IS NOT NULL
    * @return mixed
    */
   function alterContactID($value, &$row, $fieldname) {
-    $row[$fieldname . '_link'] = CRM_Utils_System::url("civicrm/contact/view", 'reset=1&cid=' . $value, $this->_absoluteUrl);
+    $row[$fieldname . '_link'] = CRM_Utils_System::url("civicrm/contact/view",
+      'reset=1&cid=' . $value, $this->_absoluteUrl);
     return $value;
   }
 

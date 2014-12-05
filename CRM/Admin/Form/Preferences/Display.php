@@ -42,8 +42,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
 
     $this->_varNames = array(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
         'contact_view_options' => array(
           'html_type' => 'checkboxes',
           'title' => ts('Viewing Contacts'),
