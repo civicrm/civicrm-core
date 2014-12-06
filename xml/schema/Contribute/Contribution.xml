@@ -122,7 +122,7 @@
   <field>
     <name>payment_instrument_id</name>
     <uniqueName>contribution_payment_instrument_id</uniqueName>
-    <title>Payment Instrument</title>
+    <title>Payment Instrument ID</title>
     <type>int unsigned</type>
     <comment>FK to Payment Instrument</comment>
     <pseudoconstant>
