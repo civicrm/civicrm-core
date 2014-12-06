@@ -394,6 +394,27 @@ CRM.strings = CRM.strings || {};
         };
         selectParams.tokenSeparators = [','];
         selectParams.createSearchChoicePosition = 'bottom';
+        $el.on('select2-selecting.crmEntity', function(e) {
+          if (e.val === "0") {
+            // Create a new term
+            e.object.label = e.object.term;
+            CRM.api3(entity, 'create', $.extend({name: e.object.term}, $el.data('api-params').params || {}))
+              .done(function(created) {
+                var
+                  val = $el.select2('val'),
+                  data = $el.select2('data'),
+                  item = {id: created.id, label: e.object.term};
+                if (val === "0") {
+                  $el.select2('data', item, true);
+                }
+                else if ($.isArray(val) && $.inArray("0", val) > -1) {
+                  _.remove(data, {id: "0"});
+                  data.push(item);
+                  $el.select2('data', data, true);
+                }
+              });
+          }
+        });
       }
       else {
         selectParams.formatInputTooShort = function() {
@@ -451,28 +472,7 @@ CRM.strings = CRM.strings || {};
             });
         });
       }
-      $el.crmSelect2($.extend(settings, $el.data('select-params'), selectParams))
-        .on('select2-selecting.crmEntity', function(e) {
-          if (e.val === "0") {
-            // Create a new term
-            e.object.label = e.object.term;
-            CRM.api3(entity, 'create', $.extend({name: e.object.term}, $el.data('api-params').params || {}))
-              .done(function(created) {
-                var
-                  val = $el.select2('val'),
-                  data = $el.select2('data'),
-                  item = {id: created.id, label: e.object.term};
-                if (val === "0") {
-                  $el.select2('data', item, true);
-                }
-                else if ($.isArray(val) && $.inArray("0", val) > -1) {
-                  _.remove(data, {id: "0"});
-                  data.push(item);
-                  $el.select2('data', data, true);
-                }
-              });
-          }
-        });
+      $el.crmSelect2($.extend(settings, $el.data('select-params'), selectParams));
     });
   };
 
