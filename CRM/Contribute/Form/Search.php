@@ -168,7 +168,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   function setDefaultValues() {
     if (empty($this->_defaults
 ['contribution_status'])) {
-      $this->_defaults['contribution_status'][1] = 1;
+      $this->_defaults['contribution_status_id'][1] = 1;
     }
     return $this->_defaults;
   }
@@ -274,7 +274,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $config = CRM_Core_Config::singleton();
     if (!empty($_POST)) {
-      foreach (array('financial_type_id', 'contribution_soft_credit_type_id', 'contribution_status', 'contribution_source', 'contribution_trxn_id') as $element) {
+      foreach (array('financial_type_id', 'contribution_soft_credit_type_id', 'contribution_status_id', 'contribution_source', 'contribution_trxn_id') as $element) {
         $value = CRM_Utils_Array::value($element, $this->_formValues);
         if ($value) {
           if (is_array($value)) {
