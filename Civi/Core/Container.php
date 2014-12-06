@@ -124,6 +124,17 @@ class Container {
     $reflectionProvider = new \Civi\API\Provider\ReflectionProvider($kernel);
     $dispatcher->addSubscriber($reflectionProvider);
 
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\DynamicFKAuthorization(
+      $kernel,
+      'Attachment',
+      array('create', 'get', 'delete'),
+      'SELECT if(cf.id,1,0) as is_valid, cef.entity_table, cef.entity_id
+         FROM civicrm_file cf
+         LEFT JOIN civicrm_entity_file cef ON cf.id = cef.file_id
+         WHERE cf.id = %1',
+      array('civicrm_activity', 'civicrm_mailing')
+    ));
+
     $kernel->setApiProviders(array(
       $reflectionProvider,
       $magicFunctionProvider,

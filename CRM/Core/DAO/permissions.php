@@ -66,6 +66,10 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     'default' => array('administer CiviCRM'),
   );
 
+  $permissions['attachment'] = array(
+    'default' => array('access CiviCRM', 'access AJAX API'),
+  );
+
   // Contact permissions
   $permissions['contact'] = array(
     'create' => array(
@@ -228,6 +232,23 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['group_contact'] = $permissions['group'];
   $permissions['group_nesting'] = $permissions['group'];
   $permissions['group_organization'] = $permissions['group'];
+
+  // CiviMail Permissions
+  $permissions['mailing'] = array(
+    'get' => array(
+      'access CiviCRM',
+      'access CiviMail',
+    ),
+    'delete' => array(
+      'access CiviCRM',
+      'access CiviMail',
+      'delete in CiviMail',
+    ),
+    'default' => array(
+      'access CiviCRM',
+      'access CiviMail',
+    ),
+  );
 
   // Membership permissions
   $permissions['membership'] = array(
