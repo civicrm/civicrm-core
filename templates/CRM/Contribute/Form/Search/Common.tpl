@@ -34,8 +34,8 @@
   {$form.contribution_amount_low.html} &nbsp;&nbsp;
   {$form.contribution_amount_high.label}
   {$form.contribution_amount_high.html} </td>
-  <td><label>{ts}Contribution Status{/ts}</label> <br />
-  {$form.contribution_status.html} </td>
+  <td><label>{$form.contribution_status_id.label}</label> <br />
+  {$form.contribution_status_id.html} </td>
 </tr>
 <tr>
   <td>

@@ -5649,6 +5649,9 @@ AND   displayRelType.is_active = 1
       if (is_array($fieldValue)) {
         $op = key($fieldValue);
         $fieldValue = $fieldValue[$op];
+        if (is_array($fieldValue)) {
+          $fieldValue = implode(', ', $fieldValue);
+        }
       }
       return array($op, $fieldValue);
     }
