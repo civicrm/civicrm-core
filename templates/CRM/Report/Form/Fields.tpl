@@ -30,7 +30,7 @@
         {*tab navigation bar*}
         <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
           {if $colGroups}
-            <li class="ui-state-default ui-corner-all ui-tabs-selected ui-state-active">
+            <li class="ui-state-default ui-corner-all">
               <a title="Columns" href="#report-tab-col-groups">{ts}Columns{/ts}</a>
             </li>
           {/if}
@@ -91,7 +91,10 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  $("#mainTabContainer").tabs();
+  $("#mainTabContainer").tabs({
+    collapsible: true,
+    active: {/literal}{if $rows}false{else}true{/if}{literal}
+  });
 });
 
 </script>
