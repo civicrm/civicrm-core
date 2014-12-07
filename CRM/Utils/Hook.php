@@ -1295,6 +1295,12 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * @param CRM_Core_Exception Exception $exception
+   */
+  static function unhandledException($exception) {
+    self::singleton()->invoke(1, $exception, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_unhandled_exception');
+  }
 
   /**
    * This hook is called for declaring managed entities via API
