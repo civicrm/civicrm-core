@@ -31,49 +31,49 @@
         <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
           {if $colGroups}
             <li class="ui-state-default ui-corner-all">
-              <a title="Columns" href="#report-tab-col-groups">{ts}Columns{/ts}</a>
+              <a title="{ts}Columns{/ts}" href="#report-tab-col-groups">{ts}Columns{/ts}</a>
             </li>
           {/if}
           {if $groupByElements}
             <li class="ui-state-default ui-corner-all">
-              <a title="Group By" href="#report-tab-group-by-elements">{ts}Grouping{/ts}</a>
+              <a title="{ts}Grouping{/ts}" href="#report-tab-group-by-elements">{ts}Grouping{/ts}</a>
             </li>
           {/if}
           {if $orderByOptions}
             <li class="ui-state-default ui-corner-all">
-              <a title="Order By" href="#report-tab-order-by-elements">{ts}Sorting{/ts}</a>
+              <a title="{ts}Sorting{/ts}" href="#report-tab-order-by-elements">{ts}Sorting{/ts}</a>
             </li>
           {/if}
           {if $form.options.html}
             <li class="ui-state-default ui-corner-all">
-              <a title="Other Options" href="#report-tab-other-options">{ts}Options{/ts}</a>
+              <a title="{ts}Options{/ts}" href="#report-tab-other-options">{ts}Options{/ts}</a>
             </li>
           {/if}
           {if $filters}
             <li class="ui-state-default ui-corner-all">
-              <a title="Filters" href="#report-tab-set-filters">{ts}Filters{/ts}</a>
+              <a title="{ts}Filters{/ts}" href="#report-tab-set-filters">{ts}Filters{/ts}</a>
             </li>
           {/if}
           {if $instanceForm OR $instanceFormError}
             <li id="tab_settings" class="ui-state-default ui-corner-all">
-              <a title="Settings" href="#report-tab-settings">{ts}Display{/ts}</a>
+              <a title="{ts}Title and Format{/ts}" href="#report-tab-settings">{ts}Title and Format{/ts}</a>
             </li>
             <li class="ui-state-default ui-corner-all">
-              <a title="Email" href="#report-tab-email">{ts}Email{/ts}</a>
+              <a title="{ts}Email Delivery{/ts}" href="#report-tab-email">{ts}Email Delivery{/ts}</a>
             </li>
             <li class="ui-state-default ui-corner-all">
-              <a title="Other" href="#report-tab-other">{ts}Access{/ts}</a>
+              <a title="{ts}Access{/ts}" href="#report-tab-other">{ts}Access{/ts}</a>
             </li>
           {/if}
         </ul>
 
         {*criteria*}
-                {include file="CRM/Report/Form/Criteria.tpl"}
+        {include file="CRM/Report/Form/Criteria.tpl"}
 
         {*settings*}
         {if $instanceForm OR $instanceFormError}
           {include file="CRM/Report/Form/Instance.tpl"}
-{/if}
+        {/if}
       </div> {* end mainTabContainer *}
 
                     {assign var=save value="_qf_"|cat:$form.formName|cat:"_submit_save"}
