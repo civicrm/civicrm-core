@@ -1444,6 +1444,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     elseif ($type == 'url') {
       if ($this->url_tracking) {
         $data = CRM_Mailing_BAO_TrackableURL::getTrackerURL($token, $this->id, $event_queue_id);
+        if (!empty($html)) {
+          $data = htmlentities($data);
+        }
       }
       else {
         $data = $token;
