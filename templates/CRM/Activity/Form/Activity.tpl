@@ -82,8 +82,9 @@
     <td class="view-value">
       {$form.target_contact_id.html}
       {if $action eq 1 or $single eq false}
-      <br/>
-      {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
+      <div class="crm-is-multi-activity-wrapper">
+        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
+      </div>
       {/if}
     </td>
   </tr>
@@ -280,18 +281,23 @@
       {literal}
         <script type="text/javascript">
           CRM.$(function($) {
-            $('.crm-accordion-body').each( function() {
+            var $form = $('form.{/literal}{$form.formClass}{literal}');
+            $('.crm-accordion-body', $form).each( function() {
               //open tab if form rule throws error
               if ( $(this).children( ).find('span.crm-error').text( ).length > 0 ) {
                 $(this).parent('.collapsed').crmAccordionToggle();
               }
             });
-            $('#swap_target_assignee').click(function() {
-              var assignees = $('#assignee_contact_id').select2("data");
-              var targets = $('#target_contact_id').select2("data");
-              $('#assignee_contact_id').select2("data", targets);
-              $('#target_contact_id').select2("data", assignees);
-              return false;
+            function toggleMultiActivityCheckbox() {
+              $('.crm-is-multi-activity-wrapper').toggle(!!($(this).val() && $(this).val().indexOf(',') > 0));
+            }
+            $('[name=target_contact_id]', $form).each(toggleMultiActivityCheckbox).change(toggleMultiActivityCheckbox);
+            $('#swap_target_assignee').click(function(e) {
+              e.preventDefault();
+              var assignees = $('#assignee_contact_id', $form).select2("data");
+              var targets = $('#target_contact_id', $form).select2("data");
+              $('#assignee_contact_id', $form).select2("data", targets);
+              $('#target_contact_id', $form).select2("data", assignees).change();
             });
           });
         </script>
