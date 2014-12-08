@@ -808,5 +808,22 @@ class CRM_Utils_Array {
     }
     return NULL;
   }
+
+  /**
+   * Transform an associative array of key=>value pairs into a non-associative array of arrays.
+   * This is necessary to preserve sort order when sending an array through json_encode.
+   *
+   * @param array $associative
+   * @param string $keyName
+   * @param string $valueName
+   * @return array
+   */
+  static function makeNonAssociative($associative, $keyName = 'key', $valueName = 'value') {
+    $output = array();
+    foreach ($associative as $key => $val) {
+      $output[] = array($keyName => $key, $valueName => $val);
+    }
+    return $output;
+  }
 }
 
