@@ -52,6 +52,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     if (CRM_Utils_Array::value('id', $params) && !CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id'], NULL, 1)) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $params['id'], 'financial_type_id');
     }
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'ContributionPage', CRM_Utils_Array::value('id', $params), $params);
     $dao = new CRM_Contribute_DAO_ContributionPage();
     $dao->copyValues($params);
     $dao->save();
@@ -59,6 +61,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       && $financialTypeId != $params['financial_type_id']) {
       CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_contribution_page', $params['financial_type_id']);
     }
+    CRM_Utils_Hook::post($hook, 'ContributionPage', $dao->id, $dao);
     return $dao;
   }
 
@@ -491,7 +494,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'toName' => $displayName,
         'toEmail' => $email,
       );
-      //CRM-13811 
+      //CRM-13811
       if ($pageID) {
         $templatesParams['cc'] = CRM_Utils_Array::value('cc_receipt', $value[$pageID]);
         $templatesParams['bcc'] = CRM_Utils_Array::value('bcc_receipt', $value[$pageID]);
