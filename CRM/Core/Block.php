@@ -312,6 +312,11 @@ class CRM_Core_Block {
         );
         break;
 
+        case self::LANGSWITCH:
+        // gives the currentPath without trailing empty lcMessages to be completed
+        $values = array('queryString' => CRM_Utils_System::getLinksUrl('lcMessages', TRUE, FALSE, FALSE));
+        self::setProperty(self::LANGSWITCH, 'templateValues', $values);
+        break;
       case self::FULLTEXT_SEARCH:
         $urlArray = array(
           'fullTextSearchID' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
