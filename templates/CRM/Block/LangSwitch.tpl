@@ -25,7 +25,7 @@
 *}
 {if isset($langSwitch) and $langSwitch|@count > 1}
   <form action="#">
-    <select name="lcMessages" onchange="window.location='{crmURL p="civicrm/admin" q="lcMessages="}'+this.value">
+    <select name="lcMessages" onchange="window.location='{crmURL q="$queryString"}'+this.value">
       {foreach from=$langSwitch item=language key=locale}
         <option value="{$locale}" {if $locale == $tsLocale}selected="selected"{/if}>{$language}</option>
       {/foreach}
