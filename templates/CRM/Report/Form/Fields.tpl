@@ -28,41 +28,41 @@
 <div class="crm-report-criteria"> {* criteria section starts *}
       <div id="mainTabContainer">
         {*tab navigation bar*}
-        <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+        <ul>
           {if $colGroups}
-            <li class="ui-state-default ui-corner-all">
+            <li class="ui-corner-all">
               <a title="{ts}Columns{/ts}" href="#report-tab-col-groups">{ts}Columns{/ts}</a>
             </li>
           {/if}
           {if $groupByElements}
-            <li class="ui-state-default ui-corner-all">
+            <li class="ui-corner-all">
               <a title="{ts}Grouping{/ts}" href="#report-tab-group-by-elements">{ts}Grouping{/ts}</a>
             </li>
           {/if}
           {if $orderByOptions}
-            <li class="ui-state-default ui-corner-all">
+            <li class="ui-corner-all">
               <a title="{ts}Sorting{/ts}" href="#report-tab-order-by-elements">{ts}Sorting{/ts}</a>
             </li>
           {/if}
-          {if $form.options.html}
-            <li class="ui-state-default ui-corner-all">
-              <a title="{ts}Options{/ts}" href="#report-tab-other-options">{ts}Options{/ts}</a>
+          {if $otherOptions}
+            <li class="ui-corner-all">
+              <a title="{ts}Display Options{/ts}" href="#report-tab-other-options">{ts}Display{/ts}</a>
             </li>
           {/if}
           {if $filters}
-            <li class="ui-state-default ui-corner-all">
+            <li class="ui-corner-all">
               <a title="{ts}Filters{/ts}" href="#report-tab-set-filters">{ts}Filters{/ts}</a>
             </li>
           {/if}
           {if $instanceForm OR $instanceFormError}
-            <li id="tab_settings" class="ui-state-default ui-corner-all">
-              <a title="{ts}Title and Format{/ts}" href="#report-tab-settings">{ts}Title and Format{/ts}</a>
+            <li id="tab_settings" class="ui-corner-all">
+              <a title="{ts}Title and Format{/ts}" href="#report-tab-format">{ts}Title and Format{/ts}</a>
             </li>
-            <li class="ui-state-default ui-corner-all">
+            <li class="ui-corner-all">
               <a title="{ts}Email Delivery{/ts}" href="#report-tab-email">{ts}Email Delivery{/ts}</a>
             </li>
-            <li class="ui-state-default ui-corner-all">
-              <a title="{ts}Access{/ts}" href="#report-tab-other">{ts}Access{/ts}</a>
+            <li class="ui-corner-all">
+              <a title="{ts}Access{/ts}" href="#report-tab-access">{ts}Access{/ts}</a>
             </li>
           {/if}
         </ul>
@@ -93,7 +93,7 @@
 CRM.$(function($) {
   $("#mainTabContainer").tabs({
     collapsible: true,
-    active: {/literal}{if $rows}false{else}true{/if}{literal}
+    active: {/literal}{if $rows}false{else}0{/if}{literal}
   });
 });
 
