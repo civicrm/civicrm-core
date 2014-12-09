@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="report-tab-settings" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+<div id="report-tab-settings" class="civireport-criteria">
 <h3>{ts}Display Settings{/ts}</h3>
 <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-title">
@@ -45,7 +45,7 @@
 </table>
 </div>
 
-<div id="report-tab-email" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+<div id="report-tab-email" class="civireport-criteria">
   <h3 class="email-delivery-settings-title">{ts}Email Delivery Settings{/ts} {help id="id-email_settings" file="CRM/Report/Form/Settings.hlp"}</h3>
   <table class="form-layout email-delivery-settings-fields">
     <tr class="crm-report-instanceForm-form-block-email_subject">
@@ -63,7 +63,7 @@
 </table>
 </div>
 
-<div id="report-tab-other" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+<div id="report-tab-other" class="civireport-criteria">
 <h3>{ts}User Access{/ts}</h3>
 <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-is_navigation">
