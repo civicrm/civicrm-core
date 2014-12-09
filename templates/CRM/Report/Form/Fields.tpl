@@ -44,9 +44,9 @@
               <a title="{ts}Sorting{/ts}" href="#report-tab-order-by-elements">{ts}Sorting{/ts}</a>
             </li>
           {/if}
-          {if $form.options.html}
+          {if $otherOptions}
             <li class="ui-corner-all">
-              <a title="{ts}Options{/ts}" href="#report-tab-other-options">{ts}Options{/ts}</a>
+              <a title="{ts}Display Options{/ts}" href="#report-tab-other-options">{ts}Display{/ts}</a>
             </li>
           {/if}
           {if $filters}
@@ -56,13 +56,13 @@
           {/if}
           {if $instanceForm OR $instanceFormError}
             <li id="tab_settings" class="ui-corner-all">
-              <a title="{ts}Title and Format{/ts}" href="#report-tab-settings">{ts}Title and Format{/ts}</a>
+              <a title="{ts}Title and Format{/ts}" href="#report-tab-format">{ts}Title and Format{/ts}</a>
             </li>
             <li class="ui-corner-all">
               <a title="{ts}Email Delivery{/ts}" href="#report-tab-email">{ts}Email Delivery{/ts}</a>
             </li>
             <li class="ui-corner-all">
-              <a title="{ts}Access{/ts}" href="#report-tab-other">{ts}Access{/ts}</a>
+              <a title="{ts}Access{/ts}" href="#report-tab-access">{ts}Access{/ts}</a>
             </li>
           {/if}
         </ul>
