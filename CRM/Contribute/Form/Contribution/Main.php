@@ -728,7 +728,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $self->_useForMember
       )
     ) {
-      $lifeMember = CRM_Member_BAO_Membership::getAllContactMembership($self->_userID, FALSE, TRUE);
+      $lifeMember = CRM_Member_BAO_Membership::getAllContactMembership($self->_membershipContactID, FALSE, TRUE);
 
       $membershipOrgDetails = CRM_Member_BAO_MembershipType::getMembershipTypeOrganization();
 
