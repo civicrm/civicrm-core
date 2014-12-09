@@ -41,7 +41,7 @@
 class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent {
 
   /**
-   * what blocks should we show and hide.
+   * What blocks should we show and hide.
    *
    * @var CRM_Core_ShowHideBlocks
    */
@@ -51,7 +51,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   protected $_profilePostMultipleAdd = array();
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -90,7 +90,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -208,8 +208,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @param array $defaults the array of default values
    *
-   * @internal param bool $force should we set show hide based on input defaults
-   *
    * @return void
    */
   function setShowHide($defaults) {
@@ -230,7 +228,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -249,7 +247,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $this->addElement('checkbox',
       'is_online_registration',
-      ts('Allow Online Registration?'),
+      ts('Allow Online Registration'),
       NULL,
       array(
         'onclick' => "return showHideByValue('is_online_registration',
@@ -318,11 +316,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Function to build Registration Block
+   * Build Registration Block
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @internal param int $pageId
    * @static
    */
   function buildRegistrationBlock(&$form) {
@@ -339,12 +336,12 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $form->addWysiwyg('footer_text', ts('Footer Text'), $footerAttribs);
 
     extract( self::getProfileSelectorTypes() );
+    //CRM-15427
+    $form->addProfileSelector( 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector( 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
 
-    $form->addProfileSelector( 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
-    $form->addProfileSelector( 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
-
-    $form->addProfileSelector( 'additional_custom_pre_id',  ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
-    $form->addProfileSelector( 'additional_custom_post_id',  ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
+    $form->addProfileSelector( 'additional_custom_pre_id',  ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector( 'additional_custom_post_id',  ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
   }
 
   /**
@@ -361,7 +358,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     extract( ( is_null($configs) ) ? self::getProfileSelectorTypes() : $configs );
     $element = $prefix . "custom_post_id_multiple[$count]";
     $label .= '<br />'.ts('(bottom of page)');
-    $form->addProfileSelector( $element,  $label, $allowCoreTypes, $allowSubTypes, $profileEntities);
+    $form->addProfileSelector( $element,  $label, $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
   }
 
   /**
@@ -376,22 +373,28 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       'profileEntities' => array(),
     );
 
-    $configs['allowCoreTypes'][] = 'Contact';
-    $configs['allowCoreTypes'][] = 'Individual';
+    $configs['allowCoreTypes'] = array_merge(array('Contact', 'Individual'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $configs['allowCoreTypes'][] = 'Participant';
-
+    //CRM-15427
+    $id = CRM_Utils_Request::retrieve( 'id' , 'Integer' );
+    if ($id) {
+      $participantEventType = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $id, 'event_type_id', 'id');
+      $participantRole  = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'default_role_id');
+      $configs['allowSubTypes']['ParticipantEventName'] = array($id);
+      $configs['allowSubTypes']['ParticipantEventType'] = array($participantEventType);
+      $configs['allowSubTypes']['ParticipantRole'] = array($participantRole);
+    }
     $configs['profileEntities'][] = array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel');
-    $configs['profileEntities'][] = array('entity_name' => 'participant_1', 'entity_type' => 'ParticipantModel');
+    $configs['profileEntities'][] = array('entity_name' => 'participant_1', 'entity_type' => 'ParticipantModel', 'entity_sub_type' => '*');
 
    return $configs;
   }
 
   /**
-   * Function to build Confirmation Block
+   * Build Confirmation Block
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @internal param int $pageId
    * @static
    */
   function buildConfirmationBlock(&$form) {
@@ -416,11 +419,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Function to build Email Block
+   * Build Email Block
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @internal param int $pageId
    * @static
    */
   function buildMailBlock(&$form) {
@@ -438,7 +440,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   function buildThankYouBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
@@ -470,13 +472,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
-   * @param $values
+   * @param array $values
    * @param $files
-   * @param $form
-   *
-   * @internal param array $fields posted values of the form
+   * @param CRM_Core_Form $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -813,7 +813,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -923,7 +923,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       if (!empty($params['additional_custom_post_id_multiple'])) {
         $additionalPostMultiple = array();
         foreach ($params['additional_custom_post_id_multiple'] as $key => $value) {
-          if (!$value && !empty($params['custom_post_id'])) {
+          if (is_null($value) && !empty($params['custom_post_id'])) {
             $additionalPostMultiple[$key] = $params['custom_post_id'];
           }
           elseif ($value == 'none') {
@@ -1008,7 +1008,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     parent::endPostProcess();
   }
-  //end of function
 
   /**
    * Return a descriptive name for the page, used in wizard header

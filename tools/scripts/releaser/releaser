@@ -200,7 +200,7 @@ function do_update() {
     fi
   else
     echo "No version entered. Aborting version update."
-  fi 
+  fi
 }
 
 #################################################

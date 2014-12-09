@@ -49,7 +49,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   protected $_single = FALSE;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -115,7 +115,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -133,26 +133,23 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
    * @return void
    */
   public function postProcess() {}
-  //end of function
 
   /**
-   * assign smarty variables to the template that will be used by google api to plot the contacts
+   * Assign smarty variables to the template that will be used by google api to plot the contacts
    *
    * @param $ids
    * @param int $locationId location_id
-   *
    * @param $page
    * @param $addBreadCrumb
    * @param string $type
    *
-   * @internal param array $contactIds list of contact ids that we need to plot
    * @return string           the location of the file we have created
    * @access protected
    */

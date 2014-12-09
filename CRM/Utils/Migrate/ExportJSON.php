@@ -50,7 +50,7 @@ class CRM_Utils_Migrate_ExportJSON {
   protected $_sitePrefix = 'Site 1';
 
   /**
-   * @param $params
+   * @param array $params
    */
   function __construct(&$params) {
     foreach ($params as $name => $value) {
@@ -180,7 +180,7 @@ WHERE      g.name IN ( $nameString )
 
   /**
    * @param $ids
-   * @param $tableName
+   * @param string $tableName
    * @param $fields
    * @param $whereField
    * @param null $additionalWhereCond
@@ -212,7 +212,7 @@ SELECT *
 
   /**
    * @param $sql
-   * @param $tableName
+   * @param string $tableName
    * @param $fields
    */
   function sql($sql, $tableName, &$fields) {
@@ -495,8 +495,8 @@ WHERE ac.contact_id IN ( $ids )
   }
 
   /**
-   * @param $id
-   * @param $name
+   * @param int $id
+   * @param string $name
    * @param $value
    */
   function appendValue($id, $name, $value) {
@@ -512,7 +512,7 @@ WHERE ac.contact_id IN ( $ids )
   }
 
   /**
-   * @param $daoName
+   * @param string $daoName
    * @param bool $onlyKeys
    *
    * @return array
@@ -585,7 +585,7 @@ WHERE ac.contact_id IN ( $ids )
   }
 
   /**
-   * @param $fileName
+   * @param string $fileName
    * @param null $lastExportTime
    * @param bool $discoverContacts
    */

@@ -89,12 +89,11 @@
           data = eval(data);//get json array
           if ( data != null ) {
             $("#financial_type_id").val(data);
-  
           }
-  
+
         }
       });
-  
+
     }
     getFinancialType();
 

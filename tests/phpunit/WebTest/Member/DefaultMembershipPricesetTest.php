@@ -124,10 +124,10 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
   }
 
   /**
-   * @param $firstName
-   * @param $lastName
+   * @param string $firstName
+   * @param string $lastName
    * @param $email
-   * @param $contactParams
+   * @param array $contactParams
    * @param $streetAddress
    */
   function contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress) {
@@ -199,7 +199,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
    * @param $validateString
    * @param bool $dateSpecificFields
    * @param $title
-   * @param $sid
+   * @param int $sid
    * @param bool $defaultPriceSet
    * @param $contributionType
    *

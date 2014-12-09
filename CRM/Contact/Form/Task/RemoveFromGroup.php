@@ -41,7 +41,7 @@
 class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -73,7 +73,7 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -92,6 +92,5 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
     $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
     CRM_Core_Session::setStatus($status, ts("Removed Contact From Group", array('plural' => "Removed Contacts From Group", 'count' => $removed)), 'success', array('expires' => 0));
   }
-  //end of function
 }
 

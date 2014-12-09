@@ -48,7 +48,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method add()
+   * Check method add()
    */
   function testAdd() {
     $params = array(
@@ -84,7 +84,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method del()
+   * Check method del()
    */
   function testDel() {
     $params = array(
@@ -114,7 +114,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method getFinancialAccount()
+   * Check method getFinancialAccount()
    */
   function testRetrieve() {
     $params = array(
@@ -143,7 +143,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method getFinancialAccount()
+   * Check method getFinancialAccount()
    */
   function testGetFinancialAccount() {
     $params = array(
@@ -172,7 +172,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method getInstrumentFinancialAccount()
+   * Check method getInstrumentFinancialAccount()
    */
   function testGetInstrumentFinancialAccount() {
     $paymentInstrumentValue = 1;

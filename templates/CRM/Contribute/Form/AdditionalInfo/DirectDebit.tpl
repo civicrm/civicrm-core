@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
@@ -23,27 +22,9 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
-class CRM_Upgrade_TwoOne_Controller extends CRM_Upgrade_Controller {
-  /**
-   * @return array
-   */
-  function &getPages() {
-    $pages = array(
-      'CRM_Upgrade_TwoOne_Form_Step1' => NULL,
-      'CRM_Upgrade_TwoOne_Form_Step2' => NULL,
-      'CRM_Upgrade_TwoOne_Form_Step3' => NULL,
-      'CRM_Upgrade_TwoOne_Form_Step4' => NULL,
-    );
-    return $pages;
-  }
-}
-
+*}
+{* this template is used for adding Credit Cart and billing details *}
+<div id="id-directDebit" class="section-shown">
+  {include file='CRM/Core/BillingBlock.tpl'}
+</div>
+{include file="CRM/Contribute/Form/AdditionalInfo/Payment.tpl"}

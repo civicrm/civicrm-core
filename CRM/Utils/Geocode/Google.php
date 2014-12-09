@@ -39,7 +39,7 @@
 class CRM_Utils_Geocode_Google {
 
   /**
-   * server to retrieve the lat/long
+   * Server to retrieve the lat/long
    *
    * @var string
    * @static
@@ -47,7 +47,7 @@ class CRM_Utils_Geocode_Google {
   static protected $_server = 'maps.googleapis.com';
 
   /**
-   * uri of service
+   * Uri of service
    *
    * @var string
    * @static
@@ -55,14 +55,12 @@ class CRM_Utils_Geocode_Google {
   static protected $_uri = '/maps/api/geocode/xml?sensor=false&address=';
 
   /**
-   * function that takes an address object and gets the latitude / longitude for this
+   * Function that takes an address object and gets the latitude / longitude for this
    * address. Note that at a later stage, we could make this function also clean up
    * the address into a more valid format
    *
-   * @param $values
+   * @param array $values
    * @param bool $stateName
-   *
-   * @internal param object $address
    *
    * @return boolean true if we modified the address, false otherwise
    * @static

@@ -40,7 +40,7 @@
 class CRM_Report_Page_TemplateList extends CRM_Core_Page {
 
   /**
-   * @param null $compID
+   * @param int $compID
    * @param null $grouping
    *
    * @return array
@@ -107,7 +107,7 @@ LEFT  JOIN civicrm_component comp
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */

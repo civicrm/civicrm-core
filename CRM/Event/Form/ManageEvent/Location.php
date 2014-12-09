@@ -41,7 +41,7 @@
 class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
   /**
-   * how many locationBlocks should we display?
+   * How many locationBlocks should we display?
    *
    * @var int
    * @const
@@ -49,27 +49,27 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   CONST LOCATION_BLOCKS = 1;
 
   /**
-   * the variable, for storing the location array
+   * The variable, for storing the location array
    *
    * @var array
    */
   protected $_locationIds = array();
 
   /**
-   * the variable, for storing location block id with event
+   * The variable, for storing location block id with event
    *
    * @var int
    */
   protected $_oldLocBlockId = 0;
 
   /**
-   * get the db values for this form
+   * Get the db values for this form
    *
    */
   public $_values = array();
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -97,7 +97,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -139,7 +139,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *
@@ -218,7 +218,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -286,7 +286,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $this->ajaxResponse['tabValid'] = TRUE;
     parent::endPostProcess();
   }
-  //end of function
 
   /**
    * Return a descriptive name for the page, used in wizard header

@@ -131,7 +131,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
   }
 
   /**
-   * @param $firstName
+   * @param string $firstName
    */
   function _addParticipant($firstName) {
 

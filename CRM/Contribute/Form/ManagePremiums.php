@@ -40,7 +40,7 @@
 class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
   /**
-   * Function to pre  process the form
+   * Pre  process the form
    *
    * @access public
    *
@@ -51,7 +51,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   }
 
   /**
-   * This function sets the default values for the form. Manage Premiums that in edit/view mode
+   * Set default values for the form. Manage Premiums that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -87,7 +87,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -189,6 +189,18 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->addFormRule(array('CRM_Contribute_Form_ManagePremiums', 'formRule'));
 
+    $this->addButtons(array(
+        array(
+          'type' => 'upload',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      )
+    );
     $this->assign('productId', $this->_id);
   }
 
@@ -260,7 +272,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -343,8 +355,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    *
    * @access private
    *
-   * @param $filename
-   * @param $resizedName
+   * @param string $filename
+   * @param string $resizedName
    * @param $width
    * @param $height
    *

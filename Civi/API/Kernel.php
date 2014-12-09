@@ -271,7 +271,6 @@ class Kernel {
   }
 
   /**
-   *
    * @param string $msg
    * @param array $data
    * @param array $apiRequest

@@ -41,7 +41,7 @@
 class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   /**
-   * how many locationBlocks should we display?
+   * How many locationBlocks should we display?
    *
    * @var int
    * @const
@@ -49,7 +49,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   CONST LOCATION_BLOCKS = 1;
 
   /**
-   * the id of the event we are proceessing
+   * The id of the event we are proceessing
    *
    * @var int
    * @protected
@@ -57,7 +57,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_eventId;
 
   /**
-   * the array of ids of all the participant we are proceessing
+   * The array of ids of all the participant we are proceessing
    *
    * @var int
    * @protected
@@ -65,7 +65,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   protected $_participantIDS = NULL;
 
   /**
-   * the id of the participant we are proceessing
+   * The id of the participant we are proceessing
    *
    * @var int
    * @protected
@@ -73,7 +73,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   protected $_participantId;
 
   /**
-   * is participant able to walk registration wizard.
+   * Is participant able to walk registration wizard.
    *
    * @var Boolean
    * @protected
@@ -81,7 +81,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_allowConfirmation;
 
   /**
-   * is participant requires approval
+   * Is participant requires approval
    *
    * @var Boolean
    * @public
@@ -89,7 +89,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_requireApproval;
 
   /**
-   * is event configured for waitlist.
+   * Is event configured for waitlist.
    *
    * @var Boolean
    * @public
@@ -97,7 +97,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_allowWaitlist;
 
   /**
-   * store additional participant ids
+   * Store additional participant ids
    * when there are pre-registered.
    *
    * @var array
@@ -106,7 +106,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_additionalParticipantIds;
 
   /**
-   * the mode that we are in
+   * The mode that we are in
    *
    * @var string
    * @protect
@@ -114,7 +114,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_mode;
 
   /**
-   * the values for the contribution db object
+   * The values for the contribution db object
    *
    * @var array
    * @protected
@@ -122,7 +122,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_values;
 
   /**
-   * the paymentProcessor attributes for this page
+   * The paymentProcessor attributes for this page
    *
    * @var array
    * @protected
@@ -190,7 +190,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_isBillingAddressRequiredForPayLater;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -400,10 +400,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
       $this->set('bltID', $this->_bltID);
 
-      if ($this->_values['event']['is_monetary'] &&
-        ($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)
-      ) {
-        CRM_Core_Payment_Form::setCreditCardFields($this);
+      if ($this->_values['event']['is_monetary']) {
+        CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
       }
       $params = array('entity_id' => $this->_eventId, 'entity_table' => 'civicrm_event');
       $this->_values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
@@ -477,7 +475,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * assign the minimal set of variables to the template
+   * Assign the minimal set of variables to the template
    *
    * @return void
    * @access public
@@ -573,10 +571,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Function to add the custom fields
+   * Add the custom fields
    *
-   * @param $id
-   * @param $name
+   * @param int $id
+   * @param string $name
    * @param bool $viewOnly
    *
    * @return void
@@ -677,8 +675,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * @param $form
-   * @param $eventID
+   * @param CRM_Core_Form $form
+   * @param int $eventID
    *
    * @throws Exception
    */
@@ -735,9 +733,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Function to handle process after the confirmation of payment by User
+   * Handle process after the confirmation of payment by User
    *
-   * @param null $contactID
+   * @param int $contactID
    * @param null $contribution
    * @param null $payment
    *
@@ -840,8 +838,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Process the participant
    *
-   * @param $params
-   * @param $contactID
+   * @param array $params
+   * @param int $contactID
    *
    * @return void
    * @access public
@@ -952,8 +950,8 @@ WHERE  v.option_group_id = g.id
    * @access public
    */
   /**
-   * @param $form
-   * @param $params
+   * @param CRM_Core_Form $form
+   * @param array $params
    * @param bool $skipCurrent
    *
    * @return int|string
@@ -1051,8 +1049,8 @@ WHERE  v.option_group_id = g.id
    * @access public
    */
   /**
-   * @param $form
-   * @param $params
+   * @param CRM_Core_Form $form
+   * @param array $params
    *
    * @return mixed
    */
@@ -1348,7 +1346,7 @@ WHERE  v.option_group_id = g.id
 
   // set the first participant ID if not set, CRM-10032
   /**
-   * @param $participantID
+   * @param int $participantID
    */
   function processFirstParticipant($participantID) {
     $this->_participantId = $participantID;
@@ -1409,11 +1407,15 @@ WHERE  v.option_group_id = g.id
     $endDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('registration_end_date',
         $this->_values['event']
       ));
+    $eventEndDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('event_end_date', $this->_values['event']));
     if (
       $endDate &&
       $endDate < $now
     ) {
       CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_end_date', $this->_values['event'])))), $redirect);
+    }
+    if (!empty($eventEndDate) && $eventEndDate < $now) {
+      CRM_Core_Error::statusBounce(ts('Event ended on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('event_end_date', $this->_values['event'])))), $redirect);
     }
   }
 }

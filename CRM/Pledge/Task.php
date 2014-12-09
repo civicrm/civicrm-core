@@ -42,7 +42,7 @@ class CRM_Pledge_Task {
   CONST DELETE_PLEDGES = 1, PRINT_PLEDGES = 2, EXPORT_PLEDGES = 3;
 
   /**
-   * the task array
+   * The task array
    *
    * @var array
    * @static
@@ -50,7 +50,7 @@ class CRM_Pledge_Task {
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array
    *
    * @var array
    * @static
@@ -126,7 +126,7 @@ class CRM_Pledge_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level
    * of the user
    *
    * @param int $permission

@@ -43,7 +43,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
     'disable_core_css' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -85,8 +85,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
       );
       if (!CRM_Utils_System::checkURL($url, TRUE)) {
         $errors = array(
-          'enableSSL' =>
-          ts('You need to set up a secure server before you can use the Force Secure URLs option'),
+          'enableSSL' => ts('You need to set up a secure server before you can use the Force Secure URLs option'),
         );
         return $errors;
       }

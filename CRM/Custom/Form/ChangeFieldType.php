@@ -39,7 +39,7 @@
 class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
 
   /**
-   * the field id
+   * The field id
    *
    * @var int
    * @access protected
@@ -47,17 +47,17 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * array of custom field values
+   * Array of custom field values
    */
   protected $_values;
 
   /**
-   * mapper array of valid field type
+   * Mapper array of valid field type
    */
   protected $_htmlTypeTransitions;
 
   /**
-   * set up variables to build the form
+   * Set up variables to build the form
    *
    * @return void
    * @acess protected
@@ -91,7 +91,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

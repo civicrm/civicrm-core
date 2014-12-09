@@ -11,7 +11,7 @@
       <title>ID</title>
       <type>int unsigned</type>
       <length>10</length>
-      <required>true</required>      
+      <required>true</required>
       <add>4.6</add>
   </field>
   <primaryKey>

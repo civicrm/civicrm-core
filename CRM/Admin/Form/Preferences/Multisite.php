@@ -42,8 +42,7 @@ class CRM_Admin_Form_Preferences_Multisite extends CRM_Admin_Form_Preferences {
     $msDoc = CRM_Utils_System::docURL2('Multi Site Installation', NULL, NULL, NULL, NULL, "wiki");
     CRM_Utils_System::setTitle(ts('Multi Site Settings'));
     $this->_varNames = array(
-      CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME => array(
         'is_enabled' => array(
           'html_type' => 'checkbox',
           'title' => ts('Enable Multi Site Configuration'),

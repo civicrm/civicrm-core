@@ -67,7 +67,7 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
   public $_donorID;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
    * @access public
@@ -111,7 +111,7 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -136,7 +136,7 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return None
    * @access public
@@ -267,7 +267,6 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
    * @param array $files the uploaded files if any
    * @param $self
    *
-   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -288,7 +287,7 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

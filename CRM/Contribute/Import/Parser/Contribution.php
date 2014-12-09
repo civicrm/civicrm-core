@@ -55,7 +55,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   protected $_newContributions;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct(&$mapperKeys, $mapperSoftCredit = NULL, $mapperPhoneType = NULL, $mapperSoftCreditType = NULL) {
     parent::__construct();
@@ -65,7 +65,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * the initializer code, called before the processing
+   * The initializer code, called before the processing
    *
    * @return void
    * @access public
@@ -136,7 +136,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * handle the values in mapField mode
+   * Handle the values in mapField mode
    *
    * @param array $values the array of values belonging to this line
    *
@@ -148,7 +148,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * handle the values in preview mode
+   * Handle the values in preview mode
    *
    * @param array $values the array of values belonging to this line
    *
@@ -160,7 +160,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * handle the values in summary mode
+   * Handle the values in summary mode
    *
    * @param array $values the array of values belonging to this line
    *
@@ -236,7 +236,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * handle the values in import mode
+   * Handle the values in import mode
    *
    * @param int $onDuplicate the code for what action to take on duplicates
    * @param array $values the array of values belonging to this line
@@ -565,7 +565,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   *  Function to process pledge payments
+   * Process pledge payments
    */
   function processPledgePayments(&$formatted) {
     if (!empty($formatted['pledge_payment_id']) && !empty($formatted['pledge_id'])) {
@@ -599,7 +599,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * the initializer code, called before the processing
+   * The initializer code, called before the processing
    *
    * @return void
    * @access public

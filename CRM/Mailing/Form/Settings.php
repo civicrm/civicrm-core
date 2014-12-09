@@ -39,7 +39,7 @@
 class CRM_Mailing_Form_Settings extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -57,7 +57,7 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -96,12 +96,12 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
       $dao->storeValues($dao, $defaults);
       $defaults['visibility'] = $dao->visibility;
     }
-    
+
     return $defaults;
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

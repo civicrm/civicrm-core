@@ -39,7 +39,7 @@ class CRM_Utils_Weight {
   static $SIGNABLE_FIELDS = array('reset', 'dao', 'idName', 'url', 'filter'); // 'id','src','dst','dir'
 
   /**
-   * Function to correct duplicate weight entries by putting them (duplicate weights) in sequence.
+   * Correct duplicate weight entries by putting them (duplicate weights) in sequence.
    *
    * @param string  $daoName full name of the DAO
    * @param array   $fieldValues field => value to be used in the WHERE
@@ -85,7 +85,7 @@ class CRM_Utils_Weight {
    *
    * @param string $daoName full name of the DAO
    * $param integer $weight the weight to be removed
-   * @param $fieldID
+   * @param int $fieldID
    * @param array $fieldValues field => value to be used in the WHERE
    * @param string $weightField field which contains the weight value,
    * defaults to 'weight'
@@ -181,7 +181,7 @@ class CRM_Utils_Weight {
   }
 
   /**
-   * returns the new calculated weight.
+   * Returns the new calculated weight.
    *
    * @param string  $daoName     full name of the DAO
    * @param array   $fieldValues field => value to be used in the WHERE
@@ -219,7 +219,7 @@ class CRM_Utils_Weight {
   }
 
   /**
-   * returns the highest weight.
+   * Returns the highest weight.
    *
    * @param string $daoName full name of the DAO
    * @param array  $fieldValues field => value to be used in the WHERE
@@ -239,7 +239,7 @@ class CRM_Utils_Weight {
   }
 
   /**
-   * returns the default weight ( highest weight + 1 ) to be used.
+   * Returns the default weight ( highest weight + 1 ) to be used.
    *
    * @param string $daoName full name of the DAO
    * @param array  $fieldValues field => value to be used in the WHERE
@@ -265,7 +265,7 @@ class CRM_Utils_Weight {
    *
    * @param null $groupBy
    *
-   * @return Object CRM_Core_DAO objet that holds the results of the query
+   * @return CRM_Core_DAO objet that holds the results of the query
    */
   static function &query($queryType,
       $daoName,
@@ -338,8 +338,8 @@ class CRM_Utils_Weight {
 
   /**
    * @param $rows
-   * @param $daoName
-   * @param $idName
+   * @param string $daoName
+   * @param string $idName
    * @param $returnURL
    * @param null $filter
    */

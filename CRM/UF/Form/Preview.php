@@ -41,7 +41,7 @@
 class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * gets session variables for group or field id
    *
@@ -126,7 +126,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

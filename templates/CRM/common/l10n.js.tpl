@@ -1,4 +1,4 @@
- {*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
@@ -31,8 +31,8 @@
   CRM.config.resourceBase = {$config->resourceBase|@json_encode};
   CRM.config.lcMessages = {$config->lcMessages|@json_encode};
 
-  // Contact create links
-  if (CRM.profileCreate !== false) CRM.profileCreate = {$contactCreate|@json_encode};
+  // Merge entityRef settings
+  CRM.config.entityRef = $.extend({ldelim}{rdelim}, {$entityRef|@json_encode}, CRM.config.entityRef || {ldelim}{rdelim});
 
   // Initialize CRM.url and CRM.formatMoney
   CRM.url({ldelim}back: '{crmURL p="*path*" q="*query*" h=0 fb=1}', front: '{crmURL p="*path*" q="*query*" h=0 fe=1}'{rdelim});
@@ -43,7 +43,7 @@
   $.fn.select2.defaults.formatLoadMore = "{ts escape='js'}Loading...{/ts}";
   $.fn.select2.defaults.formatSearching = "{ts escape='js'}Searching...{/ts}";
   $.fn.select2.defaults.formatInputTooShort = function() {ldelim}
-    return $(this).data('api-entity').toLowerCase() == 'contact' ? {$contactSearch} : {$otherSearch};
+    return ($(this).data('api-entity') === 'contact' || $(this).data('api-entity') === 'Contact') ? {$contactSearch} : {$otherSearch};
   {rdelim};
 
   // Localize jQuery UI

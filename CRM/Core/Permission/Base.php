@@ -66,7 +66,7 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * get the current permission of this user
+   * Get the current permission of this user
    *
    * @return string the permission of the user (edit or view or null)
    */
@@ -132,7 +132,7 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * given a permission string, check for access requirements
+   * Given a permission string, check for access requirements
    *
    * @param string $str the permission to check
    *

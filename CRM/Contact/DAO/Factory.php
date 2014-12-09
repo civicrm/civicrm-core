@@ -27,7 +27,7 @@ class CRM_Contact_DAO_Factory {
   static $_suffix = '.php';
 
   /**
-   * @param $className
+   * @param string $className
    *
    * @return mixed
    */

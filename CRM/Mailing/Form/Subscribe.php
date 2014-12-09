@@ -78,7 +78,7 @@ SELECT   title, description
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -93,7 +93,7 @@ SELECT   title, description
       ),
       TRUE
     );
-    $this->addRule('email', ts("Please enter a valid email address (e.g. 'yourname@example.com')."), 'email');
+    $this->addRule('email', ts("Please enter a valid email address."), 'email');
 
     if (!$this->_groupID) {
       // create a selector box of all public groups
@@ -188,7 +188,6 @@ ORDER BY title";
   }
 
   /**
-   *
    * @access public
    *
    * @return void

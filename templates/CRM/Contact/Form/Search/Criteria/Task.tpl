@@ -38,8 +38,8 @@
             </td>
             <td>
                 {$form.task_status_id.html}
-            </td>    
+            </td>
         </tr>
-      </table>         
+      </table>
     </div>
 {/if}

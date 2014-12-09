@@ -192,4 +192,20 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Core_DAO::shortenSQLName($inputData, $length, $makeRandom));
   }
 
+  function testFindById() {
+    $params = $this->sampleContact('Individual', 4);
+    $existing_contact = CRM_Contact_BAO_Contact::add($params);
+    $contact = CRM_Contact_BAO_Contact::findById($existing_contact->id);
+    $this->assertEquals($existing_contact->id, $contact->id);
+    $deleted_contact_id = $existing_contact->id;
+    CRM_Contact_BAO_Contact::deleteContact($contact->id, FALSE, TRUE);
+    $exception_thrown = FALSE;
+    try {
+      $deleted_contact = CRM_Contact_BAO_Contact::findById($deleted_contact_id);
+    }
+    catch (Exception $e) {
+      $exception_thrown = TRUE;
+    }
+    $this->assertTrue($exception_thrown);
+  }
 }

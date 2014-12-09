@@ -41,7 +41,7 @@
 class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -71,14 +71,14 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
     if ($this->_action == CRM_Core_Action::UPDATE && CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_id, 'is_reserved','vid')) {
       $this->freeze(array('is_active'));
     }
-    
+
     $this->addRule('name', ts('A financial type with this name already exists. Please select another name.'),'objectExists',
       array('CRM_Financial_DAO_FinancialType', $this->_id)
     );
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    * @return void

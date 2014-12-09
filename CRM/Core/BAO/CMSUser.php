@@ -45,7 +45,7 @@ require_once 'DB.php';
 class CRM_Core_BAO_CMSUser {
 
   /**
-   * Function for synchronizing cms users with CiviCRM contacts
+   * Synchronizing cms users with CiviCRM contacts
    *
    * @param bool $is_interactive whether to show statuses & perform redirects
    *   This behavior is misplaced in the BAO layer, but we'll preserve it to avoid
@@ -221,7 +221,7 @@ class CRM_Core_BAO_CMSUser {
   }
 
   /**
-   * Function to create CMS user using Profile
+   * Create CMS user using Profile
    *
    * @param array  $params associated array
    * @param string $mail email id for cms user
@@ -255,9 +255,9 @@ class CRM_Core_BAO_CMSUser {
   }
 
   /**
-   * Function to create Form for CMS user using Profile
+   * Create Form for CMS user using Profile
    *
-   * @param object $form
+   * @param CRM_Core_Form $form
    * @param integer $gid id of group of profile
    * @param bool $emailPresent true if the profile field has email(primary)
    * @param \const|int $action
@@ -339,23 +339,17 @@ class CRM_Core_BAO_CMSUser {
     $form->assign('showCMS', $showCMS);
   }
 
-  /*
-   * Checks that there is a valid username & email
-   *  optionally checks password is present & matches DB & gets the CMS to validate
-   *
-   *  @params array $fields Posted values of form
-   *  @param  array $files uploaded files if any
-   *  @param array $self reference to form object
-   *
-   */
   /**
-   * @param $fields
-   * @param $files
-   * @param $self
+   * Checks that there is a valid username & email
+   * optionally checks password is present & matches DB & gets the CMS to validate
+   *
+   * @param array $fields Posted values of form
+   * @param array $files uploaded files if any
+   * @param CRM_Core_Form $form
    *
    * @return array|bool
    */
-  static function formRule($fields, $files, $self) {
+  static function formRule($fields, $files, $form) {
     if (empty($fields['cms_create_account'])) {
       return TRUE;
     }
@@ -369,9 +363,9 @@ class CRM_Core_BAO_CMSUser {
     $errors = array();
     if ($isDrupal || $isJoomla || $isWordPress) {
       $emailName = NULL;
-      if (!empty($self->_bltID) && array_key_exists("email-{$self->_bltID}", $fields)) {
+      if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
         // this is a transaction related page
-        $emailName = 'email-' . $self->_bltID;
+        $emailName = 'email-' . $form->_bltID;
       } else {
         // find the email field in a profile page
         foreach ($fields as $name => $dontCare) {
@@ -424,7 +418,7 @@ class CRM_Core_BAO_CMSUser {
   }
 
   /**
-   * Function to check if a cms user already exists.
+   * Check if a cms user already exists.
    *
    * @param  Array $contact array of contact-details
    *

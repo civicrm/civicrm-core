@@ -43,7 +43,7 @@
 class CRM_ACL_Form_ACLBasic extends CRM_Admin_Form {
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -75,7 +75,7 @@ SELECT object_table
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -111,7 +111,7 @@ SELECT object_table
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array|bool
    */
@@ -125,7 +125,7 @@ SELECT object_table
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

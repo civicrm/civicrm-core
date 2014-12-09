@@ -38,21 +38,21 @@
 class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
 
   /**
-   * the debug level for civicrm
+   * The debug level for civicrm
    * @var int
    */
   public $debug = 0;
   public $backtrace = 0;
 
   /**
-   * the directory where Smarty and plugins are installed
+   * The directory where Smarty and plugins are installed
    * @var string
    */
   public $smartyDir = NULL;
   public $pluginsDir = NULL;
 
   /**
-   * the root directory of our template tree
+   * The root directory of our template tree
    * @var string
    */
   public $templateDir = NULL;
@@ -262,7 +262,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $userFrameworkLogging = FALSE;
 
   /**
-   * the handle for import file size
+   * The handle for import file size
    * @var int
    */
   public $maxImportFileSize = 1048576;
@@ -357,49 +357,49 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $enableSSL = FALSE;
 
   /**
-   * error template to use for fatal errors
+   * Error template to use for fatal errors
    *
    * @var string
    */
   public $fatalErrorTemplate = 'CRM/common/fatal.tpl';
 
   /**
-   * fatal error handler
+   * Fatal error handler
    *
    * @var string
    */
   public $fatalErrorHandler = NULL;
 
   /**
-   * legacy encoding for file encoding conversion
+   * Legacy encoding for file encoding conversion
    *
    * @var string
    */
   public $legacyEncoding = 'Windows-1252';
 
   /**
-   * field separator for import/export csv file
+   * Field separator for import/export csv file
    *
    * @var string
    */
   public $fieldSeparator = ',';
 
   /**
-   * max location blocks in address
+   * Max location blocks in address
    *
    * @var integer
    */
   public $maxLocationBlocks = 2;
 
   /**
-   * the font path where captcha fonts are stored
+   * The font path where captcha fonts are stored
    *
    * @var string
    */
   public $captchaFontPath = '/usr/X11R6/lib/X11/fonts/';
 
   /**
-   * the font to use for captcha
+   * The font to use for captcha
    *
    * @var string
    */
@@ -422,7 +422,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $dashboardCacheTimeout = 1440;
 
   /**
-   * flag to indicate if acl cache is NOT to be reset
+   * Flag to indicate if acl cache is NOT to be reset
    */
   public $doNotResetCache = 0;
 
@@ -434,19 +434,19 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $oldInputStyle = 1;
 
   /**
-   * should we disable key generation for forms
+   * Should we disable key generation for forms
    *
    * @var boolean
    */
   public $formKeyDisable = FALSE;
 
   /**
-   * to determine whether the call is from cms or civicrm
+   * To determine whether the call is from cms or civicrm
    */
   public $inCiviCRM = FALSE;
 
   /**
-   * component registry object (of CRM_Core_Component type)
+   * Component registry object (of CRM_Core_Component type)
    */
   public $componentRegistry = NULL;
 

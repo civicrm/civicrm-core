@@ -55,7 +55,6 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
   private $drupalModules = NULL;
 
   /**
-   *
    * @see CRM_Utils_Hook::invoke()
    *
    * @param integer $numParams Number of parameters to pass to the hook

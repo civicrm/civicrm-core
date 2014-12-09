@@ -43,7 +43,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   protected $_currencySymbols;
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public

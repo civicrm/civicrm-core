@@ -369,102 +369,6 @@ class CRM_Utils_Array {
   }
 
   /**
-   * Recursively copies all values of an array into a new array.
-   *
-   * If the recursion depth limit is exceeded, the deep copy appears to
-   * succeed, but the copy process past the depth limit will be shallow.
-   *
-   * @params array $array
-   *   The array to copy.
-   * @params int $maxdepth
-   *   (optional) Recursion depth limit.
-   * @params int $depth
-   *   (optional) Current recursion depth.
-   *
-   * @param $array
-   * @param int $maxdepth
-   * @param int $depth
-   *
-   * @return array
-   *   The new copy of $array.
-   *
-   * @access public
-   */
-  static function array_deep_copy(&$array, $maxdepth = 50, $depth = 0) {
-    if ($depth > $maxdepth) {
-      return $array;
-    }
-    $copy = array();
-    foreach ($array as $key => $value) {
-      if (is_array($value)) {
-        array_deep_copy($value, $copy[$key], $maxdepth, ++$depth);
-      }
-      else {
-        $copy[$key] = $value;
-      }
-    }
-    return $copy;
-  }
-
-  /**
-   * Makes a shallow copy of a variable, returning the copy by value.
-   *
-   * In some cases, functions return an array by reference, but we really don't
-   * want to receive a reference.
-   *
-   * @param $array mixed
-   *   Something to return a copy of.
-   * @return mixed
-   *   The copy.
-   * @access public
-   */
-  static function breakReference($array) {
-    $copy = $array;
-    return $copy;
-  }
-
-  /**
-   * Removes a portion of an array.
-   *
-   * This function is similar to PHP's array_splice(), with some differences:
-   *   - Array keys that are not removed are preserved. The PHP built-in
-   *     function only preserves values.
-   *   - The portion of the array to remove is specified by start and end
-   *     index rather than offset and length.
-   *   - There is no ability to specify data to replace the removed portion.
-   *
-   * The behavior given an associative array would probably not be useful.
-   *
-   * @param array $params
-   *   Array to manipulate.
-   * @param int $start
-   *   First index to remove.
-   * @param int $end
-   *   Last index to remove.
-   *
-   * @access public
-   */
-  static function crmArraySplice(&$params, $start, $end) {
-    // verify start and end index
-    if ($start < 0) {
-      $start = 0;
-    }
-    if ($end > count($params)) {
-      $end = count($params);
-    }
-
-    $i = 0;
-
-    // procees unset operation
-    foreach ($params as $key => $value) {
-      if ($i >= $start && $i < $end) {
-        unset($params[$key]);
-      }
-      $i++;
-    }
-  }
-
-  /**
    * Searches an array recursively in an optionally case-insensitive manner.
    *
    * @param string $value
@@ -566,37 +470,6 @@ class CRM_Utils_Array {
       }
     }
     return TRUE;
-  }
-
-  /**
-   * Determines the maximum depth of nested arrays in a multidimensional array.
-   *
-   * The mechanism for determining depth will be confused if the array
-   * contains keys or values with the left brace '{' character. This will
-   * cause the depth to be over-reported.
-   *
-   * @param array $array
-   *   The array to examine.
-   *
-   * @return integer
-   *   The maximum nested array depth found.
-   *
-   * @access public
-   */
-  static function getLevelsArray($array) {
-    if (!is_array($array)) {
-      return 0;
-    }
-    $jsonString = json_encode($array);
-    $parts      = explode("}", $jsonString);
-    $max        = 0;
-    foreach ($parts as $part) {
-      $countLevels = substr_count($part, "{");
-      if ($countLevels > $max) {
-        $max = $countLevels;
-      }
-    }
-    return $max;
   }
 
   /**
@@ -747,27 +620,6 @@ class CRM_Utils_Array {
       }
     }
     return $result;
-  }
-
-  /**
-   * Generate a string representation of an array.
-   *
-   * @param array $pairs
-   *   Array to stringify.
-   * @param string $l1Delim
-   *   String to use to separate key/value pairs from one another.
-   * @param string $l2Delim
-   *   String to use to separate keys from values within each key/value pair.
-   *
-   * @return string
-   *   Generated string.
-   */
-  static function implodeKeyValue($l1Delim, $l2Delim, $pairs) {
-    $exprs = array();
-    foreach ($pairs as $key => $value) {
-      $exprs[] = $key . $l2Delim . $value;
-    }
-    return implode($l1Delim, $exprs);
   }
 
   /**
@@ -945,7 +797,7 @@ class CRM_Utils_Array {
   }
 
   /**
-   * Get the first elemnet of an array
+   * Get the first element of an array
    *
    * @param array $array
    * @return mixed|NULL
@@ -955,6 +807,23 @@ class CRM_Utils_Array {
       return $value;
     }
     return NULL;
+  }
+
+  /**
+   * Transform an associative array of key=>value pairs into a non-associative array of arrays.
+   * This is necessary to preserve sort order when sending an array through json_encode.
+   *
+   * @param array $associative
+   * @param string $keyName
+   * @param string $valueName
+   * @return array
+   */
+  static function makeNonAssociative($associative, $keyName = 'key', $valueName = 'value') {
+    $output = array();
+    foreach ($associative as $key => $val) {
+      $output[] = array($keyName => $key, $valueName => $val);
+    }
+    return $output;
   }
 }
 

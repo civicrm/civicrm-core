@@ -78,7 +78,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   ///////////////// civicrm_pledge_get methods
 
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -133,7 +133,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledge = $this->callAPISuccess('pledge', 'delete', $params2);
   }
   /**
-   * test  'return.pledge_financial_type' => 1 works
+   * Test  'return.pledge_financial_type' => 1 works
    */
   function testGetPledgewithReturn() {
 
@@ -147,7 +147,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals('Donation', $pledge['pledge_financial_type']);
   }
   /**
-   * test  'return.pledge_contribution_type' => 1 works
+   * Test  'return.pledge_contribution_type' => 1 works
    * This is for legacy compatibility
   */
   function testGetPledgewithReturnLegacy() {
@@ -291,13 +291,13 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
 
-  /*
-     * Test creation of pledge with only one payment.
-     *
-     * Pledge status id left empty as it is not a required field
-     * http://issues.civicrm.org/jira/browse/CRM-8551
-     *
-     */
+  /**
+   * Test creation of pledge with only one payment.
+   *
+   * Pledge status id left empty as it is not a required field
+   * http://issues.civicrm.org/jira/browse/CRM-8551
+   *
+   */
   function testCreatePledgeSinglePayment() {
     $params = array(
       'scheduled_date' => '20110510',
@@ -354,9 +354,9 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledge = $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
 
-  /*
-     * test that status is set to pending
-     */
+  /**
+   * Test that status is set to pending
+   */
   function testCreatePledgeNoStatus() {
 
     $params = $this->_params;
@@ -369,9 +369,10 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledge = $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
 
-  //To Update Pledge
+  /**
+   * To Update Pledge
+   */
   function testCreateUpdatePledge() {
-
     // we test 'sequential' param here too
     $pledgeID = $this->pledgeCreate($this->_individualId);
     $old_params = array(
@@ -410,11 +411,11 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($pledge['values'][$pledgeID]['pledge_status'], 'Cancelled', 'In line ' . __LINE__);
     $pledge = $this->callAPISuccess('pledge', 'delete', $new_params);
   }
-/**
- *  Here we ensure we are maintaining our 'contract' & supporting previously working syntax
- *  ie contribution_type_id
- *
- */
+
+  /**
+   * Here we ensure we are maintaining our 'contract' & supporting previously working syntax
+   * ie contribution_type_id
+   */
   function testCreateUpdatePledgeLegacy() {
 
     // we test 'sequential' param here too
@@ -470,9 +471,9 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledge = $this->callAPIFailure('pledge', 'delete', $params, 'Mandatory key(s) missing from params array: id');
   }
 
-  /*
-     * legacy support for pledge_id
-     */
+  /**
+   * Legacy support for pledge_id
+   */
   function testDeletePledge() {
 
     $pledgeID = $this->pledgeCreate($this->_individualId);
@@ -482,9 +483,9 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('pledge', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
-  /*
-     * std is to accept id
-     */
+  /**
+   * Std is to accept id
+   */
   function testDeletePledgeUseID() {
 
     $pledgeID = $this->pledgeCreate($this->_individualId);
@@ -493,11 +494,12 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIAndDocument('pledge', 'delete', $params, __FUNCTION__, __FILE__);
   }
-  /*
-     * test to make sure empty get returns nothing
-     * Note that the function gives incorrect results if no pledges exist as it does a
-     * contact search instead - test only checks that the get finds the one existing
-     */
+
+  /**
+   * Test to make sure empty get returns nothing
+   * Note that the function gives incorrect results if no pledges exist as it does a
+   * contact search instead - test only checks that the get finds the one existing
+   */
   function testGetEmpty() {
     $result = $this->callAPISuccess('pledge', 'create', $this->_params);
     $result = $this->callAPISuccess('pledge', 'get', array());

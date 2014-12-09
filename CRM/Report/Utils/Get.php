@@ -36,7 +36,7 @@
 class CRM_Report_Utils_Get {
 
   /**
-   * @param $name
+   * @param string $name
    * @param $type
    *
    * @return mixed|null
@@ -53,7 +53,7 @@ class CRM_Report_Utils_Get {
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $field
    * @param $defaults
    */
@@ -96,7 +96,7 @@ class CRM_Report_Utils_Get {
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $field
    * @param $defaults
    */
@@ -134,7 +134,7 @@ class CRM_Report_Utils_Get {
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $field
    * @param $defaults
    */

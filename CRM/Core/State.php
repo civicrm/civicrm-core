@@ -39,32 +39,32 @@
 class CRM_Core_State {
 
   /**
-   * state name
+   * State name
    * @var string
    */
   protected $_name;
 
   /**
-   * this is a combination "OR" of the STATE_* constants defined below
+   * This is a combination "OR" of the STATE_* constants defined below
    * @var int
    */
   protected $_type;
 
   /**
-   * the state that precedes this state
-   * @var object
+   * The state that precedes this state
+   * @var CRM_Core_State
    */
   protected $_back;
 
   /**
-   * the state that succeeds this state
-   * @var object
+   * The state that succeeds this state
+   * @var CRM_Core_State
    */
   protected $_next;
 
   /**
    * The state machine that this state is part of
-   * @var object
+   * @var CRM_Core_StateMachine
    */
   protected $_stateMachine;
 
@@ -77,22 +77,16 @@ class CRM_Core_State {
   CONST START = 1, FINISH = 2, SIMPLE = 4;
 
   /**
-   * constructor
+   * Constructor
    *
-   * @param $name
-   * @param $type
-   * @param $back
-   * @param $next
-   * @param $stateMachine
+   * @param string $name internal name of the state
+   * @param int $type state type
+   * @param CRM_Core_State $back state that precedes this state
+   * @param CRM_Core_State $next state that follows  this state
+   * @param CRM_Core_StateMachine $stateMachine statemachine that this states belongs to
    *
-   * @internal param \the $string internal name of the state
-   * @internal param \the $int state type
-   * @internal param \the $object state that precedes this state
-   * @internal param \the $object state that follows  this state
-   * @internal param \the $object statemachine that this states belongs to
-   *
-   * @return \CRM_Core_State
-  @access public
+   * @return CRM_Core_State
+   * @access public
    */
   function __construct($name, $type, $back, $next, &$stateMachine) {
     $this->_name = $name;
@@ -187,7 +181,7 @@ class CRM_Core_State {
   }
 
   /**
-   * getter for name
+   * Getter for name
    *
    * @return string
    * @access public
@@ -197,7 +191,7 @@ class CRM_Core_State {
   }
 
   /**
-   * setter for name
+   * Setter for name
    *
    * @param string
    *
@@ -209,7 +203,7 @@ class CRM_Core_State {
   }
 
   /**
-   * getter for type
+   * Getter for type
    *
    * @return int
    * @access public

@@ -86,7 +86,7 @@
             <td>{if $row.tax_rate != '' && $row.html_type eq "Text / Numeric Quantity"}
                     {$taxTerm} ({$row.tax_rate|string_format:"%.2f"}%)
                 {/if}
-	    </td>
+      </td>
             <td>{if $row.html_type eq "Text / Numeric Quantity" }{$row.tax_amount|crmMoney}{/if}</td>
         {/if}
         <td class="field-action">{$row.action|replace:'xx':$row.id}</td>

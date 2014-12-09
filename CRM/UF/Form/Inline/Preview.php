@@ -41,7 +41,7 @@
 class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * gets session variables for group or field id
    *
@@ -60,7 +60,7 @@ class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
     }
     // Inline forms don't get menu-level permission checks
     if (!CRM_Core_Permission::check('administer CiviCRM')) {
-      CRM_Core_Error::fatal(ts('Permission denied'));
+      CRM_Core_Error::fatal(ts('Permission Denied'));
     }
     $content = json_decode($_REQUEST['ufData'], TRUE);
     foreach(array('ufGroup', 'ufFieldCollection') as $key) {

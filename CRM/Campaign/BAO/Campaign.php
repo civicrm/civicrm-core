@@ -35,7 +35,7 @@
 Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
 
   /**
-   * takes an associative array and creates a campaign object
+   * Takes an associative array and creates a campaign object
    *
    * the function extract all the params it needs to initialize the create a
    * contact object. the params array could contain additional unused name/value
@@ -43,7 +43,7 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Campaign_DAO_Campaign object
+   * @return CRM_Campaign_DAO_Campaign object
    * @access public
    * @static
    */
@@ -99,7 +99,7 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   }
 
   /**
-   * function to delete the campaign
+   * Delete the campaign
    *
    * @param  int $id id of the campaign
    *
@@ -308,12 +308,11 @@ Order By  camp.title";
   }
 
   /**
-   * Function to retrieve campaigns for dashboard.
+   * Retrieve campaigns for dashboard.
    *
    * @static
    */
-  static function getCampaignSummary($params = array(
-    ), $onlyCount = FALSE) {
+  static function getCampaignSummary($params = array(), $onlyCount = FALSE) {
     $campaigns = array();
 
     //build the limit and order clause.
@@ -466,7 +465,7 @@ SELECT  campaign.id               as id,
   }
 
   /**
-   * Function to get Campaigns groups
+   * Get Campaigns groups
    *
    * @param int $campaignId campaign id
    *
@@ -500,7 +499,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -536,8 +535,8 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    *
    */
   /**
-   * @param $form
-   * @param null $connectedCampaignId
+   * @param CRM_Core_Form $form
+   * @param int $connectedCampaignId
    */
   public static function addCampaign(&$form, $connectedCampaignId = NULL) {
     //some forms do set default and freeze.
@@ -619,7 +618,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    * Add campaign in compoent search.
    * and assign needful info to templates.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param string $elementName
    */
   public static function addCampaignInComponentSearch(&$form, $elementName = 'campaign_id') {

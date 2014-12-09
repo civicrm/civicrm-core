@@ -40,7 +40,7 @@
 class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityContact {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -50,8 +50,6 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    * Add activity assignment.
    *
    * @param array $params (reference ) an assoc array of name/value pairs
-   *
-   * @internal param array $ids (reference ) the array that holds all the db ids
    *
    * @return object activity type of object that is added
    * @access public
@@ -70,9 +68,7 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
   /**
    * Retrieve assignee_id by activity_id
    *
-   * @param $activity_id
-   *
-   * @internal param int $id ID of the activity
+   * @param int $activity_id
    *
    * @return array
    *

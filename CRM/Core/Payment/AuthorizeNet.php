@@ -64,11 +64,11 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string $mode the mode of operation: live or test
    * @param object  $paymentProcessor the details of the payment processor being invoked
-   * @param object  $paymentForm      reference to the form object if available
+   * @param CRM_Core_Form  $paymentForm      reference to the form object if available
    * @param boolean $force            should we force a reload of this payment object
    *
    * @return object
@@ -81,6 +81,15 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       self::$_singleton[$processorName] = new CRM_Core_Payment_AuthorizeNet($mode, $paymentProcessor);
     }
     return self::$_singleton[$processorName];
+  }
+
+  /**
+   * Should the first payment date be configurable when setting up back office recurring payments
+   * In the case of Authorize.net this is an option
+   * @return bool
+   */
+  protected function supportsFutureRecurStartDate() {
+    return TRUE;
   }
 
   /**
@@ -639,8 +648,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * @return bool|object
    */
-  function cancelSubscription(&$message = '', $params = array(
-    )) {
+  function cancelSubscription(&$message = '', $params = array()) {
     $template = CRM_Core_Smarty::singleton();
 
     $template->assign('subscriptionType', 'cancel');
@@ -687,8 +695,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * @return bool|object
    */
-  function updateSubscriptionBillingInfo(&$message = '', $params = array(
-    )) {
+  function updateSubscriptionBillingInfo(&$message = '', $params = array()) {
     $template = CRM_Core_Smarty::singleton();
     $template->assign('subscriptionType', 'updateBilling');
 
@@ -747,8 +754,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * @return bool|object
    */
-  function changeSubscriptionAmount(&$message = '', $params = array(
-    )) {
+  function changeSubscriptionAmount(&$message = '', $params = array()) {
     $template = CRM_Core_Smarty::singleton();
 
     $template->assign('subscriptionType', 'update');
@@ -757,7 +763,11 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $template->assign('paymentKey', $this->_getParam('paymentKey'));
 
     $template->assign('subscriptionId', $params['subscriptionId']);
-    $template->assign('totalOccurrences', $params['installments']);
+
+    // for open ended subscription totalOccurrences has to be 9999
+    $installments = empty($params['installments']) ? 9999 : $params['installments'];
+    $template->assign('totalOccurrences', $installments);
+
     $template->assign('amount', $params['amount']);
 
     $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');

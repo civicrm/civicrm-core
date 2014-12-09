@@ -146,7 +146,7 @@ class CRM_Custom_Form_CustomData {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    */

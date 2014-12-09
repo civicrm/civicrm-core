@@ -76,11 +76,7 @@ function civicrm_api3_custom_group_create($params) {
     $params['extends_entity_column_value'] = CRM_Utils_Array::explodePadded($params['extends_entity_column_value']);
   }
 
-
-  $customGroup = CRM_Core_BAO_CustomGroup::create($params);
-
-  _civicrm_api3_object_to_array($customGroup, $values[$customGroup->id]);
-  return civicrm_api3_create_success($values, $params, 'custom_group', $customGroup);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**

@@ -104,7 +104,7 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
   }
 
   /**
-   * @param $name
+   * @param string $name
    */
   function _tryPaymentProcessor($name) {
     // load contribution page

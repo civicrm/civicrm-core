@@ -75,7 +75,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string $mode the mode of operation: live or test
    *
@@ -95,7 +95,17 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * express checkout code. Check PayPal documentation for more information
+   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * @return bool
+   */
+  protected function supportsBackOffice() {
+    if ($this->_processorName == ts('PayPal Pro')) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+  /**
+   * Express checkout code. Check PayPal documentation for more information
    *
    * @param  array $params assoc array of input parameters for this transaction
    *
@@ -110,6 +120,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['paymentAction'] = $params['payment_action'];
     $args['amt'] = $params['amount'];
     $args['currencyCode'] = $params['currencyID'];
+    $args['desc'] = $params['description'];
     $args['invnum'] = $params['invoiceID'];
     $args['returnURL'] = $params['returnURL'];
     $args['cancelURL'] = $params['cancelURL'];
@@ -138,7 +149,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * get details from paypal. Check PayPal documentation for more information
+   * Get details from paypal. Check PayPal documentation for more information
    *
    * @param  string $token the key associated with this transaction
    *
@@ -179,9 +190,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * do the express checkout at paypal. Check PayPal documentation for more information
+   * Do the express checkout at paypal. Check PayPal documentation for more information
    *
-   * @param $params
+   * @param array $params
    *
    * @internal param string $token the key associated with this transaction
    *
@@ -201,6 +212,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['invnum'] = $params['invoiceID'];
     $args['returnURL'] = $params['returnURL'];
     $args['cancelURL'] = $params['cancelURL'];
+    $args['desc'] = $params['description'];
 
     $result = $this->invokeAPI($args);
 
@@ -225,7 +237,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
   //LCD add new function for handling recurring payments for PayPal Express
   /**
-   * @param $params
+   * @param array $params
    *
    * @return mixed
    */
@@ -425,7 +437,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Function to check whether a method is present ( & supported ) by the payment processor object.
+   * Check whether a method is present ( & supported ) by the payment processor object.
    *
    * @param  string $method method to check for.
    *
@@ -447,8 +459,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *
    * @return array|bool|object
    */
-  function cancelSubscription(&$message = '', $params = array(
-    )) {
+  function cancelSubscription(&$message = '', $params = array()) {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
       $args = array();
       $this->initialize($args, 'ManageRecurringPaymentsProfileStatus');
@@ -473,8 +484,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *
    * @return array|bool|object
    */
-  function updateSubscriptionBillingInfo(&$message = '', $params = array(
-    )) {
+  function updateSubscriptionBillingInfo(&$message = '', $params = array()) {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
       $config = CRM_Core_Config::singleton();
       $args = array();
@@ -535,7 +545,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param string $component
    *
    * @throws Exception
@@ -706,7 +716,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * hash_call: Function to perform the API call to PayPal using API signature
+   * Hash_call: Function to perform the API call to PayPal using API signature
    * @methodName is name of API  method.
    * @nvpStr is nvp string.
    * returns an associtive array containing the response from the server.

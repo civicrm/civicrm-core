@@ -42,7 +42,7 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
   public $permissions = NULL;
 
   /**
-   * given a permission string, check for access requirements
+   * Given a permission string, check for access requirements
    *
    * @param string $str the permission to check
    *

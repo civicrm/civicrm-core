@@ -43,14 +43,14 @@
  * {@getfields address_create}
  * {@example AddressCreate.php}
  *
- * @param $params
+ * @param array $params
  *
  * @return array of newly created tag property values.
  * @access public
  */
 function civicrm_api3_address_create(&$params) {
   /**
-   * if street_parsing, street_address has to be parsed into
+   * If street_parsing, street_address has to be parsed into
    * separate parts
    */
   if (array_key_exists('street_parsing', $params)) {
@@ -78,9 +78,9 @@ function civicrm_api3_address_create(&$params) {
   }
 
   /**
-    * create array for BAO (expects address params in as an
-    * element in array 'address'
-    */
+   * Create array for BAO (expects address params in as an
+   * element in array 'address'
+   */
   $addressBAO = CRM_Core_BAO_Address::add($params, TRUE);
   if (empty($addressBAO)) {
     return civicrm_api3_create_error("Address is not created or updated ");
@@ -105,6 +105,7 @@ function _civicrm_api3_address_create_spec(&$params) {
   $params['world_region'] = array(
     'title' => ts('World Region'),
     'name' => 'world_region',
+    'type' => CRM_Utils_Type::T_TEXT,
   );
 }
 /**
@@ -116,6 +117,7 @@ function _civicrm_api3_address_get_spec(&$params) {
   $params['world_region'] = array(
     'title' => ts('World Region'),
     'name' => 'world_region',
+    'type' => CRM_Utils_Type::T_TEXT,
   );
 }
 

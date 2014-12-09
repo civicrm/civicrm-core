@@ -50,7 +50,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Price_DAO_LineItem object
+   * @return CRM_Price_DAO_LineItem object
    * @access public
    * @static
    */
@@ -93,7 +93,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Price_BAO_LineItem object
+   * @return CRM_Price_BAO_LineItem object
    * @access public
    * @static
    */
@@ -108,7 +108,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   }
 
   /**
-   * @param $entityId
+   * @param int $entityId
    * @param $entityTable
    *
    * @return null|string
@@ -124,6 +124,16 @@ AND li.entity_id = {$entityId}
   }
 
   /**
+   * Wrapper for line item retrieval when contribution ID is known
+   * @param int $contributionID
+   *
+   * @return array
+   */
+  static function getLineItemsByContributionID($contributionID) {
+     return self::getLineItems($contributionID,'contribution', NULL, TRUE, TRUE, " WHERE contribution_id = " . (int) $contributionID);
+  }
+
+  /**
    * Given a participant id/contribution id,
    * return contribution/fee line items
    *
@@ -134,10 +144,14 @@ AND li.entity_id = {$entityId}
    * @param bool $isQtyZero
    * @param bool $relatedEntity
    *
+   * @param string $overrideWhereClause e.g "WHERE contribution id = 7 " per the getLineItemsByContributionID wrapper.
+   * this function precedes the convenience of the contribution id but since it does quite a bit more than just a db retrieval we need to be able to use it even
+   * when we don't want it's entity-id magix
+   *
    * @return array of line items
    */
-  static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL , $isQtyZero = TRUE, $relatedEntity = FALSE) {
-    $selectClause = $whereClause = $fromClause = NULL;
+  static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL , $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
+    $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
       li.label,
@@ -145,6 +159,8 @@ AND li.entity_id = {$entityId}
       li.qty,
       li.unit_price,
       li.line_total,
+      li.entity_table,
+      li.entity_id,
       pf.label as field_title,
       pf.html_type,
       pfv.membership_type_id,
@@ -194,6 +210,10 @@ AND li.entity_id = {$entityId}
     $getTaxDetails = FALSE;
     $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    if ($overrideWhereClause) {
+      $whereClause = $overrideWhereClause;
+    }
+
     $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause $orderByClause", $params);
     while ($dao->fetch()) {
       if (!$dao->id) {
@@ -210,7 +230,10 @@ AND li.entity_id = {$entityId}
         'field_title' => $dao->field_title,
         'html_type' => $dao->html_type,
         'description' => $dao->description,
-        'entity_id' => $entityId,
+        // the entity id seems prone to randomness but not sure if it has a reason - so if we are overriding the Where clause we assume
+        // we also JUST WANT TO KNOW the the entity_id in the DB
+        'entity_id' => empty($overrideWhereClause) ? $entityId : $dao->entity_id,
+        'entity_table' => $dao->entity_table,
         'contribution_id' => $dao->contribution_id,
         'financial_type_id' => $dao->financial_type_id,
         'membership_type_id' => $dao->membership_type_id,
@@ -327,17 +350,15 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * Function to process price set and line items.
+   * Process price set and line items.
    *
-   * @param $entityId
+   * @param int $entityId
    * @param array $lineItem line item array
    * @param object $contributionDetails
    * @param string $entityTable entity table
    *
    * @param bool $update
    *
-   * @internal param int $contributionId contribution id
-   * @internal param \decimal $initAmount amount
    * @access public
    * @return void
    * @static
@@ -356,7 +377,9 @@ AND li.entity_id = {$entityId}
 
       foreach ($values as $line) {
         $line['entity_table'] = $entityTable;
-        $line['entity_id'] = $entityId;
+        if (empty($line['entity_id'])) {
+          $line['entity_id'] = $entityId;
+        }
         if(!empty($line['membership_type_id'])) {
           $line['entity_table'] = 'civicrm_membership';
         }
@@ -384,10 +407,10 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * @param $entityId
+   * @param int $entityId
    * @param string $entityTable
    * @param $amount
-   * @param null $otherParams
+   * @param array $otherParams
    */
   public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
     if (!$entityId || CRM_Utils_System::isNull($amount))
@@ -438,7 +461,7 @@ AND li.entity_id = {$entityId}
   }
 
    /**
-   * Function to build line items array.
+   * Build line items array.
    * @param array $params form values
    *
    * @param string $entityId entity id

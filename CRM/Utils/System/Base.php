@@ -5,7 +5,7 @@
  */
 abstract class CRM_Utils_System_Base {
   /**
-   * deprecated property to check if this is a drupal install. The correct method is to have functions on the UF classes for all UF specific
+   * Deprecated property to check if this is a drupal install. The correct method is to have functions on the UF classes for all UF specific
    * functions and leave the codebase oblivious to the type of CMS
    * @deprecated
    * @var bool
@@ -13,7 +13,7 @@ abstract class CRM_Utils_System_Base {
   var $is_drupal = FALSE;
 
   /**
-   * deprecated property to check if this is a joomla install. The correct method is to have functions on the UF classes for all UF specific
+   * Deprecated property to check if this is a joomla install. The correct method is to have functions on the UF classes for all UF specific
    * functions and leave the codebase oblivious to the type of CMS
    * @deprecated
    * @var bool
@@ -41,7 +41,7 @@ abstract class CRM_Utils_System_Base {
   var $supports_form_extensions = FALSE;
 
   /**
-   * if we are using a theming system, invoke theme, else just print the
+   * If we are using a theming system, invoke theme, else just print the
    * content
    *
    * @param string  $content the content that will be themed
@@ -151,7 +151,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Determine the native ID of the CMS user
    *
-   * @param $username
+   * @param string $username
    *
    * @throws CRM_Core_Exception
    * @return int|NULL
@@ -297,7 +297,7 @@ abstract class CRM_Utils_System_Base {
   function getLoggedInUniqueIdentifier() {}
 
   /**
-   * return a UFID (user account ID from the UserFramework / CMS system being based on the user object
+   * Return a UFID (user account ID from the UserFramework / CMS system being based on the user object
    * passed, defaulting to the logged in user if not passed. Note that ambiguous situation occurs
    * in CRM_Core_BAO_UFMatch::synchronize - a cleaner approach would seem to be resolving the user id before calling
    * the function
@@ -315,7 +315,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * return a unique identifier (usually an email address or username) from the UserFramework / CMS system being based on the user object
+   * Return a unique identifier (usually an email address or username) from the UserFramework / CMS system being based on the user object
    * passed, defaulting to the logged in user if not passed. Note that ambiguous situation occurs
    * in CRM_Core_BAO_UFMatch::synchronize - a cleaner approach would seem to be resolving the unique identifier before calling
    * the function
@@ -348,7 +348,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * output code from error function
+   * Output code from error function
    * @param string $content
    */
   function outputError($content) {

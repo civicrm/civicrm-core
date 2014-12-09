@@ -41,7 +41,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   public $_action;
 
   /**
-   * the id of the pledge that we are proceessing
+   * The id of the pledge that we are proceessing
    *
    * @var int
    * @public
@@ -49,7 +49,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   public $_id;
 
   /**
-   * the id of the contact associated with this pledge
+   * The id of the contact associated with this pledge
    *
    * @var int
    * @public
@@ -69,13 +69,13 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   public $_freqUnits;
 
   /**
-   * is current pledge pending.
+   * Is current pledge pending.
    * @public
    */
   public $_isPending = FALSE;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -90,7 +90,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     // check for action permissions.
     if (!CRM_Core_Permission::checkActionPermission('CiviPledge', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
     $this->assign('action', $this->_action);
@@ -132,7 +132,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -219,7 +219,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -446,13 +446,12 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
    * @param $self
    *
-   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -482,7 +481,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

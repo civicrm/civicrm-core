@@ -44,7 +44,7 @@ class CRM_Contact_Form_Edit_Organization {
    * This function provides the HTML form elements that are specific
    * to the Organization Contact Type
    *
-   * @param object $form form object
+   * @param CRM_Core_Form $form form object
    * @param int $inlineEditMode ( 1 for contact summary
    * top bar form and 2 for display name edit )
    *
@@ -89,7 +89,7 @@ class CRM_Contact_Form_Edit_Organization {
   /**
    * @param $fields
    * @param $files
-   * @param null $contactID
+   * @param int $contactID
    *
    * @return array|bool
    */

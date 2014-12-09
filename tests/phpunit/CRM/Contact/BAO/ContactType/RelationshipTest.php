@@ -100,7 +100,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * methods create relationshipType with valid data
+   * Methods create relationshipType with valid data
    * success expected
    *
    */
@@ -161,7 +161,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * methods create relationshipe within same contact type with invalid Relationships
+   * Methods create relationshipe within same contact type with invalid Relationships
    *
    */
   function testRelationshipCreateInvalidWithinSameType() {
@@ -189,7 +189,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * methods create relationshipe within diff contact type with invalid Relationships
+   * Methods create relationshipe within diff contact type with invalid Relationships
    *
    */
   function testRelCreateInvalidWithinDiffTypeSpocorIndivi() {
@@ -242,7 +242,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * methods create relationshipe within same contact type with valid data
+   * Methods create relationshipe within same contact type with valid data
    * success expected
    *
    */
@@ -271,7 +271,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * methods create relationshipe within different contact type with valid data
+   * Methods create relationshipe within different contact type with valid data
    * success expected
    *
    */

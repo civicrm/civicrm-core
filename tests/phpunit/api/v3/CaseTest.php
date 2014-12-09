@@ -71,14 +71,14 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testCaseCreateEmpty() {
     $result = $this->callAPIFailure('case', 'create', array());
   }
 
   /**
-   * check if required fields are not passed
+   * Check if required fields are not passed
    */
   function testCaseCreateWithoutRequired() {
     $params = array(

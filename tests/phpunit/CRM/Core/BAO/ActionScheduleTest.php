@@ -103,6 +103,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->fixtures['sched_activity_1day'] = array( // create()
       'name' => 'One_Day_Phone_Call_Notice',
       'title' => 'One Day Phone Call Notice',
+      'limit_to' => '1',
       'absolute_date' => NULL,
       'body_html' => '<p>1-Day (non-repeating)</p>',
       'body_text' => '1-Day (non-repeating)',
@@ -132,6 +133,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->fixtures['sched_activity_1day_r'] = array(
       'name' => 'One_Day_Phone_Call_Notice_R',
       'title' => 'One Day Phone Call Notice R',
+      'limit_to' => 1,
       'absolute_date' => NULL,
       'body_html' => '<p>1-Day (repeating)</p>',
       'body_text' => '1-Day (repeating)',
@@ -896,7 +898,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $objects array(object) DAO or BAO objects
+   * @param $objects array DAO or BAO objects
    */
   function registerTestObjects($objects) {
     //if (is_object($objects)) {

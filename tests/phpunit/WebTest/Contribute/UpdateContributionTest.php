@@ -166,7 +166,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    //click through to the Contribution edit screen
    $contId = $this->urlArg('id', $this->getAttribute("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']@href"));
    $this->clickAjaxLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", "product_name_0");
-   
+
    $this->select('product_name_0', "label=$premiumName2 ( $sku2 )");
    // Clicking save.
    $this->clickAjaxLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[7][text()='$premiumName2']");
@@ -366,7 +366,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
   /**
-   * @param $entityId
+   * @param int $entityId
    * @param null $from
    * @param null $to
    * @param null $cost
@@ -400,7 +400,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
   /**
-   * @param $contId
+   * @param int $contId
    *
    * @return null|string
    */function _getFinancialTrxnAmount($contId) {
@@ -415,7 +415,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
   /**
-   * @param $contId
+   * @param int $contId
    *
    * @return null|string
    */function _getFinancialItemAmount($contId) {
@@ -430,7 +430,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
   /**
-   * @param $contId
+   * @param int $contId
    *
    * @return null|string
    */function _getTotalContributedAmount($contId) {

@@ -119,7 +119,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * test permissions limited by hook
+   * Test permissions limited by hook
    */
   function testContactGetHookLimitingHook() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlySecond'));
@@ -132,7 +132,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * confirm that without check permissions we still get 2 contacts returned
+   * Confirm that without check permissions we still get 2 contacts returned
    */
   function testContactGetHookLimitingHookDontCheck() {
     //
@@ -330,13 +330,13 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * no results returned
+   * No results returned
    */
   function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
   }
 
   /**
-   * all results returned
+   * All results returned
    * @implements CRM_Utils_Hook::aclWhereClause
    */
   function aclWhereHookAllResults($type, &$tables, &$whereTables, &$contactID, &$where) {
@@ -344,7 +344,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * full results returned
+   * Full results returned
    * @implements CRM_Utils_Hook::aclWhereClause
    */
   function aclWhereOnlySecond($type, &$tables, &$whereTables, &$contactID, &$where) {

@@ -55,7 +55,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   protected function tearDown() {}
 
   /**
-   * test case for add( )
+   * Test case for add( )
    */
   function testAdd() {
 
@@ -71,7 +71,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for getGroupId( )
+   * Test case for getGroupId( )
    */
   function testGetGroupId() {
 

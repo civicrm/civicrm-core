@@ -113,7 +113,7 @@ $('#civicrm-menu').ready(function() {
       },
       focus: function (event, ui){
         return false;
-      }, 
+      },
       select: function (event, ui) {
         document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
         return false;
@@ -126,18 +126,22 @@ $('#civicrm-menu').ready(function() {
     .keydown(function() {
       $.Menu.closeAll();
     });
-  $('.crm-hidemenu').click(function() {
+  $('.crm-hidemenu').click(function(e) {
     $.Menu.closeAll();
     $('#civicrm-menu').slideUp();
     if ($('#crm-notification-container').length) {
-      var alert = CRM.alert({/literal}'<a href="#" id="crm-restore-menu">{ts escape='js'}Restore Menu{/ts}</a>', "{ts escape='js'}CiviCRM Menu Hidden{/ts}"{literal});
-      $('#crm-restore-menu').button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function(e) {
-        e.preventDefault();
-        alert.close();
-        $('#civicrm-menu').slideDown();
-      });
+      var alert = CRM.alert({/literal}'<a href="#" id="crm-restore-menu" style="text-align: center; margin-top: -8px;">{ts escape='js'}Restore CiviCRM Menu{/ts}</a>'{literal}, '', 'none', {expires: 10000});
+      $('#crm-restore-menu')
+        .button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}})
+        .click(function(e) {
+          e.preventDefault();
+          alert.close();
+          $('#civicrm-menu').slideDown();
+        })
+        .parent().css('text-align', 'center').find('.ui-button-text').css({'padding-top': '4px', 'padding-bottom': '4px'})
+      ;
     }
-    return false;
+    e.preventDefault();
   });
   $('.crm-quickSearchField').click(function() {
     var label = $(this).text();

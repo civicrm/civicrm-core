@@ -49,7 +49,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   static $_links = NULL;
 
   /**
-   * we use desc to remind us what that column is, name is used in the tpl
+   * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    * @static
@@ -82,7 +82,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   );
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -90,7 +90,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -98,7 +98,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   protected $_limit = NULL;
 
   /**
-   * what context are we being invoked from
+   * What context are we being invoked from
    *
    * @access protected
    * @var string
@@ -106,7 +106,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   protected $_context = NULL;
 
   /**
-   * what component context are we being invoked from
+   * What component context are we being invoked from
    *
    * @access protected
    * @var string
@@ -114,7 +114,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   protected $_compContext = NULL;
 
   /**
-   * queryParams is the array returned by exportValues called on
+   * QueryParams is the array returned by exportValues called on
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
@@ -123,7 +123,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   public $_queryParams;
 
   /**
-   * represent the type of selector
+   * Represent the type of selector
    *
    * @var int
    * @access protected
@@ -188,17 +188,14 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     );
     $this->_query->_distinctComponentClause = '( civicrm_activity.id )';
     $this->_query->_groupByComponentClause = " GROUP BY civicrm_activity.id ";
-    //CRM_Core_Error::debug( $this->_query ); exit();
   }
-  //end of constructor
 
   /**
-   * getter for array of the parameters required for creating pager.
+   * Getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param $params
+   * @param array $params
    *
-   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -208,7 +205,6 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * Returns total number of rows for the query.
@@ -228,7 +224,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   }
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount
    *
    * @param enum   $action   the action being performed
    * @param int    $offset   the row number to start from
@@ -344,6 +340,17 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         );
       }
 
+      //Check if recurring activity
+      $isRecurringActivity = CRM_Core_BAO_RecurringEntity::getParentFor($row['activity_id'], 'civicrm_activity');
+      $row['repeat'] = '';
+      if ($isRecurringActivity) {
+        if ($row['activity_id'] == $isRecurringActivity) {
+          $row['repeat'] = 'Recurring Activity - (Parent)';
+        }
+        else {
+          $row['repeat'] = 'Recurring Activity - (Child)';
+        }
+      }
       $rows[] = $row;
     }
 
@@ -351,7 +358,6 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   }
 
   /**
-   *
    * @return array  $qill  which contains an array of strings
    * @access public
    */
@@ -360,7 +366,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   }
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
    * @param string $action the action being performed
@@ -422,7 +428,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   }
 
   /**
-   * name of export file.
+   * Name of export file.
    *
    * @param string $output type of output
    *
@@ -432,5 +438,3 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     return ts('CiviCRM Activity Search');
   }
 }
-//end of class
-

@@ -25,7 +25,7 @@
 *}
 {if $validCiviContribute}
     <div id="contributeForm" class="crm-contribution-search-advanced_search-form-block">
-    <table class="form-layout"> 
+    <table class="form-layout">
        {include file="CRM/Contribute/Form/Search/Common.tpl"}
     </table>
     </div>

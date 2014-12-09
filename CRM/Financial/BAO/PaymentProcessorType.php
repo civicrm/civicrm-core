@@ -35,28 +35,24 @@
 class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentProcessorType {
 
   /**
-   * static holder for the default payment processor
+   * Static holder for the default payment processor
    */
   static $_defaultPaymentProcessorType = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_BAO_LocaationType object on success, null otherwise
+   * @return CRM_Core_BAO_LocaationType object on success, null otherwise
    * @access public
    * @static
    */
@@ -71,7 +67,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -86,7 +82,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * retrieve the default payment processor
+   * Retrieve the default payment processor
    *
    * @param NULL
    *
@@ -105,14 +101,12 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * Function to add the payment-processor type in the db
+   * Add the payment-processor type in the db
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @throws Exception
-   * @internal param array $ids the array that holds all the db ids
-   *
-   * @return object CRM_Financial_DAO_PaymentProcessorType
+   * @return CRM_Financial_DAO_PaymentProcessorType
    * @access public
    * @static
    */
@@ -176,7 +170,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * Function to delete payment processor
+   * Delete payment processor
    *
    * @param  int $paymentProcessorTypeId ID of the processor to be deleted.
    *
