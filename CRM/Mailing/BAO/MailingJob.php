@@ -589,6 +589,15 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $returnProperties = $mailing->getReturnProperties();
     $params           = $targetParams = $deliveredParams = array();
     $count            = 0;
+    
+    /**
+     * CRM-15702: Sending bulk sms to contacts without e-mail addres fails.
+     * Solution is to skip checking for on hold
+     */
+    $skipOnHold = true; //do include a statement to check wether e-mail address is on hold
+    if ($mailing->sms_provider_id) {
+      $skipOnHold = false; //do not include a statement to check wether e-mail address is on hold
+    }
 
     foreach ($fields as $key => $field) {
       $params[] = $field['contact_id'];
@@ -597,7 +606,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $details = CRM_Utils_Token::getTokenDetails(
       $params,
       $returnProperties,
-      TRUE, TRUE, NULL,
+      $skipOnHold, TRUE, NULL,
       $mailing->getFlattenedTokens(),
       get_class($this),
       $this->id
