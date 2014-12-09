@@ -384,6 +384,25 @@
       }
     })
 
+    // like ng-show, but hides/displays elements using "visibility" which maintains positioning
+    // example <div crm-ui-visible="false">...content...</div>
+    .directive('crmUiVisible', function($parse) {
+      return {
+        restrict: 'EA',
+        scope: {
+          crmUiVisible: '@'
+        },
+        link: function (scope, element, attrs) {
+          var model = $parse(attrs.crmUiVisible);
+          function updatecChildren() {
+            element.css('visibility', model(scope.$parent) ? 'inherit' : 'hidden');
+          }
+          updatecChildren();
+          scope.$parent.$watch(attrs.crmUiVisible, updatecChildren);
+        }
+      };
+    })
+
     // example: <div crm-ui-wizard="myWizardCtrl"><div crm-ui-wizard-step crm-title="ts('Step 1')">...</div><div crm-ui-wizard-step crm-title="ts('Step 2')">...</div></div>
     // Note: "myWizardCtrl" has various actions/properties like next() and $first().
     // WISHLIST: Allow each step to determine if it is "complete" / "valid" / "selectable"
