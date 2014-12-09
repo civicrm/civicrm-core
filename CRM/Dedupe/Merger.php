@@ -1576,6 +1576,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       unset($submitted);
     }
 
+    CRM_Utils_Hook::post('merge', 'Contact', $mainId, CRM_Core_DAO::$_nullObject);
+
     return TRUE;
   }
 
