@@ -3,7 +3,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/crmMailing2/' + relPath;
   };
 
-  var crmMailing2 = angular.module('crmMailing2', ['crmUtil', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService']); // TODO ngSanitize, unsavedChanges
+  var crmMailing2 = angular.module('crmMailing2', ['crmUtil', 'crmAttachment', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService']); // TODO ngSanitize, unsavedChanges
 
   // Time to wait before triggering AJAX update to recipients list
   var RECIPIENTS_DEBOUNCE_MS = 100;
@@ -55,8 +55,11 @@
     });
   });
 
-  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmFromAddresses, crmStatus) {
+  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmFromAddresses, crmStatus, CrmAttachments) {
     $scope.mailing = selectedMail;
+    $scope.attachments = new CrmAttachments(function() {
+      return {entity_table: 'civicrm_mailing', entity_id: $scope.mailing.id};
+    });
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.crmFromAddresses = crmFromAddresses;
 
@@ -65,14 +68,25 @@
 
     // @return Promise
     $scope.submit = function submit() {
-      return crmStatus({start: ts('Submitting...'), success: ts('Submitted')},
-        crmMailingMgr.submit($scope.mailing)
-      );
+      var promise = crmMailingMgr.save($scope.mailing)
+        .then(function () {
+          // pre-condition: the mailing exists *before* saving attachments to it
+          return $scope.attachments.save();
+        })
+        .then(function () {
+          return crmMailingMgr.submit($scope.mailing);
+        });
+      return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, promise);
     };
     // @return Promise
     $scope.save = function save() {
       return crmStatus(null,
-        crmMailingMgr.save($scope.mailing)
+        crmMailingMgr
+          .save($scope.mailing)
+          .then(function () {
+            // pre-condition: the mailing exists *before* saving attachments to it
+            return $scope.attachments.save();
+          })
       );
     };
     // @return Promise
@@ -204,7 +218,8 @@
   // Controller for the "Preview Mailing" segment
   // Note: Expects $scope.model to be an object with properties:
   //   - mailing: object
-  crmMailing2.controller('PreviewMailingCtrl', function ($scope, dialogService, crmMailingMgr) {
+  //   - attachments: object
+  crmMailing2.controller('PreviewMailingCtrl', function ($scope, dialogService, crmMailingMgr, crmStatus) {
     var ts = $scope.ts = CRM.ts('CiviMail');
 
     $scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
@@ -237,22 +252,27 @@
         CRM.status({start: ts('Previewing'), success: ''}, CRM.toJqPromise(p));
     };
     $scope.sendTestToContact = function sendTestToContact() {
-      $scope.sendTest($scope.mailing, $scope.testContact.email, null);
+      $scope.sendTest($scope.mailing, $scope.attachments, $scope.testContact.email, null);
     };
     $scope.sendTestToGroup = function sendTestToGroup() {
-      $scope.sendTest($scope.mailing, null, $scope.testGroup.gid);
+      $scope.sendTest($scope.mailing, $scope.attachments, null, $scope.testGroup.gid);
     };
-    $scope.sendTest = function sendTest(mailing, testEmail, testGroup) {
-      var promise = crmMailingMgr.sendTest(mailing, testEmail, testGroup).then(function(deliveryInfos){
-        var count = Object.keys(deliveryInfos).length;
-        if (count === 0) {
-          CRM.alert(ts('Could not identify any recipients. Perhaps the group is empty?'));
-        }
-      });
-      CRM.status({
-        start: ts('Sending...'),
-        success: ts('Sent')
-      }, CRM.toJqPromise(promise));
+    $scope.sendTest = function sendTest(mailing, attachments, testEmail, testGroup) {
+      var promise = crmMailingMgr.save(mailing)
+          .then(function () {
+            return attachments.save();
+          })
+          .then(function () {
+            return crmMailingMgr.sendTest(mailing, testEmail, testGroup);
+          })
+          .then(function (deliveryInfos) {
+            var count = Object.keys(deliveryInfos).length;
+            if (count === 0) {
+              CRM.alert(ts('Could not identify any recipients. Perhaps the group is empty?'));
+            }
+          })
+        ;
+      return crmStatus({start: ts('Sending...'), success: ts('Sent')}, promise);
     };
   });
 
