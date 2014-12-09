@@ -1461,7 +1461,10 @@ abstract class CRM_Utils_Hook {
    * @param CRM_Core_Exception Exception $exception
    */
   static function unhandledException($exception) {
-    self::singleton()->invoke(1, $exception, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_unhandled_exception');
+    self::singleton()->invoke(1, $exception, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,'civicrm_unhandled_exception');
+    // == 4.5+ ==
+   $event = new \Civi\Core\Event\UnhandledExceptionEvent(self::$_nullObject, $exception);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("unhandled_exception", $event);
   }
 
   /**
