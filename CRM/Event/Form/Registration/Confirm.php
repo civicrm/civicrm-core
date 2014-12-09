@@ -765,6 +765,59 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // do a transfer only if a monetary payment greater than 0
       if ($this->_values['event']['is_monetary'] && $primaryParticipant) {
         if ($payment && is_object($payment)) {
+          //CRM 14512 provide line items of all participants to payment gateway
+          $primaryContactId = $this->get('primaryContactId');
+
+          //build an array of cId/pId of participants
+          $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID, NULL, $primaryContactId, $isTest, TRUE);
+
+          //need to copy, since we are unsetting on the way.
+          $copyParticipantCountLines = $participantCount;
+
+          //lets carry all participant params w/ values.
+          foreach ($additionalIDs as $participantID => $contactId) {
+            $participantNum = NULL;
+            $participantNum = $participantID;
+            if ($participantID == $registerByID) {
+              $participantNum = 0;  // is primary particpant
+            }
+            else {
+              if ($participantNum = array_search('participant', $copyParticipantCountLines)) {
+                //if no participant found break.
+                if ($participantNum === NULL) {
+                  break;
+                }
+                //unset current particpant so we don't check them again
+                unset($copyParticipantCountLines[$participantNum]);
+              }
+            }
+            // get values of line items
+            if ($this->_amount) {
+              $amount = array();
+              $amount[$participantNum]['label'] = preg_replace('//', '', $params[$participantNum]['amount_level']);
+              $amount[$participantNum]['amount'] = $params[$participantNum]['amount'];
+              $params[$participantNum]['amounts'] = $amount;
+            }
+
+            if (!empty($this->_lineItem)) {
+              $lineItems  = $this->_lineItem;
+              $lineItem   = array();
+              if ($lineItemValue = CRM_Utils_Array::value($participantNum, $lineItems)) {
+                $lineItem[] = $lineItemValue;
+              }
+              $params[$participantNum]['lineItem'] = $lineItem;
+            }
+
+            //only add additional particpants and not the primary particpant as we already have that
+            //added to $primaryParticipant so that this change doesn't break or require changes to
+            //existing gateway implementations
+            $primaryParticipant['participants_info'][$participantID] = $params[$participantNum];
+          }
+
+          //get event custom field information
+          $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', $this, $this->_eventId, 0, $this->_values['event']['event_type_id']);
+          $primaryParticipant['eventCustomFields'] = $groupTree;
+
           // call postprocess hook before leaving
           $this->postProcessHook();
           // this does not return
