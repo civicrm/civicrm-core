@@ -600,9 +600,11 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       }
       if (array_key_exists('civicrm_case_subject', $row)) {
         if ($value = $row['civicrm_case_subject']) {
-          $caseId = $row['civicrm_case_id'];
-          $contactId = $row['civicrm_contact_id'];
-          $rows[$rowNum]['civicrm_case_subject'] = "<a href= 'javascript:viewCase( $caseId,$contactId );'>$value</a>";
+          $url = CRM_Utils_System::url("civicrm/case/ajax/details",
+            "caseId={$row['civicrm_case_id']}&contactId={$row['civicrm_contact_id']}",
+            $this->_absoluteUrl
+          );
+          $rows[$rowNum]['civicrm_case_subject'] = "<a class=\"crm-popup\" href=\"$url\">$value</a>";
           $rows[$rowNum]['civicrm_case_subject_hover'] = ts('View Details of Case.');
 
           $entryFound = TRUE;
