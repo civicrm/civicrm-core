@@ -52,8 +52,11 @@
     <div class="crm-grid-header">
       <div class="crm-grid-cell">&nbsp;</div>
       <div class="crm-grid-cell">{ts}Contact{/ts}</div>
-      {if $batchType eq 2 }
+      {if $batchType eq 2}
         <div class="crm-grid-cell">&nbsp;</div>
+      {/if}
+      {if $batchType eq 3}
+        <div class="crm-grid-cell">{$form.open_pledges.1.label}</div>
       {/if}
       {foreach from=$fields item=field key=fieldName}
         <div class="crm-grid-cell">
@@ -76,10 +79,12 @@
           {$form.primary_contact_id.$rowNumber.html|crmAddClass:big}
         </div>
 
-        {if $batchType eq 2 }
+        {if $batchType eq 2}
           {$form.member_option.$rowNumber.html}
         {/if}
-
+        {if $batchType eq 3}
+          {$form.open_pledges.$rowNumber.html}
+        {/if}
         {foreach from=$fields item=field key=fieldName}
           {assign var=n value=$field.name}
           {if ( $fields.$n.data_type eq 'Date') or ( in_array( $n, array( 'thankyou_date', 'cancel_date', 'receipt_date', 'receive_date', 'join_date', 'membership_start_date', 'membership_end_date' ) ) ) }
@@ -96,6 +101,12 @@
             <div class="compressed crm-grid-cell">{$form.soft_credit_type.$rowNumber.html}</div>
           {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}
             <div class="compressed crm-grid-cell">&nbsp;{$form.field.$rowNumber.$n.html}</div>
+          {elseif $n eq 'total_amount'}
+             {if $batchType eq 3 }
+	      <div class="compressed crm-grid-cell">{$form.field.$rowNumber.$n.html}
+		{ts}<span id={$rowNumber} class="pledge-adjust-option"><a href='#'>adjust payment amount</a></span>{/ts}
+             <span id="adjust-select-{$rowNumber}" class="adjust-selectbox">{$form.option_type.$rowNumber.html}</span></div>
+             {/if}
           {else}
             <div class="compressed crm-grid-cell">{$form.field.$rowNumber.$n.html}</div>
           {/if}
@@ -112,9 +123,23 @@ CRM.$(function($) {
   $('.selector-rows').change(function () {
     var options = {
       'url': {/literal}"{crmURL p='civicrm/ajax/batch' h=0}"{literal}
-    };
-
+    }; 
     $($form).ajaxSubmit(options);
+  });
+ 
+ cj('input[id*="primary_contact_"]').change(function() {
+ var temp = this.id.split('_');
+   var ROWID = temp[3];
+   if (cj(this).val()) {
+     updateContactInfo(ROWID,'primary_');
+   }
+ });
+
+ cj('select[id^="option_type_"]').each(function () {
+    if (cj(this).val() == 1) {
+      cj(this).attr('disabled', true);
+      cj(this).hide();
+    }
   });
 
   $('#crm-container').on('keyup change', '*.selector-rows', function () {
@@ -141,7 +166,7 @@ CRM.$(function($) {
     showHideReceipt($(this));
   });
 
-  {/literal}{else}{literal}
+  {/literal}{elseif $batchType eq 2}{literal}
   $('select[id^="member_option_"]').each(function () {
     if ($(this).val() == 1) {
       $(this).prop('disabled', true);
@@ -288,7 +313,7 @@ function formatMoney(amount) {
 }
 
 function updateContactInfo(blockNo, prefix) {
-  var contactHiddenElement = 'input[name="' + prefix + 'contact_select_id[' + blockNo + ']"]';
+  var contactHiddenElement = 'input[id="' + prefix + 'contact_id_' + blockNo + '"]';
   var contactId = cj(contactHiddenElement).val();
 
   var returnProperties = '';
@@ -350,6 +375,28 @@ function updateContactInfo(blockNo, prefix) {
               });
           }
         }
+        });
+      {/literal}{elseif $batchType eq 3}{literal}
+      cj('#open_pledges_'+blockNo).empty();
+         cj('#open_pledges_'+blockNo).append(cj('<option>', {
+			    value: '',
+			    text: '-select-'
+			}));
+	 CRM.api('Pledge', 'get', {
+	  'sequential': 1,
+	 'contact_id': contactId || 0
+	 },
+	{success: function(data) {
+	 cj.each(data['values'], function(key, value) {
+	  if (value['pledge_status'] != 'Completed') {
+	  var date = cj.datepicker.parseDate('yy-mm-dd', value['pledge_next_pay_date']);
+	    cj('#open_pledges_'+ blockNo).append(cj('<option>', {
+		value: value['pledge_id'],
+		text: cj.datepicker.formatDate('yy-mm-dd', date) + ", " + value['pledge_next_pay_amount'] + ' ' + value['pledge_currency']
+		}));
+	     }
+	   });
+	 }
         });
       {/literal}{/if}{literal}
     }
@@ -464,8 +511,35 @@ function setDateFieldValue(fname, fieldValue, blockNo) {
   }
 }
 
+if (CRM.batch.type_id == 3){
+  cj('select[id*="open_pledges_"]').change(function () {
+    setPledgeAmount(cj(this), cj(this).val());
+  });
+  cj('.pledge-adjust-option').click(function(){
+    var blockNo = cj(this).attr('id');
+    cj('select[id="option_type_' + blockNo + '"]').show();
+    cj('select[id="option_type_' + blockNo + '"]').removeAttr('disabled');
+    cj('#field_' + blockNo + '_total_amount').removeAttr('readonly');
+  });
+}
+
+function setPledgeAmount(form, pledgeID) {
+  var rowID = form.closest('div.crm-grid-row').attr('entity_id');
+  var dataUrl = CRM.url('civicrm/ajax/pledgeAmount');
+  if (pledgeID) { 
+    cj.post(dataUrl, {pid: pledgeID}, function (data) {
+    cj('#field_' + rowID + '_total_amount').val(data.amount).change();
+    cj('#field_' + rowID + '_total_amount').attr('readonly', true);
+    }, 'json');
+  }
+  else {
+    cj('#field_' + rowID + '_total_amount').val('').change();
+    cj('#field_' + rowID + '_total_amount').removeAttr('readonly');
+  }
+}
+
+//end for pledge amount
 </script>
 {/literal}
-
 {*include batch copy js js file*}
 {include file="CRM/common/batchCopy.tpl"}
