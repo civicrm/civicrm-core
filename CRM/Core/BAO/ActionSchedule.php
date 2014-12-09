@@ -539,7 +539,6 @@ AND   cas.entity_value = $id AND
 
         CRM_Activity_BAO_Activity::sendSMSMessage($contactId,
           $sms_text,
-          $html,
           $smsParams,
           $activity->id,
           $userID
@@ -884,7 +883,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         CRM_Core_BAO_ActionLog::create($logParams);
 
         // insert activity log record if needed
-        if ($actionSchedule->record_activity && $activityTypeID) {
+        if ($actionSchedule->record_activity && !$isError) {
           $activityParams = array(
             'subject' => $actionSchedule->title,
             'details' => $actionSchedule->body_html,
@@ -897,6 +896,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             'source_record_id' => $dao->entityID,
           );
           $activity = CRM_Activity_BAO_Activity::create($activityParams);
+          
           //file reminder on case if source activity is a case activity
           if (!empty($dao->case_id)) {
             $caseActivityParams = array();
@@ -904,7 +904,6 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             $caseActivityParams['activity_id'] = $activity->id;
             CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
           }
-          
         }
       }
 
