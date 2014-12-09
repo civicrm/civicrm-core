@@ -26,11 +26,6 @@
 {* Report form criteria section *}
     {if $colGroups}
   <div id="report-tab-col-groups" class="civireport-criteria">
-        {if $componentName eq 'Grant'}
-            <h3>{ts}Include these Statistics{/ts}</h3>
-        {else}
-            <h3>{ts}Display Columns{/ts}</h3>
-        {/if}
         {foreach from=$colGroups item=grpFields key=dnc}
             {assign  var="count" value="0"}
             {* Wrap custom field sets in collapsed accordion pane. *}
@@ -65,7 +60,6 @@
 
     {if $groupByElements}
         <div id="report-tab-group-by-elements" class="civireport-criteria">
-        <h3>{ts}Group by Columns{/ts}</h3>
         {assign  var="count" value="0"}
         <table class="report-layout">
             <tr class="crm-report crm-report-criteria-groupby">
@@ -91,8 +85,6 @@
 
     {if $orderByOptions}
       <div id="report-tab-order-by-elements" class="civireport-criteria">
-        <h3>{ts}Order by Columns{/ts}</h3>
-
   <table id="optionField">
         <tr>
         <th>&nbsp;</th>
@@ -162,7 +154,6 @@
 
     {if $otherOptions}
         <div id="report-tab-other-options" class="civireport-criteria">
-        <h3>{ts}Other Options{/ts}</h3>
         <table class="report-layout">
           {assign var="optionCount" value=0}
           <tr class="crm-report crm-report-criteria-field">
@@ -183,7 +174,6 @@
 
     {if $filters}
   <div id="report-tab-set-filters" class="civireport-criteria">
-        <h3>{ts}Set Filters{/ts}</h3>
         <table class="report-layout">
       {assign var="counter" value=1}
             {foreach from=$filters     item=table key=tableName}

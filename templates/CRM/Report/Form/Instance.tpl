@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 <div id="report-tab-settings" class="civireport-criteria">
-<h3>{ts}Display Settings{/ts}</h3>
 <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-title">
         <td class="report-label" width="20%">{$form.title.label} {help id="id-report_title" file="CRM/Report/Form/Settings.hlp"}</td>
@@ -64,7 +63,6 @@
 </div>
 
 <div id="report-tab-other" class="civireport-criteria">
-<h3>{ts}User Access{/ts}</h3>
 <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-is_navigation">
   <td class="report-label">{$form.is_navigation.label}</td>
