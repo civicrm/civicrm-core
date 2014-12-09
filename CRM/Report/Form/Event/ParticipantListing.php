@@ -410,12 +410,16 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
    */
   function getPriceLevels() {
     $query = "
-SELECT     DISTINCT cv.label, cv.id
-FROM      civicrm_price_field_value cv
-LEFT JOIN civicrm_price_field cf ON cv.price_field_id = cf.id
-LEFT JOIN civicrm_price_set_entity ce ON ce.price_set_id = cf.price_set_id
-WHERE     ce.entity_table = 'civicrm_event'
-GROUP BY  cv.label
+SELECT CONCAT(cv.label, ' (', ps.title, ')') label, cv.id
+FROM civicrm_price_field_value cv
+LEFT JOIN civicrm_price_field cf
+  ON cv.price_field_id = cf.id
+LEFT JOIN civicrm_price_set_entity ce
+  ON ce.price_set_id = cf.price_set_id
+LEFT JOIN civicrm_price_set ps
+  ON ce.price_set_id = ps.id
+WHERE ce.entity_table = 'civicrm_event'
+ORDER BY  cv.label
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
     $elements = array();
