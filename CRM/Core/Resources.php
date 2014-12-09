@@ -704,6 +704,12 @@ class CRM_Core_Resources {
 
     $filters['event'] = array(
       array('key' => 'event_type_id', 'value' => ts('Event Type')),
+      array('key' => 'start_date', 'value' => ts('Start Date'), 'options' => array(
+        array('key' => '{">":"now"}', 'value' => ts('Upcoming')),
+        array('key' => '{"BETWEEN":["now - 3 month","now"]}', 'value' => ts('Past 3 Months')),
+        array('key' => '{"BETWEEN":["now - 6 month","now"]}', 'value' => ts('Past 6 Months')),
+        array('key' => '{"BETWEEN":["now - 1 year","now"]}', 'value' => ts('Past Year')),
+      )),
     );
 
     $filters['activity'] = array(
