@@ -173,7 +173,7 @@ class CRM_Core_Transaction {
    * After calling run(), the CRM_Core_Transaction object is "used up"; do not
    * use it again.
    *
-   * @param type $callable Should exception one paramter (CRM_Core_Transaction $tx)
+   * @param mixed $callable Should exception one paramter (CRM_Core_Transaction $tx)
    * @return \CRM_Core_Exception this
    * @throws Exception
    */
