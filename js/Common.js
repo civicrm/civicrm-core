@@ -246,12 +246,12 @@ CRM.strings = CRM.strings || {};
     }
     _.each(options, function(option) {
       if (option.children) {
-        rendered += '<optgroup label="' + option.value + '">' +
+        rendered += '<optgroup label="' + _.escape(option.value) + '">' +
           CRM.utils.renderOptions(option.children, val, rendered) +
           '</optgroup>';
       } else {
         var selected = ($.inArray('' + option.key, val) > -1) ? 'selected="selected"' : '';
-        rendered += '<option value="' + option.key + '"' + selected + '>' + option.value + '</option>';
+        rendered += '<option value="' + _.escape(option.key) + '"' + selected + '>' + _.escape(option.value) + '</option>';
       }
     });
     return rendered;
@@ -419,14 +419,12 @@ CRM.strings = CRM.strings || {};
       else {
         selectParams.formatInputTooShort = function() {
           var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
-          txt += renderEntityRefFilters($el);
-          txt += renderEntityRefCreateLinks($el);
+          txt += renderEntityRefFilters($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
         selectParams.formatNoMatches = function() {
           var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
-          txt += renderEntityRefFilters($el);
-          txt += renderEntityRefCreateLinks($el);
+          txt += renderEntityRefFilters($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
         $el.on('select2-open.crmEntity', function() {
@@ -493,7 +491,8 @@ CRM.strings = CRM.strings || {};
         combined.params.contact_type = filter.value.split('.')[0];
         combined.params.contact_sub_type = filter.value.split('.')[1];
       } else {
-        combined.params[filter.key] = filter.value;
+        // Allow json-encoded api filters e.g. {"BETWEEN":[123,456]}
+        combined.params[filter.key] = filter.value.charAt(0) === '{' ? $.parseJSON(filter.value) : filter.value;
       }
     }
     return combined;
