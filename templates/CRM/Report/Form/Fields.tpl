@@ -93,7 +93,7 @@
 CRM.$(function($) {
   $("#mainTabContainer").tabs({
     collapsible: true,
-    active: {/literal}{if $rows}false{else}true{/if}{literal}
+    active: {/literal}{if $rows}false{else}0{/if}{literal}
   });
 });
 
