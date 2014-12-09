@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="report-tab-settings" class="civireport-criteria">
+<div id="report-tab-format" class="civireport-criteria">
 <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-title">
         <td class="report-label" width="20%">{$form.title.label} {help id="id-report_title" file="CRM/Report/Form/Settings.hlp"}</td>
@@ -62,7 +62,7 @@
 </table>
 </div>
 
-<div id="report-tab-other" class="civireport-criteria">
+<div id="report-tab-access" class="civireport-criteria">
 <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-is_navigation">
   <td class="report-label">{$form.is_navigation.label}</td>
