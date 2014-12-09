@@ -41,7 +41,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
   public $_context;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @param null
    *
@@ -52,7 +52,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       //check permission for action.
       if (!CRM_Core_Permission::checkActionPermission('CiviEvent', $this->_action)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
 
       $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -121,7 +121,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null
@@ -139,7 +139,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @param null
    *
@@ -190,12 +190,12 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *
    * @param $files
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array list of errors to be posted back to the form
    * @static

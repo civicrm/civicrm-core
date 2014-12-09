@@ -307,7 +307,7 @@ class CRM_Activity_Page_AJAX {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */
@@ -458,6 +458,18 @@ class CRM_Activity_Page_AJAX {
 
     // get the contact activities
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($params);
+
+    foreach ($activities as $key => $value) {
+      //Check if recurring activity
+      if (CRM_Utils_Array::value('is_recurring_activity', $value)) {
+        if ($key == $value['is_recurring_activity']) {
+          $activities[$key]['activity_type'] = $activities[$key]['activity_type'].'<br/><span class="bold">Recurring Activity - (Parent)</span>';
+        }
+        else {
+          $activities[$key]['activity_type'] = $activities[$key]['activity_type'].'<br/><span class="bold">Recurring Activity - (Child)</span>';
+        }
+      }
+    }
 
     // store the activity filter preference CRM-11761
     $session = CRM_Core_Session::singleton();

@@ -54,9 +54,6 @@ class CRM_Core_BAO_Block {
    * @param string $blockName name of the above object
    * @param array $params input parameters to find object
    *
-   * @internal param Object $block typically a Phone|Email|IM|OpenID object
-   * @internal param array $values output values of the object
-   *
    * @return array of $block objects.
    * @access public
    * @static
@@ -102,8 +99,6 @@ class CRM_Core_BAO_Block {
    * @param Object $block typically a Phone|Email|IM|OpenID object
    * @param string $blockName name of the above object
    *
-   * @internal param array $values output values of the object
-   *
    * @return array of $block objects.
    * @access public
    * @static
@@ -129,7 +124,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * check if the current block object has any valid data
+   * Check if the current block object has any valid data
    *
    * @param array  $blockFields   array of fields that are of interest for this object
    * @param array  $params        associated array of submitted fields
@@ -148,7 +143,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * check if the current block exits
+   * Check if the current block exits
    *
    * @param string  $blockName   bloack name
    * @param array   $params      associated array of submitted fields
@@ -167,7 +162,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * Function to get all block ids for a contact
+   * Get all block ids for a contact
    *
    * @param string $blockName block name
    * @param int $contactId contact id
@@ -210,14 +205,12 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * takes an associative array and creates a block
+   * Takes an associative array and creates a block
    *
    * @param string $blockName block name
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param null $entity
-   * @param null $contactId
-   *
-   * @internal param array $requiredFields fields that's are required in a block
+   * @param int $contactId
    *
    * @return object       CRM_Core_BAO_Block object on success, null otherwise
    * @access public
@@ -393,7 +386,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * Function to delete block
+   * Delete block
    *
    * @param  string $blockName       block name
    * @param  int    $params          associates array
@@ -509,9 +502,8 @@ class CRM_Core_BAO_Block {
   /**
    * Sort location array so primary element is first
    *
-   * @param $locations
+   * @param array $locations
    *
-   * @internal param Array $location
    */
   static function sortPrimaryFirst(&$locations){
     uasort($locations, 'self::primaryComparison');
@@ -521,7 +513,7 @@ class CRM_Core_BAO_Block {
  * compare 2 locations to see which should go first based on is_primary
  * (sort function for sortPrimaryFirst)
  * @param array $location1
- * @param array_type $location2
+ * @param array $location2
  * @return number
  */
   static function primaryComparison($location1, $location2){

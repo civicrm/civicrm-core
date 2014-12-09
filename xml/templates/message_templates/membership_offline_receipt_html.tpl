@@ -26,7 +26,7 @@
     {elseif $formValues.receipt_text_renewal}
      <p>{$formValues.receipt_text_renewal|htmlize}</p>
     {else}
-     <p>{ts}Thanks for your support.{/ts}</p>
+     <p>{ts}Thank you for your support.{/ts}</p>
     {/if}
     {if ! $cancelled}
      <p>{ts}Please print this receipt for your records.{/ts}</p>
@@ -155,7 +155,7 @@
        {foreach from=$dataArray item=value key=priceset}
         <tr>
         {if $priceset}
-         <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>    
+         <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
          <td>&nbsp;{$value|crmMoney:$currency}</td>
         {elseif  $priceset == 0}
          <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>

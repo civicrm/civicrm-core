@@ -39,7 +39,7 @@
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_Core_DAO_WordReplacement
@@ -57,7 +57,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_DAO_WordRepalcement object
+   * @return CRM_Core_DAO_WordRepalcement object
    * @access public
    * @static
    */
@@ -91,8 +91,8 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Save the values of a WordReplacement
    *
-   * @param $params
-   * @param $id
+   * @param array $params
+   * @param int $id
    *
    * @return WordReplacement array
    * @access public
@@ -111,7 +111,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Create a new WordReplacement
    *
-   * @param $params
+   * @param array $params
    *
    * @return WordReplacement array
    * @access public

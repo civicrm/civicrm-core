@@ -49,16 +49,12 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   private $_location = NULL;
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_DAO_Domain object
+   * @return CRM_Core_DAO_Domain object
    * @access public
    * @static
    */
@@ -100,7 +96,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   * @deprecated
   * @see http://issues.civicrm.org/jira/browse/CRM-11204
   */
-  static function setDomain($domainID){
+  static function setDomain($domainID) {
     CRM_Core_Config::domainID($domainID);
     self::getDomain($domainID);
     CRM_Core_Config::singleton(TRUE, TRUE);
@@ -110,11 +106,10 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Reset domain to default (ie. as loaded from settings). This is the
    * counterpart to CRM_Core_BAO_Domain::setDomain.
    *
-   * @internal param int $domainID id for domain you want to set as current
    * @deprecated
    * @see CRM_Core_BAO_Domain::setDomain
    */
-  static function resetDomain(){
+  static function resetDomain() {
     CRM_Core_Config::domainID(null, true);
     self::getDomain(null, true);
     CRM_Core_Config::singleton(TRUE, TRUE);
@@ -125,12 +120,12 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    *
    * @return null|string
    */
-  static function version( $skipUsingCache = false ) {
+  static function version($skipUsingCache = false) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
       CRM_Core_Config::domainID(),
-                                       'version',
-                                       'id',
-                                       $skipUsingCache
+      'version',
+      'id',
+      $skipUsingCache
     );
   }
 
@@ -160,10 +155,10 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Save the values of a domain
    *
-   * @param $params
-   * @param $id
+   * @param array $params
+   * @param int $id
    *
-   * @return domain array
+   * @return array domain
    * @access public
    */
   static function edit(&$params, &$id) {
@@ -177,9 +172,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Create a new domain
    *
-   * @param $params
+   * @param array $params
    *
-   * @return domain array
+   * @return array domain
    * @access public
    */
   static function create($params) {
@@ -234,7 +229,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * @param $contactID
+   * @param int $contactID
    *
    * @return bool|null|object|string
    */
@@ -292,7 +287,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * @param $groupId
+   * @param int $groupId
    *
    * @return bool
    */
@@ -315,8 +310,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     return $childGrps;
   }
 
-  // function to retrieve a list of contact-ids that belongs to current domain/site.
   /**
+   * Retrieve a list of contact-ids that belongs to current domain/site.
+   *
    * @return array
    */
   static function getContactList() {

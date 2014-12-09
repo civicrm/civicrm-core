@@ -40,7 +40,7 @@
 class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null
@@ -65,7 +65,7 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @param null
    *

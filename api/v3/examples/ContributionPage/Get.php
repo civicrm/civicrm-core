@@ -55,6 +55,7 @@ function contribution_page_get_expectedresult(){
           'amount_block_is_active' => '1',
           'currency' => 'NZD',
           'is_share' => '1',
+          'is_billing_required' => 0,
         ),
     ),
 );

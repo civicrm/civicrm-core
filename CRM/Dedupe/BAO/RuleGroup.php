@@ -40,17 +40,17 @@
 class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
 
   /**
-   * ids of the contacts to limit the SQL queries (whole-database queries otherwise)
+   * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
    */
   var $contactIds = array();
 
   /**
-   * params to dedupe against (queries against the whole contact set otherwise)
+   * Params to dedupe against (queries against the whole contact set otherwise)
    */
   var $params = array();
 
   /**
-   * if there are no rules in rule group
+   * If there are no rules in rule group
    */
   var $noRules = FALSE;
 
@@ -274,8 +274,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    *
    * @return array
    */
-  static function isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum = array(
-    )) {
+  static function isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum = array()) {
     $input = array();
     foreach ($tableQueries as $key => $query) {
       $input[] = substr($key, strrpos($key, '.') + 1);
@@ -378,9 +377,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   /**
    * To find fields related to a rule group.
    *
-   * @param $params
-   *
-   * @internal param \contains $array the rule group property to identify rule group
+   * @param array $params
    *
    * @return array (rule field => weight) array and threshold associated to rule group@access public
    */

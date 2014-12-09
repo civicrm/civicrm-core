@@ -45,7 +45,7 @@ function civicrm_api3($entity, $action, $params = array()) {
 }
 
 /**
- * Function to call getfields from api wrapper. This function ensures that settings that could alter
+ * call getfields from api wrapper. This function ensures that settings that could alter
  * getfields output (e.g. action for all api & profile_id for profile api ) are consistently passed in.
  *
  * We check whether the api call is 'getfields' because if getfields is being called we return an empty array
@@ -83,8 +83,6 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
  *
  * @param $result
  *
- * @internal param array $params (reference ) input parameters
- *
  * @return boolean true if error, false otherwise
  * @static void
  * @access public
@@ -100,20 +98,11 @@ function civicrm_error($result) {
 
 /**
  * @param $entity
- * @param null $version
  *
  * @return string
  */
-function _civicrm_api_get_camel_name($entity, $version = NULL) {
-  $fragments = explode('_', $entity);
-  foreach ($fragments as & $fragment) {
-    $fragment = ucfirst($fragment);
-  }
-  // Special case: UFGroup, UFJoin, UFMatch, UFField
-  if ($fragments[0] === 'Uf') {
-    $fragments[0] = 'UF';
-  }
-  return implode('', $fragments);
+function _civicrm_api_get_camel_name($entity) {
+  return CRM_Utils_String::convertStringToCamel($entity);
 }
 
 /**

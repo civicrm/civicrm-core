@@ -12,11 +12,11 @@
 class CRM_Widget_Widget {
 
   static $_methodTable;
+
   function initialize() {
     if (!self::$_methodTable) {
       self::$_methodTable = array(
-        'getContributionPageData' =>
-        array(
+        'getContributionPageData' => array(
           'description' => 'Gets all campaign related data and returns it as a std class.',
           'access' => 'remote',
           'arguments' => array(
@@ -24,8 +24,7 @@ class CRM_Widget_Widget {
             'widgetID',
           ),
         ),
-        'getEmbedCode' =>
-        array(
+        'getEmbedCode' => array(
           'description' => 'Gets embed code.  Perhaps overkill, but we can track dropoffs in this case. by # of people reqeusting emebed code / number of unique instances.',
           'access' => 'remote',
           'arguments' => array(
@@ -93,11 +92,11 @@ class CRM_Widget_Widget {
       $data->is_active = FALSE;
     }
 
-    $data->is_active    = TRUE;
-    $data->title        = $widget->title;
-    $data->logo         = $widget->url_logo;
+    $data->is_active = TRUE;
+    $data->title = $widget->title;
+    $data->logo = $widget->url_logo;
     $data->button_title = $widget->button_title;
-    $data->button_url   = CRM_Utils_System::url('civicrm/contribute/transact',
+    $data->button_url = CRM_Utils_System::url('civicrm/contribute/transact',
       "reset=1&id=$contributionPageID",
       TRUE, NULL, FALSE, TRUE
     );
@@ -190,7 +189,8 @@ WHERE  id = %1";
    */
   public function getEmbedCode($contributionPageID, $widgetID, $format = "normal") {
     self::registerRequest($contributionPageID, $widgetID, __FUNCTION__);
-    return "<embed>.......................</embed>" . print_r(func_get_args(), 1);
+    return "<embed>.......................</embed>" .
+    print_r(func_get_args(), 1);
   }
 }
 

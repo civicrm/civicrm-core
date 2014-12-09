@@ -56,7 +56,6 @@ class CRM_Upgrade_Incremental_php_FourTwo {
    * @param $rev string, a version number, e.g. '4.2.alpha1', '4.2.beta3', '4.2.0'
    * @param null $currentVer
    *
-   * @internal param string $postUpgradeMessage , alterable
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
@@ -389,15 +388,12 @@ HAVING COUNT(cpse.price_set_id) > 1 AND MIN(cpse1.id) <> cpse.id ";
    */
   static function task_4_2_alpha1_createPriceSets(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
-    $daoName =
-      array(
-        'civicrm_contribution_page' =>
-        array(
+    $daoName = array(
+        'civicrm_contribution_page' => array(
           'CRM_Contribute_BAO_ContributionPage',
           CRM_Core_Component::getComponentID('CiviContribute')
         ),
-        'civicrm_event' =>
-        array(
+        'civicrm_event' => array(
           'CRM_Event_BAO_Event',
           CRM_Core_Component::getComponentID('CiviEvent')
         ),
@@ -453,7 +449,7 @@ WHERE     cpse.price_set_id IS NULL";
 
   /**
    *
-   * Function to create price sets
+   * create price sets
    */
   static function createPriceSet($daoName, $addTo,  $options = array()) {
     $query = "SELECT title FROM {$addTo[0]} where id =%1";

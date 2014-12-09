@@ -39,7 +39,7 @@
 class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
   /**
-   * Function to create a user in Drupal.
+   * Create a user in Drupal.
    *
    * @param array  $params associated array
    * @param string $mail email id for cms user
@@ -76,7 +76,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     * if we want to submit this form more than once in a process (e.g. create more than one user)
     * we must force it to validate each time for this form. Otherwise it will not validate
     * subsequent submissions and the manner in which the password is passed in will be invalid
-    * */
+    */
     $form_state['must_validate'] = TRUE;
     $config = CRM_Core_Config::singleton();
 
@@ -105,8 +105,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *  @param string $ufName User name
    */
   /**
-   * @param $ufID
-   * @param $ufName
+   * @param int $ufID
+   * @param string $ufName
    */
   function updateCMSName($ufID, $ufName) {
     // CRM-5555
@@ -122,13 +122,9 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Check if username and email exists in the drupal db
    *
-   * @params $params    array   array of name and mail values
-   * @params $errors    array   array of errors
-   * @params $emailName string  field label for the 'email'
-   *
-   * @param $params
-   * @param $errors
-   * @param string $emailName
+   * @param array $params array of name and mail values
+   * @param array $errors array of errors
+   * @param string $emailName  field label for the 'email'
    *
    * @return void
    */
@@ -179,15 +175,15 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /*
-   * Function to get the drupal destination string. When this is passed in the
+   * Get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
-   * @param object $form Form object representing the 'current' form - to which the user will be returned
+   * @param CRM_Core_Form $form Form object representing the 'current' form - to which the user will be returned
    * @return string $destination destination value for URL
    *
    */
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return null|string
    */
@@ -236,7 +232,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
 
   /**
-   * sets the title of the page
+   * Sets the title of the page
    *
    * @param string $title
    * @param null $pageTitle
@@ -259,8 +255,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param $breadCrumbs
-   *
+   * @param array $breadCrumbs
    * @internal param string $title
    * @internal param string $url
    *
@@ -419,7 +414,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * rewrite various system urls to https
+   * Rewrite various system urls to https
    *
    * @param null
    *
@@ -432,7 +427,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * figure out the post url for the form
+   * Figure out the post url for the form
    *
    * @param mix $action the default action if one is pre-specified
    *
@@ -536,7 +531,7 @@ AND    u.status = 1
    * Load user into session
    */
   /**
-   * @param $username
+   * @param string $username
    *
    * @return bool
    */
@@ -575,7 +570,7 @@ AND    u.status = 1
   /**
    * Determine the native ID of the CMS user
    *
-   * @param $username
+   * @param string $username
    * @return int|NULL
    */
   function getUfId($username) {
@@ -659,7 +654,7 @@ AND    u.status = 1
   }
 
   /**
-   * load drupal bootstrap
+   * Load drupal bootstrap
    *
    * @param array $params Either uid, or name & pass.
    * @param boolean $loadUser boolean Require CMS user load.
@@ -816,7 +811,7 @@ AND    u.status = 1
   }
 
   /**
-   * check is user logged in.
+   * Check is user logged in.
    *
    * @return boolean true/false.
    */

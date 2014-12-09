@@ -40,7 +40,7 @@
 class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
   /**
-   * the id of the object being viewed (note/relationship etc)
+   * The id of the object being viewed (note/relationship etc)
    *
    * @int
    * @access protected
@@ -48,7 +48,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
   public $_groupId;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @return CRM_Contact_Page_View_CustomData
    */
@@ -57,7 +57,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
   }
 
   /**
-   * add a few specific things to view contact
+   * Add a few specific things to view contact
    *
    * @return void
    * @access public
@@ -88,8 +88,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
    * type of action and executes that action.
    *
    * @access public
-   *
-   * @internal param object $page - the view page which created this one
    *
    * @return void
    * @static

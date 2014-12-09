@@ -34,7 +34,7 @@
  */
 
 /**
- * This class generates form components for processing a ontribution
+ * This class generates form components for processing a contribution
  *
  */
 class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
@@ -47,12 +47,16 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   protected $_selfService = FALSE;
 
   public $_bltID = NULL;
-  public $_paymentProcessor = NULL;
+
+  /**
+   * @var array current payment processor including a copy of the object in 'object' key
+   */
+  public $_paymentProcessor = array();
 
   public $_paymentProcessorObj = NULL;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -74,13 +78,13 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
     if ($this->_coid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
-      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
+      $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
     }
 
     if ($this->_mid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'info');
-      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'obj');
+      $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_mid, 'membership');
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
       $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_mid, 'membership_type_id');
@@ -101,9 +105,9 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       $this->_selfService = TRUE;
     }
 
-    if (!$this->_paymentProcessorObj->isSupported('updateSubscriptionBillingInfo')) {
+    if (!$this->_paymentProcessor['object']->isSupported('updateSubscriptionBillingInfo')) {
       CRM_Core_Error::fatal(ts("%1 processor doesn't support updating subscription billing details.",
-          array(1 => $this->_paymentProcessorObj->_processorName)
+          array(1 => $this->_paymentProcessor['object']->_processorName)
         ));
     }
     $this->assign('paymentProcessor', $this->_paymentProcessor);
@@ -181,7 +185,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -205,18 +209,17 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       )
     );
 
-    CRM_Core_Payment_Form::buildCreditCard($this);
+    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor['object'], TRUE);
     $this->addFormRule(array('CRM_Contribute_Form_UpdateBilling', 'formRule'), $this);
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
    * @param $self
    *
-   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public

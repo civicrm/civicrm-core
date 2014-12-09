@@ -47,8 +47,8 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
     $this->_columns = array(
       ts('Contact ID') => 'contact_id',
       ts('Name') => 'display_name',
-      ts('Donation Count') => 'donation_count',
-      ts('Donation Amount') => 'donation_amount',
+      ts('Contribution Count') => 'donation_count',
+      ts('Contribution Amount') => 'donation_amount',
     );
 
     $this->_amounts = array('min_amount_1' => ts('Min Amount One'),
@@ -85,7 +85,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   function buildForm(&$form) {
 

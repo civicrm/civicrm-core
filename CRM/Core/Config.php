@@ -50,28 +50,28 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   ///
 
   /**
-   * the dsn of the database connection
+   * The dsn of the database connection
    *
    * @var string
    */
   public $dsn;
 
   /**
-   * the name of user framework
+   * The name of user framework
    *
    * @var string
    */
   public $userFramework = 'Drupal';
 
   /**
-   * the name of user framework url variable name
+   * The name of user framework url variable name
    *
    * @var string
    */
   public $userFrameworkURLVar = 'q';
 
   /**
-   * the dsn of the database connection for user framework
+   * The dsn of the database connection for user framework
    *
    * @var string
    */
@@ -109,7 +109,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   ///
 
   /**
-   * are we initialized and in a proper state
+   * Are we initialized and in a proper state
    *
    * @var string
    */
@@ -121,7 +121,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   public $customPHPPathDir;
 
   /**
-   * the factory class used to instantiate our DB objects
+   * The factory class used to instantiate our DB objects
    *
    * @var string
    */
@@ -134,7 +134,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   private static $_log = NULL;
 
   /**
-   * the handle on the mail handler that we are using
+   * The handle on the mail handler that we are using
    *
    * @var object
    */
@@ -401,7 +401,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * initialize the DataObject framework
+   * Initialize the DataObject framework
    *
    * @return void
    * @access private
@@ -418,7 +418,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * returns the singleton logger for the application
+   * Returns the singleton logger for the application
    *
    * @param
    * @access private
@@ -434,7 +434,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * initialize the config variables
+   * Initialize the config variables
    *
    * @return void
    * @access private
@@ -662,7 +662,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * verify that the needed parameters are not null in the config
+   * Verify that the needed parameters are not null in the config
    *
    * @param CRM_Core_Config (reference ) the system config object
    * @param array           (reference ) the parameters that need a value
@@ -681,7 +681,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * reset the serialized array and recompute
+   * Reset the serialized array and recompute
    * use with care
    */
   function reset() {
@@ -701,7 +701,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * one function to get domain ID
+   * One function to get domain ID
    */
   static function domainID($domainID = NULL, $reset = FALSE) {
     static $domain;
@@ -716,7 +716,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * do general cleanup of caches, temp directories and temp tables
+   * Do general cleanup of caches, temp directories and temp tables
    * CRM-8739
    */
   function cleanupCaches($sessionReset = TRUE) {
@@ -772,7 +772,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * clear db cache
+   * Clear db cache
    */
   public static function clearDBCache() {
     $queries = array(
@@ -796,7 +796,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * clear leftover temporary tables
+   * Clear leftover temporary tables
    */
   public static function clearTempTables() {
     // CRM-5645
@@ -827,7 +827,7 @@ AND
   }
 
   /**
-   * function to check if running in upgrade mode
+   * Check if running in upgrade mode
    */
   static function isUpgradeMode($path = NULL) {
     if (defined('CIVICRM_UPGRADE_ACTIVE')) {
@@ -862,19 +862,10 @@ AND
 
   /**
    * Is back office credit card processing enabled for this site - ie are there any installed processors that support
-   * on-site processing
+   * it?
    * @return bool
    */
   static function isEnabledBackOfficeCreditCardPayments() {
-    // restrict to type=1 (credit card) payment processor payment_types and only include billing mode types 1 and 3
-    $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
-      "billing_mode IN ( 1, 3 ) AND payment_type = 1"
-    );
-    if (count($processors) > 0) {
-      return TRUE;
-    }
-    return FALSE;
+    return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('BackOffice'));
   }
 }
-// end CRM_Core_Config
-

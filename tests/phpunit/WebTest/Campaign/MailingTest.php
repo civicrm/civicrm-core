@@ -101,9 +101,9 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $groupName
+   * @param string $groupName
    * @param $campaignTitle
-   * @param $id
+   * @param int $id
    */
   function mailingAddTest($groupName, $campaignTitle, $id) {
     //---- create mailing contact and add to mailing Group

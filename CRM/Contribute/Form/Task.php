@@ -40,7 +40,7 @@
 class CRM_Contribute_Form_Task extends CRM_Core_Form {
 
   /**
-   * the task being performed
+   * The task being performed
    *
    * @var int
    */
@@ -89,7 +89,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
   public $_includesSoftCredits = FALSE;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @param
    *
@@ -101,7 +101,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param bool $useTable
    */
   static function preProcessCommon(&$form, $useTable = FALSE) {
@@ -197,15 +197,13 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * simple shell that derived classes can call to add buttons to
+   * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button
-   * @param string $nextType
+   * @param string $nextType button type for the form after processing
    * @param string $backType
    * @param bool $submitOnce
-   *
-   * @internal param string $type button type for the form after processing
    *
    * @return void
    * @access public

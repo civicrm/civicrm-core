@@ -210,15 +210,31 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Add JavaScript variables to the global CRM object.
+   * Add JavaScript variables to CRM.vars
    *
    * Example:
    * From the server:
-   * CRM_Core_Resources::singleton()->addSetting(array('myNamespace' => array('foo' => 'bar')));
-   * From javascript:
-   * CRM.myNamespace.foo // "bar"
+   * CRM_Core_Resources::singleton()->addVars('myNamespace', array('foo' => 'bar'));
+   * Access var from javascript:
+   * CRM.vars.myNamespace.foo // "bar"
    *
    * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Javascript+Reference
+   *
+   * @param string $nameSpace - usually the name of your extension
+   * @param array $vars
+   * @return CRM_Core_Resources
+   */
+  public function addVars($nameSpace, $vars) {
+    $existing = CRM_Utils_Array::value($nameSpace, CRM_Utils_Array::value('vars', $this->settings), array());
+    $vars = $this->mergeSettings($existing, $vars);
+    $this->addSetting(array('vars' => array($nameSpace => $vars)));
+    return $this;
+  }
+
+  /**
+   * Add JavaScript variables to the root of the CRM object.
+   * This function is usually reserved for low-level system use.
+   * Extensions and components should generally use addVars instead.
    *
    * @param $settings array
    * @return CRM_Core_Resources
@@ -226,8 +242,9 @@ class CRM_Core_Resources {
   public function addSetting($settings) {
     $this->settings = $this->mergeSettings($this->settings, $settings);
     if (!$this->addedSettings) {
+      $region = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
       $resources = $this;
-      CRM_Core_Region::instance('html-header')->add(array(
+      CRM_Core_Region::instance($region)->add(array(
         'callback' => function(&$snippet, &$html) use ($resources) {
           $html .= "\n" . $resources->renderSetting();
         },
@@ -284,7 +301,14 @@ class CRM_Core_Resources {
    * @return string
    */
   public function renderSetting() {
-    $js = 'var CRM = ' . json_encode($this->getSettings()) . ';';
+    // On a standard page request we construct the CRM object from scratch
+    if (!self::isAjaxMode()) {
+      $js = 'var CRM = ' . json_encode($this->getSettings()) . ';';
+    }
+    // For an ajax request we append to it
+    else {
+      $js = 'CRM.$.extend(true, CRM, ' . json_encode($this->getSettings()) . ');';
+    }
     return sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $js);
   }
 
@@ -458,7 +482,7 @@ class CRM_Core_Resources {
    * @access public
    */
   public function addCoreResources($region = 'html-header') {
-    if (!isset($this->addedCoreResources[$region])) {
+    if (!isset($this->addedCoreResources[$region]) && !self::isAjaxMode()) {
       $this->addedCoreResources[$region] = TRUE;
       $config = CRM_Core_Config::singleton();
 
@@ -485,7 +509,7 @@ class CRM_Core_Resources {
       ));
       // Disable profile creation if user lacks permission
       if (!CRM_Core_Permission::check('edit all contacts') && !CRM_Core_Permission::check('add contacts')) {
-        $settings['profileCreate'] = FALSE;
+        $settings['config']['entityRef']['contactCreate'] = FALSE;
       }
       $this->addSetting($settings);
 
@@ -569,7 +593,10 @@ class CRM_Core_Resources {
       'moneyFormat' => json_encode(CRM_Utils_Money::format(1234.56)),
       'contactSearch' => json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...')),
       'otherSearch' => json_encode(ts('Enter search term...')),
-      'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
+      'entityRef' => array(
+        'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
+        'filters' => self::getEntityRefFilters(),
+      ),
     );
     print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
     CRM_Utils_System::civiExit();
@@ -657,5 +684,44 @@ class CRM_Core_Resources {
     $config->userSystem->appendCoreResources($items);
 
     return $items;
+  }
+
+  /**
+   * @return bool - is this page request an ajax snippet?
+   */
+  static function isAjaxMode() {
+    return in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(CRM_Core_Smarty::PRINT_SNIPPET, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON));
+  }
+
+  /**
+   * Provide a list of available entityRef filters
+   * FIXME: This function doesn't really belong in this class
+   * @TODO: Provide a sane way to extend this list for other entities - a hook or??
+   * @return array
+   */
+  static function getEntityRefFilters() {
+    $filters = array();
+
+    $filters['event'] = array(
+      array('key' => 'event_type_id', 'value' => ts('Event Type')),
+    );
+
+    $filters['activity'] = array(
+      array('key' => 'activity_type_id', 'value' => ts('Activity Type')),
+      array('key' => 'status_id', 'value' => ts('Activity Status')),
+    );
+
+    $contactTypes = CRM_Utils_Array::makeNonAssociative(CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '.'));
+    $filters['contact'] = array(
+      array('key' => 'contact_type', 'value' => ts('Contact Type'), 'options' => $contactTypes),
+      array('key' => 'group', 'value' => ts('Group'), 'entity' => 'group_contact'),
+      array('key' => 'tag', 'value' => ts('Tag'), 'entity' => 'entity_tag'),
+      array('key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'address'),
+      array('key' => 'country', 'value' => ts('Country'), 'entity' => 'address'),
+      array('key' => 'gender_id', 'value' => ts('Gender')),
+      array('key' => 'is_deceased', 'value' => ts('Deceased')),
+    );
+
+    return $filters;
   }
 }

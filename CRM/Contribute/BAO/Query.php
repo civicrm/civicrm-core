@@ -35,7 +35,7 @@
 class CRM_Contribute_BAO_Query {
 
   /**
-   * static field for all the export/import contribution fields
+   * Static field for all the export/import contribution fields
    *
    * @var array
    * @static
@@ -64,7 +64,7 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * if contributions are involved, add the specific contribute fields
+   * If contributions are involved, add the specific contribute fields
    *
    * @param $query
    *
@@ -684,7 +684,7 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
@@ -722,11 +722,19 @@ class CRM_Contribute_BAO_Query {
         }
         break;
 
+      case 'civicrm_financial_account':
+        if ($mode & CRM_Contact_BAO_Query::MODE_CONTACTS) {
+          $from = " $side JOIN civicrm_financial_account ON contact_a.id = civicrm_financial_account.contact_id ";
+        }
+        break;
+
       case 'civicrm_accounting_code':
-        $from = " $side JOIN civicrm_entity_financial_account ON civicrm_entity_financial_account.entity_id = civicrm_contribution.financial_type_id AND civicrm_entity_financial_account.entity_table = 'civicrm_financial_type' ";
-        $from .= " INNER JOIN civicrm_financial_account ON civicrm_financial_account.id = civicrm_entity_financial_account.financial_account_id ";
-        $from .= " INNER JOIN civicrm_option_value cov ON cov.value = civicrm_entity_financial_account.account_relationship AND cov.name = 'Income Account is' ";
-        $from .= " INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id AND cog.name = 'account_relationship' ";
+        if ($mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+          $from = " $side JOIN civicrm_entity_financial_account ON civicrm_entity_financial_account.entity_id = civicrm_contribution.financial_type_id AND civicrm_entity_financial_account.entity_table = 'civicrm_financial_type' ";
+          $from .= " INNER JOIN civicrm_financial_account ON civicrm_financial_account.id = civicrm_entity_financial_account.financial_account_id ";
+          $from .= " INNER JOIN civicrm_option_value cov ON cov.value = civicrm_entity_financial_account.account_relationship AND cov.name = 'Income Account is' ";
+          $from .= " INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id AND cog.name = 'account_relationship' ";
+        }
         break;
 
       case 'civicrm_contribution_page':
@@ -946,11 +954,11 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * add all the elements shared between contribute search and advnaced search
+   * Add all the elements shared between contribute search and advnaced search
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @static
@@ -1101,7 +1109,7 @@ class CRM_Contribute_BAO_Query {
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
   static function searchAction(&$row, $id) {
   }

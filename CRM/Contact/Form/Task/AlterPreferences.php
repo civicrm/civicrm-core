@@ -40,7 +40,7 @@
 class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -81,7 +81,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $rule
    *
    * @return array
@@ -95,7 +95,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

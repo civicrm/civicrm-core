@@ -46,14 +46,14 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   public $_single = FALSE;
 
   /**
-   * gives all the statues for conribution
+   * Gives all the statues for conribution
    *
    * @access public
    */
   public $_contributionStatusId;
 
   /**
-   * gives the HTML template of PDF Invoice
+   * Gives the HTML template of PDF Invoice
    *
    * @access public
    */
@@ -67,12 +67,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   public $_invoiceTemplate;
 
   /**
-   * selected output
+   * Selected output
    */
   public $_selectedOutput;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -145,7 +145,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -227,11 +227,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
-   * @param $values
-   *
-   * @internal param array $fields posted values of the form
+   * @param array $values
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -248,7 +246,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -267,7 +265,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @param array $contribIDs Contribution Id
    * @param array $params associated array of submitted values
    * @param array $contactIds Contact Id
-   * @param object $form form object
+   * @param CRM_Core_Form $form form object
    * @static
    *
    */
@@ -317,7 +315,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $addressParams = array('contact_id' => $contribution->contact_id);
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams);
 
-      // to get billing address if present 
+      // to get billing address if present
       $billingAddress = array();
       foreach ($addressDetails as $key => $address) {
         if ((isset($address['is_billing']) && $address['is_billing'] == 1) && (isset($address['is_primary']) && $address['is_primary'] == 1) && $address['contact_id'] == $contribution->contact_id) {
@@ -357,10 +355,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $lineItem = CRM_Price_BAO_LineItem::getLineItems($eid, $etable);
       }
 
-      //TO DO: Need to do changes for partially paid to display amount due on PDF invoice 
+      //TO DO: Need to do changes for partially paid to display amount due on PDF invoice
       $amountDue = ($input['amount'] - $input['amount']);
 
-      // retreiving the subtotal and sum of same tax_rate 
+      // retreiving the subtotal and sum of same tax_rate
       $dataArray = array();
       $subTotal = 0;
       foreach ($lineItem as $entity_id => $taxRate) {
@@ -482,7 +480,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       if (isset($creditNoteId)) {
         $tplParams['creditnote_id'] = $creditNoteId;
       }
-      
+
       $sendTemplateParams = array(
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'contribution_invoice_receipt',
@@ -655,6 +653,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *
    * return $fileName of file which is in pdf format
    *
+   * @return string
    */
   static public function putFile($html) {
     require_once("packages/dompdf/dompdf_config.inc.php");

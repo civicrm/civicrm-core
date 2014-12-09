@@ -40,9 +40,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * Check to see if we have cache entries for this group
    * if not, regenerate, else return
    *
-   * @param $groupIDs
-   *
-   * @internal param int $groupID groupID of group that we are checking against
+   * @param $groupIDs of group that we are checking against
    *
    * @return boolean true if we did not regenerate, false if we did
    */
@@ -200,7 +198,7 @@ AND    g.refresh_date IS NULL
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    */
   static function add($groupID) {
     // first delete the current cache
@@ -218,7 +216,7 @@ AND    g.refresh_date IS NULL
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    * @param $values
    */
   static function store(&$groupID, &$values) {
@@ -387,7 +385,7 @@ WHERE  id = %1
   }
 
   /**
-   * load the smart group cache for a saved search
+   * Load the smart group cache for a saved search
    *
    * @param object  $group - the smart group that needs to be loaded
    * @param boolean $force - should we force a search through

@@ -40,53 +40,53 @@ class CRM_Activity_Import_Field {
    */
 
   /**
-   * name of the field
+   * Name of the field
    */
   public $_name;
 
   /**
-   * title of the field to be used in display
+   * Title of the field to be used in display
    */
   public $_title;
 
   /**
-   * type of field
+   * Type of field
    * @var enum
    */
   public $_type;
 
   /**
-   * is this field required
+   * Is this field required
    * @var boolean
    */
   public $_required;
 
   /**
-   * data to be carried for use by a derived class
+   * Data to be carried for use by a derived class
    * @var object
    */
   public $_payload;
 
   /**
-   * regexp to match the CSV header of this column/field
+   * Regexp to match the CSV header of this column/field
    * @var string
    */
   public $_headerPattern;
 
   /**
-   * regexp to match the pattern of data from various column/fields
+   * Regexp to match the pattern of data from various column/fields
    * @var string
    */
   public $_dataPattern;
 
   /**
-   * value of this field
+   * Value of this field
    * @var object
    */
   public $_value;
 
   /**
-   * @param $name
+   * @param string $name
    * @param $title
    * @param int $type
    * @param string $headerPattern
@@ -107,7 +107,7 @@ class CRM_Activity_Import_Field {
   }
 
   /**
-   * the value is in string format. convert the value to the type of this field
+   * The value is in string format. convert the value to the type of this field
    * and set the field value with the appropriate type
    */
   function setValue($value) {

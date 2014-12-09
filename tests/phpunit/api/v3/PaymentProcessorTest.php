@@ -80,7 +80,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   ///////////////// civicrm_payment_processor_add methods
 
   /**
-   * check with no name
+   * Check with no name
    */
   function testPaymentProcessorCreateWithoutName() {
     $payProcParams = array(
@@ -90,7 +90,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   }
 
   /**
-   * create payment processor
+   * Create payment processor
    */
   function testPaymentProcessorCreate() {
     $params = $this->_params;
@@ -115,7 +115,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   ///////////////// civicrm_payment_processor_delete methods
 
   /**
-   * check payment processor delete
+   * Check payment processor delete
    */
   function testPaymentProcessorDelete() {
     $id = $this->testPaymentProcessorCreate();
@@ -129,7 +129,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   ///////////////// civicrm_payment_processors_get methods
 
   /**
-   * check with valid params array.
+   * Check with valid params array.
    */
   function testPaymentProcessorsGet() {
     $params = $this->_params;

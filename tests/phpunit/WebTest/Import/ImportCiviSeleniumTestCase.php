@@ -32,32 +32,23 @@ require_once 'CRM/Utils/Array.php';
  */
 class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
-  /*
-     * Function to test csv import for each component.
-     *
-     * @params string $component   component name ( Event, Contribution, Membership, Activity etc)
-     * @params array  $headers     csv data headers
-     * @params array  $rows        csv data rows
-     * @params string $contactType contact type
-     * @params string $mode        import mode
-     * @params array  $fieldMapper select mapper fields while import
-     * @params array  $other       other parameters
-     *                             useMappingName     : to reuse mapping
-
-     *                             dateFormat         : date format of data
-     *                             checkMapperHeaders : to override default check mapper headers
-     *                             saveMapping        : save current mapping?
-     *                             saveMappingName    : to override mapping name
-     *
-     */
   /**
-   * @param $component
-   * @param $headers
-   * @param $rows
-   * @param string $contactType
-   * @param string $mode
-   * @param array $fieldMapper
-   * @param array $other
+   * Test csv import for each component.
+   *
+   * @param string $component   component name ( Event, Contribution, Membership, Activity etc)
+   * @param array  $headers     csv data headers
+   * @param array  $rows        csv data rows
+   * @param string $contactType contact type
+   * @param string $mode        import mode
+   * @param array  $fieldMapper select mapper fields while import
+   * @param array  $other       other parameters
+   *                             useMappingName     : to reuse mapping
+
+   *                             dateFormat         : date format of data
+   *                             checkMapperHeaders : to override default check mapper headers
+   *                             saveMapping        : save current mapping?
+   *                             saveMappingName    : to override mapping name
+   *
    */
   function importCSVComponent($component,
     $headers,
@@ -167,42 +158,32 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     }
   }
 
-  /*
-     * Function to test contact import.
-     *
-     * @params array  $headers     csv data headers
-     * @params array  $rows        csv data rows
-     * @params string $contactType contact type
-     * @params string $mode        import mode
-     * @params array  $fieldMapper select mapper fields while import
-     * @params array  $other       other parameters
-     *                             contactSubtype     : import for selected Contact Subtype
-
-     *                             useMappingName     : to reuse mapping
-     *                             dateFormat         : date format of data
-     *                             checkMapperHeaders : to override default check mapper headers
-     *                             saveMapping        : save current mapping?
-     *                             saveMappingName    : to override mapping name
-     *                             createGroup        : create new group?
-     *                             createGroupName    : to override new Group name
-     *                             createTag          : create new tag?
-     *                             createTagName      : to override new Tag name
-     *                             selectGroup        : select existing group for contacts
-     *                             selectTag          : select existing tag for contacts
-     *                             callbackImportSummary : function to override default import summary assertions
-     *
-     * @params string $type        import type (csv/sql)
-     *                             @todo:currently only supports csv, need to work on sql import
-
-     */
   /**
-   * @param $headers
-   * @param $rows
-   * @param string $contactType
-   * @param string $mode
-   * @param array $fieldMapper
-   * @param array $other
-   * @param string $type
+   * Test contact import.
+   *
+   * @param array  $headers     csv data headers
+   * @param array  $rows        csv data rows
+   * @param string $contactType contact type
+   * @param string $mode        import mode
+   * @param array  $fieldMapper select mapper fields while import
+   * @param array  $other       other parameters
+   *                             contactSubtype     : import for selected Contact Subtype
+
+   *                             useMappingName     : to reuse mapping
+   *                             dateFormat         : date format of data
+   *                             checkMapperHeaders : to override default check mapper headers
+   *                             saveMapping        : save current mapping?
+   *                             saveMappingName    : to override mapping name
+   *                             createGroup        : create new group?
+   *                             createGroupName    : to override new Group name
+   *                             createTag          : create new tag?
+   *                             createTagName      : to override new Tag name
+   *                             selectGroup        : select existing group for contacts
+   *                             selectTag          : select existing tag for contacts
+   *                             callbackImportSummary : function to override default import summary assertions
+   *
+   * @param string $type        import type (csv/sql)
+   *                             @todo:currently only supports csv, need to work on sql import
    */
   function importContacts($headers, $rows, $contactType = 'Individual', $mode = 'Skip', $fieldMapper = array(), $other = array(), $type = 'csv') {
 
@@ -245,7 +226,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
     // Select contact subtype
     if (isset($other['contactSubtype'])) {
-      $this->waitForElementPresent("css=#subType option[value={$other['contactSubtype']}]");
+      $this->waitForElementPresent("xpath=//div[@id='common-form-controls']/table/tbody/tr[1]/td[2]/span");
       $this->select('subType', $other['contactSubtype']);
     }
 
@@ -434,18 +415,11 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     }
   }
 
-  /*
-     * Helper function to get the import url of the component.
-     *
-     * @params string $component component name
-     *
-     * @return string import url
-
-     */
   /**
-   * @param $component
+   * Helper function to get the import url of the component.
+   * @param string $component component name
    *
-   * @return mixed
+   * @return string import url
    */
   private function _getImportComponentUrl($component) {
     $importComponentUrl = array(
@@ -458,23 +432,16 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     return $importComponentUrl[$component];
   }
 
-  /*
-     * Helper function to get the import url of the component.
-     *
-     * @params string $component component name
-     *
-     * @return string import url
-
-     */
   /**
    * @param $component
    * @param $contactType
    *
-   * @return mixed
+   * @return string
    */
   function _getImportComponentContactType($component, $contactType) {
     $importComponentMode = array(
-      'Event' => array('Individual' => 'CIVICRM_QFID_1_8',
+      'Event' => array(
+        'Individual' => 'CIVICRM_QFID_1_8',
         'Household' => 'CIVICRM_QFID_2_10',
         'Organization' => 'CIVICRM_QFID_4_12',
       ),
@@ -493,22 +460,15 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     return $importComponentMode[$component][$contactType];
   }
 
-  /*
-     * Helper function to check import mapping fields.
-     *
-     * @params array  $headers            field headers
-     * @params array  $rows               field rows
-     * @params array  $checkMapperHeaders override default mapper headers
-     */
   /**
-   * @param $headers
-   * @param $rows
+   * Helper function to check import mapping fields.
+   * @param array $headers
+   * @param array $rows
    * @param null $existingMapping
    * @param array $checkMapperHeaders
    * @param string $headerSelector
    */
-  function _checkImportMapperData($headers, $rows, $existingMapping = NULL, $checkMapperHeaders = array(
-    ), $headerSelector = 'th') {
+  function _checkImportMapperData($headers, $rows, $existingMapping = NULL, $checkMapperHeaders = array(), $headerSelector = 'th') {
 
     if (empty($checkMapperHeaders)) {
       $checkMapperHeaders = array(
@@ -541,20 +501,13 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     }
   }
 
-  /*
-     * Helper function to get imported contact ids.
-     *
-     * @params array  $rows        fields rows
-     * @params string $contactType contact type
-
-     *
-     * @return array  $contactIds  imported contact ids
-     */
   /**
-   * @param $rows
+   * Helper function to get imported contact ids.
+   *
+   * @param array $rows
    * @param string $contactType
    *
-   * @return array
+   * @return array $contactIds  imported contact ids
    */
   function _getImportedContactIds($rows, $contactType = 'Individual') {
     $contactIds = array();
@@ -594,15 +547,11 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     return $contactIds;
   }
 
-  /*
-     * Helper function to format headers and rows for contact relationship data.
-     *
-     * @params array  $headers data headers
-     * @params string $rows    data rows
-     */
   /**
-   * @param $headers
-   * @param $rows
+   * Helper function to format headers and rows for contact relationship data.
+   *
+   * @param array $headers
+   * @param array $rows
    */
   function _formatContactCSVdata(&$headers, &$rows) {
     if (!isset($headers['contact_relationships'])) {

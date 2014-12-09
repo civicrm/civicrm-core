@@ -100,7 +100,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   }
 
   /**
-   * add() method (add and edit modes of pledge block)
+   * Add() method (add and edit modes of pledge block)
    */
   function testAddPledgeBlock() {
 
@@ -144,7 +144,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve() and getPledgeBlock() method of  pledge block
+   * Retrieve() and getPledgeBlock() method of  pledge block
    */
   function testRetrieveAndGetPledgeBlock() {
 

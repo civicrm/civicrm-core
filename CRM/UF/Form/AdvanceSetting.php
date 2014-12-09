@@ -35,11 +35,11 @@
 class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
   /**
-   * Function to build the form for Advance Settings.
+   * Build the form object for Advance Settings.
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
@@ -99,7 +99,7 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $proxOptions[] = $form->createElement('radio', NULL, NULL, ts('Optional'), 1);
     $proxOptions[] = $form->createElement('radio', NULL, NULL, ts('Required'), 2);
 
-    $form->addGroup($proxOptions, 'is_proximity_search', ts('Proximity search'));
+    $form->addGroup($proxOptions, 'is_proximity_search', ts('Proximity Search'));
   }
 }
 

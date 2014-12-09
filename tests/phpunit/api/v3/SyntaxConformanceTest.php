@@ -388,12 +388,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public static function toBeSkipped_getSqlOperators() {
     $entitiesWithout = array(
       'Case',//case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
+      'Contact', // on the todo list!
       'EntityTag', // non-standard api - has inappropriate mandatory fields & doesn't implement limit
-      'Contact', // as with the next 3 a fix is tested & working for this but trying to keep code for review small hence just recording
-      //https://github.com/eileenmcnaughton/civicrm-core/commit/da3d6dcfd73a7e6e5f5a553e98b4608724d33765
-      'Event',// fix is https://github.com/eileenmcnaughton/civicrm-core/commit/cfd3114bd3215fed26c6e933f621b8e893cd7b3e
-      'Participant',//fix is https://github.com/eileenmcnaughton/civicrm-core/commit/6ebae38eb8999756f62259818af8827f50e8d4f3
-      'Pledge',// same fix as participant - keeping out of 4.5 as a conservative move
       'Extension', // can't handle creating 25
       'Note', // note has a default get that isn't implemented in createTestObject -meaning you don't 'get' them
       'MailingGroup', // no get call on MailingGroup
@@ -683,9 +679,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * @dataProvider entities_getlimit
    *
-   * @param $entityName
+   * @param string $entityName
    *
-   * @internal param string $entity
    */
   function testLimit($entityName) {
     $cases = array(); // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
@@ -750,9 +745,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * @dataProvider entities_getSqlOperators
    *
-   * @param $entityName
+   * @param string $entityName
    *
-   * @internal param string $entity
    */
   function testSqlOperators($entityName) {
     $baoString = _civicrm_api3_get_BAO($entityName);
@@ -1253,10 +1247,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return $returnEntities;
   }
   /**
-   * @param $entityName
+   * @param string $entityName
    * @param int $count
    *
-   * @internal param $entityName
    *
    * @return array
    */

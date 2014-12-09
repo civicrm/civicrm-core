@@ -45,18 +45,18 @@
        <add>3.0</add>
        <onDelete>CASCADE</onDelete>
   </foreignKey>
-  <field>     
-      <name>bid_value</name>  
+  <field>
+      <name>bid_value</name>
       <title>Price</title>
-      <type>decimal</type> 
-      <comment>Amount bid per item.</comment>  
-      <add>3.0</add>  
+      <type>decimal</type>
+      <comment>Amount bid per item.</comment>
+      <add>3.0</add>
   </field>
-  <field>     
-      <name>quantity</name>  
-      <type>int unsigned</type> 
-      <comment>Number of items bid on.</comment>  
-      <add>3.0</add>  
+  <field>
+      <name>quantity</name>
+      <type>int unsigned</type>
+      <comment>Number of items bid on.</comment>
+      <add>3.0</add>
   </field>
   <field>
        <name>bid_date</name>
@@ -64,37 +64,37 @@
        <comment>Date and time the bid was made.</comment>
        <add>3.0</add>
   </field>
-  <field> 
-      <name>is_active</name> 
+  <field>
+      <name>is_active</name>
       <type>boolean</type>
-      <default>0</default>                
-      <comment>Is this bid active or disabled/cancelled?</comment> 
-      <add>3.0</add> 
-  </field> 
-  <field> 
-      <name>is_winner</name> 
+      <default>0</default>
+      <comment>Is this bid active or disabled/cancelled?</comment>
+      <add>3.0</add>
+  </field>
+  <field>
+      <name>is_winner</name>
       <type>boolean</type>
-      <default>0</default>                
-      <comment>Is this bid the winning bid</comment> 
-      <add>3.0</add> 
-  </field> 
-  <field>     
-      <name>quantity_won</name>  
-      <type>int unsigned</type> 
-      <comment>Number of items this bid won.</comment>  
-      <add>3.0</add>  
+      <default>0</default>
+      <comment>Is this bid the winning bid</comment>
+      <add>3.0</add>
   </field>
-  <field> 
-      <name>contribution_id</name> 
-      <type>int unsigned</type> 
-      <comment>FK to contribution table.</comment> 
-      <add>3.0</add> 
+  <field>
+      <name>quantity_won</name>
+      <type>int unsigned</type>
+      <comment>Number of items this bid won.</comment>
+      <add>3.0</add>
   </field>
-  <foreignKey> 
-       <name>contribution_id</name> 
-       <table>civicrm_contribution</table> 
-       <key>id</key> 
-       <add>3.0</add> 
+  <field>
+      <name>contribution_id</name>
+      <type>int unsigned</type>
+      <comment>FK to contribution table.</comment>
+      <add>3.0</add>
+  </field>
+  <foreignKey>
+       <name>contribution_id</name>
+       <table>civicrm_contribution</table>
+       <key>id</key>
+       <add>3.0</add>
        <onDelete>SET NULL</onDelete>
   </foreignKey>
 </table>

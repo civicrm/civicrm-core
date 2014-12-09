@@ -59,7 +59,7 @@ function civicrm_api3_participant_create($params) {
   if (!empty($params['event_id'])) {
     $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'is_template');
     if (!empty($isTemplate)) {
-      return civicrm_api3_create_error(ts('Event templates are not meant to be registered'));
+      return civicrm_api3_create_error(ts('Event templates are not meant to be registered.'));
     }
   }
 

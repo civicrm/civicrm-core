@@ -301,7 +301,7 @@
          </table>
         {/if}
       {* Fee block (EventFees.tpl) is injected here when an event is selected. *}
-        <div id="feeBlock"></div>
+        <div class="crm-event-form-fee-block"></div>
         <fieldset>
           <table class="form-layout">
             <tr class="crm-participant-form-block-note">
@@ -339,17 +339,6 @@
       CRM.$(function($) {
 
         var $form = $('form.{/literal}{$form.formClass}{literal}');
-
-        // don't show cart related statuses if it's disabled
-        {/literal}{if !$enableCart}{literal}
-          var pendingInCartStatusId = {/literal}{$pendingInCartStatusId}{literal};
-          $("#status_id option[value='" + pendingInCartStatusId + "']").remove();
-        {/literal}{/if}{literal}
-
-        {/literal}{if $action eq 1}{literal}
-          var pendingRefundStatusId = {/literal}{$pendingRefundStatusId}{literal};
-          $("#status_id option[value='" + pendingRefundStatusId + "']").remove();
-        {/literal}{/if}{literal}
 
         // Handle event selection
         $('#event_id', $form).change(function() {
@@ -399,20 +388,14 @@
           {/if}
 
           {literal}
-          var eventId = $('#event_id').val();
-
-          {/literal}{if $action eq 2}{literal}
-            if (typeof eventId == 'undefined') {
-              var eventId = $('[name=event_id]').val();
-            }
-          {/literal}{/if}{literal}
+          var eventId = $('[name=event_id], #event_id', $form).val();
 
           if (eventId) {
             dataUrl += '&eventId=' + eventId;
           }
           else {
-            $('#eventFullMsg').hide( );
-            $('#feeBlock').html('');
+            $('#eventFullMsg', $form).hide( );
+            $('.crm-event-form-fee-block', $form).html('');
             return;
           }
 
@@ -429,13 +412,13 @@
           $.ajax({
             url: dataUrl,
             success: function ( html ) {
-              $("#feeBlock").html( html ).trigger('crmLoad');
+              $(".crm-event-form-fee-block", $form).html( html ).trigger('crmLoad');
               //show event real full as well as waiting list message.
-              if ( $("#hidden_eventFullMsg").val( ) ) {
-                $( "#eventFullMsg" ).show( ).html( $("#hidden_eventFullMsg" ).val( ) );
+              if ( $("#hidden_eventFullMsg", $form).val( ) ) {
+                $( "#eventFullMsg", $form).show( ).html( $("#hidden_eventFullMsg", $form).val( ) );
               }
               else {
-                $( "#eventFullMsg" ).hide( );
+                $( "#eventFullMsg", $form ).hide( );
               }
             }
           });

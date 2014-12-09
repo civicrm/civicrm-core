@@ -40,7 +40,7 @@
 class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
   /**
-   * the id of the event we are proceessing
+   * The id of the event we are proceessing
    *
    * @var int
    * @protected
@@ -48,7 +48,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public $_id;
 
   /**
-   * is this the first page?
+   * Is this the first page?
    *
    * @var boolean
    * @access protected
@@ -56,7 +56,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   protected $_first = FALSE;
 
   /**
-   * are we in single form mode or wizard mode?
+   * Are we in single form mode or wizard mode?
    *
    * @var boolean
    * @access protected
@@ -66,13 +66,13 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   protected $_action;
 
   /**
-   * are we actually managing an event template?
+   * Are we actually managing an event template?
    * @var boolean
    */
   protected $_isTemplate = FALSE;
 
   /**
-   * pre-populate fields based on this template event_id
+   * Pre-populate fields based on this template event_id
    * @var integer
    */
   protected $_templateId;
@@ -84,14 +84,14 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * the participant records
    */
   protected $_campaignID = NULL;
-  
+
   /**
    * Check if repeating event
    */
   protected $_isRepeatingEvent;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -101,7 +101,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     if (in_array('CiviEvent', $config->enableComponents)) {
       $this->assign('CiviEvent', TRUE);
     }
-      
+
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add', 'REQUEST');
 
     $this->assign('action', $this->_action);
@@ -120,7 +120,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
       // its an update mode, do a permission check
       if (!CRM_Event_BAO_Event::checkPermission($this->_id, CRM_Core_Permission::EDIT)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
 
       $participantListingID = CRM_Utils_Array::value('participant_listing_id', $eventInfo);
@@ -187,11 +187,11 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     }
 
     $this->_templateId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
-    
+
     //Is a repeating event
     if ($this->_isRepeatingEvent) {
-      $isRepeat = 'repeat';
-      $this->assign('isRepeat', $isRepeat);
+      $isRepeatingEntity = TRUE;
+      $this->assign('isRepeatingEntity', $isRepeatingEntity);
     }
 
     // also set up tabs
@@ -225,7 +225,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -256,7 +256,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public

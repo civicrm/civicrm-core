@@ -39,9 +39,9 @@
 class CRM_Contact_Form_Edit_Address {
 
   /**
-   * build form for address input fields
+   * Build form for address input fields
    *
-   * @param object  $form - CRM_Core_Form (or subclass)
+   * @param CRM_Core_Form $form
    * @param int     $addressBlockCount - the index of the address array (if multiple addresses on a page)
    * @param boolean $sharing - false, if we want to skip the address sharing features
    * @param boolean $inlineEdit true when edit used in inline edit
@@ -253,17 +253,13 @@ class CRM_Contact_Form_Edit_Address {
   }
 
   /**
-   * check for correct state / country mapping.
+   * Check for correct state / country mapping.
    *
    * @param $fields
    * @param $files
    * @param $self
    *
-   * @internal param \reference $array $fields - submitted form values.
-   * @internal param \reference $array $errors - if any errors found add to this array. please.
-   *
-   * @return true if no errors
-   *         array of errors if any present.
+   * @return array|bool if no errors
    *
    * @access public
    * @static
@@ -316,10 +312,10 @@ class CRM_Contact_Form_Edit_Address {
   }
 
   /**
-   * function to set default values for address block
+   * Set default values for address block
    *
    * @param array  $defaults  defaults associated array
-   * @param object $form     form object
+   * @param CRM_Core_Form $form     form object
    *
    * @static
    * @access public
@@ -419,7 +415,7 @@ class CRM_Contact_Form_Edit_Address {
 
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $groupTree
    */
   static function storeRequiredCustomDataInfo(&$form, $groupTree) {

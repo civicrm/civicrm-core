@@ -66,7 +66,7 @@ function civicrm_api3_message_template_delete($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_message_template_get_spec(&$params) {
 }

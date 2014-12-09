@@ -39,7 +39,7 @@
 class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
   /**
-   * takes an associative array and creates a address
+   * Takes an associative array and creates a address
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param boolean $fixAddress true if you need to fix (format) address values
@@ -132,7 +132,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   }
 
   /**
-   * takes an associative array and adds address
+   * Takes an associative array and adds address
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    * @param boolean  $fixAddress   true if you need to fix (format) address values
@@ -196,7 +196,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   }
 
   /**
-   * format the address params to have reasonable values
+   * Format the address params to have reasonable values
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
@@ -545,10 +545,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @param bool $microformat
    *
-   * @internal param $NULL
-   *
    * @return void
-   *
    * @access public
    */
   function addDisplay($microformat = FALSE) {
@@ -656,7 +653,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   }
 
   /**
-   * Function to get address sequence
+   * Get address sequence
    *
    * @return  array of address sequence.
    */
@@ -875,7 +872,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   }
 
   /**
-   * Function to check if current address fields are shared with any other address
+   * Check if current address fields are shared with any other address
    *
    * @param array    $fields    address fields in profile
    * @param int      $contactId contact id
@@ -946,7 +943,7 @@ SELECT is_primary,
   }
 
   /**
-   * Function to update the shared addresses if master address is modified
+   * Update the shared addresses if master address is modified
    *
    * @param int    $addressId address id
    * @param array  $params    associated array of address params
@@ -975,7 +972,7 @@ SELECT is_primary,
   }
 
   /**
-   * Function to create relationship between contacts who share an address
+   * Create relationship between contacts who share an address
    *
    * Note that currently we create relationship only for Individual contacts
    * Individual + Household and Individual + Orgnization
@@ -1049,7 +1046,7 @@ SELECT is_primary,
   }
 
   /**
-   * Function to check and set the status for shared address delete
+   * Check and set the status for shared address delete
    *
    * @param int     $addressId address id
    * @param int     $contactId contact id

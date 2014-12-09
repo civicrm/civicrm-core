@@ -49,7 +49,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method add()
+   * Check method add()
    */
   function testAdd() {
     $firstName = 'Shane';
@@ -98,7 +98,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method retrive()
+   * Check method retrive()
    */
   function testRetrieve() {
     $firstName = 'Shane';
@@ -145,7 +145,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method create()
+   * Check method create()
    */
   function testCreate() {
     $firstName = 'Shane';
@@ -221,7 +221,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method del()
+   * Check method del()
    */
   function testCreateEntityTrxn() {
     $fParams = array(
@@ -257,7 +257,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method retrieveEntityFinancialTrxn()
+   * Check method retrieveEntityFinancialTrxn()
    */
   function testRetrieveEntityFinancialTrxn() {
     $entityTrxn = self::testCreateEntityTrxn();

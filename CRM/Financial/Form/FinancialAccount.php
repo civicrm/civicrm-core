@@ -48,7 +48,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -75,7 +75,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -128,7 +128,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param $values
    * @param $files
@@ -163,7 +163,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
           'financial_account_id'  => $self->_id,
           'account_relationship'=> $relationshipId
         );
-        $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);       
+        $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
         if ($result) {
           $errorMsg['is_tax'] = ts('Is Tax? must be set for this financial account');
         }
@@ -173,7 +173,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -189,7 +189,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    * @return void

@@ -47,7 +47,7 @@
 class CRM_Contribute_Controller_Contribution extends CRM_Core_Controller {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
     parent::__construct($title, $modal);

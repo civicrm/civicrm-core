@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
@@ -23,27 +22,18 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+*}
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
-class CRM_Upgrade_TwoTwo_Controller extends CRM_Upgrade_Controller {
-  /**
-   * @return array
-   */
-  function &getPages() {
-    $pages = array(
-      'CRM_Upgrade_TwoTwo_Form_Step1' => NULL,
-      'CRM_Upgrade_TwoTwo_Form_Step2' => NULL,
-      'CRM_Upgrade_TwoTwo_Form_Step3' => NULL,
-      'CRM_Upgrade_TwoTwo_Form_Step4' => NULL,
-    );
-    return $pages;
-  }
-}
-
+<div class="crm-section no-label paypal_button_info-section">
+  <div class="content description">
+    {ts}If you have a PayPal account, you can click the PayPal button to continue. Otherwise, fill in the credit card and billing information on this form and click
+      <strong>Continue</strong>
+      at the bottom of the page.{/ts}
+  </div>
+</div>
+<div class="crm-section no-label {$form.$expressButtonName.name}-section">
+  <div class="content description">
+    {$form.$expressButtonName.html}
+    <div class="description">Save time. Checkout securely. Pay without sharing your financial information.</div>
+  </div>
+</div>

@@ -28,7 +28,7 @@
   <div class="messages status no-popup">
     <div class="icon inform-icon"></div>
     &nbsp;
-    {ts}No campaigns found.{/ts}
+    {ts}None found.{/ts}
   </div>
   <div class="action-link">
     <a href="{crmURL p='civicrm/campaign/add' q='reset=1' h=0 }" class="button"><span><div
@@ -229,8 +229,8 @@
       },
       "fnRowCallback": function (nRow, aData, iDisplayIndex) {
         //insert the id for each row for enable/disable.
-        var rowId = 'campaign_row_' + aData[0];
-        CRM.$(nRow).attr('id', rowId);
+        var rowId = 'campaign-' + aData[0];
+        CRM.$(nRow).attr('id', rowId).addClass('crm-entity');
         //handled disabled rows.
         var isActive = Boolean(Number(aData[10]));
         if (!isActive) {

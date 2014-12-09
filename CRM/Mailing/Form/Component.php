@@ -59,7 +59,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -106,7 +106,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -127,7 +127,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -148,10 +148,9 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     ), ts('Saved'), 'success');
 
   }
-  //end of function
 
   /**
-   * Function for validation
+   * Validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *

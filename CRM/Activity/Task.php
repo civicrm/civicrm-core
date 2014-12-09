@@ -47,7 +47,7 @@ class CRM_Activity_Task {
     EMAIL_SMS = 6;
 
   /**
-   * the task array
+   * The task array
    *
    * @var array
    * @static
@@ -55,7 +55,7 @@ class CRM_Activity_Task {
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array
    *
    * @var array
    * @static
@@ -164,7 +164,7 @@ class CRM_Activity_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level
    * of the user
    *
    * @param int $permission

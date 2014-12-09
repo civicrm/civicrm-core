@@ -35,7 +35,7 @@
 class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_SMS_DAO_Provider
@@ -107,7 +107,7 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
 
   /**
    * @param $values
-   * @param $providerId
+   * @param int $providerId
    */
   static function updateRecord($values, $providerId) {
     $dao = new CRM_SMS_DAO_Provider();
@@ -119,7 +119,7 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $is_active
    *
    * @return bool
@@ -129,14 +129,14 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
   }
 
   /**
-   * @param $providerID
+   * @param int $providerID
    *
    * @return null
    * @throws Exception
    */
   static function del($providerID) {
     if (!$providerID) {
-      CRM_Core_Error::fatal(ts('Invalid value passed to delete function'));
+      CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
     }
 
     $dao = new CRM_SMS_DAO_Provider();
@@ -148,7 +148,7 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
   }
 
   /**
-   * @param $providerID
+   * @param int $providerID
    * @param null $returnParam
    * @param null $returnDefaultString
    *

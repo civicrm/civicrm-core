@@ -35,9 +35,9 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
-     *  Test contact import for Individuals.
-     */
+  /**
+   *  Test contact import for Individuals.
+   */
   function testIndividualImportWithGroup() {
     $this->webtestLogin();
 
@@ -91,10 +91,9 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("{$count} Contacts"), "Contacts Not Found");
   }
 
-  /*
-     *  Helper function to provide data for contact import for Individuals.
-     */
   /**
+   * Helper function to provide data for contact import for Individuals.
+   *
    * @return array
    */
   function _individualGroupCSVData() {

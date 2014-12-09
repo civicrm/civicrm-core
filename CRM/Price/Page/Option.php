@@ -199,7 +199,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
   }
 
   /**
-   * edit custom Option.
+   * Edit custom Option.
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *

@@ -39,26 +39,26 @@
 class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
   /**
-   * the title of the group
+   * The title of the group
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * maximum profile fields that will be displayed
+   * Maximum profile fields that will be displayed
    *
    */
   protected $_maxFields = 9;
 
   /**
-   * variable to store redirect path
+   * Variable to store redirect path
    *
    */
   protected $_userContext;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -83,12 +83,22 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     $contactDetails = CRM_Contact_BAO_Contact_Utils::contactDetails($this->_activityHolderIds,
       'Activity', $returnProperties
     );
+    $readOnlyFields['assignee_display_name'] = ts('Assigned to');
+    if(!empty($contactDetails)) {
+      foreach($contactDetails as $key => $value){
+        $assignee = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($key);
+        foreach($assignee as $keys => $values) {
+          $assigneeContact[] = CRM_Contact_BAO_Contact::displayname($values);
+        }
+        $contactDetails[$key]['assignee_display_name'] = !empty($assigneeContact) ? implode(';', $assigneeContact) : NULL;
+      }
+    }
     $this->assign('contactDetails', $contactDetails);
     $this->assign('readOnlyFields', $readOnlyFields);
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -119,7 +129,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
       }
 
       //fix to reduce size as we are using this field in grid
-      if (is_array($field['attributes']) && $this->_fields[$name]['attributes']['size'] > 19) {
+      if (is_array($field['attributes']) && !empty($this->_fields[$name]['attributes']['size']) && $this->_fields[$name]['attributes']['size'] > 19) {
         //shrink class to "form-text-medium"
         $this->_fields[$name]['attributes']['size'] = 19;
       }
@@ -186,14 +196,14 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     // $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields) {
-      CRM_Core_Session::setStatus(ts("FILE or Autocomplete Select type field(s) in the selected profile are not supported for Batch Update."), ts("Some fields have been excluded"), "info");
+      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Batch Update."), ts('Some Fields Excluded'), 'info');
     }
 
     $this->addDefaultButtons(ts('Update Activities'));
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -214,7 +224,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -232,7 +242,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
         );
         $value['id'] = $key;
 
-        if ($value['activity_date_time']) {
+        if (!empty($value['activity_date_time'])) {
           $value['activity_date_time'] = CRM_Utils_Date::processDate($value['activity_date_time'], $value['activity_date_time_time']);
         }
 
@@ -292,6 +302,5 @@ WHERE  a.id = %1 ";
       CRM_Core_Session::setStatus("", ts("No Updates Saved"), "info");
     }
   }
-  //end of function
 }
 

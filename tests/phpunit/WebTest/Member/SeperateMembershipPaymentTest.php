@@ -144,9 +144,9 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
   }
 
   /**
-   * @param $pageId
-   * @param $memTypeId
-   * @param null $cid
+   * @param int $pageId
+   * @param int $memTypeId
+   * @param int $cid
    */
   function _testOnlineMembershipSignup($pageId, $memTypeId, $cid = NULL) {
     //Open Live Contribution Page

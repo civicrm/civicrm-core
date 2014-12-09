@@ -196,7 +196,7 @@ class CRM_Contact_Page_AJAX {
   }
 
   /**
-   * Function to fetch PCP ID by PCP Supporter sort_name, also displays PCP title and associated Contribution Page title
+   * Fetch PCP ID by PCP Supporter sort_name, also displays PCP title and associated Contribution Page title
    */
   static function getPCPList() {
     $name  = CRM_Utils_Array::value('s', $_GET);
@@ -317,7 +317,7 @@ class CRM_Contact_Page_AJAX {
   }
 
   /**
-   * Function to fetch the custom field help
+   * Fetch the custom field help
    */
   static function customField() {
     $fieldId          = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
@@ -518,7 +518,7 @@ ORDER BY sort_name ";
   }
 
   /**
-   * Function to delete custom value
+   * Delete custom value
    *
    */
   static function deleteCustomValue() {
@@ -537,7 +537,7 @@ ORDER BY sort_name ";
   }
 
   /**
-   * Function to perform enable / disable actions on record.
+   * Perform enable / disable actions on record.
    *
    */
   static function enableDisable() {
@@ -581,7 +581,7 @@ ORDER BY sort_name ";
   }
 
   /**
-     *Function to check the CMS username
+     *  check the CMS username
      *
     */
   static public function checkUserName() {
@@ -647,15 +647,15 @@ ORDER BY sort_name ";
         }
       }
       else {
-      	$cid = CRM_Utils_Array::value('cid', $_GET);
-      	if ($cid) {
+        $cid = CRM_Utils_Array::value('cid', $_GET);
+        if ($cid) {
           //check cid for interger
           $contIDS = explode(',', $cid);
           foreach ($contIDS as $contID) {
             CRM_Utils_Type::escape($contID, 'Integer');
           }
           $queryString = " cc.id IN ( $cid )";
-      	}
+        }
       }
 
       if ($queryString) {
@@ -743,8 +743,8 @@ LIMIT {$offset}, {$rowCount}
       $queryString = " ( cc.sort_name LIKE '%$name%' OR cp.phone LIKE '%$name%' ) ";
     }
     else {
-    	$cid = CRM_Utils_Array::value('cid', $_GET);
-    	if ($cid) {
+      $cid = CRM_Utils_Array::value('cid', $_GET);
+      if ($cid) {
         //check cid for interger
         $contIDS = explode(',', $cid);
         foreach ($contIDS as $contID) {
@@ -877,7 +877,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Function to retrieve signature based on email id
+   * Retrieve signature based on email id
    */
   static function getSignature() {
     $emailID = CRM_Utils_Type::escape($_REQUEST['emailID'], 'Positive');
@@ -896,7 +896,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Function to process dupes.
+   * Process dupes.
    *
    */
   static function processDupes() {
@@ -980,7 +980,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Function to retrieve a PDF Page Format for the PDF Letter form
+   * Retrieve a PDF Page Format for the PDF Letter form
    */
   function pdfFormat() {
     $formatId = CRM_Utils_Type::escape($_REQUEST['formatId'], 'Integer');
@@ -991,7 +991,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Function to retrieve Paper Size dimensions
+   * Retrieve Paper Size dimensions
    */
   static function paperSize() {
     $paperSizeName = CRM_Utils_Type::escape($_REQUEST['paperSizeName'], 'String');
@@ -1036,7 +1036,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * @param $name
+   * @param string $name
    *
    * @return string
    */
@@ -1065,7 +1065,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Function to retrieve contact relationships
+   * Retrieve contact relationships
    */
   public static function getContactRelationships() {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');

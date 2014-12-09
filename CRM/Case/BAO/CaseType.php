@@ -40,7 +40,7 @@
 class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
   /**
-   * static field for all the case information that we can potentially export
+   * Static field for all the case information that we can potentially export
    *
    * @var array
    * @static
@@ -48,7 +48,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   static $_exportableFields = NULL;
 
   /**
-   * takes an associative array and creates a Case Type object
+   * Takes an associative array and creates a Case Type object
    *
    * the function extract all the params it needs to initialize the create a
    * case type object. the params array could contain additional unused name/value
@@ -56,9 +56,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @internal param array $ids the array that holds all the db ids
+   * @throws CRM_Core_Exception
    *
-   * @return object CRM_Case_BAO_CaseType object
+   * @return CRM_Case_BAO_CaseType object
    * @access public
    * @static
    */
@@ -98,7 +98,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
 
   /**
-   * Function to format / convert submitted array to xml for case type definition
+   * Format / convert submitted array to xml for case type definition
    *
    * @param string $name
    * @param array $definition the case-type defintion expressed as an array-tree
@@ -107,7 +107,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @access public
    */
   static function convertDefinitionToXML($name, $definition) {
-    $xmlFile = '<?xml version="1.0" encoding="iso-8859-1" ?>' . "\n\n<CaseType>\n";
+    $xmlFile = '<?xml version="1.0" encoding="utf-8" ?>' . "\n\n<CaseType>\n";
     $xmlFile .= "<name>{$name}</name>\n";
 
     if (array_key_exists('forkable', $definition)) {
@@ -179,7 +179,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   }
 
   /**
-   * Function to get the case definition either from db or read from xml file
+   * Get the case definition either from db or read from xml file
    *
    * @param SimpleXmlElement $xml a single case-type record
    *
@@ -245,8 +245,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param array $params input parameters to find object
    * @param array $values output values of the object
    *
-   * @internal param array $ids the array that holds all the db ids
-   *
    * @return CRM_Case_BAO_CaseType|null the found object or null
    * @access public
    * @static
@@ -264,13 +262,11 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   }
 
   /**
-   * takes an associative array and creates a case type object
+   * Takes an associative array and creates a case type object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @internal param array $ids the array that holds all the db ids
-   *
-   * @return object CRM_Case_BAO_CaseType object
+   * @return CRM_Case_BAO_CaseType object
    * @access public
    * @static
    */
@@ -313,9 +309,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param array $defaults (reference ) an assoc array to hold the name / value pairs
    *                        in a hierarchical manner
    *
-   * @internal param array $ids (reference) the array that holds all the db ids
-   *
-   * @return object CRM_Case_BAO_CaseType object
+   * @return CRM_Case_BAO_CaseType object
    * @access public
    * @static
    */
@@ -325,8 +319,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   }
 
   /**
-   * @param $caseTypeId
+   * @param int $caseTypeId
    *
+   * @throws CRM_Core_Exception
    * @return mixed
    */
   static function del($caseTypeId) {

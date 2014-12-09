@@ -36,7 +36,7 @@
 class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
 
   /**
-   * the array of uploaded file names
+   * The array of uploaded file names
    * @var array
    */
   protected $_uploadNames;
@@ -48,7 +48,7 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
   protected $_uploadDir;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @param object $stateMachine reference to state machine object
    * @param string $uploadDir directory to store the uploaded files
@@ -65,9 +65,9 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * upload and move the file if valid to the uploaded directory
+   * Upload and move the file if valid to the uploaded directory
    *
-   * @param object $page       the CRM_Core_Form object
+   * @param CRM_Core_Form $page       the CRM_Core_Form object
    * @param object $data       the QFC data container
    * @param string $pageName   the name of the page which index the data container with
    * @param string $uploadName the name of the uploaded file
@@ -111,7 +111,7 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
   /**
    * Processes the request.
    *
-   * @param  object    $page       CRM_Core_Form the current form-page
+   * @param  CRM_Core_Form    $page       CRM_Core_Form the current form-page
    * @param  string    $actionName Current action name, as one Action object can serve multiple actions
    *
    * @return void
@@ -131,7 +131,7 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
 
   /**
    * @param CRM_Core_Form $page
-   * @param $actionName
+   * @param string $actionName
    *
    * @return mixed
    */

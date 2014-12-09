@@ -44,7 +44,7 @@ require_once 'Google/library/googlerequest.php';
 class CRM_Core_Payment_Google extends CRM_Core_Payment {
 
   /**
-   * mode of operation: live or test
+   * Mode of operation: live or test
    *
    * @var object
    */
@@ -75,7 +75,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string $mode the mode of operation: live or test
    *
@@ -166,7 +166,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $component
    */
   function doRecurCheckout(&$params, $component) {
@@ -299,7 +299,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   }
 
   /**
-   * hash_call: Function to perform the API call to PayPal using API signature
+   * Hash_call: Function to perform the API call to PayPal using API signature
    * @paymentProcessor is the array of payment processor settings value.
    * @searchParamsnvpStr is the array of search params.
    * returns an associtive array containing the response from the server.
@@ -354,7 +354,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   }
 
   /**
-   * @param $searchParams
+   * @param array $searchParams
    *
    * @return string
    */
@@ -435,8 +435,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *
    * @return bool|object
    */
-  function cancelSubscription(&$message = '', $params = array(
-    )) {
+  function cancelSubscription(&$message = '', $params = array()) {
     $orderNo = CRM_Utils_Array::value('subscriptionId', $params);
 
     $merchant_id  = $this->_paymentProcessor['user_name'];

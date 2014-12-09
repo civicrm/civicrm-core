@@ -1,6 +1,6 @@
 <?php
 /**
- * @param $params
+ * @param array $params
  * @param $text
  * @param $smarty
  *

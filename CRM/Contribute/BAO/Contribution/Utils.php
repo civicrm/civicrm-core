@@ -35,9 +35,9 @@
 class CRM_Contribute_BAO_Contribution_Utils {
 
   /**
-   * Function to process payment after confirmation
+   * Process payment after confirmation
    *
-   * @param object $form form object
+   * @param CRM_Core_Form $form form object
    * @param array $paymentParams array with payment related key
    * value pairs
    * @param array $premiumParams array with premium related key
@@ -45,9 +45,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @param int $contactID contact id
    * @param int $contributionTypeId financial type id
    * @param int|string $component component id
+   * @param array $fieldTypes presumably relates to custom field types - used when building data for sendMail
+   * @param $isTest
+   * @param $isPayLater
    *
-   * @param null $fieldTypes
-   *
+   * @throws CRM_Core_Exception
+   * @throws Exception
    * @return array associated array
    *
    * @static
@@ -59,26 +62,13 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $contactID,
     $contributionTypeId,
     $component = 'contribution',
-    $fieldTypes = NULL
+    $fieldTypes = NULL,
+    $isTest,
+    $isPayLater
   ) {
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
-    $isTest = ($form->_mode == 'test') ? 1 : 0;
     $lineItems = $form->_lineItem;
-
-    //do overrides that should have been done in the calling function -
-    // @todo the calling function should pass the correct
-    // variable for $contributionTypeId as it's impossible to debug what is happening in each flow here
-    // but we need to ensure it is doing so before we remove this cruft
-
-    if (isset($paymentParams['financial_type'])) {
-      $contributionTypeId = $paymentParams['financial_type'];
-    }
-    elseif (!empty($form->_values['pledge_id'])) {
-      $contributionTypeId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
-        $form->_values['pledge_id'],
-        'financial_type_id'
-      );
-    }
+    $isPaymentTransaction = self::isPaymentTransaction($form);
 
     $contributionType = new CRM_Financial_DAO_FinancialType();
     $contributionType->id = $contributionTypeId;
@@ -98,7 +88,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
     $payment = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
-    if ($form->_values['is_monetary'] && $form->_amount > 0.0 && is_array($form->_paymentProcessor)) {
+
+    if ($isPaymentTransaction) {
       $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
     }
 
@@ -107,7 +98,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
     $result = NULL;
     if ($form->_contributeMode == 'notify' ||
-      $form->_params['is_pay_later']
+      $isPayLater
     ) {
       // this is not going to come back, i.e. we fill in the other details
       // when we get a callback from the payment processor
@@ -141,7 +132,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->set('params', $form->_params);
       $form->postProcessPremium($premiumParams, $contribution);
 
-      if ($form->_values['is_monetary'] && $form->_amount >= 0.0) {
+      if ($isPaymentTransaction) {
         // add qfKey so we can send to paypal
         $form->_params['qfKey'] = $form->controller->_key;
         if ($component == 'membership') {
@@ -149,12 +140,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
           return $membershipResult;
         }
         else {
-          if (!$form->_params['is_pay_later']) {
+          if (!$isPayLater) {
             if (is_object($payment)) {
               // call postProcess hook before leaving
               $form->postProcessHook();
               // this does not return
-              $result = &$payment->doTransferCheckout($form->_params, 'contribute');
+              $result = $payment->doTransferCheckout($form->_params, 'contribute');
             }
             else{
               CRM_Core_Error::fatal($paymentObjError);
@@ -211,7 +202,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
       }
     }
-    elseif ($form->_values['is_monetary'] && $form->_amount > 0.0) {
+    elseif ($isPaymentTransaction) {
       if (!empty($paymentParams['is_recur']) &&
         $form->_contributeMode == 'direct'
       ) {
@@ -363,7 +354,22 @@ class CRM_Contribute_BAO_Contribution_Utils {
   }
 
   /**
-   * Function to get the contribution details by month
+   * Is a payment being made.
+   * Note that setting is_monetary on the form is somewhat legacy and the behaviour around this setting is confusing. It would be preferable
+   * to look for the amount only (assuming this cannot refer to payment in goats or other non-monetary currency
+   * @param CRM_Core_Form $form
+   *
+   * @return bool
+   */
+  static protected function isPaymentTransaction($form) {
+    if(!empty($form->_values['is_monetary']) && $form->_amount >= 0.0) {
+      return TRUE;
+    }
+    return FALSE;
+
+  }
+  /**
+   * Get the contribution details by month
    * of the year
    *
    * @param int     $param year
@@ -407,7 +413,7 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * Function to get the contribution details by year
+   * Get the contribution details by year
    *
    * @return array associated array
    *
@@ -450,8 +456,8 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param $params
-   * @param $contactID
+   * @param array $params
+   * @param int $contactID
    * @param $mail
    */
   static function createCMSUser(&$params, $contactID, $mail) {
@@ -472,7 +478,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param string $type
    *
    * @return bool
@@ -542,7 +548,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param $apiParams
+   * @param array $apiParams
    * @param $mapper
    * @param string $type
    * @param bool $category
@@ -743,7 +749,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return bool
    */
@@ -826,7 +832,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param $contactID
+   * @param int $contactID
    *
    * @return mixed
    */

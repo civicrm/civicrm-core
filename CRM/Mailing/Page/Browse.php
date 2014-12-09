@@ -42,7 +42,7 @@
 class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
   /**
-   * all the fields that are listings related
+   * All the fields that are listings related
    *
    * @var array
    * @access protected
@@ -50,7 +50,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   protected $_fields;
 
   /**
-   * the mailing id of the mailing we're operating on
+   * The mailing id of the mailing we're operating on
    *
    * @int
    * @access protected
@@ -58,7 +58,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   protected $_mailingId;
 
   /**
-   * the action that we are performing (in CRM_Core_Action terms)
+   * The action that we are performing (in CRM_Core_Action terms)
    *
    * @int
    * @access protected
@@ -71,7 +71,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   public $_archived;
 
   /**
-   * scheduled mailing
+   * Scheduled mailing
    *
    * @boolean
    * @access public
@@ -120,7 +120,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */
@@ -193,7 +193,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
         // check for action permissions.
         if (!CRM_Core_Permission::checkActionPermission('CiviMail', $this->_action)) {
-          CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+          CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
         }
 
         CRM_Mailing_BAO_Mailing::del($this->_mailingId);
@@ -312,7 +312,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param bool $sortBy
    *
    * @return string

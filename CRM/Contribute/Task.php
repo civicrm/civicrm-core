@@ -42,7 +42,7 @@ class CRM_Contribute_Task {
   CONST DELETE_CONTRIBUTIONS = 1, PRINT_CONTRIBUTIONS = 2, EXPORT_CONTRIBUTIONS = 3, BATCH_CONTRIBUTIONS = 4, EMAIL_CONTACTS = 5, UPDATE_STATUS = 6, PDF_RECEIPT = 7;
 
   /**
-   * the task array
+   * The task array
    *
    * @var array
    * @static
@@ -50,7 +50,7 @@ class CRM_Contribute_Task {
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array
    *
    * @var array
    * @static
@@ -125,8 +125,12 @@ class CRM_Contribute_Task {
       if (!CRM_Core_Permission::check('delete in CiviContribute')) {
         unset(self::$_tasks[1]);
       }
+      //CRM-12920 - check for edit permission
+      if( !CRM_Core_Permission::check('edit contributions') ){
+        unset(self::$_tasks[4],self::$_tasks[6]);
+      }
 
-      // remove action "Print or Email Contribution Invoices" 
+      // remove action "Print or Email Contribution Invoices"
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       if (!$invoicing) {
@@ -157,7 +161,7 @@ class CRM_Contribute_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level
    * of the user
    *
    * @param int $permission

@@ -123,7 +123,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
   function browse() {
     $resourceManager = CRM_Core_Resources::singleton();
     if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
-      $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999);
+      $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
     }
 
     $priceField    = array();
@@ -215,7 +215,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
   }
 
   /**
-   * edit price data.
+   * Edit price data.
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *
@@ -338,7 +338,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
   /**
    * Preview price field
    *
-   * @param $fid
+   * @param int $fid
    *
    * @internal param int $id price field id
    *

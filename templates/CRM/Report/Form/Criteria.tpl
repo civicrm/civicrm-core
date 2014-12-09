@@ -25,7 +25,7 @@
 *}
 {* Report form criteria section *}
     {if $colGroups}
-      <div id="col-groups" class="civireport-criteria" >
+  <div id="report-tab-col-groups" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom">
         {if $componentName eq 'Grant'}
             <h3>{ts}Include these Statistics{/ts}</h3>
         {else}
@@ -64,7 +64,7 @@
     {/if}
 
     {if $groupByElements}
-        <div id="group-by-elements" class="civireport-criteria" >
+        <div id="report-tab-group-by-elements" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>{ts}Group by Columns{/ts}</h3>
         {assign  var="count" value="0"}
         <table class="report-layout">
@@ -90,7 +90,7 @@
     {/if}
 
     {if $orderByOptions}
-      <div id="order-by-elements" class="civireport-criteria" >
+      <div id="report-tab-order-by-elements" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>{ts}Order by Columns{/ts}</h3>
 
   <table id="optionField">
@@ -133,10 +133,10 @@
             }
 
             // hide and display the appropriate blocks as directed by the php code
-            on_load_init_blocks( showRows, hideBlocks, '' );
-            
+            on_load_init_blocks( showRows, hideBlocks, '');
+
             cj('input[id^="order_by_section_"]').click(disPageBreak).each(disPageBreak);
-            
+
             function disPageBreak() {
               if (!cj(this).prop('checked')) {
                 cj(this).parent('td').next('td').children('input[id^="order_by_pagebreak_"]').prop({checked: false, disabled: true});
@@ -161,7 +161,7 @@
     {/if}
 
     {if $otherOptions}
-        <div id="other-options" class="civireport-criteria" >
+        <div id="report-tab-other-options" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>{ts}Other Options{/ts}</h3>
         <table class="report-layout">
           {assign var="optionCount" value=0}
@@ -182,7 +182,7 @@
     {/if}
 
     {if $filters}
-  <div id="set-filters" class="civireport-criteria" >
+  <div id="report-tab-set-filters" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>{ts}Set Filters{/ts}</h3>
         <table class="report-layout">
       {assign var="counter" value=1}
@@ -281,4 +281,3 @@
     </script>
     {/literal}
 
-    <div>{$form.buttons.html}</div>

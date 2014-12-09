@@ -39,7 +39,7 @@
 class CRM_Case_Form_Task_SearchTaskHookSample extends CRM_Case_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -73,7 +73,7 @@ WHERE cs.id IN ( {$caseIDs} )";
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

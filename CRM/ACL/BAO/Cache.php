@@ -41,7 +41,7 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_Cache {
   static $_cache = NULL;
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return mixed
    */
@@ -67,7 +67,7 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_Cache {
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return array
    */
@@ -93,8 +93,8 @@ SELECT acl_id
   }
 
   /**
-   * @param $id
-   * @param $cache
+   * @param int $id
+   * @param array $cache
    */
   static function store($id, &$cache) {
     foreach ($cache as $aclID => $data) {
@@ -111,7 +111,7 @@ SELECT acl_id
   }
 
   /**
-   * @param $id
+   * @param int $id
    */
   static function deleteEntry($id) {
     if (self::$_cache &&
@@ -129,7 +129,7 @@ WHERE contact_id = %1
   }
 
   /**
-   * @param $id
+   * @param int $id
    */
   static function updateEntry($id) {
     // rebuilds civicrm_acl_cache

@@ -50,7 +50,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   static $_links = NULL;
 
   /**
-   * we use desc to remind us what that column is, name is used in the tpl
+   * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    * @static
@@ -83,7 +83,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   );
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -91,7 +91,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -99,7 +99,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   protected $_limit = NULL;
 
   /**
-   * what context are we being invoked from
+   * What context are we being invoked from
    *
    * @access protected
    * @var string
@@ -107,7 +107,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   protected $_context = NULL;
 
   /**
-   * queryParams is the array returned by exportValues called on
+   * QueryParams is the array returned by exportValues called on
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
@@ -116,7 +116,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   public $_queryParams;
 
   /**
-   * represent the type of selector
+   * Represent the type of selector
    *
    * @var int
    * @access protected
@@ -177,7 +177,6 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
     $this->_query->_distinctComponentClause = "civicrm_pledge.id";
     $this->_query->_groupByComponentClause = " GROUP BY civicrm_pledge.id ";
   }
-  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -233,15 +232,13 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
 
     return self::$_links;
   }
-  //end of function
 
   /**
-   * getter for array of the parameters required for creating pager.
+   * Getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param $params
+   * @param array $params
    *
-   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -257,7 +254,6 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * Returns total number of rows for the query.
@@ -277,7 +273,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount
    *
    * @param enum   $action   the action being performed
    * @param int    $offset   the row number to start from
@@ -371,7 +367,6 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
-   *
    * @return array  $qill    which contains an array of strings
    * @access public
    */
@@ -383,7 +378,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
    * @param string $action the action being performed
@@ -460,7 +455,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
-   * name of export file.
+   * Name of export file.
    *
    * @param string $output type of output
    *
@@ -470,5 +465,4 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
     return ts('Pledge Search');
   }
 }
-//end of class
 

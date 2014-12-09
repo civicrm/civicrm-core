@@ -212,7 +212,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
   //function to check match for sumbit Advance Search
   /**
-   * @param $firstName
+   * @param string $firstName
    */
   function submitSearch($firstName) {
     $this->clickLink("_qf_Advanced_refresh");
@@ -247,8 +247,8 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
   // function to fill basic search detail
   /**
-   * @param $firstName
-   * @param $groupName
+   * @param string $firstName
+   * @param string $groupName
    * @param $tagName
    */
   function addBasicSearchDetail($firstName, $groupName, $tagName) {

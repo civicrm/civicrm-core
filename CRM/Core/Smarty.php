@@ -79,7 +79,7 @@ class CRM_Core_Smarty extends Smarty {
   private $backupFrames = array();
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @return CRM_Core_Smarty
    * @access private
@@ -188,7 +188,7 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
-   * executes & returns or displays the template results
+   * Executes & returns or displays the template results
    *
    * @param string $resource_name
    * @param string $cache_id
@@ -231,7 +231,7 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $value
    */
   function appendValue($name, $value) {

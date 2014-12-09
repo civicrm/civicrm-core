@@ -43,7 +43,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   protected $_mode;
 
   /**
-   * the id of the contact associated with this signature
+   * The id of the contact associated with this signature
    *
    * @var int
    * @public
@@ -72,7 +72,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   protected $_contactProfileId;
 
   /**
-   * the contact profile fields used for this petition
+   * The contact profile fields used for this petition
    *
    * @var array
    */
@@ -86,14 +86,14 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   protected $_activityProfileId;
 
   /**
-   * the activity profile fields used for this petition
+   * The activity profile fields used for this petition
    *
    * @var array
    */
   public $_activityProfileFields;
 
   /**
-   * the id of the survey (petition) we are proceessing
+   * The id of the survey (petition) we are proceessing
    *
    * @var int
    * @protected
@@ -108,7 +108,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   protected $_tagId;
 
   /**
-   * values to use for custom profiles
+   * Values to use for custom profiles
    *
    * @var array
    * @protected
@@ -124,7 +124,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   protected $_params;
 
   /**
-   * which email send mode do we use
+   * Which email send mode do we use
    *
    * @var int
    * EMAIL_THANK = 1,
@@ -239,7 +239,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -589,10 +589,10 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the petition profile form
+   * Build the petition profile form
    *
-   * @param $id
-   * @param $name
+   * @param int $id
+   * @param string $name
    * @param bool $viewOnly
    *
    * @return void
@@ -673,7 +673,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
   // check if user has already signed this petition
   /**
-   * @param $params
+   * @param array $params
    */
   function redirectIfSigned($params) {
     $signature = $this->bao->checkSignature($this->_surveyId, $this->_contactId);

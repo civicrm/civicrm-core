@@ -1179,7 +1179,8 @@ class CRM_GCD {
       }
       for ($i = 0; $i < self::NUM_ACTIVITY; $i++) {
         $activityDAO = new CRM_Activity_DAO_Activity();
-        $activityTypeID = mt_rand(7, 10);
+        $activityId = CRM_Core_OptionGroup::values('activity_type', NULL, NULL, NULL, ' AND v.name IN ("Tell A Friend", "Pledge Acknowledgment")');
+        $activityTypeID = array_rand($activityId);
         $activity = CRM_Core_PseudoConstant::activityType();
         $activityDAO->activity_type_id = $activityTypeID;
         $activityDAO->subject = "Subject for $activity[$activityTypeID]";
@@ -1194,19 +1195,11 @@ class CRM_GCD {
         $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $this->_insert($activityContactDAO);
 
-        if (in_array($activityTypeID, array(6, 9))) {
+        if ($activityTypeID == 9) {
           $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
           $activityContactDAO->activity_id = $activityDAO->id;
           $activityContactDAO->contact_id = mt_rand(1, 101);
           $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-          $this->_insert($activityContactDAO);
-        }
-
-        if ($activityTypeID == 7) {
-          $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
-          $activityContactDAO->activity_id = $activityDAO->id;
-          $activityContactDAO->contact_id = mt_rand(1, 101);
-          $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
           $this->_insert($activityContactDAO);
         }
       }

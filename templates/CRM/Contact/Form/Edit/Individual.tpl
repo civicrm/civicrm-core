@@ -86,7 +86,7 @@ CRM.$(function($) {
     {/if}
     {if $form.first_name}
     <td>
-      {$form.first_name.label}<br /> 
+      {$form.first_name.label}<br />
       {$form.first_name.html}
     </td>
     {/if}

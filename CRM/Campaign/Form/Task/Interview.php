@@ -39,14 +39,14 @@
 class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
 
   /**
-   * the title of the group
+   * The title of the group
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * variable to store redirect path
+   * Variable to store redirect path
    *
    */
   private $_userContext;
@@ -70,7 +70,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
   private $_allowAjaxReleaseButton;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -109,23 +109,19 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     elseif ( CRM_Core_OptionGroup::getValue('activity_type','WalkList') == $this->_surveyDetails['activity_type_id'] ) {
       $orderByParams =
         array(
-          1 =>
-          array(
+          1 => array(
             'column' => 'civicrm_address.street_name',
             'order'  => 'ASC',
           ),
-          2 =>
-          array(
+          2 => array(
             'column' => 'civicrm_address.street_number%2',
             'order' => 'ASC',
           ),
-          3 =>
-          array(
+          3 => array(
             'column' => 'civicrm_address.street_number',
             'order' => 'ASC',
           ),
-          4 =>
-          array(
+          4 => array(
             'column' => 'contact_a.sort_name',
             'order' => 'ASC',
           ),
@@ -283,7 +279,7 @@ WHERE {$clause}
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -383,7 +379,7 @@ WHERE {$clause}
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -408,23 +404,19 @@ WHERE {$clause}
     if ( CRM_Core_OptionGroup::getValue('activity_type','WalkList') == $this->_surveyDetails['activity_type_id'] ) {
       $defaults['order_bys'] =
         array(
-          1 =>
-          array(
+          1 => array(
             'column' => 'civicrm_address.street_name',
             'order'  => 'ASC',
           ),
-          2 =>
-          array(
+          2 => array(
             'column' => 'civicrm_address.street_number%2',
             'order' => 'ASC',
           ),
-          3 =>
-          array(
+          3 => array(
             'column' => 'civicrm_address.street_number',
             'order' => 'ASC',
           ),
-          4 =>
-          array(
+          4 => array(
             'column' => 'contact_a.sort_name',
             'order' => 'ASC',
           ),
@@ -444,7 +436,7 @@ WHERE {$clause}
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -470,7 +462,7 @@ WHERE {$clause}
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return mixed
    */

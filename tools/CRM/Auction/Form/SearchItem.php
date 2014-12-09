@@ -57,7 +57,7 @@ class CRM_Auction_Form_SearchItem extends CRM_Core_Form {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *

@@ -122,7 +122,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     );
     $getCustomFields = array();
     $getCustomFields = CRM_Core_BAO_CustomField::getFields('Individual', TRUE, TRUE);
-    //CRM_Core_Error::debug('fdf',$getCustomFields);
     //$this->assertEquals( 'testFld1',  $getCustomFields[$customFieldID1][0], 'Confirm First Custom field label' );
     //$this->assertEquals( 'testFld2',  $getCustomFields[$customFieldID2][0], 'Confirm Second Custom field label' );
 

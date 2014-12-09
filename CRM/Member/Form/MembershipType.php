@@ -37,10 +37,10 @@
  * This class generates form components for Membership Type
  *
  */
-class CRM_Member_Form_MembershipType extends CRM_Member_Form {
+class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
   /**
-   * max number of contacts we will display for membership-organisation
+   * Max number of contacts we will display for membership-organisation
    */
   CONST MAX_CONTACTS = 50;
 
@@ -58,7 +58,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
   }
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -108,7 +108,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -212,7 +212,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
   }
 
   /**
-   * Function for validation
+   * Validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -228,7 +228,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     }
 
     if (($params['minimum_fee'] > 0 ) && !$params['financial_type_id'] ) {
-      $errors['financial_type_id'] = ts('Please enter the financial type.');
+      $errors['financial_type_id'] = ts('Please enter the financial Type.');
     }
 
     if (empty($params['duration_interval']) and $params['duration_unit'] != 'lifetime') {
@@ -289,7 +289,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -415,9 +415,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
   }
 
   /**
-   * @param $previousID
-   * @param $priceSetId
-   * @param $membershipTypeId
+   * @param int $previousID
+   * @param int $priceSetId
+   * @param int $membershipTypeId
    * @param $optionsIds
    */
   public static function checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, &$optionsIds) {

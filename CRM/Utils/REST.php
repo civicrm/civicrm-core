@@ -89,7 +89,7 @@ class CRM_Utils_REST {
 
   // Generates values needed for non-error responses.
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */
@@ -145,10 +145,11 @@ class CRM_Utils_REST {
       $result = self::error('Could not interpret return values from function.');
     }
 
-    if (CRM_Utils_Array::value('json', $requestParams)) {
-      header('Content-Type: text/javascript');
+    if (!empty($requestParams['json'])) {
+      header('Content-Type: application/json');
       $json = json_encode(array_merge($result));
-      if (CRM_Utils_Array::value('prettyprint', $requestParams)) {
+      if (!empty($requestParams['prettyprint'])) {
+        // Used by the api explorer
         return self::jsonFormated($json);
       }
       return $json;
@@ -156,11 +157,7 @@ class CRM_Utils_REST {
 
 
     if (isset($result['count'])) {
-
-
       $count = ' count="' . $result['count'] . '" ';
-
-
     }
     else $count = "";
     $xml = "<?xml version=\"1.0\"?>
@@ -340,7 +337,7 @@ class CRM_Utils_REST {
 
   /**
    * @param $args
-   * @param $params
+   * @param array $params
    *
    * @return array|int
    */

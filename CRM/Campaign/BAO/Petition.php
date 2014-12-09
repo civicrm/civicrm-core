@@ -43,7 +43,7 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   }
 
   /**
-   * Function to get Petition Details for dashboard.
+   * Get Petition Details for dashboard.
    *
    * @static
    */
@@ -171,11 +171,11 @@ SELECT  petition.id                         as id,
   }
 
   /**
-   * takes an associative array and creates a petition signature activity
+   * Takes an associative array and creates a petition signature activity
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Campaign_BAO_Petition
+   * @return CRM_Campaign_BAO_Petition
    * @access public
    * @static
    */
@@ -229,9 +229,9 @@ SELECT  petition.id                         as id,
   }
 
   /**
-   * @param $activity_id
-   * @param $contact_id
-   * @param $petition_id
+   * @param int $activity_id
+   * @param int $contact_id
+   * @param int $petition_id
    *
    * @return bool
    */
@@ -279,13 +279,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Function to get Petition Signature Total
+   * Get Petition Signature Total
    *
-   * @param $surveyId
+   * @param int $surveyId
    *
    * @return array
-   * @internal param bool $all
-   * @internal param int $id
    * @static
    */
   static function getPetitionSignatureTotalbyCountry($surveyId) {
@@ -324,13 +322,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Function to get Petition Signature Total
+   * Get Petition Signature Total
    *
-   * @param $surveyId
+   * @param int $surveyId
    *
    * @return array
-   * @internal param bool $all
-   * @internal param int $id
    * @static
    */
   static function getPetitionSignatureTotal($surveyId) {
@@ -356,7 +352,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
 
 
   /**
-   * @param null $surveyId
+   * @param int $surveyId
    *
    * @return array
    */
@@ -387,14 +383,12 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Function to get Petition Signature Details
+   * Get Petition Signature Details
    *
-   * @param $surveyId
-   * @param null $status_id
+   * @param int $surveyId
+   * @param int $status_id
    *
    * @return array
-   * @internal param bool $all
-   * @internal param int $id
    * @static
    */
   static function getPetitionSignature($surveyId, $status_id = NULL) {
@@ -487,7 +481,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Function to check if contact has signed this petition
+   * Check if contact has signed this petition
    *
    * @param int $surveyId
    * @param int $contactId
@@ -540,7 +534,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * takes an associative array and sends a thank you or email verification email
+   * Takes an associative array and sends a thank you or email verification email
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
@@ -653,11 +647,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
 
 
         $confirmUrl = CRM_Utils_System::url('civicrm/petition/confirm',
-          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&p={$params['sid']}",
+          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&pid={$params['sid']}",
           TRUE
         );
         $confirmUrlPlainText = CRM_Utils_System::url('civicrm/petition/confirm',
-          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&p={$params['sid']}",
+          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&pid={$params['sid']}",
           TRUE,
           NULL,
           FALSE

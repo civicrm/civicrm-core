@@ -158,7 +158,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->VerifyTabularData(
       array(
         'With Contact' => "Anderson, {$firstName1}",
-        'Assigned To' => "Summerson, {$firstName2}",
+        'Assigned to' => "Summerson, {$firstName2}",
       ),
       "/label"
     );

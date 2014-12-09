@@ -28,16 +28,41 @@
       var matchingUfGroups,
         $select = $(this).hide().addClass('rendered');
 
+      var validTypesId = [];
       if (options.groupTypeFilter) {
         matchingUfGroups = ufGroupCollection.subcollection({
           filter: function(ufGroupModel) {
-            return ufGroupModel.checkGroupType(options.groupTypeFilter);
+            return ufGroupModel.checkGroupType(options.groupTypeFilter, options.allowAllSubtypes);
           }
         });
       } else {
         matchingUfGroups = ufGroupCollection;
       }
 
+      //CRM-15427 check for valid subtypes raise a warning if not valid
+      if (options.allowAllSubtypes && $.isEmptyObject(validTypesId)) {
+        validTypes = ufGroupCollection.subcollection({
+          filter: function(ufGroupModel) {
+            return ufGroupModel.checkGroupType(options.groupTypeFilter);
+          }
+        });
+        _.each(validTypes.models, function(validTypesattr) {
+          validTypesId.push(validTypesattr.id);
+        });
+      }
+      if (!$.isEmptyObject(validTypesId) && $.inArray($select.val(), validTypesId) == -1) {
+        var civiComponent;
+        if (options.groupTypeFilter.indexOf('Membership') !== -1) {
+          civiComponent = 'Membership';
+        }
+        else if (options.groupTypeFilter.indexOf('Participant') !== -1) {
+          civiComponent = 'Event';
+        }
+        else {
+          civiComponent = 'Contribution';
+        }
+        CRM.alert(ts('The selected profile is using a custom field which is not assigned to the "%1" being configured.', {1: civiComponent}), ts('Warning'));
+      }
       var view = new CRM.ProfileSelector.View({
         ufGroupId: $select.val(),
         ufGroupCollection: matchingUfGroups,
@@ -58,7 +83,9 @@
     $('.crm-profile-selector:not(.rendered)', this).each(function() {
       $(this).crmProfileSelector({
         groupTypeFilter: $(this).data('groupType'),
-        entities: $(this).data('entities')
+        entities: $(this).data('entities'),
+        //CRM-15427
+        allowAllSubtypes: $(this).data('default')
       });
     });
   });

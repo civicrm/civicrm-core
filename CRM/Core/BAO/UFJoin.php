@@ -39,11 +39,11 @@
 class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
 
   /**
-   * takes an associative array and creates a uf join object
+   * Takes an associative array and creates a uf join object
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Core_DAO_UFJoin object
+   * @return CRM_Core_DAO_UFJoin object
    * @access public
    * @static
    */
@@ -67,7 +67,7 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
   }
 
   /**
-   * @param $params
+   * @param array $params
    */
   public static function deleteAll(&$params) {
     $module      = CRM_Utils_Array::value('module', $params);
@@ -149,7 +149,7 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */

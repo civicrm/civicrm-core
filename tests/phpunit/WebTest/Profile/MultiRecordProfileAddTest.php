@@ -281,7 +281,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $gid
+   * @param int $gid
    * @param $profileTitle
    */
   function _deleteProfile($gid, $profileTitle) {

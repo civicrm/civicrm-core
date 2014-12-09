@@ -83,7 +83,7 @@
     } else if ( action == "copy" ) {
       var dialogTitle = "{/literal}{ts escape='js'}Copy to Case{/ts}{literal}";
     } else if ( action == "file" ) {
-      var dialogTitle = "{/literal}{ts escape='js'}File On Case{/ts}{literal}";
+      var dialogTitle = "{/literal}{ts escape='js'}File on Case{/ts}{literal}";
     }
 
     var dataUrl = {/literal}"{crmURL p='civicrm/case/addToCase' q='reset=1' h=0}"{literal};
@@ -122,7 +122,7 @@
         }
       );
     }
-    
+
     CRM.confirm({
       title: dialogTitle,
       width: '600',
@@ -130,7 +130,7 @@
       options: {yes: "{/literal}{ts escape='js'}Save{/ts}{literal}", no: "{/literal}{ts escape='js'}Cancel{/ts}{literal}"},
       url: dataUrl
     }).on('crmConfirm:yes', save);
-    
+
   }
 })(CRM.$);
 </script>

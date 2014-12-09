@@ -39,7 +39,7 @@
 class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -79,7 +79,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -139,8 +139,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
     );
 
     $this->setDefaults(array(
-      'contactType' =>
-        CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
       ));
 
     //build date formats

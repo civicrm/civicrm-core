@@ -182,10 +182,10 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $pageId
-   * @param $memTypeId
-   * @param $firstName
-   * @param $lastName
+   * @param int $pageId
+   * @param int $memTypeId
+   * @param string $firstName
+   * @param string $lastName
    * @param $payLater
    * @param $hash
    * @param bool $otherAmount

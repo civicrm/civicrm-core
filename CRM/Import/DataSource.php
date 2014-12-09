@@ -50,7 +50,7 @@ abstract class CRM_Import_DataSource {
   abstract public function getInfo();
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @access public
    */
@@ -61,7 +61,7 @@ abstract class CRM_Import_DataSource {
    * form snippet. It should add all fields necesarry to get the data
    * uploaded to the temporary table in the DB.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void (operates directly on form argument)
    * @access public
@@ -69,7 +69,7 @@ abstract class CRM_Import_DataSource {
   abstract public function buildQuickForm(&$form);
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    */

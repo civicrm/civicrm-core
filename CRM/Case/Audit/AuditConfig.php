@@ -14,7 +14,7 @@ class CRM_Case_Audit_AuditConfig {
   private $ifBlanks;
 
   /**
-   * @param $filename
+   * @param string $filename
    */
   public function __construct($filename) {
     $this->filename = $filename;

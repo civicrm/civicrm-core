@@ -35,30 +35,26 @@
 class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
 
   /**
-   * product information
+   * Product information
    * @var array
    * @static
    */
   private static $productInfo;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Contribute_BAO_ManagePremium object
+   * @return CRM_Contribute_BAO_ManagePremium object
    * @access public
    * @static
    */
@@ -73,7 +69,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -86,11 +82,10 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Function to delete financial Types
+   * Delete financial Types
    *
-   * @param $premiumID
+   * @param int $premiumID
    *
-   * @internal param int $contributionTypeId
    * @static
    */
   static function del($premiumID) {
@@ -103,15 +98,14 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Function to build Premium Block im Contribution Pages
+   * Build Premium Block im Contribution Pages
    *
-   * @param $form CRM_Core_Form
-   * @param $pageID
+   * @param CRM_Core_Form $form
+   * @param int $pageID
    * @param bool $formItems
-   * @param null $selectedProductID
+   * @param int $selectedProductID
    * @param null $selectedOption
    *
-   * @internal param int $pageId
    * @static
    */
   static function buildPremiumBlock(&$form, $pageID, $formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
@@ -173,13 +167,12 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Function to build Premium B im Contribution Pages
+   * Build Premium B im Contribution Pages
    *
-   * @param $form CRM_Core_Form
-   * @param $productID
-   * @param null $premiumProductID
+   * @param CRM_Core_Form $form
+   * @param int $productID
+   * @param int $premiumProductID
    *
-   * @internal param int $pageId
    * @static
    */
   function buildPremiumPreviewBlock($form, $productID, $premiumProductID = NULL) {
@@ -215,11 +208,10 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Function to delete premium associated w/ contribution page.
+   * Delete premium associated w/ contribution page.
    *
-   * @param $contributionPageID
+   * @param int $contributionPageID
    *
-   * @internal param int $contribution page id
    * @static
    */
   static function deletePremium($contributionPageID) {
@@ -250,7 +242,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Function to retrieve premium product and their options
+   * Retrieve premium product and their options
    *
    * @return array product and option arrays
    * @static

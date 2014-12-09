@@ -41,7 +41,7 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscribe {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -559,7 +559,8 @@ WHERE  email = %2
       $results[] = array(
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
-        'org' => $dao->org_unsubscribe ? ts('Yes') : ts('No'),
+        // Next value displays in selector under either Unsubscribe OR Optout column header, so always s/b Yes.
+        'unsubOrOptout' => ts('Yes'),
         'date' => CRM_Utils_Date::customFormat($dao->date),
       );
     }
@@ -567,7 +568,7 @@ WHERE  email = %2
   }
 
   /**
-   * @param $queueID
+   * @param int $queueID
    *
    * @return array
    */

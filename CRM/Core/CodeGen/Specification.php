@@ -105,7 +105,7 @@ class CRM_Core_CodeGen_Specification {
 
   /**
    * @param $tables
-   * @param $classNames
+   * @param string $classNames
    */
   function resolveForeignKeys(&$tables, &$classNames) {
     foreach (array_keys($tables) as $name) {
@@ -115,8 +115,8 @@ class CRM_Core_CodeGen_Specification {
 
   /**
    * @param $tables
-   * @param $classNames
-   * @param $name
+   * @param string $classNames
+   * @param string $name
    */
   function resolveForeignKey(&$tables, &$classNames, $name) {
     if (!array_key_exists('foreignKey', $tables[$name])) {
@@ -156,8 +156,8 @@ class CRM_Core_CodeGen_Specification {
 
   /**
    * @param $tables
-   * @param $valid
-   * @param $name
+   * @param int $valid
+   * @param string $name
    *
    * @return bool
    */
@@ -415,7 +415,7 @@ class CRM_Core_CodeGen_Specification {
   }
 
   /**
-   * @param $name
+   * @param string $name
    *
    * @return string
    */
@@ -534,7 +534,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $foreignXML
    * @param $fields
    * @param $foreignKeys
-   * @param $currentTableName
+   * @param string $currentTableName
    */
   function getForeignKey(&$foreignXML, &$fields, &$foreignKeys, &$currentTableName) {
     $name = trim((string ) $foreignXML->name);
@@ -591,7 +591,7 @@ class CRM_Core_CodeGen_Specification {
   /**
    * @param $attributes
    * @param $object
-   * @param $name
+   * @param string $name
    * @param null $pre
    * @param null $post
    */

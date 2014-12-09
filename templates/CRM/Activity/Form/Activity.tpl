@@ -82,8 +82,9 @@
     <td class="view-value">
       {$form.target_contact_id.html}
       {if $action eq 1 or $single eq false}
-      <br/>
-      {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
+      <div class="crm-is-multi-activity-wrapper">
+        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
+      </div>
       {/if}
     </td>
   </tr>
@@ -96,9 +97,11 @@
       <td>
         {$form.assignee_contact_id.html}
         {if $action neq 4}
-          <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
-            <span><div class="icon swap-icon"></div></span>
-          </a>
+          {if !$form.target_contact_id.frozen}
+            <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
+              <span class="icon ui-icon-shuffle"></span>
+            </a>
+          {/if}
           {if $activityAssigneeNotification}
             <br />
             <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
@@ -205,6 +208,45 @@
     </tr>
   {/if}
 
+  {if $action eq 2 OR $action eq 1}
+    <tr class="crm-activity-form-block-recurring_activity">
+      <td colspan="2">
+        {include file="CRM/Core/Form/RecurringEntity.tpl"}
+        {literal}
+          <script type="text/javascript">
+            CRM.$(function($) {
+              if ($('#activity_date_time').val() !== "" && $('#activity_date_time_time').val() !== "") {
+                $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
+                $('#repetition_start_date_time').val($('#activity_date_time_time').val());
+              }
+
+              $('#activity_date_time_display').change(function() {
+                $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
+              });
+
+              $('#activity_date_time_time').change(function() {
+                $('#repetition_start_date_time').val($('#activity_date_time_time').val());
+              });
+
+              if ($('#start_action_offset').val() == "" && $('#repeat_absolute_date_display').val() == "") {
+                $('#recurring-entity-block').addClass('collapsed');
+              }
+            });
+          </script>
+        {/literal}
+        {if $action eq 1}
+          {literal}
+            <script type="text/javascript">
+              CRM.$(function($) {
+                $('#recurring-entity-block div.crm-submit-buttons').css('display', 'none');
+              });
+            </script>
+          {/literal}
+        {/if}
+      </td>
+    </tr>
+  {/if}
+
   {if $action neq 4} {* Don't include "Schedule Follow-up" section in View mode. *}
   <tr class="crm-activity-form-block-schedule_followup">
     <td colspan="2">
@@ -239,18 +281,23 @@
       {literal}
         <script type="text/javascript">
           CRM.$(function($) {
-            $('.crm-accordion-body').each( function() {
+            var $form = $('form.{/literal}{$form.formClass}{literal}');
+            $('.crm-accordion-body', $form).each( function() {
               //open tab if form rule throws error
               if ( $(this).children( ).find('span.crm-error').text( ).length > 0 ) {
                 $(this).parent('.collapsed').crmAccordionToggle();
               }
             });
-            $('#swap_target_assignee').click(function() {
-              var assignees = $('#assignee_contact_id').select2("data");
-              var targets = $('#target_contact_id').select2("data");
-              $('#assignee_contact_id').select2("data", targets);
-              $('#target_contact_id').select2("data", assignees);
-              return false;
+            function toggleMultiActivityCheckbox() {
+              $('.crm-is-multi-activity-wrapper').toggle(!!($(this).val() && $(this).val().indexOf(',') > 0));
+            }
+            $('[name=target_contact_id]', $form).each(toggleMultiActivityCheckbox).change(toggleMultiActivityCheckbox);
+            $('#swap_target_assignee').click(function(e) {
+              e.preventDefault();
+              var assignees = $('#assignee_contact_id', $form).select2("data");
+              var targets = $('#target_contact_id', $form).select2("data");
+              $('#assignee_contact_id', $form).select2("data", targets);
+              $('#target_contact_id', $form).select2("data", assignees).change();
             });
           });
         </script>
@@ -282,7 +329,7 @@
     {/if}
   {/if}
   {if $action eq 4 and call_user_func(array('CRM_Case_BAO_Case','checkPermission'), $activityId, 'File On Case', $atype)}
-    <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts}File On Case{/ts}"><span><div class="icon ui-icon-clipboard"></div>{ts}File On Case{/ts}</span></a>
+    <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts}File On Case{/ts}"><span><div class="icon ui-icon-clipboard"></div>{ts}File on Case{/ts}</span></a>
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
@@ -308,3 +355,4 @@
   {/if}
   </div>{* end of form block*}
 {/if} {* end of snippet if*}
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity"}

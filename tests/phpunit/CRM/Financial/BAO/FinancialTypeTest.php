@@ -51,7 +51,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method add()
+   * Check method add()
    */
   function testAdd() {
     $params = array(
@@ -73,7 +73,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method retrive()
+   * Check method retrive()
    */
   function testRetrieve() {
     $params = array(
@@ -92,7 +92,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method setIsActive()
+   * Check method setIsActive()
    */
   function testSetIsActive() {
     $params = array(
@@ -115,7 +115,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method del()
+   * Check method del()
    */
   function testDel() {
     $params = array(
