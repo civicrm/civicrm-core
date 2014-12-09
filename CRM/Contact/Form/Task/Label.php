@@ -266,6 +266,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
           continue;
         }
 
+        $contact = array_merge($contact, $contact[$locName]);
         unset($contact[$locName]);
 
         if (!empty($contact['county_id'])) {

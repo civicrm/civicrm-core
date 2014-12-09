@@ -243,6 +243,20 @@ WHERE
   }
 
   /**
+   * Return tables using locations
+   */
+  static function locTables() {
+    static $locTables;
+    if (!$locTables) {
+      $locTables = array( 'civicrm_email', 'civicrm_address', 'civicrm_phone' );
+
+      // Allow hook_civicrm_merge() to adjust $locTables
+      CRM_Utils_Hook::merge('locTables', $locTables);
+    }
+    return $locTables;
+  }
+
+  /**
    * We treat multi-valued custom sets as "related tables" similar to activities, contributions, etc.
    * @param string $request 'relTables' or 'cidRefs'
    * @see CRM-13836
@@ -416,8 +430,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
     else {
       // if there aren't any specific tables, don't affect the ones handled by relTables()
+      // also don't affect tables in locTables() CRM-15658
       $relTables = self::relTables();
-      $handled = array();
+      $handled = self::locTables();
       foreach ($relTables as $params) {
         $handled = array_merge($handled, $params['tables']);
       }
