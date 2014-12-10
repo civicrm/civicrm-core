@@ -322,7 +322,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $this->assign('includeWysiwygEditor', TRUE);
 
     // Select list
-    $relationshipList = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactId, $this->_rtype, $this->_relationshipId, NULL, FALSE, 'label', TRUE, NULL, TRUE);
+    $relationshipList = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactId, $this->_rtype, $this->_relationshipId);
 
     // Metadata needed on clientside
     $contactTypes = CRM_Contact_BAO_ContactType::contactTypeInfo(TRUE);
