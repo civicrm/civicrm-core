@@ -842,7 +842,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     if (!empty($params['payment_processor_id'])) {
       // make sure that credit card number and cvv are valid
-      CRM_Core_Payment_Form::validateCreditCard($params, $errors);
+      CRM_Core_Payment_Form::validatePaymentInstrument($params, $errors, $self);
     }
 
     $joinDate = NULL;
