@@ -303,6 +303,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   */
   public static function toBeSkipped_updatesingle($sequential = FALSE) {
     $entitiesWithout = array(
+      'Attachment', // pseudo-entity; testUpdateSingleValueAlter doesn't introspect properly on it. Multiple magic fields
       'Mailing',
       'MailingGroup',
       'MailingJob',
