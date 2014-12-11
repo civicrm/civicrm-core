@@ -96,7 +96,7 @@ class Container {
     $dispatcher->addListener('DAO::post-insert', array('\CRM_Core_BAO_RecurringEntity', 'triggerInsert'));
     $dispatcher->addListener('DAO::post-update', array('\CRM_Core_BAO_RecurringEntity', 'triggerUpdate'));
     $dispatcher->addListener('DAO::post-delete', array('\CRM_Core_BAO_RecurringEntity', 'triggerDelete'));
-    $dispatcher->addListener('hook_civicrm_unhandled_exception', array('CRM_Core_LegacyErrorHandler', 'handleException');
+    $dispatcher->addListener('hook_civicrm_unhandled_exception', array('CRM_Core_LegacyErrorHandler', 'handleException'));
     return $dispatcher;
   }
 

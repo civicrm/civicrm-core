@@ -1459,12 +1459,18 @@ abstract class CRM_Utils_Hook {
 
   /**
    * @param CRM_Core_Exception Exception $exception
+   * @param mixed $request reserved for future use
    */
-  static function unhandledException($exception) {
-    self::singleton()->invoke(1, $exception, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,'civicrm_unhandled_exception');
+  static function unhandledException($exception, $request = NULL) {
+    self::singleton()->invoke(2, $exception, $request, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,'civicrm_unhandled_exception');
+    // == 4.4 ==
+    //$event = new stdClass();
+    //$event->exception = $exception;
+    //CRM_Core_LegacyErrorHandler::handleException($event);
+
     // == 4.5+ ==
-   $event = new \Civi\Core\Event\UnhandledExceptionEvent(self::$_nullObject, $exception);
-    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("unhandled_exception", $event);
+    $event = new \Civi\Core\Event\UnhandledExceptionEvent($exception, self::$_nullObject);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_unhandled_exception", $event);
   }
 
   /**
