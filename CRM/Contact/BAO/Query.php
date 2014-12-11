@@ -2711,7 +2711,8 @@ class CRM_Contact_BAO_Query {
     $qillOperators = array('NOT LIKE' => ts('Not Like')) + CRM_Core_SelectValues::getSearchBuilderOperators();
 
     $op = str_replace('IN', 'LIKE', $op);
-    $op = str_replace('!=', 'NOT LIKE', $op);
+    $op = str_replace('=', 'LIKE', $op);
+    $op = str_replace('!', 'NOT ', $op);
 
     if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
       $this->_where[$grouping][] = self::buildClause($alias, $op, $value, 'String');
