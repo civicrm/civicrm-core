@@ -21,7 +21,7 @@ Required vars: mailing, crmMailingConst
         <option value=""></option>
       </select>
     </div>
-    <div crm-ui-field="replyTo" crm-title="ts('Reply-To')">
+    <div crm-ui-field="replyTo" crm-title="ts('Reply-To')" ng-show="crmMailingConst.enableReplyTo">
       <select
         name="replyTo"
         ui-jq="select2"
