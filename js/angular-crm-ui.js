@@ -220,6 +220,37 @@
       };
     })
 
+    // example: <textarea crm-ui-richtext name="body_html" ng-model="mailing.body_html"></textarea>
+    .directive('crmUiRichtext', function (crmUiId, $timeout) {
+      return {
+        require: '?ngModel',
+        link: function (scope, elm, attr, ngModel) {
+          crmUiId(elm);
+          var ck = CKEDITOR.replace(elm[0]);
+
+          if (!ngModel) {
+            return;
+          }
+
+          ck.on('pasteState', function () {
+            scope.$apply(function () {
+              ngModel.$setViewValue(ck.getData());
+            });
+          });
+
+          ck.on('insertText', function () {
+            $timeout(function () {
+              ngModel.$setViewValue(ck.getData());
+            });
+          });
+
+          ngModel.$render = function (value) {
+            ck.setData(ngModel.$viewValue);
+          };
+        }
+      };
+    })
+
     // example: <a crm-ui-lock binding="mymodel.boolfield"></a>
     // example: <a crm-ui-lock
     //            binding="mymodel.boolfield"
