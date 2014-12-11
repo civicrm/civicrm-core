@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<h3>{ts}General Settings{/ts}</h3>
+<div id="report-tab-format" class="civireport-criteria">
 <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-title">
         <td class="report-label" width="20%">{$form.title.label} {help id="id-report_title" file="CRM/Report/Form/Settings.hlp"}</td>
@@ -42,10 +42,11 @@
         <td>{$form.report_footer.html}</td>
     </tr>
 </table>
-<br/>
+</div>
 
-<h3>{ts}Email Delivery Settings{/ts} {help id="id-email_settings" file="CRM/Report/Form/Settings.hlp"}</h3>
-<table class="form-layout">
+<div id="report-tab-email" class="civireport-criteria">
+  <h3 class="email-delivery-settings-title">{ts}Email Delivery Settings{/ts} {help id="id-email_settings" file="CRM/Report/Form/Settings.hlp"}</h3>
+  <table class="form-layout email-delivery-settings-fields">
     <tr class="crm-report-instanceForm-form-block-email_subject">
         <td class="report-label" width="20%">{$form.email_subject.label}</td>
         <td>{$form.email_subject.html|crmAddClass:huge}</td>
@@ -59,9 +60,9 @@
         <td>{$form.email_cc.html|crmAddClass:huge}</td>
     </tr>
 </table>
-<br/>
+</div>
 
-<h3>{ts}Other Settings{/ts}</h3>
+<div id="report-tab-access" class="civireport-criteria">
 <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-is_navigation">
   <td class="report-label">{$form.is_navigation.label}</td>
@@ -104,6 +105,7 @@
       <td>{$form.row_count.html}</td>
     </tr>
 </table>
+</div>
 
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="is_navigation"

@@ -155,7 +155,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     $this->assertFalse(empty($result['values']), "In line " . __LINE__);
     $this->assertEquals($result['values'][1]['mailing_id'], 1, "In line " . __LINE__);
     $this->assertEquals($result['values'][1]['subject'], "Some Subject", "In line " . __LINE__);
-    $this->assertEquals($result['values'][1]['creator_id'], 1, "In line " . __LINE__);
+    $this->assertEquals($result['values'][1]['creator_id'], 3, "In line " . __LINE__);
     $this->assertEquals($result['values'][1]['creator_name'], "xyz1, abc1", "In line " . __LINE__);
   }
 
@@ -188,7 +188,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     $this->assertFalse(empty($result['values']), "In line " . __LINE__);
     $this->assertEquals($result['values'][2]['mailing_id'], 2, "In line " . __LINE__);
     $this->assertEquals($result['values'][2]['subject'], "Some Subject", "In line " . __LINE__);
-    $this->assertEquals($result['values'][2]['creator_id'], 1, "In line " . __LINE__);
+    $this->assertEquals($result['values'][2]['creator_id'], 3, "In line " . __LINE__);
     $this->assertEquals($result['values'][2]['creator_name'], "xyz1, abc1", "In line " . __LINE__);
   }
 }

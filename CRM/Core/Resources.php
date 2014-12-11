@@ -509,7 +509,7 @@ class CRM_Core_Resources {
       ));
       // Disable profile creation if user lacks permission
       if (!CRM_Core_Permission::check('edit all contacts') && !CRM_Core_Permission::check('add contacts')) {
-        $settings['profileCreate'] = FALSE;
+        $settings['config']['entityRef']['contactCreate'] = FALSE;
       }
       $this->addSetting($settings);
 
@@ -593,7 +593,10 @@ class CRM_Core_Resources {
       'moneyFormat' => json_encode(CRM_Utils_Money::format(1234.56)),
       'contactSearch' => json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...')),
       'otherSearch' => json_encode(ts('Enter search term...')),
-      'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
+      'entityRef' => array(
+        'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
+        'filters' => self::getEntityRefFilters(),
+      ),
     );
     print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
     CRM_Utils_System::civiExit();
@@ -688,5 +691,43 @@ class CRM_Core_Resources {
    */
   static function isAjaxMode() {
     return in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(CRM_Core_Smarty::PRINT_SNIPPET, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON));
+  }
+
+  /**
+   * Provide a list of available entityRef filters
+   * FIXME: This function doesn't really belong in this class
+   * @TODO: Provide a sane way to extend this list for other entities - a hook or??
+   * @return array
+   */
+  static function getEntityRefFilters() {
+    $filters = array();
+
+    $filters['event'] = array(
+      array('key' => 'event_type_id', 'value' => ts('Event Type')),
+      array('key' => 'start_date', 'value' => ts('Start Date'), 'options' => array(
+        array('key' => '{">":"now"}', 'value' => ts('Upcoming')),
+        array('key' => '{"BETWEEN":["now - 3 month","now"]}', 'value' => ts('Past 3 Months')),
+        array('key' => '{"BETWEEN":["now - 6 month","now"]}', 'value' => ts('Past 6 Months')),
+        array('key' => '{"BETWEEN":["now - 1 year","now"]}', 'value' => ts('Past Year')),
+      )),
+    );
+
+    $filters['activity'] = array(
+      array('key' => 'activity_type_id', 'value' => ts('Activity Type')),
+      array('key' => 'status_id', 'value' => ts('Activity Status')),
+    );
+
+    $contactTypes = CRM_Utils_Array::makeNonAssociative(CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '.'));
+    $filters['contact'] = array(
+      array('key' => 'contact_type', 'value' => ts('Contact Type'), 'options' => $contactTypes),
+      array('key' => 'group', 'value' => ts('Group'), 'entity' => 'group_contact'),
+      array('key' => 'tag', 'value' => ts('Tag'), 'entity' => 'entity_tag'),
+      array('key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'address'),
+      array('key' => 'country', 'value' => ts('Country'), 'entity' => 'address'),
+      array('key' => 'gender_id', 'value' => ts('Gender')),
+      array('key' => 'is_deceased', 'value' => ts('Deceased')),
+    );
+
+    return $filters;
   }
 }

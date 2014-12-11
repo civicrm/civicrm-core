@@ -290,7 +290,7 @@ UNION
       $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
 
       $dedupeParams['check_permission'] = FALSE;
-      $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
+      $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Unsupervised');
 
       if (is_array($dupeIDs) && !empty($dupeIDs)) {
         // we should create relationship only w/ first org CRM-4193

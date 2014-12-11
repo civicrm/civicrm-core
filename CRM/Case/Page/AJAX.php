@@ -140,10 +140,15 @@ class CRM_Case_Page_AJAX {
                                     <tr><td>" . ts('Case Status') . "</td><td>{$cs}</td></tr>
                                     <tr><td>" . ts('Case Start Date') . "</td><td>" . CRM_Utils_Date::customFormat($dao->start_date) . "</td></tr>
                                     <tr><td>" . ts('Case End Date') . "</td><td></td></tr>" . CRM_Utils_Date::customFormat($dao->end_date) . "</table>";
-      echo $caseDetails;
+      if (CRM_Utils_Array::value('snippet', $_GET) == 'json') {
+        CRM_Core_Page_AJAX::returnJsonResponse($caseDetails);
+      }
+      else {
+        echo $caseDetails;
+      }
     }
     else {
-      echo ts('Could not find valid Case!');
+      CRM_Core_Error::fatal('Could not find valid Case.');
     }
     CRM_Utils_System::civiExit();
   }

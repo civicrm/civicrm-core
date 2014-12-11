@@ -25,49 +25,79 @@
 *}
 {if !$printOnly} {* NO print section starts *}
 {if $criteriaForm}
-<div> {* criteria section starts *}
-<div class="crm-accordion-wrapper crm-report_criteria-accordion {if $rows}collapsed{/if}">
- <div class="crm-accordion-header">
-    {ts}Report Criteria{/ts}
-   </div><!-- /.crm-accordion-header -->
- <div class="crm-accordion-body">
-        <div id="id_{$formTpl}"> {* search section starts *}
-                {include file="CRM/Report/Form/Criteria.tpl"}
-        </div> {* search div section ends *}
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
-</div> {* criteria section ends *}
-{/if}
+<div class="crm-report-criteria"> {* criteria section starts *}
+      <div id="mainTabContainer">
+        {*tab navigation bar*}
+        <ul>
+          {if $colGroups}
+            <li class="ui-corner-all">
+              <a title="{ts}Columns{/ts}" href="#report-tab-col-groups">{ts}Columns{/ts}</a>
+            </li>
+          {/if}
+          {if $groupByElements}
+            <li class="ui-corner-all">
+              <a title="{ts}Grouping{/ts}" href="#report-tab-group-by-elements">{ts}Grouping{/ts}</a>
+            </li>
+          {/if}
+          {if $orderByOptions}
+            <li class="ui-corner-all">
+              <a title="{ts}Sorting{/ts}" href="#report-tab-order-by-elements">{ts}Sorting{/ts}</a>
+            </li>
+          {/if}
+          {if $otherOptions}
+            <li class="ui-corner-all">
+              <a title="{ts}Display Options{/ts}" href="#report-tab-other-options">{ts}Display{/ts}</a>
+            </li>
+          {/if}
+          {if $filters}
+            <li class="ui-corner-all">
+              <a title="{ts}Filters{/ts}" href="#report-tab-set-filters">{ts}Filters{/ts}</a>
+            </li>
+          {/if}
+          {if $instanceForm OR $instanceFormError}
+            <li id="tab_settings" class="ui-corner-all">
+              <a title="{ts}Title and Format{/ts}" href="#report-tab-format">{ts}Title and Format{/ts}</a>
+            </li>
+            <li class="ui-corner-all">
+              <a title="{ts}Email Delivery{/ts}" href="#report-tab-email">{ts}Email Delivery{/ts}</a>
+            </li>
+            <li class="ui-corner-all">
+              <a title="{ts}Access{/ts}" href="#report-tab-access">{ts}Access{/ts}</a>
+            </li>
+          {/if}
+        </ul>
 
-{if $instanceForm OR $instanceFormError} {* settings section starts *}
-<div class="crm-accordion-wrapper crm-report_setting-accordion {if $rows}collapsed{/if}">
- <div class="crm-accordion-header" {if $updateReportButton} onclick="cj('#update-button').hide(); return false;" {/if} >
-    {if $mode eq 'template'}{ts}Create Report{/ts}{else}{ts}Report Settings{/ts}{/if}
-     </div><!-- /.crm-accordion-header -->
- <div class="crm-accordion-body">
-        <div id="id_{$instanceForm}">
-                <div id="instanceForm">
-                    {include file="CRM/Report/Form/Instance.tpl"}
+        {*criteria*}
+        {include file="CRM/Report/Form/Criteria.tpl"}
+
+        {*settings*}
+        {if $instanceForm OR $instanceFormError}
+          {include file="CRM/Report/Form/Instance.tpl"}
+        {/if}
+      </div> {* end mainTabContainer *}
+
                     {assign var=save value="_qf_"|cat:$form.formName|cat:"_submit_save"}
                     {assign var=next value="_qf_"|cat:$form.formName|cat:"_submit_next"}
                         <div class="crm-submit-buttons">
+                            {$form.buttons.html}
                             {$form.$save.html}
                             {if $mode neq 'template' && $form.$next}
                                 {$form.$next.html}
                             {/if}
                         </div>
-                </div>
-        </div>
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
-{if $updateReportButton}
-<div id='update-button' class="crm-submit-buttons">
-   {$form.$save.html}
-   {if $mode neq 'template' && $form.$next} {* Removed Save a Copy button here since user doesn't have chance to set a new title. *}
-       <span class="description">{ts}To save a copy with updated criteria click Report Settings above and update the Report Title. Then click Save a Copy.{/ts}</span>
+</div> {* criteria section ends *}
    {/if}
-</div>
-{/if}
-{/if} {* settings section ends *}
+
+{literal}
+<script type="text/javascript">
+CRM.$(function($) {
+  $("#mainTabContainer").tabs({
+    collapsible: true,
+    active: {/literal}{if $rows}false{else}0{/if}{literal}
+  });
+});
+
+</script>
+{/literal}
 
 {/if} {* NO print section ends *}

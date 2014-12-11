@@ -243,6 +243,20 @@ WHERE
   }
 
   /**
+   * Return tables using locations
+   */
+  static function locTables() {
+    static $locTables;
+    if (!$locTables) {
+      $locTables = array( 'civicrm_email', 'civicrm_address', 'civicrm_phone' );
+
+      // Allow hook_civicrm_merge() to adjust $locTables
+      CRM_Utils_Hook::merge('locTables', $locTables);
+    }
+    return $locTables;
+  }
+
+  /**
    * We treat multi-valued custom sets as "related tables" similar to activities, contributions, etc.
    * @param string $request 'relTables' or 'cidRefs'
    * @see CRM-13836
@@ -416,8 +430,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
     else {
       // if there aren't any specific tables, don't affect the ones handled by relTables()
+      // also don't affect tables in locTables() CRM-15658
       $relTables = self::relTables();
-      $handled = array();
+      $handled = self::locTables();
       foreach ($relTables as $params) {
         $handled = array_merge($handled, $params['tables']);
       }
@@ -811,9 +826,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Core_DAO::freeResult();
     }
 
-    // get all contact subtypes
-    $contactSubTypes = CRM_Contact_BAO_ContactType::subTypePairs(NULL, TRUE, '');
-
     // FIXME: there must be a better way
     foreach (array('main', 'other') as $moniker) {
       $contact = &$$moniker;
@@ -821,7 +833,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $value = empty($preferred_communication_method) ? array() : $preferred_communication_method;
       $specialValues[$moniker] = array(
         'preferred_communication_method' => $value,
-        'contact_sub_type' => $value,
         'communication_style_id' => $value,
       );
 
@@ -841,17 +852,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       );
       CRM_Core_OptionGroup::lookupValues($specialValues[$moniker], $names);
 
-      if (!empty($contact['contact_sub_type'])) {
-        $specialValues[$moniker]['contact_sub_type'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $contact['contact_sub_type']);
-
-        // fix contact sub type label for contact with sub type
-        $subtypes = array();
-        foreach ($contact['contact_sub_type'] as $key => $value) {
-          $subtypes[] = CRM_Utils_Array::retrieveValueRecursive($contactSubTypes, $value);
-        }
-        $contact['contact_sub_type_display'] = $specialValues[$moniker]['contact_sub_type_display'] = implode(', ', $subtypes);
-      }
-
       if (!empty($contact['communication_style'])) {
         $specialValues[$moniker]['communication_style_id_display'] = $contact['communication_style'];
       }
@@ -869,7 +869,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $rows = $elements = $relTableElements = $migrationInfo = array();
 
+    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+
     foreach ($diffs['contact'] as $field) {
+      if ($field == 'contact_sub_type') {
+        // CRM-15681 don't display sub-types in UI
+        continue;
+      }
       foreach (array('main', 'other') as $moniker) {
         $contact = &$$moniker;
         $value = CRM_Utils_Array::value($field, $contact);
@@ -903,6 +909,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $label = CRM_Utils_Array::value('individual_suffix', $contact);
           $value = CRM_Utils_Array::value('suffix_id', $contact);
           $field = 'suffix_id';
+        }
+        elseif ($field == 'gender_id' && !empty($value)) {
+          $label = $genders[$value];
+        }
+        elseif ($field == 'current_employer_id' && !empty($value)) {
+          $label = "$value (" . CRM_Contact_BAO_Contact::displayName($value) . ")";
         }
         $rows["move_$field"][$moniker] = $label;
         if ($moniker == 'other') {
@@ -1528,6 +1540,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     /*         } */
 
+
+    // CRM-15681 merge sub_types
+    if ($other_sub_types = CRM_Utils_array::value('contact_sub_type', $migrationInfo['other_details'])) {
+      if ($main_sub_types = CRM_Utils_array::value('contact_sub_type', $migrationInfo['main_details'])) {
+        $submitted['contact_sub_type'] = array_unique( array_merge($main_sub_types, $other_sub_types));
+      } else {
+        $submitted['contact_sub_type'] = $other_sub_types;
+      }
+    }
 
     // **** Update contact related info for the main contact
     if (!empty($submitted)) {

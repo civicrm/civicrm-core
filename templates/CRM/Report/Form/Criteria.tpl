@@ -25,12 +25,7 @@
 *}
 {* Report form criteria section *}
     {if $colGroups}
-      <div id="col-groups" class="civireport-criteria" >
-        {if $componentName eq 'Grant'}
-            <h3>{ts}Include these Statistics{/ts}</h3>
-        {else}
-            <h3>{ts}Display Columns{/ts}</h3>
-        {/if}
+  <div id="report-tab-col-groups" class="civireport-criteria">
         {foreach from=$colGroups item=grpFields key=dnc}
             {assign  var="count" value="0"}
             {* Wrap custom field sets in collapsed accordion pane. *}
@@ -64,8 +59,7 @@
     {/if}
 
     {if $groupByElements}
-        <div id="group-by-elements" class="civireport-criteria" >
-        <h3>{ts}Group by Columns{/ts}</h3>
+        <div id="report-tab-group-by-elements" class="civireport-criteria">
         {assign  var="count" value="0"}
         <table class="report-layout">
             <tr class="crm-report crm-report-criteria-groupby">
@@ -90,9 +84,7 @@
     {/if}
 
     {if $orderByOptions}
-      <div id="order-by-elements" class="civireport-criteria" >
-        <h3>{ts}Order by Columns{/ts}</h3>
-
+      <div id="report-tab-order-by-elements" class="civireport-criteria">
   <table id="optionField">
         <tr>
         <th>&nbsp;</th>
@@ -161,8 +153,7 @@
     {/if}
 
     {if $otherOptions}
-        <div id="other-options" class="civireport-criteria" >
-        <h3>{ts}Other Options{/ts}</h3>
+        <div id="report-tab-other-options" class="civireport-criteria">
         <table class="report-layout">
           {assign var="optionCount" value=0}
           <tr class="crm-report crm-report-criteria-field">
@@ -182,8 +173,7 @@
     {/if}
 
     {if $filters}
-  <div id="set-filters" class="civireport-criteria" >
-        <h3>{ts}Set Filters{/ts}</h3>
+  <div id="report-tab-set-filters" class="civireport-criteria">
         <table class="report-layout">
       {assign var="counter" value=1}
             {foreach from=$filters     item=table key=tableName}
@@ -281,4 +271,3 @@
     </script>
     {/literal}
 
-    <div>{$form.buttons.html}</div>

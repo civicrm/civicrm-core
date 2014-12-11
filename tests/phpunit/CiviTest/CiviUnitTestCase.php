@@ -445,6 +445,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Create default domain contacts for the two domains added during test class
+   * database population.
+   */
+  public function createDomainContacts() {
+    $default_domain_contact = $this->organizationCreate();
+    $second_domain_contact = $this->organizationCreate();
+  }
+
+  /**
    *  Common teardown functions for all unit tests
    */
   protected function tearDown() {
@@ -453,6 +462,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $session->set('userID', NULL);
     $tablesToTruncate = array('civicrm_contact');
     $this->quickCleanup($tablesToTruncate);
+    $this->createDomainContacts();
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
     CRM_Core_Transaction::forceRollbackIfEnabled();

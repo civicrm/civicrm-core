@@ -917,5 +917,84 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//li[@id='tab_member']/a/em");
     $this->verifyText("xpath=//li[@id='tab_member']/a/em", 1);
   }
+
+  /**
+   * Test for CRM-15658 fix
+   */
+  function testMergeEmailAndAddress() {
+    $this->webtestLogin();
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
+    $firstName = substr(sha1(rand()), 0, 7);
+    $this->type('first_name', $firstName);
+
+    //fill in last name
+    $lastName = substr(sha1(rand()), 0, 7);
+    $this->type('last_name', $lastName);
+
+    //fill in email id
+    $this->type('email_1_email', "{$firstName}.{$lastName}@example.com");
+
+    //address section
+    $this->click("addressBlock");
+    $this->waitForElementPresent("address_1_street_address");
+    $this->type("address_1_street_address", "902C El Camino Way SW");
+    $this->type("address_1_city", "Dumfries");
+    $this->type("address_1_postal_code", "1234");
+
+    // Clicking save.
+    $this->click("_qf_Contact_upload_view");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText('crm-notification-container', "Contact Saved");
+
+    //duplicate contact with same email id
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
+    $firstName2 = substr(sha1(rand()), 0, 7);
+    $this->type('first_name', $firstName2);
+
+    //fill in last name
+    $lastName2 = substr(sha1(rand()), 0, 7);
+    $this->type('last_name', $lastName2);
+
+    //fill in email id
+    $this->type('email_1_email', "{$firstName}.{$lastName}@example.com");
+
+    //address section
+    $this->click("addressBlock");
+    $this->waitForElementPresent("address_1_street_address");
+    $this->type("address_1_street_address", "2782Y Dowlen Path W");
+    $this->type("address_1_city", "Birmingham");
+    $this->type("address_1_postal_code", "3456");
+
+    // Clicking save.
+    $this->click("_qf_Contact_upload_view");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText('crm-notification-container', "Contact Saved");
+
+    $this->openCiviPage("contact/dedupefind", "reset=1&action=update&rgid=4");
+    $this->click("xpath=//a/span[text()='Refresh Duplicates']");
+    $this->assertTrue((bool)preg_match("/This will refresh the duplicates list. Click OK to proceed./", $this->getConfirmation()));
+    $this->chooseOkOnNextConfirmation();
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
+    $this->clickLink("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
+
+    //merge without specifying any criteria
+    $this->click("_qf_Merge_next-bottom");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->assertTrue($this->isTextPresent('Contacts Merged'));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[2]/div[1][contains(text(), 'Home')]"));
+    $this->verifyElementNotPresent("xpath=//div[@id='email-block']/div/div/div[3]/div[1][contains(text(), 'Home')]");
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='email-block']/div/div/div[2]/div[2]/a[contains(text(), '{$firstName}.{$lastName}@example.com')]"));
+    $this->verifyElementNotPresent("xpath=//div[@id='email-block']/div/div/div[3]/div[2]/a[contains(text(), '{$firstName}.{$lastName}@example.com')]");
+
+    $this->assertElementContainsText('address-block-1', "902C El Camino Way SW");
+    $this->assertElementContainsText('address-block-1', "Dumfries");
+    $this->assertElementContainsText('address-block-1', "1234");
+
+    $this->assertElementNotContainsText("address-block-2", "2782Y Dowlen Path W");
+    $this->assertElementNotContainsText("address-block-2", "Birmingham");
+    $this->assertElementNotContainsText("address-block-2", "3456");
+  }
 }
 

@@ -145,10 +145,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'location' => array(
         'type' => 'text',
         'label' => ts('Location'),
-        'attributes' =>
-        CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity',
-          'location'
-        ),
+        'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'location'),
         'required' => FALSE
       ),
       'details' => array(
