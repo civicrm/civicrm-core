@@ -234,24 +234,25 @@ CRM.strings = CRM.strings || {};
 
   /**
    * Render an option list
-   * @param options array
-   * @param val default value
-   * @internal param rendered
+   * @param options {array}
+   * @param val {string} default value
+   * @param escapeHtml {bool}
    * @return string
    */
-  CRM.utils.renderOptions = function(options, val) {
-    var rendered = '';
+  CRM.utils.renderOptions = function(options, val, escapeHtml) {
+    var rendered = '',
+      esc = escapeHtml === false ? _.identity : _.escape;
     if (!$.isArray(val)) {
       val = [val];
     }
     _.each(options, function(option) {
       if (option.children) {
-        rendered += '<optgroup label="' + _.escape(option.value) + '">' +
+        rendered += '<optgroup label="' + esc(option.value) + '">' +
           CRM.utils.renderOptions(option.children, val) +
           '</optgroup>';
       } else {
         var selected = ($.inArray('' + option.key, val) > -1) ? 'selected="selected"' : '';
-        rendered += '<option value="' + _.escape(option.key) + '"' + selected + '>' + _.escape(option.value) + '</option>';
+        rendered += '<option value="' + esc(option.key) + '"' + selected + '>' + esc(option.value) + '</option>';
       }
     });
     return rendered;
