@@ -1,7 +1,12 @@
 <?php
 
 class CRM_Core_LegacyErrorHandler {
-  static function handledException($e) {
+  /**
+   * @param \Civi\Core\Event\UnhandledExceptionEvent $event
+   * @throws Exception
+   */
+  static function handleException($event) {
+    $e = $event->exception;
     if ($e instanceof CRM_Core_Exception) {
       $params = $e->getErrorData();
       $message = $e->getMessage();
@@ -24,4 +29,5 @@ class CRM_Core_LegacyErrorHandler {
       }
     }
   }
+
 }
