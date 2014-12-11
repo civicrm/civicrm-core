@@ -351,6 +351,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @acess public
    */
   static function handleUnhandledException($exception) {
+    try {
+      CRM_Utils_Hook::unhandledException($exception);
+    } catch (Exception $other) {
+      // if the exception-handler generates an exception, then that sucks! oh, well. carry on.
+    }
     $config = CRM_Core_Config::singleton();
     $vars = array(
       'message' => $exception->getMessage(),
