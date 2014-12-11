@@ -1141,9 +1141,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->addElement('submit', $this->_createNewButtonName,
         ts('Save a Copy') . '...');
     }
-    if ($this->_instanceForm) {
-      $this->assign('instanceForm', TRUE);
-    }
+    $this->assign('instanceForm', $this->_instanceForm);
 
     $label = $this->_id ? ts('Print Report') : ts('Print Preview');
     $this->addElement('submit', $this->_printButtonName, $label);

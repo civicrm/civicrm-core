@@ -80,7 +80,9 @@
                     {assign var=next value="_qf_"|cat:$form.formName|cat:"_submit_next"}
                         <div class="crm-submit-buttons">
                             {$form.buttons.html}
-                            {$form.$save.html}
+                            {if $instanceForm}
+                              {$form.$save.html}
+                            {/if}
                             {if $mode neq 'template' && $form.$next}
                                 {$form.$next.html}
                             {/if}
@@ -91,10 +93,15 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  $("#mainTabContainer").tabs({
+  var tabSettings = {
     collapsible: true,
     active: {/literal}{if $rows}false{else}0{/if}{literal}
-  });
+  };
+  // If a tab contains an error, open it
+  if ($('.civireport-criteria .crm-error', '#mainTabContainer').length) {
+    tabSettings.active = $('.civireport-criteria').index($('.civireport-criteria:has(".crm-error")')[0]);
+  }
+  $("#mainTabContainer").tabs(tabSettings);
 });
 
 </script>
