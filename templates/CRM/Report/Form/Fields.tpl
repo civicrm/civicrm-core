@@ -24,8 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 {if !$printOnly} {* NO print section starts *}
-{if $criteriaForm}
-<div class="crm-report-criteria"> {* criteria section starts *}
+  {if $criteriaForm}
+    <div class="crm-report-criteria"> {* criteria section starts *}
       <div id="mainTabContainer">
         {*tab navigation bar*}
         <ul>
@@ -76,35 +76,35 @@
         {/if}
       </div> {* end mainTabContainer *}
 
-                    {assign var=save value="_qf_"|cat:$form.formName|cat:"_submit_save"}
-                    {assign var=next value="_qf_"|cat:$form.formName|cat:"_submit_next"}
-                        <div class="crm-submit-buttons">
-                            {$form.buttons.html}
-                            {if $instanceForm}
-                              {$form.$save.html}
-                            {/if}
-                            {if $mode neq 'template' && $form.$next}
-                                {$form.$next.html}
-                            {/if}
-                        </div>
-</div> {* criteria section ends *}
-   {/if}
+      {assign var=save value="_qf_"|cat:$form.formName|cat:"_submit_save"}
+      {assign var=next value="_qf_"|cat:$form.formName|cat:"_submit_next"}
+      <div class="crm-submit-buttons">
+        {$form.buttons.html}
+        {if $instanceForm}
+          {$form.$save.html}
+        {/if}
+        {if $mode neq 'template' && $form.$next}
+          {$form.$next.html}
+        {/if}
+      </div>
+    </div> {* criteria section ends *}
+  {/if}
 
 {literal}
-<script type="text/javascript">
-CRM.$(function($) {
-  var tabSettings = {
-    collapsible: true,
-    active: {/literal}{if $rows}false{else}0{/if}{literal}
-  };
-  // If a tab contains an error, open it
-  if ($('.civireport-criteria .crm-error', '#mainTabContainer').length) {
-    tabSettings.active = $('.civireport-criteria').index($('.civireport-criteria:has(".crm-error")')[0]);
-  }
-  $("#mainTabContainer").tabs(tabSettings);
-});
+  <script type="text/javascript">
+    CRM.$(function($) {
+      var tabSettings = {
+        collapsible: true,
+        active: {/literal}{if $rows}false{else}0{/if}{literal}
+      };
+      // If a tab contains an error, open it
+      if ($('.civireport-criteria .crm-error', '#mainTabContainer').length) {
+        tabSettings.active = $('.civireport-criteria').index($('.civireport-criteria:has(".crm-error")')[0]);
+      }
+      $("#mainTabContainer").tabs(tabSettings);
+    });
 
-</script>
+  </script>
 {/literal}
 
 {/if} {* NO print section ends *}
