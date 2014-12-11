@@ -530,7 +530,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
                     WHERE       $eqTable.job_id = " . $this->id . "
                         AND     $edTable.id IS null
                         AND     $ebTable.id IS null
-                        AND    $contactTable.is_opt_out = 0";
+                        AND    $contactTable.do_not_sms = 0";
     }
     $eq->query($query);
 
