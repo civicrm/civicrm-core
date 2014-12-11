@@ -1,13 +1,24 @@
 /// crmUi: Sundry UI helpers
 (function (angular, $, _) {
-  var idCount = 0;
 
   var partialUrl = function (relPath) {
     return CRM.resourceUrls['civicrm'] + '/partials/crmUi/' + relPath;
   };
 
-
   angular.module('crmUi', [])
+
+    .factory('crmUiId', function() {
+      var idCount = 0;
+      // Get the HTML ID of an element. If none available, assign one.
+      return function crmUiId(el){
+        var id = el.attr('id');
+        if (!id) {
+          id = 'crmUi_' + (++idCount);
+          el.attr('id', id);
+        }
+        return id;
+      };
+    })
 
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
     // WISHLIST: crmCollapsed should support two-way/continous binding
@@ -102,7 +113,7 @@
     // example: <div crm-ui-field crm-title="My Field"> {{mydata}} </div>
     // example: <div crm-ui-field="myfield" crm-title="My Field"> <input name="myfield" /> </div>
     // example: <div crm-ui-field="myfield" crm-title="My Field"> <input name="myfield" required /> </div>
-    .directive('crmUiField', function() {
+    .directive('crmUiField', function(crmUiId) {
       function createReqStyle(req) {
         return {visibility: req ? 'inherit' : 'hidden'};
       }
@@ -150,9 +161,7 @@
 
           // 2. Make sure that inputs are well-defined (with name+id).
 
-          if (!input.attr('id')) {
-            input.attr('id', 'crmUi_' + (++idCount));
-          }
+          crmUiId(input);
           $(label).attr('for', input.attr('id'));
 
           // 3. Monitor is the "required" and "$valid" properties
