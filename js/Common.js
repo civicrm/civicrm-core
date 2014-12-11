@@ -240,14 +240,14 @@ CRM.strings = CRM.strings || {};
    * @return string
    */
   CRM.utils.renderOptions = function(options, val) {
-    var rendered = arguments[2] || '';
+    var rendered = '';
     if (!$.isArray(val)) {
       val = [val];
     }
     _.each(options, function(option) {
       if (option.children) {
         rendered += '<optgroup label="' + _.escape(option.value) + '">' +
-          CRM.utils.renderOptions(option.children, val, rendered) +
+          CRM.utils.renderOptions(option.children, val) +
           '</optgroup>';
       } else {
         var selected = ($.inArray('' + option.key, val) > -1) ? 'selected="selected"' : '';
