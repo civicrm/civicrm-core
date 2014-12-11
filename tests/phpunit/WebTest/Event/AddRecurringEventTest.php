@@ -98,7 +98,7 @@ class WebTest_Event_AddRecurringEventTest extends CiviSeleniumTestCase {
     $countOfEvents = $this->getXpathCount("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody/tr");
     if ($countOfEvents) {
       for ($i = 0; $i <= $countOfEvents; $i++) {
-        $this->verifyText("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody/tr/td/a", 'CiviCon');
+        $this->verifyText("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody/tr/td[1]/a", 'CiviCon');
       }
     }
   }
