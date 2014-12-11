@@ -860,8 +860,13 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     //delete the contact id from recently view
     CRM_Utils_Recent::delContact($id);
 
-    // reset the group contact cache for this group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    // Update the group contact cache
+    if ($restore) {
+      CRM_Contact_BAO_GroupContactCache::remove();
+    }
+    else {
+      CRM_Contact_BAO_GroupContactCache::removeContact($id);
+    }
 
     // delete any dupe cache entry
     CRM_Core_BAO_PrevNextCache::deleteItem($id);
