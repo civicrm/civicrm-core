@@ -82,6 +82,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'css' => array('css/angular-crmMailingAB.css'),
     );
 
+    $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
     $civiMails = civicrm_api3('Mailing', 'get', array());
@@ -132,6 +133,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'mailGrp' => array_values($mailGrp['values']),
         'mailTokens' => array_values($mailTokens),
         'contactid' => $contactID,
+        'enableReplyTo' => $config->replyTo,
         'fromAddress' => array_values($fromAddress['values'][0]['api.OptionValue.get']['values']),
         'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', array('id' => 'user_contact_id', 'return' => 'email')),
         'visibility' => array(

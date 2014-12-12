@@ -1,9 +1,9 @@
 <!--
 Controller: EditMailingCtrl
-Required vars: mailing, crmMailingConst
+Required vars: mailing
 -->
 <div style="float: right;">
   <input crm-mailing-token crm-for="body_html" />
 </div>
 
-<textarea name="body_html" ng-model="mailing.body_html"></textarea>
+<textarea crm-ui-richtext name="body_html" ng-model="mailing.body_html"></textarea>
