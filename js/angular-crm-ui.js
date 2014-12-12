@@ -313,42 +313,41 @@
       };
     })
 
-    // usage: <select crm-ui-select="{placeholder:'Something',allowClear:true,...}" crm-ui-select-model="myobj.field"><option...></select>
-    .directive('crmUiSelect', function ($parse) {
+    // usage: <select crm-ui-select="{placeholder:'Something',allowClear:true,...}" ng-model="myobj.field"><option...></select>
+    .directive('crmUiSelect', function ($parse, $timeout) {
       return {
+        require: '?ngModel',
         scope: {
-          crmUiSelect: '@',
-          crmUiSelectModel: '@',
-          crmUiSelectChange: '@'
+          crmUiSelect: '@'
         },
-        link: function (scope, element, attrs) {
-          var model = $parse(attrs.crmUiSelectModel);
-
+        link: function (scope, element, attrs, ngModel) {
           // In cases where UI initiates update, there may be an extra
           // call to refreshUI, but it doesn't create a cycle.
 
-          function refreshUI() {
-            $(element).select2('val', model(scope.$parent));
-          }
+          ngModel.$render = function () {
+            $timeout(function () {
+              // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
+              // new item is added before selection is made
+              $(element).select2('val', ngModel.$viewValue);
+            });
+          };
           function refreshModel() {
-            var oldValue = model(scope.$parent), newValue = $(element).select2('val');
+            var oldValue = ngModel.$viewValue, newValue = $(element).select2('val');
             if (oldValue != newValue) {
-              scope.$parent.$apply(function(){
-                model.assign(scope.$parent, newValue);
+              scope.$parent.$apply(function () {
+                ngModel.$setViewValue(newValue);
               });
-              if (attrs.crmUiSelectChange) {
-                scope.$parent.$eval(attrs.crmUiSelectChange);
-              }
             }
           }
+
           function init() {
             // TODO watch select2-options
             var options = attrs.crmUiSelect ? scope.$parent.$eval(attrs.crmUiSelect) : {};
             $(element).select2(options);
             $(element).on('change', refreshModel);
-            setTimeout(refreshUI, 0);
-            scope.$parent.$watch(attrs.crmUiSelectModel, refreshUI);
+            $timeout(ngModel.$render);
           }
+
           init();
         }
       };
