@@ -16,7 +16,11 @@
         <div ng-include="partialUrl('schedule.html')" />
       </div>
       <div crm-ui-tab id="tab-attachment" crm-title="ts('Attachments')">
-        <div ng-include="partialUrl('attachments.html')" />
+        <div
+          ng-controller="CrmAttachmentsCtrl"
+          ng-init="init(attachments)"
+          ng-include="partialUrl('../crmAttachment/attachments.html')">
+        </div>
       </div>
       <div crm-ui-tab id="tab-header" crm-title="ts('Header and Footer')">
         <div ng-include="partialUrl('headerFooter.html')" />
