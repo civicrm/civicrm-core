@@ -193,6 +193,45 @@
         }
       },
 
+      // Copy all data fields in (mailingFrom) to (mailingTgt) -- except for (excludes)
+      // ex: crmMailingMgr.mergeInto(newMailing, mailingTemplate, ['subject']);
+      mergeInto: function mergeInto(mailingTgt, mailingFrom, excludes) {
+        var MAILING_FIELDS = [
+          'name',
+          'campaign_id',
+          'from_name',
+          'from_email',
+          'replyto_email',
+          'subject',
+          'dedupe_email',
+          'groups',
+          'mailings',
+          'body_html',
+          'body_text',
+          'footer_id',
+          'header_id',
+          'visibility',
+          'url_tracking',
+          'dedupe_email',
+          'forward_replies',
+          'auto_responder',
+          'open_tracking',
+          'override_verp',
+          'optout_id',
+          'reply_id',
+          'resubscribe_id',
+          'unsubscribe_id'
+        ];
+        if (!excludes) {
+          excludes = [];
+        }
+        _.each(MAILING_FIELDS, function (field) {
+          if (!_.contains(excludes, field)) {
+            mailingTgt[field] = mailingFrom[field];
+          }
+        })
+      },
+
       // @param mailing Object (per APIv3)
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
