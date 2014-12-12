@@ -146,6 +146,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       // hidden Option Id for validation use
       $this->add('hidden', 'optionId', $this->_oid);
 
+      // Needed for i18n dialog
+      $this->assign('optionId', $this->_oid);
+
       //hidden field ID for validation use
       $this->add('hidden', 'fieldId', $this->_fid);
 
