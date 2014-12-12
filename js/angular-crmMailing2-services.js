@@ -197,6 +197,7 @@
       // ex: crmMailingMgr.mergeInto(newMailing, mailingTemplate, ['subject']);
       mergeInto: function mergeInto(mailingTgt, mailingFrom, excludes) {
         var MAILING_FIELDS = [
+          // always exclude: 'id'
           'name',
           'campaign_id',
           'from_name',

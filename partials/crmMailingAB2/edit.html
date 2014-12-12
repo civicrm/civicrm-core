@@ -1,0 +1,26 @@
+<div crm-ui-accordion crm-title="ts('Debug')" crm-collapsed="true">
+  <pre>{{abtest|json}}</pre>
+</div>
+
+<form name="crmMailingAB2">
+  <div crm-ui-wizard>
+    <div crm-ui-wizard-step crm-title="ts('Setup')">
+      Name: <input ng-model="abtest.ab.name"/>
+    </div>
+    <div crm-ui-wizard-step crm-title="ts('Content')">
+      <div>
+        Subject A: <input ng-model="abtest.mailings.a.subject"/>
+      </div>
+      <div>
+        Subject B: <input ng-model="abtest.mailings.b.subject"/>
+      </div>
+    </div>
+    <span crm-ui-wizard-buttons style="float:right;">
+      <button
+        crm-confirm="{title:ts('Delete Draft?'), message:ts('Are you sure you want to delete the draft mailing?')}"
+        on-yes="delete()">{{ts('Delete Draft')}}
+      </button>
+      <button ng-click="save()">{{ts('Save Draft')}}</button>
+    </span>
+  </div>
+</form>
