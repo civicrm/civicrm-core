@@ -111,7 +111,7 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
 
     //Find Member
     $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');
-    $this->type("sort_name", "$firstName1 $lastName1");
+    $this->type("sort_name", "$lastName1 $firstName1");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
