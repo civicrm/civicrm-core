@@ -151,6 +151,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/search", "reset=1");
 
     $eventTypeName = 'Fundraiser';
+    $this->waitForElementPresent('event_type_id');
     $this->select2("event_type_id", $eventTypeName);
     $this->select('event_relative', "label=Choose Date Range");
     $this->webtestFillDate('event_start_date_low', '-2 year');

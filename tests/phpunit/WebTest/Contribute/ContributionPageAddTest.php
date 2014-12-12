@@ -234,7 +234,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
-    $this->type('sort_name', "$firstName $lastName");
+    $this->type('sort_name', "$lastName $firstName");
     $this->select('financial_type_id',"label=Member Dues");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
@@ -267,7 +267,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     //Find Member
     $this->openCiviPage("member/search", "reset=1", 'member_source');
-    $this->type('sort_name', "$firstName $lastName");
+    $this->type('sort_name', "$lastName $firstName");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", FALSE);
     $this->clickLink("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_MembershipView_cancel-bottom', FALSE);
 
