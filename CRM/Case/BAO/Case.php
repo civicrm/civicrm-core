@@ -55,6 +55,15 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
+   * Is CiviCase enabled?
+   * @return bool
+   */
+  static function enabled() {
+    $config = CRM_Core_Config::singleton();
+    return in_array('CiviCase', $config->enableComponents);
+  }
+
+  /**
    * Takes an associative array and creates a case object
    *
    * the function extract all the params it needs to initialize the create a
@@ -2796,18 +2805,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     }
 
     //do check for civicase component enabled.
-    if ($checkComponent) {
-      static $componentEnabled;
-      if (!isset($componentEnabled)) {
-        $config = CRM_Core_Config::singleton();
-        $componentEnabled = FALSE;
-        if (in_array('CiviCase', $config->enableComponents)) {
-          $componentEnabled = TRUE;
-        }
-      }
-      if (!$componentEnabled) {
-        return $allow;
-      }
+    if ($checkComponent && !self::enabled()) {
+      return $allow;
     }
 
     //do check for cases.
@@ -3036,15 +3035,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * or 'access all cases and activities'
    */
   static function accessCiviCase() {
-    static $componentEnabled;
-    if (!isset($componentEnabled)) {
-      $componentEnabled = FALSE;
-      $config = CRM_Core_Config::singleton();
-      if (in_array('CiviCase', $config->enableComponents)) {
-        $componentEnabled = TRUE;
-      }
-    }
-    if (!$componentEnabled) {
+    if (!self::enabled()) {
       return FALSE;
     }
 
@@ -3055,6 +3046,33 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     }
 
     return FALSE;
+  }
+
+  /**
+   * Verify user has permission to access a case
+   *
+   * @param int $caseId
+   *
+   * @return bool
+   */
+  static function accessCase($caseId) {
+    if (!$caseId || !self::enabled()) {
+      return FALSE;
+    }
+
+    // This permission always has access
+    if (CRM_Core_Permission::check('access all cases and activities')) {
+      return TRUE;
+    }
+
+    // This permission is required at minimum
+    if (!CRM_Core_Permission::check('access my cases and activities')) {
+      return FALSE;
+    }
+
+    $filterCases = CRM_Case_BAO_Case::getCases(FALSE);
+
+    return isset($filterCases[$caseId]);
   }
 
   /**
