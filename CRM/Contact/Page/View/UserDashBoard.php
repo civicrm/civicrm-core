@@ -233,6 +233,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
         CRM_Core_Action::VIEW => array(
           'name' => ts('Dashboard'),
           'url' => 'civicrm/user',
+          'class' => 'no-popup',
           'qs' => 'reset=1&id=%%cbid%%',
           'title' => ts('View Relationship'),
         ),
