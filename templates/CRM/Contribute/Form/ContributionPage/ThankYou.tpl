@@ -26,7 +26,7 @@
 {capture assign='reqMark'}<span class="marker"  title="{ts}This field is required.{/ts}">*</span>{/capture}
 <div class="crm-block crm-form-block crm-contribution-contributionpage-thankyou-form-block">
 <div id="help">
-    <p>{ts}Use this form to configure the thank-you message and receipting options. Contributors will see a confirmation and thank-you page after whenever an online contribution is successfully processed. You provide the content and layout of the thank-you section below. You also control whether an electronic receipt is automatically emailed to each contributor - and can add a custom message to that receipt.{/ts}</p>
+    <p>{ts}Use this form to configure the thank-you message and receipting options.{/ts} {help id="id_thank"}</p>
 </div>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
