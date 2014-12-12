@@ -2,16 +2,16 @@
 Controller: EditMailingCtrl
 Required vars: mailing, crmMailingConst
 -->
-
-<div class="crm-block">
+<div class="crm-block" ng-form="subform" crm-ui-id-scope>
   <div class="crm-group">
-    <div crm-ui-field="msg_template_id" crm-title="ts('Template')" style="background: #bbf; width:100%; padding: 0.1em;">
+    <div crm-ui-field="subform.msg_template_id" crm-title="ts('Template')" style="background: #bbf; width:100%; padding: 0.1em;">
       <div>
         <div ng-include="partialUrl('field/msg_template_id.html')"></div>
       </div>
     </div>
-    <div crm-ui-field="fromAddress" crm-title="ts('From')">
+    <div crm-ui-field="subform.fromAddress" crm-title="ts('From')">
       <select
+        crm-ui-id="subform.fromAddress"
         name="fromAddress"
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
@@ -21,8 +21,9 @@ Required vars: mailing, crmMailingConst
         <option value=""></option>
       </select>
     </div>
-    <div crm-ui-field="replyTo" crm-title="ts('Reply-To')" ng-show="crmMailingConst.enableReplyTo">
+    <div crm-ui-field="subform.replyTo" crm-title="ts('Reply-To')" ng-show="crmMailingConst.enableReplyTo">
       <select
+        crm-ui-id="subform.replyTo"
         name="replyTo"
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
@@ -32,16 +33,17 @@ Required vars: mailing, crmMailingConst
         <option value=""></option>
       </select>
     </div>
-    <div crm-ui-field="recipients" crm-title="ts('Recipients')">
+    <div crm-ui-field="subform.recipients" crm-title="ts('Recipients')">
       <div>
         <div ng-include="partialUrl('field/recipients.html')"></div>
       </div>
     </div>
-    <div crm-ui-field="subject" crm-title="ts('Subject')">
+    <div crm-ui-field="subform.subject" crm-title="ts('Subject')">
       <div style="float: right;">
         <input crm-mailing-token crm-for="subject" />
       </div>
       <input
+        crm-ui-id="subform.subject"
         type="text"
         class="crm-form-text"
         ng-model="mailing.subject"
