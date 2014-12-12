@@ -2,7 +2,7 @@
   <pre>{{mailing|json}}</pre>
 </div>
 
-<form name="crmMailing2">
+<form name="crmMailing2" novalidate>
   <div class="crm-block crm-form-block crmMailing2">
     <div crm-ui-wizard>
       <div crm-ui-wizard-step crm-title="ts('Define Mailing')">
@@ -30,7 +30,7 @@
             <div ng-include="partialUrl('headerFooter.html')" />
           </div>
           <div crm-ui-tab id="tab-pub" crm-title="ts('Publication')">
-            <div ng-include="partialUrl('publication.html')" />
+            <div crm-mailing-block-publication crm-mailing="mailing"/>
           </div>
           <div crm-ui-tab id="tab-response" crm-title="ts('Responses')">
             <div ng-include="partialUrl('responses.html')" />

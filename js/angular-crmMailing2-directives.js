@@ -5,6 +5,21 @@
 
   var crmMailing2 = angular.module('crmMailing2');
 
+  crmMailing2.directive('crmMailingBlockPublication', function ($parse) {
+    return {
+      scope: {
+        crmMailing: '@'
+      },
+      templateUrl: partialUrl('publication.html'),
+      link: function (scope, elm, attr) {
+        var model = $parse(attr.crmMailing);
+        scope.mailing = model(scope.$parent);
+        scope.crmMailingConst = CRM.crmMailing;
+        scope.ts = CRM.ts('CiviMail');
+      }
+    };
+  });
+
   crmMailing2.directive('crmMailingReviewBool', function () {
     return {
       scope: {
@@ -87,6 +102,7 @@
   });
 
   // example: <select multiple crm-mailing-recipients crm-mailing="mymailing" crm-avail-groups="myGroups" crm-avail-mailings="myMailings"></select>
+  // FIXME: participate in ngModel's validation cycle
   crmMailing2.directive('crmMailingRecipients', function () {
     return {
       restrict: 'AE',

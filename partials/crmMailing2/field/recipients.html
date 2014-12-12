@@ -20,6 +20,7 @@ Required vars: mailing, crmMailingConst
           crm-avail-groups="crmMailingConst.groupNames | filter:{visibility:'Public pages'}"
           crm-avail-mailings="crmMailingConst.civiMails | filter:{is_completed:1}"
           name="recipients"
+          crm-ui-id="subform.recipients"
           required
           multiple>
   </select>
