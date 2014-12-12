@@ -2,8 +2,8 @@
   <select
     name="msg_template_id"
     crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
-    crm-ui-select-model="mailing.msg_template_id"
-    crm-ui-select-change="loadTemplate(mailing.msg_template_id)"
+    ng-model="mailing.msg_template_id"
+    ng-change="loadTemplate(mailing.msg_template_id)"
     >
     <option value=""></option>
     <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
