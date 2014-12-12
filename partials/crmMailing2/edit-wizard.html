@@ -19,7 +19,11 @@
           <div ng-include="partialUrl('headerFooter.html')" />
         </div>
         <div crm-ui-accordion crm-title="ts('Attachments')" crm-collapsed="true">
-          <div ng-include="partialUrl('attachments.html')" />
+          <div
+            ng-controller="CrmAttachmentsCtrl"
+            ng-init="init(attachments)"
+            ng-include="partialUrl('../crmAttachment/attachments.html')">
+          </div>
         </div>
         <div crm-ui-accordion crm-title="ts('Preview')">
           <div ng-include="partialUrl('preview.html')" />
