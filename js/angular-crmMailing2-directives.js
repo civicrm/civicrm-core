@@ -5,24 +5,26 @@
 
   var crmMailing2 = angular.module('crmMailing2');
 
-  crmMailing2.directive('crmMailingReviewBool', function(){
+  crmMailing2.directive('crmMailingReviewBool', function () {
     return {
       scope: {
         crmOn: '@',
         crmTitle: '@'
       },
       template: '<span ng-class="spanClasses"><span class="icon" ng-class="iconClasses"></span>{{crmTitle}} </span>',
-      link: function(scope, element, attrs){
+      link: function (scope, element, attrs) {
         function refresh() {
           if (scope.$parent.$eval(attrs.crmOn)) {
             scope.spanClasses = {'crmMailing2-active': true};
             scope.iconClasses = {'ui-icon-check': true};
-          } else {
+          }
+          else {
             scope.spanClasses = {'crmMailing2-inactive': true};
             scope.iconClasses = {'ui-icon-close': true};
           }
           scope.crmTitle = scope.$parent.$eval(attrs.crmTitle);
         }
+
         refresh();
         scope.$parent.$watch(attrs.crmOn, refresh);
         scope.$parent.$watch(attrs.crmTitle, refresh);
@@ -103,8 +105,9 @@
 
         /// Convert MySQL date ("yyyy-mm-dd hh:mm:ss") to JS date object
         scope.parseDate = function (date) {
-          if (!angular.isString(date))
+          if (!angular.isString(date)) {
             return date;
+          }
           var p = date.split(/[\- :]/);
           return new Date(p[0], p[1], p[2], p[3], p[4], p[5]);
         };
@@ -176,7 +179,8 @@
           if (option.mode == 'exclude') {
             scope.mailing[typeKey].exclude.push(option.entity_id);
             arrayRemove(scope.mailing[typeKey].include, option.entity_id);
-          } else {
+          }
+          else {
             scope.mailing[typeKey].include.push(option.entity_id);
             arrayRemove(scope.mailing[typeKey].exclude, option.entity_id);
           }
@@ -188,7 +192,7 @@
         $(element).on("select2-removing", function (e) {
           var option = convertValueToObj(e.val);
           var typeKey = option.entity_type == 'civicrm_mailing' ? 'mailings' : 'groups';
-          scope.$parent.$apply(function(){
+          scope.$parent.$apply(function () {
             arrayRemove(scope.mailing[typeKey][option.mode], option.entity_id);
           });
           e.preventDefault();
