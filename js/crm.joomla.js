@@ -7,8 +7,8 @@ CRM.$(function($) {
     })
     .on('dialogclose', function(e) {
       if ($('.ui-dialog-content:visible').not(e.target).length < 1) {
-        // D7 hack, restore toolbar position (CRM-15341)
-        $('#toolbar').css('z-index', '');
+        // J3 - restore footer admin bar position (CRM-15723)
+        $('#status').css('z-index', '');
       }
     })
 });
