@@ -55,7 +55,7 @@
 
       <span crm-ui-wizard-buttons style="float:right;">
         <button crm-confirm="{title:ts('Delete Draft?'), message:ts('Are you sure you want to delete the draft mailing?')}" on-yes="delete().then(leave)">{{ts('Delete Draft')}}</button>
-        <button ng-click="save().then(leave)">{{ts('Save Draft')}}</button>
+        <button ng-click="save()">{{ts('Save Draft')}}</button>
       </span>
     </div>
   </div>
