@@ -882,5 +882,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       parent::outputError($content);
     }
   }
+  
+  /**
+   * Append to coreResourcesList
+   */
+  function appendCoreResources(&$list) {
+    $list[] = 'js/crm.joomla.js';
+  }
 }
 
