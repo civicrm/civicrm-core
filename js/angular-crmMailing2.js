@@ -71,6 +71,7 @@
     $scope.attachments = new CrmAttachments(function () {
       return {entity_table: 'civicrm_mailing', entity_id: $scope.mailing.id};
     });
+    $scope.attachments.load();
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.crmFromAddresses = crmFromAddresses;
 

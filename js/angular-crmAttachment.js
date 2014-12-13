@@ -121,12 +121,23 @@
   });
 
   // example:
-  //   $scope.attachments = new CrmAttachments({entity_table: 'civicrm_mailing', entity_id: 123});
-  //   <div ng-controller="CrmAttachmentsCtrl" ng-init="init(attachments)">
-  angular.module('crmAttachment').controller('CrmAttachmentsCtrl', function ($scope, CrmAttachments) {
-    $scope.init = function init(att) {
-      $scope.att = att;
-      att.load();
+  //   $scope.myAttachments = new CrmAttachments({entity_table: 'civicrm_mailing', entity_id: 123});
+  //   <div crm-attachments="myAttachments"/>
+  angular.module('crmAttachment').directive('crmAttachments', function ($parse, $timeout) {
+    return {
+      scope: {
+        crmAttachments: '@'
+      },
+      template: '<div ng-if="ready" ng-include="inclUrl"></div>',
+      link: function (scope, elm, attr) {
+        var model = $parse(attr.crmAttachments);
+        scope.att = model(scope.$parent);
+        scope.ts = CRM.ts(null);
+        scope.inclUrl = partialUrl('attachments.html');
+
+        // delay rendering of child tree until after model has been populated
+        scope.ready = true;
+      }
     };
   });
 

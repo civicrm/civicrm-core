@@ -14,11 +14,7 @@
       <div crm-mailing-block-header-footer crm-mailing="mailing"/>
     </div>
     <div crm-ui-accordion id="tab-attachment" crm-title="ts('Attachments')" crm-collapsed='true'>
-      <div
-        ng-controller="CrmAttachmentsCtrl"
-        ng-init="init(attachments)"
-        ng-include="partialUrl('../crmAttachment/attachments.html')">
-      </div>
+      <div crm-attachments="attachments"/>
     </div>
     <div crm-ui-accordion id="tab-pub" crm-title="ts('Publication')" crm-collapsed='true'>
       <div crm-mailing-block-publication crm-mailing="mailing"/>
