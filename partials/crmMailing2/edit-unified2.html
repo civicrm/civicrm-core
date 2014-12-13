@@ -1,17 +1,17 @@
 <form name="crmMailing2">
   <div class="crm-block crm-form-block crmMailing2">
 
-    <div ng-include="partialUrl('summary.html')"/>
-    <div ng-include="partialUrl('mailing.html')" />
-    
+    <div crm-mailing-block-summary crm-mailing="mailing"/>
+    <div crm-mailing-block-mailing crm-mailing="mailing"/>
+
     <div crm-ui-accordion crm-title="ts('HTML')">
-      <div ng-include="partialUrl('field/body_html.html')" />
+      <div crm-mailing-body-html crm-mailing="mailing"/>
     </div>
     <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='true'>
-      <div ng-include="partialUrl('field/body_text.html')" />
+      <div crm-mailing-body-text crm-mailing="mailing"/>
     </div>
     <div crm-ui-accordion id="tab-header" crm-title="ts('Header and Footer')" crm-collapsed='true'>
-      <div ng-include="partialUrl('headerFooter.html')" />
+      <div crm-mailing-block-header-footer crm-mailing="mailing"/>
     </div>
     <div crm-ui-accordion id="tab-attachment" crm-title="ts('Attachments')" crm-collapsed='true'>
       <div
@@ -21,19 +21,19 @@
       </div>
     </div>
     <div crm-ui-accordion id="tab-pub" crm-title="ts('Publication')" crm-collapsed='true'>
-      <div ng-include="partialUrl('publication.html')" />
+      <div crm-mailing-block-publication crm-mailing="mailing"/>
     </div>
     <div crm-ui-accordion id="tab-response" crm-title="ts('Responses')" crm-collapsed='true'>
-      <div ng-include="partialUrl('responses.html')" />
+      <div crm-mailing-block-responses crm-mailing="mailing"/>
     </div>
     <div crm-ui-accordion id="tab-tracking" crm-title="ts('Tracking')" crm-collapsed='true'>
-      <div ng-include="partialUrl('tracking.html')" />
+      <div crm-mailing-block-tracking crm-mailing="mailing"/>
     </div>
     <div crm-ui-accordion crm-title="ts('Preview')">
-      <div ng-include="partialUrl('preview.html')" />
+      <div crm-mailing-block-preview crm-mailing="mailing"/>
     </div>
     <div crm-ui-accordion id="tab-schedule" crm-title="ts('Schedule')">
-      <div ng-include="partialUrl('schedule.html')" />
+      <div crm-mailing-block-schedule crm-mailing="mailing"/>
     </div>
 
     <button ng-click="submit().then(leave)">{{ts('Submit Mailing')}}</button>

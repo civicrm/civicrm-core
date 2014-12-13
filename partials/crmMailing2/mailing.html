@@ -5,8 +5,18 @@ Required vars: mailing, crmMailingConst
 <div class="crm-block" ng-form="subform" crm-ui-id-scope>
   <div class="crm-group">
     <div crm-ui-field="subform.msg_template_id" crm-title="ts('Template')" style="background: #bbf; width:100%; padding: 0.1em;">
-      <div>
-        <div ng-include="partialUrl('field/msg_template_id.html')"></div>
+      <div ng-controller="MsgTemplateCtrl">
+        <select
+          crm-ui-id="subform.msg_template_id"
+          name="msg_template_id"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
+          ng-model="mailing.msg_template_id"
+          ng-change="loadTemplate(mailing.msg_template_id)"
+          >
+          <option value=""></option>
+          <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+        </select>
+        <a ng-click="saveTemplate()" class="crm-hover-button action-item" title="{{ts('Save As')}}"><span class="icon ui-icon-disk"></span></a>
       </div>
     </div>
     <div crm-ui-field="subform.fromAddress" crm-title="ts('From')">
@@ -34,8 +44,27 @@ Required vars: mailing, crmMailingConst
       </select>
     </div>
     <div crm-ui-field="subform.recipients" crm-title="ts('Recipients')">
-      <div>
-        <div ng-include="partialUrl('field/recipients.html')"></div>
+      <div ng-controller="EditRecipCtrl">
+        <div style="float: right;">
+          <div class='crmMailing2-recip-est'>
+            <a href="" ng-click="previewRecipients()">{{getRecipientsEstimate()}}</a>
+          </div>
+          <div>
+            <input name='dedupe_email' type='checkbox' ng-model='mailing.dedupe_email'  ng-true-value="1" ng-false-value="0" id="recipients-dedupe-email" />
+            <label for="recipients-dedupe-email">
+              {{ts('Dedupe')}}
+            </label>
+          </div>
+        </div>
+        <select crm-mailing-recipients
+                crm-mailing="mailing"
+                crm-avail-groups="crmMailingConst.groupNames | filter:{visibility:'Public pages'}"
+                crm-avail-mailings="crmMailingConst.civiMails | filter:{is_completed:1}"
+                name="recipients"
+                crm-ui-id="subform.recipients"
+                required
+                multiple>
+        </select>
       </div>
     </div>
     <div crm-ui-field="subform.subject" crm-title="ts('Subject')">
