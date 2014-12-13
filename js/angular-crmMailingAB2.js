@@ -42,6 +42,8 @@
   angular.module('crmMailingAB2').controller('CrmMailingAB2EditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr) {
     $scope.abtest = abtest;
     $scope.ts = CRM.ts('CiviMail');
+    $scope.crmMailingABCriteria = crmMailingABCriteria;
+
     $scope.sync = function sync() {
       abtest.mailings.a.name = ts('Test A (%1)', {1: abtest.ab.name});
       abtest.mailings.b.name = ts('Test B (%1)', {1: abtest.ab.name});
