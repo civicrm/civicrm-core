@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 
-<div class="crm-block crm-form-block crm-core-form-recurringentity-block crm-accordion-wrapper" id="recurring-entity-block">
+<div class="crm-core-form-recurringentity-block crm-accordion-wrapper" id="recurring-entity-block">
     <div class="crm-accordion-header">
       Repeat {if $entityType}{$entityType}{/if}
     </div>
