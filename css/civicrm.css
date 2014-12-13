@@ -4466,8 +4466,7 @@ span.crm-status-icon {
   display: none;
 }
 
-#crm-container.crm-public .price_set-section .sold-out-option {
-  font-weight: bold;
+#crm-container .price_set-section .sold-out-option {
   font-style: italic;
 }
 #crm-container .crm-extensions-upgrade {

@@ -222,7 +222,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param string $label label for custom field
    *
    * @param null $fieldOptions
-   * @param array $feezeOptions
+   * @param array $freezeOptions
    *
    * @return null
    * @internal param bool $search true if used for search else false
@@ -236,7 +236,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     $useRequired = TRUE,
     $label = NULL,
     $fieldOptions = NULL,
-    $feezeOptions = array()
+    $freezeOptions = array()
   ) {
 
     $field = new CRM_Price_DAO_PriceField();
@@ -329,7 +329,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
 
         // CRM-6902 - Add "max" option for a price set field
-        if (in_array($optionKey, $feezeOptions)) {
+        if (in_array($optionKey, $freezeOptions)) {
           $element->freeze();
           // CRM-14696 - Improve display for sold out price set options
           $element->setLabel($label . '&nbsp;<span class="sold-out-option">' . ts('Sold out') . '</span>');
@@ -401,10 +401,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
 
           // CRM-6902 - Add "max" option for a price set field
-          if (in_array($opId, $feezeOptions)) {
+          if (in_array($opId, $freezeOptions)) {
             $choice[$opId]->freeze();
             // CRM-14696 - Improve display for sold out price set options
-            $choice[$opId]->setText('&nbsp;<span class="sold-out-option">' . ts('Sold out') . '</span>&nbsp;' . $choice[$opId]->getText());
+            $choice[$opId]->setText($choice[$opId]->getText() . '&nbsp; <span class="sold-out-option">(' . ts('Sold out') . ')</span>');
           }
         }
         if (!empty($qf->_membershipBlock) && $field->name == 'contribution_amount') {
@@ -466,12 +466,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $selectOption[$opt['id']] = $opt['label'];
           $priceVal[$opt['id']] = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
 					
-          if (!in_array($opt['id'], $feezeOptions)) {
+          if (!in_array($opt['id'], $freezeOptions)) {
             $allowedOptions[] = $opt['id'];
           }
           // CRM-14696 - Improve display for sold out price set options
           else {
-            $opt['label'] = ts('Sold out') . '&nbsp;-&nbsp;' . $opt['label'];
+            $opt['label'] = $opt['label'] . '&nbsp;-&nbsp;' . ts('Sold out');
           }
 					
           $selectOption[$opt['id']] = $opt['label'];
@@ -490,7 +490,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         // CRM-6902 - Add "max" option for a price set field
         $button = substr($qf->controller->getButtonName(), -4);
-        if (!empty($feezeOptions) && $button != 'skip') {
+        if (!empty($freezeOptions) && $button != 'skip') {
           $qf->addRule($elementName, ts('Sorry, this option is currently sold out.'), 'regex', "/" . implode('|', $allowedOptions) . "/");
         }
         break;
@@ -524,10 +524,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $qf->addGroup($txtcheck, 'txt-'.$elementName, $label);
           }
           // CRM-6902 - Add "max" option for a price set field
-          if (in_array($opId, $feezeOptions)) {
+          if (in_array($opId, $freezeOptions)) {
             $check[$opId]->freeze();
             // CRM-14696 - Improve display for sold out price set options
-            $check[$opId]->setText('&nbsp;<span class="sold-out-option">' . ts('Sold out') . '</span>&nbsp;' . $check[$opId]->getText());
+            $check[$opId]->setText($check[$opId]->getText() . '&nbsp;<span class="sold-out-option">(' . ts('Sold out') . ')</span>');
           }
         }
         $element = &$qf->addGroup($check, $elementName, $label);
