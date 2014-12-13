@@ -5,19 +5,36 @@
 
   var crmMailing2 = angular.module('crmMailing2');
 
-  crmMailing2.directive('crmMailingBlockPublication', function ($parse) {
-    return {
-      scope: {
-        crmMailing: '@'
-      },
-      templateUrl: partialUrl('publication.html'),
-      link: function (scope, elm, attr) {
-        var model = $parse(attr.crmMailing);
-        scope.mailing = model(scope.$parent);
-        scope.crmMailingConst = CRM.crmMailing;
-        scope.ts = CRM.ts('CiviMail');
-      }
-    };
+  // The following directives have the same simple implementation -- load
+  // a template and export a "mailing" object into scope.
+  var simpleBlocks = {
+    crmMailingBlockHeaderFooter: partialUrl('headerFooter.html'),
+    crmMailingBlockMailing: partialUrl('mailing.html'),
+    crmMailingBlockPreview: partialUrl('preview.html'),
+    crmMailingBlockPublication: partialUrl('publication.html'),
+    crmMailingBlockResponses: partialUrl('responses.html'),
+    crmMailingBlockReview: partialUrl('review.html'),
+    crmMailingBlockSchedule: partialUrl('schedule.html'),
+    crmMailingBlockSummary: partialUrl('summary.html'),
+    crmMailingBlockTracking: partialUrl('tracking.html'),
+    crmMailingBodyHtml: partialUrl('body_html.html'),
+    crmMailingBodyText: partialUrl('body_text.html')
+  };
+  _.each(simpleBlocks, function(templateUrl, directiveName){
+    crmMailing2.directive(directiveName, function ($parse) {
+      return {
+        scope: {
+          crmMailing: '@'
+        },
+        templateUrl: templateUrl,
+        link: function (scope, elm, attr) {
+          var model = $parse(attr.crmMailing);
+          scope.mailing = model(scope.$parent);
+          scope.crmMailingConst = CRM.crmMailing;
+          scope.ts = CRM.ts('CiviMail');
+        }
+      };
+    });
   });
 
   crmMailing2.directive('crmMailingReviewBool', function () {
