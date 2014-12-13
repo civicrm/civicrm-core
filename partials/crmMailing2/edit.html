@@ -20,11 +20,7 @@
             </div>
           </div>
           <div crm-ui-tab id="tab-attachment" crm-title="ts('Attachments')">
-            <div
-              ng-controller="CrmAttachmentsCtrl"
-              ng-init="init(attachments)"
-              ng-include="partialUrl('../crmAttachment/attachments.html')">
-            </div>
+            <div crm-attachments="attachments"/>
           </div>
           <div crm-ui-tab id="tab-header" crm-title="ts('Header and Footer')">
             <div crm-mailing-block-header-footer crm-mailing="mailing"/>

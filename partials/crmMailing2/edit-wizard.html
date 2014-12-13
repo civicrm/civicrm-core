@@ -19,11 +19,7 @@
           <div crm-mailing-block-header-footer crm-mailing="mailing"/>
         </div>
         <div crm-ui-accordion crm-title="ts('Attachments')" crm-collapsed="true">
-          <div
-            ng-controller="CrmAttachmentsCtrl"
-            ng-init="init(attachments)"
-            ng-include="partialUrl('../crmAttachment/attachments.html')">
-          </div>
+          <div crm-attachments="attachments"/>
         </div>
         <div crm-ui-accordion crm-title="ts('Preview')">
           <div crm-mailing-block-preview crm-mailing="mailing"/>
