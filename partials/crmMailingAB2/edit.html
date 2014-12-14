@@ -1,5 +1,6 @@
 <div crm-ui-accordion crm-title="ts('Debug')" crm-collapsed="true">
-  <pre>{{abtest|json}}</pre>
+  <pre>{{abtest.ab|json}}</pre>
+  <pre>{{abtest.mailings|json}}</pre>
 </div>
 
 <!--
@@ -63,11 +64,9 @@
               <div crm-mailing-body-text crm-mailing="abtest.mailings.a"/>
             </div>
           </div>
-          <!--
           <div crm-ui-tab id="tab-attachment" crm-title="ts('Attachments')">
-            <div crm-attachments="attachments"/>
+            <div crm-attachments="abtest.attachments.a"/>
           </div>
-          -->
           <div crm-ui-tab id="tab-header" crm-title="ts('Header and Footer')">
             <div crm-mailing-block-header-footer crm-mailing="abtest.mailings.a"/>
           </div>

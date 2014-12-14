@@ -19,10 +19,11 @@
   });
 
   // CrmMailingAB is a data-model which combines an AB test (APIv3 "MailingAB") and three mailings (APIv3 "Mailing").
-  angular.module('crmMailingAB2').factory('CrmMailingAB', function (crmApi, crmMailingMgr, $q) {
+  angular.module('crmMailingAB2').factory('CrmMailingAB', function (crmApi, crmMailingMgr, $q, CrmAttachments) {
     function CrmMailingAB(id) {
       this.id = id;
       this.mailings = {};
+      this.attachments = {};
     }
 
     angular.extend(CrmMailingAB.prototype, {
@@ -45,6 +46,15 @@
           crmMailingAB.mailings.a = crmMailingMgr.create();
           crmMailingAB.mailings.b = crmMailingMgr.create();
           crmMailingAB.mailings.c = crmMailingMgr.create();
+          crmMailingAB.attachments.a = new CrmAttachments(function () {
+            return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab['mailing_id_a']};
+          });
+          crmMailingAB.attachments.b = new CrmAttachments(function () {
+            return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab['mailing_id_b']};
+          });
+          crmMailingAB.attachments.c = new CrmAttachments(function () {
+            return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab['mailing_id_c']};
+          });
 
           var dfr = $q.defer();
           dfr.resolve(crmMailingAB);
@@ -83,10 +93,17 @@
             todos[mkey] = crmMailingMgr.get(crmMailingAB.ab['mailing_id_' + mkey])
               .then(function (mailing) {
                 crmMailingAB.mailings[mkey] = mailing;
+                crmMailingAB.attachments[mkey] = new CrmAttachments(function () {
+                  return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab['mailing_id_' + mkey]};
+                });
+                return crmMailingAB.attachments[mkey].load();
               });
           }
           else {
             crmMailingAB.mailings[mkey] = crmMailingMgr.create();
+            crmMailingAB.attachments[mkey] = new CrmAttachments(function () {
+              return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab['mailing_id_' + mkey]};
+            });
           }
         });
         return $q.all(todos).then(function () {
@@ -106,9 +123,11 @@
             // paranoia: in case caller forgot to manage id on mailing
             crmMailingAB.mailings[mkey].id = crmMailingAB.ab['mailing_id_' + mkey];
           }
-          todos[mkey] = crmMailingMgr.save(crmMailingAB.mailings[mkey]).then(function(){
-            crmMailingAB.ab['mailing_id_' + mkey] = crmMailingAB.mailings[mkey].id;
-          });
+          todos[mkey] = crmMailingMgr.save(crmMailingAB.mailings[mkey])
+            .then(function () {
+              crmMailingAB.ab['mailing_id_' + mkey] = crmMailingAB.mailings[mkey].id;
+              return crmMailingAB.attachments[mkey].save();
+            });
         });
         return $q.all(todos).then(function () {
           return crmMailingAB;
