@@ -86,10 +86,74 @@
         </div>
       </div>
       <div crm-ui-wizard-step="30" crm-title="ts('Compose (A)')" ng-if="criteriaName == 'Two different emails'">
-        A
+        <div crm-ui-tab-set>
+          <div crm-ui-tab id="tab-mailingA" crm-title="ts('Mailing')">
+            <div
+              crm-mailing-ab-block-mailing="{
+                msg_template_idA: 1,
+                fromAddressA: 1,
+                replyToA: 1,
+                subjectA: 1
+                }"
+              crm-abtest="abtest"></div>
+            <div crm-ui-accordion crm-title="ts('HTML')">
+              <div crm-mailing-body-html crm-mailing="abtest.mailings.a"/>
+            </div>
+            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='true'>
+              <div crm-mailing-body-text crm-mailing="abtest.mailings.a"/>
+            </div>
+          </div>
+          <div crm-ui-tab id="tab-attachmentA" crm-title="ts('Attachments')">
+            <div crm-attachments="abtest.attachments.a"/>
+          </div>
+          <div crm-ui-tab id="tab-headerA" crm-title="ts('Header and Footer')">
+            <div crm-mailing-block-header-footer crm-mailing="abtest.mailings.a"/>
+          </div>
+          <div crm-ui-tab id="tab-pubA" crm-title="ts('Publication')">
+            <div crm-mailing-block-publication crm-mailing="abtest.mailings.a"/>
+          </div>
+          <div crm-ui-tab id="tab-responseA" crm-title="ts('Responses')">
+            <div crm-mailing-block-responses crm-mailing="abtest.mailings.a"/>
+          </div>
+        </div>
+        <div crm-ui-accordion crm-title="ts('Preview')">
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.a"/>
+        </div>
       </div>
       <div crm-ui-wizard-step="40" crm-title="ts('Compose (B)')" ng-if="criteriaName == 'Two different emails'">
-        B
+        <div crm-ui-tab-set>
+          <div crm-ui-tab id="tab-mailingB" crm-title="ts('Mailing')">
+            <div
+              crm-mailing-ab-block-mailing="{
+                msg_template_idB: 1,
+                fromAddressB: 1,
+                replyToB: 1,
+                subjectB: 1
+                }"
+              crm-abtest="abtest"></div>
+            <div crm-ui-accordion crm-title="ts('HTML')">
+              <div crm-mailing-body-html crm-mailing="abtest.mailings.b"/>
+            </div>
+            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='true'>
+              <div crm-mailing-body-text crm-mailing="abtest.mailings.b"/>
+            </div>
+          </div>
+          <div crm-ui-tab id="tab-attachmentB" crm-title="ts('Attachments')">
+            <div crm-attachments="abtest.attachments.b"/>
+          </div>
+          <div crm-ui-tab id="tab-headerB" crm-title="ts('Header and Footer')">
+            <div crm-mailing-block-header-footer crm-mailing="abtest.mailings.b"/>
+          </div>
+          <div crm-ui-tab id="tab-pubB" crm-title="ts('Publication')">
+            <div crm-mailing-block-publication crm-mailing="abtest.mailings.b"/>
+          </div>
+          <div crm-ui-tab id="tab-responseB" crm-title="ts('Responses')">
+            <div crm-mailing-block-responses crm-mailing="abtest.mailings.b"/>
+          </div>
+        </div>
+        <div crm-ui-accordion crm-title="ts('Preview')">
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.b"/>
+        </div>
       </div>
       <span crm-ui-wizard-buttons style="float:right;">
         <button
