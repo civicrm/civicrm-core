@@ -556,6 +556,19 @@
               selectedIndex = 0;
             }
             steps.push(step);
+            steps.sort(function(a,b){
+              return a.crmUiWizardStep - b.crmUiWizardStep;
+            });
+            selectedIndex = findIndex();
+          };
+          this.remove = function(step) {
+            var key = null;
+            angular.forEach(steps, function(otherStep, otherKey) {
+              if (otherStep === step) key = otherKey;
+            });
+            if (key != null) {
+              steps.splice(key, 1);
+            }
           };
           this.goto = function(index) {
             if (index < 0) index = 0;
@@ -587,18 +600,30 @@
       };
     })
 
-    // example <div crm-ui-wizard-step crm-title="ts('My Title')">...content...</div>
+    // example: <div crm-ui-wizard-step crm-title="ts('My Title')">...content...</div>
+    // If there are any conditional steps, then be sure to set a weight explicitly on *all* steps to maintain ordering.
+    // example: <div crm-ui-wizard-step="100" crm-title="..." ng-if="...">...content...</div>
     .directive('crmUiWizardStep', function() {
+      var nextWeight = 1;
       return {
         require: '^crmUiWizard',
         restrict: 'EA',
         scope: {
-          crmTitle: '@'
+          crmTitle: '@', // expression, evaluates to a printable string
+          crmUiWizardStep: '@' // int, a weight which determines the ordering of the steps
         },
         template: '<div class="crm-wizard-step" ng-show="selected" ng-transclude/></div>',
         transclude: true,
         link: function (scope, element, attrs, crmUiWizardCtrl) {
+          if (scope.crmUiWizardStep) {
+            scope.crmUiWizardStep = parseInt(scope.crmUiWizardStep);
+          } else {
+            scope.crmUiWizardStep = nextWeight++;
+          }
           crmUiWizardCtrl.add(scope);
+          element.on('$destroy', function(){
+            crmUiWizardCtrl.remove(scope);
+          });
         }
       };
     })
