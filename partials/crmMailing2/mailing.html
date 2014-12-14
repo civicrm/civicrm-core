@@ -20,28 +20,32 @@ Required vars: mailing, crmMailingConst
       </div>
     </div>
     <div crm-ui-field="subform.fromAddress" crm-title="ts('From')">
-      <select
-        crm-ui-id="subform.fromAddress"
-        name="fromAddress"
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
-        ng-model="fromPlaceholder.label"
-        ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
-        required>
-        <option value=""></option>
-      </select>
+      <div ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="mailing">
+        <select
+          crm-ui-id="subform.fromAddress"
+          name="fromAddress"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
+          ng-model="fromPlaceholder.label"
+          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
+          required>
+          <option value=""></option>
+        </select>
+      </div>
     </div>
     <div crm-ui-field="subform.replyTo" crm-title="ts('Reply-To')" ng-show="crmMailingConst.enableReplyTo">
-      <select
-        crm-ui-id="subform.replyTo"
-        name="replyTo"
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
-        ng-model="mailing.replyto_email"
-        ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
-        >
-        <option value=""></option>
-      </select>
+      <div ng-controller="EmailAddrCtrl">
+        <select
+          crm-ui-id="subform.replyTo"
+          name="replyTo"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
+          ng-model="mailing.replyto_email"
+          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
+          >
+          <option value=""></option>
+        </select>
+      </div>
     </div>
     <div crm-ui-field="subform.recipients" crm-title="ts('Recipients')">
       <div ng-controller="EditRecipCtrl">

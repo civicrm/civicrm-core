@@ -66,14 +66,13 @@
     });
   });
 
-  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmFromAddresses, crmStatus, CrmAttachments) {
+  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, CrmAttachments) {
     $scope.mailing = selectedMail;
     $scope.attachments = new CrmAttachments(function () {
       return {entity_table: 'civicrm_mailing', entity_id: $scope.mailing.id};
     });
     $scope.attachments.load();
     $scope.crmMailingConst = CRM.crmMailing;
-    $scope.crmFromAddresses = crmFromAddresses;
 
     $scope.partialUrl = partialUrl;
     var ts = $scope.ts = CRM.ts('CiviMail');
@@ -123,15 +122,6 @@
         $location.replace();
         // FIXME: Angular unnecessarily refreshes UI
       }
-    });
-
-    $scope.fromPlaceholder = {
-      label: crmFromAddresses.getByAuthorEmail($scope.mailing.from_name, $scope.mailing.from_email, true).label
-    };
-    $scope.$watch('fromPlaceholder.label', function (newValue) {
-      var addr = crmFromAddresses.getByLabel(newValue);
-      $scope.mailing.from_name = addr.author;
-      $scope.mailing.from_email = addr.email;
     });
   });
 
@@ -449,6 +439,10 @@
     }
 
     setTimeout(scopeApply(init), 0);
+  });
+
+  crmMailing2.controller('EmailAddrCtrl', function EmailAddrCtrl($scope, crmFromAddresses){
+    $scope.crmFromAddresses = crmFromAddresses;
   });
 
   // Controller for schedule-editing widget.
