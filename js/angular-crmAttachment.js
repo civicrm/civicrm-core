@@ -8,12 +8,10 @@
 
   // crmAttachment manages the list of files which are attached to a given entity
   angular.module('crmAttachment').factory('CrmAttachments', function (crmApi, crmStatus, FileUploader, $q) {
-    var _target;
-
     // @param target an Object(entity_table:'',entity_id:'') or function which generates an object
     function CrmAttachments(target) {
-      _target = target;
       var crmAttachments = this;
+      this._target = target;
       this.files = [];
       this.uploader = new FileUploader({
         url: CRM.url('civicrm/ajax/attachment'),
@@ -37,7 +35,7 @@
     angular.extend(CrmAttachments.prototype, {
       // @return Object(entity_table:'',entity_id:'')
       getTarget: function () {
-        return (angular.isFunction(_target) ? _target() : _target);
+        return (angular.isFunction(this._target) ? this._target() : this._target);
       },
       // @return Promise<Attachment>
       load: function load() {
