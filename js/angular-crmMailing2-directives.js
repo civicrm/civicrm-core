@@ -89,25 +89,14 @@
 
   // example: <input name="subject" /> <input crm-mailing-token crm-for="subject"/>
   // WISHLIST: Instead of global CRM.crmMailing.mailTokens, accept token list as an input
-  crmMailing2.directive('crmMailingToken', function (crmUiId) {
+  crmMailing2.directive('crmMailingToken', function () {
     return {
+      require: '^crmUiIdScope',
       scope: {
         crmFor: '@'
       },
       template: '<input type="text" class="crmMailingToken" />',
-      link: function (scope, element, attrs) {
-        // 1. Find the corresponding input element (crmFor)
-
-        var form = $(element).closest('form');
-        var crmForEl = $('input[name="' + attrs.crmFor + '"],textarea[name="' + attrs.crmFor + '"]', form);
-        if (form.length != 1 || crmForEl.length != 1) {
-          if (console.log) {
-            console.log('crmMailingToken cannot be matched to input element. Expected to find one form and one input.', form.length, crmForEl.length);
-          }
-          return;
-        }
-
-        // 2. Setup the token selector
+      link: function (scope, element, attrs, crmUiIdCtrl) {
         $(element).select2({
           width: "10em",
           dropdownAutoWidth: true,
@@ -115,13 +104,14 @@
           placeholder: ts('Insert')
         });
         $(element).on('select2-selecting', function (e) {
-          var id = crmUiId(crmForEl);
+          var id = crmUiIdCtrl.get(attrs.crmFor);
           if (CKEDITOR.instances[id]) {
             CKEDITOR.instances[id].insertText(e.val);
             $(element).select2('close').select2('val', '');
             CKEDITOR.instances[id].focus();
           }
           else {
+            var crmForEl = $('#' + id);
             var origVal = crmForEl.val();
             var origPos = crmForEl[0].selectionStart;
             var newVal = origVal.substring(0, origPos) + e.val + origVal.substring(origPos, origVal.length);

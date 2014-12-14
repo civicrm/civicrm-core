@@ -9,19 +9,6 @@
 
   angular.module('crmUi', [])
 
-    .factory('crmUiId', function() {
-      var idCount = 0;
-      // Get the HTML ID of an element. If none available, assign one.
-      return function crmUiId(el){
-        var id = el.attr('id');
-        if (!id) {
-          id = 'crmUi_' + (++idCount);
-          el.attr('id', id);
-        }
-        return id;
-      };
-    })
-
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
     // WISHLIST: crmCollapsed should support two-way/continous binding
     .directive('crmUiAccordion', function() {
@@ -115,7 +102,7 @@
     // example: <div crm-ui-field crm-title="My Field"> {{mydata}} </div>
     // example: <div crm-ui-field="subform.myfield" crm-title="'My Field'"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
     // example: <div crm-ui-field="subform.myfield" crm-title="'My Field'"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
-    .directive('crmUiField', function(crmUiId) {
+    .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
         default: partialUrl('field.html'),
@@ -147,9 +134,11 @@
       return {
         require: '^crmUiIdScope',
         restrict: 'EA',
-        link: function (scope, element, attrs, crmUiIdCtrl) {
-          var id = crmUiIdCtrl.get(attrs.crmUiId);
-          element.attr('id', id);
+        link: {
+          pre: function (scope, element, attrs, crmUiIdCtrl) {
+            var id = crmUiIdCtrl.get(attrs.crmUiId);
+            element.attr('id', id);
+          }
         }
       };
     })
@@ -271,12 +260,11 @@
       };
     })
 
-    // example: <textarea crm-ui-richtext name="body_html" ng-model="mailing.body_html"></textarea>
-    .directive('crmUiRichtext', function (crmUiId, $timeout) {
+    // example: <textarea crm-ui-id="myForm.body_html" crm-ui-richtext name="body_html" ng-model="mailing.body_html"></textarea>
+    .directive('crmUiRichtext', function ($timeout) {
       return {
         require: '?ngModel',
         link: function (scope, elm, attr, ngModel) {
-          crmUiId(elm);
           var ck = CKEDITOR.replace(elm[0]);
 
           if (!ngModel) {
