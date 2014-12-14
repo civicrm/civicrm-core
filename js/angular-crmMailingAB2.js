@@ -43,6 +43,8 @@
     $scope.abtest = abtest;
     $scope.ts = CRM.ts('CiviMail');
     $scope.crmMailingABCriteria = crmMailingABCriteria;
+    $scope.crmMailingConst = CRM.crmMailing;;
+    $scope.partialUrl = partialUrl;
 
     $scope.sync = function sync() {
       abtest.mailings.a.name = ts('Test A (%1)', {1: abtest.ab.name});
@@ -81,8 +83,18 @@
     $scope.delete = function () {
       throw "Not implemented: EditCtrl.delete"
     };
+    $scope.submit = function () {
+      throw "Not implemented: EditCtrl.submit"
+    };
 
+    function updateCriteriaName() {
+      $scope.criteriaName = crmMailingABCriteria.get($scope.abtest.ab.testing_criteria_id).name;
+    }
+
+    // initialize
+    updateCriteriaName();
     $scope.sync();
+    $scope.$watch('abtest.ab.testing_criteria_id', updateCriteriaName);
   });
 
 })(angular, CRM.$, CRM._);

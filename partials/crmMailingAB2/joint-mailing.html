@@ -1,0 +1,145 @@
+<!--
+Required vars: abtest
+Note: Much of this file is duplicated in crmMailing and crmMailingAB with variations on placement/title/binding.
+It could perhaps be thinned by 30-60% by making more directives.
+-->
+<div class="crm-block" ng-form="subform" crm-ui-id-scope>
+  <div class="crm-group">
+    <div crm-ui-field="subform.msg_template_id" crm-title="ts('Template')" style="background: #bbf; width:100%; padding: 0.1em;" ng-if="fields.msg_template_id">
+      <div ng-controller="MsgTemplateCtrl">
+        <select
+          crm-ui-id="subform.msg_template_id"
+          name="msg_template_id"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
+          ng-model="abtest.mailings.a.msg_template_id"
+          ng-change="loadTemplate(abtest.mailings.a, abtest.mailings.a.msg_template_id)"
+          >
+          <option value=""></option>
+          <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+        </select>
+        <a ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button action-item" title="{{ts('Save As')}}"><span class="icon ui-icon-disk"></span></a>
+      </div>
+    </div>
+    <div crm-ui-field="subform.fromAddress" crm-title="ts('From')" ng-if="fields.fromAddress">
+      <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.a">
+        <select
+          crm-ui-id="subform.fromAddress"
+          name="fromAddress"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
+          ng-model="fromPlaceholder.label"
+          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
+          required>
+          <option value=""></option>
+        </select>
+      </span>
+    </div>
+    <div crm-ui-field="subform.fromAddressA" crm-title="ts('From (A)')" ng-if="fields.fromAddressA">
+      <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.a">
+        <select
+          crm-ui-id="subform.fromAddressA"
+          name="fromAddressA"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
+          ng-model="fromPlaceholder.label"
+          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
+          required>
+          <option value=""></option>
+        </select>
+      </span>
+    </div>
+    <div crm-ui-field="subform.fromAddressB" crm-title="ts('From (B)')" ng-if="fields.fromAddressB">
+      <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.b">
+        <select
+          crm-ui-id="subform.fromAddressB"
+          name="fromAddressB"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
+          ng-model="fromPlaceholder.label"
+          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
+          required>
+          <option value=""></option>
+        </select>
+      </span>
+    </div>
+    <div crm-ui-field="subform.replyTo" crm-title="ts('Reply-To')" ng-show="crmMailingConst.enableReplyTo" ng-if="fields.replyTo">
+      <span ng-controller="EmailAddrCtrl">
+        <select
+          crm-ui-id="subform.replyTo"
+          name="replyTo"
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
+          ng-model="abtest.mailings.a.replyto_email"
+          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
+          >
+          <option value=""></option>
+        </select>
+      </span>
+    </div>
+    <!--
+    <div crm-ui-field="subform.recipients" crm-title="ts('Recipients')">
+      <div ng-controller="EditRecipCtrl">
+        <div style="float: right;">
+          <div class='crmMailing2-recip-est'>
+            <a href="" ng-click="previewRecipients()">{{getRecipientsEstimate()}}</a>
+          </div>
+          <div>
+            <input name='dedupe_email' type='checkbox' ng-model='abtest.mailings.a.dedupe_email'  ng-true-value="1" ng-false-value="0" id="recipients-dedupe-email" />
+            <label for="recipients-dedupe-email">
+              {{ts('Dedupe')}}
+            </label>
+          </div>
+        </div>
+        <select crm-mailing-recipients
+                crm-mailing="mailing"
+                crm-avail-groups="crmMailingConst.groupNames | filter:{visibility:'Public pages'}"
+                crm-avail-mailings="crmMailingConst.civiMails | filter:{is_completed:1}"
+                name="recipients"
+                crm-ui-id="subform.recipients"
+                required
+                multiple>
+        </select>
+      </div>
+    </div>
+    -->
+    <div crm-ui-field="subform.subject" crm-title="ts('Subject')" ng-if="fields.subject">
+      <div style="float: right;">
+        <input crm-mailing-token crm-for="subject" />
+      </div>
+      <input
+        crm-ui-id="subform.subject"
+        type="text"
+        class="crm-form-text"
+        ng-model="abtest.mailings.a.subject"
+        required
+        placeholder="Subject"
+        name="subject" />
+    </div>
+    <div crm-ui-field="subform.subjectA" crm-title="ts('Subject (A)')" ng-if="fields.subjectA">
+      <div style="float: right;">
+        <input crm-mailing-token crm-for="subjectA" />
+      </div>
+      <input
+        crm-ui-id="subform.subjectA"
+        type="text"
+        class="crm-form-text"
+        ng-model="abtest.mailings.a.subject"
+        required
+        placeholder="Subject"
+        name="subjectA" />
+    </div>
+    <div crm-ui-field="subform.subjectB" crm-title="ts('Subject (B)')" ng-if="fields.subjectB">
+      <div style="float: right;">
+        <input crm-mailing-token crm-for="subjectB" />
+      </div>
+      <input
+        crm-ui-id="subform.subjectB"
+        type="text"
+        class="crm-form-text"
+        ng-model="abtest.mailings.b.subject"
+        required
+        placeholder="Subject"
+        name="subjectB" />
+    </div>
+  </div>
+</div>

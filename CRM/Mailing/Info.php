@@ -72,7 +72,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     );
     $result['crmMailingAB2'] = array(
       'ext' => 'civicrm',
-      'js' => array('js/angular-crmMailingAB2.js', 'js/angular-crmMailingAB2-services.js'),
+      'js' => array('js/angular-crmMailingAB2.js', 'js/angular-crmMailingAB2-services.js', 'js/angular-crmMailingAB2-directives.js'),
       'css' => array('css/angular-crmMailingAB2.css'),
     );
     $result['crmMailingAB'] = array(
