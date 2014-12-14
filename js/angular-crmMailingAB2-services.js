@@ -18,7 +18,14 @@
     };
   });
 
-  // CrmMailingAB is a data-model which combines an AB test (APIv3 "MailingAB") and three mailings (APIv3 "Mailing").
+  // CrmMailingAB is a data-model which combines an AB test (APIv3 "MailingAB"), three mailings (APIv3 "Mailing"),
+  // and three sets of attachments (APIv3 "Attachment").
+  //
+  // example:
+  //   var abtest = new CrmMailingAB(123);
+  //   abtest.load().then(function(){
+  //     alert("Mailing A is named "+abtest.mailings.a.name);
+  //   });
   angular.module('crmMailingAB2').factory('CrmMailingAB', function (crmApi, crmMailingMgr, $q, CrmAttachments) {
     function CrmMailingAB(id) {
       this.id = id;
