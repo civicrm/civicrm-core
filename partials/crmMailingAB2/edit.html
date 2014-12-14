@@ -2,10 +2,17 @@
   <pre>{{abtest|json}}</pre>
 </div>
 
-<form name="crmMailingAB2">
+<!--
+  An ABTest includes two mailings, but we don't require the user to enter two complete mailings. For
+  simplicity, the email composition UI generally displays A (unless we specifically decided to expose an
+  individual field from B). At the end of the composition process, the controller's "sync" operation will
+  merge shared settings from "A" into "B".
+-->
+
+<form name="crmMailingAB2" novalidate>
   <div class="crm-block crm-form-block crmMailing2">
     <div crm-ui-wizard>
-      <div crm-ui-wizard-step crm-title="ts('Setup')">
+      <div crm-ui-wizard-step="10" crm-title="ts('Setup')">
         <div ng-form="setupForm" crm-ui-id-scope>
           <div>
             <label crm-ui-for="setupForm.abName">{{ts('What would you like to name the test?')}}</label>
@@ -26,21 +33,70 @@
           </div>
         </div>
       </div>
-      <div crm-ui-wizard-step crm-title="ts('Content')">
-        <div>
-          Subject A: <input ng-model="abtest.mailings.a.subject"/>
+      <div crm-ui-wizard-step="20" crm-title="ts('Compose')" ng-if="criteriaName != 'Two different emails'">
+        <div crm-ui-tab-set>
+          <div crm-ui-tab id="tab-mailing" crm-title="ts('Mailing')">
+            <div
+              ng-if="criteriaName == 'From names'"
+              crm-mailing-ab-block-mailing="{
+                msg_template_id: 1,
+                fromAddressA: 1,
+                fromAddressB: 1,
+                replyTo: 1,
+                subject: 1
+                }"
+              crm-abtest="abtest"></div>
+            <div
+              ng-if="criteriaName == 'Subject lines'"
+              crm-mailing-ab-block-mailing="{
+                msg_template_id: 1,
+                fromAddress: 1,
+                replyTo: 1,
+                subjectA: 1,
+                subjectB: 1
+                }"
+              crm-abtest="abtest"></div>
+            <div crm-ui-accordion crm-title="ts('HTML')">
+              <div crm-mailing-body-html crm-mailing="abtest.mailings.a"/>
+            </div>
+            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='true'>
+              <div crm-mailing-body-text crm-mailing="abtest.mailings.a"/>
+            </div>
+          </div>
+          <!--
+          <div crm-ui-tab id="tab-attachment" crm-title="ts('Attachments')">
+            <div crm-attachments="attachments"/>
+          </div>
+          -->
+          <div crm-ui-tab id="tab-header" crm-title="ts('Header and Footer')">
+            <div crm-mailing-block-header-footer crm-mailing="abtest.mailings.a"/>
+          </div>
+          <div crm-ui-tab id="tab-pub" crm-title="ts('Publication')">
+            <div crm-mailing-block-publication crm-mailing="abtest.mailings.a"/>
+          </div>
+          <div crm-ui-tab id="tab-response" crm-title="ts('Responses')">
+            <div crm-mailing-block-responses crm-mailing="abtest.mailings.a"/>
+          </div>
         </div>
-        <div>
-          Subject B: <input ng-model="abtest.mailings.b.subject"/>
+        <div crm-ui-accordion crm-title="ts('Preview (A)')">
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.a"/>
+        </div>
+        <div crm-ui-accordion crm-title="ts('Preview (B)')">
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.b"/>
         </div>
       </div>
-    <span crm-ui-wizard-buttons style="float:right;">
-      <button
-        crm-confirm="{title:ts('Delete Draft?'), message:ts('Are you sure you want to delete the draft mailing?')}"
-        on-yes="delete()">{{ts('Delete Draft')}}
-      </button>
-      <button ng-click="save()">{{ts('Save Draft')}}</button>
-    </span>
+      <div crm-ui-wizard-step="30" crm-title="ts('Compose (A)')" ng-if="criteriaName == 'Two different emails'">
+        A
+      </div>
+      <div crm-ui-wizard-step="40" crm-title="ts('Compose (B)')" ng-if="criteriaName == 'Two different emails'">
+        B
+      </div>
+      <span crm-ui-wizard-buttons style="float:right;">
+        <button
+          crm-confirm="{title:ts('Delete Draft?'), message:ts('Are you sure you want to delete the draft mailing?')}"
+          on-yes="delete()">{{ts('Delete Draft')}}
+        </button>
+        <button ng-click="save()">{{ts('Save Draft')}}</button>
+      </span>
     </div>
-  </div>
 </form>

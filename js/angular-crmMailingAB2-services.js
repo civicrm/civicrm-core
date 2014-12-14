@@ -31,12 +31,12 @@
         var crmMailingAB = this;
         if (!crmMailingAB.id) {
           crmMailingAB.ab = {
-            name: '',
+            name: 'Example', // FIXME
             mailing_id_a: null,
             mailing_id_b: null,
             mailing_id_c: null,
             domain_id: null,
-            testing_criteria_id: null,
+            testing_criteria_id: 1, // FIXME
             winner_criteria_id: null,
             specific_url: '',
             declare_winning_time: null,
