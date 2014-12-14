@@ -7,7 +7,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/' + module + '/' + relPath;
   };
 
-  angular.module('crmMailingAB2', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmMailing2']);
+  angular.module('crmMailingAB2', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmAttachment', 'crmMailing2']);
   angular.module('crmMailingAB2').config([
     '$routeProvider',
     function ($routeProvider) {
@@ -40,10 +40,11 @@
 
 
   angular.module('crmMailingAB2').controller('CrmMailingAB2EditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr) {
+    window.ab = abtest;
     $scope.abtest = abtest;
     $scope.ts = CRM.ts('CiviMail');
     $scope.crmMailingABCriteria = crmMailingABCriteria;
-    $scope.crmMailingConst = CRM.crmMailing;;
+    $scope.crmMailingConst = CRM.crmMailing;
     $scope.partialUrl = partialUrl;
 
     $scope.sync = function sync() {
@@ -88,7 +89,8 @@
     };
 
     function updateCriteriaName() {
-      $scope.criteriaName = crmMailingABCriteria.get($scope.abtest.ab.testing_criteria_id).name;
+      var criteria = crmMailingABCriteria.get($scope.abtest.ab.testing_criteria_id)
+      $scope.criteriaName = criteria ? criteria.name : null;
     }
 
     // initialize
