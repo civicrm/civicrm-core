@@ -1399,8 +1399,6 @@ function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $grou
 function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $errorMode = FALSE) {
   $fields = array_intersect_key($fields, $params);
   foreach ($fields as $fieldName => $fieldInfo) {
-    //In some case $params[$fieldName] holds Array value in this format Array([operator] => [value])
-
     switch (CRM_Utils_Array::value('type', $fieldInfo)) {
       case CRM_Utils_Type::T_INT:
         //field is of type integer
