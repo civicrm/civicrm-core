@@ -2,16 +2,16 @@
 Controller: EditMailingCtrl
 Required vars: mailing
 -->
-<div class="crm-block">
+<div class="crm-block" ng-form="subform" crm-ui-id-scope>
   <div class="crm-group">
-    <div crm-ui-field="url_tracking" crm-title="ts('Track Click Throughs')" crm-layout="checkbox">
-      <input name="url_tracking" type="checkbox" ng-model="mailing.url_tracking" ng-true-value="1" ng-false-value="0" />
+    <div crm-ui-field="subform.url_tracking" crm-title="ts('Track Click Throughs')" crm-layout="checkbox">
+      <input crm-ui-id="subform.url_tracking" name="url_tracking" type="checkbox" ng-model="mailing.url_tracking" ng-true-value="1" ng-false-value="0" />
     </div>
     <div class="crm-section" id="help">
       {{ts('Track the number of times recipients click each link in this mailing. NOTE: When this feature is enabled, all links in the message body will be automatically re-written to route through your CiviCRM server prior to redirecting to the target page.')}}
     </div>
-    <div crm-ui-field="open_tracking" crm-title="ts('Track Opens')" crm-layout="checkbox">
-      <input name="open_tracking" type="checkbox" ng-model="mailing.open_tracking" ng-true-value="1" ng-false-value="0" />
+    <div crm-ui-field="subform.open_tracking" crm-title="ts('Track Opens')" crm-layout="checkbox">
+      <input crm-ui-id="subform.open_tracking" name="open_tracking" type="checkbox" ng-model="mailing.open_tracking" ng-true-value="1" ng-false-value="0" />
     </div>
     <div class="crm-section" id="help">
       {{ts('Track the number of times recipients open this mailing in their email software.')}}

@@ -70,6 +70,11 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'js' => array('js/angular-crmMailing2.js', 'js/angular-crmMailing2-services.js', 'js/angular-crmMailing2-directives.js'),
       'css' => array('css/angular-crmMailing2.css'),
     );
+    $result['crmMailingAB2'] = array(
+      'ext' => 'civicrm',
+      'js' => array('js/angular-crmMailingAB2.js', 'js/angular-crmMailingAB2-services.js', 'js/angular-crmMailingAB2-directives.js'),
+      'css' => array('css/angular-crmMailingAB2.css'),
+    );
     $result['crmMailingAB'] = array(
       'ext' => 'civicrm',
       'js' => array(
@@ -133,7 +138,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'mailGrp' => array_values($mailGrp['values']),
         'mailTokens' => array_values($mailTokens),
         'contactid' => $contactID,
-        'enableReplyTo' => $config->replyTo,
+        'enableReplyTo' => isset($config->replyTo) ? $config->replyTo : 0,
         'fromAddress' => array_values($fromAddress['values'][0]['api.OptionValue.get']['values']),
         'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', array('id' => 'user_contact_id', 'return' => 'email')),
         'visibility' => array(

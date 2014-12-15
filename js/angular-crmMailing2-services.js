@@ -30,15 +30,16 @@
   // so the UI must do some adaptation. The crmFromAddresses provides a richer way to slice/dice
   // the available "From:" addrs. Records are like the underlying OptionValues -- but add "email"
   // and "author".
-  crmMailing2.factory('crmFromAddresses', function($q, crmApi) {
+  crmMailing2.factory('crmFromAddresses', function ($q, crmApi) {
     var emailRegex = /^"(.*)" \<([^@\>]*@[^@\>]*)\>$/;
-    var addrs = _.map(CRM.crmMailing.fromAddress, function(addr){
+    var addrs = _.map(CRM.crmMailing.fromAddress, function (addr) {
       var match = emailRegex.exec(addr.label);
       return _.extend({}, addr, {
         email: match ? match[2] : '(INVALID)',
         author: match ? match[1] : '(INVALID)'
       });
     });
+
     function first(array) {
       return (array.length == 0) ? null : array[0];
     }
@@ -49,7 +50,7 @@
       },
       getByAuthorEmail: function getByAuthorEmail(author, email, autocreate) {
         var result = null;
-        _.each(addrs, function(addr){
+        _.each(addrs, function (addr) {
           if (addr.author == author && addr.email == email) {
             result = addr;
           }
@@ -67,7 +68,7 @@
       getByEmail: function getByEmail(email) {
         return first(_.where(addrs, {email: email}));
       },
-      getByLabel: function(label) {
+      getByLabel: function (label) {
         return first(_.where(addrs, {label: label}));
       },
       getDefault: function getDefault() {
@@ -76,8 +77,8 @@
     };
   });
 
-  crmMailing2.factory('crmMsgTemplates', function($q, crmApi) {
-    var tpls = _.map(CRM.crmMailing.mesTemplate, function(tpl){
+  crmMailing2.factory('crmMsgTemplates', function ($q, crmApi) {
+    var tpls = _.map(CRM.crmMailing.mesTemplate, function (tpl) {
       return _.extend({}, tpl, {
         //id: tpl parseInt(tpl.id)
       });
@@ -87,12 +88,13 @@
     return {
       // @return Promise MessageTemplate (per APIv3)
       get: function get(id) {
-        id = ''+id; // parseInt(id);
+        id = '' + id; // parseInt(id);
         var dfr = $q.defer();
         var tpl = _.where(tpls, {id: id});
         if (id && tpl && tpl[0]) {
           dfr.resolve(tpl[0]);
-        } else {
+        }
+        else {
           dfr.reject(id);
         }
         return dfr.promise;
@@ -100,10 +102,10 @@
       // Save a template
       // @param tpl MessageTemplate (per APIv3) For new templates, omit "id"
       // @return Promise MessageTemplate (per APIv3)
-      save: function(tpl) {
-        return crmApi('MessageTemplate', 'create', tpl).then(function(response){
+      save: function (tpl) {
+        return crmApi('MessageTemplate', 'create', tpl).then(function (response) {
           if (!tpl.id) {
-            tpl.id = ''+response.id; //parseInt(response.id);
+            tpl.id = '' + response.id; //parseInt(response.id);
             tpls.push(tpl);
           }
           lastModifiedTpl = tpl
@@ -111,7 +113,7 @@
         });
       },
       // @return Object MessageTemplate (per APIv3)
-      getLastModifiedTpl: function() {
+      getLastModifiedTpl: function () {
         return lastModifiedTpl;
       },
       getAll: function getAll() {
@@ -121,10 +123,10 @@
   });
 
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
-  crmMailing2.factory('crmMailingMgr', function($q, crmApi, crmFromAddresses) {
+  crmMailing2.factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses) {
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
-        component_type:type,
+        component_type: type,
         is_default: "1"
       });
       return (mcs.length >= 1) ? mcs[0].id : null;
@@ -138,11 +140,11 @@
       },
       // @return Promise Mailing (per APIv3)
       get: function get(id) {
-        return crmApi('Mailing', 'getsingle', {id: id}).then(function(mailing){
-          return crmApi('MailingGroup', 'get', {mailing_id: id}).then(function(groupResult){
+        return crmApi('Mailing', 'getsingle', {id: id}).then(function (mailing) {
+          return crmApi('MailingGroup', 'get', {mailing_id: id}).then(function (groupResult) {
             mailing.groups = {include: [], exclude: []};
             mailing.mailings = {include: [], exclude: []};
-            _.each(groupResult.values, function(mailingGroup) {
+            _.each(groupResult.values, function (mailingGroup) {
               var bucket = (mailingGroup.entity_table == 'civicrm_group') ? 'groups' : 'mailings';
               var entityId = parseInt(mailingGroup.entity_id);
               mailing[bucket][mailingGroup.group_type].push(entityId);
@@ -183,26 +185,67 @@
 
       // @param mailing Object (per APIv3)
       // @return Promise
-      'delete': function(mailing) {
+      'delete': function (mailing) {
         if (mailing.id) {
           return crmApi('Mailing', 'delete', {id: mailing.id});
-        } else {
+        }
+        else {
           var d = $q.defer();
           d.resolve();
           return d.promise;
         }
       },
 
+      // Copy all data fields in (mailingFrom) to (mailingTgt) -- except for (excludes)
+      // ex: crmMailingMgr.mergeInto(newMailing, mailingTemplate, ['subject']);
+      mergeInto: function mergeInto(mailingTgt, mailingFrom, excludes) {
+        var MAILING_FIELDS = [
+          // always exclude: 'id'
+          'name',
+          'campaign_id',
+          'from_name',
+          'from_email',
+          'replyto_email',
+          'subject',
+          'dedupe_email',
+          'groups',
+          'mailings',
+          'body_html',
+          'body_text',
+          'footer_id',
+          'header_id',
+          'visibility',
+          'url_tracking',
+          'dedupe_email',
+          'forward_replies',
+          'auto_responder',
+          'open_tracking',
+          'override_verp',
+          'optout_id',
+          'reply_id',
+          'resubscribe_id',
+          'unsubscribe_id'
+        ];
+        if (!excludes) {
+          excludes = [];
+        }
+        _.each(MAILING_FIELDS, function (field) {
+          if (!_.contains(excludes, field)) {
+            mailingTgt[field] = mailingFrom[field];
+          }
+        })
+      },
+
       // @param mailing Object (per APIv3)
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
         var params = _.extend({}, mailing, {
-          options:  {force_rollback: 1},
+          options: {force_rollback: 1},
           'api.Mailing.preview': {
             id: '$value.id'
           }
         });
-        return crmApi('Mailing', 'create', params).then(function(result){
+        return crmApi('Mailing', 'create', params).then(function (result) {
           // changes rolled back, so we don't care about updating mailing
           return result.values[result.id]['api.Mailing.preview'].values;
         });
@@ -215,7 +258,7 @@
         // To get list of recipients, we tentatively save the mailing and
         // get the resulting recipients -- then rollback any changes.
         var params = _.extend({}, mailing, {
-          options:  {force_rollback: 1},
+          options: {force_rollback: 1},
           'api.mailing_job.create': 1, // note: exact match to API default
           'api.MailingRecipients.get': {
             mailing_id: '$value.id',
@@ -224,7 +267,7 @@
             'api.email.getvalue': {'return': 'email'}
           }
         });
-        return crmApi('Mailing', 'create', params).then(function(recipResult){
+        return crmApi('Mailing', 'create', params).then(function (recipResult) {
           // changes rolled back, so we don't care about updating mailing
           return recipResult.values[recipResult.id]['api.MailingRecipients.get'].values;
         });
@@ -233,7 +276,7 @@
       // Save a (draft) mailing
       // @param mailing Object (per APIv3)
       // @return Promise
-      save: function(mailing) {
+      save: function (mailing) {
         var params = _.extend({}, mailing, {
           'api.mailing_job.create': 0 // note: exact match to API default
         });
@@ -243,8 +286,10 @@
         // is therefore not allowed. Remove this after fixing Mailing.create's contract.
         delete params.scheduled_date;
 
-        return crmApi('Mailing', 'create', params).then(function(result){
-          if (result.id && !mailing.id) mailing.id = result.id;  // no rollback, so update mailing.id
+        return crmApi('Mailing', 'create', params).then(function (result) {
+          if (result.id && !mailing.id) {
+            mailing.id = result.id;
+          }  // no rollback, so update mailing.id
           // Perhaps we should reload mailing based on result?
           return result.values[result.id];
         });
@@ -265,7 +310,9 @@
           'api.mailing_job.create': 0 // note: exact match to API default
         });
         return crmApi('Mailing', 'create', params).then(function (result) {
-          if (result.id && !mailing.id) mailing.id = result.id; // no rollback, so update mailing.id
+          if (result.id && !mailing.id) {
+            mailing.id = result.id;
+          } // no rollback, so update mailing.id
           _.extend(mailing, changes); // Perhaps we should reload mailing based on result?
           return result.values[result.id];
         });
@@ -276,7 +323,7 @@
       // @param testEmail string
       // @param testGroup int (id#)
       // @return Promise for a list of delivery reports
-      sendTest: function(mailing, testEmail, testGroup) {
+      sendTest: function (mailing, testEmail, testGroup) {
         var params = _.extend({}, mailing, {
           // options:  {force_rollback: 1}, // Test mailings include tracking features, so the mailing must be persistent
           'api.Mailing.send_test': {
@@ -291,8 +338,10 @@
         // is therefore not allowed. Remove this after fixing Mailing.create's contract.
         delete params.scheduled_date;
 
-        return crmApi('Mailing', 'create', params).then(function(result){
-          if (result.id && !mailing.id) mailing.id = result.id;  // no rollback, so update mailing.id
+        return crmApi('Mailing', 'create', params).then(function (result) {
+          if (result.id && !mailing.id) {
+            mailing.id = result.id;
+          }  // no rollback, so update mailing.id
           return result.values[result.id]['api.Mailing.send_test'].values;
         });
       }

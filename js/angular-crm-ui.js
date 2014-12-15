@@ -1,24 +1,13 @@
 /// crmUi: Sundry UI helpers
 (function (angular, $, _) {
 
+  var uidCount = 0;
+
   var partialUrl = function (relPath) {
     return CRM.resourceUrls['civicrm'] + '/partials/crmUi/' + relPath;
   };
 
   angular.module('crmUi', [])
-
-    .factory('crmUiId', function() {
-      var idCount = 0;
-      // Get the HTML ID of an element. If none available, assign one.
-      return function crmUiId(el){
-        var id = el.attr('id');
-        if (!id) {
-          id = 'crmUi_' + (++idCount);
-          el.attr('id', id);
-        }
-        return id;
-      };
-    })
 
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
     // WISHLIST: crmCollapsed should support two-way/continous binding
@@ -111,12 +100,9 @@
 
     // Display a field/row in a field list
     // example: <div crm-ui-field crm-title="My Field"> {{mydata}} </div>
-    // example: <div crm-ui-field="myfield" crm-title="My Field"> <input name="myfield" /> </div>
-    // example: <div crm-ui-field="myfield" crm-title="My Field"> <input name="myfield" required /> </div>
-    .directive('crmUiField', function(crmUiId) {
-      function createReqStyle(req) {
-        return {visibility: req ? 'inherit' : 'hidden'};
-      }
+    // example: <div crm-ui-field="subform.myfield" crm-title="'My Field'"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
+    // example: <div crm-ui-field="subform.myfield" crm-title="'My Field'"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
+    .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
         default: partialUrl('field.html'),
@@ -124,65 +110,119 @@
       };
 
       return {
+        require: '^crmUiIdScope',
+        restrict: 'EA',
         scope: {
-          crmUiField: '@', // string, name of an HTML form element
-          crmLayout: '@', // string, "default" or "checkbox"
-          crmTitle: '@' // expression, printable title for the field
+          crmUiField: '@',
+          crmTitle: '@'
         },
         templateUrl: function(tElement, tAttrs){
           var layout = tAttrs.crmLayout ? tAttrs.crmLayout : 'default';
           return templateUrls[layout];
         },
         transclude: true,
-        link: function (scope, element, attrs) {
+        link: function (scope, element, attrs, crmUiIdCtrl) {
           $(element).addClass('crm-section');
-          scope.crmTitle = attrs.crmTitle;
           scope.crmUiField = attrs.crmUiField;
+          scope.crmTitle = attrs.crmTitle;
+        }
+      };
+    })
+
+    // example: <div ng-form="subform" crm-ui-id-scope><label crm-ui-for="subform.foo">Foo:</label><input crm-ui-id="subform.foo" name="foo"/></div>
+    .directive('crmUiId', function () {
+      return {
+        require: '^crmUiIdScope',
+        restrict: 'EA',
+        link: {
+          pre: function (scope, element, attrs, crmUiIdCtrl) {
+            var id = crmUiIdCtrl.get(attrs.crmUiId);
+            element.attr('id', id);
+          }
+        }
+      };
+    })
+
+    // example: <div ng-form="subform" crm-ui-id-scope><label crm-ui-for="subform.foo">Foo:</label><input crm-ui-id="subform.foo" name="foo"/></div>
+    .directive('crmUiFor', function ($parse, $timeout) {
+      return {
+        require: '^crmUiIdScope',
+        restrict: 'EA',
+        template: '<span ng-class="cssClasses"><span ng-transclude/><span crm-ui-visible="crmIsRequired" class="crm-marker" title="This field is required.">*</span></span>',
+        transclude: true,
+        link: function (scope, element, attrs, crmUiIdCtrl) {
+          scope.crmIsRequired = false;
           scope.cssClasses = {};
-          scope.crmRequiredStyle = createReqStyle(false);
 
-          // 0. Ensure that a target field has been specified
+          if (!attrs.crmUiFor) return;
 
-          if (!attrs.crmUiField) return;
-          if (attrs.crmUiField == 'name') {
-            throw new Error('Validation monitoring does not work for field name "name"');
-          }
+          var id = crmUiIdCtrl.get(attrs.crmUiFor);
+          element.attr('for', id);
+          var ngModel = null;
 
-          // 1. Figure out form and input elements
+          var updateCss = function () {
+            scope.cssClasses['crm-error'] = !ngModel.$valid && !ngModel.$pristine;
+          };
 
-          var form = $(element).closest('form');
-          var formCtrl = scope.$parent.$eval(form.attr('name'));
-          var input = $('input[name="' + attrs.crmUiField + '"],select[name="' + attrs.crmUiField + '"],textarea[name="' + attrs.crmUiField + '"]', form);
-          var label = $('>div.label >label, >label', element);
-          if (form.length != 1 || input.length != 1 || label.length != 1) {
-            if (console.log) console.log('Label cannot be matched to input element. Expected to find one form and one input[name='+attrs.crmUiField+'].', form.length, input.length, label.length);
-            return;
-          }
+          // Note: if target element is dynamically generated (eg via ngInclude), then it may not be available
+          // immediately for initialization. Use retries/retryDelay to initialize such elements.
+          var init = function (retries, retryDelay) {
+            var input = $('#' + id);
+            if (input.length == 0) {
+              if (retries) {
+                $timeout(function(){
+                  init(retries-1, retryDelay);
+                }, retryDelay);
+              }
+              return;
+            }
 
-          // 2. Make sure that inputs are well-defined (with name+id).
+            var tgtScope = scope;//.$parent;
+            if (attrs.crmDepth) {
+              for (var i = attrs.crmDepth; i > 0; i--) {
+                tgtScope = tgtScope.$parent;
+              }
+            }
 
-          crmUiId(input);
-          $(label).attr('for', input.attr('id'));
+            if (input.attr('ng-required')) {
+              scope.crmIsRequired = scope.$parent.$eval(input.attr('ng-required'));
+              scope.$parent.$watch(input.attr('ng-required'), function (isRequired) {
+                scope.crmIsRequired = isRequired;
+              });
+            }
+            else {
+              scope.crmIsRequired = input.prop('required')
+            }
 
-          // 3. Monitor is the "required" and "$valid" properties
+            ngModel = $parse(attrs.crmUiFor)(tgtScope);
+            if (ngModel) {
+              ngModel.$viewChangeListeners.push(updateCss);
+            }
+          };
 
-          if (input.attr('ng-required')) {
-            scope.crmRequiredStyle = createReqStyle(scope.$parent.$eval(input.attr('ng-required')));
-            scope.$parent.$watch(input.attr('ng-required'), function(isRequired) {
-              scope.crmRequiredStyle = createReqStyle(isRequired);
-            });
-          } else {
-            scope.crmRequiredStyle = createReqStyle(input.prop('required'));
-          }
-
-          var inputCtrl = form.attr('name') + '.' + input.attr('name');
-          scope.$parent.$watch(inputCtrl + '.$valid', function(newValue) {
-            scope.cssClasses['crm-error'] = !scope.$parent.$eval(inputCtrl + '.$valid') && !scope.$parent.$eval(inputCtrl + '.$pristine');
-          });
-          scope.$parent.$watch(inputCtrl + '.$pristine', function(newValue) {
-            scope.cssClasses['crm-error'] = !scope.$parent.$eval(inputCtrl + '.$valid') && !scope.$parent.$eval(inputCtrl + '.$pristine');
+          $timeout(function(){
+            init(3, 100);
           });
         }
+      };
+    })
+
+    // example: <div ng-form="subform" crm-ui-id-scope><label crm-ui-for="subform.foo">Foo:</label><input crm-ui-id="subform.foo" name="foo"/></div>
+    .directive('crmUiIdScope', function () {
+      return {
+        restrict: 'EA',
+        scope: {},
+        controllerAs: 'crmUiIdCtrl',
+        controller: function($scope) {
+          var ids = {};
+          this.get = function(name) {
+            if (!ids[name]) {
+              ids[name] = "crmUiId_" + (++uidCount);
+            }
+            return ids[name];
+          }
+        },
+        link: function (scope, element, attrs) {}
       };
     })
 
@@ -220,12 +260,11 @@
       };
     })
 
-    // example: <textarea crm-ui-richtext name="body_html" ng-model="mailing.body_html"></textarea>
-    .directive('crmUiRichtext', function (crmUiId, $timeout) {
+    // example: <textarea crm-ui-id="myForm.body_html" crm-ui-richtext name="body_html" ng-model="mailing.body_html"></textarea>
+    .directive('crmUiRichtext', function ($timeout) {
       return {
         require: '?ngModel',
         link: function (scope, elm, attr, ngModel) {
-          crmUiId(elm);
           var ck = CKEDITOR.replace(elm[0]);
 
           if (!ngModel) {
@@ -313,42 +352,41 @@
       };
     })
 
-    // usage: <select crm-ui-select="{placeholder:'Something',allowClear:true,...}" crm-ui-select-model="myobj.field"><option...></select>
-    .directive('crmUiSelect', function ($parse) {
+    // usage: <select crm-ui-select="{placeholder:'Something',allowClear:true,...}" ng-model="myobj.field"><option...></select>
+    .directive('crmUiSelect', function ($parse, $timeout) {
       return {
+        require: '?ngModel',
         scope: {
-          crmUiSelect: '@',
-          crmUiSelectModel: '@',
-          crmUiSelectChange: '@'
+          crmUiSelect: '@'
         },
-        link: function (scope, element, attrs) {
-          var model = $parse(attrs.crmUiSelectModel);
-
+        link: function (scope, element, attrs, ngModel) {
           // In cases where UI initiates update, there may be an extra
           // call to refreshUI, but it doesn't create a cycle.
 
-          function refreshUI() {
-            $(element).select2('val', model(scope.$parent));
-          }
+          ngModel.$render = function () {
+            $timeout(function () {
+              // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
+              // new item is added before selection is made
+              $(element).select2('val', ngModel.$viewValue);
+            });
+          };
           function refreshModel() {
-            var oldValue = model(scope.$parent), newValue = $(element).select2('val');
+            var oldValue = ngModel.$viewValue, newValue = $(element).select2('val');
             if (oldValue != newValue) {
-              scope.$parent.$apply(function(){
-                model.assign(scope.$parent, newValue);
+              scope.$parent.$apply(function () {
+                ngModel.$setViewValue(newValue);
               });
-              if (attrs.crmUiSelectChange) {
-                scope.$parent.$eval(attrs.crmUiSelectChange);
-              }
             }
           }
+
           function init() {
             // TODO watch select2-options
             var options = attrs.crmUiSelect ? scope.$parent.$eval(attrs.crmUiSelect) : {};
             $(element).select2(options);
             $(element).on('change', refreshModel);
-            setTimeout(refreshUI, 0);
-            scope.$parent.$watch(attrs.crmUiSelectModel, refreshUI);
+            $timeout(ngModel.$render);
           }
+
           init();
         }
       };
@@ -506,6 +544,19 @@
               selectedIndex = 0;
             }
             steps.push(step);
+            steps.sort(function(a,b){
+              return a.crmUiWizardStep - b.crmUiWizardStep;
+            });
+            selectedIndex = findIndex();
+          };
+          this.remove = function(step) {
+            var key = null;
+            angular.forEach(steps, function(otherStep, otherKey) {
+              if (otherStep === step) key = otherKey;
+            });
+            if (key != null) {
+              steps.splice(key, 1);
+            }
           };
           this.goto = function(index) {
             if (index < 0) index = 0;
@@ -537,18 +588,30 @@
       };
     })
 
-    // example <div crm-ui-wizard-step crm-title="ts('My Title')">...content...</div>
+    // example: <div crm-ui-wizard-step crm-title="ts('My Title')">...content...</div>
+    // If there are any conditional steps, then be sure to set a weight explicitly on *all* steps to maintain ordering.
+    // example: <div crm-ui-wizard-step="100" crm-title="..." ng-if="...">...content...</div>
     .directive('crmUiWizardStep', function() {
+      var nextWeight = 1;
       return {
         require: '^crmUiWizard',
         restrict: 'EA',
         scope: {
-          crmTitle: '@'
+          crmTitle: '@', // expression, evaluates to a printable string
+          crmUiWizardStep: '@' // int, a weight which determines the ordering of the steps
         },
         template: '<div class="crm-wizard-step" ng-show="selected" ng-transclude/></div>',
         transclude: true,
         link: function (scope, element, attrs, crmUiWizardCtrl) {
+          if (scope.crmUiWizardStep) {
+            scope.crmUiWizardStep = parseInt(scope.crmUiWizardStep);
+          } else {
+            scope.crmUiWizardStep = nextWeight++;
+          }
           crmUiWizardCtrl.add(scope);
+          element.on('$destroy', function(){
+            crmUiWizardCtrl.remove(scope);
+          });
         }
       };
     })

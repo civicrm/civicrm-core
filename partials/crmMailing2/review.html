@@ -3,7 +3,7 @@ Controller: EditMailingCtrl
 Required vars: mailing
 -->
 <div>
-  <div class="crm-block">
+  <div class="crm-block" ng-form="reviewForm" crm-ui-id-scope>
     <div class="crm-group">
       <div crm-ui-field crm-title="ts('Mailing Name')">
         {{mailing.name}}
