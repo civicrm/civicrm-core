@@ -157,7 +157,17 @@
         </div>
       </div>
       <div crm-ui-wizard-step="30" crm-title="ts('Schedule')">
-        Scheduling!
+        <div
+          crm-mailing-ab-block-setup="{
+            scheduled_date: 1,
+            declare_winning_time: 1
+          }"
+          crm-abtest="abtest"></div>
+        <center>
+          <a class="crmMailing2-submit-button" ng-click="submit().then(leave)">
+            <div>{{ts('Submit Mailing')}}</div>
+          </a>
+        </center>
       </div>
       <span crm-ui-wizard-buttons style="float:right;">
         <button
