@@ -398,7 +398,7 @@
       json: "CRM.api3('" + entity + "', '" + action + "'",
       drush: "drush cvapi " + entity + '.' + action + ' ',
       wpcli: "wp cv api " + entity + '.' + action + ' ',
-      rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&json=" + JSON.stringify(params) + "&api_key=yoursitekey&key=yourkey"
+      rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&json=" + JSON.stringify(params) + "&api_key=yourkey&key=sitekey"
     };
     smartyStub = false;
     $.each(params, function(key, value) {
