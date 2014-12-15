@@ -41,7 +41,7 @@
   <td>
     <div class="float-left">
       <label>{ts}Payment Method{/ts}</label> <br />
-      {$form.contribution_payment_instrument_id.html|crmAddClass:twenty}
+      {$form.payment_instrument.html|crmAddClass:twenty}
     </div>
     <div class="float-left" id="contribution_check_number_wrapper">
       {$form.contribution_check_number.label} <br />

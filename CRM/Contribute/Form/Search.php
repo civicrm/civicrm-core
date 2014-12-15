@@ -269,7 +269,14 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $config = CRM_Core_Config::singleton();
     if (!empty($_POST)) {
-      foreach (array('financial_type_id', 'contribution_soft_credit_type_id', 'contribution_status_id', 'contribution_source', 'contribution_trxn_id') as $element) {
+      $specialParams = array(
+        'financial_type_id',
+        'contribution_soft_credit_type_id',
+        'contribution_status_id',
+        'contribution_source',
+        'contribution_trxn_id'
+      );
+      foreach ($specialParams as $element) {
         $value = CRM_Utils_Array::value($element, $this->_formValues);
         if ($value) {
           if (is_array($value)) {
