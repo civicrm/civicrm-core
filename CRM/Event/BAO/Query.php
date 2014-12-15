@@ -244,7 +244,7 @@ class CRM_Event_BAO_Query {
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
-    $fields = array_merge(self::fields(), CRM_Event_BAO_Event::fields(), CRM_Event_BAO_Participant::exportableFields());
+    $fields = array_merge(CRM_Event_BAO_Event::fields(), CRM_Event_BAO_Participant::exportableFields());
 
     switch ($name) {
       case 'event_start_date_low':
