@@ -71,7 +71,6 @@
     <uniqueName>event_type_id</uniqueName>
     <title>Event Type</title>
     <default>0</default>
-    <export>true</export>
     <pseudoconstant>
       <optionGroupName>event_type</optionGroupName>
     </pseudoconstant>
