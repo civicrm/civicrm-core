@@ -216,7 +216,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
     // location types
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('id' => 'display_name'));
-    $this->addElement('select', 'location_type_id', ts("Location Type"), array('' => '-select-') + $locationTypes);
+    $this->addElement('select', 'location_type_id', ts("Location Type"), array('' => ts('Automatic')) + $locationTypes);
 
     $methods = CRM_Core_SelectValues::emailSelectMethods();
     $this->addElement('select', 'email_selection_method', ts("Email Selection Method"), $methods);
