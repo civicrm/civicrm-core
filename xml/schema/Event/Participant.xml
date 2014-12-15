@@ -102,7 +102,7 @@
     <import>true</import>
     <type>varchar</type>
     <length>128</length>
-    <export>true</export>
+    <export>false</export>
     <default>NULL</default>
     <comment>Participant role ID. Implicit FK to civicrm_option_value where option_group = participant_role.</comment>
     <add>1.7</add>
