@@ -955,7 +955,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
       if ($checkCheckBoxField && !empty($fields['custom_' . $customFieldID]) && $fields['custom_' . $customFieldID]['html_type'] == 'CheckBox') {
         formatCheckBoxField($value, 'custom_' . $customFieldID, $entity);
       }
-      
+
       CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $values['custom'],
         $value, $extends, $customValueID, $entityId, FALSE, FALSE, TRUE
       );
@@ -1347,34 +1347,33 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
   $fields = array_intersect_key($fields, $params);
   foreach ($fields as $fieldName => $fieldInfo) {
     //In some case $params[$fieldName] holds Array value in this format Array([operator] => [value])
-    $fieldValue = CRM_Utils_Array::value($fieldName, $params);
-    $op = NULL;
-    if (!empty($fieldValue) && is_array($fieldValue) && in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators())) {
-      $op = key($fieldValue);
-      $fieldValue = CRM_Utils_Array::value($op, $fieldValue);;
-    }
+
     switch (CRM_Utils_Array::value('type', $fieldInfo)) {
       case CRM_Utils_Type::T_INT:
         //field is of type integer
-        _civicrm_api3_validate_integer($fieldValue, $fieldName, $fieldInfo, $entity);
+        _civicrm_api3_validate_integer($params, $fieldName, $fieldInfo, $entity);
         break;
 
       case 4:
       case 12:
       case CRM_Utils_Type::T_TIMESTAMP:
         //field is of type date or datetime
-        _civicrm_api3_validate_date($params, $fieldName, $fieldValue, $fieldInfo);
+        _civicrm_api3_validate_date($params, $fieldName, $fieldInfo);
         break;
 
     case 32://blob
-        _civicrm_api3_validate_html($fieldValue, $fieldName, $fieldInfo);
+        _civicrm_api3_validate_html($params, $fieldName, $fieldInfo);
         break;
 
       case CRM_Utils_Type::T_STRING:
-        _civicrm_api3_validate_string($fieldValue, $fieldName, $fieldInfo, $entity);
+        _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
         break;
 
       case CRM_Utils_Type::T_MONEY:
+        list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
+        if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+          break;
+        }
         if (!CRM_Utils_Rule::money($fieldValue) && !empty($fieldValue)) {
           throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
         }
@@ -1392,13 +1391,8 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
       }
       if (!empty($fieldInfo['api.unique'])) {
         $params['entity'] = $entity;
-        _civicrm_api3_validate_uniquekey($params, $fieldName, $fieldValue, $fieldInfo);
+        _civicrm_api3_validate_uniquekey($params, $fieldName, $fieldInfo);
       }
-    }
-
-    $params[$fieldName] = $fieldValue;
-    if (!is_null($op)) {
-      $params[$fieldName] = array($op => $fieldValue);
     }
   }
 }
@@ -1418,13 +1412,24 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
  * @param array $fieldInfo array of fields from getfields function
  * @throws Exception
  */
-function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldValue, &$fieldInfo) {
+function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
+  list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
+  if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+    return;
+  }
   //should we check first to prevent it from being copied if they have passed in sql friendly format?
   if (!empty($params[$fieldInfo['name']])) {
     $fieldValue = _civicrm_api3_getValidDate($fieldValue, $fieldInfo['name'], $fieldInfo['type']);
   }
   if ((CRM_Utils_Array::value('name', $fieldInfo) != $fieldName) && !empty($fieldValue)) {
     $fieldValue = _civicrm_api3_getValidDate($fieldValue, $fieldName, $fieldInfo['type']);
+  }
+
+  if (!empty($op)) {
+    $params[$fieldName][$op] = $fieldValue;
+  }
+  else {
+    $params[$fieldName] = $fieldValue;
   }
 }
 
@@ -1479,7 +1484,11 @@ function _civicrm_api3_validate_constraint(&$fieldValue, &$fieldName, &$fieldInf
  * @param $fieldInfo array of fields from getfields function
  * @throws Exception
  */
-function _civicrm_api3_validate_uniquekey(&$params, &$fieldName, &$fieldValue, &$fieldInfo) {
+function _civicrm_api3_validate_uniquekey(&$params, &$fieldName, &$fieldInfo) {
+  list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
+  if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+    return;
+  }
   $existing = civicrm_api($params['entity'], 'get', array(
       'version' => $params['version'],
       $fieldName => $fieldValue,
@@ -1738,13 +1747,18 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
  * @param string $entity
  * @throws API_Exception
  */
-function _civicrm_api3_validate_integer(&$fieldValue, &$fieldName, &$fieldInfo, $entity) {
+function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $entity) {
+  list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
+  if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+    return;
+  }
+
   if (!empty($fieldValue)) {
     // if value = 'user_contact_id' (or similar), replace value with contact id
     if (!is_numeric($fieldValue) && is_scalar($fieldValue)) {
       $realContactId = _civicrm_api3_resolve_contactID($fieldValue);
       if ('unknown-user' === $realContactId) {
-        throw new API_Exception("\"$fieldName\" \"{$params[$fieldName]}\" cannot be resolved to a contact ID", 2002, array('error_field' => $fieldName,"type"=>"integer"));
+        throw new API_Exception("\"$fieldName\" \"{$fieldValue}\" cannot be resolved to a contact ID", 2002, array('error_field' => $fieldName,"type"=>"integer"));
       } elseif (is_numeric($realContactId)) {
         $fieldValue = $realContactId;
       }
@@ -1807,7 +1821,11 @@ function  _civicrm_api3_resolve_contactID($contactIdExpr) {
  *
  * @throws API_Exception
  */
-function _civicrm_api3_validate_html(&$fieldValue, &$fieldName, $fieldInfo) {
+function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
+  list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
+  if (strpos($op, 'NULL') || strpos($op, 'EMPTY')) {
+    return;
+  }
   if ($fieldValue) {
     if (!CRM_Utils_Rule::xssString($fieldValue)) {
       throw new API_Exception('Illegal characters in input (potential scripting attack)', array("field"=>$fieldName,"error_code"=>"xss"));
@@ -1824,7 +1842,11 @@ function _civicrm_api3_validate_html(&$fieldValue, &$fieldName, $fieldInfo) {
  * @throws API_Exception
  * @throws Exception
  */
-function _civicrm_api3_validate_string(&$fieldValue, &$fieldName, &$fieldInfo, $entity) {
+function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity) {
+  list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
+  if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+    return;
+  }
   // If fieldname exists in params
   $fieldValue = !empty($fieldValue) ? $fieldValue : '';
   if(!is_array($fieldValue)){
@@ -1994,4 +2016,23 @@ function _civicrm_api3_deprecation_check($entity, $result = array()) {
       return $fnName($result);
     }
   }
+}
+
+/**
+ * In some case $params[$fieldName] holds Array value in this format Array([operator] => [value])
+ * So this function returns the actual field value
+ *
+ * @param array $params
+ * @param string $fieldName
+ * @return string|int|boolean|date|null
+ */
+function _civicrm_api3_field_value_check(&$params, $fieldName) {
+  $fieldValue = CRM_Utils_Array::value($fieldName, $params);
+  $op = NULL;
+
+  if (!empty($fieldValue) && is_array($fieldValue) && in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators())) {
+    $op = key($fieldValue);
+    $fieldValue = CRM_Utils_Array::value($op, $fieldValue);
+  }
+  return array($fieldValue, $op);
 }

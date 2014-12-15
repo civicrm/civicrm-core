@@ -619,7 +619,9 @@ class CRM_Contact_BAO_Query {
       if (
         (substr($name, 0, 12) == 'participant_') ||
         (substr($name, 0, 7) == 'pledge_') ||
-        (substr($name, 0, 5) == 'case_')
+        (substr($name, 0, 5) == 'case_') ||
+        (substr($name, 0, 13) == 'contribution_') ||
+        (substr($name, 0, 8) == 'payment_')
       ) {
         continue;
       }
@@ -1512,7 +1514,10 @@ class CRM_Contact_BAO_Query {
       return $result;
     }
 
-    if ($apiEntity && substr($id, 0, strlen($apiEntity)) != $apiEntity) {
+    if ($apiEntity &&
+      (substr($id, 0, strlen($apiEntity)) != $apiEntity) &&
+      (substr($id, 0, 10) != 'financial_' && substr($id, 0, 8) != 'payment_')
+    ) {
       $id = $apiEntity . '_' . $id;
     }
 
@@ -1589,6 +1594,7 @@ class CRM_Contact_BAO_Query {
       (substr($values[0], 0, 7) == 'pledge_') ||
       (substr($values[0], 0, 5) == 'case_') ||
       (substr($values[0], 0, 10) == 'financial_') ||
+      (substr($values[0], 0, 8) == 'payment_') ||
       (substr($values[0], 0, 11) == 'membership_')
     ) {
       return;
@@ -5572,6 +5578,7 @@ AND   displayRelType.is_active = 1
 
   static function buildQillForFieldValue($daoName, $fieldName, $fieldValue, $op, $pseduoExtraParam = array()) {
     $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
+    $qillOperators = CRM_Core_SelectValues::getSearchBuilderOperators();
     if ($fieldName == 'activity_type_id') {
       $pseduoOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     }
@@ -5585,7 +5592,6 @@ AND   displayRelType.is_active = 1
           $fieldValue = implode(', ', $fieldValue);
         }
       }
-      return array($op, $fieldValue);
     }
     elseif (is_array($fieldValue)) {
       $qillString = array();
@@ -5596,13 +5602,14 @@ AND   displayRelType.is_active = 1
       foreach ((array)$fieldValue as $val) {
         $qillString[] = $pseduoOptions[$val];
       }
-      return array($op, implode(', ', $qillString));
+      $fieldValue = implode(', ', $qillString);
     }
     else {
       if (array_key_exists($fieldValue, $pseduoOptions)) {
         $fieldValue = $pseduoOptions[$fieldValue];
       }
-      return array($op, $fieldValue);
     }
+
+    return array(CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue);
   }
 }
