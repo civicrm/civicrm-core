@@ -1,5 +1,5 @@
-<div style="width: 98%" ng-controller="EditScheduleCtrl">
-  <div style="width: 40em; text-align: left; margin: auto;">
+<div class="crmMailing2-schedule-outer" crm-mailing-radio-date="schedule" crm-model="mailing.scheduled_date">
+  <div class="crmMailing2-schedule-inner">
     <div>
       <input ng-model="schedule.mode" type="radio" name="send" value="now" id="schedule-send-now"/>
       <label for="schedule-send-now">{{ts('Send immediately')}}</label>
