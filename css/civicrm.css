@@ -4444,13 +4444,13 @@ span.crm-status-icon {
 }
 
 #crm-container.crm-public .price-set-row .crm-price-amount-amount {
-  font-weight: bold;
   min-width: 2em;
   color: #333333;
 }
 
 #crm-container.crm-public .price-set-row .crm-price-amount-label {
   color: #444444;
+  font-weight: bold;
 }
 
 #crm-container.crm-public .price-set-row .highlight label {
