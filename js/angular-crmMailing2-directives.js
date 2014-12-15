@@ -5,24 +5,134 @@
 
   var crmMailing2 = angular.module('crmMailing2');
 
-  crmMailing2.directive('crmMailingReviewBool', function(){
+  // The following directives have the same simple implementation -- load
+  // a template and export a "mailing" object into scope.
+  var simpleBlocks = {
+    crmMailingBlockHeaderFooter: partialUrl('headerFooter.html'),
+    crmMailingBlockMailing: partialUrl('mailing.html'),
+    crmMailingBlockPreview: partialUrl('preview.html'),
+    crmMailingBlockPublication: partialUrl('publication.html'),
+    crmMailingBlockResponses: partialUrl('responses.html'),
+    crmMailingBlockReview: partialUrl('review.html'),
+    crmMailingBlockSchedule: partialUrl('schedule.html'),
+    crmMailingBlockSummary: partialUrl('summary.html'),
+    crmMailingBlockTracking: partialUrl('tracking.html'),
+    crmMailingBodyHtml: partialUrl('body_html.html'),
+    crmMailingBodyText: partialUrl('body_text.html')
+  };
+  _.each(simpleBlocks, function(templateUrl, directiveName){
+    crmMailing2.directive(directiveName, function ($parse) {
+      return {
+        scope: {
+          crmMailing: '@'
+        },
+        templateUrl: templateUrl,
+        link: function (scope, elm, attr) {
+          var model = $parse(attr.crmMailing);
+          scope.mailing = model(scope.$parent);
+          scope.crmMailingConst = CRM.crmMailing;
+          scope.ts = CRM.ts('CiviMail');
+        }
+      };
+    });
+  });
+
+  // Convert between a mailing "From Address" (mailing.from_name,mailing.from_email) and a unified label ("Name" <e@ma.il>)
+  // example: <span crm-mailing-from-address="myPlaceholder" crm-mailing="myMailing"><select ng-model="myPlaceholder.label"></select></span>
+  // NOTE: This really doesn't belong in a directive. I've tried (and failed) to make this work with a getterSetter binding, eg
+  // <select ng-model="mailing.convertFromAddress" ng-model-options="{getterSetter: true}">
+  crmMailing2.directive('crmMailingFromAddress', function ($parse, crmFromAddresses) {
+    return {
+      link: function (scope, element, attrs) {
+        var placeholder = attrs.crmMailingFromAddress;
+        var model = $parse(attrs.crmMailing);
+        var mailing = model(scope.$parent);
+        scope[placeholder] = {
+          label: crmFromAddresses.getByAuthorEmail(mailing.from_name, mailing.from_email, true).label
+        };
+        scope.$watch(placeholder + '.label', function (newValue) {
+          var addr = crmFromAddresses.getByLabel(newValue);
+          mailing.from_name = addr.author;
+          mailing.from_email = addr.email;
+        });
+        // FIXME: Shouldn't we also be watching mailing.from_name and mailing.from_email?
+      }
+    };
+  });
+
+  // Represent a datetime field as if it were a radio ('schedule.mode') and a datetime ('schedule.datetime').
+  // example: <div crm-mailing-radio-date="mySchedule" crm-model="mailing.scheduled_date">...</div>
+  // FIXME: use ngModel instead of adhoc crmModel
+  crmMailing2.directive('crmMailingRadioDate', function ($parse) {
+    return {
+      link: function ($scope, element, attrs) {
+        var schedModel = $parse(attrs.crmModel);
+
+        var schedule = $scope[attrs.crmMailingRadioDate] = {
+          mode: 'now',
+          datetime: ''
+        };
+        var updateChildren = (function () {
+          var sched = schedModel($scope);
+          if (sched) {
+            schedule.mode = 'at';
+            schedule.datetime = sched;
+          }
+          else {
+            schedule.mode = 'now';
+          }
+        });
+        var updateParent = (function () {
+          switch (schedule.mode) {
+            case 'now':
+              schedModel.assign($scope, null);
+              break;
+            case 'at':
+              schedModel.assign($scope, schedule.datetime);
+              break;
+            default:
+              throw 'Unrecognized schedule mode: ' + schedule.mode;
+          }
+        });
+
+        $scope.$watch(attrs.crmModel, updateChildren);
+        $scope.$watch(attrs.crmMailingRadioDate + '.mode', updateParent);
+        $scope.$watch(attrs.crmMailingRadioDate + '.datetime', function (newValue, oldValue) {
+          // automatically switch mode based on datetime entry
+          if (oldValue != newValue) {
+            if (!newValue || newValue == " ") {
+              schedule.mode = 'now';
+            }
+            else {
+              schedule.mode = 'at';
+            }
+          }
+          updateParent();
+        });
+      }
+    };
+  });
+
+  crmMailing2.directive('crmMailingReviewBool', function () {
     return {
       scope: {
         crmOn: '@',
         crmTitle: '@'
       },
       template: '<span ng-class="spanClasses"><span class="icon" ng-class="iconClasses"></span>{{crmTitle}} </span>',
-      link: function(scope, element, attrs){
+      link: function (scope, element, attrs) {
         function refresh() {
           if (scope.$parent.$eval(attrs.crmOn)) {
             scope.spanClasses = {'crmMailing2-active': true};
             scope.iconClasses = {'ui-icon-check': true};
-          } else {
+          }
+          else {
             scope.spanClasses = {'crmMailing2-inactive': true};
             scope.iconClasses = {'ui-icon-close': true};
           }
           scope.crmTitle = scope.$parent.$eval(attrs.crmTitle);
         }
+
         refresh();
         scope.$parent.$watch(attrs.crmOn, refresh);
         scope.$parent.$watch(attrs.crmTitle, refresh);
@@ -32,25 +142,14 @@
 
   // example: <input name="subject" /> <input crm-mailing-token crm-for="subject"/>
   // WISHLIST: Instead of global CRM.crmMailing.mailTokens, accept token list as an input
-  crmMailing2.directive('crmMailingToken', function (crmUiId) {
+  crmMailing2.directive('crmMailingToken', function () {
     return {
+      require: '^crmUiIdScope',
       scope: {
         crmFor: '@'
       },
       template: '<input type="text" class="crmMailingToken" />',
-      link: function (scope, element, attrs) {
-        // 1. Find the corresponding input element (crmFor)
-
-        var form = $(element).closest('form');
-        var crmForEl = $('input[name="' + attrs.crmFor + '"],textarea[name="' + attrs.crmFor + '"]', form);
-        if (form.length != 1 || crmForEl.length != 1) {
-          if (console.log) {
-            console.log('crmMailingToken cannot be matched to input element. Expected to find one form and one input.', form.length, crmForEl.length);
-          }
-          return;
-        }
-
-        // 2. Setup the token selector
+      link: function (scope, element, attrs, crmUiIdCtrl) {
         $(element).select2({
           width: "10em",
           dropdownAutoWidth: true,
@@ -58,13 +157,14 @@
           placeholder: ts('Insert')
         });
         $(element).on('select2-selecting', function (e) {
-          var id = crmUiId(crmForEl);
+          var id = crmUiIdCtrl.get(attrs.crmFor);
           if (CKEDITOR.instances[id]) {
             CKEDITOR.instances[id].insertText(e.val);
             $(element).select2('close').select2('val', '');
             CKEDITOR.instances[id].focus();
           }
           else {
+            var crmForEl = $('#' + id);
             var origVal = crmForEl.val();
             var origPos = crmForEl[0].selectionStart;
             var newVal = origVal.substring(0, origPos) + e.val + origVal.substring(origPos, origVal.length);
@@ -85,6 +185,7 @@
   });
 
   // example: <select multiple crm-mailing-recipients crm-mailing="mymailing" crm-avail-groups="myGroups" crm-avail-mailings="myMailings"></select>
+  // FIXME: participate in ngModel's validation cycle
   crmMailing2.directive('crmMailingRecipients', function () {
     return {
       restrict: 'AE',
@@ -103,8 +204,9 @@
 
         /// Convert MySQL date ("yyyy-mm-dd hh:mm:ss") to JS date object
         scope.parseDate = function (date) {
-          if (!angular.isString(date))
+          if (!angular.isString(date)) {
             return date;
+          }
           var p = date.split(/[\- :]/);
           return new Date(p[0], p[1], p[2], p[3], p[4], p[5]);
         };
@@ -176,7 +278,8 @@
           if (option.mode == 'exclude') {
             scope.mailing[typeKey].exclude.push(option.entity_id);
             arrayRemove(scope.mailing[typeKey].include, option.entity_id);
-          } else {
+          }
+          else {
             scope.mailing[typeKey].include.push(option.entity_id);
             arrayRemove(scope.mailing[typeKey].exclude, option.entity_id);
           }
@@ -188,7 +291,7 @@
         $(element).on("select2-removing", function (e) {
           var option = convertValueToObj(e.val);
           var typeKey = option.entity_type == 'civicrm_mailing' ? 'mailings' : 'groups';
-          scope.$parent.$apply(function(){
+          scope.$parent.$apply(function () {
             arrayRemove(scope.mailing[typeKey][option.mode], option.entity_id);
           });
           e.preventDefault();

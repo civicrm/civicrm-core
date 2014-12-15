@@ -3,13 +3,16 @@
     return CRM.resourceUrls['civicrm'] + '/partials/crmMailing2/' + relPath;
   };
 
-  var crmMailing2 = angular.module('crmMailing2', ['crmUtil', 'crmAttachment', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService']); // TODO ngSanitize, unsavedChanges
+  var crmMailing2 = angular.module('crmMailing2', [
+    'crmUtil', 'crmAttachment', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService'
+  ]); // TODO ngSanitize, unsavedChanges
 
   // Time to wait before triggering AJAX update to recipients list
   var RECIPIENTS_DEBOUNCE_MS = 100;
   var RECIPIENTS_PREVIEW_LIMIT = 10000;
 
-  crmMailing2.config(['$routeProvider',
+  crmMailing2.config([
+    '$routeProvider',
     function ($routeProvider) {
       $routeProvider.when('/mailing2', {
         template: '<div></div>',
@@ -19,28 +22,36 @@
         templateUrl: partialUrl('edit.html'),
         controller: 'EditMailingCtrl',
         resolve: {
-          selectedMail: function selectedMail($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
+          selectedMail: function selectedMail($route, crmMailingMgr) {
+            return crmMailingMgr.getOrCreate($route.current.params.id);
+          }
         }
       });
       $routeProvider.when('/mailing2/:id/unified', {
         templateUrl: partialUrl('edit-unified.html'),
         controller: 'EditMailingCtrl',
         resolve: {
-          selectedMail: function selectedMail($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
+          selectedMail: function selectedMail($route, crmMailingMgr) {
+            return crmMailingMgr.getOrCreate($route.current.params.id);
+          }
         }
       });
       $routeProvider.when('/mailing2/:id/unified2', {
         templateUrl: partialUrl('edit-unified2.html'),
         controller: 'EditMailingCtrl',
         resolve: {
-          selectedMail: function selectedMail($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
+          selectedMail: function selectedMail($route, crmMailingMgr) {
+            return crmMailingMgr.getOrCreate($route.current.params.id);
+          }
         }
       });
       $routeProvider.when('/mailing2/:id/wizard', {
         templateUrl: partialUrl('edit-wizard.html'),
         controller: 'EditMailingCtrl',
         resolve: {
-          selectedMail: function selectedMail($route, crmMailingMgr) { return crmMailingMgr.getOrCreate($route.current.params.id); }
+          selectedMail: function selectedMail($route, crmMailingMgr) {
+            return crmMailingMgr.getOrCreate($route.current.params.id);
+          }
         }
       });
     }
@@ -55,13 +66,13 @@
     });
   });
 
-  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmFromAddresses, crmStatus, CrmAttachments) {
+  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, CrmAttachments) {
     $scope.mailing = selectedMail;
-    $scope.attachments = new CrmAttachments(function() {
+    $scope.attachments = new CrmAttachments(function () {
       return {entity_table: 'civicrm_mailing', entity_id: $scope.mailing.id};
     });
+    $scope.attachments.load();
     $scope.crmMailingConst = CRM.crmMailing;
-    $scope.crmFromAddresses = crmFromAddresses;
 
     $scope.partialUrl = partialUrl;
     var ts = $scope.ts = CRM.ts('CiviMail');
@@ -103,7 +114,7 @@
     };
 
     // Transition URL "/mailing2/new" => "/mailing2/123" as soon as ID is known
-    $scope.$watch('mailing.id', function(newValue, oldValue) {
+    $scope.$watch('mailing.id', function (newValue, oldValue) {
       if (newValue && newValue != oldValue) {
         var parts = $location.path().split('/'); // e.g. "/mailing2/new" or "/mailing2/123/wizard"
         parts[2] = newValue;
@@ -111,15 +122,6 @@
         $location.replace();
         // FIXME: Angular unnecessarily refreshes UI
       }
-    });
-
-    $scope.fromPlaceholder = {
-      label: crmFromAddresses.getByAuthorEmail($scope.mailing.from_name, $scope.mailing.from_email, true).label
-    };
-    $scope.$watch('fromPlaceholder.label', function(newValue){
-      var addr = crmFromAddresses.getByLabel(newValue);
-      $scope.mailing.from_name = addr.author;
-      $scope.mailing.from_email = addr.email;
     });
   });
 
@@ -133,45 +135,57 @@
     $scope.recipients = null;
     $scope.getRecipientsEstimate = function () {
       var ts = $scope.ts;
-      if ($scope.recipients == null)
+      if ($scope.recipients == null) {
         return ts('(Estimating)');
-      if ($scope.recipients.length == 0)
+      }
+      if ($scope.recipients.length == 0) {
         return ts('No recipients');
-      if ($scope.recipients.length == 1)
+      }
+      if ($scope.recipients.length == 1) {
         return ts('~1 recipient');
-      if (RECIPIENTS_PREVIEW_LIMIT > 0 && $scope.recipients.length >= RECIPIENTS_PREVIEW_LIMIT)
+      }
+      if (RECIPIENTS_PREVIEW_LIMIT > 0 && $scope.recipients.length >= RECIPIENTS_PREVIEW_LIMIT) {
         return ts('>%1 recipients', {1: RECIPIENTS_PREVIEW_LIMIT});
+      }
       return ts('~%1 recipients', {1: $scope.recipients.length});
     };
-    $scope.getIncludesAsString = function() {
+    $scope.getIncludesAsString = function () {
       var first = true;
       var names = '';
-      _.each($scope.mailing.groups.include, function(id){
-        if (!first) names = names + ', ';
-        var group = _.where(CRM.crmMailing.groupNames, {id: ''+id});
+      _.each($scope.mailing.groups.include, function (id) {
+        if (!first) {
+          names = names + ', ';
+        }
+        var group = _.where(CRM.crmMailing.groupNames, {id: '' + id});
         names = names + group[0].title;
         first = false;
       });
-      _.each($scope.mailing.mailings.include, function(id){
-        if (!first) names = names + ', ';
-        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: ''+id});
+      _.each($scope.mailing.mailings.include, function (id) {
+        if (!first) {
+          names = names + ', ';
+        }
+        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: '' + id});
         names = names + oldMailing[0].name;
         first = false;
       });
       return names;
     };
-    $scope.getExcludesAsString = function() {
+    $scope.getExcludesAsString = function () {
       var first = true;
       var names = '';
-      _.each($scope.mailing.groups.exclude, function(id){
-        if (!first) names = names + ', ';
-        var group = _.where(CRM.crmMailing.groupNames, {id: ''+id});
+      _.each($scope.mailing.groups.exclude, function (id) {
+        if (!first) {
+          names = names + ', ';
+        }
+        var group = _.where(CRM.crmMailing.groupNames, {id: '' + id});
         names = names + group[0].title;
         first = false;
       });
-      _.each($scope.mailing.mailings.exclude, function(id){
-        if (!first) names = names + ', ';
-        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: ''+id});
+      _.each($scope.mailing.mailings.exclude, function (id) {
+        if (!first) {
+          names = names + ', ';
+        }
+        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: '' + id});
         names = names + oldMailing[0].name;
         first = false;
       });
@@ -239,7 +253,7 @@
     $scope.previewDialog = function previewDialog(template) {
       var p = crmMailingMgr
         .preview($scope.mailing)
-        .then(function(content){
+        .then(function (content) {
           var options = {
             autoOpen: false,
             modal: true,
@@ -249,7 +263,7 @@
           };
           dialogService.open('previewDialog', template, content, options);
         });
-        CRM.status({start: ts('Previewing'), success: ''}, CRM.toJqPromise(p));
+      CRM.status({start: ts('Previewing'), success: ''}, CRM.toJqPromise(p));
     };
     $scope.sendTestToContact = function sendTestToContact() {
       $scope.sendTest($scope.mailing, $scope.attachments, $scope.testContact.email, null);
@@ -291,7 +305,7 @@
     var ts = $scope.ts = CRM.ts('CiviMail');
 
     $scope.previewComponent = function previewComponent(title, componentId) {
-      var component = _.where(CRM.crmMailing.headerfooterList, {id: ""+componentId});
+      var component = _.where(CRM.crmMailing.headerfooterList, {id: "" + componentId});
       if (!component || !component[0]) {
         CRM.alert(ts('Invalid component ID (%1)', {
           1: componentId
@@ -318,21 +332,19 @@
   });
 
   // Controller for the in-place msg-template management
-  // Scope members:
-  //  - [input] mailing: object
   crmMailing2.controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService, $parse) {
     var ts = $scope.ts = CRM.ts('CiviMail');
     $scope.crmMsgTemplates = crmMsgTemplates;
 
     // @return Promise MessageTemplate (per APIv3)
-    $scope.saveTemplate = function saveTemplate() {
+    $scope.saveTemplate = function saveTemplate(mailing) {
       var model = {
-        selected_id: $scope.mailing.msg_template_id,
+        selected_id: mailing.msg_template_id,
         tpl: {
           msg_title: '',
-          msg_subject: $scope.mailing.subject,
-          msg_text: $scope.mailing.body_text,
-          msg_html: $scope.mailing.body_html
+          msg_subject: mailing.subject,
+          msg_text: mailing.body_text,
+          msg_html: mailing.body_html
         }
       };
       var options = {
@@ -341,19 +353,19 @@
         title: ts('Save Template')
       };
       return dialogService.open('saveTemplateDialog', partialUrl('dialog/saveTemplate.html'), model, options)
-        .then(function(item){
-          $parse('mailing.msg_template_id').assign($scope, item.id);
+        .then(function (item) {
+          mailing.msg_template_id = item.id;
           return item;
         });
     };
 
     // @param int id
     // @return Promise
-    $scope.loadTemplate = function loadTemplate(id) {
+    $scope.loadTemplate = function loadTemplate(mailing, id) {
       return crmMsgTemplates.get(id).then(function (tpl) {
-        $scope.mailing.subject = tpl.msg_subject;
-        $scope.mailing.body_text = tpl.msg_text;
-        $scope.mailing.body_html = tpl.msg_html;
+        mailing.subject = tpl.msg_subject;
+        mailing.body_text = tpl.msg_text;
+        mailing.body_html = tpl.msg_html;
       });
     };
   });
@@ -425,58 +437,11 @@
       };
       dialogService.setButtons('saveTemplateDialog', buttons);
     }
+
     setTimeout(scopeApply(init), 0);
   });
 
-  // Controller for schedule-editing widget.
-  // Scope members:
-  //  - [input] mailing: object
-  //     - scheduled_date: null|string(YYYY-MM-DD hh:mm)
-  crmMailing2.controller('EditScheduleCtrl', function EditScheduleCtrl($scope, $parse) {
-    var schedModelExpr = 'mailing.scheduled_date';
-    var schedModel = $parse(schedModelExpr);
-
-    $scope.schedule = {
-      mode: 'now',
-      datetime: ''
-    };
-    var updateChildren = (function () {
-      var sched = schedModel($scope);
-      if (sched) {
-        $scope.schedule.mode = 'at';
-        $scope.schedule.datetime = sched;
-      }
-      else {
-        $scope.schedule.mode = 'now';
-      }
-    });
-    var updateParent = (function () {
-      switch ($scope.schedule.mode) {
-        case 'now':
-          schedModel.assign($scope, null);
-          break;
-        case 'at':
-          schedModel.assign($scope, $scope.schedule.datetime);
-          break;
-        default:
-          throw 'Unrecognized schedule mode: ' + $scope.schedule.mode;
-      }
-    });
-
-    $scope.$watch(schedModelExpr, updateChildren);
-    $scope.$watch('schedule.mode', updateParent);
-    $scope.$watch('schedule.datetime', function (newValue, oldValue) {
-      // automatically switch mode based on datetime entry
-      if (oldValue != newValue) {
-        if (!newValue || newValue == " ") {
-          $scope.schedule.mode = 'now';
-        }
-        else {
-          $scope.schedule.mode = 'at';
-        }
-      }
-      updateParent();
-    });
+  crmMailing2.controller('EmailAddrCtrl', function EmailAddrCtrl($scope, crmFromAddresses){
+    $scope.crmFromAddresses = crmFromAddresses;
   });
-
 })(angular, CRM.$, CRM._);

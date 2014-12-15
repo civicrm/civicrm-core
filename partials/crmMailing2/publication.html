@@ -1,11 +1,8 @@
-<!--
-Controller: EditMailingCtrl
-Required vars: mailing
--->
-<div class="crm-block">
+<div class="crm-block" ng-form="subform" crm-ui-id-scope>
   <div class="crm-group">
-    <div crm-ui-field="visibility" crm-title="ts('Mailing Visibility')">
+    <div crm-ui-field="subform.visibility" crm-title="ts('Mailing Visibility')">
       <select
+        crm-ui-id="subform.visibility"
         name="visibility"
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true}"

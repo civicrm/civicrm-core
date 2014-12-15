@@ -45,6 +45,15 @@ span.crmMailing2-exclude {
 .crmMailing2 .preview-group, .crmMailing2 .preview-contact {
 }
 
+.crmMailing2 .crmMailing2-schedule-outer {
+  width: 98%
+}
+.crmMailing2 .crmMailing2-schedule-inner {
+  width: 40em;
+  text-align: left;
+  margin: auto;
+}
+
 /* Odd: These placeholder directives break if combined */
 input[name=preview_test_email]:-moz-placeholder {
   text-align: center;
