@@ -3,9 +3,9 @@
   angular.module('crmMailingAB2').factory('crmMailingABCriteria', function () {
     // TODO Get data from server
     var values = {
-      '1': {value: '1', name: 'Subject lines', label: ts('Different "Subject" lines')},
-      '2': {value: '2', name: 'From names', label: ts('Different "From" names')},
-      '3': {value: '3', name: 'Two different emails', label: ts('Entirely different emails')}
+      '1': {value: '1', name: 'Subject lines', label: ts('Test different "Subject" lines')},
+      '2': {value: '2', name: 'From names', label: ts('Test different "From" lines')},
+      '3': {value: '3', name: 'Two different emails', label: ts('Test entirely different emails')}
     };
     return {
       get: function get(value) {
