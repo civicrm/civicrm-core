@@ -106,13 +106,15 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     //retrieve the profile specific to batch type
     switch ($batchTypeId) {
       case 1:
-        //batch profile used for contribution
+      case 3:
+        //batch profile used for pledges
         $profileName = "contribution_batch_entry";
         break;
 
       case 2:
         //batch profile used for memberships
         $profileName = "membership_batch_entry";
+        break;
     }
 
     // get and return the profile id
