@@ -150,34 +150,6 @@ processed by Angular; if false, the field will be hidden and completely ignored 
     </div>
 
 
-    <!--
-    <div crm-ui-field="subform.recipients" crm-title="ts('Recipients')">
-      <div ng-controller="EditRecipCtrl">
-        <div style="float: right;">
-          <div class='crmMailing2-recip-est'>
-            <a href="" ng-click="previewRecipients()">{{getRecipientsEstimate()}}</a>
-          </div>
-          <div>
-            <input name='dedupe_email' type='checkbox' ng-model='abtest.mailings.a.dedupe_email'  ng-true-value="1" ng-false-value="0" id="recipients-dedupe-email" />
-            <label for="recipients-dedupe-email">
-              {{ts('Dedupe')}}
-            </label>
-          </div>
-        </div>
-        <select crm-mailing-recipients
-                crm-mailing="mailing"
-                crm-avail-groups="crmMailingConst.groupNames | filter:{visibility:'Public pages'}"
-                crm-avail-mailings="crmMailingConst.civiMails | filter:{is_completed:1}"
-                name="recipients"
-                crm-ui-id="subform.recipients"
-                required
-                multiple>
-        </select>
-      </div>
-    </div>
-    -->
-
-
     <div crm-ui-field="subform.subject" crm-title="ts('Subject')" ng-if="fields.subject">
       <div style="float: right;">
         <input crm-mailing-token crm-for="subform.subject" />
