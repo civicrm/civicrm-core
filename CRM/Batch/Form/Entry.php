@@ -217,10 +217,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $this->add('select', "option_type[$rowNumber]", NULL, $optionTypes);
         if (!empty($this->_batchId) && !empty($this->_batchInfo['data']) && !empty($rowNumber)) {
           $dataValues = json_decode($this->_batchInfo['data'], TRUE);
-          $PledgeIDs = CRM_Pledge_BAO_Pledge::getContactPledges($dataValues['values']['primary_contact_id'][$rowNumber]);
-          foreach ($PledgeIDs as $pledgeID) {
-            $pledgePayment = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);
-            $options += array($pledgeID => CRM_Utils_Date::customFormat($pledgePayment['schedule_date'], '%d/%m/%Y') . ', ' . $pledgePayment['amount'] . ' ' . $pledgePayment['currency']);
+          if (!empty($dataValues['values']['primary_contact_id'][$rowNumber])) {
+            $pledgeIDs = CRM_Pledge_BAO_Pledge::getContactPledges($dataValues['values']['primary_contact_id'][$rowNumber]);
+            foreach ($pledgeIDs as $pledgeID) {
+              $pledgePayment = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);
+              $options += array($pledgeID => CRM_Utils_Date::customFormat($pledgePayment['schedule_date'], '%d/%m/%Y') . ', ' . $pledgePayment['amount'] . ' ' . $pledgePayment['currency']);
+            }
           }
         }
         $this->add('select', "open_pledges[$rowNumber]", ts('Open Pledges'), $options);
@@ -466,7 +468,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         );
         foreach ($fieldTranslations as $formField => $baoField) {
-          if(isset($value[$formField])) {
+          if (isset($value[$formField])) {
             $value[$baoField] = $value[$formField];
           }
           unset($value[$formField]);
