@@ -54,6 +54,7 @@
 
       var criteria = crmMailingABCriteria.get(abtest.ab.testing_criteria_id);
       if (criteria) {
+        // TODO review fields exposed in UI and make sure the sync rules match
         switch (criteria.name) {
           case 'Subject lines':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, ['name', 'subject']);
