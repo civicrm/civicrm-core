@@ -102,11 +102,13 @@
           {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}
             <div class="compressed crm-grid-cell">&nbsp;{$form.field.$rowNumber.$n.html}</div>
           {elseif $n eq 'total_amount'}
-             {if $batchType eq 3 }
-	      <div class="compressed crm-grid-cell">{$form.field.$rowNumber.$n.html}
-		{ts}<span id={$rowNumber} class="pledge-adjust-option"><a href='#'>adjust payment amount</a></span>{/ts}
-             <span id="adjust-select-{$rowNumber}" class="adjust-selectbox">{$form.option_type.$rowNumber.html}</span></div>
-             {/if}
+             <div class="compressed crm-grid-cell">
+               {$form.field.$rowNumber.$n.html}
+               {if $batchType eq 3 }
+		 {ts}<span id={$rowNumber} class="pledge-adjust-option"><a href='#'>adjust payment amount</a></span>{/ts}
+                 <span id="adjust-select-{$rowNumber}" class="adjust-selectbox">{$form.option_type.$rowNumber.html}</span>
+               {/if}
+             </div>
           {else}
             <div class="compressed crm-grid-cell">{$form.field.$rowNumber.$n.html}</div>
           {/if}
@@ -528,12 +530,14 @@ function setPledgeAmount(form, pledgeID) {
   var dataUrl = CRM.url('civicrm/ajax/pledgeAmount');
   if (pledgeID) { 
     cj.post(dataUrl, {pid: pledgeID}, function (data) {
+    cj('#field_' + rowID + '_financial_type').val(data.financial_type_id).change();
     cj('#field_' + rowID + '_total_amount').val(data.amount).change();
     cj('#field_' + rowID + '_total_amount').attr('readonly', true);
     }, 'json');
   }
   else {
     cj('#field_' + rowID + '_total_amount').val('').change();
+    cj('#field_' + rowID + '_financial_type').val('').change(); 
     cj('#field_' + rowID + '_total_amount').removeAttr('readonly');
   }
 }
