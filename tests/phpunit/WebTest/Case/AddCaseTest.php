@@ -168,7 +168,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
   function _testVerifyCaseSummary($validateStrings, $activityTypes) {
     $this->assertStringsPresent($validateStrings);
     foreach ($activityTypes as $aType) {
-      $this->assertText("add_activity_type_id", $aType);
+      $this->assertElementPresent("xpath=//div[@class='case-control-panel']/div/p/select", $aType);
     }
     $this->assertElementPresent("link=Assign to Another Client", "Assign to Another Client link is missing.");
     $this->assertElementPresent("xpath=//a[text()=' Print Report']", "Print Case Summary button is missing.");
