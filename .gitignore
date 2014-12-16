@@ -10,6 +10,10 @@ packages/cache
 packages/doc
 packages/temp
 packages/test
+packages/git-footnote
+packages/_ORIGINAL_
+packages/SeleniumRC
+packages/PhpDocumentor
 settings_location.php
 drupal/
 WordPress
