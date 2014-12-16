@@ -691,7 +691,7 @@ WHERE  civicrm_pledge_payment.id = {$paymentId}
     $statusClause = " IN (" . implode(',', $status) . ")";
 
     $query = "
-SELECT civicrm_pledge_payment.id id, civicrm_pledge_payment.scheduled_amount amount, civicrm_pledge_payment.currency, civicrm_pledge_payment.scheduled_date
+SELECT civicrm_pledge_payment.id id, civicrm_pledge_payment.scheduled_amount amount, civicrm_pledge_payment.currency, civicrm_pledge_payment.scheduled_date,civicrm_pledge.financial_type_id
 FROM civicrm_pledge, civicrm_pledge_payment
 WHERE civicrm_pledge.id = civicrm_pledge_payment.pledge_id
   AND civicrm_pledge_payment.status_id {$statusClause}
@@ -711,6 +711,7 @@ LIMIT 0, %2
         'amount' => $payment->amount,
         'currency' => $payment->currency,
         'schedule_date' => $payment->scheduled_date,
+        'financial_type_id' => $payment->financial_type_id,
         'count' => $count,
       );
       $count++;
