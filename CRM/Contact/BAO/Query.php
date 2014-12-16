@@ -2697,33 +2697,41 @@ class CRM_Contact_BAO_Query {
    */
   function contactSubType(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
-    $this->includeContactSubTypes($value, $grouping);
+    $this->includeContactSubTypes($value, $grouping, $op);
   }
 
   /**
    * @param $value
    * @param $grouping
    */
-  function includeContactSubTypes($value, $grouping) {
+  function includeContactSubTypes($value, $grouping, $op = 'LIKE') {
 
     $clause = array();
     $alias = "contact_a.contact_sub_type";
+    $qillOperators = array('NOT LIKE' => ts('Not Like')) + CRM_Core_SelectValues::getSearchBuilderOperators();
 
-    if (is_array($value)) {
+    $op = str_replace('IN', 'LIKE', $op);
+    $op = str_replace('=', 'LIKE', $op);
+    $op = str_replace('!', 'NOT ', $op);
+
+    if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+      $this->_where[$grouping][] = self::buildClause($alias, $op, $value, 'String');
+    }
+    else if (is_array($value)) {
       foreach ($value as $k => $v) {
         if (!empty($k)) {
-          $clause[$k] = "($alias like '%" . CRM_Core_DAO::VALUE_SEPARATOR . CRM_Utils_Type::escape($k, 'String') . CRM_Core_DAO::VALUE_SEPARATOR . "%')";
+          $clause[$k] = "($alias $op '%" . CRM_Core_DAO::VALUE_SEPARATOR . CRM_Utils_Type::escape($k, 'String') . CRM_Core_DAO::VALUE_SEPARATOR . "%')";
         }
       }
     }
     else {
-      $clause[$value] = "($alias like '%" . CRM_Core_DAO::VALUE_SEPARATOR . CRM_Utils_Type::escape($value, 'String') . CRM_Core_DAO::VALUE_SEPARATOR . "%')";
+      $clause[$value] = "($alias $op '%" . CRM_Core_DAO::VALUE_SEPARATOR . CRM_Utils_Type::escape($value, 'String') . CRM_Core_DAO::VALUE_SEPARATOR . "%')";
     }
 
     if (!empty($clause)) {
       $this->_where[$grouping][] = "( " . implode(' OR ', $clause) . " )";
-      $this->_qill[$grouping][] = ts('Contact Subtype') . ' - ' . implode(' ' . ts('or') . ' ', array_keys($clause));
     }
+    $this->_qill[$grouping][] = ts('Contact Subtype %1 ', array(1 => $qillOperators[$op])) . implode(' ' . ts('or') . ' ', array_keys($clause));
   }
 
   /**
