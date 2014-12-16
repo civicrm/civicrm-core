@@ -78,7 +78,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     //Create role
     $role = 'role' . substr(sha1(rand()), 0, 7);
     $this->open($this->sboxPath . "admin/people/permissions/roles");
-    $this->waitForElementPresent("edit-add");
+    $this->waitForElementPresent("edit-submit");
     $this->type("edit-name", $role);
     $this->click("edit-add");
     $this->waitForPageToLoad($this->getTimeoutMsec());
