@@ -36,8 +36,7 @@
   angular.module('crmMailingAB2').controller('CrmMailingAB2ListCtrl', function ($scope, mailingABList, crmMailingABCriteria) {
     $scope.mailingABList = mailingABList.values;
     $scope.testing_criteria = crmMailingABCriteria.getAll();
-  })
-
+  });
 
   angular.module('crmMailingAB2').controller('CrmMailingAB2EditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr) {
     window.ab = abtest;
