@@ -467,6 +467,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->unsetExtensionSystem();
     CRM_Core_Transaction::forceRollbackIfEnabled();
     \Civi\Core\Transaction\Manager::singleton(TRUE);
+    $this->clearOutputBuffer();
   }
 
   /**
@@ -2906,43 +2907,43 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->callAPISuccess('price_field_value', 'create', array_merge($priceFieldValue, array('price_field_id' => $newPriceField['id'])));
   }
 
-/**
- * Create an instance of the paypal processor
- * @todo this isn't a great place to put it - but really it belongs on a class that extends
- * this parent class & we don't have a structure for that yet
- * There is another function to this effect on the PaypalPro test but it appears to be silently failing
- * & the best protection agains that is the functions this class affords
- */
- function paymentProcessorCreate($params = array()) {
-   $params = array_merge(array(
-     'name' => 'demo',
-     'domain_id' => CRM_Core_Config::domainID(),
-     'payment_processor_type_id' => 'PayPal',
-     'is_active' => 1,
-     'is_default' => 0,
-     'is_test' => 1,
-     'user_name' => 'sunil._1183377782_biz_api1.webaccess.co.in',
-     'password' => '1183377788',
-     'signature' => 'APixCoQ-Zsaj-u3IH7mD5Do-7HUqA9loGnLSzsZga9Zr-aNmaJa3WGPH',
-     'url_site' => 'https://www.sandbox.paypal.com/',
-     'url_api' => 'https://api-3t.sandbox.paypal.com/',
-     'url_button' => 'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',
-     'class_name' => 'Payment_PayPalImpl',
-     'billing_mode' => 3,
-     'financial_type_id' => 1,
-     ),
-   $params);
-   if(!is_numeric($params['payment_processor_type_id'])) {
-     // really the api should handle this through getoptions but it's not exactly api call so lets just sort it
-     //here
-     $params['payment_processor_type_id'] = $this->callAPISuccess('payment_processor_type', 'getvalue', array(
-       'name' => $params['payment_processor_type_id'],
-       'return' => 'id',
-       ), 'integer');
-   }
-   $result = $this->callAPISuccess('payment_processor', 'create', $params);
-   return $result['id'];
- }
+  /**
+   * Create an instance of the paypal processor
+   * @todo this isn't a great place to put it - but really it belongs on a class that extends
+   * this parent class & we don't have a structure for that yet
+   * There is another function to this effect on the PaypalPro test but it appears to be silently failing
+   * & the best protection agains that is the functions this class affords
+   */
+  function paymentProcessorCreate($params = array()) {
+    $params = array_merge(array(
+      'name' => 'demo',
+      'domain_id' => CRM_Core_Config::domainID(),
+      'payment_processor_type_id' => 'PayPal',
+      'is_active' => 1,
+      'is_default' => 0,
+      'is_test' => 1,
+      'user_name' => 'sunil._1183377782_biz_api1.webaccess.co.in',
+      'password' => '1183377788',
+      'signature' => 'APixCoQ-Zsaj-u3IH7mD5Do-7HUqA9loGnLSzsZga9Zr-aNmaJa3WGPH',
+      'url_site' => 'https://www.sandbox.paypal.com/',
+      'url_api' => 'https://api-3t.sandbox.paypal.com/',
+      'url_button' => 'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',
+      'class_name' => 'Payment_PayPalImpl',
+      'billing_mode' => 3,
+      'financial_type_id' => 1,
+    ),
+    $params);
+    if(!is_numeric($params['payment_processor_type_id'])) {
+      // really the api should handle this through getoptions but it's not exactly api call so lets just sort it
+      //here
+      $params['payment_processor_type_id'] = $this->callAPISuccess('payment_processor_type', 'getvalue', array(
+        'name' => $params['payment_processor_type_id'],
+        'return' => 'id',
+      ), 'integer');
+    }
+    $result = $this->callAPISuccess('payment_processor', 'create', $params);
+    return $result['id'];
+  }
 
   /**
    * Set up initial recurring payment allowing subsequent IPN payments
@@ -3012,5 +3013,11 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   function CiviUnitTestCase_fatalErrorHandler($message) {
     throw new Exception("{$message['message']}: {$message['code']}");
+  }
+
+  function clearOutputBuffer() {
+    while (ob_get_level() > 0) {
+      ob_end_clean();
+    }
   }
 }
