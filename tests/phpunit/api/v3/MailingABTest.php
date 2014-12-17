@@ -53,6 +53,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_mailingID_A = $this->createMailing();
     $this->_mailingID_B = $this->createMailing();
     $this->_mailingID_C = $this->createMailing();
@@ -69,13 +70,6 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
-    $this->deleteMailing($this->_mailingID_A);
-    $this->deleteMailing($this->_mailingID_B);
-    $this->deleteMailing($this->_mailingID_C);
-    $this->groupDelete($this->_groupID);
-  }
-
   /**
    * Test civicrm_mailing_create
    */
@@ -90,7 +84,26 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
    */
   public function testMailerDeleteSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+
+    $this->assertDBQuery(1, "SELECT count(*) FROM civicrm_mailing_abtesting WHERE id = %1", array(
+      1 => array($result['id'], 'Integer'),
+    ));
+    $this->assertDBQuery(3, "SELECT count(*) FROM civicrm_mailing WHERE id IN (%1,%2,%3)", array(
+      1 => array($this->_mailingID_A, 'Integer'),
+      2 => array($this->_mailingID_B, 'Integer'),
+      3 => array($this->_mailingID_C, 'Integer'),
+    ));
+
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
+
+    $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_mailing_abtesting WHERE id = %1", array(
+      1 => array($result['id'], 'Integer'),
+    ));
+    $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_mailing WHERE id IN (%1,%2,%3)", array(
+      1 => array($this->_mailingID_A, 'Integer'),
+      2 => array($this->_mailingID_B, 'Integer'),
+      3 => array($this->_mailingID_C, 'Integer'),
+    ));
   }
 
   public function testMailingABRecipientsUpdate() {
