@@ -106,25 +106,46 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     ));
   }
 
-  public function testMailingABRecipientsUpdate() {
-    //create 100 contacts for group $this->_groupID
-    $totalGroupContacts = 100;
+  public function groupPctProvider() {
+    $cases = array(); // array(int $totalSize, int $groupPct, int $expectedCountA, $expectedCountB, $expectedCountC)
+    $cases[] = array(400, 7, 28, 28, 344);
+    $cases[] = array(100, 10, 10, 10, 80);
+    $cases[] = array(50, 20, 10, 10, 30);
+    $cases[] = array(50, 10, 5, 5, 40);
+    $cases[] = array(3, 10, 1, 1, 1);
+    $cases[] = array(2, 10, 1, 1, 0);
+    $cases[] = array(1, 10, 1, 0, 0);
+    return $cases;
+  }
 
+  /**
+   * @param $totalGroupContacts
+   * @param $groupPct
+   * @param $expectedCountA
+   * @param $expectedCountB
+   * @param $expectedCountC
+   * @dataProvider groupPctProvider
+   */
+  public function testMailingABRecipientsUpdate($totalGroupContacts, $groupPct, $expectedCountA, $expectedCountB, $expectedCountC) {
     $result = $this->groupContactCreate($this->_groupID, $totalGroupContacts);
-    //check if 100 group contacts are included on desired group
     $this->assertEquals($totalGroupContacts, $result['added'], "in line " . __LINE__);
 
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $totalSelectedContacts = round(($totalGroupContacts * $result['values'][$result['id']]['group_percentage'])/100);
+    $params = $this->_params;
+    $params['group_percentage'] = $groupPct;
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
     $params = array('id' => $result['id'], 'groups' => array('include' => array($this->_groupID)));
     $this->callAPISuccess('MailingAB', 'recipients_update', $params);
 
     //check total number of A/B mail recipients is what selected percentage of Mail C
-    $countA = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' =>  $this->_mailingID_A));
-    $this->assertEquals($countA, $totalSelectedContacts, "in line " . __LINE__);
-    $countB = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' =>  $this->_mailingID_B));
-    $this->assertEquals($countB, $totalSelectedContacts, "in line " . __LINE__);
+    $countA = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' => $this->_mailingID_A));
+    $this->assertEquals($expectedCountA, $countA, "check mailing recipients A in line " . __LINE__);
+
+    $countB = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' => $this->_mailingID_B));
+    $this->assertEquals($expectedCountB, $countB, "check mailing recipients B in line " . __LINE__);
+
+    $countC = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' => $this->_mailingID_C));
+    $this->assertEquals($expectedCountC, $countC, "check mailing recipients C in line " . __LINE__);
   }
 
 }
