@@ -975,6 +975,18 @@ WHERE  id = %1";
   }
 
   /**
+   * Fetch groups in a nested format suitable for use in select form element
+   * @param bool $checkPermissions
+   * @param string|null $groupType
+   * @param bool $excludeHidden
+   * @return array
+   */
+  public static function nestedGroup($checkPermissions = TRUE, $groupType = NULL, $excludeHidden = TRUE) {
+    $groups = $checkPermissions ? self::group($groupType, $excludeHidden) : self::allGroup($groupType, $excludeHidden);
+    return CRM_Contact_BAO_Group::getGroupsHierarchy($groups, NULL, '&nbsp;&nbsp;', TRUE);
+  }
+
+  /**
    * Get all permissioned groups from database
    *
    * The static array group is returned, and if it's
