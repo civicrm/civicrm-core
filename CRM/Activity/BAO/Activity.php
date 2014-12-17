@@ -2503,6 +2503,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $contactActivities[$activityId]['target_contact'] = $values['recipients'];
         }
         elseif (isset($values['target_contact_counter']) && $values['target_contact_counter']) {
+          $contactActivities[$activityId]['target_contact'] = '';
           foreach ($values['target_contact_name'] as $tcID => $tcName) {
             $contactActivities[$activityId]['target_contact'] .= CRM_Utils_System::href($tcName,
               'civicrm/contact/view', "reset=1&cid={$tcID}");
