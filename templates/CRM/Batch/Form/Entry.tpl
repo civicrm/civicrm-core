@@ -394,7 +394,7 @@ function updateContactInfo(blockNo, prefix) {
 	  var date = cj.datepicker.parseDate('yy-mm-dd', value['pledge_next_pay_date']);
 	    cj('#open_pledges_'+ blockNo).append(cj('<option>', {
 		value: value['pledge_id'],
-		text: cj.datepicker.formatDate('yy-mm-dd', date) + ", " + value['pledge_next_pay_amount'] + ' ' + value['pledge_currency']
+		text: cj.datepicker.formatDate('yy-mm-dd', date) + " - " + value['pledge_next_pay_amount'] + ' ' + value['pledge_currency']
 		}));
 	     }
 	   });

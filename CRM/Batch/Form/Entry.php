@@ -138,8 +138,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Memberships'));
       $customFields = CRM_Core_BAO_CustomField::getFields('Membership');
     }
-   elseif ($this->_batchInfo['type_id'] == $batchTypes['Pledge']) {
-     CRM_Utils_System::setTitle(ts('Batch Data Entry for Pledges'));
+   elseif ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
+     CRM_Utils_System::setTitle(ts('Batch Data Entry for Pledge Payments'));
      $customFields = CRM_Core_BAO_CustomField::getFields('Contribution');
    }
     $this->_fields = array();
@@ -197,6 +197,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     $contactReturnProperties = array();
+    $config = CRM_Core_Config::singleton();
+    
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
       $this->addEntityRef("primary_contact_id[{$rowNumber}]", '', array('create' => TRUE, 'placeholder' => ts('- select -')));
 
@@ -208,7 +210,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         );
         $this->add('select', "member_option[$rowNumber]", '', $options);
       }
-      if ($this->_batchInfo['type_id'] == $batchTypes['Pledge']) {
+      if ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
         $options =  array('' => '-select-');
         $optionTypes = array(
           '1' => ts('Adjust Pledge Payment Schedule?'),
@@ -221,11 +223,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $pledgeIDs = CRM_Pledge_BAO_Pledge::getContactPledges($dataValues['values']['primary_contact_id'][$rowNumber]);
             foreach ($pledgeIDs as $pledgeID) {
               $pledgePayment = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);
-              $options += array($pledgeID => CRM_Utils_Date::customFormat($pledgePayment['schedule_date'], '%d/%m/%Y') . ', ' . $pledgePayment['amount'] . ' ' . $pledgePayment['currency']);
+              $options += array($pledgeID => CRM_Utils_Date::customFormat($pledgePayment['schedule_date'], '%d/%m/%Y') . ' - ' . $pledgePayment['amount'] . ' ' . $pledgePayment['currency']);
             }
           }
         }
-        $this->add('select', "open_pledges[$rowNumber]", ts('Open Pledges'), $options);
+        
+        $this->add('select', "open_pledges[$rowNumber]", ts('Open Pledges (Due Date - Amount)'), $options);
      }
 
       foreach ($this->_fields as $name => $field) {
@@ -371,7 +374,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     // get the profile information
     $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
-    if (in_array($this->_batchInfo['type_id'], array($batchTypes['Pledge'], $batchTypes['Contribution']))) {
+    if (in_array($this->_batchInfo['type_id'], array($batchTypes['Pledge Payment'], $batchTypes['Contribution']))) {
       $this->processContribution($params);
     }
     elseif ($this->_batchInfo['type_id'] == $batchTypes['Membership']) {
@@ -502,7 +505,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $contribution = CRM_Contribute_BAO_Contribution::create($value, CRM_Core_DAO::$_nullArray);
         $pledgeId = $params['open_pledges'][$key];
         $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
-        if ($this->_batchInfo['type_id'] == $batchTypes['Pledge'] && is_numeric($pledgeId)) {
+        if ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment'] && is_numeric($pledgeId)) {
           $adjustTotalAmount = FALSE;
           if ($params['option_type'][$key] == 2) {
             $adjustTotalAmount=TRUE;

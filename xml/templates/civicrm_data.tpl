@@ -875,10 +875,10 @@ VALUES
    (@option_group_id_conference_slot, '{ts escape="sql"}Morning Sessions{/ts}', 1, 'Morning Sessions', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_conference_slot, '{ts escape="sql"}Evening Sessions{/ts}', 2, 'Evening Sessions', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
 
--- default batch type
+-- default batch types
    (@option_group_id_batch_type, '{ts escape="sql"}Contribution{/ts}', 1, 'Contribution', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_batch_type, '{ts escape="sql"}Membership{/ts}', 2, 'Membership', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_batch_type, '{ts escape="sql"}Pledge{/ts}', 3, 'Pledge', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_batch_type, '{ts escape="sql"}Pledge Payment{/ts}', 3, 'Pledge Payment', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
 
 -- default batch statuses
    (@option_group_id_batch_status, '{ts escape="sql"}Open{/ts}', 1, 'Open', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
