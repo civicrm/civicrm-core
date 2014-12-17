@@ -258,6 +258,65 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertEquals(array('alice@example.org', 'bob@example.org', 'carol@example.org'), $deliveredEmails);
   }
 
+  public function submitProvider() {
+    $cases = array(); // $useLogin, $params, $expectedFailure, $expectedJobCount
+    $cases[] = array(
+      TRUE, //useLogin
+      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
+      FALSE, // expectedFailure
+      1, // expectedJobCount
+    );
+    $cases[] = array(
+      FALSE, //useLogin
+      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
+      "/Failed to determine current user/", // expectedFailure
+      0, // expectedJobCount
+    );
+    $cases[] = array(
+      TRUE, //useLogin
+      array('scheduled_date' => '2014-12-13 10:00:00'),
+      FALSE, // expectedFailure
+      1, // expectedJobCount
+    );
+    $cases[] = array(
+      TRUE, //useLogin
+      array(),
+      "/Missing parameter scheduled_date and.or approval_date/", // expectedFailure
+      0, // expectedJobCount
+    );
+    return $cases;
+  }
+
+  /**
+   * @param bool $useLogin
+   * @param array $params
+   * @param null|string $expectedFailure
+   * @param int $expectedJobCount
+   * @dataProvider submitProvider
+   */
+  public function testMailerSubmit($useLogin, $params, $expectedFailure, $expectedJobCount) {
+    if ($useLogin) {
+      $this->createLoggedInUser();
+    }
+
+    $id = $this->createDraftMailing();
+
+    $params['id'] = $id;
+    if ($expectedFailure) {
+      $submitResult = $this->callAPIFailure('mailing', 'submit', $params);
+      $this->assertRegExp($expectedFailure, $submitResult['error_message']);
+    }
+    else {
+      $submitResult = $this->callAPIAndDocument('mailing', 'submit', $params, __FUNCTION__, __FILE__);
+      $this->assertTrue(is_numeric($submitResult['id']));
+      $this->assertTrue(is_numeric($submitResult['values'][$id]['scheduled_id']));
+      $this->assertEquals($params['scheduled_date'], $submitResult['values'][$id]['scheduled_date']);
+    }
+    $this->assertDBQuery($expectedJobCount, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
+      1 => array($id, 'Integer')
+    ));
+  }
+
   public function testMailerStats() {
     $result = $this->groupContactCreate($this->_groupID, 100);
     $this->assertEquals(100, $result['added']); //verify if 100 contacts are added for group
@@ -402,6 +461,20 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     $result = $this->callAPIFailure('mailing_event', 'forward', $params,
       'Queue event could not be found'
     );
+  }
+
+  /**
+   * @return array|int
+   */
+  public function createDraftMailing() {
+    $createParams = $this->_params;
+    $createParams['api.mailing_job.create'] = 0; // note: exact match to API default
+    $createResult = $this->callAPISuccess('mailing', 'create', $createParams, __FUNCTION__, __FILE__);
+    $this->assertTrue(is_numeric($createResult['id']));
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
+      1 => array($createResult['id'], 'Integer')
+    ));
+    return $createResult['id'];
   }
 
 //----------- civicrm_mailing_create ----------
