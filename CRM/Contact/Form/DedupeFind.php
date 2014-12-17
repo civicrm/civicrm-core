@@ -63,9 +63,10 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
 
-    $groupList = CRM_Core_PseudoConstant::group();
-    $groupList[''] = ts('- All Contacts -');
-    asort($groupList);
+    $groupList = array('' => ts('- All Contacts -')) + CRM_Core_PseudoConstant::nestedGroup();
+//    $groupList = CRM_Core_PseudoConstant::group();
+//    $groupList[''] = ts('- All Contacts -');
+//    asort($groupList);
 
     $this->add('select', 'group_id', ts('Select Group'), $groupList);
     $this->addButtons(array(

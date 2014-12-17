@@ -573,7 +573,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
   function preProcess() {
     // set the various class variables
 
-    $this->_group = CRM_Core_PseudoConstant::group();
+    $this->_group = CRM_Core_PseudoConstant::nestedGroup();
 
     $this->_groupIterator = CRM_Core_PseudoConstant::groupIterator();
     $this->_tag = CRM_Core_BAO_Tag::getTags();

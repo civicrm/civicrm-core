@@ -111,7 +111,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     $form->add('select', 'contact_type', ts('Find...'), $contactTypes);
 
     // add select for groups
-    $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::group();
+    $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::nestedGroup();
     $form->addElement('select', 'group', ts('in'), $group);
 
     // add select for categories

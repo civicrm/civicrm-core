@@ -92,7 +92,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
           $group = CRM_Core_PseudoConstant::allGroup();
         }
         else {
-          $group = CRM_Core_PseudoConstant::group();
+          $group = CRM_Core_PseudoConstant::nestedGroup();
         }
         $ids = $group;
       }

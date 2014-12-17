@@ -163,7 +163,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
           'title' => ts('Group'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'group' => TRUE,
-          'options' => CRM_Core_PseudoConstant::group(),
+          'options' => CRM_Core_PseudoConstant::nestedGroup(),
         ),
       ),
     );
