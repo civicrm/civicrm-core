@@ -2984,10 +2984,11 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * Verify user has permission to access a case
    *
    * @param int $caseId
+   * @param bool $denyClosed set TRUE if one wants closed cases to be treated as inaccessible
    *
    * @return bool
    */
-  static function accessCase($caseId) {
+  static function accessCase($caseId, $denyClosed = TRUE) {
     if (!$caseId || !self::enabled()) {
       return FALSE;
     }
@@ -3002,9 +3003,29 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       return FALSE;
     }
 
-    $filterCases = CRM_Case_BAO_Case::getCases(FALSE);
+    $session = CRM_Core_Session::singleton();
+    $userID = CRM_Utils_Type::validate($session->get('userID'), 'Positive');
+    $caseId = CRM_Utils_Type::validate($caseId, 'Positive');
 
-    return isset($filterCases[$caseId]);
+    $condition = " AND civicrm_case.is_deleted = 0 ";
+    $condition .= " AND case_relationship.contact_id_b = {$userID} ";
+    $condition .= " AND civicrm_case.id = {$caseId}";
+
+    if ($denyClosed) {
+      $closedId = CRM_Core_OptionGroup::getValue('case_status', 'Closed', 'name');
+      $condition .= " AND civicrm_case.status_id != $closedId";
+    }
+
+    // We don't actually care about activities in the case, but the underlying
+    // query is verbose, and this allows us to share the basic query with
+    // getCases(). $type=='any' means that activities will be left-joined.
+    $query = self::getCaseActivityQuery('any', $userID, $condition);
+    $queryParams = array();
+    $dao = CRM_Core_DAO::executeQuery($query,
+      $queryParams
+    );
+
+    return (bool) $dao->fetch();
   }
 
   /**

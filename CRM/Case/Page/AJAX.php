@@ -130,7 +130,7 @@ class CRM_Case_Page_AJAX {
   function caseDetails() {
     $caseId = CRM_Utils_Type::escape($_GET['caseId'], 'Positive');
 
-    if (!CRM_Case_BAO_Case::accessCase($caseId)) {
+    if (!CRM_Case_BAO_Case::accessCase($caseId, FALSE)) {
       CRM_Utils_System::permissionDenied();
     }
 
