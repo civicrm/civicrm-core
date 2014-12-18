@@ -331,8 +331,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         // CRM-6902 - Add "max" option for a price set field
         if (in_array($optionKey, $freezeOptions)) {
           $element->freeze();
-          // CRM-14696 - Improve display for sold out price set options
-          $element->setLabel($label . '&nbsp;<span class="sold-out-option">(' . ts('Sold out') . ')</span>');
+          // CRM-14696 - Styling for sold out Text input fields is handled in PriceSet.tpl
         }
 
         //CRM-10117
