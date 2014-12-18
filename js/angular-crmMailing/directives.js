@@ -8,11 +8,9 @@
   var simpleBlocks = {
     crmMailingBlockHeaderFooter: partialUrl('headerFooter.html'),
     crmMailingBlockMailing: partialUrl('mailing.html'),
-    crmMailingBlockPreview: partialUrl('preview.html'),
     crmMailingBlockPublication: partialUrl('publication.html'),
     crmMailingBlockResponses: partialUrl('responses.html'),
     crmMailingBlockRecipients: partialUrl('recipients.html'),
-    crmMailingBlockReview: partialUrl('review.html'),
     crmMailingBlockSchedule: partialUrl('schedule.html'),
     crmMailingBlockSummary: partialUrl('summary.html'),
     crmMailingBlockTracking: partialUrl('tracking.html'),
@@ -35,6 +33,51 @@
         }
       };
     });
+  });
+
+  // example: <div crm-mailing-block-preview crm-mailing="myMailing" on-preview="openPreview(myMailing, preview.mode)" on-send="sendEmail(myMailing,preview.recipient)">
+  // note: the directive defines a variable called "preview" with any inputs supplied by the user (e.g. the target recipient for an example mailing)
+  angular.module('crmMailing').directive('crmMailingBlockPreview', function ($parse) {
+    return {
+      templateUrl: partialUrl('preview.html'),
+      link: function (scope, elm, attr) {
+        var mailingModel = $parse(attr.crmMailing);
+        scope.mailing = mailingModel(scope);
+        scope.crmMailingConst = CRM.crmMailing;
+        scope.ts = CRM.ts('CiviMail');
+        scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
+        scope.testGroup = {gid: null};
+
+        scope.doPreview = function(mode) {
+          scope.$eval(attr.onPreview, {
+            preview: {mode: mode}
+          });
+        };
+        scope.doSend = function doSend(recipient) {
+          scope.$eval(attr.onSend, {
+            preview: {recipient: recipient}
+          });
+        };
+      }
+    };
+  });
+
+  angular.module('crmMailing').directive('crmMailingBlockReview', function ($parse, crmMailingPreviewMgr) {
+    return {
+      scope: {
+        crmMailing: '@'
+      },
+      templateUrl: partialUrl('review.html'),
+      link: function (scope, elm, attr) {
+        var mailingModel = $parse(attr.crmMailing);
+        scope.mailing = mailingModel(scope.$parent);
+        scope.crmMailingConst = CRM.crmMailing;
+        scope.ts = CRM.ts('CiviMail');
+        scope.previewMailing = function previewMailing(mailing, mode) {
+          return crmMailingPreviewMgr.preview(mailing, mode);
+        };
+      }
+    };
   });
 
   // Convert between a mailing "From Address" (mailing.from_name,mailing.from_email) and a unified label ("Name" <e@ma.il>)
@@ -247,7 +290,9 @@
 
         // Update $(element) view based on latest data
         function refreshUI() {
-          $(element).select2('val', convertMailingToValues(scope.mailing));
+          if (scope.mailing) {
+            $(element).select2('val', convertMailingToValues(scope.mailing));
+          }
         }
 
         /// @return string HTML representingn an option

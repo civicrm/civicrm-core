@@ -66,7 +66,7 @@
     });
   });
 
-  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, CrmAttachments) {
+  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, CrmAttachments, crmMailingPreviewMgr) {
     $scope.mailing = selectedMail;
     $scope.attachments = new CrmAttachments(function () {
       return {entity_table: 'civicrm_mailing', entity_id: $scope.mailing.id};
@@ -76,6 +76,23 @@
 
     $scope.partialUrl = partialUrl;
     var ts = $scope.ts = CRM.ts('CiviMail');
+
+    // @return Promise
+    $scope.previewMailing = function previewMailing(mailing, mode) {
+      return crmMailingPreviewMgr.preview(mailing, mode);
+    };
+
+    // @return Promise
+    $scope.sendTest = function sendTest(mailing, attachments, recipient) {
+      var savePromise = crmMailingMgr.save(mailing)
+        .then(function () {
+          return attachments.save();
+        });
+      return crmStatus({start: ts('Saving...'), success: ''}, savePromise)
+        .then(function () {
+          crmMailingPreviewMgr.sendTest(mailing, recipient);
+        });
+    };
 
     // @return Promise
     $scope.submit = function submit() {
@@ -89,6 +106,7 @@
         });
       return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, promise);
     };
+
     // @return Promise
     $scope.save = function save() {
       return crmStatus(null,
@@ -100,12 +118,14 @@
           })
       );
     };
+
     // @return Promise
     $scope.delete = function cancel() {
       return crmStatus({start: ts('Deleting...'), success: ts('Deleted')},
         crmMailingMgr.delete($scope.mailing)
       );
     };
+
     $scope.leave = function leave() {
       window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
         reset: 1,
@@ -227,67 +247,6 @@
   //   - recipients: array of contacts
   angular.module('crmMailing').controller('PreviewRecipCtrl', function ($scope) {
     $scope.ts = CRM.ts('CiviMail');
-  });
-
-  // Controller for the "Preview Mailing" segment
-  // Note: Expects $scope.model to be an object with properties:
-  //   - mailing: object
-  //   - attachments: object
-  angular.module('crmMailing').controller('PreviewMailingCtrl', function ($scope, dialogService, crmMailingMgr, crmStatus) {
-    var ts = $scope.ts = CRM.ts('CiviMail');
-
-    $scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
-    $scope.testGroup = {gid: null};
-
-    $scope.previewHtml = function previewHtml() {
-      $scope.previewDialog(partialUrl('dialog/previewHtml.html'));
-    };
-    $scope.previewText = function previewText() {
-      $scope.previewDialog(partialUrl('dialog/previewText.html'));
-    };
-    $scope.previewFull = function previewFull() {
-      $scope.previewDialog(partialUrl('dialog/previewFull.html'));
-    };
-    // Open a dialog with a preview of the current mailing
-    // @param template string URL of the template to use in the preview dialog
-    $scope.previewDialog = function previewDialog(template) {
-      var p = crmMailingMgr
-        .preview($scope.mailing)
-        .then(function (content) {
-          var options = {
-            autoOpen: false,
-            modal: true,
-            title: ts('Subject: %1', {
-              1: content.subject
-            })
-          };
-          dialogService.open('previewDialog', template, content, options);
-        });
-      CRM.status({start: ts('Previewing'), success: ''}, CRM.toJqPromise(p));
-    };
-    $scope.sendTestToContact = function sendTestToContact() {
-      $scope.sendTest($scope.mailing, $scope.attachments, $scope.testContact.email, null);
-    };
-    $scope.sendTestToGroup = function sendTestToGroup() {
-      $scope.sendTest($scope.mailing, $scope.attachments, null, $scope.testGroup.gid);
-    };
-    $scope.sendTest = function sendTest(mailing, attachments, testEmail, testGroup) {
-      var promise = crmMailingMgr.save(mailing)
-          .then(function () {
-            return attachments.save();
-          })
-          .then(function () {
-            return crmMailingMgr.sendTest(mailing, testEmail, testGroup);
-          })
-          .then(function (deliveryInfos) {
-            var count = Object.keys(deliveryInfos).length;
-            if (count === 0) {
-              CRM.alert(ts('Could not identify any recipients. Perhaps the group is empty?'));
-            }
-          })
-        ;
-      return crmStatus({start: ts('Sending...'), success: ts('Sent')}, promise);
-    };
   });
 
   // Controller for the "Preview Mailing" dialog
@@ -441,7 +400,7 @@
     setTimeout(scopeApply(init), 0);
   });
 
-  angular.module('crmMailing').controller('EmailAddrCtrl', function EmailAddrCtrl($scope, crmFromAddresses){
+  angular.module('crmMailing').controller('EmailAddrCtrl', function EmailAddrCtrl($scope, crmFromAddresses) {
     $scope.crmFromAddresses = crmFromAddresses;
   });
 })(angular, CRM.$, CRM._);

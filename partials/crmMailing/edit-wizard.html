@@ -26,7 +26,7 @@
           <div crm-attachments="attachments"/>
         </div>
         <div crm-ui-accordion crm-title="ts('Preview')">
-          <div crm-mailing-block-preview crm-mailing="mailing"/>
+          <div crm-mailing-block-preview crm-mailing="mailing" on-preview="previewMailing(mailing, preview.mode)" on-send="sendTest(mailing, attachments, preview.recipient)" />
         </div>
       </div>
 
