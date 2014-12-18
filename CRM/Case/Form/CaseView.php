@@ -391,8 +391,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       $this->assign('hookCaseSummary', $hookCaseSummary);
     }
 
-
-    $allTags = CRM_Core_BAO_Tag::getTags('civicrm_case');
+    CRM_Core_BAO_Tag::getTags('civicrm_case', $allTags, NULL,
+      '&nbsp;&nbsp;', TRUE);
 
     if (!empty($allTags)) {
       $this->add('select', 'case_tag', ts('Tags'), $allTags, FALSE,
