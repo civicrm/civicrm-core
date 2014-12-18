@@ -257,7 +257,7 @@
           'api.mailing_job.create': 1, // note: exact match to API default
           'api.MailingRecipients.get': {
             mailing_id: '$value.id',
-            options: { limit: previewLimit },
+            options: {limit: previewLimit},
             'api.contact.getvalue': {'return': 'display_name'},
             'api.email.getvalue': {'return': 'email'}
           }
@@ -307,16 +307,15 @@
 
       // Immediately send a test message
       // @param mailing Object (per APIv3)
-      // @param testEmail string
-      // @param testGroup int (id#)
+      // @param to Object with either key "email" (string) or "gid" (int)
       // @return Promise for a list of delivery reports
-      sendTest: function (mailing, testEmail, testGroup) {
+      sendTest: function (mailing, recipient) {
         var params = _.extend({}, mailing, {
           // options:  {force_rollback: 1}, // Test mailings include tracking features, so the mailing must be persistent
           'api.Mailing.send_test': {
             mailing_id: '$value.id',
-            test_email: testEmail,
-            test_group: testGroup
+            test_email: recipient.email,
+            test_group: recipient.gid
           }
         });
 
@@ -334,4 +333,49 @@
       }
     };
   });
+
+  // The preview manager performs preview actions while putting up a visible UI (e.g. dialogs & status alerts)
+  angular.module('crmMailing').factory('crmMailingPreviewMgr', function (dialogService, crmMailingMgr, crmStatus) {
+    return {
+      // @param mode string one of 'html', 'text', or 'full'
+      // @return Promise
+      preview: function preview(mailing, mode) {
+        var templates = {
+          html: partialUrl('dialog/previewHtml.html'),
+          text: partialUrl('dialog/previewText.html'),
+          full: partialUrl('dialog/previewFull.html')
+        };
+        var result = null;
+        var p = crmMailingMgr
+          .preview(mailing)
+          .then(function (content) {
+            var options = {
+              autoOpen: false,
+              modal: true,
+              title: ts('Subject: %1', {
+                1: content.subject
+              })
+            };
+            result = dialogService.open('previewDialog', templates[mode], content, options);
+          });
+        crmStatus({start: ts('Previewing'), success: ''}, p);
+        return result;
+      },
+
+      // @param to Object with either key "email" (string) or "gid" (int)
+      // @return Promise
+      sendTest: function sendTest(mailing, recipient) {
+        var promise = crmMailingMgr.sendTest(mailing, recipient)
+            .then(function (deliveryInfos) {
+              var count = Object.keys(deliveryInfos).length;
+              if (count === 0) {
+                CRM.alert(ts('Could not identify any recipients. Perhaps the group is empty?'));
+              }
+            })
+          ;
+        return crmStatus({start: ts('Sending...'), success: ts('Sent')}, promise);
+      }
+    };
+  });
+
 })(angular, CRM.$, CRM._);
