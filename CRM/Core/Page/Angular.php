@@ -71,8 +71,9 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
     $angularModules['angularFileUpload'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-file-upload/angular-file-upload.min.js'));
     $angularModules['dialogService'] = array('ext' => 'civicrm' , 'js' => array('packages/bower_components/angular-jquery-dialog-service/dialog-service.js'));
     $angularModules['crmAttachment'] = array('ext' => 'civicrm', 'js' => array('js/angular-crmAttachment.js'), 'css' => array('css/angular-crmAttachment.css'));
-    $angularModules['crmUi'] = array('ext' => 'civicrm', 'js' => array('js/angular-crm-ui.js'));
+    $angularModules['crmUi'] = array('ext' => 'civicrm', 'js' => array('js/angular-crm-ui.js', 'packages/ckeditor/ckeditor.js'));
     $angularModules['crmUtil'] = array('ext' => 'civicrm', 'js' => array('js/angular-crm-util.js'));
+    $angularModules['ngSanitize'] = array('ext' => 'civicrm', 'js' => array('js/angular-sanitize.js'));
 
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {
       $angularModules = array_merge($angularModules, $component->getAngularModules());
