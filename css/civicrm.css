@@ -4282,8 +4282,10 @@ span.crm-status-icon {
   max-width: 100%;
 }
 
-#crm-container.crm-public .label {
+#crm-container.crm-public .label,
+#crm-container.crm-public .price-field-amount {
   padding-top: 6px;
+  font-size: 15px;
 }
 
 .crm-container.crm-public .select2-container,
@@ -4466,8 +4468,12 @@ span.crm-status-icon {
   display: none;
 }
 
-#crm-container .price_set-section .sold-out-option {
-  font-style: italic;
+#crm-container .sold-out-option,
+#crm-container .price-set-row span.sold-out-option .crm-price-amount-label,
+#crm-container .price-set-row span.sold-out-option .crm-price-amount-amount {
+  font-style: italic !important;
+  font-weight: normal !important;
+  color: #666 !important;
 }
 #crm-container .crm-extensions-upgrade {
   background: #ffb;
