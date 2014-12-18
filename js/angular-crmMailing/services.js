@@ -1,6 +1,6 @@
 (function (angular, $, _) {
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/crmMailing2/' + relPath;
+    return CRM.resourceUrls['civicrm'] + '/partials/crmMailing/' + relPath;
   };
 
   // FIXME: surely there's already some helper which can do this in one line?
