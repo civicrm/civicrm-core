@@ -160,7 +160,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
 
 
     $this->click("_qf_Search_refresh");
-    $this->waitForElementPresent("search-status");
+    $this->waitForElementPresent("xpath=//form[@id='Search']/div[3]/div/div[1]/div");
 
     $stringsToCheck = array(
       "Start Date - greater than or equal to",
