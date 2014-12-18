@@ -1,6 +1,6 @@
 (function (angular, $, _) {
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/crmMailing2/' + relPath;
+    return CRM.resourceUrls['civicrm'] + '/partials/crmMailing/' + relPath;
   };
 
   // FIXME: surely there's already some helper which can do this in one line?
@@ -21,13 +21,11 @@
     return yyyy + "-" + mm + "-" + dd + " " + hh + ":" + min + ":" + sec;
   };
 
-  var crmMailing2 = angular.module('crmMailing2');
-
   // The representation of from/reply-to addresses is inconsistent in the mailing data-model,
   // so the UI must do some adaptation. The crmFromAddresses provides a richer way to slice/dice
   // the available "From:" addrs. Records are like the underlying OptionValues -- but add "email"
   // and "author".
-  crmMailing2.factory('crmFromAddresses', function ($q, crmApi) {
+  angular.module('crmMailing').factory('crmFromAddresses', function ($q, crmApi) {
     var emailRegex = /^"(.*)" \<([^@\>]*@[^@\>]*)\>$/;
     var addrs = _.map(CRM.crmMailing.fromAddress, function (addr) {
       var match = emailRegex.exec(addr.label);
@@ -74,7 +72,7 @@
     };
   });
 
-  crmMailing2.factory('crmMsgTemplates', function ($q, crmApi) {
+  angular.module('crmMailing').factory('crmMsgTemplates', function ($q, crmApi) {
     var tpls = _.map(CRM.crmMailing.mesTemplate, function (tpl) {
       return _.extend({}, tpl, {
         //id: tpl parseInt(tpl.id)
@@ -120,7 +118,7 @@
   });
 
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
-  crmMailing2.factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses) {
+  angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses) {
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
         component_type: type,

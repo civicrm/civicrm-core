@@ -1,6 +1,6 @@
 (function (angular, $, _) {
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/crmMailingAB2/' + relPath;
+    return CRM.resourceUrls['civicrm'] + '/partials/crmMailingAB/' + relPath;
   };
 
   // example:
@@ -11,7 +11,7 @@
     crmMailingAbBlockSetup: partialUrl('setup.html')
   };
   _.each(simpleDirectives, function (templateUrl, directiveName) {
-    angular.module('crmMailingAB2').directive(directiveName, function ($parse, crmMailingABCriteria) {
+    angular.module('crmMailingAB').directive(directiveName, function ($parse, crmMailingABCriteria) {
       var scopeDesc = {crmAbtest: '@'};
       scopeDesc[directiveName] = '@';
 
@@ -33,7 +33,7 @@
   });
 
   // example: <div crm-mailing-ab-slider ng-model="abtest.ab.group_percentage"></div>
-  angular.module('crmMailingAB2').directive('crmMailingAbSlider', function () {
+  angular.module('crmMailingAB').directive('crmMailingAbSlider', function () {
     return {
       require: '?ngModel',
       scope: {},

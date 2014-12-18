@@ -59,33 +59,25 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $result = array();
     $result['crmMailing'] = array(
       'ext' => 'civicrm',
-      'js' => array(
-        'js/angular-Mailing.js' ,
-        'js/angularsanitize.js' ,
-        'packages/ckeditor/ckeditor.js'
-       ),
-    );
-    $result['crmMailing2'] = array(
-      'ext' => 'civicrm',
-      'js' => array('js/angular-crmMailing2.js', 'js/angular-crmMailing2-services.js', 'js/angular-crmMailing2-directives.js'),
-      'css' => array('css/angular-crmMailing2.css'),
-    );
-    $result['crmMailingAB2'] = array(
-      'ext' => 'civicrm',
-      'js' => array('js/angular-crmMailingAB2.js', 'js/angular-crmMailingAB2-services.js', 'js/angular-crmMailingAB2-directives.js'),
-      'css' => array('css/angular-crmMailingAB2.css'),
+      'js' => array('js/angular-crmMailing.js', 'js/angular-crmMailing/services.js', 'js/angular-crmMailing/directives.js'),
+      'css' => array('css/angular-crmMailing.css'),
     );
     $result['crmMailingAB'] = array(
       'ext' => 'civicrm',
-      'js' => array(
-        'js/angular-crmMailingAB.js',
-        'js/angular-crmMailingAB-ReportCtrl.js',
-        'js/d3.min.js',
-        'js/angular-sanitize.js',
-        'packages/ckeditor/ckeditor.js',
-      ),
+      'js' => array('js/angular-crmMailingAB.js', 'js/angular-crmMailingAB/services.js', 'js/angular-crmMailingAB/directives.js'),
       'css' => array('css/angular-crmMailingAB.css'),
     );
+//    $result['crmMailingAB'] = array(
+//      'ext' => 'civicrm',
+//      'js' => array(
+//        'js/angular-crmMailingAB.js',
+//        'js/angular-crmMailingAB-ReportCtrl.js',
+//        'js/d3.min.js',
+//        'js/angular-sanitize.js',
+//        'packages/ckeditor/ckeditor.js',
+//      ),
+//      'css' => array('css/angular-crmMailingAB.css'),
+//    );
 
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
