@@ -306,7 +306,9 @@ CRM.strings = CRM.strings || {};
         settings = {allowClear: !$el.hasClass('required')};
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function () {
-        $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
+        if ($(this).attr('value').indexOf('crm_optgroup_end') === -1) {
+          $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
+        }
         $(this).remove();
       });
       // Defaults for single-selects
