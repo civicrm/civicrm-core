@@ -36,35 +36,7 @@
       </div>
     </div>
     <div crm-ui-field="setupForm.recipients" crm-title="ts('Recipients')" ng-if="fields.recipients">
-      <div ng-controller="EditRecipCtrl">
-        <div style="float: right;">
-          <div class='crmMailing2-recip-est'>
-            <a href="" ng-click="previewRecipients()">{{getRecipientsEstimate()}}</a>
-          </div>
-          <div>
-            <input
-              name='dedupe_email'
-              type='checkbox'
-              ng-model='abtest.mailings.a.dedupe_email'
-              ng-true-value="1"
-              ng-false-value="0"
-              id="recipients-dedupe-email"/>
-            <label for="recipients-dedupe-email">
-              {{ts('Dedupe')}}
-            </label>
-          </div>
-        </div>
-        <select
-          crm-mailing-recipients
-          crm-mailing="abtest.mailings.a"
-          crm-avail-groups="crmMailingConst.groupNames | filter:{visibility:'Public pages'}"
-          crm-avail-mailings="crmMailingConst.civiMails | filter:{is_completed:1}"
-          name="recipients"
-          crm-ui-id="setupForm.recipients"
-          required
-          multiple>
-        </select>
-      </div>
+      <div crm-mailing-block-recipients="{name: 'recipients', id: 'setupForm.recipients'}" crm-mailing="abtest.mailings.a"></div>
     </div>
     <div crm-ui-field crm-title="ts('Distribution')" ng-if="fields.group_percentage">
       <div crm-mailing-ab-slider ng-model="abtest.ab.group_percentage"></div>

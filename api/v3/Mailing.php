@@ -50,6 +50,20 @@
  * @return array API Success Array
  */
 function civicrm_api3_mailing_create($params, $ids = array()) {
+  if (CRM_Mailing_Info::workflowEnabled()) {
+    if (!CRM_Core_Permission::check('create mailings')) {
+      throw new \Civi\API\Exception\UnauthorizedException("This system uses advanced CiviMail workflows which require additional permissions");
+    }
+    if (!CRM_Core_Permission::check('schedule mailings')) {
+      unset($params['scheduled_date']);
+      unset($params['scheduled_id']);
+    }
+    if (!CRM_Core_Permission::check('approve mailings')) {
+      unset($params['approval_date']);
+      unset($params['approver_id']);
+      unset($params['approval_status_id']);
+    }
+  }
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -103,7 +117,6 @@ function civicrm_api3_mailing_delete($params, $ids = array()) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
-
 /**
  * Handle a get event.
  *
@@ -112,6 +125,48 @@ function civicrm_api3_mailing_delete($params, $ids = array()) {
  */
 function civicrm_api3_mailing_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+function _civicrm_api3_mailing_submit_spec(&$spec) {
+  $mailingFields = CRM_Mailing_DAO_Mailing::fields();
+  $spec['id'] = $mailingFields['id'];
+  $spec['scheduled_date'] = $mailingFields['scheduled_date'];
+  $spec['approval_date'] = $mailingFields['approval_date'];
+}
+
+/**
+ * @param array $params
+ */
+function civicrm_api3_mailing_submit($params) {
+  civicrm_api3_verify_mandatory($params, 'CRM_Mailing_DAO_Mailing', array('id'));
+
+  if (!isset($params['scheduled_date']) && !isset($updateParams['approval_date'])) {
+    throw new API_Exception("Missing parameter scheduled_date and/or approval_date");
+  }
+  if (!is_numeric(CRM_Core_Session::getLoggedInContactID())) {
+    throw new API_Exception("Failed to determine current user");
+  }
+
+  $updateParams = array();
+  $updateParams['id'] = $params['id'];
+
+  // the BAO will autocreate the job
+  $updateParams['api.mailing_job.create'] = 0; // note: exact match to API default
+
+  // note: we'll pass along scheduling/approval fields, but they may get ignored
+  // if we don't have permission
+  if (isset($params['scheduled_date'])) {
+    $updateParams['scheduled_date'] = $params['scheduled_date'];
+    $updateParams['scheduled_id'] = CRM_Core_Session::getLoggedInContactID();
+  }
+  if (isset($params['approval_date']) ) {
+    $updateParams['approval_date'] = $params['approval_date'];
+    $updateParams['approver_id'] = CRM_Core_Session::getLoggedInContactID();
+    $updateParams['approval_status_id'] = CRM_Utils_Array::value('approval_status_id', $updateParams, CRM_Core_OptionGroup::getDefaultValue('mail_approval_status'));
+  }
+
+  $updateParams['options']['reload'] = 1;
+  return civicrm_api3('Mailing', 'create', $updateParams);
 }
 
 /**

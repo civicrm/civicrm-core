@@ -13,6 +13,7 @@
     crmMailingBlockPreview: partialUrl('preview.html'),
     crmMailingBlockPublication: partialUrl('publication.html'),
     crmMailingBlockResponses: partialUrl('responses.html'),
+    crmMailingBlockRecipients: partialUrl('recipients.html'),
     crmMailingBlockReview: partialUrl('review.html'),
     crmMailingBlockSchedule: partialUrl('schedule.html'),
     crmMailingBlockSummary: partialUrl('summary.html'),
@@ -32,6 +33,7 @@
           scope.mailing = model(scope.$parent);
           scope.crmMailingConst = CRM.crmMailing;
           scope.ts = CRM.ts('CiviMail');
+          scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};
         }
       };
     });
