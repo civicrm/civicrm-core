@@ -2,27 +2,27 @@
 
   var partialUrl = function (relPath, module) {
     if (!module) {
-      module = 'crmMailingAB2';
+      module = 'crmMailingAB';
     }
     return CRM.resourceUrls['civicrm'] + '/partials/' + module + '/' + relPath;
   };
 
-  angular.module('crmMailingAB2', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmAttachment', 'crmMailing']);
-  angular.module('crmMailingAB2').config([
+  angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmAttachment', 'crmMailing']);
+  angular.module('crmMailingAB').config([
     '$routeProvider',
     function ($routeProvider) {
-      $routeProvider.when('/abtest2', {
+      $routeProvider.when('/abtest', {
         templateUrl: partialUrl('list.html'),
-        controller: 'CrmMailingAB2ListCtrl',
+        controller: 'CrmMailingABListCtrl',
         resolve: {
           mailingABList: function ($route, crmApi) {
             return crmApi('MailingAB', 'get', {rowCount: 0});
           }
         }
       });
-      $routeProvider.when('/abtest2/:id', {
+      $routeProvider.when('/abtest/:id', {
         templateUrl: partialUrl('edit.html'),
-        controller: 'CrmMailingAB2EditCtrl',
+        controller: 'CrmMailingABEditCtrl',
         resolve: {
           abtest: function ($route, CrmMailingAB) {
             var abtest = new CrmMailingAB($route.current.params.id == 'new' ? null : $route.current.params.id);
@@ -33,12 +33,12 @@
     }
   ]);
 
-  angular.module('crmMailingAB2').controller('CrmMailingAB2ListCtrl', function ($scope, mailingABList, crmMailingABCriteria) {
+  angular.module('crmMailingAB').controller('CrmMailingABListCtrl', function ($scope, mailingABList, crmMailingABCriteria) {
     $scope.mailingABList = mailingABList.values;
     $scope.testing_criteria = crmMailingABCriteria.getAll();
   });
 
-  angular.module('crmMailingAB2').controller('CrmMailingAB2EditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr) {
+  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr) {
     window.ab = abtest;
     $scope.abtest = abtest;
     $scope.ts = CRM.ts('CiviMail');

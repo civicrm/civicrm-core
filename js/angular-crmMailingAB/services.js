@@ -1,6 +1,6 @@
 (function (angular, $, _) {
 
-  angular.module('crmMailingAB2').factory('crmMailingABCriteria', function () {
+  angular.module('crmMailingAB').factory('crmMailingABCriteria', function () {
     // TODO Get data from server
     var values = {
       '1': {value: '1', name: 'Subject lines', label: ts('Test different "Subject" lines')},
@@ -26,7 +26,7 @@
   //   abtest.load().then(function(){
   //     alert("Mailing A is named "+abtest.mailings.a.name);
   //   });
-  angular.module('crmMailingAB2').factory('CrmMailingAB', function (crmApi, crmMailingMgr, $q, CrmAttachments) {
+  angular.module('crmMailingAB').factory('CrmMailingAB', function (crmApi, crmMailingMgr, $q, CrmAttachments) {
     function CrmMailingAB(id) {
       this.id = id;
       this.mailings = {};
