@@ -470,7 +470,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $allowedOptions[] = $opt['id'];
           }
           // CRM-14696 - Improve display for sold out price set options
-          else {            
+          else {
             $opt['label'] = $opt['label'] . ' (' . ts('Sold out') . ')';
           }
 					
