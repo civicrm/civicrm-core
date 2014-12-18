@@ -3,8 +3,6 @@
     return CRM.resourceUrls['civicrm'] + '/partials/crmMailing2/' + relPath;
   };
 
-  var crmMailing2 = angular.module('crmMailing2');
-
   // The following directives have the same simple implementation -- load
   // a template and export a "mailing" object into scope.
   var simpleBlocks = {
@@ -22,7 +20,7 @@
     crmMailingBodyText: partialUrl('body_text.html')
   };
   _.each(simpleBlocks, function(templateUrl, directiveName){
-    crmMailing2.directive(directiveName, function ($parse) {
+    angular.module('crmMailing').directive(directiveName, function ($parse) {
       return {
         scope: {
           crmMailing: '@'
@@ -43,7 +41,7 @@
   // example: <span crm-mailing-from-address="myPlaceholder" crm-mailing="myMailing"><select ng-model="myPlaceholder.label"></select></span>
   // NOTE: This really doesn't belong in a directive. I've tried (and failed) to make this work with a getterSetter binding, eg
   // <select ng-model="mailing.convertFromAddress" ng-model-options="{getterSetter: true}">
-  crmMailing2.directive('crmMailingFromAddress', function ($parse, crmFromAddresses) {
+  angular.module('crmMailing').directive('crmMailingFromAddress', function ($parse, crmFromAddresses) {
     return {
       link: function (scope, element, attrs) {
         var placeholder = attrs.crmMailingFromAddress;
@@ -65,7 +63,7 @@
   // Represent a datetime field as if it were a radio ('schedule.mode') and a datetime ('schedule.datetime').
   // example: <div crm-mailing-radio-date="mySchedule" crm-model="mailing.scheduled_date">...</div>
   // FIXME: use ngModel instead of adhoc crmModel
-  crmMailing2.directive('crmMailingRadioDate', function ($parse) {
+  angular.module('crmMailing').directive('crmMailingRadioDate', function ($parse) {
     return {
       link: function ($scope, element, attrs) {
         var schedModel = $parse(attrs.crmModel);
@@ -115,7 +113,7 @@
     };
   });
 
-  crmMailing2.directive('crmMailingReviewBool', function () {
+  angular.module('crmMailing').directive('crmMailingReviewBool', function () {
     return {
       scope: {
         crmOn: '@',
@@ -125,11 +123,11 @@
       link: function (scope, element, attrs) {
         function refresh() {
           if (scope.$parent.$eval(attrs.crmOn)) {
-            scope.spanClasses = {'crmMailing2-active': true};
+            scope.spanClasses = {'crmMailing-active': true};
             scope.iconClasses = {'ui-icon-check': true};
           }
           else {
-            scope.spanClasses = {'crmMailing2-inactive': true};
+            scope.spanClasses = {'crmMailing-inactive': true};
             scope.iconClasses = {'ui-icon-close': true};
           }
           scope.crmTitle = scope.$parent.$eval(attrs.crmTitle);
@@ -144,7 +142,7 @@
 
   // example: <input name="subject" /> <input crm-mailing-token crm-for="subject"/>
   // WISHLIST: Instead of global CRM.crmMailing.mailTokens, accept token list as an input
-  crmMailing2.directive('crmMailingToken', function () {
+  angular.module('crmMailing').directive('crmMailingToken', function () {
     return {
       require: '^crmUiIdScope',
       scope: {
@@ -188,7 +186,7 @@
 
   // example: <select multiple crm-mailing-recipients crm-mailing="mymailing" crm-avail-groups="myGroups" crm-avail-mailings="myMailings"></select>
   // FIXME: participate in ngModel's validation cycle
-  crmMailing2.directive('crmMailingRecipients', function () {
+  angular.module('crmMailing').directive('crmMailingRecipients', function () {
     return {
       restrict: 'AE',
       scope: {
@@ -260,7 +258,7 @@
           }
           var option = convertValueToObj(item.id);
           var icon = (option.entity_type === 'civicrm_mailing') ? 'EnvelopeIn.gif' : 'group.png';
-          var spanClass = (option.mode == 'exclude') ? 'crmMailing2-exclude' : 'crmMailing2-include';
+          var spanClass = (option.mode == 'exclude') ? 'crmMailing-exclude' : 'crmMailing-include';
           return "<img src='../../sites/all/modules/civicrm/i/" + icon + "' height=12 width=12 /> <span class='" + spanClass + "'>" + item.text + "</span>";
         }
 

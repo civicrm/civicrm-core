@@ -7,7 +7,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/' + module + '/' + relPath;
   };
 
-  angular.module('crmMailingAB2', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmAttachment', 'crmMailing2']);
+  angular.module('crmMailingAB2', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmAttachment', 'crmMailing']);
   angular.module('crmMailingAB2').config([
     '$routeProvider',
     function ($routeProvider) {

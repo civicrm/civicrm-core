@@ -1,16 +1,16 @@
-.crmMailing2 input[name=subject] {
+.crmMailing input[name=subject] {
   width: 30em;
 }
-.crmMailing2 select, .crmMailing2 input[type=text] {
+.crmMailing select, .crmMailing input[type=text] {
   width: 40em;
 }
-.crmMailing2 textarea {
+.crmMailing textarea {
   margin: 0.5em;
   width: 95%;
   height: 20em;
 }
 
-.crmMailing2-recip-est {
+.crmMailing-recip-est {
   background: #ee8;
   font-size: small;
   padding: 0.33em;
@@ -19,19 +19,19 @@
   text-align: center;
 }
 
-span.crmMailing2-include {
+span.crmMailing-include {
   color: #060;
 }
-span.crmMailing2-exclude {
+span.crmMailing-exclude {
   color: #600;
   text-decoration: line-through;
 }
 
-.crmMailing2 input[name=preview_test_email], .crmMailing2-preview select[name=preview_test_group] {
+.crmMailing input[name=preview_test_email], .crmMailing-preview select[name=preview_test_group] {
   width: 80%;
 }
 
-.crmMailing2 .preview-popup, .crmMailing2 .preview-contact, .crmMailing2 .preview-group {
+.crmMailing .preview-popup, .crmMailing .preview-contact, .crmMailing .preview-group {
   width: 30%;
   height: 4.5em;
   margin: 0.5em;
@@ -39,16 +39,16 @@ span.crmMailing2-exclude {
   vertical-align: middle;
   float: left;
 }
-.crmMailing2 .preview-popup, .crmMailing2 .preview-contact {
+.crmMailing .preview-popup, .crmMailing .preview-contact {
   border-right: 1px solid black;
 }
-.crmMailing2 .preview-group, .crmMailing2 .preview-contact {
+.crmMailing .preview-group, .crmMailing .preview-contact {
 }
 
-.crmMailing2 .crmMailing2-schedule-outer {
+.crmMailing .crmMailing-schedule-outer {
   width: 98%
 }
-.crmMailing2 .crmMailing2-schedule-inner {
+.crmMailing .crmMailing-schedule-inner {
   width: 40em;
   text-align: left;
   margin: auto;
@@ -67,12 +67,12 @@ input[name=preview_test_email]::-webkit-input-placeholder  {
 input[name=preview_test_email]:-ms-input-placeholder {
   text-align: center;
 }
-.crmMailing2-active {
+.crmMailing-active {
 }
-.crmMailing2-inactive {
+.crmMailing-inactive {
   text-decoration: line-through;
 }
-a.crmMailing2-submit-button div {
+a.crmMailing-submit-button div {
   color: black;
   background: #bfb;
   border: 1px solid #8a8;
@@ -80,10 +80,10 @@ a.crmMailing2-submit-button div {
   margin: 1em;
   width: 15em;
 }
-a.crmMailing2-submit-button div:hover {
+a.crmMailing-submit-button div:hover {
   background: #afa;
   border: 1px solid #7a7;
 }
-a.crmMailing2-submit-button:hover {
+a.crmMailing-submit-button:hover {
   text-decoration: none;
 }
