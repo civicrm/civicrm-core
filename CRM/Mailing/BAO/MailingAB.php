@@ -125,15 +125,24 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
     if (empty($id)) {
       CRM_Core_Error::fatal();
     }
+    CRM_Core_Transaction::create()->run(function() use ($id) {
+      CRM_Utils_Hook::pre('delete', 'MailingAB', $id, CRM_Core_DAO::$_nullArray);
 
-    CRM_Utils_Hook::pre('delete', 'MailingAB', $id, CRM_Core_DAO::$_nullArray);
+      $dao = new CRM_Mailing_DAO_MailingAB();
+      $dao->id = $id;
+      if ($dao->find(TRUE)) {
+        $mailing_ids = array($dao->mailing_id_a, $dao->mailing_id_b, $dao->mailing_id_c);
+        $dao->delete();
+        foreach ($mailing_ids as $mailing_id) {
+          if ($mailing_id) {
+            CRM_Mailing_BAO_Mailing::del($mailing_id);
+          }
+        }
+      }
 
-    $dao = new CRM_Mailing_DAO_MailingAB();
-    $dao->id = $id;
-    $dao->delete();
+      CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
 
-    CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
-
-    CRM_Utils_Hook::post('delete', 'MailingAB', $id, $dao);
+      CRM_Utils_Hook::post('delete', 'MailingAB', $id, $dao);
+    });
   }
 }

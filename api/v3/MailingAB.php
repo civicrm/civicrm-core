@@ -97,9 +97,10 @@ function civicrm_api3_mailing_a_b_recipients_update($params) {
   //update recipients for mailing_id_c
   CRM_Mailing_BAO_Mailing::getRecipients($mailingAB['mailing_id_c'], $mailingAB['mailing_id_c'], NULL, NULL, TRUE);
 
-  //calulate total number of random recipients for mail C from group_percentage selected
+  //calculate total number of random recipients for mail C from group_percentage selected
   $totalCount =  civicrm_api3('MailingRecipients', 'getcount', array('mailing_id' => $mailingAB['mailing_id_c']));
-  $totalSelected = round(($totalCount * $mailingAB['group_percentage'])/100);
+  //we need at least 1 recipient for each test mailing, even if totalCount*group_percentage =~ 0
+  $totalSelected = max(1, round(($totalCount * $mailingAB['group_percentage'])/100));
 
   foreach (array('mailing_id_a', 'mailing_id_b') as $columnName) {
     CRM_Mailing_BAO_Recipients::updateRandomRecipients($mailingAB['mailing_id_c'], $mailingAB[$columnName], $totalSelected);

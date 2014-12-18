@@ -21,9 +21,6 @@
     return yyyy + "-" + mm + "-" + dd + " " + hh + ":" + min + ":" + sec;
   };
 
-  // FIXME: Load status ids from DB
-  var APPROVAL_STATUSES = { Approved: "1", Rejected: "2", None: "3" };
-
   var crmMailing2 = angular.module('crmMailing2');
 
   // The representation of from/reply-to addresses is inconsistent in the mailing data-model,
@@ -299,22 +296,14 @@
       // @param mailing Object (per APIv3)
       // @return Promise
       submit: function (mailing) {
-        var changes = {
+        var params = {
+          id: mailing.id,
           approval_date: createNow(),
-          approver_id: CRM.crmMailing.contactid,
-          approval_status_id: APPROVAL_STATUSES.Approved,
-          scheduled_date: mailing.scheduled_date ? mailing.scheduled_date : createNow(),
-          scheduled_id: CRM.crmMailing.contactid
+          scheduled_date: mailing.scheduled_date ? mailing.scheduled_date : createNow()
         };
-        var params = _.extend({}, mailing, changes, {
-          'api.mailing_job.create': 0 // note: exact match to API default
-        });
-        return crmApi('Mailing', 'create', params).then(function (result) {
-          if (result.id && !mailing.id) {
-            mailing.id = result.id;
-          } // no rollback, so update mailing.id
-          _.extend(mailing, changes); // Perhaps we should reload mailing based on result?
-          return result.values[result.id];
+        return crmApi('Mailing', 'submit', params).then(function (result) {
+          _.extend(mailing, result.values[result.id]); // Perhaps we should reload mailing based on result?
+          return mailing;
         });
       },
 
