@@ -266,7 +266,10 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
         'maxlength' => '128')), TRUE
     );
 
-    $tags = CRM_Core_BAO_Tag::getTags('civicrm_case');
+    $tags = CRM_Core_BAO_Tag::getTags('civicrm_case',
+      CRM_Core_DAO::$_nullArray, NULL,
+      '&nbsp;&nbsp;', TRUE);
+
     if (!empty($tags)) {
       $this->add('select', 'tag', ts('Select Tags'), $tags, FALSE,
         array('id' => 'tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
