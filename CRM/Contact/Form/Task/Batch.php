@@ -252,7 +252,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       //parse street address, CRM-7768
       self::parseStreetAddress($value, $this);
 
-      CRM_Contact_BAO_Contact::createProfileContact($value, $this->_fields, $key, NULL, $ufGroupId);
+      CRM_Contact_BAO_Contact::createProfileContact($value, $this->_fields, $key, NULL, $ufGroupId, NULL, TRUE);
       if ($notify) {
         $values = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($ufGroupId, $key, NULL);
         CRM_Core_BAO_UFGroup::commonSendMail($key, $values);
