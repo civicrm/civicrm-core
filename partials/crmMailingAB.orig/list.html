@@ -14,6 +14,7 @@ Required vars: mailingABList
       <th>Id</th>
       <th>Test Type</th>
       <th></th>
+
       <th></th>
     </tr>
     </thead>
@@ -21,11 +22,10 @@ Required vars: mailingABList
     <tr ng-repeat="mailingAB in mailingABList">
       <td>{{mailingAB.name}}</td>
       <td>{{mailingAB.id}}</td>
-      <td>{{testing_criteria[mailingAB.testing_criteria_id].label}}</td>
-      <td>
-        <a class="action-item crm-hover-button" ng-href="#/abtest2/{{mailingAB.id}}">Edit</a>&nbsp
-        <a class="action-item crm-hover-button" ng-href="#/abtest2/report/{{mailingAB.id}}">Results</a>
-      </td>
+      <td>{{testing_criteria[mailingAB.testing_criteria_id]}}</td>
+      <td><a class="action-item crm-hover-button" ng-href="#/abtest/{{mailingAB.id}}">Edit</a>&nbsp
+      <a class="action-item crm-hover-button" ng-href="#/abtest/report/{{mailingAB.id}}">Results</a></td>
+
     </tr>
     </tbody>
   </table>
@@ -39,5 +39,5 @@ Required vars: mailingABList
 
 <div class="crm-submit-buttons">
   <br>
-  <a ng-href="#/abtest2/new" class="button"><span><div class="icon add-icon"></div>New A/B Test</span></a>
+  <a ng-href="#/abtest/new" class="button"><span><div class="icon add-icon"></div>New A/B Test</span></a>
 </div>
