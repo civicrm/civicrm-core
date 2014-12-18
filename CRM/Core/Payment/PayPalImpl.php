@@ -110,7 +110,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['paymentAction'] = $params['payment_action'];
     $args['amt'] = $params['amount'];
     $args['currencyCode'] = $params['currencyID'];
-    $args['desc'] = $params['description'];
+    $args['desc'] = CRM_Utils_Array::value('description', $params);
     $args['invnum'] = $params['invoiceID'];
     $args['returnURL'] = $params['returnURL'];
     $args['cancelURL'] = $params['cancelURL'];
@@ -167,10 +167,10 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $params['payer_id'] = $result['payerid'];
     $params['payer_status'] = $result['payerstatus'];
     $params['first_name'] = $result['firstname'];
-    $params['middle_name'] = $result['middlename'];
+    $params['middle_name'] = CRM_Utils_Array::value('middlename', $result);
     $params['last_name'] = $result['lastname'];
     $params['street_address'] = $result['shiptostreet'];
-    $params['supplemental_address_1'] = $result['shiptostreet2'];
+    $params['supplemental_address_1'] = CRM_Utils_Array::value('shiptostreet2', $result);
     $params['city'] = $result['shiptocity'];
     $params['state_province'] = $result['shiptostate'];
     $params['postal_code'] = $result['shiptozip'];
@@ -200,8 +200,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['currencyCode'] = $params['currencyID'];
     $args['payerID'] = $params['payer_id'];
     $args['invnum'] = $params['invoiceID'];
-    $args['returnURL'] = $params['returnURL'];
-    $args['cancelURL'] = $params['cancelURL'];
+    $args['returnURL'] = CRM_Utils_Array::value('returnURL', $params);
+    $args['cancelURL'] = CRM_Utils_Array::value('cancelURL', $params);
     $args['desc'] = $params['description'];
 
     $result = $this->invokeAPI($args);
@@ -215,7 +215,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $params['trxn_id'] = $result['transactionid'];
     $params['gross_amount'] = $result['amt'];
     $params['fee_amount'] = $result['feeamt'];
-    $params['net_amount'] = $result['settleamt'];
+    $params['net_amount'] = CRM_Utils_Array::value('settleamt', $result);
     if ($params['net_amount'] == 0 && $params['fee_amount'] != 0) {
       $params['net_amount'] = $params['gross_amount'] - $params['fee_amount'];
     }
