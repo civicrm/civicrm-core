@@ -14,11 +14,11 @@
   angular.module('crmMailing').config([
     '$routeProvider',
     function ($routeProvider) {
-      $routeProvider.when('/mailing2', {
+      $routeProvider.when('/mailing', {
         template: '<div></div>',
         controller: 'ListMailingsCtrl'
       });
-      $routeProvider.when('/mailing2/:id', {
+      $routeProvider.when('/mailing/:id', {
         templateUrl: partialUrl('edit.html'),
         controller: 'EditMailingCtrl',
         resolve: {
@@ -27,7 +27,7 @@
           }
         }
       });
-      $routeProvider.when('/mailing2/:id/unified', {
+      $routeProvider.when('/mailing/:id/unified', {
         templateUrl: partialUrl('edit-unified.html'),
         controller: 'EditMailingCtrl',
         resolve: {
@@ -36,7 +36,7 @@
           }
         }
       });
-      $routeProvider.when('/mailing2/:id/unified2', {
+      $routeProvider.when('/mailing/:id/unified2', {
         templateUrl: partialUrl('edit-unified2.html'),
         controller: 'EditMailingCtrl',
         resolve: {
@@ -45,7 +45,7 @@
           }
         }
       });
-      $routeProvider.when('/mailing2/:id/wizard', {
+      $routeProvider.when('/mailing/:id/wizard', {
         templateUrl: partialUrl('edit-wizard.html'),
         controller: 'EditMailingCtrl',
         resolve: {
@@ -113,10 +113,10 @@
       });
     };
 
-    // Transition URL "/mailing2/new" => "/mailing2/123" as soon as ID is known
+    // Transition URL "/mailing/new" => "/mailing/123" as soon as ID is known
     $scope.$watch('mailing.id', function (newValue, oldValue) {
       if (newValue && newValue != oldValue) {
-        var parts = $location.path().split('/'); // e.g. "/mailing2/new" or "/mailing2/123/wizard"
+        var parts = $location.path().split('/'); // e.g. "/mailing/new" or "/mailing/123/wizard"
         parts[2] = newValue;
         $location.path(parts.join('/'));
         $location.replace();
