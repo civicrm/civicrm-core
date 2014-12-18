@@ -738,7 +738,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->assign('customDataSubType', $this->_activityTypeId);
     $this->assign('entityID', $this->_activityId);
 
-    $tags = CRM_Core_BAO_Tag::getTags('civicrm_activity');
+    $tags = CRM_Core_BAO_Tag::getTags('civicrm_activity',
+      CRM_Core_DAO::$_nullArray, NULL,
+      '&nbsp;&nbsp;', TRUE);
 
     if (!empty($tags)) {
       $this->add('select', 'tag', ts('Tags'), $tags, FALSE,

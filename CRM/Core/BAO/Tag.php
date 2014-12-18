@@ -179,17 +179,22 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * @param string $usedFor
-   * @param array $tags
-   * @param int $parentId
-   * @param string $separator
+   * Function to retrieve tags
+   *
+   * @param string $usedFor which type of tag entity
+   * @param array $tags tags array
+   * @param int $parentId parent id if you want need only children
+   * @param string $separator separator to indicate children
+   * @param boolean $formatSelectable add special property for non-selectable
+   *                tag, so they cannot be selected
    *
    * @return array
    */
   static function getTags($usedFor = 'civicrm_contact',
     &$tags = array(),
     $parentId  = NULL,
-    $separator = '&nbsp;&nbsp;'
+    $separator = '&nbsp;&nbsp;',
+    $formatSelectable = FALSE
   ) {
     if (!is_array($tags)) {
       $tags = array();
@@ -200,7 +205,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     // Instead of recursively making mysql queries, we'll make one big
     // query and build the heirarchy with the algorithm below.
     $args = array(1 => array('%' . $usedFor . '%', 'String'));
-    $query = "SELECT id, name, parent_id, is_tagset
+    $query = "SELECT id, name, parent_id, is_tagset, is_selectable
                   FROM civicrm_tag
               WHERE used_for LIKE %1";
     if ($parentId) {
@@ -217,13 +222,35 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     // are necessarily placed.
     $roots = $rows = array();
     while ($dao->fetch()) {
+      // note that we are prepending id with "crm_disabled_opt" which identifies
+      // them as disabled so that they cannot be selected. We do some magic
+      // in crm-select2 js function that marks option values to "disabled"
+      // current QF version in CiviCRM does not support passing this attribute,
+      // so this is another ugly hack / workaround,
+      // also know one is too keen to upgrade QF :P
+      $idPrefix = '';
+      if ($formatSelectable && !$dao->is_selectable) {
+        $idPrefix = "crm_disabled_opt";
+      }
       if ($dao->parent_id == $parentId && $dao->is_tagset == 0) {
-        $roots[] = array('id' => $dao->id, 'prefix' => '', 'name' => $dao->name);
+        $roots[] = array(
+          'id' => $dao->id,
+          'prefix' => '',
+          'name' => $dao->name,
+          'idPrefix' => $idPrefix,
+          );
       }
       else {
-        $rows[] = array('id' => $dao->id, 'prefix' => '', 'name' => $dao->name, 'parent_id' => $dao->parent_id);
+        $rows[] = array(
+          'id' => $dao->id,
+          'prefix' => '',
+          'name' => $dao->name,
+          'parent_id' => $dao->parent_id,
+          'idPrefix' => $idPrefix,
+         );
       }
     }
+
     $dao->free();
     // While we have nodes left to build, shift the first (alphabetically)
     // node of the list, place it in our tags list and loop through the
@@ -234,7 +261,11 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $new_roots         = array();
       $current_rows      = $rows;
       $root              = array_shift($roots);
-      $tags[$root['id']] = array($root['prefix'], $root['name']);
+      $tags[$root['id']] = array(
+        $root['prefix'],
+        $root['name'],
+        $root['idPrefix'],
+        );
 
       // As you find the children, append them to the end of the new set
       // of roots (maintain alphabetical ordering). Also remove the node
@@ -242,7 +273,12 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       if (is_array($current_rows)) {
         foreach ($current_rows as $key => $row) {
           if ($row['parent_id'] == $root['id']) {
-            $new_roots[] = array('id' => $row['id'], 'prefix' => $tags[$root['id']][0] . $separator, 'name' => $row['name']);
+            $new_roots[] = array(
+              'id' => $row['id'],
+              'prefix' => $tags[$root['id']][0] . $separator,
+              'name' => $row['name'],
+              'idPrefix' => $row['idPrefix'],
+              );
             unset($rows[$key]);
           }
         }
@@ -255,10 +291,17 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
     // Prefix each name with the calcuated spacing to give the visual
     // appearance of ordering when transformed into HTML in the form layer.
-    foreach ($tags as & $tag) {
-      $tag = $tag[0] . $tag[1];
+    // here is the actual code that to prepends and set disabled attribute for
+    // non-selectable tags
+    $formattedTags = array();
+    foreach ($tags as $key => $tag) {
+      if (!empty($tag[2])) {
+        $key = $tag[2]. "-" . $key;
+      }
+      $formattedTags[$key] = $tag[0] . $tag[1];
     }
 
+    $tags = $formattedTags;
     return $tags;
   }
 
