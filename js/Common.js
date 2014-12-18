@@ -312,7 +312,7 @@ CRM.strings = CRM.strings || {};
 
       // quickform does not support disabled option, so yet another hack to
       // add disabled property for option values
-      $('option[value^=crm_disabled_opt]').attr('disabled', 'disabled');
+      $('option[value^=crm_disabled_opt]', this).attr('disabled', 'disabled');
 
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
