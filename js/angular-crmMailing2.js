@@ -3,7 +3,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/crmMailing2/' + relPath;
   };
 
-  var crmMailing2 = angular.module('crmMailing2', [
+  angular.module('crmMailing', [
     'crmUtil', 'crmAttachment', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService'
   ]); // TODO ngSanitize, unsavedChanges
 
@@ -11,7 +11,7 @@
   var RECIPIENTS_DEBOUNCE_MS = 100;
   var RECIPIENTS_PREVIEW_LIMIT = 10000;
 
-  crmMailing2.config([
+  angular.module('crmMailing').config([
     '$routeProvider',
     function ($routeProvider) {
       $routeProvider.when('/mailing2', {
@@ -57,7 +57,7 @@
     }
   ]);
 
-  crmMailing2.controller('ListMailingsCtrl', function ListMailingsCtrl() {
+  angular.module('crmMailing').controller('ListMailingsCtrl', function ListMailingsCtrl() {
     // We haven't implemented this in Angular, but some users may get clever
     // about typing URLs, so we'll provide a redirect.
     window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
@@ -66,7 +66,7 @@
     });
   });
 
-  crmMailing2.controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, CrmAttachments) {
+  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, CrmAttachments) {
     $scope.mailing = selectedMail;
     $scope.attachments = new CrmAttachments(function () {
       return {entity_table: 'civicrm_mailing', entity_id: $scope.mailing.id};
@@ -130,7 +130,7 @@
   // Scope members:
   //  - [input] mailing: object
   //  - [output] recipients: array of recipient records
-  crmMailing2.controller('EditRecipCtrl', function EditRecipCtrl($scope, dialogService, crmApi, crmMailingMgr) {
+  angular.module('crmMailing').controller('EditRecipCtrl', function EditRecipCtrl($scope, dialogService, crmApi, crmMailingMgr) {
     var ts = $scope.ts = CRM.ts('CiviMail');
     $scope.recipients = null;
     $scope.getRecipientsEstimate = function () {
@@ -225,7 +225,7 @@
   // Controller for the "Preview Recipients" dialog
   // Note: Expects $scope.model to be an object with properties:
   //   - recipients: array of contacts
-  crmMailing2.controller('PreviewRecipCtrl', function ($scope) {
+  angular.module('crmMailing').controller('PreviewRecipCtrl', function ($scope) {
     $scope.ts = CRM.ts('CiviMail');
   });
 
@@ -233,7 +233,7 @@
   // Note: Expects $scope.model to be an object with properties:
   //   - mailing: object
   //   - attachments: object
-  crmMailing2.controller('PreviewMailingCtrl', function ($scope, dialogService, crmMailingMgr, crmStatus) {
+  angular.module('crmMailing').controller('PreviewMailingCtrl', function ($scope, dialogService, crmMailingMgr, crmStatus) {
     var ts = $scope.ts = CRM.ts('CiviMail');
 
     $scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
@@ -295,13 +295,13 @@
   //   - "subject"
   //   - "body_html"
   //   - "body_text"
-  crmMailing2.controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope, crmMailingMgr) {
+  angular.module('crmMailing').controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope, crmMailingMgr) {
     $scope.ts = CRM.ts('CiviMail');
   });
 
   // Controller for the "Preview Mailing Component" segment
   // which displays header/footer/auto-responder
-  crmMailing2.controller('PreviewComponentCtrl', function PreviewMailingDialogCtrl($scope, dialogService) {
+  angular.module('crmMailing').controller('PreviewComponentCtrl', function PreviewMailingDialogCtrl($scope, dialogService) {
     var ts = $scope.ts = CRM.ts('CiviMail');
 
     $scope.previewComponent = function previewComponent(title, componentId) {
@@ -327,12 +327,12 @@
   //   - "subject"
   //   - "body_html"
   //   - "body_text"
-  crmMailing2.controller('PreviewComponentDialogCtrl', function PreviewMailingDialogCtrl($scope) {
+  angular.module('crmMailing').controller('PreviewComponentDialogCtrl', function PreviewMailingDialogCtrl($scope) {
     $scope.ts = CRM.ts('CiviMail');
   });
 
   // Controller for the in-place msg-template management
-  crmMailing2.controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService, $parse) {
+  angular.module('crmMailing').controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService, $parse) {
     var ts = $scope.ts = CRM.ts('CiviMail');
     $scope.crmMsgTemplates = crmMsgTemplates;
 
@@ -378,7 +378,7 @@
   //       - "msg_subject": string
   //       - "msg_text": string
   //       - "msg_html": string
-  crmMailing2.controller('SaveMsgTemplateDialogCtrl', function SaveMsgTemplateDialogCtrl($scope, crmMsgTemplates, dialogService) {
+  angular.module('crmMailing').controller('SaveMsgTemplateDialogCtrl', function SaveMsgTemplateDialogCtrl($scope, crmMsgTemplates, dialogService) {
     var ts = $scope.ts = CRM.ts('CiviMail');
     $scope.saveOpt = {mode: '', newTitle: ''};
     $scope.selected = null;
@@ -441,7 +441,7 @@
     setTimeout(scopeApply(init), 0);
   });
 
-  crmMailing2.controller('EmailAddrCtrl', function EmailAddrCtrl($scope, crmFromAddresses){
+  angular.module('crmMailing').controller('EmailAddrCtrl', function EmailAddrCtrl($scope, crmFromAddresses){
     $scope.crmFromAddresses = crmFromAddresses;
   });
 })(angular, CRM.$, CRM._);
