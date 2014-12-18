@@ -57,8 +57,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $texts = array(
       "Title - New Membership $hash",
       "This is introductory message for $pageTitle",
-      '$ 50.00 Student',
-      "$ $rand.00 Label $hash",
+      'Student - $ 50.00',
+      "Label $hash - $ $rand.00",
       "Pay later label $hash",
       'Organization Details',
       'Other Amount',
@@ -68,6 +68,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     );
     foreach ($texts as $text) {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+      $this->waitForAjaxContent();
     }
 
     // Disable and re-enable Other Amounts (verify fix for CRM-15021)
@@ -125,8 +126,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $texts = array(
       "Title - New Membership $hash",
       "This is introductory message for $pageTitle",
-      '$ 50.00 Student',
-      "$ $rand.00 Label $hash",
+      'Student - $ 50.00',
+      "Label $hash - $ $rand.00",
       "Pay later label $hash",
       'Organization Details',
       'Other Amount',
@@ -136,6 +137,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     );
     foreach ($texts as $text) {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+      $this->waitForAjaxContent();
     }
   }
 
@@ -171,7 +173,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $texts = array(
       "Title - New Membership $hash",
       "This is introductory message for $pageTitle",
-      "$ $rand.00 Label $hash",
+      "Label $hash - $ $rand.00",
       "Pay later label $hash",
       'Organization Details',
       'Other Amount',
@@ -181,6 +183,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     );
     foreach ($texts as $text) {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+      $this->waitForAjaxContent();
     }
   }
 
