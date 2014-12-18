@@ -4317,7 +4317,8 @@ span.crm-status-icon {
   padding-top: 6px;
 }
 
-#crm-container.crm-public .calc-value {
+#crm-container.crm-public .calc-value,
+#crm-container.crm-public .content {
   padding-top: 6px;
   font-size: 15px;
 }
@@ -4473,6 +4474,7 @@ span.crm-status-icon {
 #crm-container .price-set-row span.sold-out-option .crm-price-amount-amount {
   font-style: italic !important;
   font-weight: normal !important;
+  font-size: 15px;
   color: #666 !important;
 }
 #crm-container .crm-extensions-upgrade {

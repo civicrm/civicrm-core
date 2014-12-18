@@ -68,32 +68,40 @@
 
                 <div class="label">{$form.$element_name.label}</div>
                 <div class="content {$element.name}-content">{$form.$element_name.html}
-                  {if $element.is_display_amounts && $element.html_type eq 'Text'}
-                    <span class="price-field-amount">
-                      {foreach item=option from=$element.options}
-            {if ($option.tax_amount || $option.tax_amount == "0") && $displayOpt && $invoicing}
-        {assign var="amount" value=`$option.amount+$option.tax_amount`}
-        {if $displayOpt == 'Do_not_show'}
-          {$amount|crmMoney}
-        {elseif $displayOpt == 'Inclusive'}
-          {$amount|crmMoney}
-          <span class='crm-price-amount-label'> (includes {$taxTerm} of {$option.tax_amount|crmMoney})</span>
-        {else}
-          {$option.amount|crmMoney}
-          <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney} {$taxTerm}</span>
-        {/if}
-      {else}
-        {$option.amount|crmMoney}
-      {/if}
-          {/foreach}
+                  {if $element.html_type eq 'Text'}
+                    {if $element.is_display_amounts}
+                    <span class="price-field-amount{if $form.$element_name.frozen EQ 1} sold-out-option{/if}">
+                    {foreach item=option from=$element.options}
+                      {if ($option.tax_amount || $option.tax_amount == "0") && $displayOpt && $invoicing}
+                        {assign var="amount" value=`$option.amount+$option.tax_amount`}
+                        {if $displayOpt == 'Do_not_show'}
+                          {$amount|crmMoney}
+                        {elseif $displayOpt == 'Inclusive'}
+                          {$amount|crmMoney}
+                          <span class='crm-price-amount-label'> (includes {$taxTerm} of {$option.tax_amount|crmMoney})</span>
+                        {else}
+                          {$option.amount|crmMoney}
+                          <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney} {$taxTerm}</span>
+                        {/if}
+                      {else}
+                        {$option.amount|crmMoney} {$fieldHandle} {$form.$fieldHandle.frozen}
+                      {/if}
+                      {if $form.$element_name.frozen EQ 1} ({ts}Sold out{/ts}){/if}
+                    {/foreach}
                     </span>
+                    {else}
+                      {* Not showing amount, but still need to conditionally show Sold out marker *}
+                      {if $form.$element_name.frozen EQ 1}
+                        <span class="sold-out-option">({ts}Sold out{/ts})<span>
+                      {/if}
+                    {/if}
                   {/if}
-                      {if $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
+                  {if $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
                 </div>
                 <div class="clear"></div>
 
             {/if}
-            </div>
+          </div>
         {/if}
     {/foreach}
 
