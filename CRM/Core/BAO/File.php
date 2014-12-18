@@ -419,7 +419,8 @@ AND       CEF.entity_id    = %2";
 
     $form->assign('numAttachments', $numAttachments);
 
-    $tags = CRM_Core_BAO_Tag::getTags('civicrm_file');
+    CRM_Core_BAO_Tag::getTags('civicrm_file', $tags, NULL,
+      '&nbsp;&nbsp;', TRUE);
 
     // get tagset info
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_file');
