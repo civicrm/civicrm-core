@@ -140,7 +140,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $eventInfoStrings = array($eventTitle, $eventDescription, $streetAddress);
     $this->_testVerifyEventInfo($eventTitle, $eventInfoStrings);
 
-    $registerStrings = array("$ 250.00 Member", "$ 325.00 Non-member", $registerIntro);
+    $registerStrings = array("Member - $ 250.00", "Non-member - $ 325.00", $registerIntro);
     $registerUrl = $this->_testVerifyRegisterPage($registerStrings);
 
     $numberRegistrations = 3;
@@ -357,9 +357,9 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
 
     $this->type('sort_name', $email);
     $this->click("_qf_Search_refresh");
-    $this->waitForElementPresent("//*[@id='participantSearch']");
-    $this->click("xpath=//div[@id='participantSearch']/table/tbody/tr/td[11]/span/a[text()='Edit']");
+    $this->waitForElementPresent("xpath=//div[@id='participantSearch']");
+    $this->click("xpath=//div[@id='participantSearch']/table/tbody/tr/td[11]/span[1]/a[2][text()='Edit']");
     $this->waitForElementPresent("_qf_Participant_cancel-bottom");
-    $this->assertElementContainsText('crm-container', "$campaignTitle");
+    $this->assertElementContainsText("xpath=//form[@id='Participant']/div[2]/div/table[@class='form-layout-compressed']/tbody/tr[4]/td[2]/select", "$campaignTitle");
   }
 }
