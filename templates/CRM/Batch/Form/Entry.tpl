@@ -56,7 +56,7 @@
         <div class="crm-grid-cell">&nbsp;</div>
       {/if}
       {if $batchType eq 3}
-        <div class="crm-grid-cell">{$form.open_pledges.1.label}</div>
+        <div class="crm-grid-cell">{ts}Open Pledges (Due Date - Amount){/ts}</div>
       {/if}
       {foreach from=$fields item=field key=fieldName}
         <div class="crm-grid-cell">
@@ -391,10 +391,11 @@ function updateContactInfo(blockNo, prefix) {
 	{success: function(data) {
 	 cj.each(data['values'], function(key, value) {
 	  if (value['pledge_status'] != 'Completed') {
-	  var date = cj.datepicker.parseDate('yy-mm-dd', value['pledge_next_pay_date']);
+	   var date = cj.datepicker.parseDate('yy-mm-dd', value['pledge_next_pay_date']);
+           var dateformat = "{/literal}{$config->dateInputFormat}{literal}";
 	    cj('#open_pledges_'+ blockNo).append(cj('<option>', {
 		value: value['pledge_id'],
-		text: cj.datepicker.formatDate('yy-mm-dd', date) + " - " + value['pledge_next_pay_amount'] + ' ' + value['pledge_currency']
+		text: cj.datepicker.formatDate(dateformat, date) + ", " + value['pledge_next_pay_amount'] + ' ' + value['pledge_currency']
 		}));
 	     }
 	   });
