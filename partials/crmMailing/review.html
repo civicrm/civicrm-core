@@ -20,11 +20,9 @@ Required vars: mailing
         </div>
       </div>
       <div crm-ui-field crm-title="ts('Content')">
-        <div ng-controller="PreviewMailingCtrl">
-          <span ng-show="mailing.body_html"><a class="crm-hover-button action-item" ng-click="previewHtml()">{{ts('HTML')}} <span class="icon ui-icon-newwin"></span></a></span>
-          <span ng-show="mailing.body_text"><a class="crm-hover-button action-item" ng-click="previewText()">{{ts('Plain Text')}} <span class="icon ui-icon-newwin"></span></a></span>
-          <!-- TODO: attachments -->
-        </div>
+        <span ng-show="mailing.body_html"><a class="crm-hover-button action-item" ng-click="previewMailing(mailing, 'html')">{{ts('HTML')}} <span class="icon ui-icon-newwin"></span></a></span>
+        <span ng-show="mailing.body_text"><a class="crm-hover-button action-item" ng-click="previewMailing(mailing, 'text')">{{ts('Plain Text')}} <span class="icon ui-icon-newwin"></span></a></span>
+        <!-- TODO: attachments -->
       </div>
       <div crm-ui-field crm-title="ts('Attachments')" ng-show="attachments.files.length > 0 || attachments.uploader.queue.length > 0">
         <div ng-repeat="file in attachments.files">

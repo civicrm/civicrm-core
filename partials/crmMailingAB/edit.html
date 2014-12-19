@@ -80,10 +80,10 @@
           </div>
         </div>
         <div crm-ui-accordion crm-title="ts('Preview (A)')">
-          <div crm-mailing-block-preview crm-mailing="abtest.mailings.a"/>
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.a" on-preview="previewMailing('a', preview.mode)" on-send="sendTest('a', preview.recipient)" />
         </div>
         <div crm-ui-accordion crm-title="ts('Preview (B)')">
-          <div crm-mailing-block-preview crm-mailing="abtest.mailings.b"/>
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.b" on-preview="previewMailing('b', preview.mode)" on-send="sendTest('b', preview.recipient)" />
         </div>
       </div>
       <div crm-ui-wizard-step="21" crm-title="ts('Compose (A)')" ng-if="criteriaName == 'Two different emails'">
@@ -118,7 +118,7 @@
           </div>
         </div>
         <div crm-ui-accordion crm-title="ts('Preview')">
-          <div crm-mailing-block-preview crm-mailing="abtest.mailings.a"/>
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.a" on-preview="previewMailing('a', preview.mode)" on-send="sendTest('a', preview.recipient)" />
         </div>
       </div>
       <div crm-ui-wizard-step="22" crm-title="ts('Compose (B)')" ng-if="criteriaName == 'Two different emails'">
@@ -153,7 +153,7 @@
           </div>
         </div>
         <div crm-ui-accordion crm-title="ts('Preview')">
-          <div crm-mailing-block-preview crm-mailing="abtest.mailings.b"/>
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.b" on-preview="previewMailing('b', preview.mode)" on-send="sendTest('b', preview.recipient)" />
         </div>
       </div>
       <div crm-ui-wizard-step="30" crm-title="ts('Schedule')">
