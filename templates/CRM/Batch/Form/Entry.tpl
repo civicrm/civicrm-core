@@ -56,7 +56,7 @@
         <div class="crm-grid-cell">&nbsp;</div>
       {/if}
       {if $batchType eq 3}
-        <div class="crm-grid-cell">{ts}Open Pledges{/ts}</div>
+        <div class="crm-grid-cell">{ts}Open Pledges (Due Date - Amount){/ts}</div>
       {/if}
       {foreach from=$fields item=field key=fieldName}
         <div class="crm-grid-cell">

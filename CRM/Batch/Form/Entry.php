@@ -228,7 +228,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
         }
 
-        $this->add('select', "open_pledges[$rowNumber]", ts('Open Pledges (Due Date - Amount)'), $options);
+        $this->add('select', "open_pledges[$rowNumber]", '', $options);
      }
 
       foreach ($this->_fields as $name => $field) {
@@ -297,7 +297,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
       }
     }
-    if ($self->_batchInfo['type_id'] == $batchTypes['Pledge']) {
+    if ($self->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
       foreach (array_unique($params["open_pledges"]) as $value) {
         $duplicateRows = array_keys($params["open_pledges"], $value);
         if (count($duplicateRows) > 1) {
