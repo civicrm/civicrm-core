@@ -905,7 +905,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
       }
 
       $query = "select " . implode(", ", $ifnulls) .
-        ", count(*) as ct from civireport_activity_temp_target where civicrm_contact_contact_target_id <> '' group by " .
+        ", count(DISTINCT civicrm_activity_id) as ct from civireport_activity_temp_target group by " .
         implode(", ", $sectionAliases);
 
       // initialize array of total counts
