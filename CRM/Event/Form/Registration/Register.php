@@ -745,18 +745,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $dbTotalCount      = CRM_Utils_Array::value($optId, $recordedOptionsCount, 0);
         $currentTotalCount = CRM_Utils_Array::value($optId, $currentOptionsCount, 0);
 
-        // Do not consider current count for select field,
-        // since we are not going to freeze the options.
-        if ($field['html_type'] == 'Select') {
-          $totalCount = $dbTotalCount;
-        }
-        else {
-          $totalCount = $currentTotalCount + $dbTotalCount;
-        }
 
+        $totalCount = $currentTotalCount + $dbTotalCount;
         $isFull = FALSE;
         if ($maxValue &&
-          (($totalCount >= $maxValue) || ($totalCount + $count > $maxValue))
+          (($totalCount > $maxValue) || ($totalCount + $count > $maxValue))
         ) {
           $isFull = TRUE;
           $optionFullIds[$optId] = $optId;
