@@ -302,7 +302,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $duplicateRows = array_keys($params["open_pledges"], $value);
         if (count($duplicateRows) > 1) {
           foreach ($duplicateRows as $key) {
-            $errors["open_pledges[$key]"] = ts('Open Pledge can not be same');
+            $errors["open_pledges[$key]"] = ts('You can not record two payments for the same pledge in a single batch.');
           }
         }
       }
