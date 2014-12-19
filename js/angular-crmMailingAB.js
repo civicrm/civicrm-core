@@ -101,19 +101,26 @@
 
     // @return Promise
     $scope.delete = function () {
-      return crmStatus({start: ts('Deleting...'), success: ts('Deleted')}, abtest.delete());
+      return crmStatus({start: ts('Deleting...'), success: ts('Deleted')}, abtest.delete().then(leave));
     };
 
     // @return Promise
     $scope.submit = function submit() {
-      return crmStatus({start: ts('Saving...'), success: ''}, abtest.save().then(updateUrl))
+      return crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
         .then(function () {
           return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, $q.all([
             crmMailingMgr.submit(abtest.mailings.a),
             crmMailingMgr.submit(abtest.mailings.b)
           ]));
-        });
+        })
+        .then(leave);
     };
+
+    function leave() {
+      console.log('leave from', $location.path(), ' to abtest');
+      $location.path('abtest');
+      $location.replace();
+    }
 
     function updateCriteriaName() {
       var criteria = crmMailingABCriteria.get($scope.abtest.ab.testing_criteria_id)

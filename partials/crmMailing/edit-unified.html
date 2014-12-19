@@ -44,8 +44,8 @@
       <div crm-mailing-block-preview crm-mailing="mailing" on-preview="previewMailing(mailing, preview.mode)" on-send="sendTest(mailing, attachments, preview.recipient)" />
     </div>
 
-    <button ng-click="submit().then(leave)">{{ts('Submit Mailing')}}</button>
+    <button ng-click="submit()">{{ts('Submit Mailing')}}</button>
     <button ng-click="save()">{{ts('Save Draft')}}</button>
-    <button crm-confirm="{title:ts('Delete Draft?'), message:ts('Are you sure you want to delete the draft mailing?')}" on-yes="delete().then(leave)">{{ts('Delete Draft')}}</button>
+    <button crm-confirm="{title:ts('Delete Draft?'), message:ts('Are you sure you want to delete the draft mailing?')}" on-yes="delete()">{{ts('Delete Draft')}}</button>
   </div>
 </form>
