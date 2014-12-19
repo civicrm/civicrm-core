@@ -38,14 +38,16 @@
     $scope.testing_criteria = crmMailingABCriteria.getAll();
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus) {
-    window.ab = abtest;
+  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location) {
     $scope.abtest = abtest;
     var ts = $scope.ts = CRM.ts('CiviMail');
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.partialUrl = partialUrl;
 
+    $scope.isSubmitted = function isSubmitted() {
+      return _.size(abtest.mailings.a.jobs) > 0 || _.size(abtest.mailings.b.jobs) > 0;
+    };
     $scope.sync = function sync() {
       abtest.mailings.a.name = ts('Test A (%1)', {1: abtest.ab.name});
       abtest.mailings.b.name = ts('Test B (%1)', {1: abtest.ab.name});
@@ -77,10 +79,13 @@
       }
       crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings.a, ['name']);
     };
+
+    // @return Promise
     $scope.save = function save() {
       $scope.sync();
-      return crmStatus({start: ts('Saving...'), success: ts('Saved')}, abtest.save());
+      return crmStatus({start: ts('Saving...'), success: ts('Saved')}, abtest.save().then(updateUrl));
     };
+
     // @return Promise
     $scope.previewMailing = function previewMailing(mailingName, mode) {
       return crmMailingPreviewMgr.preview(abtest.mailings[mailingName], mode);
@@ -88,21 +93,44 @@
 
     // @return Promise
     $scope.sendTest = function sendTest(mailingName, recipient) {
-      return crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
+      return crmStatus({start: ts('Saving...'), success: ''}, abtest.save().then(updateUrl))
         .then(function () {
           crmMailingPreviewMgr.sendTest(abtest.mailings[mailingName], recipient);
         });
     };
+
+    // @return Promise
     $scope.delete = function () {
-      throw "Not implemented: EditCtrl.delete"
+      return crmStatus({start: ts('Deleting...'), success: ts('Deleted')}, abtest.delete());
     };
-    $scope.submit = function () {
-      throw "Not implemented: EditCtrl.submit"
+
+    // @return Promise
+    $scope.submit = function submit() {
+      return crmStatus({start: ts('Saving...'), success: ''}, abtest.save().then(updateUrl))
+        .then(function () {
+          return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, $q.all([
+            crmMailingMgr.submit(abtest.mailings.a),
+            crmMailingMgr.submit(abtest.mailings.b)
+          ]));
+        });
     };
 
     function updateCriteriaName() {
       var criteria = crmMailingABCriteria.get($scope.abtest.ab.testing_criteria_id)
       $scope.criteriaName = criteria ? criteria.name : null;
+    }
+
+    // Transition URL "/abtest/new" => "/abtest/123"
+    function updateUrl() {
+      var parts = $location.path().split('/'); // e.g. "/abtest/new" or "/abtest/123/wizard"
+      if (parts[2] != $scope.abtest.ab.id) {
+        parts[2] = $scope.abtest.ab.id;
+        $location.path(parts.join('/'));
+        $location.replace();
+        // FIXME: Angular unnecessarily refreshes UI
+        // WARNING: Changing the URL triggers a full reload. Any pending AJAX operations
+        // could be inconsistently applied. Run updateUrl() after other changes complete.
+      }
     }
 
     // initialize
