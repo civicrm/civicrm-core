@@ -110,8 +110,7 @@
             return crmMailingMgr.submit($scope.mailing);
           })
           .then(function () {
-            updateUrl();
-            return $scope.mailing;
+            leave('scheduled');
           })
         ;
       return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, promise);
@@ -126,10 +125,7 @@
             // pre-condition: the mailing exists *before* saving attachments to it
             return $scope.attachments.save();
           })
-          .then(function () {
-            updateUrl();
-            return $scope.mailing;
-          })
+          .then(updateUrl)
       );
     };
 
@@ -137,14 +133,33 @@
     $scope.delete = function cancel() {
       return crmStatus({start: ts('Deleting...'), success: ts('Deleted')},
         crmMailingMgr.delete($scope.mailing)
+          .then(function () {
+            leave('unscheduled')
+          })
       );
     };
 
-    $scope.leave = function leave() {
-      window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
-        reset: 1,
-        scheduled: 'false'
-      });
+    // @param string listingScreen 'archive', 'scheduled', 'unscheduled'
+    function leave(listingScreen) {
+      switch (listingScreen) {
+        case 'archive':
+          window.location = CRM.url('civicrm/mailing/browse/archived', {
+            reset: 1
+          });
+          break;
+        case 'scheduled':
+          window.location = CRM.url('civicrm/mailing/browse/scheduled', {
+            reset: 1,
+            scheduled: 'true'
+          });
+          break;
+        case 'unscheduled':
+        default:
+          window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
+            reset: 1,
+            scheduled: 'false'
+          });
+      }
     };
 
     // Transition URL "/mailing/new" => "/mailing/123"
