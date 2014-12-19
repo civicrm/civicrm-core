@@ -77,6 +77,10 @@
     $scope.partialUrl = partialUrl;
     var ts = $scope.ts = CRM.ts('CiviMail');
 
+    $scope.isSubmitted = function isSubmitted() {
+      return _.size($scope.mailing.jobs) > 0;
+    };
+
     // @return Promise
     $scope.previewMailing = function previewMailing(mailing, mode) {
       return crmMailingPreviewMgr.preview(mailing, mode);
@@ -87,7 +91,8 @@
       var savePromise = crmMailingMgr.save(mailing)
         .then(function () {
           return attachments.save();
-        });
+        })
+        .then(updateUrl);
       return crmStatus({start: ts('Saving...'), success: ''}, savePromise)
         .then(function () {
           crmMailingPreviewMgr.sendTest(mailing, recipient);
@@ -97,13 +102,17 @@
     // @return Promise
     $scope.submit = function submit() {
       var promise = crmMailingMgr.save($scope.mailing)
-        .then(function () {
-          // pre-condition: the mailing exists *before* saving attachments to it
-          return $scope.attachments.save();
-        })
-        .then(function () {
-          return crmMailingMgr.submit($scope.mailing);
-        });
+          .then(function () {
+            // pre-condition: the mailing exists *before* saving attachments to it
+            return $scope.attachments.save();
+          })
+          .then(function () {
+            return crmMailingMgr.submit($scope.mailing);
+          })
+          .then(function () {
+            leave('scheduled');
+          })
+        ;
       return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, promise);
     };
 
@@ -116,6 +125,7 @@
             // pre-condition: the mailing exists *before* saving attachments to it
             return $scope.attachments.save();
           })
+          .then(updateUrl)
       );
     };
 
@@ -123,26 +133,47 @@
     $scope.delete = function cancel() {
       return crmStatus({start: ts('Deleting...'), success: ts('Deleted')},
         crmMailingMgr.delete($scope.mailing)
+          .then(function () {
+            leave('unscheduled')
+          })
       );
     };
 
-    $scope.leave = function leave() {
-      window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
-        reset: 1,
-        scheduled: 'false'
-      });
+    // @param string listingScreen 'archive', 'scheduled', 'unscheduled'
+    function leave(listingScreen) {
+      switch (listingScreen) {
+        case 'archive':
+          window.location = CRM.url('civicrm/mailing/browse/archived', {
+            reset: 1
+          });
+          break;
+        case 'scheduled':
+          window.location = CRM.url('civicrm/mailing/browse/scheduled', {
+            reset: 1,
+            scheduled: 'true'
+          });
+          break;
+        case 'unscheduled':
+        default:
+          window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
+            reset: 1,
+            scheduled: 'false'
+          });
+      }
     };
 
-    // Transition URL "/mailing/new" => "/mailing/123" as soon as ID is known
-    $scope.$watch('mailing.id', function (newValue, oldValue) {
-      if (newValue && newValue != oldValue) {
-        var parts = $location.path().split('/'); // e.g. "/mailing/new" or "/mailing/123/wizard"
-        parts[2] = newValue;
+    // Transition URL "/mailing/new" => "/mailing/123"
+    function updateUrl() {
+      var parts = $location.path().split('/'); // e.g. "/mailing/new" or "/mailing/123/wizard"
+      if (parts[2] != $scope.mailing.id) {
+        parts[2] = $scope.mailing.id;
         $location.path(parts.join('/'));
         $location.replace();
         // FIXME: Angular unnecessarily refreshes UI
+        // WARNING: Changing the URL triggers a full reload. Any pending AJAX operations
+        // could be inconsistently applied. Run updateUrl() after other changes complete.
       }
-    });
+    }
   });
 
   // Controller for the edit-recipients fields (
@@ -254,7 +285,7 @@
   //   - "subject"
   //   - "body_html"
   //   - "body_text"
-  angular.module('crmMailing').controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope, crmMailingMgr) {
+  angular.module('crmMailing').controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope) {
     $scope.ts = CRM.ts('CiviMail');
   });
 
@@ -291,7 +322,7 @@
   });
 
   // Controller for the in-place msg-template management
-  angular.module('crmMailing').controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService, $parse) {
+  angular.module('crmMailing').controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService) {
     var ts = $scope.ts = CRM.ts('CiviMail');
     $scope.crmMsgTemplates = crmMsgTemplates;
 
