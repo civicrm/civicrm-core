@@ -70,6 +70,9 @@
         else {
           return crmApi('MailingAB', 'get', {id: crmMailingAB.id})
             .then(function (abResult) {
+              if (abResult.count != 1) {
+                throw "Failed to load AB Test";
+              }
               crmMailingAB.ab = abResult.values[abResult.id];
               return crmMailingAB._loadMailings();
             });
@@ -89,6 +92,18 @@
           .then(function () {
             return crmMailingAB;
           });
+      },
+      // @param mailing Object (per APIv3)
+      // @return Promise
+      'delete': function () {
+        if (this.id) {
+          return crmApi('MailingAB', 'delete', {id: this.id});
+        }
+        else {
+          var d = $q.defer();
+          d.resolve();
+          return d.promise;
+        }
       },
       // Load mailings A, B, and C (if available)
       // @return Promise CrmMailingAB

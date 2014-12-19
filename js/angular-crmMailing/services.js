@@ -29,7 +29,7 @@
     var emailRegex = /^"(.*)" \<([^@\>]*@[^@\>]*)\>$/;
     var addrs = _.map(CRM.crmMailing.fromAddress, function (addr) {
       var match = emailRegex.exec(addr.label);
-      return _.extend({}, addr, {
+      return angular.extend({}, addr, {
         email: match ? match[2] : '(INVALID)',
         author: match ? match[1] : '(INVALID)'
       });
@@ -74,7 +74,7 @@
 
   angular.module('crmMailing').factory('crmMsgTemplates', function ($q, crmApi) {
     var tpls = _.map(CRM.crmMailing.mesTemplate, function (tpl) {
-      return _.extend({}, tpl, {
+      return angular.extend({}, tpl, {
         //id: tpl parseInt(tpl.id)
       });
     });
@@ -135,8 +135,24 @@
       },
       // @return Promise Mailing (per APIv3)
       get: function get(id) {
-        return crmApi('Mailing', 'getsingle', {id: id}).then(function (mailing) {
-          return crmApi('MailingGroup', 'get', {mailing_id: id}).then(function (groupResult) {
+        var crmMailingMgr = this;
+        var mailing;
+        return crmApi('Mailing', 'getsingle', {id: id})
+          .then(function (getResult) {
+            mailing = getResult;
+            return $q.all([
+              crmMailingMgr._loadGroups(mailing),
+              crmMailingMgr._loadJobs(mailing)
+            ]);
+          })
+          .then(function () {
+            return mailing;
+          });
+      },
+      // Call MailingGroup.get and merge results into "mailing"
+      _loadGroups: function (mailing) {
+        return crmApi('MailingGroup', 'get', {mailing_id: mailing.id})
+          .then(function (groupResult) {
             mailing.groups = {include: [], exclude: []};
             mailing.mailings = {include: [], exclude: []};
             _.each(groupResult.values, function (mailingGroup) {
@@ -144,13 +160,20 @@
               var entityId = parseInt(mailingGroup.entity_id);
               mailing[bucket][mailingGroup.group_type].push(entityId);
             });
-            return mailing;
           });
-        });
+      },
+      // Call MailingJob.get and merge results into "mailing"
+      _loadJobs: function (mailing) {
+        return crmApi('MailingJob', 'get', {mailing_id: mailing.id, is_test: 0})
+          .then(function (jobResult) {
+            mailing.jobs = mailing.jobs || {};
+            angular.extend(mailing.jobs, jobResult.values);
+          });
       },
       // @return Object Mailing (per APIv3)
       create: function create() {
         return {
+          jobs: {}, // {jobId: JobRecord}
           name: "revert this", // fixme
           campaign_id: null,
           from_name: crmFromAddresses.getDefault().author,
@@ -234,7 +257,7 @@
       // @param mailing Object (per APIv3)
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
-        var params = _.extend({}, mailing, {
+        var params = angular.extend({}, mailing, {
           options: {force_rollback: 1},
           'api.Mailing.preview': {
             id: '$value.id'
@@ -252,7 +275,7 @@
       previewRecipients: function previewRecipients(mailing, previewLimit) {
         // To get list of recipients, we tentatively save the mailing and
         // get the resulting recipients -- then rollback any changes.
-        var params = _.extend({}, mailing, {
+        var params = angular.extend({}, mailing, {
           options: {force_rollback: 1},
           'api.mailing_job.create': 1, // note: exact match to API default
           'api.MailingRecipients.get': {
@@ -272,7 +295,7 @@
       // @param mailing Object (per APIv3)
       // @return Promise
       save: function (mailing) {
-        var params = _.extend({}, mailing, {
+        var params = angular.extend({}, mailing, {
           'api.mailing_job.create': 0 // note: exact match to API default
         });
 
@@ -281,12 +304,14 @@
         // is therefore not allowed. Remove this after fixing Mailing.create's contract.
         delete params.scheduled_date;
 
+        delete params.jobs;
+
         return crmApi('Mailing', 'create', params).then(function (result) {
           if (result.id && !mailing.id) {
             mailing.id = result.id;
           }  // no rollback, so update mailing.id
           // Perhaps we should reload mailing based on result?
-          return result.values[result.id];
+          return mailing;
         });
       },
 
@@ -294,15 +319,20 @@
       // @param mailing Object (per APIv3)
       // @return Promise
       submit: function (mailing) {
+        var crmMailingMgr = this;
         var params = {
           id: mailing.id,
           approval_date: createNow(),
           scheduled_date: mailing.scheduled_date ? mailing.scheduled_date : createNow()
         };
-        return crmApi('Mailing', 'submit', params).then(function (result) {
-          _.extend(mailing, result.values[result.id]); // Perhaps we should reload mailing based on result?
-          return mailing;
-        });
+        return crmApi('Mailing', 'submit', params)
+          .then(function (result) {
+            angular.extend(mailing, result.values[result.id]); // Perhaps we should reload mailing based on result?
+            return crmMailingMgr._loadJobs(mailing);
+          })
+          .then(function () {
+            return mailing;
+          });
       },
 
       // Immediately send a test message
@@ -310,7 +340,7 @@
       // @param to Object with either key "email" (string) or "gid" (int)
       // @return Promise for a list of delivery reports
       sendTest: function (mailing, recipient) {
-        var params = _.extend({}, mailing, {
+        var params = angular.extend({}, mailing, {
           // options:  {force_rollback: 1}, // Test mailings include tracking features, so the mailing must be persistent
           'api.Mailing.send_test': {
             mailing_id: '$value.id',
@@ -323,6 +353,8 @@
         // as an *intent* to schedule and creates tertiary records. Saving a draft with a scheduled_date
         // is therefore not allowed. Remove this after fixing Mailing.create's contract.
         delete params.scheduled_date;
+
+        delete params.jobs;
 
         return crmApi('Mailing', 'create', params).then(function (result) {
           if (result.id && !mailing.id) {
