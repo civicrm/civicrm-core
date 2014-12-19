@@ -270,7 +270,7 @@
   //   - "subject"
   //   - "body_html"
   //   - "body_text"
-  angular.module('crmMailing').controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope, crmMailingMgr) {
+  angular.module('crmMailing').controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope) {
     $scope.ts = CRM.ts('CiviMail');
   });
 
@@ -307,7 +307,7 @@
   });
 
   // Controller for the in-place msg-template management
-  angular.module('crmMailing').controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService, $parse) {
+  angular.module('crmMailing').controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService) {
     var ts = $scope.ts = CRM.ts('CiviMail');
     $scope.crmMsgTemplates = crmMsgTemplates;
 
