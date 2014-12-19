@@ -198,7 +198,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     $contactReturnProperties = array();
     $config = CRM_Core_Config::singleton();
-    
+
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
       $this->addEntityRef("primary_contact_id[{$rowNumber}]", '', array('create' => TRUE, 'placeholder' => ts('- select -')));
 
@@ -223,12 +223,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $pledgeIDs = CRM_Pledge_BAO_Pledge::getContactPledges($dataValues['values']['primary_contact_id'][$rowNumber]);
             foreach ($pledgeIDs as $pledgeID) {
               $pledgePayment = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);
-              $options += array($pledgeID => CRM_Utils_Date::customFormat($pledgePayment['schedule_date'], '%d/%m/%Y') . ' - ' . $pledgePayment['amount'] . ' ' . $pledgePayment['currency']);
+              $options += array($pledgeID => CRM_Utils_Date::customFormat($pledgePayment['schedule_date'], '%m/%d/%Y') . ', ' . $pledgePayment['amount'] . ' ' . $pledgePayment['currency']);
             }
           }
         }
-        
-        $this->add('select', "open_pledges[$rowNumber]", ts('Open Pledges (Due Date - Amount)'), $options);
+
+        $this->add('select', "open_pledges[$rowNumber]", '', $options);
      }
 
       foreach ($this->_fields as $name => $field) {
@@ -272,6 +272,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   static function formRule($params, $files, $self) {
     $errors = array();
+    $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
 
     if (!empty($params['_qf_Entry_upload_force'])) {
       return TRUE;
@@ -290,13 +291,22 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       }
 
       //membership type is required for membership batch entry
-      if ( $self->_batchInfo['type_id'] == 2 ) {
+      if ($self->_batchInfo['type_id'] == $batchTypes['Membership']) {
         if (empty($value['membership_type'][1])) {
           $errors["field[$key][membership_type]"] = ts('Membership type is a required field.');
         }
       }
     }
-
+    if ($self->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
+      foreach (array_unique($params["open_pledges"]) as $value) {
+        $duplicateRows = array_keys($params["open_pledges"], $value);
+        if (count($duplicateRows) > 1) {
+          foreach ($duplicateRows as $key) {
+            $errors["open_pledges[$key]"] = ts('Open Pledge can not be same');
+          }
+        }
+      }
+    }
     if ($batchTotal != $self->_batchInfo['total']) {
       $self->assign('batchAmountMismatch', TRUE);
       $errors['_qf_defaults'] = ts('Total for amounts entered below does not match the expected batch total.');
@@ -500,34 +510,37 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
         }
         $value['line_item'] = $lineItem;
-
         //finally call contribution create for all the magic
         $contribution = CRM_Contribute_BAO_Contribution::create($value, CRM_Core_DAO::$_nullArray);
-        $pledgeId = $params['open_pledges'][$key];
         $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
-        if ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment'] && is_numeric($pledgeId)) {
+        if ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
           $adjustTotalAmount = FALSE;
-          if ($params['option_type'][$key] == 2) {
-            $adjustTotalAmount=TRUE;
-          }
-          $pledgeId = $params['open_pledges'][$key];
-          $result = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
-          $pledgePaymentId = 0;
-          foreach ($result as $key => $value ) {
-            if ($value['status'] != 'Completed') {
-              $pledgePaymentId = $value['id'];
-              break;
+          if (isset($params['option_type'][$key])) {
+            if ($params['option_type'][$key] == 2) {
+              $adjustTotalAmount = TRUE;
             }
           }
-          CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $pledgePaymentId, 'contribution_id', $contribution->id);
-          CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId,
-            array($pledgePaymentId),
-            $contribution->contribution_status_id,
-            NULL,
-            $contribution->total_amount,
-            $adjustTotalAmount
-          );
+          $pledgeId = $params['open_pledges'][$key];
+          if (is_numeric($pledgeId)) {
+            $result = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
+            $pledgePaymentId = 0;
+            foreach ($result as $key => $values ) {
+              if ($values['status'] != 'Completed') {
+                $pledgePaymentId = $values['id'];
+                break;
+              }
+            }
+            CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $pledgePaymentId, 'contribution_id', $contribution->id);
+            CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId,
+              array($pledgePaymentId),
+              $contribution->contribution_status_id,
+              NULL,
+              $contribution->total_amount,
+              $adjustTotalAmount
+            );
+          }
         }
+
         //process premiums
         if (!empty($value['product_name'])) {
           if ($value['product_name'][0] > 0) {
@@ -551,11 +564,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // end of premium
 
         //send receipt mail.
-        if ( $contribution->id && !empty($value['send_receipt'])) {
+        if ($contribution->id && !empty($value['send_receipt'])) {
             // add the domain email id
             $domainEmail = CRM_Core_BAO_Domain::getNameAndEmail();
             $domainEmail = "$domainEmail[0] <$domainEmail[1]>";
-
             $value['from_email_address'] = $domainEmail;
             $value['contribution_id'] = $contribution->id;
             CRM_Contribute_Form_AdditionalInfo::emailReceipt( $this, $value );
@@ -782,7 +794,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
             $premiumParams = array(
               'product_id' => $value['product_name'][0],
-              'contribution_id' => $value['contribution_id'],
+              'contribution_id' => CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $membership->id, 'contribution_id', 'membership_id'),
               'product_option' => $value['product_option'],
               'quantity' => 1,
             );
@@ -800,6 +812,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
             $value['from_email_address'] = $domainEmail;
             $value['membership_id']      = $membership->id;
+            $value['contribution_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $membership->id, 'contribution_id', 'membership_id');
             CRM_Member_Form_Membership::emailReceipt( $this, $value, $membership );
         }
       }
