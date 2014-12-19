@@ -1,4 +1,7 @@
-<div ng-controller="PreviewMailingCtrl" class="crmMailing-preview">
+<!--
+Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
+-->
+<div class="crmMailing-preview">
   <!-- Note:
   In Firefox (at least), clicking the preview buttons causes the browser to display validation warnings
   for unrelated fields *and* display preview. To avoid this weird UX, we disable preview buttons when the form is incomplete/invalid.
@@ -8,14 +11,14 @@
       <em>({{ts('No content to preview')}})</em>
     </div>
     <div ng-hide="!mailing.body_html">
-      <button ng-disabled="crmMailing.$invalid" ng-click="previewHtml()">{{ts('Preview as HTML')}}</button>
+      <button ng-disabled="crmMailing.$invalid" ng-click="doPreview('html')">{{ts('Preview as HTML')}}</button>
     </div>
     <div ng-hide="!mailing.body_text">
-      <button ng-disabled="crmMailing.$invalid" ng-click="previewText()">{{ts('Preview as Plain Text')}}</button>
+      <button ng-disabled="crmMailing.$invalid" ng-click="doPreview('text')">{{ts('Preview as Plain Text')}}</button>
     </div>
     <!--
     <div ng-hide="!mailing.body_html && !mailing.body_text">
-      <button ng-disabled="crmMailing.$invalid" ng-click="previewFull()">{{ts('Preview')}}</button>
+      <button ng-disabled="crmMailing.$invalid" ng-click="doPreview('full')">{{ts('Preview')}}</button>
     </div>
     -->
   </div>
@@ -32,7 +35,7 @@
         placeholder="example@example.org"
         />
     </div>
-    <button ng-disabled="crmMailing.$invalid || !testContact.email" ng-click="sendTestToContact()">{{ts('Send test')}}</button>
+    <button ng-disabled="crmMailing.$invalid || !testContact.email" ng-click="doSend({email: testContact.email})">{{ts('Send test')}}</button>
   </div>
   <div class="preview-group" ng-form>
     <div>
@@ -49,7 +52,7 @@
         <option value=""></option>
       </select>
     </div>
-    <button ng-disabled="crmMailing.$invalid || !testGroup.gid" ng-click="sendTestToGroup()">{{ts('Send test')}}</button>
+    <button ng-disabled="crmMailing.$invalid || !testGroup.gid" ng-click="doSend({gid: testGroup.gid})">{{ts('Send test')}}</button>
   </div>
   <div class="clear"></div>
 </div>

@@ -38,10 +38,10 @@
     $scope.testing_criteria = crmMailingABCriteria.getAll();
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr) {
+  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus) {
     window.ab = abtest;
     $scope.abtest = abtest;
-    $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts('CiviMail');
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.partialUrl = partialUrl;
@@ -79,7 +79,19 @@
     };
     $scope.save = function save() {
       $scope.sync();
-      return abtest.save();
+      return crmStatus({start: ts('Saving...'), success: ts('Saved')}, abtest.save());
+    };
+    // @return Promise
+    $scope.previewMailing = function previewMailing(mailingName, mode) {
+      return crmMailingPreviewMgr.preview(abtest.mailings[mailingName], mode);
+    };
+
+    // @return Promise
+    $scope.sendTest = function sendTest(mailingName, recipient) {
+      return crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
+        .then(function () {
+          crmMailingPreviewMgr.sendTest(abtest.mailings[mailingName], recipient);
+        });
     };
     $scope.delete = function () {
       throw "Not implemented: EditCtrl.delete"
