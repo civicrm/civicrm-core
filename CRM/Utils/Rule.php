@@ -153,6 +153,10 @@ class CRM_Utils_Rule {
    * @return bool
    */
   static function url($url) {
+    if (preg_match('/^\//', $url)) {
+      // allow relative URL's (CRM-15598)
+      $url = 'http://' . $_SERVER['HTTP_HOST'] . $url;
+    }
     return (bool) filter_var($url, FILTER_VALIDATE_URL);
   }
 
