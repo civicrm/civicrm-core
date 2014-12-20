@@ -33,9 +33,11 @@
     }
   ]);
 
-  angular.module('crmMailingAB').controller('CrmMailingABListCtrl', function ($scope, mailingABList, crmMailingABCriteria) {
+  angular.module('crmMailingAB').controller('CrmMailingABListCtrl', function ($scope, mailingABList, crmMailingABCriteria, crmMailingABStatus) {
+    var ts = $scope.ts = CRM.ts('CiviMail');
     $scope.mailingABList = mailingABList.values;
-    $scope.testing_criteria = crmMailingABCriteria.getAll();
+    $scope.crmMailingABCriteria = crmMailingABCriteria;
+    $scope.crmMailingABStatus = crmMailingABStatus;
   });
 
   angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location) {
