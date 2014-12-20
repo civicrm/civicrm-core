@@ -38,7 +38,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   protected $_params;
   protected $_apiversion = 3;
   protected $_entity = 'MailingAB';
-
+  protected $_groupID;
 
   /**
    * @return array
@@ -119,6 +119,9 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   }
 
   /**
+   * Create a test and ensure that all three mailings (A/B/C) wind up with the correct
+   * number of recipients.
+   *
    * @param $totalGroupContacts
    * @param $groupPct
    * @param $expectedCountA
@@ -126,7 +129,9 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
    * @param $expectedCountC
    * @dataProvider groupPctProvider
    */
-  public function testMailingABRecipientsUpdate($totalGroupContacts, $groupPct, $expectedCountA, $expectedCountB, $expectedCountC) {
+  public function testDistribution($totalGroupContacts, $groupPct, $expectedCountA, $expectedCountB, $expectedCountC) {
+    $this->createLoggedInUser();
+
     $result = $this->groupContactCreate($this->_groupID, $totalGroupContacts);
     $this->assertEquals($totalGroupContacts, $result['added'], "in line " . __LINE__);
 
@@ -134,18 +139,63 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     $params['group_percentage'] = $groupPct;
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
-    $params = array('id' => $result['id'], 'groups' => array('include' => array($this->_groupID)));
-    $this->callAPISuccess('MailingAB', 'recipients_update', $params);
+    $this->callAPISuccess('Mailing', 'create', array(
+      'id' => $this->_mailingID_A,
+      'groups' => array('include' => array($this->_groupID)),
+    ));
+    $this->assertJobCounts(0, 0, 0);
 
-    //check total number of A/B mail recipients is what selected percentage of Mail C
+    $this->callAPISuccess('MailingAB', 'submit', array(
+      'id' => $result['id'],
+      'status' => 'Testing',
+      'scheduled_date' => date('YmdHis'),
+      'approval_date' => date('YmdHis'),
+    ));
+    $this->assertRecipientCounts($expectedCountA, $expectedCountB, $expectedCountC);
+    $this->assertJobCounts(1, 1, 0);
+
+    $this->callAPISuccess('MailingAB', 'submit', array(
+      'id' => $result['id'],
+      'status' => 'Final',
+      'scheduled_date' => date('YmdHis'),
+      'approval_date' => date('YmdHis'),
+    ));
+    $this->assertRecipientCounts($expectedCountA, $expectedCountB, $expectedCountC);
+    $this->assertJobCounts(1, 1, 1);
+  }
+
+  /**
+   * @param $expectedCountA
+   * @param $expectedCountB
+   * @param $expectedCountC
+   */
+  protected function assertRecipientCounts($expectedCountA, $expectedCountB, $expectedCountC) {
     $countA = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' => $this->_mailingID_A));
-    $this->assertEquals($expectedCountA, $countA, "check mailing recipients A in line " . __LINE__);
-
     $countB = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' => $this->_mailingID_B));
-    $this->assertEquals($expectedCountB, $countB, "check mailing recipients B in line " . __LINE__);
-
     $countC = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' => $this->_mailingID_C));
+    $this->assertEquals($expectedCountA, $countA, "check mailing recipients A in line " . __LINE__);
+    $this->assertEquals($expectedCountB, $countB, "check mailing recipients B in line " . __LINE__);
     $this->assertEquals($expectedCountC, $countC, "check mailing recipients C in line " . __LINE__);
   }
 
+  protected function assertJobCounts($expectedA, $expectedB, $expectedC) {
+    $this->assertDBQuery($expectedA, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
+        1 => array(
+          $this->_mailingID_A,
+          'Integer'
+        )
+      ));
+    $this->assertDBQuery($expectedB, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
+        1 => array(
+          $this->_mailingID_B,
+          'Integer'
+        )
+      ));
+    $this->assertDBQuery($expectedC, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
+        1 => array(
+          $this->_mailingID_C,
+          'Integer'
+        )
+      ));
+  }
 }
