@@ -117,7 +117,6 @@
     };
 
     function leave() {
-      console.log('leave from', $location.path(), ' to abtest');
       $location.path('abtest');
       $location.replace();
     }
