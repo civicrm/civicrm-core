@@ -325,13 +325,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $logging = FALSE;
 
   /**
-   * Whether CiviCRM should check for newer versions
-   *
-   * @var boolean
-   */
-  public $versionCheck = TRUE;
-
-  /**
    * Whether public pages should display "empowered by CiviCRM"
    *
    * @var boolean
