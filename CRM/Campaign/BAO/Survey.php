@@ -53,11 +53,10 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   /**
    * The action links that we need to display for the browse screen
    *
-   * @param $params
+   * @param array $params
    * @param $defaults
    *
-   * @return \CRM_Campaign_DAO_Survey|null
-   * @internal param array $
+   * @return CRM_Campaign_DAO_Survey|null
    */
   static function retrieve(&$params, &$defaults) {
     $dao = new CRM_Campaign_DAO_Survey();
@@ -72,15 +71,15 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   }
 
   /**
-   * takes an associative array and creates a Survey object
+   * Takes an associative array and creates a Survey object
    *
    * the function extract all the params it needs to initialize the create a
    * survey object.
    *
    *
-   * @param $params
+   * @param array $params
    *
-   * @return object CRM_Survey_DAO_Survey object
+   * @return CRM_Survey_DAO_Survey object
    * @access public
    * @static
    */
@@ -118,12 +117,11 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   }
 
   /**
-   * Function to retrieve surveys for dashboard.
+   * Retrieve surveys for dashboard.
    *
    * @static
    */
-  static function getSurveySummary($params = array(
-    ), $onlyCount = FALSE) {
+  static function getSurveySummary($params = array(), $onlyCount = FALSE) {
     //build the limit and order clause.
     $limitClause = $orderByClause = $lookupTableJoins = NULL;
     if (!$onlyCount) {
@@ -244,7 +242,7 @@ SELECT  survey.id                         as id,
   }
 
   /**
-   * Function to get Surveys
+   * Get Surveys
    *
    * @param boolean $onlyActive  retrieve only active surveys.
    * @param boolean $onlyDefault retrieve only default survey.
@@ -301,7 +299,7 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Function to get Surveys activity types
+   * Get Surveys activity types
    *
    *
    * @static
@@ -336,15 +334,14 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Function to get Surveys custom groups
+   * Get Surveys custom groups
    *
    * @param $surveyTypes array an array of survey type id.
    *
    * @return array
    * @static
    */
-  static function getSurveyCustomGroups($surveyTypes = array(
-    )) {
+  static function getSurveyCustomGroups($surveyTypes = array()) {
     $customGroups = array();
     if (!is_array($surveyTypes)) {
       $surveyTypes = array($surveyTypes);
@@ -377,7 +374,7 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -390,7 +387,7 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Function to delete the survey
+   * Delete the survey
    *
    * @param int $id survey id
    *
@@ -415,14 +412,13 @@ SELECT  survey.id    as id,
   /**
    * This function retrieve contact information.
    *
-   * @param $voterIds
+   * @param array $voterIds
    * @param array $returnProperties an array of return elements.
    *
-   * @internal param array $voter an array of contact Ids.
-   * @return array $voterDetails array of contact info.@static
+   * @return array $voterDetails array of contact info.
+   * @static
    */
-  static function voterDetails($voterIds, $returnProperties = array(
-    )) {
+  static function voterDetails($voterIds, $returnProperties = array()) {
     $voterDetails = array();
     if (!is_array($voterIds) || empty($voterIds)) {
       return $voterDetails;
@@ -509,7 +505,7 @@ Group By  contact.id";
    * @param int $surveyId survey id.
    * @param array $voterIds voterIds.
    *
-   * @param null $interviewerId
+   * @param int $interviewerId
    * @param array $statusIds
    *
    * @return array $activityDetails array of survey activity.@static
@@ -569,7 +565,7 @@ INNER JOIN  civicrm_activity_contact activityAssignment
    *
    * @param int $surveyId survey id.
    *
-   * @param null $interviewerId
+   * @param int $interviewerId
    * @param null $statusIds
    * @param null $voterIds
    * @param bool $onlyCount
@@ -725,8 +721,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * This function is to check survey activity.
    *
    * @param int $activityId activity id.
-   * @internal param int $activityTypeId activity type id.
-   * @return boolean $isSurveyActivity true/false boolean.
+   * @return boolean $isSurveyActivity true/false
    * @static
    */
   static function isSurveyActivity($activityId) {
@@ -773,7 +768,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   /**
    * This function return all voter links with respecting permissions
    *
-   * @param $surveyId
+   * @param int $surveyId
    * @param bool $enclosedInUL
    * @param string $extraULName
    * @return array|string $url array of permissioned links@static
@@ -859,7 +854,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * Function to retrieve survey associated profile id.
+   * Retrieve survey associated profile id.
    *
    */
   public static function getSurveyProfileId($surveyId) {
@@ -890,7 +885,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * @param $surveyId
+   * @param int $surveyId
    *
    * @return mixed
    */
@@ -906,7 +901,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * Function to decides the contact type for given survey.
+   * Decides the contact type for given survey.
    *
    */
   public static function getSurveyContactType($surveyId) {
@@ -925,7 +920,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * Function to get survey supportable profile types
+   * Get survey supportable profile types
    *
    */
   public static function surveyProfileTypes() {
@@ -1052,7 +1047,7 @@ INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
   /**
    * Check and update the survey respondents.
    *
-   * @param $params
+   * @param array $params
    *
    * @return array success message
    */

@@ -197,7 +197,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
   /**
    * @param bool $discount
    * @param bool $priceSet
-   * @param $processorId
+   * @param int $processorId
    */
   function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorId) {
     // Go to Fees tab
@@ -230,8 +230,8 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
   }
 
   /**
-   * @param $ContactName
-   * @param $relatedName
+   * @param string $ContactName
+   * @param string $relatedName
    * @param $relType
    */
   function _testAddRelationship($ContactName, $relatedName, $relType) {

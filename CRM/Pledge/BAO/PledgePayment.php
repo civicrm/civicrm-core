@@ -35,14 +35,14 @@
 class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * Function to get pledge payment details
+   * Get pledge payment details
    *
    * @param int $pledgeId pledge id
    *
@@ -93,7 +93,7 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return pledge
    */
@@ -208,7 +208,7 @@ WHERE     pledge_id = %1
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Pledge_BAO_PledgePayment object
+   * @return CRM_Pledge_BAO_PledgePayment object
    * @access public
    * @static
    */
@@ -225,11 +225,9 @@ WHERE     pledge_id = %1
   /**
    * Delete pledge payment
    *
-   * @param $id
+   * @param int $id
    *
-   * @internal param array $params associate array of field
-   *
-   * @return pledge payment id
+   * @return int pledge payment id
    * @static
    */
   static function del($id) {
@@ -252,7 +250,7 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Function to delete all pledge payments
+   * Delete all pledge payments
    *
    * @param int $id pledge id
    *
@@ -325,17 +323,16 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * update Pledge Payment Status
+   * Update Pledge Payment Status
    *
    * @param int $pledgeID , id of pledge
    * @param array $paymentIDs , ids of pledge payment(s) to update
    * @param int $paymentStatusID , payment status to set
-   * @param null $pledgeStatusID
+   * @param int $pledgeStatusID pledge status to change (if needed)
    * @param float|int $actualAmount , actual amount being paid
    * @param bool $adjustTotalAmount , is amount being paid different from scheduled amount?
    * @param bool $isScriptUpdate , is function being called from bin script?
    *
-   * @internal param int $pledgeStatus , pledge status to change (if needed)
    * @return int $newStatus, updated status id (or 0)
    */
   static function updatePledgePaymentStatus(
@@ -611,7 +608,7 @@ WHERE  civicrm_pledge.id = %2
   }
 
   /**
-   * Function to update pledge payment table
+   * Update pledge payment table
    *
    * @param int $pledgeId pledge id
    * @param int $paymentStatusId payment status id to set
@@ -657,7 +654,7 @@ WHERE  civicrm_pledge_payment.pledge_id = %1
   }
 
   /**
-   * Function to update pledge payment table when reminder is sent
+   * Update pledge payment table when reminder is sent
    *
    * @param int $paymentId payment id
    *
@@ -674,7 +671,7 @@ WHERE  civicrm_pledge_payment.id = {$paymentId}
   }
 
   /**
-   * Function to get oldest pending or in progress pledge payments
+   * Get oldest pending or in progress pledge payments
    *
    * @param int $pledgeID pledge id
    *
@@ -694,7 +691,7 @@ WHERE  civicrm_pledge_payment.id = {$paymentId}
     $statusClause = " IN (" . implode(',', $status) . ")";
 
     $query = "
-SELECT civicrm_pledge_payment.id id, civicrm_pledge_payment.scheduled_amount amount, civicrm_pledge_payment.currency
+SELECT civicrm_pledge_payment.id id, civicrm_pledge_payment.scheduled_amount amount, civicrm_pledge_payment.currency, civicrm_pledge_payment.scheduled_date,civicrm_pledge.financial_type_id
 FROM civicrm_pledge, civicrm_pledge_payment
 WHERE civicrm_pledge.id = civicrm_pledge_payment.pledge_id
   AND civicrm_pledge_payment.status_id {$statusClause}
@@ -713,6 +710,8 @@ LIMIT 0, %2
         'id' => $payment->id,
         'amount' => $payment->amount,
         'currency' => $payment->currency,
+        'schedule_date' => $payment->scheduled_date,
+        'financial_type_id' => $payment->financial_type_id,
         'count' => $count,
       );
       $count++;
@@ -721,12 +720,12 @@ LIMIT 0, %2
   }
 
   /**
-   * @param $pledgeID
+   * @param int $pledgeID
    * @param $actualAmount
    * @param $pledgeScheduledAmount
-   * @param null $paymentContributionId
-   * @param null $pPaymentId
-   * @param null $paymentStatusID
+   * @param int $paymentContributionId
+   * @param int $pPaymentId
+   * @param int $paymentStatusID
    */
   static function adjustPledgePayment($pledgeID, $actualAmount, $pledgeScheduledAmount, $paymentContributionId = NULL, $pPaymentId = NULL, $paymentStatusID = NULL) {
     $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');

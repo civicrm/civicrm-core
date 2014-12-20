@@ -42,7 +42,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   CONST MAX_CONTACTS_TO_PROCESS = 1000;
 
   /**
-   *(Dear God Why) Keep a global count of mails processed within the current
+   * (Dear God Why) Keep a global count of mails processed within the current
    * request.
    *
    * @static
@@ -51,14 +51,14 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   static $mailsProcessed = 0;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return CRM_Mailing_BAO_MailingJob
    */
@@ -77,7 +77,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   /**
    * Initiate all pending/ready jobs
    *
-   * @param null $testParams
+   * @param array $testParams
    * @param null $mode
    *
    * @return void
@@ -430,7 +430,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
-   * @param null $testParams
+   * @param array $testParams
    */
   public function queue($testParams = NULL) {
     $mailing = new CRM_Mailing_BAO_Mailing();
@@ -482,7 +482,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
    *
    * @param object $mailer A Mail object to send the messages
    *
-   * @param null $testParams
+   * @param array $testParams
    *
    * @return void
    * @access public
@@ -634,6 +634,15 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $returnProperties = $mailing->getReturnProperties();
     $params           = $targetParams = $deliveredParams = array();
     $count            = 0;
+    
+    /**
+     * CRM-15702: Sending bulk sms to contacts without e-mail addres fails.
+     * Solution is to skip checking for on hold
+     */
+    $skipOnHold = true; //do include a statement to check wether e-mail address is on hold
+    if ($mailing->sms_provider_id) {
+      $skipOnHold = false; //do not include a statement to check wether e-mail address is on hold
+    }
 
     foreach ($fields as $key => $field) {
       $params[] = $field['contact_id'];
@@ -642,7 +651,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $details = CRM_Utils_Token::getTokenDetails(
       $params,
       $returnProperties,
-      TRUE, TRUE, NULL,
+      $skipOnHold, TRUE, NULL,
       $mailing->getFlattenedTokens(),
       get_class($this),
       $this->id
@@ -808,7 +817,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
-   * cancel a mailing
+   * Cancel a mailing
    *
    * @param int $mailingId  the id of the mailing to be canceled
    * @static
@@ -901,8 +910,8 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
   }
 
   /**
-   * @param $deliveredParams
-   * @param $targetParams
+   * @param array $deliveredParams
+   * @param array $targetParams
    * @param $mailing
    * @param $job_date
    *

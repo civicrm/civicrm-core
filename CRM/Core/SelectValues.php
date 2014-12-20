@@ -38,7 +38,7 @@
 class CRM_Core_SelectValues {
 
   /**
-   * preferred mail format
+   * Preferred mail format
    * @static
    */
   static function pmf() {
@@ -50,7 +50,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * privacy options
+   * Privacy options
    * @static
    */
   static function privacy() {
@@ -65,7 +65,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * various pre defined contact super types
+   * Various pre defined contact super types
    * @static
    */
   static function contactType() {
@@ -77,7 +77,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * various pre defined unit list
+   * Various pre defined unit list
    * @static
    */
   static function unitList($unitType = NULL) {
@@ -93,7 +93,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * membership type unit
+   * Membership type unit
    * @static
    */
   static function membershipTypeUnitList( ) {
@@ -101,7 +101,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * various pre defined period types
+   * Various pre defined period types
    * @static
    */
   static function periodType() {
@@ -112,7 +112,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * various pre defined email selection methods
+   * Various pre defined email selection methods
    * @static
    */
   static function emailSelectMethods() {
@@ -125,7 +125,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * various pre defined member visibility options
+   * Various pre defined member visibility options
    * @static
    */
   static function memberVisibility() {
@@ -136,7 +136,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * various pre defined event dates
+   * Various pre defined event dates
    * @static
    */
   static function eventDate() {
@@ -174,7 +174,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * various pre defined extensions for dynamic properties and groups
+   * Various pre defined extensions for dynamic properties and groups
    *
    * @static
    */
@@ -203,7 +203,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * styles for displaying the custom data group
+   * Styles for displaying the custom data group
    *
    * @static
    */
@@ -216,7 +216,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * for displaying the uf group types
+   * For displaying the uf group types
    *
    * @static
    */
@@ -236,7 +236,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * the status of a contact within a group
+   * The status of a contact within a group
    *
    * @static
    */
@@ -249,7 +249,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * list of Group Types
+   * List of Group Types
    * @static
    */
   static function groupType() {
@@ -260,7 +260,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * compose the parameters for a date select object
+   * Compose the parameters for a date select object
    *
    * @param  string|NULL $type the type of date
    * @param  string|NULL $format date format ( QF format)
@@ -312,7 +312,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * values for UF form visibility options
+   * Values for UF form visibility options
    *
    * @static
    */
@@ -325,7 +325,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * values for group form visibility options
+   * Values for group form visibility options
    *
    * @static
    */
@@ -337,7 +337,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * different type of Mailing Components
+   * Different type of Mailing Components
    *
    * @static
    * return array
@@ -355,7 +355,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Function to get hours
+   * Get hours
    *
    *
    * @static
@@ -369,7 +369,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Function to get minutes
+   * Get minutes
    *
    *
    * @static
@@ -383,7 +383,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Function to get the Map Provider
+   * Get the Map Provider
    *
    * @return array $map array of map providers
    * @static
@@ -397,7 +397,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Function to get the Geocoding Providers from available plugins
+   * Get the Geocoding Providers from available plugins
    *
    * @return array $geo array of geocoder providers
    * @static
@@ -411,7 +411,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Function to get the Address Standardization Providers from available
+   * Get the Address Standardization Providers from available
    * plugins
    *
    * @return array $addr array of address standardization providers
@@ -426,7 +426,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * different type of Mailing Tokens
+   * Different type of Mailing Tokens
    *
    * @static
    * return array
@@ -453,7 +453,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * different type of Activity Tokens
+   * Different type of Activity Tokens
    *
    * @static
    * return array
@@ -468,7 +468,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * different type of Membership Tokens
+   * Different type of Membership Tokens
    *
    * @static
    * return array
@@ -486,7 +486,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * different type of Event Tokens
+   * Different type of Event Tokens
    *
    * @static
    * return array
@@ -511,7 +511,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * different type of Event Tokens
+   * Different type of Event Tokens
    *
    * @static
    * return array
@@ -545,7 +545,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * different type of Contact Tokens
+   * Different type of Contact Tokens
    *
    * @static
    * return array
@@ -612,7 +612,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * different type of Participant Tokens
+   * Different type of Participant Tokens
    *
    * @static
    * return array
@@ -723,7 +723,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Function to get numeric options
+   * Get numeric options
    *
    *
    * @static
@@ -737,7 +737,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * barcode types
+   * Barcode types
    * @static
    */
   static function getBarcodeTypes() {
@@ -748,7 +748,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * dedupe rule types
+   * Dedupe rule types
    */
   static function getDedupeRuleTypes() {
     return array(
@@ -759,7 +759,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * campaign group types
+   * Campaign group types
    */
   static function getCampaignGroupTypes() {
     return array(
@@ -769,7 +769,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * subscription history method
+   * Subscription history method
    */
   static function getSubscriptionHistoryMethods() {
     return array(
@@ -781,7 +781,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * premium units
+   * Premium units
    */
   static function getPremiumUnits() {
     return array(
@@ -793,7 +793,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * extension types
+   * Extension types
    */
   static function getExtensionTypes() {
     return  array(
@@ -806,7 +806,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * job frequency
+   * Job frequency
    */
   static function getJobFrequency() {
     return array(
@@ -838,7 +838,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * profile group types
+   * Profile group types
    *
    * @static
    */
@@ -858,7 +858,7 @@ class CRM_Core_SelectValues {
 
 
   /**
-   * word replacement match type
+   * Word replacement match type
    */
   static function getWordReplacementMatchType() {
     return array(
@@ -868,7 +868,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * mailing group types
+   * Mailing group types
    */
   static function getMailingGroupTypes() {
     return array(

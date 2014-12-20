@@ -165,7 +165,7 @@
 }
 
 {literal}
-<script type='text/javascript'>
+  <script type='text/javascript'>
     CRM.$(function($) {
       var $form = $('form.{/literal}{$form.formClass}{literal}'),
         recipientMapping = eval({/literal}{$recipientMapping}{literal});
@@ -181,38 +181,9 @@
         $('#relativeDate, #relativeDateRepeat, #repeatFields, #OR', $form).hide();
       }
 
-      $('#entity_0', $form).change(buildSelects);
-
       loadMsgBox();
       $('#mode', $form).change(loadMsgBox);
 
-      showHideLimitTo();
-      buildSelects();
-
-      $('#recipient', $form).change(populateRecipient);
-      $('#limit_to', $form).change(populateRecipient).change(buildSelects);
-
-      var entity = $('#entity_0', $form).val();
-      if (!(entity === '2' || entity === '3') || $('#recipient', $form).val() !== '1') {
-        $('#recipientList', $form).hide();
-      }
-      else if (entity === '1') {
-        $('#recipient', $form).change(buildSelects);
-      }
-
-      function buildSelects() {
-        var mappingID = $('#entity_0', $form).val();
-
-        $.getJSON(CRM.url('civicrm/ajax/mapping'), {mappingID: mappingID},
-          function (result) {
-            CRM.utils.setOptions($('#start_action_date', $form), result.sel4);
-            CRM.utils.setOptions($('#end_date', $form), result.sel4);
-            CRM.utils.setOptions($('#recipient', $form), result.sel5);
-            recipientMapping = result.recipientMapping;
-            populateRecipient();
-          }
-        );
-      }
       function populateRecipient() {
         var recipient = $("#recipient", $form).val();
         if ((recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') && $('#limit_to').val() != '') {
@@ -222,17 +193,17 @@
             });
           $("#recipientList", $form).show();
         }
+        else {
+          $("#recipientList", $form).hide();
+	}
 
-        var entity = $('#entity_0', $form).val();
-        if (!(entity === '2' || entity === '3')) {
-          $('#recipientList', $form).hide();
-        }
         showHideLimitTo();
       }
+
       // CRM-14070 Hide limit-to when entity is activity
       function showHideLimitTo() {
         $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
-        if ($('#entity_0', $form).val() != '1') {
+        if ($('#entity_0', $form).val() != '1' || !($('#entity_0').length)) {
           if ($('#limit_to', $form).val() == '') {
             $('tr.recipient:visible, #recipientList, #recipient, a.recipient').hide();
             $('a.limit_to').show();
@@ -250,27 +221,57 @@
           $("label[for='recipient']").text('{/literal}{$recipientLabels.activity}{literal}');
         }
       }
-    });
 
-  function loadMsgBox() {
-    if (cj('#mode').val() == 'Email' || cj('#mode').val() == 0){
-      cj('#sms').hide();
-      cj('#email').show();
-    }
-    else if (cj('#mode').val() == 'SMS'){
-      cj('#email').hide();
-      cj('#sms').show();
-      showSaveUpdateChkBox('SMS');
-    }
-    else if (cj('#mode').val() == 'User_Preference'){
-        cj('#email').show();
-        cj('#sms').show();
-      showSaveUpdateChkBox('SMS');
+      $('#recipient', $form).change(populateRecipient);
+
+      {/literal}{if !$context}{literal}
+        var entity = $('#entity_0', $form).val();
+        if (!(entity === '2' || entity === '3')) {
+          $('#recipientList', $form).hide();
+         }
+
+        $('#entity_0, #limit_to', $form).change(buildSelects);
+
+        buildSelects();
+
+        function buildSelects() {
+          var mappingID = $('#entity_0', $form).val();
+
+          $.getJSON(CRM.url('civicrm/ajax/mapping'), {mappingID: mappingID},
+            function (result) {
+              CRM.utils.setOptions($('#start_action_date', $form), result.sel4);
+              CRM.utils.setOptions($('#end_date', $form), result.sel4);
+              CRM.utils.setOptions($('#recipient', $form), result.sel5);
+              recipientMapping = result.recipientMapping;
+              populateRecipient();
+            }
+          );
+        }
+      {/literal}{else}{literal}
+        populateRecipient();
+        $('#limit_to', $form).change(populateRecipient);
+      {/literal}{/if}{literal}
+
+      function loadMsgBox() {
+        if (cj('#mode').val() == 'Email' || cj('#mode').val() == 0){
+          cj('#sms').hide();
+          cj('#email').show();
+        }
+        else if (cj('#mode').val() == 'SMS'){
+          cj('#email').hide();
+          cj('#sms').show();
+          showSaveUpdateChkBox('SMS');
+        }
+        else if (cj('#mode').val() == 'User_Preference'){
+          cj('#email').show();
+          cj('#sms').show();
+          showSaveUpdateChkBox('SMS');
+        }
       }
-  }
 
- </script>
- {/literal}
+    });
+  </script>
+{/literal}
 
 {/if}
 

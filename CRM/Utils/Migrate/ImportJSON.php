@@ -204,7 +204,7 @@ class CRM_Utils_Migrate_ImportJSON {
 
   /**
    * @param $chunk
-   * @param $daoName
+   * @param string $daoName
    * @param null $lookUpMapping
    * @param null $dateFields
    */
@@ -280,7 +280,7 @@ class CRM_Utils_Migrate_ImportJSON {
   }
 
   /**
-   * @param $tableName
+   * @param string $tableName
    */
   function populateCache($tableName) {
     if (isset($this->_lookupCache[$tableName])) {

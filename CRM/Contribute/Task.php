@@ -42,7 +42,7 @@ class CRM_Contribute_Task {
   CONST DELETE_CONTRIBUTIONS = 1, PRINT_CONTRIBUTIONS = 2, EXPORT_CONTRIBUTIONS = 3, BATCH_CONTRIBUTIONS = 4, EMAIL_CONTACTS = 5, UPDATE_STATUS = 6, PDF_RECEIPT = 7;
 
   /**
-   * the task array
+   * The task array
    *
    * @var array
    * @static
@@ -50,7 +50,7 @@ class CRM_Contribute_Task {
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array
    *
    * @var array
    * @static
@@ -161,7 +161,7 @@ class CRM_Contribute_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level
    * of the user
    *
    * @param int $permission

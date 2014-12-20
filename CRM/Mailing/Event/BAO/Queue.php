@@ -35,7 +35,7 @@
 class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -272,7 +272,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * @param $queueID
+   * @param int $queueID
    *
    * @return array
    */
@@ -301,7 +301,7 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param null $now
    */
   static function bulkCreate($params, $now = NULL) {

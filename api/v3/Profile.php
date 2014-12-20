@@ -139,7 +139,7 @@ function civicrm_api3_profile_get($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_profile_get_spec(&$params) {
   $params['profile_id']['api.required'] = TRUE;
@@ -393,7 +393,7 @@ function civicrm_api3_profile_apply($params) {
  *  Note that that since the existing code for deriving a blank profile is not easily accessible our
  *  interim solution is just to return an empty array
  *
- * @param $params
+ * @param array $params
  *
  * @return array
  */
@@ -481,8 +481,6 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
  * @param integer $profileID
  * @param integer $optionsBehaviour 0 = don't resolve, 1 = resolve non-aggressively, 2 = resolve aggressively - ie include country & state
  * @param $is_flush
- *
- * @internal param $params
  *
  * @return
  */
@@ -691,7 +689,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
  * @todo this should be handled by the api wrapper using getfields info - need to check
  * how we add a a pseudoconstant to this pseudo api to make that work
  *
- * @param $profileID
+ * @param int $profileID
  *
  * @return integer|string
  * @throws CiviCRM_API3_Exception

@@ -39,21 +39,19 @@
 class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
 
   /**
-   * variable to store redirect path
+   * Variable to store redirect path
    *
    */
   protected $_userContext;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
    */
   function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
+    // initialize the task and row fields
     parent::preProcess();
 
     $session = CRM_Core_Session::singleton();
@@ -61,7 +59,7 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -74,7 +72,7 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -92,6 +90,5 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
       CRM_Event_BAO_Participant::create($value);
     }
   }
-  //end of function
 }
 

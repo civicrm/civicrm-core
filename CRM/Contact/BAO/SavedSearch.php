@@ -40,7 +40,7 @@
 class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @return \CRM_Contact_BAO_SavedSearch CRM_Contact_BAO_SavedSearch
    */
@@ -49,7 +49,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * query the db for all saved searches.
+   * Query the db for all saved searches.
    *
    * @return array $aSavedSearch - contains the search name as value and and id as key
    *
@@ -73,7 +73,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Contact_BAO_SavedSearch
+   * @return CRM_Contact_BAO_SavedSearch
    * @access public
    * @static
    */
@@ -88,7 +88,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * given an id, extract the formValues of the saved search
+   * Given an id, extract the formValues of the saved search
    *
    * @param int $id the id of the saved search
    *
@@ -131,7 +131,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return array
    */
@@ -150,7 +150,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * get the where clause for a saved search
+   * Get the where clause for a saved search
    *
    * @param int $id saved search id
    * @param  array $tables (reference ) add the tables that are needed for the select clause
@@ -173,7 +173,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return string
    */
@@ -197,7 +197,7 @@ WHERE  $where";
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return array
    */
@@ -229,7 +229,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * given a saved search compute the clause and the tables
+   * Given a saved search compute the clause and the tables
    * and store it for future use
    */
   function buildClause() {
@@ -264,7 +264,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * given an id, get the name of the saved search
+   * Given an id, get the name of the saved search
    *
    * @param int $id the id of the saved search
    *

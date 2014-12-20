@@ -51,7 +51,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
   }
 
   /**
-   * add() method (create and update modes)
+   * Add() method (create and update modes)
    */
   function testAdd() {
     $contactId = Contact::createIndividual();
@@ -94,7 +94,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
   }
 
   /**
-   * allPhones() method - get all Phones for our contact, with primary Phone first
+   * AllPhones() method - get all Phones for our contact, with primary Phone first
    */
   function testAllPhones() {
     $contactParams = array(
@@ -121,7 +121,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
   }
 
   /**
-   * allEntityPhones() method - get all Phones for a location block, with primary Phone first
+   * AllEntityPhones() method - get all Phones for a location block, with primary Phone first
    * @todo FIXME: Fixing this test requires add helper functions in CiviTest to create location block and phone and link them to an event. Punting to 3.1 cycle. DGG
    */
   function SKIPPED_testAllEntityPhones() {}

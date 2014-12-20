@@ -40,35 +40,35 @@
 class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
   /**
-   * survet id`
+   * Survet id`
    *
    * @var int
    */
   protected $_surveyId;
 
   /**
-   * interviewer id
+   * Interviewer id
    *
    * @var int
    */
   protected $_interviewerId;
 
   /**
-   * survey details
+   * Survey details
    *
    * @var object
    */
   protected $_surveyDetails;
 
   /**
-   * number of voters
+   * Number of voters
    *
    * @var int
    */
   protected $_numVoters;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -153,7 +153,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -201,7 +201,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *
@@ -233,7 +233,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

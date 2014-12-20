@@ -110,7 +110,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_SetEntity extends CRM_Core_DAO
     public $price_set_id;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_Upgrade_Snapshot_V4p2_Price_DAO_SetEntity

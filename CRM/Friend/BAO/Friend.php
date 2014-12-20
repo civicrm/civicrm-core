@@ -46,7 +46,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * takes an associative array and creates a friend object
+   * Takes an associative array and creates a friend object
    *
    * the function extract all the params it needs to initialize the create a
    * friend object. the params array could contain additional unused name/value
@@ -54,7 +54,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Friend_BAO_Friend object
+   * @return CRM_Friend_BAO_Friend object
    * @access public
    * @static
    */
@@ -87,11 +87,11 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * takes an associative array and creates a friend object
+   * Takes an associative array and creates a friend object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact object
    * @access public
    * @static
    */
@@ -236,9 +236,9 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
-   * @param object $form form object
+   * @param CRM_Core_Form $form form object
    *
    * @return void
    * @access public
@@ -288,11 +288,8 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   /**
    * Process that send tell a friend e-mails
    *
-   * @params int     $contactId      contact id
-   * @params array   $values         associative array of name/value pair
-   *
-   * @param $contactID
-   * @param $values
+   * @param int $contactID
+   * @param array $values
    *
    * @return void
    * @access public
@@ -336,7 +333,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * takes an associative array and creates a tell a friend object
+   * Takes an associative array and creates a tell a friend object
    *
    * the function extract all the params it needs to initialize the create/edit a
    * friend object. the params array could contain additional unused name/value
@@ -344,7 +341,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Friend_BAO_Friend object
+   * @return CRM_Friend_BAO_Friend object
    * @access public
    * @static
    */

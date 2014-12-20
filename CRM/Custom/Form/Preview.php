@@ -44,14 +44,14 @@
 class CRM_Custom_Form_Preview extends CRM_Core_Form {
 
   /**
-   * the group tree data
+   * The group tree data
    *
    * @var array
    */
   protected $_groupTree;
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * gets session variables for group or field id
    *
@@ -109,7 +109,7 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @param null
    *

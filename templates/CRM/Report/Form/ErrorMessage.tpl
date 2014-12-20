@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {if $outputMode eq 'html' && !$rows}
-    <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>&nbsp; {ts}None found.{/ts}
-    </div>
+  <div class="messages status no-popup">
+    <div class="icon inform-icon"></div>&nbsp; {ts}None found.{/ts}
+  </div>
 {/if}

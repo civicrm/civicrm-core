@@ -71,10 +71,10 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
-   * @param null $id
-   * @param null $contactID
+   * @param int $id
+   * @param int $contactID
    * @param bool $print
    * @param bool $allowID
    *

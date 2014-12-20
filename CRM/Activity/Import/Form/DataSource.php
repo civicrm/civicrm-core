@@ -39,7 +39,7 @@
 class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -52,7 +52,7 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -102,8 +102,7 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
     }
 
     $this->setDefaults(array(
-      'onDuplicate' =>
-        CRM_Import_Parser::DUPLICATE_SKIP,
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       ));
 
     //build date formats

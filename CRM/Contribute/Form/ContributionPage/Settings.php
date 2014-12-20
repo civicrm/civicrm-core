@@ -35,7 +35,7 @@
 class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -45,7 +45,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -113,7 +113,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -214,7 +214,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $values posted values of the form
    *

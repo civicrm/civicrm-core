@@ -162,7 +162,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @param bool $check
    *
@@ -335,7 +335,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -367,7 +367,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * Save a payment processor
    *
    * @param $values
-   * @param $domainID
+   * @param int $domainID
    * @param $test
    *
    * @return Void

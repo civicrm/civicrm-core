@@ -238,7 +238,7 @@ ORDER BY weight, label
   }
 
   /**
-   * edit custom Option.
+   * Edit custom Option.
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *

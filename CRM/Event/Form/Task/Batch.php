@@ -39,32 +39,32 @@
 class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
   /**
-   * the title of the group
+   * The title of the group
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * maximum profile fields that will be displayed
+   * Maximum profile fields that will be displayed
    *
    */
   protected $_maxFields = 9;
 
   /**
-   * variable to store redirect path
+   * Variable to store redirect path
    *
    */
   protected $_userContext;
 
   /**
-   * variable to store previous status id.
+   * Variable to store previous status id.
    *
    */
   protected $_fromStatusIds;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -92,7 +92,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -234,7 +234,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -272,7 +272,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -348,11 +348,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       CRM_Core_Session::setStatus(ts('No updates have been saved.'), ts('Not Saved'), 'alert');
     }
   }
-  //end of function
 
   /**
-   * @param $participantId
-   * @param $statusId
+   * @param int $participantId
+   * @param int $statusId
    *
    * @return Ambigous|void
    */

@@ -59,7 +59,7 @@ class CRM_Core_Payment_PaymentExpressUtils {
 
   /**
    * @param $xml
-   * @param $name
+   * @param string $name
    *
    * @return mixed
    */
@@ -70,7 +70,7 @@ class CRM_Core_Payment_PaymentExpressUtils {
 
   /**
    * @param $xml
-   * @param $name
+   * @param string $name
    *
    * @return mixed|null
    */

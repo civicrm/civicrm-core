@@ -169,8 +169,6 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
       //LCD end
     }
 
-    // LCD debug
-    //CRM_Core_Error::debug($membershipSummary);
     $status = CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent();
     $status = implode(',', $status);
 

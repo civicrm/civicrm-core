@@ -150,7 +150,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $memTypeParams
+   * @param array $memTypeParams
    */
   function _addMembership($memTypeParams) {
     // click through to the membership view screen
@@ -187,7 +187,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
   /**
    * @param $profileTitle
-   * @param $customDataParams
+   * @param array $customDataParams
    */
   function _addProfile($profileTitle, $customDataParams) {
 

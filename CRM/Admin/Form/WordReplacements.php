@@ -111,7 +111,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -175,7 +175,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $values posted values of the form
    *
@@ -210,7 +210,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

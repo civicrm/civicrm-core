@@ -39,11 +39,11 @@
 class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_ContributionPage {
 
   /**
-   * takes an associative array and creates a contribution page object
+   * Takes an associative array and creates a contribution page object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Contribute_DAO_ContributionPage object
+   * @return CRM_Contribute_DAO_ContributionPage object
    * @access public
    * @static
    */
@@ -52,17 +52,20 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     if (!empty($params['id']) && !CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id'], NULL, 1)) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $params['id'], 'financial_type_id');
     }
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'ContributionPage', CRM_Utils_Array::value('id', $params), $params);
     $dao = new CRM_Contribute_DAO_ContributionPage();
     $dao->copyValues($params);
     $dao->save();
     if ($financialTypeId && !empty($params['financial_type_id']) && $financialTypeId != $params['financial_type_id']) {
       CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_contribution_page', $params['financial_type_id']);
     }
+    CRM_Utils_Hook::post($hook, 'ContributionPage', $dao->id, $dao);
     return $dao;
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -75,7 +78,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $values
    */
   static function setValues($id, &$values) {
@@ -106,7 +109,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     }
 
   /**
-   * Function to send the emails
+   * Send the emails
    *
    * @param int $contactID contact id
    * @param array $values associated array of fields
@@ -423,13 +426,11 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     }
   }
 
-  /*
-     * Construct the message to be sent by the send function
-     *
-     */
   /**
-   * @param $tplParams
-   * @param $contactID
+   * Construct the message to be sent by the send function
+   *
+   * @param array $tplParams
+   * @param int $contactID
    * @param $isTest
    *
    * @return array
@@ -455,7 +456,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Function to send the emails for Recurring Contribution Notication
+   * Send the emails for Recurring Contribution Notication
    *
    * @param string $type txnType
    * @param int $contactID contact id for contributor
@@ -553,7 +554,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Function to add the custom fields for contribution page (ie profile)
+   * Add the custom fields for contribution page (ie profile)
    *
    * @param int $gid uf group id
    * @param string $name
@@ -700,7 +701,7 @@ WHERE entity_table = 'civicrm_contribution_page'
   }
 
   /**
-   * Function to check if contribution page contains payment
+   * Check if contribution page contains payment
    * processor that supports recurring payment
    *
    * @param int $contributionPageId Contribution Page Id
@@ -728,7 +729,7 @@ WHERE entity_table = 'civicrm_contribution_page'
   }
 
   /**
-   * Function to get info for all sections enable/disable.
+   * Get info for all sections enable/disable.
    *
    * @param array $contribPageIds
    * @return array $info info regarding all sections.
@@ -915,7 +916,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   }
 
   /**
-   * helper to determine if the page supports separate membership payments
+   * Helper to determine if the page supports separate membership payments
    * @param integer id form id
    *
    * @return bool isSeparateMembershipPayment

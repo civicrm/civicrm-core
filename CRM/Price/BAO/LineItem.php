@@ -50,7 +50,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Price_DAO_LineItem object
+   * @return CRM_Price_DAO_LineItem object
    * @access public
    * @static
    */
@@ -93,7 +93,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Price_BAO_LineItem object
+   * @return CRM_Price_BAO_LineItem object
    * @access public
    * @static
    */
@@ -108,7 +108,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   }
 
   /**
-   * @param $entityId
+   * @param int $entityId
    * @param $entityTable
    *
    * @return null|string
@@ -124,8 +124,8 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * wrapper for line item retrieval when contribution ID is known
-   * @param $contributionID
+   * Wrapper for line item retrieval when contribution ID is known
+   * @param int $contributionID
    *
    * @return array
    */
@@ -350,17 +350,15 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * Function to process price set and line items.
+   * Process price set and line items.
    *
-   * @param $entityId
+   * @param int $entityId
    * @param array $lineItem line item array
    * @param object $contributionDetails
    * @param string $entityTable entity table
    *
    * @param bool $update
    *
-   * @internal param int $contributionId contribution id
-   * @internal param \decimal $initAmount amount
    * @access public
    * @return void
    * @static
@@ -409,10 +407,10 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * @param $entityId
+   * @param int $entityId
    * @param string $entityTable
    * @param $amount
-   * @param null $otherParams
+   * @param array $otherParams
    */
   public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
     if (!$entityId || CRM_Utils_System::isNull($amount))
@@ -463,7 +461,7 @@ AND li.entity_id = {$entityId}
   }
 
    /**
-   * Function to build line items array.
+   * Build line items array.
    * @param array $params form values
    *
    * @param string $entityId entity id

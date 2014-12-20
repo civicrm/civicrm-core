@@ -35,28 +35,24 @@
 class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
   /**
-   * static holder for the default LT
+   * Static holder for the default LT
    */
   static $_defaultMembershipStatus = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Member_BAO_MembershipStatus object
+   * @return CRM_Member_BAO_MembershipStatus object
    * @access public
    * @static
    */
@@ -71,7 +67,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -90,7 +86,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @throws Exception
-   * @return object CRM_Member_BAO_MembershipStatus object
+   * @return CRM_Member_BAO_MembershipStatus object
    * @access public
    * @static
    */
@@ -111,7 +107,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     return $membershipStatusBAO;
   }
   /**
-   * function to add the membership types
+   * Add the membership types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids array contains the id - this param is deprecated
@@ -169,7 +165,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Function to get  membership status
+   * Get  membership status
    *
    * @param int $membershipStatusId
    *
@@ -187,12 +183,11 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Function to delete membership Types
+   * Delete membership Types
    *
    * @param int $membershipStatusId
    *
    * @throws CRM_Core_Exception
-   * @internal param $
    * @static
    */
   static function del($membershipStatusId) {
@@ -218,17 +213,16 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Function to find the membership status based on start date, end date, join date & status date.
+   * Find the membership status based on start date, end date, join date & status date.
    *
    * @param  string $startDate start date of the member whose membership status is to be calculated.
    * @param  string $endDate end date of the member whose membership status is to be calculated.
    * @param  string $joinDate join date of the member whose membership status is to be calculated.
    * @param \date|string $statusDate status date of the member whose membership status is to be calculated.
    * @param  boolean $excludeIsAdmin exclude the statuses those having is_admin = 1
-   * @param $membershipTypeID
+   * @param int $membershipTypeID
    * @param array $membership membership params as available to calling function - passed to the hook
    *
-   * @internal param int $membershipType membership type id - passed to the hook
    * @return array
   @static
    */

@@ -396,8 +396,8 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
-   * @param $groupName
-   * @param $daoName
+   * @param string $groupName
+   * @param string $daoName
    * @param null $sql
    */
   function fetch($groupName, $daoName, $sql = NULL) {
@@ -536,7 +536,6 @@ class CRM_Utils_Migrate_Export {
    * @param string $tagName
    * @param array $keyValues
    * @throws Exception
-   * @internal param string $additional XML
    * @return string XML
    */
   public function renderKeyValueXML($tagName, $keyValues) {

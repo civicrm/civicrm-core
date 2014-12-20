@@ -37,7 +37,7 @@
 </style>
 <script type="text/javascript">
   (function($, _){{/literal}
-    var entityID={$entityID},
+    var entityID='{$entityID}',
       entityTable='{$entityTable}',
       $form = $('form.{$form.formClass}');
     {literal}
@@ -67,9 +67,9 @@
           "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
         }
       });
-	  
+
 	  {/literal}
-      {if $permission neq 'edit'}
+      {if !empty($permission) && $permission neq 'edit'}
         {literal}
           $("#tagtree input").prop('disabled', true);
         {/literal}
@@ -87,19 +87,24 @@
 {/if}
     <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
       <tr>
-       {if $groupElementType eq 'select'}
-          <td><span class="label">{if $title}{$form.group.label}{/if}</span>
+        {if !$type || $type eq 'group'}
+          <td>
+            {if $groupElementType eq 'select'}
+              <span class="label">{if $title}{$form.group.label}{/if}</span>
+            {/if}
             {$form.group.html}
           </td>
-      {/if}
-      
-	  <td width="70%"><span class="label">{if $title}{$form.$key.label}{/if}</span>
-		<div id="tagtree">
-			{include file="CRM/Contact/Form/Edit/Tagtree.tpl" level=1}
-		</div>
-	  </td>
-    </tr>
+        {/if}
+      </tr>
+
     {if !$type || $type eq 'tag'}
+      <tr>
+        <td width="70%"><span class="label">{if $title}{$form.$key.label}{/if}</span>
+          <div id="tagtree">
+            {include file="CRM/Contact/Form/Edit/Tagtree.tpl" level=1}
+          </div>
+        </td>
+      </tr>
       <tr><td>{include file="CRM/common/Tagset.tpl"}</td></tr>
     {/if}
   </table>

@@ -56,7 +56,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   protected $_gLabel;
 
   /**
-   * Function to pre-process
+   * Pre-process
    *
    * @return void
    * @access public
@@ -115,7 +115,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -143,7 +143,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -321,7 +321,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files  the uploaded files if any
@@ -368,7 +368,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

@@ -103,17 +103,24 @@ function _civicrm_api3_contribution_create_spec(&$params) {
   );
   $params['soft_credit_to'] = array(
     'name' => 'soft_credit_to',
-    'title' => 'Soft Credit contact ID',
+    'title' => 'Soft Credit contact ID (legacy)',
     'type' => 1,
-    'description' => 'ID of Contact to be Soft credited to',
+    'description' => 'ID of Contact to be Soft credited to (deprecated - use contribution_soft api)',
     'FKClassName' => 'CRM_Contact_DAO_Contact',
   );
   $params['honor_contact_id'] = array(
     'name' => 'honor_contact_id',
-    'title' => 'Honoree contact ID',
+    'title' => 'Honoree contact ID (legacy)',
     'type' => 1,
-    'description' => 'ID of honoree contact',
+    'description' => 'ID of honoree contact (deprecated - use contribution_soft api)',
     'FKClassName' => 'CRM_Contact_DAO_Contact',
+  );
+  $params['honor_type_id'] = array(
+    'name' => 'honor_type_id',
+    'title' => 'Honoree Type (legacy)',
+    'type' => 1,
+    'description' => 'Type of honoree contact (deprecated - use contribution_soft api)',
+    'pseudoconstant' => TRUE,
   );
   // note this is a recommended option but not adding as a default to avoid
   // creating unnecessary changes for the dev
@@ -146,16 +153,18 @@ function _civicrm_api3_contribution_create_spec(&$params) {
 function _civicrm_api3_contribution_create_legacy_support_45(&$params){
   //legacy soft credit handling - recommended approach is chaining
   if(!empty($params['soft_credit_to'])){
-    $params['soft_credit'] = array(array(
+    $params['soft_credit'][] = array(
       'contact_id'          => $params['soft_credit_to'],
       'amount'              => $params['total_amount'],
-      'soft_credit_type_id' => CRM_Core_OptionGroup::getDefaultValue("soft_credit_type")));
+      'soft_credit_type_id' => CRM_Core_OptionGroup::getDefaultValue("soft_credit_type")
+    );
   }
   if(!empty($params['honor_contact_id'])){
-    $params['soft_credit'] = array(array(
+    $params['soft_credit'][] = array(
       'contact_id'          => $params['honor_contact_id'],
       'amount'              => $params['total_amount'],
-      'soft_credit_type_id' => CRM_Core_OptionGroup::getValue('soft_credit_type', 'in_honor_of', 'name')));
+      'soft_credit_type_id' => CRM_Utils_Array::value('honor_type_id', $params, CRM_Core_OptionGroup::getValue('soft_credit_type', 'in_honor_of', 'name'))
+    );
   }
 }
 
@@ -193,11 +202,7 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
  *
  * @param  array $params (reference ) input parameters
  *
- * @internal param array $returnProperties Which properties should be included in the
- * returned Contribution object. If NULL, the default
- * set of properties will be included.
- *
- * @return array (reference )        array of contributions, if error an array with an error id and error message
+ * @return array of contributions, if error an array with an error id and error message
  * @static void
  * @access public
  * {@getfields Contribution_get}
@@ -437,7 +442,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
 
 /**
  * provide function metadata
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_contribution_completetransaction_spec(&$params) {
   $params['id'] = array(

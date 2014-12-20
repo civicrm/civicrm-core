@@ -52,7 +52,7 @@ class CRM_Financial_BAO_ExportFormat {
   static protected $_template;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     if ( !isset( self::$_template ) ) {
@@ -62,7 +62,7 @@ class CRM_Financial_BAO_ExportFormat {
 
   // Override to assemble the appropriate subset of financial data for the specific export format
   /**
-   * @param $exportParams
+   * @param array $exportParams
    *
    * @return mixed
    */
@@ -177,7 +177,7 @@ class CRM_Financial_BAO_ExportFormat {
 
   /**
    * @param $batchIds
-   * @param $fileName
+   * @param string $fileName
    *
    * @throws CRM_Core_Exception
    */

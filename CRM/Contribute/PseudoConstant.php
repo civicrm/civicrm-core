@@ -40,14 +40,14 @@
 class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * financial types
+   * Financial types
    * @var array
    * @static
    */
   private static $financialType;
 
   /**
-   * financial types
+   * Financial types
    * @var array
    * @static
    */
@@ -55,28 +55,28 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
 
 
   /**
-   * financial types
+   * Financial types
    * @var array
    * @static
    */
   private static $financialAccount;
 
     /**
-   * contribution pages
+   * Contribution pages
    * @var array
    * @static
    */
   private static $contributionPageActive = NULL;
 
   /**
-   * contribution pages
+   * Contribution pages
    * @var array
    * @static
    */
   private static $contributionPageAll = NULL;
 
   /**
-   * payment instruments
+   * Payment instruments
    *
    * @var array
    * @static
@@ -84,7 +84,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $paymentInstrument;
 
   /**
-   * contribution status
+   * Contribution status
    *
    * @var array
    * @static
@@ -99,14 +99,14 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $pcPage;
 
   /**
-   * status of personal campaign page
+   * Status of personal campaign page
    * @var array
    * @static
    */
   private static $pcpStatus;
 
   /**
-   * contribution / financial batches
+   * Contribution / financial batches
    * @var array
    * @static
    */
@@ -119,7 +119,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
+   * @param int $id
    *
    * @return array - array reference of all financial types if any
    * @static
@@ -151,8 +151,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
-   * @param null $financialAccountTypeId
+   * @param int $id
+   * @param int $financialAccountTypeId
    * @param string $retrieveColumn
    * @param string $key
    *
@@ -273,7 +273,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $pageID
+   * @param int $pageID
    * @return array - array of all Premiums if any
    * @static
    */
@@ -321,7 +321,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
+   * @param int $id
    * @param string $columnName
    * @return array - array reference of all contribution statuses
    * @static
@@ -347,7 +347,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    *
    * @param null $pageType
-   * @param null $id
+   * @param int $id
    *
    * @return array - array reference of all pcp if any
    * @static
@@ -406,8 +406,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param $financialTypeId
-   * @param null $relationTypeId
+   * @param int $financialTypeId
+   * @param int $relationTypeId
    * @return array - array reference of all financial accounts for a Financial type
    */
   public static function financialAccountType($financialTypeId, $relationTypeId = NULL) {
@@ -437,7 +437,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
+   * @param int $id
    * @return array - array reference of all batches if any
    * @static
    */

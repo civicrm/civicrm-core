@@ -42,7 +42,7 @@
 class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
   /**
-   * all the fields that are listings related
+   * All the fields that are listings related
    *
    * @var array
    * @access protected
@@ -50,7 +50,7 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
   protected $_fields;
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */

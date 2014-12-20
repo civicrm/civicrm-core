@@ -71,12 +71,10 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $this->assertEquals(5, $result['count'], " in line " . __LINE__);
   }
 
-  /*
-     * Test that passing in a single variable works
-     */
+  /**
+   * Test that passing in a single variable works
+   */
   function testGetSinglePledgePayment() {
-
-
     $createparams = array(
       'contact_id' => $this->_individualId,
       'pledge_id' => $this->_pledgeID,
@@ -91,12 +89,10 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count'], " in line " . __LINE__);
   }
 
-  /*
-     * Test that passing in a single variable works:: status_id
-     */
+  /**
+   * Test that passing in a single variable works:: status_id
+   */
   function testGetSinglePledgePaymentByStatusID() {
-
-
     $createparams = array(
       'contact_id' => $this->_individualId,
       'pledge_id' => $this->_pledgeID,
@@ -112,9 +108,9 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count'], " in line " . __LINE__);
   }
 
-  /*
- * Test that creating a payment will add the contribution ID
- */
+  /**
+   * Test that creating a payment will add the contribution ID
+   */
   function testCreatePledgePayment() {
     //check that 5 pledge payments exist at the start
     $beforeAdd = $this->callAPISuccess('pledge_payment', 'get', array());
@@ -158,9 +154,9 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $this->assertEquals($this->_contributionID, $getIndPaymentAgain['values'][$result['id']]['contribution_id'], " in line " . __LINE__);
   }
 
-  /*
-     * test checks behaviour when more payments are created than should be possible
-     */
+  /**
+   * Test checks behaviour when more payments are created than should be possible
+   */
   function testCreatePledgePaymentAllCreated() {
     $params = array(
       'pledge_id' => $this->_pledgeID,
@@ -199,12 +195,12 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
 
     $this->assertEquals(6, $result['count']);
   }
-  /*
- * Test that creating a payment will add the contribution ID where only one pledge payment
- * in schedule
- */
-  function testCreatePledgePaymentWhereOnlyOnePayment() {
 
+  /**
+   * Test that creating a payment will add the contribution ID where only one pledge payment
+   * in schedule
+   */
+  function testCreatePledgePaymentWhereOnlyOnePayment() {
     $pledgeParams = array(
       'contact_id' => $this->_individualId,
       'pledge_create_date' => date('Ymd'),

@@ -3702,6 +3702,26 @@ div.m ul#civicrm-menu,
 .crm-container .select2-dropdown-open .select2-choice .select2-arrow b {
   background-position: -18px 1px;
 }
+.select2-drop .crm-entityref-links {
+  border-top: 1px solid #d3d3d3;
+  margin-top: 9px;
+}
+.select2-drop .crm-entityref-filters {
+  margin-top: 4px;
+}
+.select2-drop .crm-entityref-filters select {
+  border-radius: 3px;
+  border: 1px solid #f2f2f2;
+  background-color: #f6f6f6;
+  color: #494949;
+  font-size: 11px;
+  max-width: 70%;
+}
+.select2-drop .crm-entityref-filters select:hover,
+.select2-drop .crm-entityref-filters select:focus,
+.select2-drop .crm-entityref-filters select.active {
+  border: 1px solid #808080;
+}
 /* Style autocomplete results */
 .crm-container .select2-results {
   font-size: 12px;
@@ -4262,8 +4282,10 @@ span.crm-status-icon {
   max-width: 100%;
 }
 
-#crm-container.crm-public .label {
+#crm-container.crm-public .label,
+#crm-container.crm-public .price-field-amount {
   padding-top: 6px;
+  font-size: 15px;
 }
 
 .crm-container.crm-public .select2-container,
@@ -4295,7 +4317,8 @@ span.crm-status-icon {
   padding-top: 6px;
 }
 
-#crm-container.crm-public .calc-value {
+#crm-container.crm-public .calc-value,
+#crm-container.crm-public .content {
   padding-top: 6px;
   font-size: 15px;
 }
@@ -4424,13 +4447,13 @@ span.crm-status-icon {
 }
 
 #crm-container.crm-public .price-set-row .crm-price-amount-amount {
-  font-weight: bold;
   min-width: 2em;
   color: #333333;
 }
 
 #crm-container.crm-public .price-set-row .crm-price-amount-label {
   color: #444444;
+  font-weight: bold;
 }
 
 #crm-container.crm-public .price-set-row .highlight label {
@@ -4442,6 +4465,18 @@ span.crm-status-icon {
   color: #222222;
 }
 
+#crm-container.crm-public .price-set-option-content > tt {
+  display: none;
+}
+
+#crm-container .sold-out-option,
+#crm-container .price-set-row span.sold-out-option .crm-price-amount-label,
+#crm-container .price-set-row span.sold-out-option .crm-price-amount-amount {
+  font-style: italic !important;
+  font-weight: normal !important;
+  font-size: 15px;
+  color: #666 !important;
+}
 #crm-container .crm-extensions-upgrade {
   background: #ffb;
   border: 1px solid #000;

@@ -39,7 +39,7 @@
 class CRM_Custom_Form_Group extends CRM_Core_Form {
 
   /**
-   * the set id saved to the session for an update
+   * The set id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -55,7 +55,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   protected $_isGroupEmpty = TRUE;
 
   /**
-   * array of existing subtypes set for a custom set
+   * Array of existing subtypes set for a custom set
    *
    * @var array
    * @access protected
@@ -63,7 +63,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   protected $_subtypes = array();
 
   /**
-   * array of default params
+   * Array of default params
    *
    * @var array
    * @access protected
@@ -71,7 +71,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   protected $_defaults = array();
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @param null
    *
@@ -110,13 +110,12 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
    * @param $self
    *
-   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -189,7 +188,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @param null
    *
@@ -405,7 +404,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null
@@ -443,9 +442,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       else {
         $defaults['extends'][1] = array(0 => '');
       }
-
-
-      $subName = CRM_Utils_Array::value('extends_entity_column_id', $defaults);
 
       if ($extends == 'Relationship' && !empty($this->_subtypes)) {
         $relationshipDefaults = array();
@@ -532,16 +528,12 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     }
   }
 
-  /*
-   * Function to return a formatted list of relationship name.
-   * @param $list array array of relationship name.
-   * @static
-   * return array array of relationship name.
-   */
   /**
-   * @param $list
+   * Return a formatted list of relationship name.
    *
-   * @return array
+   * @param array $list array of relationship name.
+   *
+   * @return array of relationship name.
    */
   static function getFormattedList(&$list) {
     $relName = array();

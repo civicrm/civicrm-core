@@ -47,7 +47,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
   protected $_force;
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later
    *
    * @return void
    * @access public
@@ -70,7 +70,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *

@@ -47,7 +47,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method create()
+   * Check method create()
    */
   function testCreate() {
     $contactId          = $this->individualCreate();

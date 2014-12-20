@@ -204,7 +204,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
   }
 
   /**
-   * edit CiviCRM Profile data.
+   * Edit CiviCRM Profile data.
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *
@@ -283,10 +283,8 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
   /**
    * Preview custom field
    *
-   * @param $fieldId
-   * @param $groupId
-   *
-   * @internal param int $id custom field id
+   * @param int $fieldId custom field id
+   * @param int $groupId
    *
    * @return void
    * @access public

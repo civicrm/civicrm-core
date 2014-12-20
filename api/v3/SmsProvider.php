@@ -41,7 +41,7 @@
  * {@getfields sms_provider_create}
  * @example sms_providerCreate.php
  *
- * @param $params
+ * @param array $params
  *
  * @return array of newly created sms_provider property values.
  * @access public
@@ -57,7 +57,7 @@ function civicrm_api3_sms_provider_create($params) {
  * {@getfields sms_provider_get}
  * @example sms_providerCreate.php
  *
- * @param $params
+ * @param array $params
  *
  * @return array of retrieved sms_provider property values.
  * @access public
@@ -73,7 +73,7 @@ function civicrm_api3_sms_provider_get($params) {
  * {@getfields sms_provider_delete}
  * @example sms_providerCreate.php
  *
- * @param $params
+ * @param array $params
  *
  * @return array of deleted values.
  * @access public

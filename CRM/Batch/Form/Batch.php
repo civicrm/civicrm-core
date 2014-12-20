@@ -47,7 +47,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -65,9 +65,6 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
 
     $batchTypes = CRM_Batch_BAO_Batch::buildOptions('type_id');
 
-    // unset non-related types
-    unset($batchTypes[3]);
-    unset($batchTypes[4]);
     $type = $this->add('select', 'type_id', ts('Type'), $batchTypes);
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -80,7 +77,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -100,7 +97,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -136,6 +133,5 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/batch/entry', "id={$batch->id}&reset=1"));
     }
   }
-  //end of function
 }
 

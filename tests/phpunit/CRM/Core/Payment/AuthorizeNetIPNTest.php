@@ -45,7 +45,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * test IPN response updates contribution_recur & contribution for first & second contribution
+   * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
   function testIPNPaymentRecurSuccess() {
     $this->setupRecurringPaymentProcessorTransaction();
@@ -66,7 +66,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * test IPN response updates contribution_recur & contribution for first & second contribution
+   * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
   function testIPNPaymentMembershipRecurSuccess() {
     $this->setupMembershipRecurringPaymentProcessorTransaction();

@@ -49,16 +49,12 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Auction_BAO_Item object
+   * @return CRM_Auction_BAO_Item object
    * @access public
    * @static
    */
@@ -88,7 +84,7 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
   }
 
   /**
-   * function to add the auction
+   * add the auction
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -136,7 +132,7 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
   }
 
   /**
-   * function to create the auction
+   * create the auction
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -162,7 +158,7 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
   }
 
   /**
-   * Function to delete the auction
+   * delete the auction
    *
    * @param int $id  auction id
    *

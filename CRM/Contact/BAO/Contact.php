@@ -60,21 +60,21 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     END";
 
   /**
-   * the types of communication preferences
+   * The types of communication preferences
    *
    * @var array
    */
   static $_commPrefs = array('do_not_phone', 'do_not_email', 'do_not_mail', 'do_not_sms', 'do_not_trade');
 
   /**
-   * types of greetings
+   * Types of greetings
    *
    * @var array
    */
   static $_greetingTypes = array('addressee', 'email_greeting', 'postal_greeting');
 
   /**
-   * static field for all the contact information that we can potentially import
+   * Static field for all the contact information that we can potentially import
    *
    * @var array
    * @static
@@ -82,7 +82,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   static $_importableFields = array();
 
   /**
-   * static field for all the contact information that we can potentially export
+   * Static field for all the contact information that we can potentially export
    *
    * @var array
    * @static
@@ -90,7 +90,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   static $_exportableFields = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_Contact_DAO_Contact
@@ -103,7 +103,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * takes an associative array and creates a contact object
+   * Takes an associative array and creates a contact object
    *
    * the function extract all the params it needs to initialize the create a
    * contact object. the params array could contain additional unused name/value
@@ -111,7 +111,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact object
    * @access public
    * @static
    */
@@ -261,7 +261,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * Function to create contact
+   * Create contact
    * takes an associative array and creates a contact object and all the associated
    * derived objects (i.e. individual, location, email, phone etc)
    *
@@ -274,7 +274,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param bool $skipDelete
    *
    * @throws Exception
-   * @return object CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact object
    * @access public
    * @static
    */
@@ -551,7 +551,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   *
    * Get the values for pseudoconstants for name->value and reverse.
    *
    * @param array   $defaults (reference) the default values, some of which need to be resolved.
@@ -682,18 +681,14 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array   $params   (reference ) an assoc array of name/value pairs
    * @param array   $defaults (reference ) an assoc array to hold the name / value pairs
    *                        in a hierarchical manner
    * @param boolean $microformat  for location in microformat
    *
-   * @return object CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact object
    * @access public
    * @static
    */
@@ -735,7 +730,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * function to get the display name of a contact
+   * Get the display name of a contact
    *
    * @param  int    $id id of the contact
    *
@@ -865,8 +860,13 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     //delete the contact id from recently view
     CRM_Utils_Recent::delContact($id);
 
-    // reset the group contact cache for this group
-    CRM_Contact_BAO_GroupContactCache::remove();
+    // Update the group contact cache
+    if ($restore) {
+      CRM_Contact_BAO_GroupContactCache::remove();
+    }
+    else {
+      CRM_Contact_BAO_GroupContactCache::removeContact($id);
+    }
 
     // delete any dupe cache entry
     CRM_Core_BAO_PrevNextCache::deleteItem($id);
@@ -883,7 +883,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * function to delete the image of a contact
+   * Delete the image of a contact
    *
    * @param  int $id id of the contact
    *
@@ -902,12 +902,10 @@ WHERE id={$id}; ";
   }
 
   /**
-   * function to return relative path
+   * Return relative path
    * @todo make this a method of $config->userSystem (i.e. UF classes) rather than a static function
    *
-   * @param $absolutePath
-   *
-   * @internal param String $absPath absolute path
+   * @param string $absolutePath absolute path
    *
    * @return String $relativePath Relative url of uploaded image
    */
@@ -941,7 +939,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * function to return proportional height and width of the image
+   * Return proportional height and width of the image
    *
    * @param  Integer $imageWidth  width of image
    *
@@ -970,18 +968,12 @@ WHERE id={$id}; ";
   }
 
   /**
-   * function to validate type of contact image
+   * Validate type of contact image
    *
-   * @param $params
+   * @param array $params
    * @param  String $imageIndex index of image field
-   *
    * @param  String $statusMsg status message to be set after operation
-   *
-   * @param string $opType
-   *
-   * @internal param Array $param array of contact/profile field to be edited/added
-   *
-   * @opType String $opType     type of operation like fatal, bounce etc
+   * @param string $opType type of operation like fatal, bounce etc
    *
    * @return boolean true if valid image extension
    */
@@ -1019,7 +1011,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * function to extract contact id from url for deleting contact image
+   * Extract contact id from url for deleting contact image
    */
   public static function processImage() {
 
@@ -1148,7 +1140,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * combine all the importable fields from the lower levels object
+   * Combine all the importable fields from the lower levels object
    *
    * The ordering is important, since currently we do not have a weight
    * scheme. Adding weight is super important
@@ -1312,6 +1304,10 @@ WHERE id={$id}; ";
             'title' => ts('Note(s)'),
             'name' => 'note',
           ),
+          'communication_style_id' => array(
+            'title' => ts('Communication Style'),
+            'name' => 'communication_style_id',
+          ),
         ));
       }
 
@@ -1339,7 +1335,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * combine all the exportable fields from the lower levels object
+   * Combine all the exportable fields from the lower levels object
    *
    * currentlty we are using importable fields as exportable fields
    *
@@ -1578,7 +1574,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Function to get the all contact details(Hierarchical)
+   * Get the all contact details(Hierarchical)
    *
    * @param int   $contactId contact id
    * @param array $fields fields array
@@ -1604,13 +1600,12 @@ WHERE id={$id}; ";
   }
 
   /**
-   * given a set of flat profile style field names, create a hierarchy
+   * Given a set of flat profile style field names, create a hierarchy
    * for query to use and crete the right sql
    *
    * @param $fields
    * @param int $contactId contact id
    *
-   * @internal param array $properties a flat return properties name value array
    * @return array a hierarchical property tree if appropriate
    * @access public
    * @static
@@ -1672,13 +1667,13 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Function to return the primary location type of a contact
+   * Return the primary location type of a contact
    *
    * $params int     $contactId contact_id
    * $params boolean $isPrimaryExist if true, return primary contact location type otherwise null
    * $params boolean $skipDefaultPriamry if true, return primary contact location type otherwise null
    *
-   * @param $contactId
+   * @param int $contactId
    * @param bool $skipDefaultPriamry
    * @param null $block
    *
@@ -1741,7 +1736,7 @@ WHERE  civicrm_contact.id = %1 ";
   }
 
   /**
-   * function to get the display name, primary email and location type of a contact
+   * Get the display name, primary email and location type of a contact
    *
    * @param  int    $id id of the contact
    *
@@ -1785,23 +1780,18 @@ ORDER BY civicrm_email.is_primary DESC";
   }
 
   /**
-   * function to add/edit/register contacts through profile.
+   * Add/edit/register contacts through profile.
    *
-   * @params  array  $params        Array of profile fields to be edited/added.
-   * @params  int    $contactID     contact_id of the contact to be edited/added.
-   * @params  array  $fields        array of fields from UFGroup
-   * @params  int    $addToGroupID  specifies the default group to which contact is added.
-   * @params  int    $ufGroupId     uf group id (profile id)
-   * @param $params
-   * @param $fields
-   * @param null $contactID
-   * @param null $addToGroupID
-   * @param null $ufGroupId
-   * @param   string $ctype contact type
-   * @param   boolean $visibility basically lets us know where this request is coming from
+   * @param array $params Array of profile fields to be edited/added.
+   * @param array $fields Array of fields from UFGroup
+   * @param int $contactID id of the contact to be edited/added.
+   * @param int $addToGroupID specifies the default group to which contact is added.
+   * @param int $ufGroupId uf group id (profile id)
+   * @param ctype
+   * @param boolean $visibility basically lets us know where this request is coming from
    *                                if via a profile from web, we restrict what groups are changed
    *
-   * @return  int                   contact id created/edited
+   * @return int contact id created/edited
    * @static
    * @access public
    */
@@ -1897,10 +1887,10 @@ ORDER BY civicrm_email.is_primary DESC";
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $fields
-   * @param null $contactID
-   * @param null $ufGroupId
+   * @param int $contactID
+   * @param int $ufGroupId
    * @param null $ctype
    * @param bool $skipCustom
    *
@@ -2263,7 +2253,7 @@ ORDER BY civicrm_email.is_primary DESC";
   }
 
   /**
-   * Function to find the get contact details
+   * Find the get contact details
    * does not respect ACLs for now, which might need to be rectified at some
    * stage based on how its used
    *
@@ -2317,7 +2307,7 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
   }
 
   /**
-   * Function to find the contact details associated with an OpenID
+   * Find the contact details associated with an OpenID
    *
    * @param string $openId openId of the contact
    * @param string $ctype  contact type
@@ -2573,7 +2563,7 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Function to process greetings and cache
+   * Process greetings and cache
    *
    * @param object  $contact contact object after save
    * @param boolean $useDefaults use default greeting values
@@ -2724,7 +2714,7 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Function to retrieve loc block ids w/ given condition.
+   * Retrieve loc block ids w/ given condition.
    *
    * @param  int    $contactId    contact id.
    * @param  array  $criteria     key => value pair which should be
@@ -2776,9 +2766,9 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Function to build context menu items.
+   * Build context menu items.
    *
-   * @param null $contactId
+   * @param int $contactId
    *
    * @return array of context menu for logged in user.
    * @static
@@ -3036,7 +3026,7 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Function to retrieve display name of contact that address is shared
+   * Retrieve display name of contact that address is shared
    * based on $masterAddressId or $contactId .
    *
    * @param  int    $masterAddressId    master id.
@@ -3073,7 +3063,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   /**
    * Get the creation/modification times for a contact
    *
-   * @param $contactId
+   * @param int $contactId
    *
    * @return array('created_date' => $, 'modified_date' => $)
    */
@@ -3098,6 +3088,52 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
+   * Generate triggers to update the timestamp on the corresponding civicrm_contact row,
+   * on insert/update/delete to a table that extends civicrm_contact.
+   * Don't regenerate triggers for all such tables if only asked for one table.
+   *
+   * @param array $info
+   *   Reference to the array where generated trigger information is being stored
+   * @param string|null $reqTableName
+   *   Name of the table for which triggers are being generated, or NULL if all tables
+   * @param array $relatedTableNames
+   *   Array of all core or all custom table names extending civicrm_contact
+   * @param string $contactRefColumn
+   *   'contact_id' if processing core tables, 'entity_id' if processing custom tables
+   * @return void
+   *
+   * @link https://issues.civicrm.org/jira/browse/CRM-15602
+   * @see triggerInfo
+   * @access public
+   * @static
+   */
+  static function generateTimestampTriggers(&$info, $reqTableName, $relatedTableNames, $contactRefColumn) {
+    // Safety
+    $contactRefColumn = CRM_Core_DAO::escapeString($contactRefColumn);
+    // If specific related table requested, just process that one
+    if (in_array($reqTableName, $relatedTableNames)) {
+      $relatedTableNames = array($reqTableName);
+    }
+
+    // If no specific table requested (include all related tables),
+    // or a specific related table requested (as matched above)
+    if (empty($reqTableName) || in_array($reqTableName, $relatedTableNames)) {
+      $info[] = array(
+        'table' => $relatedTableNames,
+        'when' => 'AFTER',
+        'event' => array('INSERT', 'UPDATE'),
+        'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.$contactRefColumn;\n",
+      );
+      $info[] = array(
+        'table' => $relatedTableNames,
+        'when' => 'AFTER',
+        'event' => array('DELETE'),
+        'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = OLD.$contactRefColumn;\n",
+      );
+    }
+  }
+
+  /**
    * Get a list of triggers for the contact table
    *
    * @see hook_civicrm_triggerInfo
@@ -3115,6 +3151,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       }
     }
 
+    // Update timestamp for civicrm_contact itself
     if ($tableName == NULL || $tableName == self::getTableName()) {
       $info[] = array(
         'table' => array(self::getTableName()),
@@ -3132,18 +3169,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       'civicrm_phone',
       'civicrm_website',
     );
-    $info[] = array(
-      'table' => $relatedTables,
-      'when' => 'AFTER',
-      'event' => array('INSERT', 'UPDATE'),
-      'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.contact_id;\n",
-    );
-    $info[] = array(
-      'table' => $relatedTables,
-      'when' => 'AFTER',
-      'event' => array('DELETE'),
-      'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = OLD.contact_id;\n",
-    );
+    self::generateTimestampTriggers($info, $tableName, $relatedTables, 'contact_id');
 
     // Update timestamp when modifying related custom-data tables
     $customGroupTables = array();
@@ -3154,18 +3180,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       $customGroupTables[] = $customGroupDAO->table_name;
     }
     if (!empty($customGroupTables)) {
-      $info[] = array(
-        'table' => $customGroupTables,
-        'when' => 'AFTER',
-        'event' => array('INSERT', 'UPDATE'),
-        'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.entity_id;\n",
-      );
-      $info[] = array(
-        'table' => $customGroupTables,
-        'when' => 'AFTER',
-        'event' => array('DELETE'),
-        'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = OLD.entity_id;\n",
-      );
+      self::generateTimestampTriggers($info, $tableName, $customGroupTables, 'entity_id');
     }
 
     // Update phone table to populate phone_numeric field
@@ -3183,7 +3198,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
-   * Function to check if contact is being used in civicrm_domain
+   * Check if contact is being used in civicrm_domain
    * based on $contactId
    *
    * @param  int     $contactId   contact id.

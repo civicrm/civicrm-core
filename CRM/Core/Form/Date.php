@@ -35,14 +35,14 @@
 Class CRM_Core_Form_Date {
 
   /**
-   * various Date Formats
+   * Various Date Formats
    */
   CONST DATE_yyyy_mm_dd = 1, DATE_mm_dd_yy = 2, DATE_mm_dd_yyyy = 4, DATE_Month_dd_yyyy = 8, DATE_dd_mon_yy = 16, DATE_dd_mm_yyyy = 32;
 
   /**
    * This function is to build the date-format form
    *
-   * @param Object  $form   the form object that we are operating on
+   * @param CRM_Core_Form  $form   the form object that we are operating on
    *
    * @static
    * @access public
@@ -74,7 +74,7 @@ Class CRM_Core_Form_Date {
    * This function is to retrieve the date range - relative or absolute
    * and assign it to the form
    *
-   * @param object $form - the form the dates should be added to
+   * @param CRM_Core_Form $form - the form the dates should be added to
    * @param string $fieldName
    * @param integer $count
    * @param string $from
@@ -114,7 +114,7 @@ Class CRM_Core_Form_Date {
    * This function is to build the date range array that will provide the form option values
    * It can be - relative or absolute
    *
-   * @param Object  $form   the form object that we are operating on
+   * @param CRM_Core_Form  $form   the form object that we are operating on
    * @param string $fieldName
    * @param integer $count
    * @param String $from
@@ -236,7 +236,6 @@ Class CRM_Core_Form_Date {
    * @param string $dateFormat
    * @param boolean $displayTime
    *
-   * @internal param int $count
    * @return null
    */
   static function addDateRangeToForm(&$form, $fieldName, $selector, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE) {

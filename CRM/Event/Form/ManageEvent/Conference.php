@@ -45,7 +45,7 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
   public $_action;
 
   /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -71,7 +71,7 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public

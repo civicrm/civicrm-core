@@ -49,7 +49,7 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
   protected $_rows;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -100,7 +100,7 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -119,6 +119,8 @@ AND    {$this->_componentClause}";
     $this->add('select', 'pdf_format_id', ts('Page Format'),
       array(0 => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE)
     );
+    $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
+    $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do no email / Do not mail)'), FALSE);
 
     $this->addButtons(array(
         array(
@@ -139,11 +141,11 @@ AND    {$this->_componentClause}";
    */
   function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
-    return array('pdf_format_id' => $defaultFormat['id']);
+    return array('pdf_format_id' => $defaultFormat['id'], 'receipt_update' => 1, 'override_privacy' => 0);
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -191,10 +193,9 @@ AND    {$this->_componentClause}";
       // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
 
-      // CRM_Core_Error::debug('input',$input);
-
       $values = array();
       $mail = $elements['baseIPN']->sendMail($input, $ids, $objects, $values, FALSE, $elements['createPdf']);
+
 
       if ($mail['html']) {
         $message[] = $mail['html'];
@@ -205,6 +206,10 @@ AND    {$this->_componentClause}";
 
       // reset template values before processing next transactions
       $template->clearTemplateVars();
+      if (!empty($params['receipt_update'])) {
+        $objects['contribution']->receipt_date = date('Y-m-d H-i-s');
+        $objects['contribution']->save();
+      }
     }
 
     if ($elements['createPdf']) {
@@ -231,7 +236,7 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * declaration of common variables for Invoice and PDF
+   * Declaration of common variables for Invoice and PDF
    *
    * @access public
    *
@@ -274,11 +279,13 @@ AND    {$this->_componentClause}";
       $pdfElements['suppressedEmails'] = 0;
       $suppressedEmails = 0;
       foreach ($contactDetails as $id => $values) {
-        if (empty($values['email']) || !empty($values['do_not_email']) ||
-            CRM_Utils_Array::value('is_deceased', $values) || !empty($values['on_hold'])) {
-          $suppressedEmails++;
-          $pdfElements['suppressedEmails'] = $suppressedEmails;
-          $excludeContactIds[] = $values['contact_id'];
+        if (empty($values['email']) ||
+          (empty($params['override_privacy']) && !empty($values['do_not_email']))
+          || CRM_Utils_Array::value('is_deceased', $values)
+          || !empty($values['on_hold'])) {
+            $suppressedEmails++;
+            $pdfElements['suppressedEmails'] = $suppressedEmails;
+            $excludeContactIds[] = $values['contact_id'];
         }
       }
     }

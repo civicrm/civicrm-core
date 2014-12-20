@@ -452,8 +452,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
   }
 
   /**
-   * @param $firstName
-   * @param $lastName
+   * @param string $firstName
+   * @param string $lastName
    * @param $events
    */
   function _checkContributionsandEventRegistration($firstName, $lastName, $events) {

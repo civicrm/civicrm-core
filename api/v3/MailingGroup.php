@@ -99,7 +99,7 @@ function civicrm_api3_mailing_group_create($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return array
  */

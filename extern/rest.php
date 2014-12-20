@@ -26,17 +26,14 @@
 */
 
 require_once '../civicrm.config.php';
-require_once 'CRM/Core/Config.php';
 $config = CRM_Core_Config::singleton();
 
 session_start();
-require_once 'CRM/Utils/REST.php';
 $rest = new CRM_Utils_REST();
 
-if (isset($_GET['json']) && $_GET['json']) {
-  header('Content-Type: text/javascript');
-}
-else {
+// Json-appropriate header will be set by CRM_Utils_Rest
+// But we need to set header here for non-json
+if (empty($_GET['json'])) {
   header('Content-Type: text/xml');
 }
 echo $rest->bootAndRun();

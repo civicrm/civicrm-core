@@ -596,7 +596,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
 }
 
 /**
- *  Function to check duplicate contacts based on de-deupe parameters
+ * check duplicate contacts based on de-deupe parameters
  */
 function _civicrm_api3_deprecated_check_contact_dedupe($params) {
   static $cIndieFields = NULL;
@@ -1212,11 +1212,8 @@ function _civicrm_api3_deprecated_validate_formatted_contact(&$params) {
 /**
  * @deprecated - this is part of the import parser not the API & needs to be moved on out
  *
- * @param $params
+ * @param array $params
  * @param $onDuplicate
- *
- * @internal param $ <type> $params
- * @internal param $ <type> $onDuplicate
  *
  * @return array|bool <type>
  */
@@ -1330,11 +1327,11 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
 }
 
 /**
- * @param $params
+ * @param array $params
  * @param bool $dupeCheck
  * @param bool $dupeErrorArray
  * @param bool $requiredCheck
- * @param null $dedupeRuleGroupID
+ * @param int $dedupeRuleGroupID
  *
  * @return array|null
  */
@@ -1468,10 +1465,7 @@ function _civicrm_api3_deprecated_contact_check_params(
 /**
  *
  * @param $result
- * @param $activityTypeID
- *
- * @internal param $ <type> $result
- * @internal param $ <type> $activityTypeID
+ * @param int $activityTypeID
  *
  * @return array <type> $params
  */

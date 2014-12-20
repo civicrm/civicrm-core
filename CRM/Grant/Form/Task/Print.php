@@ -39,7 +39,7 @@
 class CRM_Grant_Form_Task_Print extends CRM_Grant_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -67,7 +67,7 @@ class CRM_Grant_Form_Task_Print extends CRM_Grant_Form_Task {
   }
 
   /**
-   * Build the form - it consists of
+   * Build the form object - it consists of
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
    *
@@ -95,7 +95,7 @@ class CRM_Grant_Form_Task_Print extends CRM_Grant_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

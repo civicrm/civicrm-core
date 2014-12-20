@@ -50,7 +50,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   static $_links = NULL;
 
   /**
-   * we use desc to remind us what that column is, name is used in the tpl
+   * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    * @static
@@ -80,7 +80,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   );
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -88,7 +88,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -96,7 +96,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   protected $_limit = NULL;
 
   /**
-   * what context are we being invoked from
+   * What context are we being invoked from
    *
    * @access protected
    * @var string
@@ -104,7 +104,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   protected $_context = NULL;
 
   /**
-   * queryParams is the array returned by exportValues called on
+   * QueryParams is the array returned by exportValues called on
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
@@ -113,7 +113,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   public $_queryParams;
 
   /**
-   * represent the type of selector
+   * Represent the type of selector
    *
    * @var int
    * @access protected
@@ -177,7 +177,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     $this->_query->_distinctComponentClause = " civicrm_membership.id";
     $this->_query->_groupByComponentClause = " GROUP BY civicrm_membership.id ";
   }
-  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -272,14 +271,12 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
 
     return self::$_links[$status];
   }
-  //end of function
 
   /**
-   * getter for array of the parameters required for creating pager.
+   * Getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param $params
-   * @internal param $
+   * @param array $params
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -295,7 +292,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * Returns total number of rows for the query.
@@ -315,7 +311,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount
    *
    * @param enum   $action   the action being performed
    * @param int    $offset   the row number to start from
@@ -451,7 +447,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
-   *
    * @return array              $qill         which contains an array of strings
    * @access public
    */
@@ -463,7 +458,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
    * @param string $action the action being performed
@@ -540,7 +535,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
-   * name of export file.
+   * Name of export file.
    *
    * @param string $output type of output
    *
@@ -550,5 +545,4 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     return ts('CiviCRM Member Search');
   }
 }
-//end of class
 

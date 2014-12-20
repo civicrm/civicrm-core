@@ -62,7 +62,7 @@ class WebTest_Event_AddRecurringEventTest extends CiviSeleniumTestCase {
     $this->webtestFillDate("exclude_date", "12/05/2015");
     $this->click('add_to_exclude_list');
     $this->click('_qf_Repeat_submit-bottom');
-    $this->waitForTextPresent('Based on your repeat configuration here is the list of dates, Do you wish to create recurring set of these dates?');
+    $this->waitForTextPresent('Based on your repeat configuration, here is the list of dates. Do you wish to create a recurring set with these dates?');
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Ok']");
     $this->waitForAjaxContent();
     $this->checkCRMAlert('Repeat Configuration has been saved');
@@ -98,7 +98,7 @@ class WebTest_Event_AddRecurringEventTest extends CiviSeleniumTestCase {
     $countOfEvents = $this->getXpathCount("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody/tr");
     if ($countOfEvents) {
       for ($i = 0; $i <= $countOfEvents; $i++) {
-        $this->verifyText("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody/tr/td/a", 'CiviCon');
+        $this->verifyText("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody/tr/td[1]/a", 'CiviCon');
       }
     }
   }

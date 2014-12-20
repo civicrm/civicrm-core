@@ -95,7 +95,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -147,13 +147,12 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
    * @param $self
    *
-   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -171,7 +170,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

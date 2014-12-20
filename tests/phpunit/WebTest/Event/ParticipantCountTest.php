@@ -106,7 +106,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify number of registered participants
-    $this->assertTrue($this->isTextPresent('2 Results'));
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", '2 Results');
   }
 
   function testParticipantCountWithPriceset() {
@@ -331,7 +331,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return string
    */
@@ -437,7 +437,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $eventParams
+   * @param array $eventParams
    * @param $participants
    * @param $priceFieldOptionCounts
    */

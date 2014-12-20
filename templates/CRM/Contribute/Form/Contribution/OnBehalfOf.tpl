@@ -221,18 +221,20 @@ function setLocationDetails(contactID , reset) {
     success     : function(data, status) {
       for (var ele in data) {
         if (cj("#"+ ele).hasClass('crm-chain-select-target')) {
-          cj("#"+ ele).data('newVal', data[ele].value).off('.autofill').on('crmOptionsUpdated.autofill', function() {console.log(this.id, cj(this).data('newVal'));
+          cj("#"+ ele).data('newVal', data[ele].value).off('.autofill').on('crmOptionsUpdated.autofill', function() {
             cj(this).off('.autofill').val(cj(this).data('newVal')).change();
           });
         }
         if (data[ele].type == 'Radio') {
           if (data[ele].value) {
-            cj("input[name='"+ ele +"']").filter("[value=" + data[ele].value + "]").prop('checked', true);
+            var fldName = ele.replace('onbehalf_', '');
+            cj("input[name='onbehalf["+ fldName +"]']").filter("[value='" + data[ele].value + "']").prop('checked', true);
           }
         }
         else if (data[ele].type == 'CheckBox') {
-          if (data[ele].value) {
-            cj("input[name='"+ ele +"']").prop('checked','checked');
+          for (var selectedOption in data[ele].value) {
+            var fldName = ele.replace('onbehalf_', '');
+            cj("input[name='onbehalf["+ fldName+"]["+ selectedOption +"]']").prop('checked','checked');
           }
         }
         else if (data[ele].type == 'Multi-Select') {
@@ -258,7 +260,10 @@ function setLocationDetails(contactID , reset) {
           }
         }
         else {
-          cj('#' + ele ).val(data[ele].value).change();
+          // do not set defaults to file type fields
+          if (cj('#' + ele).attr('type') != 'file') {
+            cj('#' + ele ).val(data[ele].value).change();
+          }
         }
       }
     },

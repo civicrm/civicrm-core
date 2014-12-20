@@ -58,7 +58,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string $mode the mode of operation: live or test
    *
@@ -119,11 +119,15 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       $params['trxn_id'] = sprintf('live_%08d', $trxn_id);
     }
     $params['gross_amount'] = $params['amount'];
+    // Add a fee_amount so we can make sure fees are handled properly in underlying classes.
+    $params['fee_amount'] = 1.50;
+    $params['net_amount'] = $params['gross_amount'] - $params['fee_amount'];
+
     return $params;
   }
 
   /**
-   * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
    * @return bool
    */
   protected function supportsLiveMode() {

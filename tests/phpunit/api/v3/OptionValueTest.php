@@ -132,12 +132,10 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('option_value', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertGreaterThan(1, $result['count'], 'In line ' . __LINE__);
   }
-  /*
-     * test that using option_group_name returns more than 1 & less than all
-     */
 
-
-
+  /**
+   * Test that using option_group_name returns more than 1 & less than all
+   */
   public function testGetOptionGroupByName() {
     $activityTypesParams = array('option_group_name' => 'activity_type', 'option.limit' => 100);
     $params = array('option.limit' => 100);
@@ -146,13 +144,15 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $this->assertGreaterThan(1, $activityTypes['count'], 'In line ' . __LINE__);
     $this->assertGreaterThan($activityTypes['count'], $result['count'], 'In line ' . __LINE__);
   }
+
   public function testGetOptionDoesNotExist() {
     $result = $this->callAPISuccess('option_value', 'get', array('label' => 'FSIGUBSFGOMUUBSFGMOOUUBSFGMOOBUFSGMOOIIB'));
     $this->assertEquals(0, $result['count'], 'In line ' . __LINE__);
   }
-/*
- * Check that domain_id is honoured
- */
+
+  /**
+   * Check that domain_id is honoured
+   */
   public function testCreateOptionSpecifyDomain() {
     $result = $this->callAPISuccess('option_group', 'get', array(
       'name' => 'from_email_address',
@@ -167,9 +167,10 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(2, $domain_id);
   }
-  /*
+
+  /**
    * Check that component_id is honoured
-  */
+   */
   public function testCreateOptionSpecifyComponentID() {
     $result = $this->callAPISuccess('option_group', 'get', array(
       'name' => 'from_email_address',
@@ -182,9 +183,10 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(2, $component_id);
   }
-  /*
+
+  /**
    * Check that component  continues to be honoured
-  */
+   */
   public function testCreateOptionSpecifyComponent() {
     $result = $this->callAPISuccess('option_group', 'get', array(
       'name' => 'from_email_address',
@@ -201,9 +203,10 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(2, $component_id);
   }
-  /*
+
+  /**
    * Check that component string is honoured
-  */
+   */
   public function testCreateOptionSpecifyComponentString() {
     $result = $this->callAPISuccess('option_group', 'get', array(
       'name' => 'from_email_address',
@@ -219,9 +222,10 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(2, $component_id);
   }
-  /*
+
+  /**
    * Check that domain_id is honoured
-  */
+   */
   public function testCRM12133CreateOptionWeightNoValue() {
     $optionGroup = $this->callAPISuccess(
       'option_group', 'get', array(
@@ -245,9 +249,9 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $this->callAPISuccess('option_value', 'delete', array('id' => $optionValue2['id']));
   }
 
-  /*
+  /**
    * Check that domain_id is honoured
-  */
+   */
   public function testCreateOptionNoName() {
     $optionGroup = $this->callAPISuccess('option_group', 'get', array(
       'name' => 'gender',
@@ -283,8 +287,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
 
-  /*
-   * update option value with 'id' paramter and the value to update
+  /**
+   * Update option value with 'id' paramter and the value to update
    * and not passing option group id
    */
   public function testUpdateOptionValueNoGroupId() {
@@ -302,8 +306,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $this->assertEquals($val, 0, "update with no group id is not proper" . __LINE__);
   }
 
-  /*
-   * update option value with 'id' paramter and the value to update
+  /**
+   * Update option value with 'id' paramter and the value to update
    * and as well as option group id
    */
   public function testUpdateOptionValueWithGroupId() {

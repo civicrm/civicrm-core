@@ -74,6 +74,11 @@
       {/literal}
       // Workaround for possible duplicate ids in the dom - select by name instead of id and exclude already initialized widgets
       var $dateElement = $('input[name={$displayDate}].dateplugin:not(.hasDatepicker)');
+      {literal}
+      if (!$dateElement.length) {
+        return;
+      }
+      {/literal}
       {if $timeElement}
         var $timeElement = $dateElement.siblings("#{$timeElement}");
         var time_format = $timeElement.attr('timeFormat');

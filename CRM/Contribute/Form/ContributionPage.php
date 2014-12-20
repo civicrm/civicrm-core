@@ -39,7 +39,7 @@
 class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
   /**
-   * the page id saved to the session for an update
+   * The page id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -47,7 +47,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * the pledgeBlock id saved to the session for an update
+   * The pledgeBlock id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -55,7 +55,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_pledgeBlockID;
 
   /**
-   * are we in single form mode or wizard mode?
+   * Are we in single form mode or wizard mode?
    *
    * @var boolean
    * @access protected
@@ -63,7 +63,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_single;
 
   /**
-   * is this the first page?
+   * Is this the first page?
    *
    * @var boolean
    * @access protected
@@ -71,7 +71,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_first = FALSE;
 
   /**
-   * store price set id.
+   * Store price set id.
    *
    * @var int
    * @access protected
@@ -81,7 +81,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_values;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -142,7 +142,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -240,7 +240,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public

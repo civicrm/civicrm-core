@@ -43,7 +43,7 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * if membership are involved, add the specific membership fields
+   * If membership are involved, add the specific membership fields
    *
    * @param $query
    *
@@ -348,7 +348,7 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
@@ -433,7 +433,7 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function buildSearchForm(&$form) {
     foreach (CRM_Member_PseudoConstant::membershipType() as $id => $Name) {
@@ -484,7 +484,7 @@ class CRM_Member_BAO_Query {
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
   static function searchAction(&$row, $id) {}
 

@@ -200,8 +200,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
    *
    * @return array
    */
-  public static function getCampaignSummary($params = array(
-    )) {
+  public static function getCampaignSummary($params = array()) {
     $campaignsData = array();
 
     //get the campaigns.
@@ -294,8 +293,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
    *
    * @return array
    */
-  function getSurveySummary($params = array(
-    )) {
+  function getSurveySummary($params = array()) {
     $surveysData = array();
 
     //get the survey.
@@ -395,8 +393,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
    *
    * @return array
    */
-  function getPetitionSummary($params = array(
-    )) {
+  function getPetitionSummary($params = array()) {
     $config = CRM_Core_Config::singleton();
     $petitionsData = array();
 
@@ -496,6 +493,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         'link' => CRM_Utils_System::url('civicrm/campaign', "reset=1&type=$name"),
       );
     }
+    $allTabs['campaign']['class'] = 'livePage';
     $this->assign('tabHeader', $allTabs);
   }
 }

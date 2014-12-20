@@ -55,7 +55,7 @@ class CRM_Bridge_OG_Utils {
   }
 
   /**
-   * @param $ogID
+   * @param int $ogID
    *
    * @return string
    */
@@ -64,7 +64,7 @@ class CRM_Bridge_OG_Utils {
   }
 
   /**
-   * @param $ogID
+   * @param int $ogID
    *
    * @return string
    */
@@ -73,7 +73,7 @@ class CRM_Bridge_OG_Utils {
   }
 
   /**
-   * @param $groupID
+   * @param int $groupID
    * @param bool $abort
    *
    * @return int|null|string
@@ -98,7 +98,7 @@ class CRM_Bridge_OG_Utils {
   }
 
   /**
-   * @param $ufID
+   * @param int $ufID
    *
    * @return int
    * @throws Exception

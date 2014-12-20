@@ -155,7 +155,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * edit custom group
+   * Edit custom group
    *
    * @param int    $id       custom group id
    * @param string $action   the action to be invoked

@@ -40,7 +40,7 @@
 class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
 
   /**
-   * static holder for the Paper Size Option Group ID
+   * Static holder for the Paper Size Option Group ID
    */
   private static $_gid = NULL;
 
@@ -131,7 +131,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * retrieve the default Paper Size values
+   * Retrieve the default Paper Size values
    *
    * @param NULL
    *
@@ -236,7 +236,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $values   (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_DAO_OptionValue object
+   * @return CRM_Core_DAO_OptionValue object
    * @access public
    * @static
    */
@@ -327,7 +327,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Function to delete a Paper Size
+   * Delete a Paper Size
    *
    * @param  int  $id     ID of the Paper Size to be deleted.
    *

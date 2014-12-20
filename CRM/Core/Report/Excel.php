@@ -152,7 +152,7 @@ class CRM_Core_Report_Excel {
   }
 
   /**
-   * @param $fileName
+   * @param string $fileName
    * @param $header
    * @param $rows
    * @param null $titleHeader

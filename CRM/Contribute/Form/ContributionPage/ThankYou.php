@@ -39,7 +39,7 @@
 class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -53,7 +53,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -63,8 +63,18 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
 
     // thank you title and text (html allowed in text)
     $this->add('text', 'thankyou_title', ts('Thank-you Page Title'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_title'), TRUE);
-    $this->addWysiwyg('thankyou_text', ts('Thank-you Message'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_text'));
-    $this->addWysiwyg('thankyou_footer', ts('Thank-you Page Footer'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_footer'));
+
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_text');
+    $attributes['click_wysiwyg'] = true;
+    $this->addWysiwyg('thankyou_text', ts('Thank-you Message'), $attributes);
+    // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
+    // explicit height and width.
+    $footerAttribs = array(
+      'rows' => 2,
+      'cols' => 40,
+      'click_wysiwyg' => true,
+    );
+    $this->addWysiwyg('thankyou_footer', ts('Thank-you Footer'), $footerAttribs);
 
     $this->addElement('checkbox', 'is_email_receipt', ts('Email Receipt to Contributor?'), NULL, array('onclick' => "showReceipt()"));
     $this->add('text', 'receipt_from_name', ts('Receipt From Name'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'receipt_from_name'));
@@ -82,7 +92,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields  the input form values
    * @param array $files   the uploaded files if any
