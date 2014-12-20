@@ -85,7 +85,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   public function testMailerDeleteSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
 
-    $this->assertDBQuery(1, "SELECT count(*) FROM civicrm_mailing_abtesting WHERE id = %1", array(
+    $this->assertDBQuery(1, "SELECT count(*) FROM civicrm_mailing_abtest WHERE id = %1", array(
       1 => array($result['id'], 'Integer'),
     ));
     $this->assertDBQuery(3, "SELECT count(*) FROM civicrm_mailing WHERE id IN (%1,%2,%3)", array(
@@ -96,7 +96,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
 
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
 
-    $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_mailing_abtesting WHERE id = %1", array(
+    $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_mailing_abtest WHERE id = %1", array(
       1 => array($result['id'], 'Integer'),
     ));
     $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_mailing WHERE id IN (%1,%2,%3)", array(
