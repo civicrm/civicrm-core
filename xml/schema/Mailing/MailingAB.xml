@@ -3,7 +3,7 @@
 <table>
   <base>CRM/Mailing</base>
   <class>MailingAB</class>
-  <name>civicrm_mailing_abtesting</name>
+  <name>civicrm_mailing_abtest</name>
   <comment>Stores information about abtesting</comment>
   <archive>true</archive>
   <field>
