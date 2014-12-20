@@ -48,6 +48,7 @@
     $scope.isSubmitted = function isSubmitted() {
       return _.size(abtest.mailings.a.jobs) > 0 || _.size(abtest.mailings.b.jobs) > 0;
     };
+
     $scope.sync = function sync() {
       abtest.mailings.a.name = ts('Test A (%1)', {1: abtest.ab.name});
       abtest.mailings.b.name = ts('Test B (%1)', {1: abtest.ab.name});
@@ -58,14 +59,27 @@
         // TODO review fields exposed in UI and make sure the sync rules match
         switch (criteria.name) {
           case 'Subject lines':
-            crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, ['name', 'subject']);
+            crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
+              'name',
+              'groups',
+              'mailings',
+              'subject'
+            ]);
             break;
           case 'From names':
-            crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, ['name', 'from_name', 'from_email']);
+            crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
+              'name',
+              'groups',
+              'mailings',
+              'from_name',
+              'from_email'
+            ]);
             break;
           case 'Two different emails':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
+              'groups',
+              'mailings',
               'subject',
               'from_name',
               'from_email',
@@ -78,6 +92,7 @@
         }
       }
       crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings.a, ['name']);
+      return $q.when(true);
     };
 
     // @return Promise
@@ -88,11 +103,13 @@
 
     // @return Promise
     $scope.previewMailing = function previewMailing(mailingName, mode) {
+      $scope.sync();
       return crmMailingPreviewMgr.preview(abtest.mailings[mailingName], mode);
     };
 
     // @return Promise
     $scope.sendTest = function sendTest(mailingName, recipient) {
+      $scope.sync();
       return crmStatus({start: ts('Saving...'), success: ''}, abtest.save().then(updateUrl))
         .then(function () {
           crmMailingPreviewMgr.sendTest(abtest.mailings[mailingName], recipient);
@@ -106,12 +123,12 @@
 
     // @return Promise
     $scope.submit = function submit() {
+      $scope.sync();
       return crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
         .then(function () {
-          return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, $q.all([
-            crmMailingMgr.submit(abtest.mailings.a),
-            crmMailingMgr.submit(abtest.mailings.b)
-          ]));
+          return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, abtest.submit('Testing'));
+          // Note: We're going to leave, so we don't care that submit() modifies several server-side records.
+          // If we stayed on this page, then we'd care about updating and call: abtest.submit().then(abtest.load)
         })
         .then(leave);
     };
