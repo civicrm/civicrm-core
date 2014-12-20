@@ -10,6 +10,26 @@
     };
   });
 
+  angular.module('crmUtil').factory('crmNow', function($q){
+    // FIXME: surely there's already some helper which can do this in one line?
+    // @return string "YYYY-MM-DD hh:mm:ss"
+    return function crmNow() {
+      var currentdate = new Date();
+      var yyyy = currentdate.getFullYear();
+      var mm = currentdate.getMonth() + 1;
+      mm = mm < 10 ? '0' + mm : mm;
+      var dd = currentdate.getDate();
+      dd = dd < 10 ? '0' + dd : dd;
+      var hh = currentdate.getHours();
+      hh = hh < 10 ? '0' + hh : hh;
+      var min = currentdate.getMinutes();
+      min = min < 10 ? '0' + min : min;
+      var sec = currentdate.getSeconds();
+      sec = sec < 10 ? '0' + sec : sec;
+      return yyyy + "-" + mm + "-" + dd + " " + hh + ":" + min + ":" + sec;
+    };
+  });
+
   // crmWatcher allows one to setup event listeners and temporarily suspend
   // them en masse.
   //
