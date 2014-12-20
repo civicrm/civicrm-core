@@ -102,7 +102,7 @@
           .then(function () {
             return crmApi('MailingAB', 'create', crmMailingAB.ab)
               .then(function (abResult) {
-                crmMailingAB.ab.id = abResult.id;
+                crmMailingAB.id = crmMailingAB.ab.id = abResult.id;
               });
           })
           .then(function () {
@@ -111,14 +111,30 @@
       },
       // Schedule the test
       // @return Promise CrmMailingAB
-      // Note: Submission may cause the server state to change. Consider abtest.submit().then(abtest.load)
-      submit: function submit(newStatus) {
+      // Note: Submission may cause the server state to change. Consider abtest.submit().then(...abtest.load()...)
+      submitTest: function submitTest() {
         var crmMailingAB = this;
         var params = {
           id: this.ab.id,
-          status: newStatus,
+          status: 'Testing',
           approval_date: crmNow(),
           scheduled_date: this.mailings.a.scheduled_date ? this.mailings.a.scheduled_date : crmNow()
+        };
+        return crmApi('MailingAB', 'submit', params)
+          .then(function () {
+            return crmMailingAB;
+          });
+      },
+      // Schedule the final mailing
+      // @return Promise CrmMailingAB
+      // Note: Submission may cause the server state to change. Consider abtest.submit().then(...abtest.load()...)
+      submitFinal: function submitFinal() {
+        var crmMailingAB = this;
+        var params = {
+          id: this.ab.id,
+          status: 'Final',
+          approval_date: crmNow(),
+          scheduled_date: this.mailings.c.scheduled_date ? this.mailings.c.scheduled_date : crmNow()
         };
         return crmApi('MailingAB', 'submit', params)
           .then(function () {
