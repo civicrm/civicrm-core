@@ -68,6 +68,13 @@ class CRM_Utils_VersionCheck {
   public $localMajorVersion;
 
   /**
+   * User setting to skip updates prior to a certain date
+   *
+   * @var string
+   */
+  public $ignoreDate;
+
+  /**
    * Info about available versions
    *
    * @var array
@@ -108,6 +115,7 @@ class CRM_Utils_VersionCheck {
       $this->localVersion = trim($info['version']);
       $this->localMajorVersion = $this->getMajorVersion($this->localVersion);
     }
+    // Populate $versionInfo
     if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionCheck', NULL, 1)) {
       // Use cached data if available and not stale
       if (!$this->readCacheFile()) {
@@ -117,26 +125,11 @@ class CRM_Utils_VersionCheck {
         // Get the latest version and send site info
         $this->pingBack();
       }
-    }
-    // Make sure version info is in ascending order for easier comparisons
-    ksort($this->versionInfo, SORT_NUMERIC);
-  }
+      $this->ignoreDate = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionCheckIgnoreDate');
 
-  /**
-   * Magic property accessor
-   * @param $variable
-   * @return mixed
-   */
-  function __get($variable) {
-    switch ($variable) {
-      case "localVersionStatus":
-        if ($this->localVersion && $this->versionInfo) {
-          $versionInfo = CRM_Utils_Array::value($this->localMajorVersion, $this->versionInfo);
-          return CRM_Utils_Array::value('status', $versionInfo);
-        }
-        return NULL;
+      // Sort version info in ascending order for easier comparisons
+      ksort($this->versionInfo, SORT_NUMERIC);
     }
-    return NULL;
   }
 
   /**
@@ -183,13 +176,18 @@ class CRM_Utils_VersionCheck {
     return "$a.$b";
   }
 
+  /**
+   * @return bool
+   */
   public function isSecurityUpdateAvailable() {
     $thisVersion = $this->getReleaseInfo($this->localVersion);
     $localVersionDate = CRM_Utils_Array::value('date', $thisVersion, 0);
     foreach ($this->versionInfo as $majorVersion) {
       foreach ($majorVersion['releases'] as $release) {
         if (!empty($release['security']) && $release['date'] > $localVersionDate) {
-          return TRUE;
+          if (!$this->ignoreDate || $this->ignoreDate < $release['date']) {
+            return TRUE;
+          }
         }
       }
     }
@@ -199,24 +197,39 @@ class CRM_Utils_VersionCheck {
    * Get the latest version number if it's newer than the local one
    *
    * @return string|null
-   * Returns the newer version's number, or null if the versions are equal
+   * Returns version number of the latest release if it is greater than the local version
    */
   public function isNewerVersionAvailable() {
     $newerVersion = NULL;
     if ($this->versionInfo && $this->localVersion) {
-      // If using an alpha or beta, find the absolute latest available
-      $latest = end($this->versionInfo);
-      // Otherwise find the latest stable version available
-      if ($this->localVersionStatus != 'testing') {
-        foreach ($this->versionInfo as $majorVersion) {
-          if ($majorVersion['status'] == 'stable') {
-            $latest = $majorVersion;
+      foreach ($this->versionInfo as $majorVersionNumber => $majorVersion) {
+        $release = $this->checkBranchForNewVersion($majorVersion);
+        if ($release) {
+          // If we have a release with the same majorVersion as local, return it
+          if ($majorVersionNumber == $this->localMajorVersion) {
+            return $release;
+          }
+          // Search outside the local majorVersion (excluding non-stable)
+          elseif ($majorVersion['status'] != 'testing') {
+            // We found a new release but don't return yet, keep searching newer majorVersions
+            $newerVersion = $release;
           }
         }
       }
-      if ($latest && !empty($latest['releases'])) {
-        foreach ($latest['releases'] as $release) {
-          if (version_compare($this->localVersion, $release['version']) < 0) {
+    }
+    return $newerVersion;
+  }
+
+  /**
+   * @param $majorVersion
+   * @return null|string
+   */
+  private function checkBranchForNewVersion($majorVersion) {
+    $newerVersion = NULL;
+    if (!empty($majorVersion['releases'])) {
+      foreach ($majorVersion['releases'] as $release) {
+        if (version_compare($this->localVersion, $release['version']) < 0) {
+          if (!$this->ignoreDate || $this->ignoreDate < $release['date']) {
             $newerVersion = $release['version'];
           }
         }
@@ -232,6 +245,7 @@ class CRM_Utils_VersionCheck {
   public function versionAlert() {
     $versionAlertSetting = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, 1);
     $securityAlertSetting = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityUpdateAlert', NULL, 3);
+    $settingsUrl =  CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1', FALSE, NULL, FALSE, FALSE, TRUE);
     if (CRM_Core_Permission::check('administer CiviCRM') && $securityAlertSetting > 1 && $this->isSecurityUpdateAvailable()) {
       $session = CRM_Core_Session::singleton();
       if ($session->timer('version_alert', 24 * 60 * 60)) {
@@ -239,8 +253,10 @@ class CRM_Utils_VersionCheck {
           '<ul>
             <li><a href="https://civicrm.org/advisory">' . ts('Read advisory') . '</a></li>
             <li><a href="https://civicrm.org/download">' . ts('Download now') . '</a></li>
+            <li><a class="crm-setVersionCheckIgnoreDate" href="' . $settingsUrl . '">' . ts('Suppress this message') . '</a></li>
           </ul>';
-        $session->setStatus($msg, ts('Security Alert'));
+        $session->setStatus($msg, ts('Security Alert'), 'alert');
+        CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Admin/Form/Setting/versionCheckOptions.js');
       }
     }
     elseif (CRM_Core_Permission::check('administer CiviCRM') && $versionAlertSetting > 1) {
@@ -248,9 +264,13 @@ class CRM_Utils_VersionCheck {
       if ($newerVersion) {
         $session = CRM_Core_Session::singleton();
         if ($session->timer('version_alert', 24 * 60 * 60)) {
-          $msg = ts('A newer version of CiviCRM is available: %1', array(1 => $newerVersion))
-          . '<br /><a href="https://civicrm.org/download">' . ts('Download now') . '</a>';
+          $msg = ts('A newer version of CiviCRM is available: %1', array(1 => $newerVersion)) .
+            '<ul>
+              <li><a href="https://civicrm.org/download">' . ts('Download now') . '</a></li>
+              <li><a class="crm-setVersionCheckIgnoreDate" href="' . $settingsUrl . '">' . ts('Suppress this message') . '</a></li>
+            </ul>';
           $session->setStatus($msg, ts('Update Available'), 'info');
+          CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Admin/Form/Setting/versionCheckOptions.js');
         }
       }
     }

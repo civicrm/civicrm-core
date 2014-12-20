@@ -45,6 +45,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'versionAlert' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'securityUpdateAlert' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'versionCheck' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'versionCheckIgnoreDate' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'empoweredBy' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'maxFileSize' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'doNotAttachPDFReceipt' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
