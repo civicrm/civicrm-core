@@ -808,5 +808,25 @@ class CRM_Utils_Array {
     }
     return NULL;
   }
+
+  /**
+   * Extract any $keys from $array and copy to a new array.
+   *
+   * Note: If a $key does not appear in $array, then it will
+   * not appear in the result.
+   *
+   * @param array $array
+   * @param array $keys list of keys to copy
+   * @return array
+   */
+  static function subset($array, $keys) {
+    $result = array();
+    foreach ($keys as $key) {
+      if (isset($array[$key])) {
+        $result[$key] = $array[$key];
+      }
+    }
+    return $result;
+  }
 }
 

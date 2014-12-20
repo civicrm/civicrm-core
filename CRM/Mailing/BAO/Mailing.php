@@ -112,7 +112,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   // note that $job_id is used only as a variable in the temp table construction
   // and does not play a role in the queries generated
   /**
-   * @param $job_id
+   * @param int $job_id (misnomer) a nonce value used to name temporary tables
    * @param null $mailing_id
    * @param null $offset
    * @param null $limit
@@ -1692,7 +1692,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       }
 
       // Populate the recipients.
-      self::getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, FALSE);
+      if (empty($params['_skip_evil_bao_auto_recipients_'])) {
+        self::getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, FALSE);
+      }
     }
 
     return $mailing;

@@ -2,29 +2,25 @@
 Controller: ABListingCtrl
 Required vars: mailingABList
 -->
-<div id="help">
-  A/B Testing list
-</div>
 
 <div ng-show="!$.isEmptyObject(mailingABList)">
   <table class="display">
     <thead>
     <tr>
-      <th>Title</th>
-      <th>Id</th>
-      <th>Test Type</th>
-      <th></th>
+      <th>{{ts('Name')}}</th>
+      <th>{{ts('Status')}}</th>
+      <th>{{ts('Test Type')}}</th>
       <th></th>
     </tr>
     </thead>
     <tbody>
     <tr ng-repeat="mailingAB in mailingABList">
       <td>{{mailingAB.name}}</td>
-      <td>{{mailingAB.id}}</td>
-      <td>{{testing_criteria[mailingAB.testing_criteria_id].label}}</td>
+      <td>{{crmMailingABStatus.getByName(mailingAB.status).label}}</td>
+      <td>{{crmMailingABCriteria.get(mailingAB.testing_criteria_id).label}}</td>
       <td>
-        <a class="action-item crm-hover-button" ng-href="#/abtest/{{mailingAB.id}}">Edit</a>&nbsp
-        <a class="action-item crm-hover-button" ng-href="#/abtest/report/{{mailingAB.id}}">Results</a>
+        <a class="action-item crm-hover-button" ng-href="#/abtest/{{mailingAB.id}}" ng-show="mailingAB.status == 'Draft'">{{ts('Continue')}}</a>
+        <a class="action-item crm-hover-button" ng-href="#/abtest/{{mailingAB.id}}/report" ng-show="mailingAB.status != 'Draft'">{{ts('Results')}}</a>
       </td>
     </tr>
     </tbody>
@@ -33,11 +29,11 @@ Required vars: mailingABList
 
 <div ng-show="$.isEmptyObject(mailingABList)" class="messages status no-popup">
   <div class="icon inform-icon"></div>
-  You have no A/B mailings
+  {{ts('You have no A/B mailings')}}
 </div>
 
 
 <div class="crm-submit-buttons">
   <br>
-  <a ng-href="#/abtest/new" class="button"><span><div class="icon add-icon"></div>New A/B Test</span></a>
+  <a ng-href="#/abtest/new" class="button"><span><div class="icon add-icon"></div>{{ts('New A/B Test')}}</span></a>
 </div>
