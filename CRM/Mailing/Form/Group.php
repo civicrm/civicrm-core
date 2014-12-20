@@ -40,14 +40,14 @@
 class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
   /**
-   * the mailing ID of the mailing if we are resuming a mailing
+   * The mailing ID of the mailing if we are resuming a mailing
    *
    * @var integer
    */
   protected $_mailingID;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -89,7 +89,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -182,7 +182,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -216,7 +216,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
     // location types
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('id' => 'display_name'));
-    $this->addElement('select', 'location_type_id', ts("Location Type"), array('' => '-select-') + $locationTypes);
+    $this->addElement('select', 'location_type_id', ts("Location Type"), array('' => ts('Automatic')) + $locationTypes);
 
     $methods = CRM_Core_SelectValues::emailSelectMethods();
     $this->addElement('select', 'email_selection_method', ts("Email Selection Method"), $methods);
@@ -541,7 +541,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *

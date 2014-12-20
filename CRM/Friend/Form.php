@@ -45,7 +45,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   CONST NUM_OPTION = 3;
 
   /**
-   * the id of the entity that we are proceessing
+   * The id of the entity that we are proceessing
    *
    * @var int
    * @protected
@@ -53,7 +53,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   protected $_entityId;
 
   /**
-   * the table name of the entity that we are proceessing
+   * The table name of the entity that we are proceessing
    *
    * @var string
    * @protected
@@ -63,7 +63,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   protected $_campaignId;
 
   /**
-   * the contact ID
+   * The contact ID
    *
    * @var int
    * @protected
@@ -146,7 +146,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -175,7 +175,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -229,11 +229,9 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * Function for validation
+   * Validation
    *
-   * @param $fields
-   *
-   * @internal param array $params (ref.) an assoc array of name/value pairs
+   * @param array $fields
    *
    * @return mixed true or array of errors
    * @access public
@@ -270,7 +268,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

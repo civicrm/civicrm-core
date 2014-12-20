@@ -104,6 +104,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
 
     // visit event search page
     $this->openCiviPage("event/search", "reset=1");
+    $this->waitForElementPresent('_qf_Search_refresh');
 
     $eventName = "Fall Fundraiser Dinner";
     $this->select2("event_id", $eventName);
@@ -151,13 +152,15 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/search", "reset=1");
 
     $eventTypeName = 'Fundraiser';
+    $this->waitForElementPresent('event_type_id');
     $this->select2("event_type_id", $eventTypeName);
     $this->select('event_relative', "label=Choose Date Range");
     $this->webtestFillDate('event_start_date_low', '-2 year');
     $this->webtestFillDate('event_end_date_high', '+1 year');
 
 
-    $this->clickLink("_qf_Search_refresh", "search-status");
+    $this->click("_qf_Search_refresh");
+    $this->waitForElementPresent("xpath=//form[@id='Search']/div[3]/div/div[1]/div");
 
     $stringsToCheck = array(
       "Start Date - greater than or equal to",

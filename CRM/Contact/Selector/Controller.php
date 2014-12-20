@@ -34,7 +34,7 @@
  */
 class CRM_Contact_Selector_Controller extends CRM_Core_Selector_Controller {
   /**
-   * default function for qill, if needed to be implemented, we
+   * Default function for qill, if needed to be implemented, we
    * expect the subclass to do it
    *
    * @return string the status message

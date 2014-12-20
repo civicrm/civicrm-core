@@ -49,7 +49,7 @@ class CRM_Utils_Check_Message {
   private $title;
 
   /**
-   * @param $name
+   * @param string $name
    * @param $message
    * @param $title
    */

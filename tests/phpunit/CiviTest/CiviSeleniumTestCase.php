@@ -328,7 +328,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * @param $option_group_name
+   * @param string $option_group_name
    *
    * @return array|int
    */
@@ -505,19 +505,17 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     //$this->assertContains($sortName, $this->getValue('contact_1'), "autocomplete expected $sortName but didn’t find it in " . $this->getValue('contact_1'));
   }
 
-  /*
-     * 1. By default, when no strtotime arg is specified, sets date to "now + 1 month"
-     * 2. Does not set time. For setting both date and time use webtestFillDateTime() method.
-     * 3. Examples of $strToTime arguments -
-     *        webtestFillDate('start_date',"now")
-     *        webtestFillDate('start_date',"10 September 2000")
-     *        webtestFillDate('start_date',"+1 day")
-     *        webtestFillDate('start_date',"+1 week")
-     *        webtestFillDate('start_date',"+1 week 2 days 4 hours 2 seconds")
-     *        webtestFillDate('start_date',"next Thursday")
-     *        webtestFillDate('start_date',"last Monday")
-     */
   /**
+   * 1. By default, when no strtotime arg is specified, sets date to "now + 1 month"
+   * 2. Does not set time. For setting both date and time use webtestFillDateTime() method.
+   * 3. Examples of $strToTime arguments -
+   *        webtestFillDate('start_date',"now")
+   *        webtestFillDate('start_date',"10 September 2000")
+   *        webtestFillDate('start_date',"+1 day")
+   *        webtestFillDate('start_date',"+1 week")
+   *        webtestFillDate('start_date',"+1 week 2 days 4 hours 2 seconds")
+   *        webtestFillDate('start_date',"next Thursday")
+   *        webtestFillDate('start_date',"last Monday")
    * @param $dateElement
    * @param null $strToTimeArgs
    */
@@ -536,8 +534,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->click("link=$day");
   }
 
-  // 1. set both date and time.
   /**
+   * 1. set both date and time.
    * @param $dateElement
    * @param null $strToTimeArgs
    */
@@ -999,7 +997,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param bool $pledges
    * @param bool $recurring
    * @param bool $membershipTypes
-   * @param null $memPriceSetId
+   * @param int $memPriceSetId
    * @param bool $friend
    * @param int $profilePreId
    * @param int $profilePostId
@@ -1333,12 +1331,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Function to update default strict rule.
+   * Update default strict rule.
    *
-   * @params  string   $contactType  Contact type
    * @param string $contactType
-   * @param   array $fields Fields to be set for strict rule
-   * @param   Integer $threshold Rule's threshold value
+   * @param array $fields Fields to be set for strict rule
+   * @param int $threshold Rule's threshold value
    */
   function webtestStrictDedupeRuleDefault($contactType = 'Individual', $fields = array(), $threshold = 10) {
     // set default strict rule.
@@ -1608,7 +1605,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   // Request a record from the DB by seachColumn+searchValue. Success if a record is found.
   /**
-   * @param $daoName
+   * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
    * @param $searchColumn
@@ -1626,7 +1623,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   // Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
   /**
-   * @param $daoName
+   * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
    * @param $searchColumn
@@ -1642,8 +1639,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   // Request a record from the DB by id. Success if row not found.
   /**
-   * @param $daoName
-   * @param $id
+   * @param string $daoName
+   * @param int $id
    * @param $message
    */
   function assertDBRowNotExist($daoName, $id, $message) {
@@ -1656,7 +1653,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   // Compare a single column value in a retrieved DB record to an expected value
   /**
-   * @param $daoName
+   * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
    * @param $searchColumn
@@ -1677,8 +1674,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   // Compare all values in a single retrieved DB record to an array of expected values
   /**
-   * @param $daoName
-   * @param $searchParams
+   * @param string $daoName
+   * @param array $searchParams
    * @param $expectedValues
    */
   function assertDBCompareValues($daoName, $searchParams, $expectedValues) {
@@ -2010,7 +2007,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $sku
    * @param $amount
    * @param $price
@@ -2199,7 +2196,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * function to type and select first occurance of autocomplete
+   * Type and select first occurance of autocomplete
    */
   function select2($fieldName,$label, $multiple = FALSE, $xpath=FALSE) {
     // In the case of chainSelect, wait for options to load
@@ -2231,7 +2228,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * function to select multiple options
+   * Select multiple options
    */
   function multiselect2($fieldid, $params) {
     // In the case of chainSelect, wait for options to load
@@ -2267,7 +2264,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * function to enable or disable Pop-ups via Display Preferences
+   * Enable or disable Pop-ups via Display Preferences
    */
   function enableDisablePopups($enabled = TRUE) {
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1');

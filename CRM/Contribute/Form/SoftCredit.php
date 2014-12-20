@@ -39,9 +39,9 @@
 class CRM_Contribute_Form_SoftCredit {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access static
@@ -192,7 +192,7 @@ class CRM_Contribute_Form_SoftCredit {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    *

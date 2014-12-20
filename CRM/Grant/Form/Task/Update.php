@@ -41,7 +41,7 @@
 class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -56,7 +56,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -78,7 +78,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

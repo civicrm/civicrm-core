@@ -134,7 +134,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -244,7 +244,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -452,7 +452,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
   /**
-   * Function for validation
+   * Validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -486,7 +486,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * Function to process the renewal form
+   * Process the renewal form
    *
    * @access public
    *

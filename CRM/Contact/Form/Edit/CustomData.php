@@ -39,9 +39,9 @@
 class CRM_Contact_Form_Edit_CustomData {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
@@ -67,7 +67,7 @@ class CRM_Contact_Form_Edit_CustomData {
   }
 
   /**
-   * build the form elements for CustomData object
+   * Build the form object elements for CustomData object
    *
    * @param CRM_Core_Form $form       reference to the form object
    *
@@ -102,12 +102,12 @@ class CRM_Contact_Form_Edit_CustomData {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $defaults
    *
    * @return void

@@ -35,7 +35,7 @@
 class CRM_Core_IDS {
 
   /**
-   * define the threshold for the ids reactions
+   * Define the threshold for the ids reactions
    */
   private $threshold = array(
     'log' => 25,
@@ -44,7 +44,7 @@ class CRM_Core_IDS {
   );
 
   /**
-   * the init object
+   * The init object
    */
   private $init = NULL;
 
@@ -205,10 +205,8 @@ class CRM_Core_IDS {
    * This function writes an entry about the intrusion
    * to the intrusion database
    *
-   * @param $result
+   * @param array $result
    * @param int $reaction
-   *
-   * @internal param array $results
    *
    * @return boolean
    */

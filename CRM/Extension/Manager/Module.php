@@ -60,7 +60,7 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
 
   /**
    * @param CRM_Extension_Info $info
-   * @param $hookName
+   * @param string $hookName
    */
   private function callHook(CRM_Extension_Info $info, $hookName) {
     try {

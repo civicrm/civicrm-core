@@ -39,12 +39,12 @@
 class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * store membership price set id
+   * Store membership price set id
    */
   protected $_memPriceSetId = NULL;
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -80,10 +80,11 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       $this->_memPriceSetId = $priceSetId;
       $pFIDs = array();
       if ($priceSetId) {
-        CRM_Core_DAO::commonRetrieveAll('CRM_Price_DAO_PriceField', 'price_set_id', $priceSetId, $pFIDs, $return = array('html_type', 'name'));
+        CRM_Core_DAO::commonRetrieveAll('CRM_Price_DAO_PriceField', 'price_set_id', $priceSetId, $pFIDs, $return = array('html_type', 'name', 'label'));
         foreach ($pFIDs as $pid => $pValue) {
           if ($pValue['html_type'] == 'Radio' && $pValue['name'] == 'membership_amount') {
             $defaults['mem_price_field_id'] = $pValue['id'];
+            $defaults['membership_type_label'] = $pValue['label'];
           }
         }
 
@@ -105,7 +106,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -127,6 +128,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       $this->addElement('checkbox', 'is_required', ts('Require Membership Signup'));
       $this->addElement('checkbox', 'display_min_fee', ts('Display Membership Fee'));
       $this->addElement('checkbox', 'is_separate_payment', ts('Separate Membership Payment'));
+      $this->addElement('text', 'membership_type_label', ts('Membership Types Label'), array('placeholder' => ts('Membership')));
 
       $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
       $paymentProcessorIds = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
@@ -210,12 +212,12 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
   }
 
   /**
-   * Function for validation
+   * Validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
    * @param $files
-   * @param null $contributionPageId
+   * @param int $contributionPageId
    *
    * @return mixed true or array of errors
    * @access public
@@ -247,7 +249,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             }
             if (!($paymentProcessorTypeId == CRM_Utils_Array::key('PayPal', $paymentProcessorType) ||
               ($paymentProcessorTypeId == CRM_Utils_Array::key('AuthNet', $paymentProcessorType)))) {
-              $errors['member_price_set_id'] = ts('The membership price set associated with this online contribution allows a user to select BOTH an auto-renew AND a non-auto-renew membership. This requires submitting multiple processor transactions, and is not supported for one or more of the payment processors enabled under the Fees tab.');
+              $errors['member_price_set_id'] = ts('The membership price set associated with this online contribution allows a user to select BOTH an auto-renew AND a non-auto-renew membership. This requires submitting multiple processor transactions, and is not supported for one or more of the payment processors enabled under the Amounts tab.');
             }
 
           }
@@ -390,7 +392,6 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
         if (empty($editedResults['id'])) {
           $fieldParams['name'] = strtolower(CRM_Utils_String::munge('Membership Amount', '_', 245));
-          $fieldParams['label'] = !empty($params['new_title']) ? $params['new_title'] : ts('Membership');
           if (empty($params['mem_price_field_id'])) {
             CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceField', 0, 1, array('price_set_id' => $priceSetID));
           }
@@ -400,6 +401,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
           $fieldParams['id'] = CRM_Utils_Array::value('id', $editedResults);
         }
 
+        $fieldParams['label'] = !empty($params['membership_type_label']) ? $params['membership_type_label'] : ts('Membership');
         $fieldParams['is_active'] = 1;
         $fieldParams['html_type'] = 'Radio';
         $fieldParams['is_required'] = !empty($params['is_required']) ? 1 : 0;

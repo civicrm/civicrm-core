@@ -370,7 +370,7 @@ class CRM_Utils_Mail_Incoming {
 
   /**
    * @param $address
-   * @param $params
+   * @param array $params
    * @param $subParam
    * @param $mail
    */
@@ -395,7 +395,7 @@ class CRM_Utils_Mail_Incoming {
   /**
    * @param $addresses
    * @param $token
-   * @param $params
+   * @param array $params
    * @param $mail
    */
   public static function parseAddresses(&$addresses, $token, &$params, &$mail) {
@@ -409,7 +409,7 @@ class CRM_Utils_Mail_Incoming {
   }
 
   /**
-   * retrieve a contact ID and if not present
+   * Retrieve a contact ID and if not present
    * create one with this email
    */
   public static function getContactID($email, $name = NULL, $create = TRUE, &$mail) {

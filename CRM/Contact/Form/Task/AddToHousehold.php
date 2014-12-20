@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -54,7 +54,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @access public
    *
@@ -110,7 +110,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -178,7 +178,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
   /**
    * This function is to get the result of the search for Add to * forms
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param  array $params This contains elements for search criteria
    *
    * @access public

@@ -44,29 +44,29 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    */
 
   /**
-   * imported file size
+   * Imported file size
    */
   protected $_fileSize;
 
   /**
-   * seperator being used
+   * Seperator being used
    */
   protected $_seperator;
 
   /**
-   * total number of lines in file
+   * Total number of lines in file
    */
   protected $_lineCount;
 
   /**
-   * whether the file has a column header or not
+   * Whether the file has a column header or not
    *
    * @var boolean
    */
   protected $_haveColumnHeader;
 
   /**
-   * @param $fileName
+   * @param string $fileName
    * @param string $seperator
    * @param $mapper
    * @param bool $skipColumnHeader
@@ -296,7 +296,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * function to format the field values for input to the api
+   * Format the field values for input to the api
    *
    * @return array (reference ) associative array of name/value pairs
    * @access public
@@ -316,7 +316,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $title
    * @param int $type
    * @param string $headerPattern
@@ -386,11 +386,10 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   /**
    * Export data to a CSV file
    *
-   * @param $fileName
+   * @param string $fileName
    * @param array $header
-   * @param data $data
+   * @param array $data
    *
-   * @internal param string $filename
    * @return void
    * @access public
    */

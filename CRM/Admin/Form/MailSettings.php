@@ -40,7 +40,7 @@
 class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -103,7 +103,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *
@@ -122,7 +122,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

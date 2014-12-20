@@ -332,7 +332,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
   /**
    * @param $contactType
-   * @param $name
+   * @param string $name
    * @param $email
    * @param null $streetName
    * @param null $postalCode

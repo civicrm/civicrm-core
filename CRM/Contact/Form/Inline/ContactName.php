@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
 
   /**
-   * build the form elements
+   * Build the form object elements
    *
    * @return void
    * @access public
@@ -53,7 +53,7 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
+   * Process the form
    *
    * @return void
    * @access public

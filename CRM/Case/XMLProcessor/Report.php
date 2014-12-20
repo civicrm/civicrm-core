@@ -47,10 +47,10 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   public function __construct() {}
 
   /**
-   * @param $clientID
-   * @param $caseID
-   * @param $activitySetName
-   * @param $params
+   * @param int $clientID
+   * @param int $caseID
+   * @param string $activitySetName
+   * @param array $params
    *
    * @return mixed
    */
@@ -89,8 +89,8 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   }
 
   /**
-   * @param $clientID
-   * @param $caseID
+   * @param int $clientID
+   * @param int $caseID
    *
    * @return array
    */
@@ -148,7 +148,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
 
   /**
    * @param $xml
-   * @param $activitySetName
+   * @param string $activitySetName
    *
    * @return array|bool
    */
@@ -176,7 +176,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
 
   /**
    * @param $xml
-   * @param $activitySetName
+   * @param string $activitySetName
    *
    * @return null|string
    */
@@ -192,8 +192,8 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   }
 
   /**
-   * @param $clientID
-   * @param $caseID
+   * @param int $clientID
+   * @param int $caseID
    * @param $activityTypes
    * @param $activities
    */
@@ -236,8 +236,8 @@ AND    ac.case_id = %1
   }
 
   /**
-   * @param $clientID
-   * @param $activityID
+   * @param int $clientID
+   * @param int $activityID
    * @param bool $anyActivity
    * @param int $redact
    *
@@ -305,7 +305,7 @@ WHERE      a.id = %1
   }
 
   /**
-   * @param $clientID
+   * @param int $clientID
    * @param $activityDAO
    * @param $activityTypeInfo
    *
@@ -534,7 +534,7 @@ WHERE      a.id = %1
   }
 
   /**
-   * @param $clientID
+   * @param int $clientID
    * @param $activityDAO
    * @param $activityTypeInfo
    *
@@ -594,7 +594,7 @@ WHERE      a.id = %1
   }
 
   /**
-   * @param $activityTypeID
+   * @param int $activityTypeID
    * @param null $dateFormat
    *
    * @return mixed
@@ -696,7 +696,7 @@ WHERE  entity_id = %1
   }
 
   /**
-   * @param $activityID
+   * @param int $activityID
    *
    * @return null|string
    */
@@ -722,8 +722,7 @@ LIMIT  1
    *
    * @return mixed
    */
-  private function redact($string, $printReport = FALSE, $replaceString = array(
-    )) {
+  private function redact($string, $printReport = FALSE, $replaceString = array()) {
     if ($printReport) {
       return CRM_Utils_String::redaction($string, $replaceString);
     }
@@ -735,11 +734,11 @@ LIMIT  1
   }
 
   /**
-   * @param $clientID
-   * @param $caseID
-   * @param $activitySetName
-   * @param $params
-   * @param $form
+   * @param int $clientID
+   * @param int $caseID
+   * @param string $activitySetName
+   * @param array $params
+   * @param CRM_Core_Form $form
    *
    * @return mixed
    */

@@ -153,6 +153,10 @@ class CRM_Utils_Rule {
    * @return bool
    */
   static function url($url) {
+    if (preg_match('/^\//', $url)) {
+      // allow relative URL's (CRM-15598)
+      $url = 'http://' . $_SERVER['HTTP_HOST'] . $url;
+    }
     return (bool) filter_var($url, FILTER_VALIDATE_URL);
   }
 
@@ -212,7 +216,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * check the validity of the date (in qf format)
+   * Check the validity of the date (in qf format)
    * note that only a year is valid, or a mon-year is
    * also valid in addition to day-mon-year. The date
    * specified has to be beyond today. (i.e today or later)
@@ -305,7 +309,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * check the validity of a date or datetime (timestamp)
+   * Check the validity of a date or datetime (timestamp)
    * value which is in YYYYMMDD or YYYYMMDDHHMMSS format
    *
    * Uses PHP checkdate() - params are ( int $month, int $day, int $year )
@@ -549,7 +553,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * see how file rules are written in HTML/QuickForm/file.php
+   * See how file rules are written in HTML/QuickForm/file.php
    * Checks to make sure the uploaded file is ascii
    *
    * @param     array     Uploaded file info (from $_FILES)
@@ -596,7 +600,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * see how file rules are written in HTML/QuickForm/file.php
+   * See how file rules are written in HTML/QuickForm/file.php
    * Checks to make sure the uploaded file is html
    *
    * @param     array     Uploaded file info (from $_FILES)
@@ -741,7 +745,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * check the validity of the date (in qf format)
+   * Check the validity of the date (in qf format)
    * note that only a year is valid, or a mon-year is
    * also valid in addition to day-mon-year
    *

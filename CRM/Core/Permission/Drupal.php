@@ -39,7 +39,7 @@
 class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
 
   /**
-   * is this user someone with access for the entire system
+   * Is this user someone with access for the entire system
    *
    * @var boolean
    */
@@ -47,14 +47,14 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   protected $_editAdminUser = FALSE;
 
   /**
-   * am in in view permission or edit permission?
+   * Am in in view permission or edit permission?
    * @var boolean
    */
   protected $_viewPermission = FALSE;
   protected $_editPermission = FALSE;
 
   /**
-   * the current set of permissioned groups for the user
+   * The current set of permissioned groups for the user
    *
    * @var array
    */
@@ -63,11 +63,11 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
 
 
   /**
-   * given a permission string, check for access requirements
+   * Given a permission string, check for access requirements
    *
    * @param string $str the permission to check
    *
-   * @param null $contactID
+   * @param int $contactID
    *
    * @return boolean true if yes, else false
    * @access public

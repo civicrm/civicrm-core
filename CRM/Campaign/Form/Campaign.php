@@ -40,28 +40,28 @@
 class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
   /**
-   * action
+   * Action
    *
    * @var int
    */
   protected $_action;
 
   /**
-   * context
+   * Context
    *
    * @var string
    */
   protected $_context;
 
   /**
-   * object values.
+   * Object values.
    *
    * @var array
    */
   protected $_values;
 
   /**
-   * the id of the campaign we are proceessing
+   * The id of the campaign we are proceessing
    *
    * @var int
    * @protected
@@ -131,7 +131,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public

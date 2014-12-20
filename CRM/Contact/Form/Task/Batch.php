@@ -39,37 +39,37 @@
 class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
-   * the title of the group
+   * The title of the group
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * maximum contacts that should be allowed to update
+   * Maximum contacts that should be allowed to update
    *
    */
   protected $_maxContacts = 100;
 
   /**
-   * maximum profile fields that will be displayed
+   * Maximum profile fields that will be displayed
    *
    */
   protected $_maxFields = 9;
 
   /**
-   * variable to store redirect path
+   * Variable to store redirect path
    *
    */
   protected $_userContext;
 
   /**
-   * when not to reset sort_name
+   * When not to reset sort_name
    */
   protected $_preserveDefault = TRUE;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -82,7 +82,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -166,7 +166,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -196,7 +196,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields  the input form values
    *
@@ -224,7 +224,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -252,7 +252,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       //parse street address, CRM-7768
       self::parseStreetAddress($value, $this);
 
-      CRM_Contact_BAO_Contact::createProfileContact($value, $this->_fields, $key, NULL, $ufGroupId);
+      CRM_Contact_BAO_Contact::createProfileContact($value, $this->_fields, $key, NULL, $ufGroupId, NULL, TRUE);
       if ($notify) {
         $values = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($ufGroupId, $key, NULL);
         CRM_Core_BAO_UFGroup::commonSendMail($key, $values);
@@ -264,12 +264,11 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', array('plural' => 'Contact Subtype field of %count contacts has not been updated.', 'count' => $inValidSubtypeCnt)), ts('Invalid Subtype'));
     }
   }
-  //end of function
 
   /**
-   * parse street address
+   * Parse street address
    * @param array $contactValues contact values
-   * @param object $form form object
+   * @param CRM_Core_Form $form form object
    */
   public static function parseStreetAddress(&$contactValues, &$form) {
     if (!is_array($contactValues) || !is_array($form->_fields)) {

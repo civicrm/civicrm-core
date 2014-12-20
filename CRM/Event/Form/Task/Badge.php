@@ -48,12 +48,12 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
   public $_single = FALSE;
 
   /**
-   * component clause
+   * Component clause
    */
   public $_componentClause;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @param
    *
@@ -83,7 +83,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -108,7 +108,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

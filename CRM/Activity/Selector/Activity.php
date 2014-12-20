@@ -40,7 +40,7 @@
 class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
   /**
-   * we use desc to remind us what that column is, name is used in the tpl
+   * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    * @static
@@ -48,7 +48,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   static $_columnHeaders;
 
   /**
-   * contactId - contact id of contact whose activies are displayed
+   * ContactId - contact id of contact whose activies are displayed
    *
    * @var int
    * @access protected
@@ -99,14 +99,12 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * - View
    *
-   * @param $activityTypeId
-   * @param null $sourceRecordId
+   * @param int $activityTypeId
+   * @param int $sourceRecordId
    * @param bool $accessMailingReport
-   * @param null $activityId
+   * @param int $activityId
    * @param null $key
    * @param null $compContext
-   *
-   * @internal param string $activityType type of activity
    *
    * @return array
    * @access public
@@ -274,12 +272,11 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * getter for array of the parameters required for creating pager.
+   * Getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param $params
+   * @param array $params
    *
-   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -292,7 +289,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
    * @param string $action the action being performed
@@ -341,7 +338,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount
    *
    * @param enum $action the action being performed
    * @param int $offset the row number to start from
@@ -467,7 +464,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * name of export file.
+   * Name of export file.
    *
    * @param string $output type of output
    *
@@ -478,7 +475,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * get colunmn headers for search selector
+   * Get colunmn headers for search selector
    *
    *
    * @return array $_columnHeaders

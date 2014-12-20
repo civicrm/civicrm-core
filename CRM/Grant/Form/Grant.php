@@ -40,7 +40,7 @@
 class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
   /**
-   * the id of the case that we are proceessing
+   * The id of the case that we are proceessing
    *
    * @var int
    * @protected
@@ -48,7 +48,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * the id of the contact associated with this contribution
+   * The id of the contact associated with this contribution
    *
    * @var int
    * @protected
@@ -58,7 +58,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   protected $_context;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -170,7 +170,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -259,7 +259,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

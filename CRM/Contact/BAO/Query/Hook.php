@@ -44,7 +44,7 @@ class CRM_Contact_BAO_Query_Hook {
   protected $_queryObjects = NULL;
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @return object
    * @static
@@ -95,7 +95,7 @@ class CRM_Contact_BAO_Query_Hook {
 
   /**
    * @param $query
-   * @param $fnName
+   * @param string $fnName
    */
   public function alterSearchQuery(&$query, $fnName) {
     foreach (self::getSearchQueryObjects() as $obj) {
@@ -104,7 +104,7 @@ class CRM_Contact_BAO_Query_Hook {
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $mode
    * @param $side
    *
@@ -146,7 +146,7 @@ class CRM_Contact_BAO_Query_Hook {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $type
    */
   public function buildAdvancedSearchPaneForm(&$form, $type) {

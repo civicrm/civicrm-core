@@ -64,11 +64,10 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       'civicrm_contact_household' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
         'fields' => array(
-          'household_name' =>
-            array(
-              'title' => ts('Household Name'),
-              'required' => TRUE,
-            ),
+          'household_name' => array(
+            'title' => ts('Household Name'),
+            'required' => TRUE,
+          ),
           'id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
@@ -210,7 +209,9 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (!empty($field['required']) ||
+            !empty($this->_params['fields'][$fieldName])
+          ) {
             if ($tableName == 'civicrm_address') {
               $this->_addressField = TRUE;
             }
@@ -283,7 +284,9 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             if ($op) {
               if ($fieldName == 'relationship_type_id') {
-                $clause = "{$this->_aliases['civicrm_relationship']}.relationship_type_id=" . $this->relationshipId;
+                $clause =
+                  "{$this->_aliases['civicrm_relationship']}.relationship_type_id=" .
+                  $this->relationshipId;
               }
               else {
                 $clause = $this->whereClause($field,
@@ -348,7 +351,10 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
-    $this->buildACLClause(array($this->_aliases['civicrm_contact'], $this->_aliases['civicrm_contact_household']));
+    $this->buildACLClause(array(
+        $this->_aliases['civicrm_contact'],
+        $this->_aliases['civicrm_contact_household']
+      ));
     $sql = $this->buildQuery(TRUE);
     $rows = array();
 
@@ -416,13 +422,16 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       //replace retionship id by relationship name
       if (array_key_exists('civicrm_relationship_relationship_type_id', $row)) {
         if ($value = $row['civicrm_relationship_relationship_type_id']) {
-          $rows[$rowNum]['civicrm_relationship_relationship_type_id'] = $this->relationTypes[$value . '_' . $type];
+          $rows[$rowNum]['civicrm_relationship_relationship_type_id'] = $this->relationTypes[
+          $value . '_' . $type];
           $entryFound = TRUE;
         }
       }
 
       //remove duplicate Organization names
-      if (array_key_exists('civicrm_contact_household_household_name', $row) && $this->_outputMode != 'csv') {
+      if (array_key_exists('civicrm_contact_household_household_name', $row) &&
+        $this->_outputMode != 'csv'
+      ) {
         if ($value = $row['civicrm_contact_household_household_name']) {
           if ($rowNum == 0) {
             $priviousHousehold = $value;
@@ -448,14 +457,18 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             );
 
             $rows[$rowNum]['civicrm_contact_household_household_name'] =
-              "<a href='$url' title='" . ts('View contact summary for this househould') . "'>" . $value . '</a>';
+              "<a href='$url' title='" .
+              ts('View contact summary for this househould') . "'>" . $value .
+              '</a>';
           }
           $entryFound = TRUE;
         }
       }
 
       //remove duplicate Contact names and relationship type
-      if (array_key_exists('civicrm_contact_id', $row) && $this->_outputMode != 'csv') {
+      if (array_key_exists('civicrm_contact_id', $row) &&
+        $this->_outputMode != 'csv'
+      ) {
         if ($value = $row['civicrm_contact_id']) {
           if ($rowNum == 0) {
             $priviousContact = $value;
@@ -526,7 +539,8 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
         CRM_Core_Permission::check('access CiviContribute')
       ) {
         $url = CRM_Utils_System::url("civicrm/contact/view/contribution",
-          "reset=1&id=" . $row['civicrm_contribution_id'] . "&cid=" . $row['civicrm_contact_id'] .
+          "reset=1&id=" . $row['civicrm_contribution_id'] . "&cid=" .
+          $row['civicrm_contact_id'] .
           "&action=view&context=contribution&selectedChild=contribute",
           $this->_absoluteUrl
         );

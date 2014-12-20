@@ -35,7 +35,7 @@
 class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -123,8 +123,8 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
 
   /**
    * @param $msg
-   * @param $mailing_id
-   * @param $queue_id
+   * @param int $mailing_id
+   * @param int $queue_id
    * @param bool $onlyHrefs
    */
   public static function scan_and_replace(&$msg, $mailing_id, $queue_id, $onlyHrefs = FALSE) {

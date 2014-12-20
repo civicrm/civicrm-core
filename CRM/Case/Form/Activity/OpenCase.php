@@ -40,7 +40,7 @@
 class CRM_Case_Form_Activity_OpenCase {
 
   /**
-   * the id of the client associated with this case
+   * The id of the client associated with this case
    *
    * @var int
    * @public
@@ -48,7 +48,7 @@ class CRM_Case_Form_Activity_OpenCase {
   public $_contactID;
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function preProcess(&$form) {
     //get multi client case configuration
@@ -90,12 +90,12 @@ class CRM_Case_Form_Activity_OpenCase {
   }
 
   /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
@@ -210,12 +210,12 @@ class CRM_Case_Form_Activity_OpenCase {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
-   * @param $form
-   * @param $params
+   * @param CRM_Core_Form $form
+   * @param array $params
    *
    * @return void
    */
@@ -251,13 +251,11 @@ class CRM_Case_Form_Activity_OpenCase {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param $fields
    * @param $files
-   * @param $form
-   *
-   * @internal param array $values posted values of the form
+   * @param CRM_Core_Form $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -273,12 +271,12 @@ class CRM_Case_Form_Activity_OpenCase {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
    * @param $form
-   * @param $params
+   * @param array $params
    *
    * @return void
    */

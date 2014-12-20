@@ -39,7 +39,7 @@
 class CRM_Core_Payment_ProcessorForm {
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param null $type
    * @param null $mode
    *

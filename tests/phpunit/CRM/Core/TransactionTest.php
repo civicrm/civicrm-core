@@ -223,7 +223,6 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    * @param string $createStyle 'sql-insert'|'bao-create'
    * @param string $commitStyle 'implicit-commit'|'explicit-commit'
    * @dataProvider dataCreateAndCommitStyles
@@ -238,7 +237,6 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    * @param string $createStyle 'sql-insert'|'bao-create'
    * @param string $commitStyle 'implicit-commit'|'explicit-commit'
    * @dataProvider dataCreateAndCommitStyles
@@ -277,7 +275,6 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    * @param array $existsByOffset array(int $cidOffset => bool $expectExists)
    * @param int $generalOffset
    */

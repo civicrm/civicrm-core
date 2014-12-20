@@ -36,7 +36,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
   }
 
   /*
-   * Function to test individual pane seperatly.
+   * test individual pane seperatly.
    */
   function testAdvancedSearch() {
     $this->webtestLogin();

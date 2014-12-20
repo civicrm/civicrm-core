@@ -7,12 +7,12 @@
 class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    * @todo this is horrible copy & paste code because there is so much risk of breakage
    * in fixing the existing pdfLetter classes to be suitably generic
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $membershipIDs
    * @param $skipOnHold
    * @param $skipDeceased
@@ -43,10 +43,9 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
 
     CRM_Utils_System::civiExit(1);
   }
-  //end of function
 
   /**
-   * generate htmlfor pdf letters
+   * Generate htmlfor pdf letters
    *
    * @param array $membershipIDs
    * @param array $returnProperties

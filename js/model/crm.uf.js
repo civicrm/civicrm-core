@@ -104,7 +104,12 @@
       case 'Case':
         return 'case_1';
       default:
-        throw "Cannot guess entity name for field_type=" + field_type;
+        if (!$.isEmptyObject(CRM.contactSubTypes) && ($.inArray(field_type,CRM.contactSubTypes) > -1)) {
+          return 'contact_1';
+        }
+        else {
+          throw "Cannot guess entity name for field_type=" + field_type;
+        }
     }
   }
 

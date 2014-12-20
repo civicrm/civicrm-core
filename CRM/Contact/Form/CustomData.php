@@ -51,14 +51,14 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   protected $_tableId;
 
   /**
-   * entity type of the table id
+   * Entity type of the table id
    *
    * @var string
    */
   protected $_entityType;
 
   /**
-   * entity sub type of the table id
+   * Entity sub type of the table id
    *
    * @var string
    * @access protected
@@ -66,7 +66,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   protected $_entitySubType;
 
   /**
-   * the group tree data
+   * The group tree data
    *
    * @var array
    */
@@ -94,7 +94,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   protected $_groupCollapseDisplay;
 
   /**
-   * custom group id
+   * Custom group id
    *
    * @int
    * @access public
@@ -105,7 +105,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
   public $_copyValueId;
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * gets session variables for table name, id of entity in table, type of entity and stores them.
    *
@@ -175,7 +175,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

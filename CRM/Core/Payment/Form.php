@@ -79,10 +79,10 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * add general billing fields
+   * Add general billing fields
    * @todo set these like processor fields & let payment processors alter them
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access protected
@@ -292,7 +292,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
+   * Billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
    * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
    *
    * @param $form
@@ -353,9 +353,9 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * function to map address fields
+   * Map address fields
    *
-   * @param $id
+   * @param int $id
    * @param $src
    * @param $dst
    * @param bool $reverse
@@ -395,7 +395,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * function to get the credit card expiration month
+   * Get the credit card expiration month
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * See CRM-9017
    *
@@ -413,7 +413,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * function to get the credit card expiration year
+   * Get the credit card expiration year
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * This function exists only to make it consistent with getCreditCardExpirationMonth
    *

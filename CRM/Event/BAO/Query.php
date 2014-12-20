@@ -56,7 +56,7 @@ class CRM_Event_BAO_Query {
   }
 
   /**
-   * build select for CiviEvent
+   * Build select for CiviEvent
    *
    * @param $query
    *
@@ -500,7 +500,7 @@ class CRM_Event_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
@@ -546,7 +546,7 @@ class CRM_Event_BAO_Query {
   }
 
   /**
-   * getter for the qill object
+   * Getter for the qill object
    *
    * @return string
    * @access public
@@ -679,7 +679,7 @@ class CRM_Event_BAO_Query {
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
   static function searchAction(&$row, $id) {}
 

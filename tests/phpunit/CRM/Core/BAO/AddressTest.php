@@ -51,7 +51,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * create() method (create and update modes)
+   * Create() method (create and update modes)
    */
   function testCreate() {
     $contactId = Contact::createIndividual();
@@ -250,7 +250,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * getValues() method (get Address fields)
+   * GetValues() method (get Address fields)
    */
   function testGetValues() {
     $contactId = Contact::createIndividual();
@@ -290,7 +290,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * parseStreetAddress() method (get street address parsed)
+   * ParseStreetAddress() method (get street address parsed)
    */
   function testParseStreetAddress() {
 

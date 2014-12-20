@@ -46,7 +46,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
   protected $_surveyId;
 
   /**
-   * surveyTitle
+   * SurveyTitle
    *
    * @var string
    */
@@ -54,7 +54,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
 
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -73,7 +73,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

@@ -42,7 +42,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     //now do the test membership signup.
     $this->openCiviPage('contribute/transact', "reset=1&action=preview&id={$pageId}", "_qf_Main_upload-bottom");
 
-    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'Student')]");
+    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]/div[2]/span/label/span[1][contains(text(),'Student')]");
 
     $this->click("auto_renew");
 
@@ -55,13 +55,13 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $text = 'I want this membership to be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]/strong[2]", $text, 'Missing text: ' . $text);
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $text = 'This membership will be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]/strong[3]", $text, 'Missing text: ' . $text);
   }
 
   function testOnlineAutoRenewMembershipAuthenticated() {
@@ -74,7 +74,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     //now do the test membership signup.
     $this->openCiviPage('contribute/transact', "reset=1&action=preview&id={$pageId}", "_qf_Main_upload-bottom");
 
-    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'Student')]");
+    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]/div[2]/span/label/span[1][contains(text(),'Student')]");
 
     $this->click("auto_renew");
 
@@ -88,13 +88,13 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
 
     $text = 'I want this membership to be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]/strong[2]", $text, 'Missing text: ' . $text);
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $text = 'This membership will be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]/strong[3]", $text, 'Missing text: ' . $text);
   }
 
   function testOnlinePendingAutoRenewMembershipAnonymous() {
@@ -104,7 +104,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     //now do the test membership signup.
     $this->openCiviPage('contribute/transact', "reset=1&action=preview&id={$pageId}", "_qf_Main_upload-bottom");
 
-    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'Student')]");
+    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]/div[2]/span/label/span[1][contains(text(),'Student')]");
 
     $this->click("auto_renew");
 
@@ -116,13 +116,13 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
 
     $text = 'I want this membership to be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]/strong[2]", $text, 'Missing text: ' . $text);
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $text = 'This membership will be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]/strong[3]", $text, 'Missing text: ' . $text);
   }
 
   /**

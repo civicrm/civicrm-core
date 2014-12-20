@@ -41,7 +41,7 @@
 class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent {
 
   /**
-   * what blocks should we show and hide.
+   * What blocks should we show and hide.
    *
    * @var CRM_Core_ShowHideBlocks
    */
@@ -51,7 +51,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   protected $_profilePostMultipleAdd = array();
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -90,7 +90,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -208,8 +208,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @param array $defaults the array of default values
    *
-   * @internal param bool $force should we set show hide based on input defaults
-   *
    * @return void
    */
   function setShowHide($defaults) {
@@ -230,7 +228,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -318,11 +316,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Function to build Registration Block
+   * Build Registration Block
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @internal param int $pageId
    * @static
    */
   function buildRegistrationBlock(&$form) {
@@ -376,8 +373,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       'profileEntities' => array(),
     );
 
-    $configs['allowCoreTypes'][] = 'Contact';
-    $configs['allowCoreTypes'][] = 'Individual';
+    $configs['allowCoreTypes'] = array_merge(array('Contact', 'Individual'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $configs['allowCoreTypes'][] = 'Participant';
     //CRM-15427
     $id = CRM_Utils_Request::retrieve( 'id' , 'Integer' );
@@ -395,11 +391,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Function to build Confirmation Block
+   * Build Confirmation Block
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @internal param int $pageId
    * @static
    */
   function buildConfirmationBlock(&$form) {
@@ -424,11 +419,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Function to build Email Block
+   * Build Email Block
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @internal param int $pageId
    * @static
    */
   function buildMailBlock(&$form) {
@@ -446,7 +440,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   function buildThankYouBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
@@ -478,13 +472,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
-   * @param $values
+   * @param array $values
    * @param $files
-   * @param $form
-   *
-   * @internal param array $fields posted values of the form
+   * @param CRM_Core_Form $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -821,7 +813,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -1016,7 +1008,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     parent::endPostProcess();
   }
-  //end of function
 
   /**
    * Return a descriptive name for the page, used in wizard header

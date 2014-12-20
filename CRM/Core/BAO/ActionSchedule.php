@@ -40,7 +40,7 @@
 class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
   /**
-   * @param null $id
+   * @param int $id
    *
    * @return array
    */
@@ -262,7 +262,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   }
 
   /**
-   * @param null $id
+   * @param int $id
    *
    * @return array
    */
@@ -319,7 +319,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @param bool $namesOnly return simple list of names
    *
    * @param null $entityValue
-   * @param null $id
+   * @param int $id
    *
    * @return array  (reference)   reminder list
    * @static
@@ -414,11 +414,11 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * @param $contactId
+   * @param int $contactId
    * @param $to
-   * @param $scheduleID
+   * @param int $scheduleID
    * @param $from
-   * @param $tokenParams
+   * @param array $tokenParams
    *
    * @return bool|null
    * @throws CRM_Core_Exception
@@ -539,7 +539,6 @@ AND   cas.entity_value = $id AND
 
         CRM_Activity_BAO_Activity::sendSMSMessage($contactId,
           $sms_text,
-          $html,
           $smsParams,
           $activity->id,
           $userID
@@ -579,12 +578,12 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * Function to add the schedules reminders in the db
+   * Add the schedules reminders in the db
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
-   * @return object CRM_Core_DAO_ActionSchedule
+   * @return CRM_Core_DAO_ActionSchedule
    * @access public
    * @static
    *
@@ -604,7 +603,7 @@ AND   cas.entity_value = $id AND
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $values (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_DAO_ActionSchedule object on success, null otherwise
+   * @return CRM_Core_DAO_ActionSchedule object on success, null otherwise
    * @access public
    * @static
    */
@@ -627,7 +626,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * Function to delete a Reminder
+   * Delete a Reminder
    *
    * @param  int  $id     ID of the Reminder to be deleted.
    *
@@ -647,7 +646,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
@@ -660,7 +659,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * @param $mappingID
+   * @param int $mappingID
    * @param $now
    *
    * @throws CRM_Core_Exception
@@ -684,10 +683,11 @@ AND   cas.entity_value = $id AND
     while ($actionSchedule->fetch()) {
       $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
 
-    if ($actionSchedule->from_email)
-            $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
+      if ($actionSchedule->from_email)
+        $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
 
-
+      $activityTypeID = false;
+      $activityStatusID = false;
       if ($actionSchedule->record_activity) {
         if ($mapping->entity == 'civicrm_membership') {
           $activityTypeID =
@@ -703,6 +703,7 @@ AND   cas.entity_value = $id AND
       }
 
       if ($mapping->entity == 'civicrm_activity') {
+        $compInfo = CRM_Core_Component::getEnabledComponents();
         $tokenEntity = 'activity';
         $tokenFields = array('activity_id', 'activity_type', 'subject', 'details', 'activity_date_time');
         $extraSelect = ', ov.label as activity_type, e.id as activity_id';
@@ -714,6 +715,14 @@ INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.optio
           $extraJoin   = "
 LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'
 LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
+        }
+
+        //join for caseId
+        // if CiviCase component is enabled
+        if (array_key_exists('CiviCase', $compInfo)) {
+          $extraSelect .= ", civicrm_case_activity.case_id as case_id";
+          $extraJoin .= "
+            LEFT JOIN `civicrm_case_activity` ON `e`.`id` = `civicrm_case_activity`.`activity_id`";
         }
       }
 
@@ -874,7 +883,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         CRM_Core_BAO_ActionLog::create($logParams);
 
         // insert activity log record if needed
-        if ($actionSchedule->record_activity) {
+        if ($actionSchedule->record_activity && !$isError) {
           $activityParams = array(
             'subject' => $actionSchedule->title,
             'details' => $actionSchedule->body_html,
@@ -887,6 +896,14 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             'source_record_id' => $dao->entityID,
           );
           $activity = CRM_Activity_BAO_Activity::create($activityParams);
+          
+          //file reminder on case if source activity is a case activity
+          if (!empty($dao->case_id)) {
+            $caseActivityParams = array();
+            $caseActivityParams['case_id'] = $dao->case_id;
+            $caseActivityParams['activity_id'] = $activity->id;
+            CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
+          }
         }
       }
 
@@ -895,7 +912,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
   }
 
   /**
-   * @param $mappingID
+   * @param int $mappingID
    * @param $now
    * @param array $params
    *
@@ -1215,12 +1232,8 @@ LEFT JOIN {$reminderJoinClause}
 {$whereClause} {$limitWhereClause} AND {$dateClause} {$notINClause}
 ";
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
-
-      if (!is_null($limitTo) && $limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) {
-        $additionWhere = ' WHERE ';
-        if ($actionSchedule->start_action_date) {
-          $additionWhere = $whereClause . ' AND ';
-        }
+      $isSendToAdditionalContacts = (!is_null($limitTo) && $limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) ? TRUE : FALSE;
+      if ($isSendToAdditionalContacts) {
         $contactTable = "civicrm_contact c";
         $addSelect  = "SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id";
         $additionReminderClause = "civicrm_action_log reminder ON reminder.contact_id = c.id AND
@@ -1304,7 +1317,7 @@ INNER JOIN {$reminderJoinClause}
           CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
         }
 
-        if (!is_null($limitTo) && $limitTo == 0) {
+        if ($isSendToAdditionalContacts) {
           $addSelect .= ', MAX(reminder.action_date_time) as latest_log_time';
           $sqlEndEventCheck = "
 SELECT * FROM {$table}
@@ -1397,8 +1410,8 @@ WHERE     m.owner_membership_id IS NOT NULL AND
   }
 
   /**
-   * @param $id
-   * @param $mappingID
+   * @param int $id
+   * @param int $mappingID
    *
    * @return null|string
    */
@@ -1415,7 +1428,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
   }
 
   /**
-   * @param $mappingID
+   * @param int $mappingID
    * @param $recipientType
    *
    * @return array

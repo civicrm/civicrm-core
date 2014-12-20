@@ -35,7 +35,7 @@
 class CRM_Contribute_BAO_Query {
 
   /**
-   * static field for all the export/import contribution fields
+   * Static field for all the export/import contribution fields
    *
    * @var array
    * @static
@@ -64,7 +64,7 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * if contributions are involved, add the specific contribute fields
+   * If contributions are involved, add the specific contribute fields
    *
    * @param $query
    *
@@ -684,7 +684,7 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
@@ -954,11 +954,11 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * add all the elements shared between contribute search and advnaced search
+   * Add all the elements shared between contribute search and advnaced search
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @static
@@ -1109,7 +1109,7 @@ class CRM_Contribute_BAO_Query {
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
   static function searchAction(&$row, $id) {
   }

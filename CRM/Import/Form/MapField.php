@@ -40,7 +40,7 @@
 abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
 
   /**
-   * cache of preview data values
+   * Cache of preview data values
    *
    * @var array
    * @access protected
@@ -48,7 +48,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
   protected $_dataValues;
 
   /**
-   * mapper fields
+   * Mapper fields
    *
    * @var array
    * @access protected
@@ -56,7 +56,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
   protected $_mapperFields;
 
   /**
-   * loaded mapping ID
+   * Loaded mapping ID
    *
    * @var int
    * @access protected
@@ -64,7 +64,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
   protected $_loadedMappingId;
 
   /**
-   * number of columns in import file
+   * Number of columns in import file
    *
    * @var int
    * @access protected
@@ -72,7 +72,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
   protected $_columnCount;
 
   /**
-   * column headers, if we have them
+   * Column headers, if we have them
    *
    * @var array
    * @access protected
@@ -80,7 +80,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
   protected $_columnHeaders;
 
   /**
-   * an array of booleans to keep track of whether a field has been used in
+   * An array of booleans to keep track of whether a field has been used in
    * form building already.
    *
    * @var array

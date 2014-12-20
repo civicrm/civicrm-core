@@ -277,7 +277,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
 
   /**
    * @param $module
-   * @param $name
+   * @param string $name
    */
   public static function incHookCount($module, $name) {
     global $_test_extension_manager_moduletest_counts;

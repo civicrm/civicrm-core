@@ -280,7 +280,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -303,7 +303,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -427,7 +427,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->contributionGetnCheck($params, $contribution['id']);
   }
   /**
-   * test create with valid payment instument
+   * Test create with valid payment instument
    */
   function testCreateContributionWithPaymentInstrument() {
     $params = $this->_params + array('payment_instrument' => 'EFT');
@@ -476,9 +476,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1,$contribution['count']);
   }
 
-  /*
-     * Create test with unique field name on source
-     */
+  /**
+   * Create test with unique field name on source
+   */
   function testCreateContributionSource() {
 
     $params = array(
@@ -514,9 +514,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receive_date'])));
   }
 
-  /*
-     * Create test with unique field name on source
-     */
+  /**
+   * Create test with unique field name on source
+   */
   function testCreateContributionSourceInvalidContac() {
 
     $params = array(
@@ -558,7 +558,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * test note created correctly
+   * Test note created correctly
    */
   function testCreateContributionWithNote() {
     $description = "Demonstrates creating contribution with Note Entity";
@@ -607,11 +607,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('my contribution note', $result['values'][0]['note']);
     $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
   }
-  /*
-     * This is the test for creating soft credits - however a 'get' is not yet possible via API
-     * as the current BAO functions are contact-centric (from what I can find)
-     *
-     */
+
+  /**
+   * This is the test for creating soft credits - however a 'get' is not yet possible via API
+   * as the current BAO functions are contact-centric (from what I can find)
+   */
   function testCreateContributionWithSoftCredt() {
     $description = "Demonstrates creating contribution with SoftCredit";
     $subfile     = "ContributionCreateWithSoftCredit";
@@ -770,7 +770,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * in the interests of removing financial type / contribution type checks from
+   * In the interests of removing financial type / contribution type checks from
    * legacy format function lets test that the api is doing this for us
    */
   function testCreateInvalidFinancialType() {
@@ -780,7 +780,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * in the interests of removing financial type / contribution type checks from
+   * In the interests of removing financial type / contribution type checks from
    * legacy format function lets test that the api is doing this for us
    */
   function testValidNamedFinancialType() {
@@ -855,7 +855,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * test that BAO defaults work
+   * Test that BAO defaults work
    */
   function testCreateBAODefaults() {
     unset($this->_params['contribution_source_id'], $this->_params['payment_instrument_id']);
@@ -1051,7 +1051,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * test that update does not change status id CRM-15105
+   * Test that update does not change status id CRM-15105
    */
   function testCreateUpdateWithoutChangingPendingStatus() {
     $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_params, array('contribution_status_id' => 2)));
@@ -1320,7 +1320,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * test membership is renewed when transaction completed
+   * Test membership is renewed when transaction completed
    */
   function testCompleteTransactionMembershipPriceSet() {
     $this->createPriceSetWithPage('membership');
@@ -1332,7 +1332,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * test membership is renewed when transaction completed
+   * Test membership is renewed when transaction completed
    */
   function testCompleteTransactionMembershipPriceSetTwoTerms() {
     $this->createPriceSetWithPage('membership');
@@ -1351,7 +1351,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
 
   /**
-   * this could be merged with 4.5 function setup in api_v3_ContributionPageTest::setUpContributionPage
+   * This could be merged with 4.5 function setup in api_v3_ContributionPageTest::setUpContributionPage
    * on parent class at some point (fn is not in 4.4)
    * @param $entity
    * @param array $params
@@ -1410,7 +1410,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Set up a pending transaction with a specific price field id
-   * @param $priceFieldValueID
+   * @param int $priceFieldValueID
    */
   function setUpPendingContribution($priceFieldValueID){
     $contactID = $this->individualCreate();
@@ -1566,7 +1566,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $contId
+   * @param int $contId
    *
    * @return null|string
    */function _getFinancialTrxnAmount($contId) {
@@ -1582,7 +1582,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
  }
 
   /**
-   * @param $contId
+   * @param int $contId
    *
    * @return null|string
    */function _getFinancialItemAmount($contId) {
@@ -1597,7 +1597,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
  }
 
   /**
-   * @param $contId
+   * @param int $contId
    * @param $context
    */
   function _checkFinancialItem($contId, $context) {
@@ -1667,7 +1667,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * @param $contribution
    * @param $context
-   * @param null $instrumentId
+   * @param int $instrumentId
    */
   function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL) {
    $trxnParams = array(
@@ -1763,7 +1763,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
  }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $context
    */
   function _checkFinancialRecords($params,$context) {

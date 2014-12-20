@@ -88,10 +88,9 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("{$countContacts} Contacts"));
   }
 
-  /*
-     *  Helper function to provide data for contact import for sample.
-     */
   /**
+   * Helper function to provide data for contact import for sample.
+   *
    * @return array
    */
   function _contactTagCSVData() {
@@ -109,7 +108,8 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -120,7 +120,8 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
         'state' => 'NY',
         'country' => 'United States',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',

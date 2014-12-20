@@ -61,7 +61,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   public $_paymentProcessorObj = NULL;
 
   /**
-   * the id of the contact associated with this recurring contribution
+   * The id of the contact associated with this recurring contribution
    *
    * @var int
    * @public
@@ -125,7 +125,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -143,7 +143,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the components of the form
+   * Actually build the components of the form
    *
    * @return void
    * @access public

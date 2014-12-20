@@ -94,7 +94,7 @@ class org_civicrm_search_activityimplementsCRM_Contact_Form_Search_Interface {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   function buildForm(&$form) {
 
@@ -263,11 +263,9 @@ class org_civicrm_search_activityimplementsCRM_Contact_Form_Search_Interface {
                  ON assignment.assignee_contact_id = contact_c.id ";
   }
 
-  /*
-     * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
-     *
-     */
   /**
+   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
+   *
    * @param bool $includeContactIDs
    *
    * @return string
@@ -343,8 +341,9 @@ class org_civicrm_search_activityimplementsCRM_Contact_Form_Search_Interface {
   }
 
   /*
-     * Functions below generally don't need to be modified
-     */
+   * Functions below generally don't need to be modified
+   */
+
   /**
    * @return mixed
    */

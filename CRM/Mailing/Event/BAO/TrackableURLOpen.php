@@ -35,7 +35,7 @@
 class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_TrackableURLOpen {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -160,8 +160,6 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    * Get tracked url count for each mailing for a given set of mailing IDs
    *
    * @param $mailingIDs
-   *
-   * @internal param int $contactID ID of the mailing
    *
    * @return array          trackable url count per mailing ID
    * @access public

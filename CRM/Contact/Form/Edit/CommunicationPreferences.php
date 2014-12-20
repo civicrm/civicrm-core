@@ -39,14 +39,14 @@
 class CRM_Contact_Form_Edit_CommunicationPreferences {
 
   /**
-   * greetings
+   * Greetings
    * @var array
    * @static
    */
   static $greetings = array();
 
   /**
-   * build the form elements for Communication Preferences object
+   * Build the form object elements for Communication Preferences object
    *
    * @param CRM_Core_Form $form       reference to the form object
    *
@@ -131,13 +131,11 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
    * @param $self
-   *
-   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -159,12 +157,12 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $defaults
    *
    * @return void

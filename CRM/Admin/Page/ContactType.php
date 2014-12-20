@@ -65,27 +65,23 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
   function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
-        CRM_Core_Action::UPDATE =>
-        array(
+        CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/options/subtype',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Contact Type'),
         ),
-        CRM_Core_Action::DISABLE =>
-        array(
+        CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Contact Type'),
         ),
-        CRM_Core_Action::ENABLE =>
-        array(
+        CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Contact Type'),
         ),
-        CRM_Core_Action::DELETE =>
-        array(
+        CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/options/subtype',
           'qs' => 'action=delete&id=%%id%%',

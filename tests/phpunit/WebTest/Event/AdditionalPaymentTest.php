@@ -209,7 +209,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
 
   /**
    * @param $feeAmt
-   * @param $amtPaid
+   * @param int $amtPaid
    */
   function _checkPaymentInfoTable($feeAmt, $amtPaid) {
     $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td", "$ {$feeAmt}", 'Missing text: appropriate fee amount');

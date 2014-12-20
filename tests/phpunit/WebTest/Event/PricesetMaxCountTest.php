@@ -1117,7 +1117,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return string
    */

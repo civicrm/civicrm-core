@@ -121,7 +121,7 @@ class CiviDBAssert {
    * Compare a single column value in a retrieved DB record to an expected value
    *
    * @param $testCase
-   * @param $daoName
+   * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
    * @param $searchColumn

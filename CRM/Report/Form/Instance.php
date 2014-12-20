@@ -35,7 +35,7 @@
 class CRM_Report_Form_Instance {
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function buildForm(&$form) {
     // we should not build form elements in dashlet mode
@@ -183,11 +183,13 @@ class CRM_Report_Form_Instance {
    * @return array|bool
    */
   static function formRule($fields, $errors, $self) {
-    $buttonName = $self->controller->getButtonName();
-    $selfButtonName = $self->getVar('_instanceButtonName');
+    // Validate both the "next" and "save" buttons for creating/updating a report
+    $nextButton = $self->controller->getButtonName();
+    $saveButton = str_replace('_next', '_save', $nextButton);
+    $clickedButton = $self->getVar('_instanceButtonName');
 
     $errors = array();
-    if ($selfButtonName == $buttonName) {
+    if ($clickedButton == $nextButton || $clickedButton == $saveButton) {
       if (empty($fields['title'])) {
         $errors['title'] = ts('Title is a required field.');
         $self->assign('instanceFormError', TRUE);
@@ -198,7 +200,7 @@ class CRM_Report_Form_Instance {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $defaults
    */
   static function setDefaultValues(&$form, &$defaults) {
@@ -264,7 +266,7 @@ class CRM_Report_Form_Instance {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param bool $redirect
    */
   static function postProcess(&$form, $redirect = TRUE) {

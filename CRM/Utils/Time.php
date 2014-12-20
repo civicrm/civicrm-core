@@ -44,7 +44,7 @@ class CRM_Utils_Time {
   static private $_delta = 0;
 
   /**
-   * get the time
+   * Get the time
    *
    * @param string $returnFormat format in which date is to be retrieved
    *
@@ -66,7 +66,7 @@ class CRM_Utils_Time {
   }
 
   /**
-   * set the given time
+   * Set the given time
    *
    * @param string $newDateTime  a date formatted with strtotime
    * @param string $returnFormat format in which date is to be retrieved

@@ -71,7 +71,7 @@ class CRM_Core_Permission {
   CONST AUTH_SRC_UNKNOWN = 0, AUTH_SRC_CHECKSUM = 1, AUTH_SRC_SITEKEY = 2, AUTH_SRC_LOGIN = 4;
 
   /**
-   * get the current permission of this user
+   * Get the current permission of this user
    *
    * @return string the permission of the user (edit or view or null)
    */
@@ -81,7 +81,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * given a permission string or array, check for access requirements
+   * Given a permission string or array, check for access requirements
    * @param mixed $permissions the permission to check as an array or string -see examples
    *  arrays
    *
@@ -269,7 +269,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * @param $gid
+   * @param int $gid
    * @param int $type
    *
    * @return bool
@@ -349,7 +349,7 @@ class CRM_Core_Permission {
 
   /**
    * @param int $type
-   * @param null $eventID
+   * @param int $eventID
    * @param string $context
    *
    * @return array|null
@@ -426,7 +426,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * check permissions for delete and edit actions
+   * Check permissions for delete and edit actions
    *
    * @param string $module component name.
    * @param integer $action action to be check across component
@@ -701,7 +701,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * Function to get component name from given permission.
+   * Get component name from given permission.
    *
    * @param string $permission
    *

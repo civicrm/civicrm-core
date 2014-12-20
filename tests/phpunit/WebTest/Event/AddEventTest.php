@@ -203,7 +203,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $eventTitle
    * @param $discount
    */
@@ -366,8 +366,8 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   /**
    * @param $eventTitle
    * @param $eventDescription
-   * @param $templateID
-   * @param $eventTypeID
+   * @param int $templateID
+   * @param int $eventTypeID
    */
   function _testAddEventInfoFromTemplate($eventTitle, $eventDescription, $templateID, $eventTypeID) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
@@ -807,12 +807,12 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("event/search?reset=1", "reset=1");
     $this->select2("event_id", $eventTitle, FALSE);
-    $this->click("xpath=//td[@class='crm-event-form-block-participant_status']/div[@class='listing-box']//div/label[text()='Pending from pay later']");
+    $this->click("xpath=//div[@id='searchForm']/table/tbody/tr[5]/td[1]/div//div/label[text()='Pending from pay later']");
     $this->clickLink('_qf_Search_refresh');
-    $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='Edit']");
+    $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[2][text()='Edit']");
 
-    $uRL = $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='Edit']@href");
-    $this->click("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='Edit']");
+    $uRL = $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[2][text()='Edit']@href");
+    $this->click("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[2][text()='Edit']");
     $this->waitForElementPresent("status_id");
     $this->select('status_id', 'label=Registered');
     $this->waitForElementPresent("record_contribution");
@@ -852,7 +852,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $contributionID
+   * @param int $contributionID
    */
   function verifyFinancialRecords($contributionID) {
     // check count for civicrm_contribution and civicrm_financial_item in civicrm_entity_financial_trxn

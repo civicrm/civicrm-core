@@ -30,7 +30,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
   }
 
   /**
-   * add() method (create and update modes)
+   * Add() method (create and update modes)
    */
   function testAdd() {
     $contactId = Contact::createIndividual();
@@ -74,7 +74,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
   }
 
   /**
-   * ifAllowedToLogin() method (set and reset allowed_to_login)
+   * IfAllowedToLogin() method (set and reset allowed_to_login)
    */
   function testIfAllowedToLogin() {
     $contactId = Contact::createIndividual();
@@ -119,7 +119,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
   }
 
   /**
-   * allOpenIDs() method - get all OpenIDs for the given contact
+   * AllOpenIDs() method - get all OpenIDs for the given contact
    */
   function testAllOpenIDs() {
     $contactId = Contact::createIndividual();

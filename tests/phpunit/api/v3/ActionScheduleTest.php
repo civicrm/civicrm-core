@@ -94,7 +94,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
-   * check if required fields are not passed
+   * Check if required fields are not passed
    */
   function testActionScheduleCreateWithoutRequired() {
     $params = array(

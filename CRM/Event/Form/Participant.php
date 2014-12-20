@@ -43,7 +43,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $useLivePageJS = TRUE;
 
   /**
-   * the values for the contribution db object
+   * The values for the contribution db object
    *
    * @var array
    * @protected
@@ -51,7 +51,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_values;
 
   /**
-   * the values for the quickconfig for priceset
+   * The values for the quickconfig for priceset
    *
    * @var boolean
    * @protected
@@ -75,7 +75,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_priceSet;
 
   /**
-   * the id of the participation that we are proceessing
+   * The id of the participation that we are proceessing
    *
    * @var int
    * @protected
@@ -83,7 +83,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_id;
 
   /**
-   * the id of the note
+   * The id of the note
    *
    * @var int
    * @protected
@@ -91,7 +91,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected $_noteId = NULL;
 
   /**
-   * the id of the contact associated with this participation
+   * The id of the contact associated with this participation
    *
    * @var int
    * @protected
@@ -99,7 +99,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_contactId;
 
   /**
-   * array of event values
+   * Array of event values
    *
    * @var array
    * @protected
@@ -135,60 +135,59 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected $_eventTypeId = NULL;
 
   /**
-   * participant status Id
+   * Participant status Id
    */
   protected $_statusId = NULL;
 
   /**
-   * cache all the participant statuses
+   * Cache all the participant statuses
    */
   protected $_participantStatuses;
 
   /**
-   * participant mode
+   * Participant mode
    */
   public $_mode = NULL;
 
   /**
-   * event ID preselect
+   * Event ID preselect
    */
   public $_eID = NULL;
 
-  /*
-     *Line Item for Price Set
-     */
-
+  /**
+   * Line Item for Price Set
+   */
   public $_lineItem = NULL;
-  /*
-     *Contribution mode for event registration for offline mode
-     */
 
+  /*
+   * Contribution mode for event registration for offline mode
+   */
   public $_contributeMode = 'direct';
 
   public $_online;
 
   /**
-   * store id of role custom data type ( option value )
+   * Store id of role custom data type ( option value )
    */
   protected $_roleCustomDataTypeID;
 
   /**
-   * store id of event Name custom data type ( option value)
+   * Store id of event Name custom data type ( option value)
    */
   protected $_eventNameCustomDataTypeID;
 
   /**
-   * selected discount id
+   * Selected discount id
    */
   public $_originalDiscountId = NULL;
 
   /**
-   * event id
+   * Event id
    */
   public $_eventId = NULL;
 
   /**
-   * id of payment, if any
+   * Id of payment, if any
    */
   public $_paymentId = NULL;
 
@@ -199,7 +198,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_onlinePendingContributionId = NULL;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -592,7 +591,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -797,13 +796,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
-   * @param $values
+   * @param array $values posted values of the form
    * @param $files
    * @param $self
-   *
-   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -875,7 +872,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    */
@@ -1201,6 +1198,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
 
+      // CRM-15622: fix for incorrect contribution.fee_amount
+      $paymentParams['fee_amount'] = NULL;
       $result = $payment->doDirectPayment($paymentParams);
 
       if (is_a($result, 'CRM_Core_Error')) {

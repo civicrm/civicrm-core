@@ -151,7 +151,6 @@ function civicrm_api3_event_get($params) {
       $event[$eventDAO->id]['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventDAO->id);
     }
   }
-  //end of the loop
 
   return civicrm_api3_create_success($event, $params, 'event', 'get', $eventDAO);
 }
@@ -200,7 +199,7 @@ function civicrm_api3_event_delete($params) {
 /*
 
 /**
- * Function to add 'is_full' & 'available_seats' to the return array. (this might be better in the BAO)
+ * add 'is_full' & 'available_seats' to the return array. (this might be better in the BAO)
  * Default BAO function returns a string if full rather than a Bool - which is more appropriate to a form
  *
  * @param array $event return array of the event
@@ -209,7 +208,7 @@ function civicrm_api3_event_delete($params) {
  */
 /**
  * @param $event
- * @param $event_id
+ * @param int $event_id
  */
 function _civicrm_api3_event_getisfull(&$event, $event_id) {
   $eventFullResult = CRM_Event_BAO_Participant::eventFull($event_id, 1);

@@ -37,7 +37,7 @@
  */
 
 /**
- * Function to create relationship type
+ * create relationship type
  *
  * @param  array $params   Associative array of property name/value pairs to insert in new relationship type.
  *
@@ -91,7 +91,7 @@ function _civicrm_api3_relationship_type_create_spec(&$params) {
 }
 
 /**
- * Function to get all relationship type
+ * get all relationship type
  * retruns  An array of Relationship_type
  * @access  public
  * {@getfields RelationshipType_get}

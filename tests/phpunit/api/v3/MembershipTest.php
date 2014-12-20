@@ -258,7 +258,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID2);
   }
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -663,7 +663,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with complete array + custom field
+   * Check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -799,7 +799,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * change custom field using update
+   * Change custom field using update
    */
   function testUpdateWithCustom() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);

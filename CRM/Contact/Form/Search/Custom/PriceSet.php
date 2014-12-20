@@ -155,7 +155,7 @@ WHERE participant_id = $participantID;
   }
 
   /**
-   * @param null $eventID
+   * @param int $eventID
    *
    * @return Object
    */
@@ -186,7 +186,7 @@ AND    p.entity_id    = e.id
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @throws Exception
    */

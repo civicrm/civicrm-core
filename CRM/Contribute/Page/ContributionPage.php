@@ -555,7 +555,7 @@ ORDER BY title asc
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param bool $sortBy
    *
    * @return int|string
@@ -622,7 +622,7 @@ ORDER BY title asc
 
   /**
    * @param $whereClause
-   * @param $whereParams
+   * @param array $whereParams
    */
   function pager($whereClause, $whereParams) {
 
@@ -648,7 +648,7 @@ SELECT count(id)
 
   /**
    * @param $whereClause
-   * @param $whereParams
+   * @param array $whereParams
    */
   function pagerAtoZ($whereClause, $whereParams) {
 

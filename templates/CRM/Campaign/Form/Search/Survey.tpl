@@ -215,8 +215,8 @@ function loadSurveyList( )
              "fnDrawCallback": function() { CRM.$().crmtooltip(); },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
          //insert the id for each row for enable/disable.
-         var rowId = 'survey_row_' + aData[0];
-         CRM.$(nRow).attr( 'id', rowId );
+         var rowId = 'survey-' + aData[0];
+         CRM.$(nRow).attr( 'id', rowId).addClass('crm-entity');
          //handled disabled rows.
          var isActive = Boolean(Number(aData[10]));
          if ( !isActive ) CRM.$(nRow).addClass( 'disabled' );

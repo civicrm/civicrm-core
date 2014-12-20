@@ -118,7 +118,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   }
 
   /**
-   * given a 'civicrm' type string, return the mysql data store area
+   * Given a 'civicrm' type string, return the mysql data store area
    *
    * @param string $type the civicrm type string
    *
@@ -190,7 +190,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   }
 
   /**
-   * Function to delet option value give an option value and custom group id
+   * Delet option value give an option value and custom group id
    *
    * @param int $customValueID custom value ID
    * @param int $customGroupID custom group ID

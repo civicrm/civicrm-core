@@ -40,7 +40,7 @@
 class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig {
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -58,7 +58,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig 
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -107,7 +107,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig 
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

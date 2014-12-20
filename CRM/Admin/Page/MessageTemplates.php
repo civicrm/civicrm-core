@@ -236,9 +236,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
   }
 
   /**
-   * browse all entities.
-   *
-   * @internal param int $action
+   * Browse all entities.
    *
    * @return void
    * @access public

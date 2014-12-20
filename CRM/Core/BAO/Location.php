@@ -44,7 +44,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   static $blocks = array('phone', 'email', 'im', 'openid', 'address');
 
   /**
-   * Function to create various elements of location block
+   * Create various elements of location block
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param boolean $fixAddress true if you need to fix (format) address values
@@ -130,7 +130,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   }
 
   /**
-   * takes an entity array and finds the existing location block
+   * Takes an entity array and finds the existing location block
    * @access public
    * @static
    */
@@ -151,7 +151,7 @@ WHERE e.id = %1";
   }
 
   /**
-   * takes an associative array and adds location block
+   * Takes an associative array and adds location block
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
@@ -168,7 +168,7 @@ WHERE e.id = %1";
   }
 
   /**
-   *  This function deletes the Location Block
+   * Delete the Location Block
    *
    * @param  int  $locBlockId    id of the Location Block
    *
@@ -233,14 +233,8 @@ WHERE e.id = %1";
   }
 
   /**
-   * Given the list of params in the params array, fetch the object
-   * and store the values in the values array
-   *
    * @param $entityBlock
    * @param bool $microformat
-   *
-   * @internal param array $params input parameters to find object
-   * @internal param array $values output values of the object
    *
    * @return array   array of objects(CRM_Core_BAO_Location)
    * @access public
@@ -265,7 +259,7 @@ WHERE e.id = %1";
         $name = ucfirst($block);
       }
       $baoString = 'CRM_Core_BAO_' . $name;
-      $blocks[$block] = $baoString::getValues( $entityBlock, $microformat );
+      $blocks[$block] = $baoString::getValues($entityBlock, $microformat);
     }
     return $blocks;
   }
@@ -304,17 +298,13 @@ WHERE e.id = %1";
     }
   }
 
-  /* Function to copy or update location block.
+  /**
+   * Copy or update location block.
    *
    * @param  int  $locBlockId  location block id.
    * @param  int  $updateLocBlockId update location block id
-   * @return int  newly created/updated location block id.
-   */
-  /**
-   * @param $locBlockId
-   * @param null $updateLocBlockId
    *
-   * @return mixed
+   * @return int  newly created/updated location block id.
    */
   static function copyLocBlock($locBlockId, $updateLocBlockId = NULL) {
     //get the location info.

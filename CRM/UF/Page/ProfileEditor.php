@@ -31,6 +31,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             'is_active' => 1,
             'rowCount' => 1000, // FIXME
           )),
+          'contactSubTypes' => CRM_Contact_BAO_ContactType::subTypes(),
           'profilePreviewKey' => CRM_Core_Key::get('CRM_UF_Form_Inline_Preview', TRUE),
         );
       })
@@ -66,8 +67,6 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    * @param array $entityTypes strings, e.g. "IndividualModel", "ActivityModel"
    */
   static function registerSchemas($entityTypes) {
-    /* CRM_Core_Error::backtrace(); */
-    /*   CRM_Core_Error::debug( '$entityTypes', $entityTypes ); */
     // TODO in cases where registerSchemas is called multiple times for same entity, be more efficient
     CRM_Core_Resources::singleton()->addSettingsFactory(function () use ($entityTypes) {
       return array(
@@ -195,7 +194,9 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         case 'Individual':
         case 'Organization':
         case 'Household':
-          if ($field['field_type'] != $extends && $field['field_type'] != 'Contact') {
+          if ($field['field_type'] != $extends && $field['field_type'] != 'Contact'
+            //CRM-15595 check if subtype
+            && !in_array($field['field_type'], CRM_Contact_BAO_ContactType::subTypes($extends))) {
             continue 2;
           }
           break;

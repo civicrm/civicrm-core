@@ -44,27 +44,27 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    */
 
   /**
-   * total number of lines in file
+   * Total number of lines in file
    */
   protected $_rowCount;
 
   /**
-   * running total number of un matched Conact
+   * Running total number of un matched Conact
    */
   protected $_unMatchCount;
 
   /**
-   * array of unmatched lines
+   * Array of unmatched lines
    */
   protected $_unMatch;
 
   /**
-   * total number of contacts with unparsed addresses
+   * Total number of contacts with unparsed addresses
    */
   protected $_unparsedAddressCount;
 
   /**
-   * filename of mismatch data
+   * Filename of mismatch data
    *
    * @var string
    */
@@ -74,33 +74,33 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   protected $_statusFieldName;
 
   /**
-   * on duplicate
+   * On duplicate
    *
    * @var int
    */
   public $_onDuplicate;
 
   /**
-   * dedupe rule group id to use if set
+   * Dedupe rule group id to use if set
    *
    * @var int
    */
   public $_dedupeRuleGroupID = NULL;
 
   /**
-   * @param $tableName
+   * @param string $tableName
    * @param $mapper
    * @param int $mode
    * @param int $contactType
    * @param string $primaryKeyName
    * @param string $statusFieldName
    * @param int $onDuplicate
-   * @param null $statusID
+   * @param int $statusID
    * @param null $totalRowCount
    * @param bool $doGeocodeAddress
    * @param int $timeout
    * @param null $contactSubType
-   * @param null $dedupeRuleGroupID
+   * @param int $dedupeRuleGroupID
    *
    * @return mixed
    */
@@ -451,7 +451,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Function to set IM Service Provider type fields
+   * Set IM Service Provider type fields
    *
    * @param array $elements IM service provider type ids
    *
@@ -519,7 +519,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Function to set IM Service Provider type fields for related contacts
+   * Set IM Service Provider type fields for related contacts
    *
    * @param array $elements IM service provider type ids of related contact
    *
@@ -533,7 +533,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * function to format the field values for input to the api
+   * Format the field values for input to the api
    *
    * @return array (reference ) associative array of name/value pairs
    * @access public
@@ -541,7 +541,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   function &getActiveFieldParams() {
     $params = array();
 
-    //CRM_Core_Error::debug( 'Count', $this->_activeFieldCount );
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if ($this->_activeFields[$i]->_name == 'do_not_import') {
         continue;
@@ -645,7 +644,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $title
    * @param int $type
    * @param string $headerPattern
@@ -730,11 +729,10 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   /**
    * Export data to a CSV file
    *
-   * @param $fileName
+   * @param string $fileName
    * @param array $header
-   * @param data $data
+   * @param array $data
    *
-   * @internal param string $filename
    * @return void
    * @access public
    */

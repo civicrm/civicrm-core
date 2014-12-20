@@ -40,14 +40,14 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
   public $_single = FALSE;
 
   /**
-   * all the existing templates in the system
+   * All the existing templates in the system
    *
    * @var array
    */
   public $_templates = NULL;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -59,7 +59,7 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -72,7 +72,7 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *

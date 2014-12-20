@@ -184,7 +184,6 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
       }
     }
 
-    // CRM_Core_Error::debug_var( 'c', $contribution );
     $contribution->save();
     $transaction->commit();
     return TRUE;
@@ -205,7 +204,6 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
 
     $input['component'] = strtolower($component);
 
-    // CRM_Core_Error::debug_var( "$status, $component", $dataRoot );
     $orderNo = $dataRoot['google-order-number']['VALUE'];
 
     require_once 'CRM/Contribute/DAO/Contribution.php';
@@ -253,7 +251,6 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
     require_once 'CRM/Core/Transaction.php';
     $transaction = new CRM_Core_Transaction();
 
-    // CRM_Core_Error::debug_var( 'c', $contribution );
     if ($status == 'PAYMENT_DECLINED' ||
       $status == 'CANCELLED_BY_GOOGLE' ||
       $status == 'CANCELLED'

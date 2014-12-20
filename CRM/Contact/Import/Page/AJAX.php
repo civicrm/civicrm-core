@@ -39,7 +39,7 @@
 class CRM_Contact_Import_Page_AJAX {
 
   /**
-   * Function to show import status
+   * Show import status
    */
   static function status() {
     // make sure we get an id

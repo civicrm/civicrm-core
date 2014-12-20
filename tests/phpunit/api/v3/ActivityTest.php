@@ -111,14 +111,14 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testActivityCreateEmpty() {
     $result = $this->callAPIFailure('activity', 'create', array());
   }
 
   /**
-   * check if required fields are not passed
+   * Check if required fields are not passed
    */
   function testActivityCreateWithoutRequired() {
     $params = array(
@@ -205,7 +205,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with incorrect required fields
+   * Check with incorrect required fields
    */
   function testActivityCreateWithUnknownActivityTypeId() {
     $params = array(
@@ -727,7 +727,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * check activity deletion with empty params
+   * Check activity deletion with empty params
    */
   function testDeleteActivityForEmptyParams() {
     $params = array('version' => $this->_apiversion);
@@ -735,7 +735,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * check activity deletion without activity id
+   * Check activity deletion without activity id
    */
   function testDeleteActivityWithoutId() {
     $params = array(
@@ -746,7 +746,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * check activity deletion without activity type
+   * Check activity deletion without activity type
    */
   function testDeleteActivityWithoutActivityType() {
     $params = array('id' => 1);
@@ -754,7 +754,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * check activity deletion with incorrect data
+   * Check activity deletion with incorrect data
    */
   function testDeleteActivityWithIncorrectActivityType() {
     $params = array(
@@ -766,7 +766,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * check activity deletion with correct data
+   * Check activity deletion with correct data
    */
   function testDeleteActivity() {
     $result = $this->callAPISuccess('activity', 'create', $this->_params);
@@ -780,7 +780,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * check if required fields are not passed
+   * Check if required fields are not passed
    */
   function testActivityUpdateWithoutRequired() {
     $params = array(
@@ -806,7 +806,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with incorrect required fields
+   * Check with incorrect required fields
    */
   function testActivityUpdateWithIncorrectContactActivityType() {
     $params = array(
@@ -1028,7 +1028,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * check activity update with status
+   * Check activity update with status
    */
   function testActivityUpdateWithStatus() {
     $activity = $this->callAPISuccess('activity', 'create', $this->_params);

@@ -38,7 +38,7 @@
  */
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return array
  */
@@ -50,7 +50,7 @@ function civicrm_api3_system_log_delete($params) {
  * Create system log
  * It's arguable whether this function should exist as it fits our crud pattern and adding it meets our SyntaxConformance test requirements
  * but it just wraps system.log which is more consistent with the PSR3 implemented.
- * @param $params
+ * @param array $params
  *
  * @return array
  */
@@ -59,7 +59,7 @@ function civicrm_api3_system_log_create($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return array
  */
@@ -69,7 +69,7 @@ function _civicrm_api3_system_log_create_spec(&$params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return array
  */

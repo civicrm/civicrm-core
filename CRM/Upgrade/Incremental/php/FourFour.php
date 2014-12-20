@@ -55,7 +55,6 @@ class CRM_Upgrade_Incremental_php_FourFour {
    * @param $rev string, a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'
    * @param null $currentVer
    *
-   * @internal param string $postUpgradeMessage , alterable
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
@@ -354,8 +353,8 @@ ALTER TABLE civicrm_dashboard
 
   /**
    * @param CRM_Queue_TaskContext $ctx
-   * @param $startId
-   * @param $endId
+   * @param int $startId
+   * @param int $endId
    *
    * @return bool
    */
@@ -456,8 +455,8 @@ ALTER TABLE civicrm_dashboard
    * (e.g. "http://example.com/?page=CiviCRM&amp;q=civicrm/contact/imagefile&amp;photo=123.jpg").
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $startId
-   * @param $endId
+   * @param int $startId
+   * @param int $endId
    * @return bool
    */
   static function cleanupBackendImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId) {

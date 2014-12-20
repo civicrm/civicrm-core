@@ -58,7 +58,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Contribution extends CRM_Contact_F
   }
 
   /**
-   * get contribution ids in entity tables.
+   * Get contribution ids in entity tables.
    *
    * @param string $queryText
    * @param string $entityIDTableName

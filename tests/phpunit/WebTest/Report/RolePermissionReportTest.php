@@ -76,7 +76,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
 
     // change report setting to for a particular role
     $this->openCiviPage('report/instance/1', 'reset=1');
-    $this->click("css=div.crm-report_setting-accordion div.crm-accordion-header");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[6]/a");
     $this->waitForElementPresent("_qf_Summary_submit_save");
     $this->select("permission", "value=access CiviCRM");
     $this->select("grouprole-f", "value=$role1");
@@ -218,7 +218,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $roleid
+   * @param int $roleid
    *
    * @return string
    */

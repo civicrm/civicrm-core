@@ -40,7 +40,7 @@
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
-   * the id of the contribution page that we are processsing
+   * The id of the contribution page that we are processsing
    *
    * @var int
    * @public
@@ -48,7 +48,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_id;
 
   /**
-   * the mode that we are in
+   * The mode that we are in
    *
    * @var string
    * @protect
@@ -56,7 +56,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_mode;
 
   /**
-   * the contact id related to a membership
+   * The contact id related to a membership
    *
    * @var int
    * @public
@@ -64,7 +64,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_membershipContactID;
 
   /**
-   * the values for the contribution db object
+   * The values for the contribution db object
    *
    * @var array
    * @protected
@@ -72,7 +72,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_values;
 
   /**
-   * the paymentProcessor attributes for this page
+   * The paymentProcessor attributes for this page
    *
    * @var array
    * @protected
@@ -94,7 +94,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   protected $_separateMembershipPayment;
   /**
-   * the default values for the form
+   * The default values for the form
    *
    * @var array
    * @protected
@@ -134,7 +134,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_amount;
 
   /**
-   * pcp id
+   * Pcp id
    *
    * @var integer
    * @public
@@ -142,7 +142,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_pcpId;
 
   /**
-   * pcp block
+   * Pcp block
    *
    * @var array
    * @public
@@ -150,7 +150,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_pcpBlock;
 
   /**
-   * pcp info
+   * Pcp info
    *
    * @var array
    * @public
@@ -167,7 +167,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   protected $_userID;
 
   /**
-   * the Membership ID for membership renewal
+   * The Membership ID for membership renewal
    *
    * @var int
    * @public
@@ -207,14 +207,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_contributeMode;
 
   /**
-   * contribution page supports memberships
+   * Contribution page supports memberships
    * @var boolean
    */
   public $_useForMember;
 
   public $_isBillingAddressRequiredForPayLater;
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -537,7 +537,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * set the default values
+   * Set the default values
    *
    * @return void
    * @access public
@@ -547,7 +547,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * assign the minimal set of variables to the template
+   * Assign the minimal set of variables to the template
    *
    * @return void
    * @access public
@@ -674,10 +674,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Function to add the custom fields
+   * Add the custom fields
    *
-   * @param $id
-   * @param $name
+   * @param int $id
+   * @param string $name
    * @param bool $viewOnly
    * @param null $profileContactType
    * @param null $fieldTypes
@@ -840,7 +840,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Function to authenticate pledge user during online payment.
+   * Authenticate pledge user during online payment.
    *
    * @access public
    *
