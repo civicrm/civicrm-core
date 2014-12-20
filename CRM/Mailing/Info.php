@@ -67,17 +67,10 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'js' => array('js/angular-crmMailingAB.js', 'js/angular-crmMailingAB/services.js', 'js/angular-crmMailingAB/directives.js'),
       'css' => array('css/angular-crmMailingAB.css'),
     );
-//    $result['crmMailingAB'] = array(
-//      'ext' => 'civicrm',
-//      'js' => array(
-//        'js/angular-crmMailingAB.js',
-//        'js/angular-crmMailingAB-ReportCtrl.js',
-//        'js/d3.min.js',
-//        'js/angular-sanitize.js',
-//        'packages/ckeditor/ckeditor.js',
-//      ),
-//      'css' => array('css/angular-crmMailingAB.css'),
-//    );
+    $result['crmD3'] = array(
+      'ext' => 'civicrm',
+      'js' => array('js/angular-crmD3.js', 'js/d3.min.js'),
+    );
 
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
