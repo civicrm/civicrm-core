@@ -1,5 +1,23 @@
 (function (angular, $, _) {
 
+  // FIXME: surely there's already some helper which can do this in one line?
+  // @return string "YYYY-MM-DD hh:mm:ss"
+  var createNow = function () {
+    var currentdate = new Date();
+    var yyyy = currentdate.getFullYear();
+    var mm = currentdate.getMonth() + 1;
+    mm = mm < 10 ? '0' + mm : mm;
+    var dd = currentdate.getDate();
+    dd = dd < 10 ? '0' + dd : dd;
+    var hh = currentdate.getHours();
+    hh = hh < 10 ? '0' + hh : hh;
+    var min = currentdate.getMinutes();
+    min = min < 10 ? '0' + min : min;
+    var sec = currentdate.getSeconds();
+    sec = sec < 10 ? '0' + sec : sec;
+    return yyyy + "-" + mm + "-" + dd + " " + hh + ":" + min + ":" + sec;
+  };
+
   angular.module('crmMailingAB').factory('crmMailingABCriteria', function () {
     // TODO Get data from server
     var values = {
@@ -40,6 +58,7 @@
         if (!crmMailingAB.id) {
           crmMailingAB.ab = {
             name: 'Example', // FIXME
+            status: 'Draft',
             mailing_id_a: null,
             mailing_id_b: null,
             mailing_id_c: null,
@@ -81,7 +100,6 @@
       // @return Promise CrmMailingAB
       save: function save() {
         var crmMailingAB = this;
-
         return crmMailingAB._saveMailings()
           .then(function () {
             return crmApi('MailingAB', 'create', crmMailingAB.ab)
@@ -89,6 +107,22 @@
                 crmMailingAB.ab.id = abResult.id;
               });
           })
+          .then(function () {
+            return crmMailingAB;
+          });
+      },
+      // Schedule the test
+      // @return Promise CrmMailingAB
+      // Note: Submission may cause the server state to change. Consider abtest.submit().then(abtest.load)
+      submit: function submit(newStatus) {
+        var crmMailingAB = this;
+        var params = {
+          id: this.id,
+          status: newStatus,
+          approval_date: createNow(),
+          scheduled_date: this.mailings.a.scheduled_date ? this.mailings.a.scheduled_date : createNow()
+        };
+        return crmApi('MailingAB', 'submit', params)
           .then(function () {
             return crmMailingAB;
           });
@@ -137,6 +171,7 @@
       _saveMailings: function _saveMailings() {
         var crmMailingAB = this;
         var todos = {};
+        var p = $q.when(true);
         _.each(['a', 'b', 'c'], function (mkey) {
           if (!crmMailingAB.mailings[mkey]) {
             return;
@@ -145,13 +180,15 @@
             // paranoia: in case caller forgot to manage id on mailing
             crmMailingAB.mailings[mkey].id = crmMailingAB.ab['mailing_id_' + mkey];
           }
-          todos[mkey] = crmMailingMgr.save(crmMailingAB.mailings[mkey])
-            .then(function () {
-              crmMailingAB.ab['mailing_id_' + mkey] = crmMailingAB.mailings[mkey].id;
-              return crmMailingAB.attachments[mkey].save();
-            });
+          p = p.then(function(){
+            return crmMailingMgr.save(crmMailingAB.mailings[mkey])
+              .then(function () {
+                crmMailingAB.ab['mailing_id_' + mkey] = crmMailingAB.mailings[mkey].id;
+                return crmMailingAB.attachments[mkey].save();
+              });
+          });
         });
-        return $q.all(todos).then(function () {
+        return p.then(function () {
           return crmMailingAB;
         });
       }
