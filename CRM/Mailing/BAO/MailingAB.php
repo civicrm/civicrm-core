@@ -145,4 +145,23 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
       CRM_Utils_Hook::post('delete', 'MailingAB', $id, $dao);
     });
   }
+
+  /**
+   * Transfer recipients from the canonical mailing A to the other mailings.
+   *
+   * @param CRM_Mailing_DAO_MailingAB $dao
+   */
+  public static function distributeRecipients(CRM_Mailing_DAO_MailingAB $dao) {
+    CRM_Mailing_BAO_Mailing::getRecipients($dao->mailing_id_a, $dao->mailing_id_a, NULL, NULL, TRUE);
+
+    //calculate total number of random recipients for mail C from group_percentage selected
+    $totalCount = CRM_Mailing_BAO_Recipients::mailingSize($dao->mailing_id_a);
+    $totalSelected = max(1, round(($totalCount * $dao->group_percentage) / 100));
+
+    CRM_Mailing_BAO_Recipients::reassign($dao->mailing_id_a, array(
+      $dao->mailing_id_b => (2 * $totalSelected <= $totalCount) ? $totalSelected : $totalCount - $totalSelected,
+      $dao->mailing_id_c => max(0, $totalCount - $totalSelected - $totalSelected),
+    ));
+
+  }
 }

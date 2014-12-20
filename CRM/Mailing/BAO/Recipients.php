@@ -88,39 +88,53 @@ WHERE  mailing_id = %1
   /**
    * Moves a number of randomly-chosen recipients of one Mailing to another Mailing.
    *
-   * @param int $mailingIdC
+   * @param int $sourceMailingId
    *   Source mailing ID
    * @param int $newMailingID
    *   Destination mailing ID
    * @param int $totalLimit
    *   Number of recipients to move
    */
-  static function updateRandomRecipients($mailingIdC, $newMailingID, $totalLimit = NULL) {
+  static function updateRandomRecipients($sourceMailingId, $newMailingID, $totalLimit = NULL) {
     $limitString = NULL;
     if ($totalLimit) {
       $limitString = "LIMIT 0, $totalLimit";
     }
-    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS  mail_C_$mailingIdC");
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS  srcMailing_$sourceMailingId");
     $sql = "
-CREATE TEMPORARY TABLE mail_C_$mailingIdC
+CREATE TEMPORARY TABLE srcMailing_$sourceMailingId
             (mailing_recipient_id int, id int PRIMARY KEY AUTO_INCREMENT, INDEX(mailing_recipient_id))
             ENGINE=HEAP";
     CRM_Core_DAO::executeQuery($sql);
     $sql = "
-INSERT INTO mail_C_$mailingIdC (mailing_recipient_id)
+INSERT INTO srcMailing_$sourceMailingId (mailing_recipient_id)
 SELECT mr.id
 FROM   civicrm_mailing_recipients mr
-WHERE  mr.mailing_id = $mailingIdC
+WHERE  mr.mailing_id = $sourceMailingId
 ORDER BY RAND()
 $limitString
     ";
     CRM_Core_DAO::executeQuery($sql);
     $sql = "
 UPDATE civicrm_mailing_recipients mr
-INNER JOIN mail_C_$mailingIdC temp_mr ON temp_mr.mailing_recipient_id = mr.id
+INNER JOIN srcMailing_$sourceMailingId temp_mr ON temp_mr.mailing_recipient_id = mr.id
 SET mr.mailing_id = $newMailingID
      ";
     CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
+   * Redistribute recipients from $sourceMailingId to a series of other mailings.
+   *
+   * @param int $sourceMailingId
+   * @param array $to (int $targetMailingId => int $count)
+   */
+  static function reassign($sourceMailingId, $to) {
+    foreach ($to as $targetMailingId => $count) {
+      if ($count > 0) {
+        CRM_Mailing_BAO_Recipients::updateRandomRecipients($sourceMailingId, $targetMailingId, $count);
+      }
+    }
   }
 
 }
