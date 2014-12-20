@@ -7,7 +7,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/' + module + '/' + relPath;
   };
 
-  angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmAttachment', 'crmMailing']);
+  angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmAttachment', 'crmMailing', 'crmD3']);
   angular.module('crmMailingAB').config([
     '$routeProvider',
     function ($routeProvider) {
@@ -26,6 +26,16 @@
         resolve: {
           abtest: function ($route, CrmMailingAB) {
             var abtest = new CrmMailingAB($route.current.params.id == 'new' ? null : $route.current.params.id);
+            return abtest.load();
+          }
+        }
+      });
+      $routeProvider.when('/abtest/:id/report', {
+        templateUrl: partialUrl('report.html'),
+        controller: 'CrmMailingABReportCtrl',
+        resolve: {
+          abtest: function ($route, CrmMailingAB) {
+            var abtest = new CrmMailingAB($route.current.params.id);
             return abtest.load();
           }
         }
@@ -162,6 +172,20 @@
     updateCriteriaName();
     $scope.sync();
     $scope.$watch('abtest.ab.testing_criteria_id', updateCriteriaName);
+  });
+
+  angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, abtest, crmMailingABCriteria, crmApi) {
+    var ts = $scope.ts = CRM.ts('CiviMail');
+
+    $scope.abtest = abtest;
+
+    $scope.stats = {};
+    crmApi('Mailing', 'stats', {mailing_id: abtest.ab.mailing_id_a}).then(function(data){
+      $scope.stats.a = data.values[abtest.ab.mailing_id_a];
+    });
+    crmApi('Mailing', 'stats', {mailing_id: abtest.ab.mailing_id_b}).then(function(data){
+      $scope.stats.b = data.values[abtest.ab.mailing_id_b];
+    });
   });
 
 })(angular, CRM.$, CRM._);
