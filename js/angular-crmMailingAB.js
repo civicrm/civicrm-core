@@ -138,9 +138,9 @@
       $scope.sync();
       return crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
         .then(function () {
-          return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, abtest.submit('Testing'));
+          return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, abtest.submitTest());
           // Note: We're going to leave, so we don't care that submit() modifies several server-side records.
-          // If we stayed on this page, then we'd care about updating and call: abtest.submit().then(abtest.load)
+          // If we stayed on this page, then we'd care about updating and call: abtest.submitTest().then(...abtest.load()...)
         })
         .then(leave);
     };
@@ -174,7 +174,7 @@
     $scope.$watch('abtest.ab.testing_criteria_id', updateCriteriaName);
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, abtest, crmMailingABCriteria, crmApi) {
+  angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, abtest, crmApi, crmMailingPreviewMgr, dialogService) {
     var ts = $scope.ts = CRM.ts('CiviMail');
 
     $scope.abtest = abtest;
@@ -186,6 +186,68 @@
     crmApi('Mailing', 'stats', {mailing_id: abtest.ab.mailing_id_b}).then(function(data){
       $scope.stats.b = data.values[abtest.ab.mailing_id_b];
     });
+    crmApi('Mailing', 'stats', {mailing_id: abtest.ab.mailing_id_c}).then(function(data){
+      $scope.stats.c = data.values[abtest.ab.mailing_id_c];
+    });
+
+    $scope.previewMailing = function previewMailing(mailingName, mode) {
+      return crmMailingPreviewMgr.preview(abtest.mailings[mailingName], mode);
+    };
+    $scope.selectWinner = function selectWinner(mailingName) {
+      var model = {
+        abtest: abtest,
+        mailingName: mailingName
+      };
+      var options = {
+        autoOpen: false,
+        modal: true,
+        title: ts('Select Winner (%1)', {
+          1: mailingName.toUpperCase()
+        })
+      };
+      return dialogService.open('selectWinnerDialog', partialUrl('selectWinner.html'), model, options);
+    };
+  });
+
+
+  angular.module('crmMailingAB').controller('CrmMailingABWinnerDialogCtrl', function ($scope, $timeout, dialogService, crmMailingMgr, crmStatus) {
+    var ts = $scope.ts = CRM.ts('CiviMail');
+    var abtest = $scope.abtest = $scope.model.abtest;
+    var mailingName = $scope.model.mailingName;
+
+    var titles = {a: ts('Mailing A'), b: ts('Mailing B')};
+    $scope.mailingTitle = titles[mailingName];
+
+    function init() {
+      // When using dialogService with a button bar, the major button actions
+      // need to be registered with the dialog widget (and not embedded in
+      // the body of the dialog).
+      var buttons = {};
+      buttons[ts('Select Winner')] = function () {
+        crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings[mailingName], [
+          'name',
+          'groups',
+          'mailings',
+          'scheduled_date'
+        ]);
+        crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
+          .then(function () {
+            return crmStatus({start: ts('Submitting...'), success: ts('Submitted')},
+              abtest.submitFinal().then(function(){
+                return abtest.load();
+              }));
+          })
+          .then(function(){
+            dialogService.close('selectWinnerDialog', abtest);
+          });
+      };
+      buttons[ts('Cancel')] = function () {
+        dialogService.cancel('selectWinnerDialog');
+      };
+      dialogService.setButtons('selectWinnerDialog', buttons);
+    }
+
+    $timeout(init);
   });
 
 })(angular, CRM.$, CRM._);
