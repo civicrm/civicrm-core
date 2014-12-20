@@ -19,9 +19,21 @@
   <field>
     <name>name</name>
     <type>varchar</type>
-    <length>25</length>
+    <length>128</length>
     <title>Name</title>
-    <comment>name of abtesting</comment>
+    <comment>Name of the A/B test</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>status</name>
+    <type>varchar</type>
+    <length>32</length>
+    <title>Status</title>
+    <comment>Status</comment>
+    <pseudoconstant>
+      <optionGroupName>mailing_ab_status</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
     <add>4.5</add>
   </field>
   <field>
