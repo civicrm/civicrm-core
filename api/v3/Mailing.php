@@ -62,6 +62,7 @@ function civicrm_api3_mailing_create($params, $ids = array()) {
       unset($params['approval_date']);
       unset($params['approver_id']);
       unset($params['approval_status_id']);
+      unset($params['approval_note']);
     }
   }
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -132,6 +133,8 @@ function _civicrm_api3_mailing_submit_spec(&$spec) {
   $spec['id'] = $mailingFields['id'];
   $spec['scheduled_date'] = $mailingFields['scheduled_date'];
   $spec['approval_date'] = $mailingFields['approval_date'];
+  $spec['approval_status_id'] = $mailingFields['approval_status_id'];
+  $spec['approval_note'] = $mailingFields['approval_note'];
 }
 
 /**
@@ -163,6 +166,9 @@ function civicrm_api3_mailing_submit($params) {
     $updateParams['approval_date'] = $params['approval_date'];
     $updateParams['approver_id'] = CRM_Core_Session::getLoggedInContactID();
     $updateParams['approval_status_id'] = CRM_Utils_Array::value('approval_status_id', $updateParams, CRM_Core_OptionGroup::getDefaultValue('mail_approval_status'));
+  }
+  if (isset($params['approval_note'])) {
+    $updateParams['approval_note'] = $params['approval_note'];
   }
 
   $updateParams['options']['reload'] = 1;
