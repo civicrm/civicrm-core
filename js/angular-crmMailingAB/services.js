@@ -1,23 +1,5 @@
 (function (angular, $, _) {
 
-  // FIXME: surely there's already some helper which can do this in one line?
-  // @return string "YYYY-MM-DD hh:mm:ss"
-  var createNow = function () {
-    var currentdate = new Date();
-    var yyyy = currentdate.getFullYear();
-    var mm = currentdate.getMonth() + 1;
-    mm = mm < 10 ? '0' + mm : mm;
-    var dd = currentdate.getDate();
-    dd = dd < 10 ? '0' + dd : dd;
-    var hh = currentdate.getHours();
-    hh = hh < 10 ? '0' + hh : hh;
-    var min = currentdate.getMinutes();
-    min = min < 10 ? '0' + min : min;
-    var sec = currentdate.getSeconds();
-    sec = sec < 10 ? '0' + sec : sec;
-    return yyyy + "-" + mm + "-" + dd + " " + hh + ":" + min + ":" + sec;
-  };
-
   angular.module('crmMailingAB').factory('crmMailingABCriteria', function () {
     // TODO Get data from server
     var values = {
@@ -44,7 +26,7 @@
   //   abtest.load().then(function(){
   //     alert("Mailing A is named "+abtest.mailings.a.name);
   //   });
-  angular.module('crmMailingAB').factory('CrmMailingAB', function (crmApi, crmMailingMgr, $q, CrmAttachments) {
+  angular.module('crmMailingAB').factory('CrmMailingAB', function (crmApi, crmMailingMgr, $q, CrmAttachments, crmNow) {
     function CrmMailingAB(id) {
       this.id = id;
       this.mailings = {};
@@ -117,10 +99,10 @@
       submit: function submit(newStatus) {
         var crmMailingAB = this;
         var params = {
-          id: this.id,
+          id: this.ab.id,
           status: newStatus,
-          approval_date: createNow(),
-          scheduled_date: this.mailings.a.scheduled_date ? this.mailings.a.scheduled_date : createNow()
+          approval_date: crmNow(),
+          scheduled_date: this.mailings.a.scheduled_date ? this.mailings.a.scheduled_date : crmNow()
         };
         return crmApi('MailingAB', 'submit', params)
           .then(function () {
