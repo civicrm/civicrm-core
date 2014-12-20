@@ -1,0 +1,49 @@
+<div>
+
+  <table>
+    <thead>
+    <tr>
+      <th>{{ts('Details')}}</th>
+      <th style="width: 10em;">{{ts('Mailing A')}}</th>
+      <th style="width: 10em;">{{ts('Mailing B')}}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>{{ts('Delivered')}}</td>
+      <td>{{stats.a.Delivered}}</td>
+      <td>{{stats.b.Delivered}}</td>
+    </tr>
+    <tr>
+      <td>{{ts('Bounces')}}</td>
+      <td>{{stats.a.Bounces}}</td>
+      <td>{{stats.b.Bounces}}</td>
+    </tr>
+    <tr>
+      <td>{{ts('Unsubscribers')}}</td>
+      <td>{{stats.a.Unsubscribers}}</td>
+      <td>{{stats.b.Unsubscribers}}</td>
+    </tr>
+    <tr>
+      <td>{{'Opened'}}</td>
+      <td>{{stats.a.Opened}}</td>
+      <td>{{stats.b.Opened}}</td>
+    </tr>
+    <tr>
+      <td>{{ts('Unique Clicks')}}</td>
+      <td>{{stats.a['Unique Clicks']}}</td>
+      <td>{{stats.b['Unique Clicks']}}</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div crm-ui-tab-set>
+    <div crm-ui-tab id="tab-opens" crm-title="ts('Opens (WIP)')">
+      <div crm-mailing-ab-stats="{criteria: 'open', split_count: 5}" crm-abtest="abtest"></div>
+    </div>
+    <div crm-ui-tab id="tab-clicks" crm-title="ts('Total Clicks (WIP)')">
+      <div crm-mailing-ab-stats="{criteria: 'total unique clicks', split_count: 5}" crm-abtest="abtest"></div>
+    </div>
+  </div>
+
+</div>
