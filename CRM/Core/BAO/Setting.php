@@ -535,6 +535,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       'IDS_user_agent',
       'check_permissions',
       'options',
+      'prettyprint',
     );
     $settingParams = array_diff_key($params, array_fill_keys($ignoredParams, TRUE));
     $getFieldsParams = array('version' => 3);
@@ -546,7 +547,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $fields = civicrm_api3('setting','getfields', $getFieldsParams);
     $invalidParams = (array_diff_key($settingParams, $fields['values']));
     if (!empty($invalidParams)) {
-      throw new api_Exception(implode(',', $invalidParams) . " not valid settings");
+      throw new api_Exception(implode(',', array_keys($invalidParams)) . " not valid settings");
     }
     if (!empty($settingParams)) {
       $filteredFields = array_intersect_key($settingParams, $fields['values']);
