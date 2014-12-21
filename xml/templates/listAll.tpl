@@ -39,7 +39,7 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
   static private $tables = null;
   static private $daoToClass = null;
 
-  static private function init($fresh = FALSE) {ldelim}
+  static public function init($fresh = FALSE) {ldelim}
     static $init = FALSE;
     if ($init && !$fresh) return;
 
@@ -64,7 +64,10 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
     $init = TRUE;
   {rdelim}
 
-  static private function registerEntityType($daoName, $className, $tableName) {ldelim}
+  /**
+   * (Quasi-Private) Do not call externally (except for unit-testing)
+   */
+  static public function registerEntityType($daoName, $className, $tableName) {ldelim}
     self::$daoToClass[$daoName] = $className;
     self::$tables[$tableName] = $className;
   {rdelim}

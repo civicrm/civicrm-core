@@ -810,6 +810,26 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Extract any $keys from $array and copy to a new array.
+   *
+   * Note: If a $key does not appear in $array, then it will
+   * not appear in the result.
+   *
+   * @param array $array
+   * @param array $keys list of keys to copy
+   * @return array
+   */
+  static function subset($array, $keys) {
+    $result = array();
+    foreach ($keys as $key) {
+      if (isset($array[$key])) {
+        $result[$key] = $array[$key];
+      }
+    }
+    return $result;
+  }
+
+  /**
    * Transform an associative array of key=>value pairs into a non-associative array of arrays.
    * This is necessary to preserve sort order when sending an array through json_encode.
    *

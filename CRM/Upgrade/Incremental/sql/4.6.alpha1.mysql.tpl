@@ -29,6 +29,22 @@ INSERT INTO `civicrm_navigation`
 VALUES
   ( {$domainID}, 'civicrm/admin/setting/preferences/contribute',      '{ts escape="sql" skip="true"}CiviContribute Component Settings{/ts}', 'CiviContribute Component Settings', 'administer CiviCRM', '', @parent_id, '1', NULL, @add_weight_id + 1 );
 
+-- Insert menu items under "Mailings" for A/B Tests
+SELECT @parent_id := id from `civicrm_navigation` where name = 'Mailings' AND domain_id = {$domainID};
+SELECT @add_weight_id := weight from `civicrm_navigation` where `name` = 'Find Mass SMS' and `parent_id` = @parent_id;
+
+UPDATE `civicrm_navigation`
+SET `weight` = `weight`+2
+WHERE `parent_id` = @parent_id
+AND `weight` > @add_weight_id;
+
+INSERT INTO `civicrm_navigation`
+( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+( {$domainID}, 'civicrm/a/#/abtest/new',                            '{ts escape="sql" skip="true"}New A/B Test{/ts}', 'New A/B Test',                                        'access CiviMail,create mailings', 'OR', @parent_id  , '1', NULL, @add_weight_id + 1 ),
+( {$domainID}, 'civicrm/a/#/abtest',                                '{ts escape="sql" skip="true"}Manage A/B Tests{/ts}', 'Manage A/B Tests',                                'access CiviMail,create mailings', 'OR', @parent_id, '1', 1, @add_weight_id + 2 );
+
+
 -- New activity types required for Print and Email Invoice
 SELECT @option_group_id_act     := max(id) from civicrm_option_group where name = 'activity_type';
 SELECT @option_group_id_act_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;

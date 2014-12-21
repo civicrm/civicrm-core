@@ -112,6 +112,34 @@ class Kernel {
     }
   }
 
+  /**
+   * Determine if a hypothetical API call would be authorized.
+   *
+   * @param string $entity
+   *   type of entities to deal with
+   * @param string $action
+   *   create, get, delete or some special action name.
+   * @param array $params
+   *   array to be passed to function
+   * @param null $extra
+   * @return bool TRUE if authorization would succeed
+   * @throws \Exception
+   */
+  public function runAuthorize($entity, $action, $params, $extra = NULL) {
+    $apiProvider = NULL;
+    $apiRequest = Request::create($entity, $action, $params, $extra);
+
+    try {
+      $this->boot();
+      list($apiProvider, $apiRequest) = $this->resolve($apiRequest);
+      $this->authorize($apiProvider, $apiRequest);
+      return true;
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      return false;
+    }
+  }
+
   public function boot() {
     require_once ('api/v3/utils.php');
     require_once 'api/Exception.php';

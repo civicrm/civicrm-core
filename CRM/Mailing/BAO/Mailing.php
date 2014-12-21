@@ -112,7 +112,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   // note that $job_id is used only as a variable in the temp table construction
   // and does not play a role in the queries generated
   /**
-   * @param int $job_id
+   * @param int $job_id (misnomer) a nonce value used to name temporary tables
    * @param int $mailing_id
    * @param null $offset
    * @param null $limit
@@ -1655,16 +1655,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $mg = new CRM_Mailing_DAO_MailingGroup();
     foreach (array('groups', 'mailings') as $entity) {
       foreach (array('include', 'exclude', 'base') as $type) {
-        if (isset($params[$entity]) && !empty($params[$entity][$type]) &&
-          is_array($params[$entity][$type])) {
-          foreach ($params[$entity][$type] as $entityId) {
-            $mg->reset();
-            $mg->mailing_id   = $mailing->id;
-            $mg->entity_table = ($entity == 'groups') ? $groupTableName : $mailingTableName;
-            $mg->entity_id    = $entityId;
-            $mg->group_type   = $type;
-            $mg->save();
-          }
+        if (isset($params[$entity][$type])) {
+          self::replaceGroups($mailing->id, $type, $entity, $params[$entity][$type]);
         }
       }
     }
@@ -1701,15 +1693,38 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       }
 
       // Populate the recipients.
-      $mailing->getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, FALSE);
+      if (empty($params['_skip_evil_bao_auto_recipients_'])) {
+        self::getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, FALSE);
+      }
     }
 
     return $mailing;
   }
 
   /**
-   * Get hash value of the mailing
+   * Replace the list of recipients on a given mailing
    *
+   * @param int $mailingId
+   * @param string $type 'include' or 'exclude'
+   * @param string $entity 'groups' or 'mailings'
+   * @param array<int> $entityIds
+   * @throws CiviCRM_API3_Exception
+   */
+  public static function replaceGroups($mailingId, $type, $entity, $entityIds) {
+    $values = array();
+    foreach ($entityIds as $entityId) {
+      $values[] = array('entity_id' => $entityId);
+    }
+    civicrm_api3('mailing_group', 'replace', array(
+      'mailing_id' =>  $mailingId,
+      'group_type' => $type,
+      'entity_table' => ($entity == 'groups') ? CRM_Contact_BAO_Group::getTableName() : CRM_Mailing_BAO_Mailing::getTableName(),
+      'values' => $values,
+    ));
+  }
+
+  /**
+   * Get hash value of the mailing
    */
   public static function getMailingHash($id) {
     $hash = NULL;
