@@ -1,0 +1,24 @@
+<div ng-controller="PreviewRecipCtrl">
+  <!--
+  Controller: PreviewRecipCtrl
+  Required vars: model.recipients
+  -->
+  <p><em>{{ts('Based on current data, the following contacts will receive a copy of the mailing. If contacts are added or removed from the target groups, then the final list may change.')}}</em></p>
+  <div ng-show="model.recipients == 0">
+    {{ts('No recipients')}}
+  </div>
+  <table ng-show="model.recipients.length > 0">
+    <thead>
+      <tr>
+        <th>{{ts('Name')}}</th>
+        <th>{{ts('Email')}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="recipient in model.recipients">
+        <td>{{recipient['api.contact.getvalue']}}</td>
+        <td>{{recipient['api.email.getvalue']}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

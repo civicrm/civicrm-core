@@ -92,7 +92,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    * @access public
    * @static
    */
-  public static function getTotalCount($mailing_id, $job_id = NULL, $is_distinct = FALSE) {
+  public static function getTotalCount($mailing_id, $job_id = NULL, $is_distinct = FALSE, $toDate = NULL) {
     $dao = new CRM_Core_DAO();
 
     $delivered = self::getTableName();
@@ -115,6 +115,10 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
                     ON  $job.mailing_id = $mailing.id
             WHERE       $bounce.id IS null
                 AND     $mailing.id = " . CRM_Utils_Type::escape($mailing_id, 'Integer');
+
+    if (!empty($toDate)) {
+      $query .= " AND $delivered.time_stamp <= $toDate";
+    }
 
     if (!empty($job_id)) {
       $query .= " AND $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer');
@@ -149,7 +153,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    * @static
    */
   public static function &getRows($mailing_id, $job_id = NULL,
-    $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL
+    $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $is_test = 0
   ) {
 
     $dao = new CRM_Core_Dao();
@@ -163,7 +167,8 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
     $email     = CRM_Core_BAO_Email::getTableName();
 
     $query = "
-            SELECT      $contact.display_name as display_name,
+            SELECT      $delivered.id as id,
+                        $contact.display_name as display_name,
                         $contact.id as contact_id,
                         $email.email as email,
                         $delivered.time_stamp as date
@@ -178,7 +183,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
                     ON  $bounce.event_queue_id = $queue.id
             INNER JOIN  $job
                     ON  $queue.job_id = $job.id
-                    AND $job.is_test = 0
+                    AND $job.is_test = $is_test
             INNER JOIN  $mailing
                     ON  $job.mailing_id = $mailing.id
             WHERE       $bounce.id IS null
@@ -218,7 +223,8 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
       $url = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$dao->contact_id}"
       );
-      $results[] = array(
+      $results[$dao->id] = array(
+        'contact_id' => $dao->contact_id,
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
         'date' => CRM_Utils_Date::customFormat($dao->date),
@@ -305,4 +311,3 @@ SET        e.on_hold = 0,
   }
 
 }
-
