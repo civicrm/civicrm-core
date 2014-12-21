@@ -112,8 +112,8 @@
 
         {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
         <div id="totalAmountBlock">
-          <br /><span class="description">{ts}Total amount of this contribution.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
-          <br /><span id="totalTaxAmount" class="label"></span>
+          {if $hasPriceSets}<span class="description">{ts}Alternatively, you can use a price set.{/ts}</span>{/if}
+          <div id="totalTaxAmount" class="label"></div>
         </div>
       </td>
     </tr>
@@ -635,6 +635,9 @@ CRM.$(function($) {
         var taxRate = taxRates[financialType];
         if (!taxRate) {
           taxRate = 0;
+          cj("#totalTaxAmount").hide( );
+        } else {
+          cj("#totalTaxAmount").show( );          
         }
         var totalAmount = $('#total_amount').val();
         var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
@@ -646,7 +649,7 @@ CRM.$(function($) {
         var taxAmount = (taxRate/100)*totalAmount;
         taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         var totalTaxAmount = taxAmount + Number(totalAmount);
-  totalTaxAmount = formatMoney( totalTaxAmount, 2, seperator, thousandMarker );
+        totalTaxAmount = formatMoney( totalTaxAmount, 2, seperator, thousandMarker );
 
         $("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
       }

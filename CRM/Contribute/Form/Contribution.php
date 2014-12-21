@@ -924,8 +924,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_id && isset($this->_values['tax_amount'])) {
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
       if (CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails)) {
+        if ($totalAmount) {
+          $totalAmount->freeze();          
+        }
         $financialType->freeze();
-        $totalAmount->freeze();
         $this->assign('freezeFinancialType', TRUE);
       }
     }
