@@ -569,7 +569,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return array|bool
    */
-  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $redirectForPerformance = FALSE) {
+  static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2) {
     $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
     $cacheKeyString = "merge {$contactType}";
     $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
@@ -577,11 +577,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND
                                                              pn.entity_id2 = de.contact_id2 )";
 
-    $limit = $redirectForPerformance ? 75 : 1;
-    $where = "de.id IS NULL LIMIT {$limit}";
+    $where = "de.id IS NULL";
+    if ($isSelected === 0 || $isSelected === 1) {
+      $where .= " AND pn.is_selected = {$isSelected}";
+    } // else consider all dupe pairs
+    $where .= " LIMIT {$batchLimit}";
+
+    $redirectForPerformance = ($batchLimit > 1) ? TRUE : FALSE;
 
     $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where);
-    if (empty($dupePairs) && !$redirectForPerformance) {
+    if (empty($dupePairs) && !$redirectForPerformance && $isSelected == 2) {
       // If we haven't found any dupes, probably cache is empty.
       // Try filling cache and give another try.
       CRM_Core_BAO_PrevNextCache::refillCache($rgid, $gid, $cacheKeyString);
@@ -589,11 +594,68 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     $cacheParams = array(
-      'cache_key_string' => $cacheKeyString,
-      'join' => $join,
-      'where' => $where,
-    );
+        'cache_key_string' => $cacheKeyString,
+        'join' => $join,
+        'where' => $where);
     return CRM_Dedupe_Merger::merge($dupePairs, $cacheParams, $mode, $autoFlip, $redirectForPerformance);
+  }
+
+  static function updateMergeStats($cacheKeyString, $result = array()) {
+    // gather latest stats
+    $merged = count($result['merged']);
+    $skipped = count($result['skipped']);
+
+    if ($merged <= 0 && $skipped <= 0) {
+      return;
+    }
+
+    // get previous stats
+    $previousStats = CRM_Core_BAO_PrevNextCache::retrieve("{$cacheKeyString}_stats");
+    if (!empty($previousStats)) {
+      if ($previousStats[0]['merged']) {
+        $merged = $merged + $previousStats[0]['merged'];
+      }
+      if ($previousStats[0]['skipped']) {
+        $skipped = $skipped + $previousStats[0]['skipped'];
+      }
+    }
+
+    // delete old stats
+    CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
+
+    // store the updated stats
+    $data = array(
+        'merged' => $merged,
+        'skipped' => $skipped);
+    $data = CRM_Core_DAO::escapeString(serialize($data));
+
+    $values = array();
+    $values[] = " ( 'civicrm_contact', 0, 0, '{$cacheKeyString}_stats', '$data' ) ";
+    CRM_Core_BAO_PrevNextCache::setItem($values);
+  }
+
+  static function resetMergeStats($cacheKeyString) {
+    return CRM_Core_BAO_PrevNextCache::deleteItem(NULL, "{$cacheKeyString}_stats");
+  }
+
+  static function getMergeStats($cacheKeyString) {
+    $stats = CRM_Core_BAO_PrevNextCache::retrieve("{$cacheKeyString}_stats");
+    if (!empty($stats)) {
+      $stats = $stats[0];
+    }
+    return $stats;
+  }
+
+  static function getMergeStatsMsg($cacheKeyString) {
+    $msg = '';
+    $stats = CRM_Dedupe_Merger::getMergeStats($cacheKeyString);
+    if (!empty($stats['merged'])) {
+      $msg = "{$stats['merged']} " . ts(' Contact(s) were merged. ');
+    }
+    if (!empty($stats['skipped'])) {
+      $msg .= $stats['skipped'] . ts(' Contact(s) were skipped.');
+    }
+    return $msg;
   }
 
   /**
@@ -656,7 +718,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $migrationInfo['rows'] = &$rowsElementsAndInfo['rows'];
 
         // go ahead with merge if there is no conflict
-        if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode)) {
+        $conflicts = array();
+        if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode, $conflicts)) {
           CRM_Dedupe_Merger::moveAllBelongings($mainId, $otherId, $migrationInfo);
           $resultStats['merged'][] = array('main_id' => $mainId, 'other_id' => $otherId);
         }
@@ -664,10 +727,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $resultStats['skipped'][] = array('main_id' => $mainId, 'other_id' => $otherId);
         }
 
-        // delete entry from PrevNextCache table so we don't consider the pair next time
-        // pair may have been flipped, so make sure we delete using both orders
-        CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString);
-        CRM_Core_BAO_PrevNextCache::deletePair($otherId, $mainId, $cacheKeyString);
+        // store any conflicts
+        if (!empty($conflicts)) {
+          CRM_Core_BAO_PrevNextCache::markConflict($mainId, $otherId, $cacheKeyString, $conflicts);
+        }
+        else {
+          // delete entry from PrevNextCache table so we don't consider the pair next time
+          // pair may have been flipped, so make sure we delete using both orders
+          CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString, TRUE);
+        }
 
         CRM_Core_DAO::freeResult();
         unset($rowsElementsAndInfo, $migrationInfo);
@@ -685,6 +753,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         unset($dupePairs);
       }
     }
+
+    CRM_Dedupe_Merger::updateMergeStats($cacheKeyString, $resultStats);
     return $resultStats;
   }
 
@@ -705,8 +775,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return bool
    */
-  public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe') {
-    $conflicts = array();
+  static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = array()) {
+    //$conflicts = array();
     $migrationData = array(
       'old_migration_info' => $migrationInfo,
       'mode' => $mode,
@@ -791,7 +861,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     if (!empty($conflicts)) {
       foreach ($conflicts as $key => $val) {
         if ($val === NULL and $mode == 'safe') {
-          // un-resolved conflicts still present. Lets skip this merge.
+          // un-resolved conflicts still present. Lets skip this merge after saving the conflict / reason.
           return TRUE;
         }
         else {

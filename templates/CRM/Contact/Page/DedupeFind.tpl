@@ -25,12 +25,78 @@
 *}
 {if $action eq 2 || $action eq 16}
 <div class="form-item">
-  <table class='pagerDisplay'>
+  <div class="crm-accordion-wrapper crm-search_filters-accordion">
+    <div class="crm-accordion-header">
+    {ts}Filter Contacts{/ts}</a>
+    </div><!-- /.crm-accordion-header -->
+    <div class="crm-accordion-body">
+      <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
+        <tr>
+          <td class="crm-contact-form-block-contact1">
+            <label for="contact1">{ts}Contact 1{/ts}</label><br />
+            <input type="text" placeholder="Search Contact1" search-column="2" />
+          </td>
+          <td class="crm-contact-form-block-contact2">
+            <label for="contact2">{ts}Contact 2{/ts}</label><br />
+            <input type="text" placeholder="Search Contact2" search-column="5" />
+          </td>
+          <td class="crm-contact-form-block-email1">
+            <label for="email1">{ts}Email 1{/ts}</label><br />
+            <input type="text" placeholder="Search Email1" search-column="3" />
+          </td>
+          <td class="crm-contact-form-block-email2">
+            <label for="email2">{ts}Email 2{/ts}</label><br />
+            <input type="text" placeholder="Search Email2" search-column="6" />
+          </td>
+        </tr>
+        <tr>
+          <td class="crm-contact-form-block-street-address1">
+            <label for="street-adddress1">{ts}Street Address 1{/ts}</label><br />
+            <input type="text" placeholder="Search Street Address1" search-column="7" />
+          </td>
+          <td class="crm-contact-form-block-street-address2">
+            <label for="street-adddress2">{ts}Street Address 2{/ts}</label><br />
+            <input type="text" placeholder="Search Street Address2" search-column="8" />
+          </td>
+          <td class="crm-contact-form-block-postcode1">
+            <label for="postcode1">{ts}Postcode 1{/ts}</label><br />
+            <input type="text" placeholder="Search Postcode1" search-column="9" />
+          </td>
+          <td class="crm-contact-form-block-postcode2">
+            <label for="postcode2">{ts}Postcode 2{/ts}</label><br />
+            <input type="text" placeholder="Search Postcode2" search-column="10" />
+          </td>
+        </tr>
+      </table>
+    </div><!-- /.crm-accordion-body -->
+  </div><!-- /.crm-accordion-wrapper -->
+  <div>
+    Show / Hide columns:
+    <a class="toggle-vis" data-column-main="7" data-column-dupe="8">Street Address</a>, &nbsp;
+    <a class="toggle-vis" data-column-main="9" data-column-dupe="10">Post Code</a>, &nbsp;
+    <a class="toggle-vis" data-column-main="11">Conflicts</a>, &nbsp;
+    <a class="toggle-vis" data-column-main="12">Threshold</a>
+  </div><br/>
+  <table id="dupePairs" class="display compact" cellspacing="0" width="100%">
     <thead>
-    <tr class="columnheader"><th id="nosort">{ts}Contact{/ts} 1</th><th id="nosort">{ts}Contact{/ts} 2 ({ts}Duplicate{/ts})</th><th id="nosort">{ts}Threshold{/ts}</th><th id="nosort">&nbsp;</th></tr>
+      <tr> 
+        <th class="crm-dedupe-merge">&nbsp;</th>
+        <th class="crm-empty">&nbsp;</th>
+        <th class="crm-contact">{ts}Contact{/ts} 1</th>
+        <th class="crm-contact">{ts}Email{/ts} 1</th>
+        <th class="crm-empty">&nbsp;</th>
+        <th class="crm-contact-duplicate">{ts}Contact{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th class="crm-contact-duplicate">{ts}Email{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th class="crm-contact">{ts}Street Address{/ts} 1</th>
+        <th class="crm-contact-duplicate">{ts}Street Address{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th class="crm-contact">{ts}Postcode{/ts} 1</th>
+        <th class="crm-contact-duplicate">{ts}Postcode{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th class="crm-contact-conflicts">{ts}Conflicts{/ts}</th>
+        <th class="crm-threshold">{ts}Threshold{/ts}</th>
+        <th class="crm-empty">&nbsp;</th>
+      </tr>
     </thead>
   </table>
-  {include file="CRM/common/jsortable.tpl" sourceUrl=$sourceUrl useAjax=1 }
   {if $cid}
     <table style="width: 45%; float: left; margin: 10px;">
       <tr class="columnheader"><th colspan="2">{ts 1=$main_contacts[$cid]}Merge %1 with{/ts}</th></tr>
@@ -51,6 +117,27 @@
 
 {if $context eq 'search'}
    {crmButton href=$backURL icon="close"}{ts}Done{/ts}{/crmButton}
+{elseif $context eq 'conflicts'}
+   {if $gid}
+      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=map&mode=aggressive" a=1}{/capture}
+   {else}
+      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&action=map&mode=aggressive" a=1}{/capture}
+   {/if}
+   <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in force merge mode - all selected duplicates will be merged into main contacts even in case of any conflicts. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span>{ts}Force Merge Selected Duplicates{/ts}</span></a>
+
+   {if $gid}
+     {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`&mode=aggressive" a=1}{/capture}
+   {else}
+     {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&mode=aggressive" a=1}{/capture}
+   {/if}
+   <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span>{ts}Force Merge All Duplicates{/ts}</span></a>
+
+   {if $gid}
+      {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=`$rgid`&gid=`$gid`" a=1}{/capture}
+   {else}
+      {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=`$rgid`" a=1}{/capture}
+   {/if}
+   <a href="{$backURL}" title="{ts}List All Duplicates{/ts}" class="button"><span>{ts}List All Duplicates{/ts}</span></a>
 {else}
    {if $gid}
       {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=renew" a=1}{/capture}
@@ -62,14 +149,19 @@
    </a>
 
    {if $gid}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=map" a=1}{/capture}
+      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=map" a=1}{/capture}
    {else}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&rgid=`$rgid`&action=map" a=1}{/capture}
+      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&action=map" a=1}{/capture}
    {/if}
-   <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button">
-     <span><div class="icon ui-icon-script"></div> {ts}Batch Merge Duplicates{/ts}</span>
-   </a>
+    <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span>{ts}Batch Merge Selected Duplicates{/ts}</span></a>
 
+   {if $gid}
+      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`" a=1}{/capture}
+   {else}
+      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`" a=1}{/capture}
+   {/if}
+   <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span>{ts}Batch Merge All Duplicates{/ts}</span></a>
+ 
    {capture assign=backURL}{crmURL p="civicrm/contact/deduperules" q="reset=1" a=1}{/capture}
    <a href="{$backURL}" class="button crm-button-type-cancel">
      <span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span>
@@ -84,6 +176,105 @@
 {include file='CRM/common/dedupe.tpl'}
 {literal}
 <script type="text/javascript">
-var oTable = null;
+CRM.$(function($) {
+  var sourceUrl = {/literal}'{$sourceUrl}'{literal};
+  $('#dupePairs').dataTable({
+    //"scrollX": true, // doesn't work with hover popup for for icons
+    "lengthMenu": [[10, 25, 50, 100, 1000, 2000, -1], [10, 25, 50, 100, 1000, 2000, "All"]],
+    "dom": 'flrtip',
+    "ajax": sourceUrl,
+    "columns"  : [
+      {data: "is_selected_input"},
+      {data: "src_image"},
+      {data: "src"},
+      {data: "src_email"},
+      {data: "dst_image"},
+      {data: "dst"},
+      {data: "dst_email"},
+      {data: "src_street"},
+      {data: "dst_street"},
+      {data: "src_postcode"},
+      {data: "dst_postcode"},
+      {data: "conflicts"},
+      {data: "weight"},
+      {data: "actions"},
+    ],
+    "order": [], // removes default order by for column 1 (checkbox)
+    "columnDefs": [ 
+      {
+        "targets": [0, 1, 4, 13],
+        "orderable": false
+      },
+      {
+        "targets": [7, 8, 9, 10, 11, 12],
+        "visible": false
+      }
+    ],
+    rowCallback: function (row, data) {
+      // Set the checked state of the checkbox in the table
+      $('input.crm-dedupe-select', row).prop('checked', data.is_selected == 1);
+      if (data.is_selected == 1) {
+        $(row).toggleClass('selected');
+      }
+      // for action column at the last, set nowrap
+      $('td:last', row).attr('nowrap','nowrap');
+    }
+  });
+
+  // apply selected class on click of a row
+  $('#dupePairs tbody').on('click', 'tr', function() {
+    $(this).toggleClass('selected');
+    $('input.crm-dedupe-select', this).prop('checked', $(this).hasClass("selected"));
+    var sth = $('input.crm-dedupe-select', this);
+    toggleDedupeSelect(sth);
+  });
+
+  // inline search boxes placed in tfoot
+  $('#dupePairsColFilters thead th').each( function () {
+    var title = $('#dupePairs thead th').eq($(this).index()).text();
+    if (title.length > 1) {
+      $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+    }
+  });
+
+  // apply dataTable
+  var table = $('#dupePairs').DataTable();
+
+  // apply the search
+  $('#searchOptions input').on( 'keyup change', function () {
+    table
+      .column($(this).attr('search-column'))
+      .search(this.value)
+      .draw();
+  });
+
+  // show / hide columns
+  $('a.toggle-vis').on('click', function (e) {
+    e.preventDefault();
+    var column = table.column( $(this).attr('data-column-main') );
+    column.visible( ! column.visible() );
+
+    if ($(this).attr('data-column-dupe')) {
+      column = table.column( $(this).attr('data-column-dupe') );
+      column.visible( ! column.visible() );
+    }
+  });
+});
+
+function toggleDedupeSelect(element) {
+  var is_selected = CRM.$(element).prop('checked') ? 1: 0;
+  var id = CRM.$(element).prop('name').substr(5);
+
+  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/toggleDedupeSelect' h=0 q='snippet=4'}"{literal};
+  var rgid = {/literal}"{$rgid}"{literal};
+  var gid = {/literal}"{$gid}"{literal};
+
+  rgid = rgid.length > 0 ? rgid : 0;
+  gid  = gid.length > 0 ? gid : 0;
+  
+  CRM.$.post(dataUrl, {pnid: id, rgid: rgid, gid: gid, is_selected: is_selected}, function (data) {
+    // nothing to do for now
+  }, 'json');
+}
 </script>
 {/literal}
