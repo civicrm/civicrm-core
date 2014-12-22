@@ -47,4 +47,9 @@
     <page_callback>CRM_Pledge_Page_AJAX::pledgeName</page_callback>
     <access_arguments>access CiviCRM,access CiviPledge</access_arguments>
   </item>
+  <item>
+    <path>civicrm/ajax/pledgeAmount</path>
+    <page_callback>CRM_Pledge_Page_AJAX::getPledgeDefaults</page_callback>
+    <access_arguments>access CiviPledge,administer CiviCRM</access_arguments>
+  </item>
 </menu>

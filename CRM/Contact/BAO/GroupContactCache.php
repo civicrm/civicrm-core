@@ -385,6 +385,30 @@ WHERE  id = %1
   }
 
   /**
+   * Removes one or more contacts from the smart group cache
+   * @param int|array $cid
+   * @param int $groupId
+   * @return bool - true if successful
+   */
+  static function removeContact($cid, $groupId = NULL) {
+    $cids = array();
+    // sanitize input
+    foreach ((array) $cid as $c) {
+      $cids[] = CRM_Utils_Type::escape($c, 'Integer');
+    }
+    if ($cids) {
+      $condition = count($cids) == 1 ? "= {$cids[0]}" : "IN (" . implode(',', $cids) . ")";
+      if ($groupId) {
+        $condition .= " AND group_id = " . CRM_Utils_Type::escape($groupId, 'Integer');
+      }
+      $sql = "DELETE FROM civicrm_group_contact_cache WHERE contact_id $condition";
+      CRM_Core_DAO::executeQuery($sql);
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
    * Load the smart group cache for a saved search
    *
    * @param object  $group - the smart group that needs to be loaded

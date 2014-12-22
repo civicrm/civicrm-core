@@ -29,6 +29,22 @@ INSERT INTO `civicrm_navigation`
 VALUES
   ( {$domainID}, 'civicrm/admin/setting/preferences/contribute',      '{ts escape="sql" skip="true"}CiviContribute Component Settings{/ts}', 'CiviContribute Component Settings', 'administer CiviCRM', '', @parent_id, '1', NULL, @add_weight_id + 1 );
 
+-- Insert menu items under "Mailings" for A/B Tests
+SELECT @parent_id := id from `civicrm_navigation` where name = 'Mailings' AND domain_id = {$domainID};
+SELECT @add_weight_id := weight from `civicrm_navigation` where `name` = 'Find Mass SMS' and `parent_id` = @parent_id;
+
+UPDATE `civicrm_navigation`
+SET `weight` = `weight`+2
+WHERE `parent_id` = @parent_id
+AND `weight` > @add_weight_id;
+
+INSERT INTO `civicrm_navigation`
+( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+( {$domainID}, 'civicrm/a/#/abtest/new',                            '{ts escape="sql" skip="true"}New A/B Test{/ts}', 'New A/B Test',                                        'access CiviMail,create mailings', 'OR', @parent_id  , '1', NULL, @add_weight_id + 1 ),
+( {$domainID}, 'civicrm/a/#/abtest',                                '{ts escape="sql" skip="true"}Manage A/B Tests{/ts}', 'Manage A/B Tests',                                'access CiviMail,create mailings', 'OR', @parent_id, '1', 1, @add_weight_id + 2 );
+
+
 -- New activity types required for Print and Email Invoice
 SELECT @option_group_id_act     := max(id) from civicrm_option_group where name = 'activity_type';
 SELECT @option_group_id_act_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;
@@ -68,6 +84,14 @@ CREATE TABLE IF NOT EXISTS `civicrm_recurring_entity` (
   `mode` tinyint(4) NOT NULL DEFAULT '1' COMMENT '1-this entity, 2-this and the following entities, 3-all the entities',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=87 ;
+
+-- add batch type for pledge payments
+SELECT @option_group_id := id FROM civicrm_option_group WHERE name = 'batch_type';
+
+SELECT @max_option_value:= max(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id;
+
+INSERT INTO civicrm_option_value(option_group_id, {localize field='label'}`label`{/localize}, value, name,weight)
+VALUES (@option_group_id, {localize}'{ts escape="sql"}Pledge Payment{/ts}'{/localize}, @max_option_value+1, 'Pledge Payment','3');
 
 --CRM-12281: To update name of Latvian provinces.
 UPDATE `civicrm_state_province` SET `name` = (N'Jūrmala') where `id` = 3552;

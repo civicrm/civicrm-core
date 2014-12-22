@@ -76,6 +76,14 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
 
       if (!$this->_isTagSet) {
         $this->add('select', 'parent_id', ts('Parent Tag'), $allTag, FALSE, array('class' => 'crm-select2'));
+
+        // Tagsets are not selectable by definition so only include the selectable field if NOT a tagset.
+        $selectable = $this->add('checkbox', 'is_selectable', ts('Selectable?'));
+        // Selectable should be checked by default when creating a new tag
+        if ($this->_action == CRM_Core_Action::ADD) {
+          $selectable->setValue(1);        
+        }
+
       }
 
       $this->assign('isTagSet', $this->_isTagSet);
@@ -90,12 +98,6 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       $this->add('text', 'description', ts('Description'),
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'description')
       );
-
-      $selectable = $this->add('checkbox', 'is_selectable', ts('Selectable?'));
-      // Selectable should be checked by default when creating a new tag
-      if ($this->_action == CRM_Core_Action::ADD) {
-        $selectable->setValue(1);        
-      }
 
       $isReserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 

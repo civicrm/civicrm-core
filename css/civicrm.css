@@ -324,7 +324,7 @@ input.crm-form-entityref {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffffff', endColorstr = '#eeeeee', GradientType = 0);
   background-image: linear-gradient(top, #fff 0%, #eee 50%);
 }
-.crm-container input.crm-form-text.ng-invalid {
+.crm-container input.crm-form-text.ng-invalid.ng-dirty {
     border: 1px solid #FF0000;
 }
 .crm-container input.crm-form-text,
@@ -4282,8 +4282,10 @@ span.crm-status-icon {
   max-width: 100%;
 }
 
-#crm-container.crm-public .label {
+#crm-container.crm-public .label,
+#crm-container.crm-public .price-field-amount {
   padding-top: 6px;
+  font-size: 15px;
 }
 
 .crm-container.crm-public .select2-container,
@@ -4315,7 +4317,8 @@ span.crm-status-icon {
   padding-top: 6px;
 }
 
-#crm-container.crm-public .calc-value {
+#crm-container.crm-public .calc-value,
+#crm-container.crm-public .content {
   padding-top: 6px;
   font-size: 15px;
 }
@@ -4444,13 +4447,13 @@ span.crm-status-icon {
 }
 
 #crm-container.crm-public .price-set-row .crm-price-amount-amount {
-  font-weight: bold;
   min-width: 2em;
   color: #333333;
 }
 
 #crm-container.crm-public .price-set-row .crm-price-amount-label {
   color: #444444;
+  font-weight: bold;
 }
 
 #crm-container.crm-public .price-set-row .highlight label {
@@ -4462,6 +4465,18 @@ span.crm-status-icon {
   color: #222222;
 }
 
+#crm-container.crm-public .price-set-option-content > tt {
+  display: none;
+}
+
+#crm-container .sold-out-option,
+#crm-container .price-set-row span.sold-out-option .crm-price-amount-label,
+#crm-container .price-set-row span.sold-out-option .crm-price-amount-amount {
+  font-style: italic !important;
+  font-weight: normal !important;
+  font-size: 15px;
+  color: #666 !important;
+}
 #crm-container .crm-extensions-upgrade {
   background: #ffb;
   border: 1px solid #000;

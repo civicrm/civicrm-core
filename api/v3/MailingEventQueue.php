@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                                |
@@ -25,64 +24,54 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 */
-
 /**
  *
- * @package CRM
+ * APIv3 functions for registering/processing mailing group events.
+ *
+ * @package CiviCRM_APIv3
+ * @subpackage API_MailerGroup
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
-
 /**
- * Page for displaying list of Reprot templates available
+ * Handle a confirm event
+ *
+ * @param array $params Associative array of property
+ *                       name/value pairs to insert in new 'survey'
+ *
+ * @throws Exception
+ * @return array api result array
+ * {@getfields mailing_event_confirm_create}
+ * @access public
  */
-class CRM_Report_Page_List extends CRM_Core_Page {
-
-  /**
-   * @return array
-   */
-  public static function &info() {
-    $sql = "
-SELECT  v.id, v.value, v.label, v.description, v.component_id,
-        inst.id as instance_id, ifnull( SUBSTRING(comp.name, 5), 'Contact' ) as component_name
-FROM    civicrm_option_value v
-INNER JOIN civicrm_option_group g
-        ON (v.option_group_id = g.id AND g.name = 'report_list')
-LEFT  JOIN civicrm_report_instance inst
-        ON v.value = inst.report_id
-LEFT  JOIN civicrm_component comp
-        ON v.component_id = comp.id
-WHERE     v.is_active = 1
-ORDER BY  v.weight";
-
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    $rows = array();
-    while ($dao->fetch()) {
-      $url = 'civicrm/report/';
-      $rows[$dao->component_name][$dao->value]['title'] = $dao->label;
-      $rows[$dao->component_name][$dao->value]['description'] = $dao->description;
-      $rows[$dao->component_name][$dao->value]['url'] = CRM_Utils_System::url('civicrm/report/' . trim($dao->value, '/'), 'reset=1');
-      if ($dao->instance_id) {
-        $rows[$dao->component_name][$dao->value]['instanceUrl'] = CRM_Utils_System::url('civicrm/report/instance/list',
-          "reset=1&ovid={$dao->id}"
-        );
-      }
-    }
-
-    return $rows;
+function civicrm_api3_mailing_event_queue_create($params) {
+  if (!array_key_exists('id', $params) && !array_key_exists('email_id', $params) && !array_key_exists('phone_id', $params)) {
+    throw new API_Exception("Mandatory key missing from params array: id, email_id, or phone_id field is required" );
   }
-
-  /**
-   * Run this page (figure out the action needed and perform it).
-   *
-   * @return void
-   */
-  function run() {
-    $rows = self::info();
-    $this->assign('list', $rows);
-
-    return parent::run();
-  }
+  civicrm_api3_verify_mandatory($params,
+    'CRM_Mailing_DAO_MailingJob',
+    array('job_id','contact_id'),
+    FALSE
+  );
+  return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_Queue', $params);
 }
 
+function civicrm_api3_mailing_event_queue_get($params) {
+  return _civicrm_api3_basic_get('CRM_Mailing_Event_BAO_Queue', $params);
+}
+
+function civicrm_api3_mailing_event_queue_delete($params) {
+  return _civicrm_api3_basic_delete('CRM_Mailing_Event_BAO_Queue', $params);
+}
+
+/**
+ * Adjust Metadata for Create action
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
+function _civicrm_api3_mailing_event_queue_create_spec(&$params) {
+  $params['job_id']['api.required'] = 1;
+  $params['contact_id']['api.required'] = 1;
+}

@@ -605,6 +605,20 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
+   * Execute a query and log the results.
+   *
+   * @param string $query
+   */
+  static function debug_query_result($query) {
+    $dao = CRM_Core_DAO::executeQuery($query);
+    $results = array();
+    while ($dao->fetch()) {
+      $results[] = (array)$dao;
+    }
+    CRM_Core_Error::debug_var('dao result', array('query' => $query, 'results' => $results));
+  }
+
+  /**
    * Obtain a reference to the error log
    *
    * @param string $comp

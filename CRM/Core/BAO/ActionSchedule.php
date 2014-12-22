@@ -1232,12 +1232,8 @@ LEFT JOIN {$reminderJoinClause}
 {$whereClause} {$limitWhereClause} AND {$dateClause} {$notINClause}
 ";
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
-
-      if (!is_null($limitTo) && $limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) {
-        $additionWhere = ' WHERE ';
-        if ($actionSchedule->start_action_date) {
-          $additionWhere = $whereClause . ' AND ';
-        }
+      $isSendToAdditionalContacts = (!is_null($limitTo) && $limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) ? TRUE : FALSE;
+      if ($isSendToAdditionalContacts) {
         $contactTable = "civicrm_contact c";
         $addSelect  = "SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id";
         $additionReminderClause = "civicrm_action_log reminder ON reminder.contact_id = c.id AND
@@ -1321,7 +1317,7 @@ INNER JOIN {$reminderJoinClause}
           CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
         }
 
-        if (!is_null($limitTo) && $limitTo == 0) {
+        if ($isSendToAdditionalContacts) {
           $addSelect .= ', MAX(reminder.action_date_time) as latest_log_time';
           $sqlEndEventCheck = "
 SELECT * FROM {$table}

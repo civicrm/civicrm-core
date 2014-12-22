@@ -261,7 +261,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
     $relationship->free();
 
-    CRM_Utils_Hook::post($hook, 'Relationship', $relationshipId, $relationship);
+    CRM_Utils_Hook::post($hook, 'Relationship', $relationship->id, $relationship);
 
     return $relationship;
   }
@@ -369,15 +369,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           (!$otherContactType) ||
           $value['contact_type_b'] == $otherContactType
         ) &&
-        (!$contactSubType ||
-          (in_array($value['contact_sub_type_a'], $contactSubType) ||
-            in_array($value['contact_sub_type_b'], $contactSubType) ||
-            ((!$value['contact_sub_type_b'] &&
-                !$value['contact_sub_type_a']
-              ) &&
-              !$onlySubTypeRelationTypes
-            )
-          )
+        (in_array($value['contact_sub_type_a'], $contactSubType) ||
+          in_array($value['contact_sub_type_b'], $contactSubType) ||
+          (!$value['contact_sub_type_a'] && !$onlySubTypeRelationTypes)
         )
       ) {
         $relationshipType[$key . '_a_b'] = $value["{$column}_a_b"];
@@ -390,15 +384,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           (!$otherContactType) ||
           $value['contact_type_a'] == $otherContactType
         ) &&
-        (!$contactSubType ||
-          (in_array($value['contact_sub_type_b'], $contactSubType) ||
-            in_array($value['contact_sub_type_a'], $contactSubType) ||
-            ((!$value['contact_sub_type_a'] &&
-                !$value['contact_sub_type_b']
-              ) &&
-              !$onlySubTypeRelationTypes
-            )
-          )
+        (in_array($value['contact_sub_type_b'], $contactSubType) ||
+          in_array($value['contact_sub_type_a'], $contactSubType) ||
+          (!$value['contact_sub_type_b'] && !$onlySubTypeRelationTypes)
         )
       ) {
         $relationshipType[$key . '_b_a'] = $value["{$column}_b_a"];
@@ -487,7 +475,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $relationship->delete();
     CRM_Core_Session::setStatus(ts('Selected relationship has been deleted successfully.'), ts('Record Deleted'), 'success');
 
-    CRM_Utils_Hook::post('delete', 'Relationship', $relationship->id, $relationship);
+    CRM_Utils_Hook::post('delete', 'Relationship', $id, $relationship);
 
     // delete the recently created Relationship
     $relationshipRecent = array(

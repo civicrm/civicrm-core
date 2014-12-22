@@ -125,7 +125,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     //Find Member
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
-    $this->type("sort_name", "$firstName $lastName");
+    $this->type("sort_name", "$lastName $firstName");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
@@ -174,7 +174,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     //Find Member
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
-    $this->type("sort_name", "$firstName $lastName");
+    $this->type("sort_name", "$lastName $firstName");
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -196,7 +196,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     // Select membership type 1
     $this->waitForElementPresent("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label");
     if ($memTypeId != 'No thank you') {
-    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'$memTypeId')]");
+    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//div/span/label/span[1][contains(text(),'$memTypeId')]");
     }
 
     else {
@@ -319,7 +319,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     //Find Contribution
     $this->openCiviPage("contribute/search","reset=1", "contribution_date_low");
 
-    $this->type("sort_name", "$firstName $lastName");
+    $this->type("sort_name", "$lastName $firstName");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 

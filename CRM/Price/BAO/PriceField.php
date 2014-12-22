@@ -222,7 +222,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param string $label label for custom field
    *
    * @param null $fieldOptions
-   * @param array $feezeOptions
+   * @param array $freezeOptions
    *
    * @return null
    * @internal param bool $search true if used for search else false
@@ -236,7 +236,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     $useRequired = TRUE,
     $label = NULL,
     $fieldOptions = NULL,
-    $feezeOptions = array()
+    $freezeOptions = array()
   ) {
 
     $field = new CRM_Price_DAO_PriceField();
@@ -328,9 +328,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $qf->add( 'text', 'txt-'.$elementName, $label, array( 'size' => '4'));
         }
 
-        // CRM-6902
-        if (in_array($optionKey, $feezeOptions)) {
+        // CRM-6902 - Add "max" option for a price set field
+        if (in_array($optionKey, $freezeOptions)) {
           $element->freeze();
+          // CRM-14696 - Styling for sold out Text input fields is handled in PriceSet.tpl
         }
 
         //CRM-10117
@@ -356,22 +357,22 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         foreach ($customOption as $opId => $opt) {
           $taxAmount = CRM_Utils_Array::value('tax_amount', $opt);
           if ($field->is_display_amounts) {
-            $opt['label'] = !empty($opt['label']) ? $opt['label'] : '';
+            $opt['label'] = !empty($opt['label']) ? $opt['label'] . '&nbsp;-&nbsp;' : '';
             if (isset($taxAmount) && $invoicing) {
               if ($displayOpt == 'Do_not_show') {
-                $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName] + $taxAmount) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
+                $opt['label'] =  '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' . '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName] + $taxAmount) . '</span>';
               }
               else if ($displayOpt == 'Inclusive') {
-                $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName] + $taxAmount) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
-                $opt['label'] .= '<span class="crm-price-amount-label"> (includes ' . $taxTerm . ' of ' . CRM_Utils_Money::format($opt['tax_amount']) . ')</span>';
+                $opt['label'] = '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' . '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName] + $taxAmount) . '</span>';
+                $opt['label'] .= '<span class="crm-price-amount-tax"> (includes ' . $taxTerm . ' of ' . CRM_Utils_Money::format($opt['tax_amount']) . ')</span>';
               }
               else {
-                $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
-                $opt['label'] .= '<span class="crm-price-amount-label"> + '. CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
+                $opt['label'] =  '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' . '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span>';
+                $opt['label'] .= '<span class="crm-price-amount-tax"> + '. CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
               }
             }
             else {
-              $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
+              $opt['label'] = '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' . '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span>';
             }
           }
           $count = CRM_Utils_Array::value('count', $opt, '');
@@ -398,9 +399,11 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $qf->add( 'text', 'txt-'.$elementName, $label, array( 'size' => '4'));
           }
 
-          // CRM-6902
-          if (in_array($opId, $feezeOptions)) {
+          // CRM-6902 - Add "max" option for a price set field
+          if (in_array($opId, $freezeOptions)) {
             $choice[$opId]->freeze();
+            // CRM-14696 - Improve display for sold out price set options
+            $choice[$opId]->setText('<span class="sold-out-option">' . $choice[$opId]->getText() . '&nbsp;(' . ts('Sold out') . ')</span>');
           }
         }
         if (!empty($qf->_membershipBlock) && $field->name == 'contribution_amount') {
@@ -452,22 +455,31 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           if ($field->is_display_amounts) {
             $opt['label'] .= '&nbsp;-&nbsp;';
             if (isset($taxAmount)  && $invoicing) {
-              $opt['label'] .= self::getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm);
+              $opt['label'] = $opt['label'] . self::getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm);
             }
             else {
-              $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
+              $opt['label'] = $opt['label'] . CRM_Utils_Money::format($opt[$valueFieldName]);
             }
           }
+          
           $selectOption[$opt['id']] = $opt['label'];
           $priceVal[$opt['id']] = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
-
-          if (!in_array($opt['id'], $feezeOptions)) {
+					
+          if (!in_array($opt['id'], $freezeOptions)) {
             $allowedOptions[] = $opt['id'];
           }
+          // CRM-14696 - Improve display for sold out price set options
+          else {
+            $opt['label'] = $opt['label'] . ' (' . ts('Sold out') . ')';
+          }
+					
+          $selectOption[$opt['id']] = $opt['label'];
+
           if ($is_pay_later) {
             $qf->add( 'text', 'txt-'.$elementName, $label, array( 'size' => '4'));
           }
         }
+        
         $element = &$qf->add('select', $elementName, $label,
           array(
             '' => ts('- select -')) + $selectOption,
@@ -475,9 +487,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             array('price' => json_encode($priceVal))
           );
 
-        // CRM-6902
+        // CRM-6902 - Add "max" option for a price set field
         $button = substr($qf->controller->getButtonName(), -4);
-        if (!empty($feezeOptions) && $button != 'skip') {
+        if (!empty($freezeOptions) && $button != 'skip') {
           $qf->addRule($elementName, ts('Sorry, this option is currently sold out.'), 'regex', "/" . implode('|', $allowedOptions) . "/");
         }
         break;
@@ -491,7 +503,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
 
           if ($field->is_display_amounts) {
-            $opt['label'] .= '&nbsp;-&nbsp;';
+            $opt['label'] = '<span class="crm-price-amount-label">' . $opt['label'] . '</span>&nbsp;-&nbsp;';
             if (isset($taxAmount) && $invoicing) {
               $opt['label'] .= self::getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm);
             }
@@ -510,9 +522,11 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $txtcheck[$opId] =& $qf->createElement( 'text', $opId, $opt['label'], array( 'size' => '4' ) );
             $qf->addGroup($txtcheck, 'txt-'.$elementName, $label);
           }
-          // CRM-6902
-          if (in_array($opId, $feezeOptions)) {
+          // CRM-6902 - Add "max" option for a price set field
+          if (in_array($opId, $freezeOptions)) {
             $check[$opId]->freeze();
+            // CRM-14696 - Improve display for sold out price set options
+            $check[$opId]->setText('<span class="sold-out-option">' . $check[$opId]->getText() . '&nbsp;(' . ts('Sold out') . ')</span>');
           }
         }
         $element = &$qf->addGroup($check, $elementName, $label);
@@ -755,11 +769,11 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
     }
     else if ($displayOpt == 'Inclusive') {
       $label = CRM_Utils_Money::format($opt[$valueFieldName] + $opt['tax_amount']);
-      $label .= '<span class="crm-price-amount-label"> (includes ' . $taxTerm . ' of ' . CRM_Utils_Money::format($opt['tax_amount']) . ')</span>';
+      $label .= '<span class="crm-price-amount-tax"> (includes ' . $taxTerm . ' of ' . CRM_Utils_Money::format($opt['tax_amount']) . ')</span>';
     }
     else {
       $label = CRM_Utils_Money::format($opt[$valueFieldName]);
-      $label .= '<span class="crm-price-amount-label"> + '. CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
+      $label .= '<span class="crm-price-amount-tax"> + '. CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
     }
 
     return $label;

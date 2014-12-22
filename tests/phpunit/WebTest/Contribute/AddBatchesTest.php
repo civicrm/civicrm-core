@@ -181,7 +181,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
   function _checkResult($data, $type) {
     if ($type == "Contribution") {
       $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
-      $this->type("sort_name", "{$data['first_name']} {$data['last_name']}");
+      $this->type("sort_name", "{$data['last_name']} {$data['first_name']}");
       $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
       $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
       $expected = array(
@@ -205,7 +205,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $this->openCiviPage("member/search", "reset=1", "member_join_date_low");
 
       // select contact
-      $this->type("sort_name", "{$data['first_name']} {$data['last_name']}");
+      $this->type("sort_name", "{$data['last_name']} {$data['first_name']}");
       $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
       $this->click("xpath=//div[@id='memberSearch']//table/tbody/tr[1]/td[11]/span/a[text()='View']");
       $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");

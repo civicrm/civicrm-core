@@ -234,24 +234,25 @@ CRM.strings = CRM.strings || {};
 
   /**
    * Render an option list
-   * @param options array
-   * @param val default value
-   * @internal param rendered
+   * @param options {array}
+   * @param val {string} default value
+   * @param escapeHtml {bool}
    * @return string
    */
-  CRM.utils.renderOptions = function(options, val) {
-    var rendered = arguments[2] || '';
+  CRM.utils.renderOptions = function(options, val, escapeHtml) {
+    var rendered = '',
+      esc = escapeHtml === false ? _.identity : _.escape;
     if (!$.isArray(val)) {
       val = [val];
     }
     _.each(options, function(option) {
       if (option.children) {
-        rendered += '<optgroup label="' + _.escape(option.value) + '">' +
-          CRM.utils.renderOptions(option.children, val, rendered) +
+        rendered += '<optgroup label="' + esc(option.value) + '">' +
+          CRM.utils.renderOptions(option.children, val) +
           '</optgroup>';
       } else {
         var selected = ($.inArray('' + option.key, val) > -1) ? 'selected="selected"' : '';
-        rendered += '<option value="' + _.escape(option.key) + '"' + selected + '>' + _.escape(option.value) + '</option>';
+        rendered += '<option value="' + esc(option.key) + '"' + selected + '>' + esc(option.value) + '</option>';
       }
     });
     return rendered;
@@ -308,6 +309,11 @@ CRM.strings = CRM.strings || {};
         $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
         $(this).remove();
       });
+
+      // quickform does not support disabled option, so yet another hack to
+      // add disabled property for option values
+      $('option[value^=crm_disabled_opt]', this).attr('disabled', 'disabled');
+
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
         settings.minimumResultsForSearch = 10;
@@ -612,6 +618,16 @@ CRM.strings = CRM.strings || {};
     }
   }
 
+  //CRM-15598 - Override url validator method to allow relative url's (e.g. /index.htm)
+  $.validator.addMethod("url", function(value, element) {
+    if (/^\//.test(value)) {
+      // Relative url: prepend dummy path for validation.
+      value = 'http://domain.tld' + value;
+    }
+    // From jQuery Validation Plugin v1.12.0
+    return this.optional(element) || /^(https?|s?ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(value);
+  });
+
   /**
    * Wrapper for jQuery validate initialization function; supplies defaults
    */
@@ -852,6 +868,27 @@ CRM.strings = CRM.strings || {};
       .fail(function(data) {
         handle('error', data);
       });
+  };
+
+  // Convert an Angular promise to a jQuery promise
+  CRM.toJqPromise = function(aPromise) {
+    var jqDeferred = $.Deferred();
+    aPromise.then(
+      function(data) { jqDeferred.resolve(data); },
+      function(data) { jqDeferred.reject(data); }
+      // should we also handle progress events?
+    );
+    return jqDeferred.promise();
+  };
+
+  CRM.toAPromise = function($q, jqPromise) {
+    var aDeferred = $q.defer();
+    jqPromise.then(
+      function(data) { aDeferred.resolve(data); },
+      function(data) { aDeferred.reject(data); }
+      // should we also handle progress events?
+    );
+    return aDeferred.promise;
   };
 
   /**

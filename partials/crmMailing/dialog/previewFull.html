@@ -1,0 +1,10 @@
+<div ng-controller="PreviewMailingDialogCtrl">
+  <div crm-ui-tab-set>
+    <div crm-ui-tab id="preview-html" crm-title="ts('HTML')">
+      <iframe crm-ui-iframe="model.body_html"></iframe>
+    </div>
+    <div crm-ui-tab id="preview-text" crm-title="ts('Plain Text')">
+      <pre>{{model.body_text}}</pre>
+    </div>
+  </div>
+</div>

@@ -42,6 +42,15 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   CONST MAX_CONTACTS_TO_PROCESS = 1000;
 
   /**
+   * (Dear God Why) Keep a global count of mails processed within the current
+   * request.
+   *
+   * @static
+   * @var int
+   */
+  static $mailsProcessed = 0;
+
+  /**
    * Class constructor
    */
   function __construct() {
@@ -534,8 +543,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     }
     $eq->query($query);
 
-    static $config = NULL;
-    static $mailsProcessed = 0;
+    $config = NULL;
 
     if ($config == NULL) {
       $config = CRM_Core_Config::singleton();
@@ -570,7 +578,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
       if (
         $config->mailerBatchLimit > 0 &&
-        $mailsProcessed >= $config->mailerBatchLimit
+        self::$mailsProcessed >= $config->mailerBatchLimit
       ) {
         if (!empty($fields)) {
           $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
@@ -578,7 +586,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         $eq->free();
         return FALSE;
       }
-      $mailsProcessed++;
+      self::$mailsProcessed++;
 
       $fields[] = array(
         'id' => $eq->id,
@@ -626,6 +634,15 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $returnProperties = $mailing->getReturnProperties();
     $params           = $targetParams = $deliveredParams = array();
     $count            = 0;
+    
+    /**
+     * CRM-15702: Sending bulk sms to contacts without e-mail addres fails.
+     * Solution is to skip checking for on hold
+     */
+    $skipOnHold = true; //do include a statement to check wether e-mail address is on hold
+    if ($mailing->sms_provider_id) {
+      $skipOnHold = false; //do not include a statement to check wether e-mail address is on hold
+    }
 
     foreach ($fields as $key => $field) {
       $params[] = $field['contact_id'];
@@ -634,7 +651,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $details = CRM_Utils_Token::getTokenDetails(
       $params,
       $returnProperties,
-      TRUE, TRUE, NULL,
+      $skipOnHold, TRUE, NULL,
       $mailing->getFlattenedTokens(),
       get_class($this),
       $this->id

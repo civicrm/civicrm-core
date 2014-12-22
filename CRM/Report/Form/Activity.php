@@ -239,7 +239,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'activity_type_id' => array(
               'title' => ts('Activity Type'),
               'default_weight' => '2',
-              'dbAlias' => 'civicrm_activity_activity_type_id'
+              'dbAlias' => "option_value_civireport"
             ),
           ),
           'grouping' => 'activity-fields',
@@ -250,7 +250,12 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           'fields' => array(// so we have $this->_alias populated
           ),
         ),
-      ) + $this->addAddressFields(FALSE, TRUE);
+        'civicrm_option_value' => array(
+          'dao' => 'CRM_Core_DAO_OptionValue',
+          'fields' => array(// so we have $this->_alias populated
+          ),
+        ),
+      ) + $this->addressFields(TRUE);
 
     if ($campaignEnabled) {
       // Add display column and filter for Survey Results, Campaign and Engagement Index if CiviCampaign is enabled
@@ -290,6 +295,19 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
+  }
+
+  /** adding address fields with dbAlias for order clause
+   * @return array address fields
+   */
+  function addressFields($orderBy = FALSE) {
+    $address = parent::addAddressFields(FALSE, TRUE);
+    if ($orderBy) {
+      foreach ($address['civicrm_address']['order_bys'] as $fieldName => $field) {
+        $address['civicrm_address']['order_bys'][$fieldName]['dbAlias'] = "civicrm_address_{$fieldName}";
+      }
+    }
+    return $address;
   }
 
   /**
@@ -367,6 +385,18 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         unset($this->_selectAliases[$key]);
       }
 
+      if ($recordType != 'final') {
+        foreach ($this->_columns['civicrm_address']['order_bys'] as $fieldName => $field) {
+          $orderByFld = $this->_columns['civicrm_address']['order_bys'][$fieldName];
+          $fldInfo = $this->_columns['civicrm_address']['fields'][$fieldName];
+          $this->_selectAliases[] = $orderByFld['dbAlias'];
+          $this->_selectClauses[] = "{$fldInfo['dbAlias']} as {$orderByFld['dbAlias']}";
+        }
+        $this->_selectAliases[] = $this->_aliases['civicrm_option_value'];
+        $this->_selectClauses[] = "{$this->_aliases['civicrm_option_value']}.label as {$this->_aliases['civicrm_option_value']}";
+        $this->_selectAliases = array_unique($this->_selectAliases);
+        $this->_selectClauses = array_unique($this->_selectClauses);
+      }
       $this->_select = "SELECT " . implode(', ', $this->_selectClauses) . " ";
     }
   }
@@ -376,6 +406,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    */
   function from($recordType) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityTypeId = CRM_Core_DAO::getFieldValue("CRM_Core_DAO_OptionGroup", 'activity_type', 'id', 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
@@ -436,6 +467,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       }
       $this->_aliases['civicrm_contact'] = 'civicrm_contact_source';
     }
+    $this->_from .= "INNER JOIN civicrm_option_value {$this->_aliases['civicrm_option_value']}
+            ON {$this->_aliases['civicrm_option_value']}.option_group_id = {$activityTypeId}
+            AND {$this->_aliases['civicrm_option_value']}.value = {$this->_aliases['civicrm_activity']}.activity_type_id";
     $this->addAddressFromClause();
   }
 
@@ -852,6 +886,55 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
       if (!$entryFound) {
         break;
       }
+    }
+  }
+
+  function sectionTotals() {
+    // Reports using order_bys with sections must populate $this->_selectAliases in select() method.
+    if (empty($this->_selectAliases)) {
+      return;
+    }
+
+    if (!empty($this->_sections)) {
+      // pull section aliases out of $this->_sections
+      $sectionAliases = array_keys($this->_sections);
+
+      $ifnulls = array();
+      foreach (array_merge($sectionAliases, $this->_selectAliases) as $alias) {
+        $ifnulls[] = "ifnull($alias, '') as $alias";
+      }
+
+      $query = "select " . implode(", ", $ifnulls) .
+        ", count(DISTINCT civicrm_activity_id) as ct from civireport_activity_temp_target group by " .
+        implode(", ", $sectionAliases);
+
+      // initialize array of total counts
+      $totals = array();
+      $dao = CRM_Core_DAO::executeQuery($query);
+      while ($dao->fetch()) {
+        // let $this->_alterDisplay translate any integer ids to human-readable values.
+        $rows[0] = $dao->toArray();
+        $this->alterDisplay($rows);
+        $row = $rows[0];
+
+        // add totals for all permutations of section values
+        $values = array();
+        $i = 1;
+        $aliasCount = count($sectionAliases);
+        foreach ($sectionAliases as $alias) {
+          $values[] = $row[$alias];
+          $key = implode(CRM_Core_DAO::VALUE_SEPARATOR, $values);
+          if ($i == $aliasCount) {
+            // the last alias is the lowest-level section header; use count as-is
+            $totals[$key] = $dao->ct;
+          }
+          else {
+            // other aliases are higher level; roll count into their total
+            $totals[$key] += $dao->ct;
+          }
+        }
+      }
+      $this->assign('sectionTotals', $totals);
     }
   }
 }
