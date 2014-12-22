@@ -220,7 +220,7 @@ AND li.entity_id = {$entityId}
         continue;
       }
       $lineItems[$dao->id] = array(
-        'qty' => $dao->qty,
+        'qty' => (float) $dao->qty,
         'label' => $dao->label,
         'unit_price' => $dao->unit_price,
         'line_total' => $dao->line_total,
