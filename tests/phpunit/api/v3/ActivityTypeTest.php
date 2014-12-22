@@ -40,6 +40,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
     $this->_apiversion = 3;
     CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
 
   /**
@@ -56,7 +57,6 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
    *  Test civicrm_activity_type_create()
    */
   function testActivityTypeCreate() {
-
     $params = array(
       'weight' => '2',
       'label' => 'send out letters',
@@ -72,7 +72,6 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
    *  Test civicrm_activity_type_create - check id
    */
   function testActivityTypecreatecheckId() {
-
     $params = array(
       'label' => 'type_create',
       'weight' => '2',
@@ -86,7 +85,6 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
    *  Test civicrm_activity_type_delete()
    */
   function testActivityTypeDelete() {
-
     $params = array(
       'label' => 'type_create_delete',
       'weight' => '2',
