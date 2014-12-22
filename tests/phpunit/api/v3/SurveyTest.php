@@ -56,6 +56,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
 
   function setUp() {
     $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', array('label' => 'PhoneBank', 'return' => 'value'), 'integer');
+    $this->useTransaction();
     $this->enableCiviCampaign();
     $this->params = array(
       'title' => "survey title",
@@ -64,16 +65,6 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
       'instructions' => "Call people, ask for money",
     );
     parent::setUp();
-  }
-
-/**
- * Here we clean up any test data we created.
- * Note that the quickCleanup function turns off Foreign keys first
- * so will not remove related entities
- */
-  function tearDown() {
-    $tablesToTruncate = array('civicrm_survey');
-    $this->quickCleanup($tablesToTruncate);
   }
 
   /**
