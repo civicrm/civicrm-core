@@ -41,6 +41,8 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->_apiversion = 3;
     $this->_entity = 'Email';
     parent::setUp();
+    $this->useTransaction(TRUE);
+
     $this->_contactID = $this->organizationCreate(NULL);
     $this->_locationType = $this->locationTypeCreate(NULL);
     $this->_locationType2 = $this->locationTypeCreate(array(
@@ -59,11 +61,6 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
-    $this->contactDelete($this->_contactID);
-    $this->locationTypeDelete($this->_locationType->id);
-    $this->locationTypeDelete($this->_locationType2->id);
-  }
   public function testCreateEmail() {
     $params = $this->_params;
     //check there are no emails to start with
