@@ -39,13 +39,10 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_apiversion = 3;
     $this->_groupID = $this->groupCreate();
     $this->_email = 'test@test.test';
-  }
-
-  function tearDown() {
-    $this->groupDelete($this->_groupID);
   }
 
   //---------- civicrm_mailing_event_subscribe methods ---------
