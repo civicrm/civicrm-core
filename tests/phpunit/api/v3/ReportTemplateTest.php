@@ -40,9 +40,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
-
-  function tearDown() {}
 
   public function testReportTemplate() {
     $result = $this->callAPISuccess('ReportTemplate', 'create', array(
