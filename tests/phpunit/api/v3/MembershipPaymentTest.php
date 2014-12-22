@@ -44,6 +44,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   protected $_contribution = array();
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     $this->_contactID = $this->organizationCreate(NULL);
     $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
@@ -66,20 +67,6 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
     );
 
     $this->_contribution = $this->callAPISuccess('contribution','create', $params);
-  }
-
-  function tearDown() {
-    $this->quickCleanup(
-      array(
-        'civicrm_contact',
-        'civicrm_contribution',
-        'civicrm_membership',
-        'civicrm_membership_payment',
-        'civicrm_membership_status',
-        'civicrm_membership_type',
-        'civicrm_line_item',
-      )
-    );
   }
 
   ///////////////// civicrm_membership_payment_create methods
