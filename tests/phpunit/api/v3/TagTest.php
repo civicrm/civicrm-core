@@ -51,12 +51,9 @@ class api_v3_TagTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->tag = $this->tagCreate();
     $this->ids['tag'][] = $this->tagID = $this->tag['id'];
-  }
-
-  function tearDown() {
-    $this->deleteFromIDSArray();
   }
 
   ///////////////// civicrm_tag_get methods
