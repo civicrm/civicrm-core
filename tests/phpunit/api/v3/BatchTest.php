@@ -54,17 +54,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  protected function tearDown() {
-    $tablesToTruncate = array('civicrm_batch');
-    $this->quickCleanup($tablesToTruncate);
+    $this->useTransaction(TRUE);
   }
 
   /**
