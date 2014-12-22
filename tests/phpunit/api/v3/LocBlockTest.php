@@ -36,9 +36,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-  }
-
-  function tearDown() {
+    $this->useTransaction(TRUE);
   }
 
   public function testCreateLocBlock() {
@@ -113,11 +111,5 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'delete', array('id' => $id));
   }
 
-  public static function setUpBeforeClass() {
-      // put stuff here that should happen before all tests in this unit
-  }
-
-  public static function tearDownAfterClass(){
-  }
 }
 
