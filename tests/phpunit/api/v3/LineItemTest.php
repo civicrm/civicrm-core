@@ -44,6 +44,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_individualId = $this->individualCreate();
     $contributionParams = array(
       'contact_id' => $this->_individualId,
@@ -68,26 +69,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
-
-    foreach ($this->contactIds as $id) {
-      $this->callAPISuccess('contact', 'delete', array('id' => $id));
-    }
-    $this->quickCleanup(
-        array(
-            'civicrm_contact',
-            'civicrm_contribution',
-            'civicrm_line_item',
-        )
-    );
-  }
-
   public function testCreateLineItem() {
-    $this->quickCleanup(
-        array(
-            'civicrm_line_item',
-        )
-    );
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params + array('debug' => 1), __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
@@ -117,19 +99,5 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values']['entity_id']['api.required']);
   }
 
-  public static function setUpBeforeClass() {
-      // put stuff here that should happen before all tests in this unit
-  }
-
-  public static function tearDownAfterClass(){
-    $tablesToTruncate = array(
-      'civicrm_contact',
-      'civicrm_financial_type',
-      'civicrm_contribution',
-      'civicrm_line_item',
-    );
-    $unitTest = new CiviUnitTestCase();
-    $unitTest->quickCleanup($tablesToTruncate);
-  }
 }
 
