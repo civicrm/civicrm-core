@@ -39,14 +39,6 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   protected $_noteID;
   protected $_note;
 
-
-  /**
-   *
-   */
-  function __construct() {
-    parent::__construct();
-  }
-
   function setUp() {
 
     $this->_apiversion = 3;
