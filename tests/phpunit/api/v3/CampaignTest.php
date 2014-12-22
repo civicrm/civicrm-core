@@ -46,9 +46,8 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
       'created_date' => 'first sat of July 2008',
     );
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
-
-  function tearDown() {}
 
   public function testCreateCampaign() {
     $description = "Create a campaign - Note use of relative dates here http://www.php.net/manual/en/datetime.formats.relative.php";
@@ -66,6 +65,7 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
   }
 
   public function testDeleteCampaign() {
+    $this->callAPISuccess('campaign', 'create', $this->params);
     $entity = $this->callAPISuccess('campaign', 'get', ($this->params));
     $delete = array('id' => $entity['id']);
     $result = $this->callAPIAndDocument('campaign', 'delete', $delete, __FUNCTION__, __FILE__);
