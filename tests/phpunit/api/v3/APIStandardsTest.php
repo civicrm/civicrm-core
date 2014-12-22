@@ -61,6 +61,7 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
   public function setUp() {
     //  Connect to the database
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_apiversion = 3;
     $this->_apiDir = "../api/v3/";
     $this->_functionFiles = array('Entity.php', 'utils.php');
