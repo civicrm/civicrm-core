@@ -45,12 +45,12 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
   function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
+    $this->useTransaction();
 
     $this->_contactID    = $this->organizationCreate();
     $loc                 = $this->locationTypeCreate();
     $this->_locationType = $loc->id;
     CRM_Core_PseudoConstant::flush();
-    $this->quickCleanup(array('civicrm_phone'));
     $this->_params = array(
       'contact_id' => $this->_contactID,
       'location_type_id' => $this->_locationType,
@@ -58,11 +58,6 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
       'is_primary' => 1,
       'phone_type_id' => 1,
     );
-  }
-
-  function tearDown() {
-    $this->locationTypeDelete($this->_locationType);
-    $this->contactDelete($this->_contactID);
   }
 
   public function testCreatePhone() {
