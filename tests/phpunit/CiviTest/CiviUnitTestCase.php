@@ -2693,17 +2693,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Use $ids as an instruction to do test cleanup
-   */
-  function deleteFromIDSArray() {
-    foreach ($this->ids as $entity => $ids) {
-      foreach ($ids as $id) {
-        $this->callAPISuccess($entity, 'delete', array('id' => $id));
-      }
-    }
-  }
-
-  /**
    * FIXME: something NULLs $GLOBALS['_HTML_QuickForm_registered_rules'] when the tests are ran all together
    * (NB unclear if this is still required)
    */
