@@ -47,15 +47,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  protected function tearDown() {}
 
   function testAddFormattedParam() {
     $values = array('contact_type' => 'Individual');
