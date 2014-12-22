@@ -36,16 +36,6 @@ require_once 'CiviTest/Participant.php';
  * Class CRM_Event_BAO_ParticipantTest
  */
 class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Participant BAOs',
-      'description' => 'Test all Event_BAO_Participant methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

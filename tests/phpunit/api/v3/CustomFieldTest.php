@@ -39,17 +39,6 @@ require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
 class api_v3_CustomFieldTest extends CiviUnitTestCase {
   protected $_apiversion;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Custom Field Create',
-      'description' => 'Test all Custom Field Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     $this->_apiversion = 3;
     parent::setUp();

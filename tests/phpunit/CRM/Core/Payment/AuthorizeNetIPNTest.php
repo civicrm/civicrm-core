@@ -14,17 +14,6 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   protected $_contributionPageID;
   protected $_paymentProcessorID;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Authorize.net IPN processing',
-      'description' => 'Authorize.net IPN methods.',
-      'group' => 'Payment Processor Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorCreate(array(

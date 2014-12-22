@@ -23,14 +23,6 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
   protected $fixtures;
 
-  function get_info() {
-    return array(
-      'name'    => 'ManagedEntities',
-      'description' => 'Test automatic creation/deletion of entities',
-      'group'     => 'Core',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->modules = array(

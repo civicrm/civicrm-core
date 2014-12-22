@@ -32,16 +32,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Member_BAO_MembershipTypeTest
  */
 class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'MembershipType BAOs',
-      'description' => 'Test all Member_BAO_MembershipType methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

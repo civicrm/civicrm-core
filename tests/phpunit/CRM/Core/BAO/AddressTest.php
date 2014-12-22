@@ -33,17 +33,6 @@ require_once 'CiviTest/Contact.php';
  * Class CRM_Core_BAO_AddressTest
  */
 class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Address BAOs',
-      'description' => 'Test all Core_BAO_Address methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
 

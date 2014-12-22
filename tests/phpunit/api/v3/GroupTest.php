@@ -37,17 +37,6 @@ class api_v3_GroupTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_groupID;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Group Get',
-      'description' => 'Test all Group Get API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     $this->_apiversion = 3;
 

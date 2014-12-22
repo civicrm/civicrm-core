@@ -15,17 +15,6 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
 
   protected static $bodytext = 'Unit tests keep children safe.';
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Spool (redirect to database) Mailing Test',
-      'description' => 'Test emails when redirected to database. See also WebTest_Mailing_SpoolTest.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->_mut = new CiviMailUtils( $this, true );

@@ -37,17 +37,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_entity;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Event Create',
-      'description' => 'Test all Event Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->_apiversion = 3;

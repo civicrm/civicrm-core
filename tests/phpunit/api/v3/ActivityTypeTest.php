@@ -36,18 +36,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
 
-
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Activity Type',
-      'description' => 'Test all ActivityType Get/Create/Delete methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     $this->_apiversion = 3;
     CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');

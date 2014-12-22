@@ -37,17 +37,6 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   protected $_apiversion;
 
   /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Group Organization',
-      'description' => 'Test all Group Organization API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
-  /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    *

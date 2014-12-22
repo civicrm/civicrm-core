@@ -56,17 +56,6 @@ class api_v3_SettingTest extends CiviUnitTestCase {
 
   }
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Settings Tests',
-      'description' => 'Settings API',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $params = array(

@@ -7,17 +7,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Rule Test',
-      'description' => 'Test the validation rules',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
   }

@@ -40,17 +40,6 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   protected $_groupId1;
 
   /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Group Contact Create',
-      'description' => 'Test all Group Contact Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
-  /**
    * Set up for group contact tests
    *
    * @todo set up calls function that doesn't work @ the moment

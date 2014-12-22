@@ -7,16 +7,6 @@ require_once 'CiviTest/Custom.php';
  * Class CRM_Core_BAO_CustomValueTableSetGetTest
  */
 class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Custom Value Table BAO setValues and getValues',
-      'description' => 'Test setValues and getValues Core_BAO_CustomValueTable methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

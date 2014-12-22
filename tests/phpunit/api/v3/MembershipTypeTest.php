@@ -37,18 +37,6 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_entity = 'MembershipType';
 
-
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'MembershipType Create',
-      'description' => 'Test all Membership Type Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);

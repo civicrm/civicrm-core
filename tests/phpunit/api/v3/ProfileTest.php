@@ -42,17 +42,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   protected $_membershipTypeID;
   protected $_contactID;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Profile Test',
-      'description' => 'Test all profile API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
