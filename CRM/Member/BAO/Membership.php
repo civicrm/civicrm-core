@@ -64,22 +64,25 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @access public
    * @static
    */
-  static function &add(&$params, &$ids) {
-
-    if (CRM_Utils_Array::value('membership', $ids)) {
-      CRM_Utils_Hook::pre('edit', 'Membership', $ids['membership'], $params);
-      $oldStatus         = NULL;
-      $oldType           = NULL;
-      $membershipObj     = new CRM_Member_DAO_Membership();
-      $membershipObj->id = $ids['membership'];
+  static function add(&$params, $ids = array()) {
+    $oldStatus = $oldType = NULL;
+    $params['id'] = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membership', $ids));
+    if ($params['id']) {
+      CRM_Utils_Hook::pre('edit', 'Membership', $params['id'], $params);
+    }
+    else {
+      CRM_Utils_Hook::pre('create', 'Membership', $params['id'], $params);
+    }
+    $id = $params['id'];
+    // we do this after the hooks are called in case it has been altered
+    if ($id) {
+      $membershipObj = new CRM_Member_DAO_Membership();
+      $membershipObj->id = $id;
       $membershipObj->find();
       while ($membershipObj->fetch()) {
         $oldStatus = $membershipObj->status_id;
         $oldType = $membershipObj->membership_type_id;
       }
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Membership', NULL, $params);
     }
 
     if (array_key_exists('is_override', $params) && !$params['is_override']) {
@@ -88,7 +91,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     $membership = new CRM_Member_BAO_Membership();
     $membership->copyValues($params);
-    $membership->id = CRM_Utils_Array::value('membership', $ids);
+    $membership->id = $id;
 
     $membership->save();
     $membership->free();
@@ -136,7 +139,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // reset the group contact cache since smart groups might be affected due to this
     CRM_Contact_BAO_GroupContactCache::remove();
 
-    if (CRM_Utils_Array::value('membership', $ids)) {
+    if ($id) {
       if ($membership->status_id != $oldStatus) {
         $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
         $activityParam = array(
