@@ -36,7 +36,6 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   protected $params;
   protected $id;
 
-
   public $DBResetRequired = FALSE;
 
   function setUp() {
@@ -52,9 +51,8 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
       'weight' => 10,
     );
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
-
-  function tearDown() {}
 
   public function testCreateParticipantStatusType() {
     $result = $this->callAPIAndDocument('participant_status_type', 'create', $this->params, __FUNCTION__, __FILE__);
@@ -63,6 +61,9 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   }
 
   public function testGetParticipantStatusType() {
+    $result = $this->callAPIAndDocument('participant_status_type', 'create', $this->params, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+
     $result = $this->callAPIAndDocument('participant_status_type', 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
