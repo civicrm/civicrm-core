@@ -49,6 +49,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_params = array(
       'sequential' => 1,
       'name' => 'API_Test_Job',
@@ -59,13 +60,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
     );
-  }
-
-  function tearDown() {
-    $this->quickCleanup(array('civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule'));
-    $this->quickCleanUpFinancialEntities();
-    CRM_Utils_Hook::singleton()->reset();
-    parent::tearDown();
   }
 
   /**
