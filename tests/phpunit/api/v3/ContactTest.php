@@ -51,15 +51,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   protected $_financialTypeId =1;
 
   /**
-   *  Constructor
-   *
-   *  Initialize configuration
-   */
-  function __construct() {
-    parent::__construct();
-  }
-
-  /**
    *  Test setup for every test
    *
    *  Connect to the database, truncate the tables that will be used
