@@ -41,7 +41,7 @@ abstract class CRM_Contact_BAO_Query_Interface {
   abstract public function &getFields();
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $mode
    * @param $side
    *
@@ -86,7 +86,7 @@ abstract class CRM_Contact_BAO_Query_Interface {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $type
    *
    * @return null

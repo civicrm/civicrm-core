@@ -49,7 +49,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @param array  $params (reference ) an assoc array of name/value pairs
    * @param array  $contact  contact object
    *
-   * @return object CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact object
    * @access public
    * @static
    */
@@ -333,7 +333,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * regenerates display_name for contacts with given prefixes/suffixes
+   * Regenerates display_name for contacts with given prefixes/suffixes
    *
    * @param array $ids     the array with the prefix/suffix id governing which contacts to regenerate
    * @param int   $action  the action describing whether prefix/suffix was UPDATED or DELETED
@@ -380,7 +380,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * creates display name
+   * Creates display name
    *
    * @return string  the constructed display name
    */

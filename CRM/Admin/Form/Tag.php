@@ -41,7 +41,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   protected $_isTagSet;
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -76,6 +76,14 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
 
       if (!$this->_isTagSet) {
         $this->add('select', 'parent_id', ts('Parent Tag'), $allTag, FALSE, array('class' => 'crm-select2'));
+
+        // Tagsets are not selectable by definition so only include the selectable field if NOT a tagset.
+        $selectable = $this->add('checkbox', 'is_selectable', ts('Selectable?'));
+        // Selectable should be checked by default when creating a new tag
+        if ($this->_action == CRM_Core_Action::ADD) {
+          $selectable->setValue(1);        
+        }
+
       }
 
       $this->assign('isTagSet', $this->_isTagSet);
@@ -90,9 +98,6 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       $this->add('text', 'description', ts('Description'),
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'description')
       );
-
-      //@lobo haven't a clue why the checkbox isn't displayed (it should be checked by default
-      $this->add('checkbox', 'is_selectable');
 
       $isReserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
@@ -122,7 +127,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *
@@ -148,6 +153,10 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
 
     if (!isset($params['is_reserved'])) {
       $params['is_reserved'] = 0;
+    }
+
+    if (!isset($params['is_selectable'])) {
+      $params['is_selectable'] = 0;
     }
 
     if ($this->_action == CRM_Core_Action::DELETE) {

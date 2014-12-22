@@ -44,7 +44,7 @@ class CRM_Export_BAO_Export {
   CONST EXPORT_ROW_COUNT = 10000;
 
   /**
-   * Function to get the list the export fields
+   * Get the list the export fields
    *
    * @param int $selectAll user preference while export
    * @param array $ids contact ids
@@ -896,6 +896,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           }
           elseif (array_key_exists($field, $contactRelationshipTypes)) {
             $relDAO = CRM_Utils_Array::value($iterationDAO->contact_id, $allRelContactArray[$field]);
+            $relationQuery[$field]->convertToPseudoNames($relDAO);
             foreach ($value as $relationField => $relationValue) {
               if (is_object($relDAO) && property_exists($relDAO, $relationField)) {
                 $fieldValue = $relDAO->$relationField;
@@ -924,6 +925,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               }
               $field = $field . '_';
 
+              if (array_key_exists($relationField, $multipleSelectFields)) {
+                $param = array($relationField => $fieldValue);
+                $names = array($relationField => array('newName' => $relationField, 'groupName' => $relationField));
+                CRM_Core_OptionGroup::lookupValues($param, $names, FALSE);
+                $fieldValue = $param[$relationField];
+              }
               if (is_object($relDAO) && $relationField == 'id') {
                 $row[$field . $relationField] = $relDAO->contact_id;
               }
@@ -1164,7 +1171,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   /**
-   * name of the export file based on mode
+   * Name of the export file based on mode
    *
    * @param string  $output type of output
    * @param int     $mode export mode
@@ -1200,7 +1207,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   /**
-   * Function to handle import error file creation.
+   * Handle import error file creation.
    *
    */
   static function invoke() {
@@ -1416,7 +1423,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   /**
-   * @param $tableName
+   * @param string $tableName
    * @param $details
    * @param $sqlColumns
    */
@@ -1509,10 +1516,10 @@ CREATE TABLE {$exportTempTable} (
   }
 
   /**
-   * @param $tableName
+   * @param string $tableName
    * @param $headerRows
    * @param $sqlColumns
-   * @param $exportParams
+   * @param array $exportParams
    */
   static function mergeSameAddress($tableName, &$headerRows, &$sqlColumns, $exportParams) {
     // check if any records are present based on if they have used shared address feature,
@@ -1617,8 +1624,8 @@ WHERE  id IN ( $deleteIDString )
   }
 
   /**
-   * @param $contactId
-   * @param $exportParams
+   * @param int $contactId
+   * @param array $exportParams
    *
    * @return array
    */
@@ -1680,7 +1687,7 @@ WHERE  id IN ( $deleteIDString )
 
   /**
    * @param $sql
-   * @param $exportParams
+   * @param array $exportParams
    * @param bool $sharedAddress
    *
    * @return array
@@ -1782,7 +1789,7 @@ WHERE  id IN ( $deleteIDString )
   }
 
   /**
-   * Function to merge household record into the individual record
+   * Merge household record into the individual record
    * if exists
    *
    * @param string $exportTempTable temporary temp table that stores the records
@@ -1920,7 +1927,7 @@ LIMIT $offset, $limit
   }
 
   /**
-   * Function to manipulate header rows for relationship fields
+   * Manipulate header rows for relationship fields
    *
    */
   public static function manipulateHeaderRows(&$headerRows, $contactRelationshipTypes) {
@@ -1934,7 +1941,7 @@ LIMIT $offset, $limit
   }
 
   /**
-   * Function to exclude contacts who are deceased, have "Do not mail" privacy setting,
+   * Exclude contacts who are deceased, have "Do not mail" privacy setting,
    * or have no street address
    *
    */

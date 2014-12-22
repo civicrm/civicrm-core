@@ -35,9 +35,9 @@
 class CRM_Contact_BAO_SearchCustom {
 
   /**
-   * @param $csID
-   * @param null $ssID
-   * @param null $gID
+   * @param int $csID
+   * @param int $ssID
+   * @param int $gID
    *
    * @return array
    * @throws Exception
@@ -100,8 +100,8 @@ class CRM_Contact_BAO_SearchCustom {
   }
 
   /**
-   * @param $csID
-   * @param $ssID
+   * @param int $csID
+   * @param int $ssID
    *
    * @return mixed
    * @throws Exception
@@ -120,8 +120,8 @@ class CRM_Contact_BAO_SearchCustom {
   }
 
   /**
-   * @param $csID
-   * @param $ssID
+   * @param int $csID
+   * @param int $ssID
    *
    * @return mixed
    */
@@ -150,8 +150,8 @@ class CRM_Contact_BAO_SearchCustom {
   }
 
   /**
-   * @param $csID
-   * @param $ssID
+   * @param int $csID
+   * @param int $ssID
    *
    * @return array
    */

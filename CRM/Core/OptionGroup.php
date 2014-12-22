@@ -47,7 +47,7 @@ class CRM_Core_OptionGroup {
   );
 
   /**
-   * @param $dao
+   * @param CRM_Core_DAO $dao
    * @param bool $flip
    * @param bool $grouping
    * @param bool $localize
@@ -165,12 +165,12 @@ WHERE  v.option_group_id = g.id
   /**
    * Counterpart to values() which removes the item from the cache
    *
-   * @param $name
+   * @param string $name
    * @param $flip
    * @param $grouping
    * @param $localize
    * @param $condition
-   * @param $labelColumnName
+   * @param string $labelColumnName
    * @param $onlyActive
    * @param string $keyColumnName
    */
@@ -242,7 +242,7 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * Function to lookup titles OR ids for a set of option_value populated fields. The retrieved value
+   * Lookup titles OR ids for a set of option_value populated fields. The retrieved value
    * is assigned a new fieldname by id or id's by title
    * (each within a specificied option_group)
    *
@@ -318,7 +318,7 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * @param $groupName
+   * @param string $groupName
    * @param $value
    * @param bool $onlyActiveValue
    *
@@ -354,7 +354,7 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * @param $groupName
+   * @param string $groupName
    * @param $label
    * @param string $labelField
    * @param string $labelType
@@ -443,9 +443,7 @@ WHERE  v.option_group_id = g.id
    *                          bool   'is_default'  (optional) - is this the default one to display when rendered in form
    *                          bool   'is_active'   (optional) - should this element be rendered
    * @param int $defaultID (reference) - the option value ID of the default element (if set) is returned else 'null'
-   * @param null $groupTitle
-   *
-   * @internal param string $groupLabel - the optional label of the option group else set to group name
+   * @param null $groupTitle the optional label of the option group else set to group name
    *
    * @access public
    * @static
@@ -487,7 +485,7 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * @param $groupName
+   * @param string $groupName
    * @param $values
    * @param bool $flip
    * @param string $field
@@ -533,7 +531,7 @@ ORDER BY v.weight
   }
 
   /**
-   * @param $groupName
+   * @param string $groupName
    * @param string $operator
    */
   static function deleteAssoc($groupName, $operator = "=") {
@@ -550,7 +548,7 @@ DELETE g, v
   }
 
   /**
-   * @param $groupName
+   * @param string $groupName
    * @param $value
    *
    * @return null|string
@@ -570,7 +568,7 @@ SELECT v.label
   }
 
   /**
-   * @param $groupName
+   * @param string $groupName
    * @param $fieldValue
    * @param string $field
    * @param string $fieldType

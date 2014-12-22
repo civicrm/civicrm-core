@@ -111,7 +111,7 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
 
     //Find Member
     $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');
-    $this->type("sort_name", "$firstName1 $lastName1");
+    $this->type("sort_name", "$lastName1 $firstName1");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
@@ -144,9 +144,9 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
   }
 
   /**
-   * @param $pageId
-   * @param $memTypeId
-   * @param null $cid
+   * @param int $pageId
+   * @param int $memTypeId
+   * @param int $cid
    */
   function _testOnlineMembershipSignup($pageId, $memTypeId, $cid = NULL) {
     //Open Live Contribution Page
@@ -157,7 +157,7 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     $this->openCiviPage("contribute/transact", $args, '_qf_Main_upload-bottom');
 
     // Select membership type 1
-    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'$memTypeId')]");
+    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//div/span/label/span[1][contains(text(),'$memTypeId')]");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", 60);
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->clickLink("_qf_Confirm_next-bottom", NULL);

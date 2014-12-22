@@ -36,7 +36,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   *  Function to check for Valid Street Address
+   * Check for Valid Street Address
    */
   function testValidStreetAddressParsing() {
     $this->webtestLogin();
@@ -90,9 +90,9 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  /*
-     *  Function to check for Invalid Street Address
-     */
+  /**
+   * Check for Invalid Street Address
+   */
   function testInvalidStreetAddressParsing() {
     $this->webtestLogin();
 
@@ -147,7 +147,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   *  Function to check Street Address when Address Parsing is Disabled
+   * Check Street Address when Address Parsing is Disabled
    */
   function testStreetAddress() {
     $this->webtestLogin();
@@ -182,10 +182,9 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
     $this->assertEquals('22 Adams Avenue Unit 3c', $actualvalue);
   }
 
-  /*
-     *  Helper function to provide csv data with Valid Street Address.
-     */
   /**
+   * Helper function to provide csv data with Valid Street Address.
+   *
    * @return array
    */
   function _validStreetAddressCSVData() {
@@ -233,10 +232,9 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
-     *  Helper function to provide csv data with Invalid Street Address.
-     */
   /**
+   * Helper function to provide csv data with Invalid Street Address.
+   *
    * @return array
    */
   function _invalidStreetAddressCSVData() {
@@ -255,7 +253,8 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => 'A' . substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => 'A' . substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => substr(sha1(rand()), 0, 7) . 'and',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -267,7 +266,8 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
         'state' => 'NY',
         'country' => 'United States',
       ),
-      array('first_name' => 'S' . substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => 'S' . substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => substr(sha1(rand()), 0, 7) . 'sum',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',

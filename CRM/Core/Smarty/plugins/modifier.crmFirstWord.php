@@ -34,17 +34,11 @@
  */
 
 /**
- * Replace the value of an attribute in the input string. Assume
- * the the attribute is well formed, of the type name="value". If
- * no replacement is mentioned the value is inserted at the end of
- * the form element
+ * Replace a string with the first word in the string
  *
  * @param string $string the html to be tweaked with
  *
- * @internal param string $attribute the attribute to modify
- * @internal param string $value the new attribute value
- *
- * @return string        the new modified html string
+ * @return string
  * @access public
  */
 function smarty_modifier_crmFirstWord($string) {

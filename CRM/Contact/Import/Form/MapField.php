@@ -40,7 +40,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
 
   /**
-   * an array of all contact fields with
+   * An array of all contact fields with
    * formatted custom field names.
    *
    * @var array
@@ -49,7 +49,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   protected $_formattedFieldNames;
 
   /**
-   * on duplicate
+   * On duplicate
    *
    * @var int
    */
@@ -93,7 +93,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -199,7 +199,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -622,7 +622,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *
@@ -977,7 +977,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * format custom field name.
+   * Format custom field name.
    * combine group and field name to avoid conflict.
    *
    * @param $fields

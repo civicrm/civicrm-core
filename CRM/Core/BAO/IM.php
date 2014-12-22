@@ -39,7 +39,7 @@
 class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
 
   /**
-   * takes an associative array and adds im
+   * Takes an associative array and adds im
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *

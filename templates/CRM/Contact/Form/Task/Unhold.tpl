@@ -27,7 +27,7 @@
 <div class="spacer"></div>
 <div class="messages status no-popup">
     <div class="icon inform-icon"></div>
-          <p>{ts}Are you sure you want to unhold email of selected contact(s)?.{/ts} {ts}This operation cannot be undone.{/ts}</p>
+          <p>{ts}Are you sure you want to unhold email of selected contact(s)?.{/ts} {ts}This action cannot be undone.{/ts}</p>
       <p>{include file="CRM/Contact/Form/Task.tpl"}</p>
     </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>

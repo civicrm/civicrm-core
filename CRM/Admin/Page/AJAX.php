@@ -62,14 +62,14 @@ class CRM_Admin_Page_AJAX {
   }
 
   /**
-   * Function to process drag/move action for menu tree
+   * Process drag/move action for menu tree
    */
   static function menuTree() {
     CRM_Core_BAO_Navigation::processNavigation($_GET);
   }
 
   /**
-   * Function to build status message while
+   * Build status message while
    * enabling/ disabling various objects
    */
   static function getStatusMsg() {

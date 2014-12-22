@@ -87,7 +87,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   ///////////////// civicrm_note_get methods
 
   /**
-   * check retrieve note with empty parameter array
+   * Check retrieve note with empty parameter array
    * Error expected
    */
   function testGetWithEmptyParams() {
@@ -95,7 +95,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   }
 
   /**
-   * check retrieve note with missing patrameters
+   * Check retrieve note with missing patrameters
    * Error expected
    */
   function testGetWithoutEntityId() {
@@ -106,7 +106,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   }
 
   /**
-   * check civicrm_note_get
+   * Check civicrm_note_get
    */
   function testGet() {
     $entityId = $this->_noteID;

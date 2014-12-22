@@ -57,8 +57,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $texts = array(
       "Title - New Membership $hash",
       "This is introductory message for $pageTitle",
-      '$ 50.00 Student',
-      "$ $rand.00 Label $hash",
+      'Student - $ 50.00',
+      "Label $hash - $ $rand.00",
       "Pay later label $hash",
       'Organization Details',
       'Other Amount',
@@ -68,6 +68,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     );
     foreach ($texts as $text) {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+      $this->waitForAjaxContent();
     }
 
     // Disable and re-enable Other Amounts (verify fix for CRM-15021)
@@ -125,8 +126,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $texts = array(
       "Title - New Membership $hash",
       "This is introductory message for $pageTitle",
-      '$ 50.00 Student',
-      "$ $rand.00 Label $hash",
+      'Student - $ 50.00',
+      "Label $hash - $ $rand.00",
       "Pay later label $hash",
       'Organization Details',
       'Other Amount',
@@ -136,11 +137,12 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     );
     foreach ($texts as $text) {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+      $this->waitForAjaxContent();
     }
   }
 
   /**
-   * check CRM-7943
+   * Check CRM-7943
    */
   function testContributionPageSeparatePayment() {
     // open browser, login
@@ -171,7 +173,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $texts = array(
       "Title - New Membership $hash",
       "This is introductory message for $pageTitle",
-      "$ $rand.00 Label $hash",
+      "Label $hash - $ $rand.00",
       "Pay later label $hash",
       'Organization Details',
       'Other Amount',
@@ -181,11 +183,12 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     );
     foreach ($texts as $text) {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+      $this->waitForAjaxContent();
     }
   }
 
   /**
-   * check CRM-7949
+   * Check CRM-7949
    */
   function testContributionPageSeparatePaymentPayLater() {
     // open browser, login
@@ -234,7 +237,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
-    $this->type('sort_name', "$firstName $lastName");
+    $this->type('sort_name', "$lastName $firstName");
     $this->select('financial_type_id',"label=Member Dues");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
@@ -267,7 +270,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     //Find Member
     $this->openCiviPage("member/search", "reset=1", 'member_source');
-    $this->type('sort_name', "$firstName $lastName");
+    $this->type('sort_name', "$lastName $firstName");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", FALSE);
     $this->clickLink("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_MembershipView_cancel-bottom', FALSE);
 

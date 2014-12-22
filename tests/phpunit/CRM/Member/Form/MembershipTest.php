@@ -81,7 +81,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         'civicrm_acl_contact_cache',
         'civicrm_relationship_type',
         'civicrm_saved_search',
-        'civicrm_contact_type',
         'civicrm_mailing_component',
         'civicrm_mailing_bounce_type',
         'civicrm_mailing_bounce_pattern',

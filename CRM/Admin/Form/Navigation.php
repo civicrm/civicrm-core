@@ -50,7 +50,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   protected $_defaults = array();
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -112,7 +112,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
       $homeMenuId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Home', 'id', 'name');
       unset($parentMenu[$homeMenuId]);
 
-      $parent = $this->add('select', 'parent_id', ts('Parent'), array('' => ts('-- select --')) + $parentMenu);
+      $parent = $this->add('select', 'parent_id', ts('Parent'), array('' => ts('- select -')) + $parentMenu);
     }
   }
 
@@ -143,7 +143,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

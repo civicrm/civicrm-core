@@ -61,9 +61,6 @@ class CRM_Exception extends PEAR_Exception {
    * @param string exception message
    * @param int $code
    * @param Exception $previous
-   *
-   * @internal param array|\Exception|int|null|\PEAR_Error $exception cause
-   * @internal param int|null $exception code or null
    */
   public function __construct($message = NULL, $code = 0, Exception$previous = NULL) {
     parent::__construct($message, $code, $previous);
@@ -76,7 +73,7 @@ class CRM_Exception extends PEAR_Exception {
 class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
-   * status code of various types of errors
+   * Status code of various types of errors
    * @var const
    */
   CONST FATAL_ERROR = 2;
@@ -106,7 +103,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static $modeException = NULL;
 
   /**
-   * singleton function used to manage this object.
+   * Singleton function used to manage this object.
    *
    * @param null $package
    * @param bool $msgCallback
@@ -125,7 +122,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * constructor
+   * Constructor
    */
   function __construct() {
     parent::__construct('CiviCRM');
@@ -171,7 +168,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * create the main callback method. this method centralizes error processing.
+   * Create the main callback method. this method centralizes error processing.
    *
    * the errors we expect are from the pear modules DB, DB_DataObject
    * which currently use PEAR::raiseError to notify of error messages.
@@ -301,20 +298,17 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * display an error page with an error message describing what happened
+   * Display an error page with an error message describing what happened
    *
-   * @param null $message
-   * @param null $code
-   * @param null $email
+   * @param string $message the error message
+   * @param string $code the error code if any
+   * @param string $email the email address to notify of this situation
    *
    * @throws Exception
-   * @internal param \message $string the error message
-   * @internal param \code $string the error code if any
-   * @internal param \email $string the email address to notify of this situation
    *
    * @return void
    * @static
-   * @acess public
+   * @access public
    */
   static function fatal($message = NULL, $code = NULL, $email = NULL) {
     $vars = array(
@@ -361,6 +355,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
     }
 
+    if ($config->backtrace) {
+      self::backtrace();
+    }
+
+    CRM_Core_Error::debug_var('Fatal Error Details', $vars);
+    CRM_Core_Error::backtrace('backTrace', TRUE);
+
     // If we are in an ajax callback, format output appropriately
     if (CRM_Utils_Array::value('snippet', $_REQUEST) === CRM_Core_Smarty::PRINT_JSON) {
       $out = array(
@@ -376,22 +377,16 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       CRM_Core_Page_AJAX::returnJsonResponse($out);
     }
 
-    if ($config->backtrace) {
-      self::backtrace();
-    }
-
     $template = CRM_Core_Smarty::singleton();
     $template->assign($vars);
 
-    CRM_Core_Error::debug_var('Fatal Error Details', $vars);
-    CRM_Core_Error::backtrace('backTrace', TRUE);
     $config->userSystem->outputError($template->fetch($config->fatalErrorTemplate));
 
     self::abend(CRM_Core_Error::FATAL_ERROR);
   }
 
   /**
-   * display an error page with an error message describing what happened
+   * Display an error page with an error message describing what happened
    *
    * This function is evil -- it largely replicates fatal(). Hopefully the
    * entire CRM_Core_Error system can be hollowed out and replaced with
@@ -401,7 +396,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @return void
    * @static
-   * @acess public
+   * @access public
    */
   static function handleUnhandledException($exception) {
     $config = CRM_Core_Config::singleton();
@@ -464,7 +459,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * outputs pre-formatted debug information. Flushes the buffers
+   * Outputs pre-formatted debug information. Flushes the buffers
    * so we can interrupt a potential POST/redirect
    *
    * @param  string name of debug section
@@ -516,15 +511,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Similar to the function debug. Only difference is
    * in the formatting of the output.
    *
-   * @param $variable_name
-   * @param $variable
-   * @param bool $print
-   * @param bool $log
+   * @param string $variable_name
+   * @param mixed $variable
+   * @param bool $print should we use print_r ? (else we use var_dump)
+   * @param bool $log should we log or return the output
    * @param string $comp variable name
-   *
-   * @internal param \reference $mixed to variables that we need a trace of
-   * @internal param \should $bool we use print_r ? (else we use var_dump)
-   * @internal param \should $bool we log or return the output
    *
    * @return string the generated output
    *
@@ -567,7 +558,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * display the error message on terminal
+   * Display the error message on terminal
    *
    * @param $message
    * @param bool $out should we log or return the output
@@ -611,6 +602,20 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         CRM_Core_Error::debug_var( 'Query', $string, false, true );
       }
     }
+  }
+
+  /**
+   * Execute a query and log the results.
+   *
+   * @param string $query
+   */
+  static function debug_query_result($query) {
+    $dao = CRM_Core_DAO::executeQuery($query);
+    $results = array();
+    while ($dao->fetch()) {
+      $results[] = (array)$dao;
+    }
+    CRM_Core_Error::debug_var('dao result', array('query' => $query, 'results' => $results));
   }
 
   /**
@@ -808,7 +813,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param $message
    * @param int $code
    * @param string $level
-   * @param null $params
+   * @param array $params
    *
    * @return object
    */
@@ -845,7 +850,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Function to reset the error stack
+   * Reset the error stack
    *
    * @access public
    * @static

@@ -36,7 +36,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
   }
 
   /*
-   * Function to test individual pane seperatly.
+   * test individual pane seperatly.
    */
   function testAdvancedSearch() {
     $this->webtestLogin();
@@ -158,7 +158,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
    */
   function _checkOpenedPanes($openedPanes = array(
     )) {
-    if (!$this->isTextPresent('No matches found')) {
+    if (!$this->isTextPresent('None found.')) {
       $this->click('css=div.crm-advanced_search_form-accordion div.crm-accordion-header');
     }
 

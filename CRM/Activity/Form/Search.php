@@ -42,7 +42,7 @@
 class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * the params that are sent to the query
+   * The params that are sent to the query
    *
    * @var array
    * @access protected
@@ -50,7 +50,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   protected $_queryParams;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -58,7 +58,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -66,7 +66,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   protected $_limit = NULL;
 
   /**
-   * prefix for the controller
+   * Prefix for the controller
    *
    */
   protected $_prefix = "activity_";
@@ -74,7 +74,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   protected $_defaults;
 
   /**
-   * the saved search ID retrieved from the GET vars
+   * The saved search ID retrieved from the GET vars
    *
    * @var int
    * @access protected
@@ -82,7 +82,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   protected $_ssID;
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later
    *
    * @return void
    * @access public
@@ -90,19 +90,15 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   function preProcess() {
     $this->set('searchFormName', 'Search');
 
-    /**
-     * set the button names
-     */
+    // set the button names
     $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
     $this->defaults = array();
 
-    /*
-     * we allow the controller to set force/reset externally, useful when we are being
-     * driven by the wizard framework
-     */
+    // we allow the controller to set force/reset externally, useful when we are being
+    // driven by the wizard framework
     $this->_reset   = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
     $this->_force   = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit   = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
@@ -168,7 +164,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *

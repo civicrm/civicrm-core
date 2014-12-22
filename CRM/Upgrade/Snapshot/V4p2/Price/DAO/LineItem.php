@@ -146,7 +146,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO
     public $price_field_value_id;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @access public
    * @return \CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem

@@ -78,7 +78,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   ///////////////// civicrm_custom_group_create methods
 
   /**
-   * check with empty array
+   * Check with empty array
    * note that these tests are of marginal value so should not be included in copy & paste
    * code. The SyntaxConformance is capable of testing this for all entities on create
    * & delete (& it would be easy to add if not there)
@@ -90,7 +90,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testCustomGroupCreateNoExtends() {
     $params = array(
@@ -111,7 +111,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with empty array
+   * Check with empty array
    */
   function testCustomGroupCreateInvalidExtends() {
     $params = array(
@@ -132,7 +132,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with a string instead of array for extends
+   * Check with a string instead of array for extends
    */
   function testCustomGroupCreateExtendsString() {
     $params = array(
@@ -152,7 +152,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with valid array
+   * Check with valid array
    */
   function testCustomGroupCreate() {
     $params = array(
@@ -173,7 +173,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with valid array
+   * Check with valid array
    */
   function testCustomGroupGetFields() {
     $params = array(
@@ -190,7 +190,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with extends array length greater than 1
+   * Check with extends array length greater than 1
    */
   function testCustomGroupExtendsMultipleCreate() {
     $params = array(
@@ -210,7 +210,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with style missing from params array
+   * Check with style missing from params array
    */
   function testCustomGroupCreateNoStyle() {
     $params = array(
@@ -230,7 +230,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with not array
+   * Check with not array
    */
   function testCustomGroupCreateNotArray() {
     $params = NULL;
@@ -239,7 +239,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check without title
+   * Check without title
    */
   function testCustomGroupCreateNoTitle() {
     $params = array('extends' => array('Contact'),
@@ -255,7 +255,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check for household without weight
+   * Check for household without weight
    */
   function testCustomGroupCreateHouseholdNoWeight() {
     $params = array(
@@ -276,7 +276,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check for Contribution Donation
+   * Check for Contribution Donation
    */
   function testCustomGroupCreateContributionDonation() {
     $params = array(
@@ -297,7 +297,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with valid array
+   * Check with valid array
    */
   function testCustomGroupCreateGroup() {
     $params = array(
@@ -319,7 +319,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with Activity - Meeting Type
+   * Check with Activity - Meeting Type
    */
   function testCustomGroupCreateActivityMeeting() {
     $params = array(
@@ -341,7 +341,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   ///////////////// civicrm_custom_group_delete methods
 
   /**
-   * check without GroupID
+   * Check without GroupID
    */
   function testCustomGroupDeleteWithoutGroupID() {
     $customGroup = $this->callAPIFailure('custom_group', 'delete', array());
@@ -349,7 +349,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with no array
+   * Check with no array
    */
   function testCustomGroupDeleteNoArray() {
     $params = NULL;
@@ -358,7 +358,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with valid custom group id
+   * Check with valid custom group id
    */
   function testCustomGroupDelete() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group'));
@@ -368,12 +368,10 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('custom_group', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
   }
-  /*
-     * main success get function
-     */
 
-
-
+  /**
+   * Main success get function
+   */
   public function testGetCustomGroupSuccess() {
 
     $this->callAPISuccess($this->_entity, 'create', $this->_params);

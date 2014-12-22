@@ -210,14 +210,11 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->click("css=ul#civicrm-menu li.crm-Reports");
     $this->clickLink("css=ul#civicrm-menu li.crm-Contact_Reports a");
 
-    $this->clickLink("xpath=//div[@id='Contact']/table/tbody/tr/td/a");
+    $this->clickLink("xpath=//div[@id='Contact']/table/tbody/tr/td[1]/a");
 
     $this->assertTextPresent("Constituent Summary");
-    $this->click("//div[contains(text(), 'Report Criteria')]");
-    $this->waitForVisible("//h3[contains(text(), 'Display Columns')]");
-    $this->click("//form[@id='Summary']/div[2]//div[@id='id_default']/div/div/div");
-    $this->waitForVisible("//label[contains(text(), 'Most Important Issue')]");
-    $this->assertTextPresent("Set Filters");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[3]/a");
+    $this->waitForElementPresent("xpath=//div[@id='report-tab-set-filters']");
     $this->assertTextPresent("Contact Name");
     $this->assertTextPresent("Contact Source");
     $this->assertTextPresent("Country");
@@ -291,7 +288,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertElementPresent("post_URL");
     $this->assertTextPresent("Drupal user account registration option?");
     $this->assertTextPresent("What to do upon duplicate match");
-    $this->assertTextPresent("Proximity search");
+    $this->assertTextPresent("Proximity Search");
   }
 
   function testTags() {

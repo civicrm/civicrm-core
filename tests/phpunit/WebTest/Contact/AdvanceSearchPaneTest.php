@@ -36,7 +36,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
   }
 
   /*
-   * Function to test individual pane seperatly.
+   * test individual pane seperatly.
    */
   function testIndividualPanes() {
     $this->webtestLogin();
@@ -62,7 +62,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
   }
 
   /*
-   * Function to test by selecting all panes at a time.
+   * test by selecting all panes at a time.
    */
   function testAllPanes() {
     $this->webtestLogin();
@@ -91,7 +91,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
    */
   function _checkOpenedPanes($openedPanes = array(
     )) {
-    if (!$this->isTextPresent('No matches found')) {
+    if (!$this->isTextPresent('None found.')) {
       $this->click('css=div.crm-advanced_search_form-accordion div.crm-accordion-header');
     }
 

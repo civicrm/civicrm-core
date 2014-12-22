@@ -207,7 +207,10 @@ VALUES
    ('name_badge'                    , '{ts escape="sql"}Name Badge Format{/ts}'                  , 1, 1, 0),
    ('communication_style'           , '{ts escape="sql"}Communication Style{/ts}'                , 1, 1, 0),
    ('msg_mode'                      , '{ts escape="sql"}Message Mode{/ts}'                       , 1, 1, 0),
-   ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , 1, 1, 1);
+   ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , 1, 1, 1),
+   ('mailing_ab_status'             , '{ts escape="sql"}Mailing A/B Status{/ts}'                 , 1, 1, 1),
+   ('mailing_ab_testing_criteria'   , '{ts escape="sql"}Mailing A/B Testing Criteria{/ts}'       , 1, 1, 1),
+   ('mailing_ab_winner_criteria'    , '{ts escape="sql"}Mailing A/B Testing Winner Criteria{/ts}', 1, 1, 1);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -284,6 +287,9 @@ SELECT @option_group_id_name_badge := max(id) from civicrm_option_group where na
 SELECT @option_group_id_communication_style := max(id) from civicrm_option_group where name = 'communication_style';
 SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
 SELECT @option_group_id_contactDateMode := max(id) from civicrm_option_group where name = 'contact_date_reminder_options';
+SELECT @option_group_id_mailingABStatus := max(id) from civicrm_option_group where name = 'mailing_ab_status';
+SELECT @option_group_id_mailingABCriteria := max(id) from civicrm_option_group where name = 'mailing_ab_testing_criteria';
+SELECT @option_group_id_mailingABWinnerCriteria := max(id) from civicrm_option_group where name = 'mailing_ab_winner_criteria';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -314,7 +320,7 @@ VALUES
    (@option_group_id_act, '{ts escape="sql"}Tell a Friend{/ts}',                      9, 'Tell a Friend',       NULL, 1, NULL, 9, '{ts escape="sql"}Send information about a contribution campaign or event to a friend.{/ts}', 0, 1, 1, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}Pledge Acknowledgment{/ts}',              10, 'Pledge Acknowledgment',  NULL, 1, NULL, 10, '{ts escape="sql"}Send Pledge Acknowledgment.{/ts}',                                     0, 1, 1, @pledgeCompId, NULL),
    (@option_group_id_act, '{ts escape="sql"}Pledge Reminder{/ts}',                    11, 'Pledge Reminder',    NULL, 1, NULL, 11, '{ts escape="sql"}Send Pledge Reminder.{/ts}',                                               0, 1, 1, @pledgeCompId, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Inbound Email{/ts}',                      12, 'Inbound Email',      NULL, 1, NULL, 12, '{ts escape="sql"}Inbound Email.{/ts}',                                                      0, 1, 1, NULL, NULL),   
+   (@option_group_id_act, '{ts escape="sql"}Inbound Email{/ts}',                      12, 'Inbound Email',      NULL, 1, NULL, 12, '{ts escape="sql"}Inbound Email.{/ts}',                                                     0, 1, 1, NULL, NULL),
 
 -- Activity Types for case activities
    (@option_group_id_act, '{ts escape="sql"}Open Case{/ts}',          13, 'Open Case',          NULL, 0,  0, 13, '', 0, 1, 1, @caseCompId, NULL),
@@ -365,7 +371,7 @@ VALUES
    (@option_group_id_act, '{ts escape="sql"}Inbound SMS{/ts}',  45, 'Inbound SMS', NULL, 1, NULL,  45, '{ts escape="sql"}Inbound SMS{/ts}', 0, 1, 1, NULL, NULL),
 
 
- -- Activity types for particial payment   
+ -- Activity types for particial payment
    (@option_group_id_act, '{ts escape="sql"}Payment{/ts}', 46, 'Payment', NULL, 1, NULL, 46, '{ts escape="sql"}Additional payment recorded for event or membership fee.{/ts}', 0, 1, 1, @contributeCompId, NULL),
    (@option_group_id_act, '{ts escape="sql"}Refund{/ts}', 47, 'Refund', NULL, 1, NULL, 47, '{ts escape="sql"}Refund recorded for event or membership fee.{/ts}', 0, 1, 1, @contributeCompId, NULL),
 
@@ -593,7 +599,7 @@ VALUES
   (@option_group_id_report , '{ts escape="sql"}Event Income Report (Summary){/ts}',           'event/summary',                  'CRM_Report_Form_Event_Summary',                  NULL, 0, NULL, 19, '{ts escape="sql"}Provides an overview of event income. You can include key information such as event ID, registration, attendance, and income generated to help you determine the success of an event.{/ts}', 0, 0, 1, @eventCompId, NULL),
   (@option_group_id_report , '{ts escape="sql"}Event Income Report (Detail){/ts}',            'event/income',                   'CRM_Report_Form_Event_Income',                   NULL, 0, NULL, 20, '{ts escape="sql"}Helps you to analyze the income generated by an event. The report can include details by participant type, status and payment method.{/ts}', 0, 0, 1, @eventCompId, NULL),
   (@option_group_id_report , '{ts escape="sql"}Pledge Report{/ts}',                           'pledge/detail',                 'CRM_Report_Form_Pledge_Detail',                 NULL, 0, NULL, 21,   '{ts escape="sql"}Pledge Report{/ts}', 0, 0, 1, @pledgeCompId, NULL),
-  (@option_group_id_report , '{ts escape="sql"}Pledged But not Paid Report{/ts}',             'pledge/pbnp',                    'CRM_Report_Form_Pledge_Pbnp',                    NULL, 0, NULL, 22, '{ts escape="sql"}Pledged but not Paid Report{/ts}', 0, 0, 1, @pledgeCompId, NULL),
+  (@option_group_id_report , '{ts escape="sql"}Pledged but not Paid Report{/ts}',             'pledge/pbnp',                    'CRM_Report_Form_Pledge_Pbnp',                    NULL, 0, NULL, 22, '{ts escape="sql"}Pledged but not Paid Report{/ts}', 0, 0, 1, @pledgeCompId, NULL),
   (@option_group_id_report , '{ts escape="sql"}Relationship Report{/ts}',                     'contact/relationship',           'CRM_Report_Form_Contact_Relationship',           NULL, 0, NULL, 23, '{ts escape="sql"}Relationship Report{/ts}', 0, 0, 1, NULL, NULL),
   (@option_group_id_report , '{ts escape="sql"}Case Summary Report{/ts}',                     'case/summary',                   'CRM_Report_Form_Case_Summary',                   NULL, 0, NULL, 24, '{ts escape="sql"}Provides a summary of cases and their duration by date range, status, staff member and / or case role.{/ts}', 0, 0, 1, @caseCompId, NULL),
   (@option_group_id_report , '{ts escape="sql"}Case Time Spent Report{/ts}',                  'case/timespent',                 'CRM_Report_Form_Case_TimeSpent',                 NULL, 0, NULL, 25, '{ts escape="sql"}Aggregates time spent on case and / or non-case activities by activity type and contact.{/ts}', 0, 0, 1, @caseCompId, NULL),
@@ -620,6 +626,7 @@ VALUES
   (@option_group_id_report , '{ts escape="sql"}Contribution Aggregate by Relationship{/ts}',                   'contribute/history',              'CRM_Report_Form_Contribute_History',              NULL, 0, NULL, 46,  '{ts escape="sql"}List contact's donation history, grouped by year, along with contributions attributed to any of the contact's related contacts.{/ts}', 0, 0, 1, @contributeCompId, NULL),
   (@option_group_id_report,  {localize}'{ts escape="sql"}Mail Detail Report{/ts}'{/localize},                                            'mailing/detail',     'CRM_Report_Form_Mailing_Detail',          NULL, 0, NULL, 47,  {localize}'{ts escape="sql"}Provides reporting on Intended and Successful Deliveries, Unsubscribes and Opt-outs, Replies and Forwards.{/ts}'{/localize},   0, 0, 1, @mailCompId, NULL),
   (@option_group_id_report, {localize}'{ts escape="sql"}Contribution and Membership Details{/ts}'{/localize}, 'member/contributionDetail', 'CRM_Report_Form_Member_ContributionDetail', NULL, 0, NULL, 48, {localize}'{ts escape="sql"}Contribution details for any type of contribution, plus associated membership information for contributions which are in payment for memberships.{/ts}'{/localize}, 0, 0, 1, @memberCompId, NULL),
+  (@option_group_id_report, {localize}'{ts escape="sql"}Recurring Contributions Report{/ts}'{/localize}, 'contribute/recur', 'CRM_Report_Form_Contribute_Recur',               NULL, 0, NULL, 49, {localize}'{ts escape="sql"}Provides information about the status of recurring contributions{/ts}'{/localize}, 0, 0, 1, @contributeCompId, NULL),
 
   (@option_group_id_acs, '{ts escape="sql"}Scheduled{/ts}',  1, 'Scheduled',  NULL, 0, 1,    1, NULL, 0, 1, 1, NULL, NULL),
   (@option_group_id_acs, '{ts escape="sql"}Completed{/ts}',  2, 'Completed',  NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL),
@@ -874,9 +881,10 @@ VALUES
    (@option_group_id_conference_slot, '{ts escape="sql"}Morning Sessions{/ts}', 1, 'Morning Sessions', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_conference_slot, '{ts escape="sql"}Evening Sessions{/ts}', 2, 'Evening Sessions', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
 
--- default batch type
+-- default batch types
    (@option_group_id_batch_type, '{ts escape="sql"}Contribution{/ts}', 1, 'Contribution', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_batch_type, '{ts escape="sql"}Membership{/ts}', 2, 'Membership', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_batch_type, '{ts escape="sql"}Pledge Payment{/ts}', 3, 'Pledge Payment', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
 
 -- default batch statuses
    (@option_group_id_batch_status, '{ts escape="sql"}Open{/ts}', 1, 'Open', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
@@ -937,7 +945,22 @@ VALUES
 
 -- Reminder Options for Contact Date Fields
 (@option_group_id_contactDateMode, '{ts escape="sql"}Actual date only{/ts}', '1', 'Actual date only', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_contactDateMode, '{ts escape="sql"}Each anniversary{/ts}', '2', 'Each anniversary', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL);
+(@option_group_id_contactDateMode, '{ts escape="sql"}Each anniversary{/ts}', '2', 'Each anniversary', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL),
+
+-- Mailing A/B Status
+(@option_group_id_mailingABStatus, '{ts escape="sql"}Draft{/ts}', '1', 'Draft', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
+(@option_group_id_mailingABStatus, '{ts escape="sql"}Testing{/ts}', '2', 'Testing', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
+(@option_group_id_mailingABStatus, '{ts escape="sql"}Final{/ts}', '3', 'Final', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
+
+-- Mailing A/B Testing Winner Criteria
+(@option_group_id_mailingABWinnerCriteria, '{ts escape="sql"}Open{/ts}', '1', 'Open', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
+(@option_group_id_mailingABWinnerCriteria, '{ts escape="sql"}Total Unique Clicks{/ts}', '2', 'Total Unique Clicks', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL),
+(@option_group_id_mailingABWinnerCriteria, '{ts escape="sql"}Total Clicks on a particular link{/ts}', '3', 'Total Clicks on a particular link', NULL, NULL, 0, 3, NULL, 0, 1, 1, NULL, NULL),
+
+-- Mailing A/B Testing Criteria
+(@option_group_id_mailingABCriteria, '{ts escape="sql"}Subject Lines {/ts}', '1', 'Subject Lines', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
+(@option_group_id_mailingABCriteria, '{ts escape="sql"}From Names {/ts}', '2', 'From Names', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL),
+(@option_group_id_mailingABCriteria, '{ts escape="sql"}Two different Emails {/ts}', '3', 'Two different Emails ', NULL, NULL, 0, 3, NULL, 0, 1, 1, NULL, NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
@@ -1016,7 +1039,7 @@ VALUES
     ('Grace',     '{ts escape="sql"}Grace{/ts}', 'end_date', null, null,'end_date','month', 1, 1, 0, 3, 0, 1, 0),
     ('Expired',   '{ts escape="sql"}Expired{/ts}', 'end_date', 'month', 1, null, null, null, 0, 0, 4, 0, 1, 0),
     ('Pending',   '{ts escape="sql"}Pending{/ts}', 'join_date', null, null,'join_date',null,null, 0, 0, 5, 0, 1, 1),
-    ('Cancelled', '{ts escape="sql"}Cancelled{/ts}', 'join_date', null, null,'join_date',null,null, 0, 0, 6, 0, 1, 0),
+    ('Cancelled', '{ts escape="sql"}Cancelled{/ts}', 'join_date', null, null,'join_date',null,null, 0, 0, 6, 0, 1, 1),
     ('Deceased',  '{ts escape="sql"}Deceased{/ts}', null, null, null, null, null, null, 0, 1, 7, 0, 1, 1);
 
 

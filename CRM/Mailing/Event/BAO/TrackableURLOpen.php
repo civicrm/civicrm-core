@@ -35,7 +35,7 @@
 class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_TrackableURLOpen {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -108,7 +108,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    * @static
    */
   public static function getTotalCount($mailing_id, $job_id = NULL,
-    $is_distinct = FALSE, $url_id = NULL
+    $is_distinct = FALSE, $url_id = NULL, $toDate = NULL
   ) {
     $dao = new CRM_Core_DAO();
 
@@ -128,6 +128,10 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
                     ON  $job.mailing_id = $mailing.id
                     AND $job.is_test = 0
             WHERE       $mailing.id = " . CRM_Utils_Type::escape($mailing_id, 'Integer');
+
+    if (!empty($toDate)) {
+      $query .= " AND $click.time_stamp <= $toDate";
+    }
 
     if (!empty($job_id)) {
       $query .= " AND $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer');
@@ -156,8 +160,6 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    * Get tracked url count for each mailing for a given set of mailing IDs
    *
    * @param $mailingIDs
-   *
-   * @internal param int $contactID ID of the mailing
    *
    * @return array          trackable url count per mailing ID
    * @access public
@@ -338,4 +340,3 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     return $results;
   }
 }
-

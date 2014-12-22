@@ -1,7 +1,4 @@
 <?php
-
-define('API_V3_EXTENSION_DELIMITER', ',');
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                                |
@@ -27,6 +24,9 @@ define('API_V3_EXTENSION_DELIMITER', ',');
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
+
+define('API_V3_EXTENSION_DELIMITER', ',');
+
 
 /**
  * File for the CiviCRM APIv3 extension functions
@@ -260,7 +260,7 @@ function civicrm_api3_extension_refresh($params) {
 /**
  * Get a list of available extensions
  *
- * @param $params
+ * @param array $params
  *
  * @return array API result
  * @static void

@@ -100,7 +100,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Case opened successfully.");
 
     foreach ($activityTypes as $aType) {
-      $this->assertText("add_activity_type_id", $aType);
+      $this->assertElementPresent("xpath=//div[@class='case-control-panel']/div/p/select", $aType);
     }
 
     $this->click("xpath=//div[contains(text(), 'Roles')]");

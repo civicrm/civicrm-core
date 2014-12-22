@@ -54,7 +54,6 @@ class CRM_Upgrade_Incremental_php_FourThree {
    * @param $rev string, a version number, e.g. '4.3.alpha1', '4.3.beta3', '4.3.0'
    * @param null $currentVer
    *
-   * @internal param string $postUpgradeMessage , alterable
    * @return void|bool
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
@@ -966,7 +965,7 @@ ALTER TABLE civicrm_financial_account
   }
 
   /**
-   * change index and add missing constraints for civicrm_contribution_recur
+   * Change index and add missing constraints for civicrm_contribution_recur
    */
   function addMissingConstraints(CRM_Queue_TaskContext $ctx) {
     $query = "SHOW KEYS FROM `civicrm_contribution_recur` WHERE key_name = 'UI_contrib_payment_instrument_id'";
@@ -1123,7 +1122,7 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
   }
 
   /**
-   * replace contribution_type to financial_type in table
+   * Replace contribution_type to financial_type in table
    * civicrm_saved_search and Structure civicrm_report_instance
    */
   function replaceContributionTypeId(CRM_Queue_TaskContext $ctx, $query, $table) {

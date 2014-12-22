@@ -42,7 +42,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @return void
    * @access public
@@ -92,7 +92,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -280,7 +280,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *
@@ -335,7 +335,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
               continue;
             }
             if ($self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
-              $errors['_qf_default'] .= ts('Missing required field: Provide Particiapnt ID') . '<br />';
+              $errors['_qf_default'] .= ts('Missing required field: Provide Participant ID') . '<br />';
             }
             else {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(

@@ -182,7 +182,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
   /**
    * @param $validateStrings
-   * @param $sid
+   * @param int $sid
    */
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
@@ -498,7 +498,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Function to test to regiter participant for event with
+   * Test to regiter participant for event with
 
    * multiple price fields in price-set
    * CRM-11986
@@ -600,7 +600,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('source', 'Event StandaloneAddTest Webtest');
 
     // Select an event fee
-    $this->waitForElementPresent("xpath=//div[@id='priceset']/div[2]/div[2]");
+    $this->waitForElementPresent("xpath=//div[@id='priceset']/div[2]/div[2]/input");
     $this->type("xpath=//div[@id='priceset']/div[2]/div[2]/input", '5');
     $this->fireEvent("xpath=//div[@id='priceset']/div[2]/div[2]/input", 'blur');
     $this->waitForElementPresent("xpath=//div[@id='priceset']/div[3]/div[2]/div[1]/span/input");
@@ -726,6 +726,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
     //check the delete for price field
     $this->openCiviPage("admin/price/field", "reset=1&action=browse&sid={$sid}");
+    $this->waitForElementPresent("xpath=//table[@id='options']/tbody/tr/td[9]/span[2]");
     $this->click("xpath=//table[@id='options']/tbody/tr/td[9]/span[2]/ul/li[2]/a");
     //assert the message
     $this->waitForText('price_set_used_by',
@@ -746,7 +747,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $expectedLineItems
+   * @param array $expectedLineItems
    */
   function _checkLineItems($expectedLineItems) {
     foreach ($expectedLineItems as $lineKey => $lineValue) {

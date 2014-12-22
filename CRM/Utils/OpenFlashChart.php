@@ -41,7 +41,7 @@ require_once 'packages/OpenFlashChart/php-ofc-library/open-flash-chart.php';
 class CRM_Utils_OpenFlashChart {
 
   /**
-   * colours.
+   * Colours.
    * @var array
    * @static
    */
@@ -509,7 +509,7 @@ class CRM_Utils_OpenFlashChart {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $chart
    *
    * @return array

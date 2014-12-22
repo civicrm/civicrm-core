@@ -43,7 +43,7 @@
 class CRM_ACL_Form_ACL extends CRM_Admin_Form {
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
    * @access public
    *
@@ -113,7 +113,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -138,7 +138,8 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       $operations, TRUE
     );
 
-    $objTypes = array('1' => ts('A group of contacts'),
+    $objTypes = array(
+      '1' => ts('A group of contacts'),
       '2' => ts('A profile'),
       '3' => ts('A set of custom data fields'),
     );
@@ -157,24 +158,29 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
 
 
     $label = ts('Role');
-    $role = array('-1' => ts('- select role -'),
+    $role = array(
+      '-1' => ts('- select role -'),
       '0' => ts('Everyone'),
     ) + CRM_Core_OptionGroup::values('acl_role');
     $this->add('select', 'entity_id', $label, $role, TRUE);
 
-    $group = array('-1' => ts('- select -'),
+    $group = array(
+      '-1' => ts('- select -'),
       '0' => ts('All Groups'),
     ) + CRM_Core_PseudoConstant::group();
 
-    $customGroup = array('-1' => ts('- select -'),
+    $customGroup = array(
+      '-1' => ts('- select -'),
       '0' => ts('All Custom Groups'),
     ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
 
-    $ufGroup = array('-1' => ts('- select -'),
+    $ufGroup = array(
+      '-1' => ts('- select -'),
       '0' => ts('All Profiles'),
     ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
-    $event = array('-1' => ts('- select -'),
+    $event = array(
+      '-1' => ts('- select -'),
       '0' => ts('All Events'),
     ) + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
 
@@ -189,7 +195,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return bool
    */
@@ -262,7 +268,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

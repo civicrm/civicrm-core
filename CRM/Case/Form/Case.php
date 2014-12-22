@@ -62,32 +62,32 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   public $_activityTypeFile = NULL;
 
   /**
-   * logged in contact Id
+   * Logged in contact Id
    */
   public $_currentUserId = NULL;
 
   /**
-   * activity type Id
+   * Activity type Id
    */
   public $_activityTypeId = NULL;
 
   /**
-   * activity type Id
+   * Activity type Id
    */
   public $_activityId = NULL;
 
   /**
-   * action
+   * Action
    */
   public $_action;
 
   /**
-   * case type id
+   * Case type id
    */
   public $_caseTypeId = NULL;
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -114,7 +114,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     //CRM-4418
     if (!CRM_Core_Permission::checkActionPermission('CiviCase', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
@@ -204,7 +204,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -266,7 +266,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
         'maxlength' => '128')), TRUE
     );
 
-    $tags = CRM_Core_BAO_Tag::getTags('civicrm_case');
+    CRM_Core_BAO_Tag::getTags('civicrm_case', $tags, NULL,
+      '&nbsp;&nbsp;', TRUE);
+
     if (!empty($tags)) {
       $this->add('select', 'tag', ts('Select Tags'), $tags, FALSE,
         array('id' => 'tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
@@ -312,12 +314,12 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $values posted values of the form
    *
    * @param $files
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -328,7 +330,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    *

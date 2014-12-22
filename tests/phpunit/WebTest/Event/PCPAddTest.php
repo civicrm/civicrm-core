@@ -116,12 +116,12 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $processorName
+   * @param string $processorName
    * @param $campaignType
-   * @param null $contributionPageId
-   * @param $firstName
-   * @param $lastName
-   * @param $middleName
+   * @param int $contributionPageId
+   * @param string $firstName
+   * @param string $lastName
+   * @param string $middleName
    * @param $email
    */
   function _testAddEventForPCP($processorName, $campaignType, $contributionPageId = NULL, $firstName, $lastName, $middleName, $email) {
@@ -265,10 +265,10 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
   /**
    * @param $eventTitle
-   * @param $pageId
-   * @param $firstName
-   * @param $lastName
-   * @param $middleName
+   * @param int $pageId
+   * @param string $firstName
+   * @param string $lastName
+   * @param string $middleName
    * @param $email
    * @param int $numberRegistrations
    * @param $campaignType
@@ -435,7 +435,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
   /**
    * @param $campaignType
-   * @param $contributionPageId
+   * @param int $contributionPageId
    *
    * @return null
    */
@@ -477,11 +477,11 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $eventName
-   * @param $lastNameDonar
-   * @param $firstNameDonar
-   * @param $firstNameCreator
-   * @param $lastNameCreator
+   * @param string $eventName
+   * @param string $lastNameDonar
+   * @param string $firstNameDonar
+   * @param string $firstNameCreator
+   * @param string $lastNameCreator
    * @param $amount
    */
   function _testParticipantSearchEventName($eventName, $lastNameDonar, $firstNameDonar, $firstNameCreator, $lastNameCreator, $amount) {
@@ -493,8 +493,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Search_refresh");
 
     $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody/tr[1]/td[@class='crm-participant-sort_name']/a[text()='{$sortName}']/../../td[11]/span/a[text()='View']", "xpath=//table[@class='selector row-highlight']/tbody/tr/td[8]/span/a[text()='View']", FALSE);
-    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr/td[8]/span/a[text()='View']");
-    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']", "_qf_ParticipantView_cancel-bottom", false);
 
     $this->webtestVerifyTabularData(
       array(
@@ -508,7 +507,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $firstName
+   * @param string $firstName
    * @param $lastName
    * @param $pcpCreatorFirstName
    * @param $pcpCreatorLastName

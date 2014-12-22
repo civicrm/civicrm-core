@@ -51,7 +51,7 @@ class CRM_Mailing_BAO_Query {
   }
 
   /**
-   * if mailings are involved, add the specific Mailing fields
+   * If mailings are involved, add the specific Mailing fields
    *
    * @param $query
    *
@@ -145,7 +145,7 @@ class CRM_Mailing_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
@@ -375,11 +375,11 @@ class CRM_Mailing_BAO_Query {
   }
 
   /**
-   * add all the elements shared between Mailing search and advnaced search
+   * Add all the elements shared between Mailing search and advnaced search
    *
    * @access public
    *
-   * @param $form CRM_Core_Form
+   * @param CRM_Core_Form $form
    * @return void
    * @static
    */
@@ -427,7 +427,7 @@ class CRM_Mailing_BAO_Query {
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
   static function searchAction(&$row, $id) {}
 
@@ -442,8 +442,8 @@ class CRM_Mailing_BAO_Query {
    *
    * @param $query
    * @param $values
-   * @param $tableName
-   * @param $fieldName
+   * @param string $tableName
+   * @param string $fieldName
    * @param $fieldTitle
    *
    * @param $valueTitles

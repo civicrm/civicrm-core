@@ -164,7 +164,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
   }
 
   /**
-   * build the outcome basing on the CRM_Profile_Page_Dynamic's HTML
+   * Build the outcome basing on the CRM_Profile_Page_Dynamic's HTML
    *
    * @return void
    * @access public

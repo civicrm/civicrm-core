@@ -54,7 +54,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object
    *
    * @param string $mode the mode of operation: live or test
    *

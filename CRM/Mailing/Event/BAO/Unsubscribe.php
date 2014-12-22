@@ -41,7 +41,7 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscribe {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -418,7 +418,7 @@ WHERE  email = %2
    * @static
    */
   public static function getTotalCount($mailing_id, $job_id = NULL,
-    $is_distinct = FALSE, $org_unsubscribe = NULL
+    $is_distinct = FALSE, $org_unsubscribe = NULL, $toDate = NULL
   ) {
     $dao = new CRM_Core_DAO();
 
@@ -441,6 +441,10 @@ WHERE  email = %2
                     ON  $job.mailing_id = $mailing.id
                     AND $job.is_test = 0
             WHERE       $mailing.id = " . CRM_Utils_Type::escape($mailing_id, 'Integer');
+
+    if (!empty($toDate)) {
+      $query .= " AND $unsub.time_stamp <= $toDate";
+    }
 
     if (!empty($job_id)) {
       $query .= " AND $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer');
@@ -559,7 +563,8 @@ WHERE  email = %2
       $results[] = array(
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
-        'org' => $dao->org_unsubscribe ? ts('Yes') : ts('No'),
+        // Next value displays in selector under either Unsubscribe OR Optout column header, so always s/b Yes.
+        'unsubOrOptout' => ts('Yes'),
         'date' => CRM_Utils_Date::customFormat($dao->date),
       );
     }
@@ -567,7 +572,7 @@ WHERE  email = %2
   }
 
   /**
-   * @param $queueID
+   * @param int $queueID
    *
    * @return array
    */
@@ -595,4 +600,3 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
     return array($displayName, $email);
   }
 }
-

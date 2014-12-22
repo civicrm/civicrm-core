@@ -119,8 +119,7 @@ class CRM_Utils_XML {
   /**
    * Convert an XML element to an array
    *
-   * @pararm $obj SimpleXMLElement
-   * @param $obj
+   * @param $obj SimpleXMLElement
    *
    * @return array
    */

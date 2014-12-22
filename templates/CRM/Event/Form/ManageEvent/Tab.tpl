@@ -86,7 +86,7 @@ CRM.$(function($) {
     event.stopPropagation();
     return false;
   });
-  
+
   $('#crm-participant-link').click(function(event) {
     $('#crm-participant-list').toggle();
     $('#crm-event-links-list').hide();
@@ -106,5 +106,4 @@ CRM.$(function($) {
 });
 </script>
 {/literal}
-
-{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl"}
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$id entityTable="civicrm_event"}

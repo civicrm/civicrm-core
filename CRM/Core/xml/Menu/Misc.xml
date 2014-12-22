@@ -56,7 +56,7 @@
   </item>
   <item>
      <path>civicrm/file/delete</path>
-     <title>Delete file</title>
+     <title>Delete File</title>
      <access_arguments>access CiviCRM</access_arguments>
      <page_callback>CRM_Core_BAO_File::deleteAttachment</page_callback>
   </item>
@@ -79,6 +79,11 @@
     <path>civicrm/i18n</path>
     <page_callback>CRM_Core_I18n_Form</page_callback>
     <access_arguments>translate CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/ajax/attachment</path>
+    <page_callback>CRM_Core_Page_AJAX_Attachment::attachFile</page_callback>
+    <access_arguments>access CiviCRM;access AJAX API</access_arguments>
   </item>
   <item>
      <path>civicrm/ajax/doc</path>

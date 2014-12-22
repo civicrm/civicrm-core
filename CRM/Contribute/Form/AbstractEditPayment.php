@@ -46,13 +46,28 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
 
   public $_fields;
 
+  /**
+   * @var array current payment processor including a copy of the object in 'object' key
+   */
   public $_paymentProcessor;
   public $_recurPaymentProcessors;
 
+  /**
+   * Array of processor options in the format id => array($id => $label)
+   * WARNING it appears that the format used to differ to this and there are places in the code that
+   * expect the old format. $this->_paymentProcessors provides the additional data which this
+   * array seems to have provided in the past
+   * @var array
+   */
   public $_processors;
 
   /**
-   * the id of the contribution that we are proceessing
+   * Available payment processors with full details including the key 'object' indexed by their id
+   * @var array
+   */
+  protected $_paymentProcessors = array();
+  /**
+   * The id of the contribution that we are processing
    *
    * @var int
    * @public
@@ -60,7 +75,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_id;
 
   /**
-   * the id of the premium that we are proceessing
+   * The id of the premium that we are proceessing
    *
    * @var int
    * @public
@@ -73,7 +88,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_productDAO = NULL;
 
   /**
-   * the id of the note
+   * The id of the note
    *
    * @var int
    * @public
@@ -81,7 +96,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_noteID;
 
   /**
-   * the id of the contact associated with this contribution
+   * The id of the contact associated with this contribution
    *
    * @var int
    * @public
@@ -89,7 +104,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_contactID;
 
   /**
-   * the id of the pledge payment that we are processing
+   * The id of the pledge payment that we are processing
    *
    * @var int
    * @public
@@ -97,7 +112,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_ppID;
 
   /**
-   * the id of the pledge that we are processing
+   * The id of the pledge that we are processing
    *
    * @var int
    * @public
@@ -105,7 +120,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_pledgeID;
 
   /**
-   * is this contribution associated with an online
+   * Is this contribution associated with an online
    * financial transaction
    *
    * @var boolean
@@ -122,7 +137,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_options;
 
   /**
-   * stores the honor id
+   * Stores the honor id
    *
    * @var int
    * @public
@@ -130,7 +145,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $_honorID = NULL;
 
   /**
-   * Store the contribution Type ID
+   * Store the financial Type ID
    *
    * @var array
    */
@@ -157,11 +172,33 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    */
   public $_lineItems;
 
+  /**
+   * Is this a backoffice form
+   * (this will affect whether paypal express code is displayed)
+   * @var bool
+   */
+  public $isBackOffice = TRUE;
+
   protected $_formType;
+
+  /**
+   * @var mystery variable screaming out for documentation
+   */
   protected $_cdType;
 
   /**
-   * @param $id
+   * Array of fields to display on billingBlock.tpl - this is not fully implemented but basically intent is the panes/fieldsets on this page should
+   * be all in this array in order like
+   *  'credit_card' => array('credit_card_number' ...
+   *  'billing_details' => array('first_name' ...
+   *
+   * such that both the fields and the order can be more easily altered by payment processors & other extensions
+   * @var array
+   */
+  public $billingFieldSets = array();
+
+  /**
+   * @param int $id
    */
   public function showRecordLinkMesssage($id) {
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $id, 'contribution_status_id');
@@ -176,7 +213,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $values
    */
   public function buildValuesAndAssignOnline_Note_Type($id, &$values) {
@@ -225,7 +262,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @todo - this function is a long way, non standard of saying $dao = new CRM_Contribute_DAO_ContributionProduct(); $dao->id = $id; $dao->find();
    */
   public function assignPremiumProduct($id) { //to get Premium id
@@ -246,6 +283,12 @@ WHERE  contribution_id = {$id}
 
   /**
    * This function process contribution related objects.
+   *
+   * @param integer $contributionId
+   * @param integer $statusId
+   * @param integer|null $previousStatusId
+   *
+   * @return null|string
    */
   protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL) {
     $statusMsg = NULL;
@@ -335,54 +378,31 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * @return array (0 => array(int $ppId => string $label), 1 => array(...payproc details...))
+   * @return array of valid processors. The array resembles the DB table but also has 'object' as a key
+   * @throws Exception
    */
-  public function getValidProcessorsAndAssignFutureStartDate() {
-    $validProcessors = array();
-    // restrict to payment_type = 1 (credit card only) and billing mode 1 and 3
-    $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 ) AND payment_type = 1");
+  public function getValidProcessors() {
+    $defaultID = NULL;
+    $capabilities = array('BackOffice');
+    if ($this->_mode == 'live') {
+      $capabilities[] = 'LiveMode';
+    }
+    $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors($capabilities);
+    return $processors;
 
-    foreach ($processors as $ppID => $label) {
-      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
-      // at this stage only Authorize.net has been tested to support future start dates so if it's enabled let the template know
-      // to show receive date
-      $processorsSupportingFutureStartDate = array('AuthNet');
-      if (in_array($paymentProcessor['payment_processor_type'], $processorsSupportingFutureStartDate)) {
-        $this->assign('processorSupportsFutureStartDate', TRUE);
-      }
-      if ($paymentProcessor['payment_processor_type'] == 'PayPal' && !$paymentProcessor['user_name']) {
-        continue;
-      }
-      elseif ($paymentProcessor['payment_processor_type'] == 'Dummy' && $this->_mode == 'live') {
-        continue;
-      }
-      else {
-        $paymentObject = CRM_Core_Payment::singleton($this->_mode, $paymentProcessor, $this);
-        $error = $paymentObject->checkConfig();
-        if (empty($error)) {
-          $validProcessors[$ppID] = $label;
-        }
-        $paymentObject = NULL;
-      }
-    }
-    if (empty($validProcessors)) {
-      CRM_Core_Error::fatal(ts('You will need to configure the %1 settings for your Payment Processor before you can submit credit card transactions.', array(1 => $this->_mode)));
-    }
-    else {
-      return array($validProcessors, $paymentProcessor);
-    }
   }
 
   /**
    * Assign billing type id to bltID
    *
+   * @throws CRM_Core_Exception
    * @return void
    */
   public function assignBillingType() {
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
     $this->_bltID = array_search('Billing', $locationTypes);
     if (!$this->_bltID) {
-      CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));
+      throw new CRM_Core_Exception(ts('Please set a location type of %1', array(1 => 'Billing')));
     }
     $this->set('bltID', $this->_bltID);
     $this->assign('bltID', $this->_bltID);
@@ -394,9 +414,21 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   public function assignProcessors() {
     //ensure that processor has a valid config
     //only valid processors get display to user
-    if ($this->_mode) {
-      list($this->_processors, $paymentProcessor) = $this->getValidProcessorsAndAssignFutureStartDate();
 
+    if ($this->_mode) {
+      $this->assign(CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('supportsFutureRecurStartDate')), TRUE);
+      $this->_paymentProcessors = $this->getValidProcessors();
+      if (!isset($this->_paymentProcessor['id'])) {
+        // if the payment processor isn't set yet (as indicated by the presence of an id,) we'll grab the first one which should be the default
+        $this->_paymentProcessor = reset($this->_paymentProcessors);
+      }
+      if (empty($this->_paymentProcessors)) {
+        throw new CRM_Core_Exception(ts('You will need to configure the %1 settings for your Payment Processor before you can submit a credit card transactions.', array(1 => $this->_mode)));
+      }
+      $this->_processors  = array();
+      foreach ($this->_paymentProcessors as $id => $processor) {
+        $this->_processors[$id] = ts($processor['name']);
+      }
       //get the valid recurring processors.
       $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
       $this->_recurPaymentProcessors = array_intersect_assoc($this->_processors, $recurring);
@@ -406,8 +438,8 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     );
 
     // this required to show billing block
-    $this->assign_by_ref('paymentProcessor', $paymentProcessor);
-    $this->assign('hidePayPalExpress', TRUE);
+    // @todo remove this assignment the billing block is now designed to be always included but will not show fieldsets unless those sets of fields are assigned
+    $this->assign_by_ref('paymentProcessor', $processor);
   }
 
   /**
@@ -432,7 +464,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * @param $financialTypeId
+   * @param int $financialTypeId
    *
    * @return array
    */
@@ -448,8 +480,8 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * @param $financialTypeId
-   * @param $relationTypeId
+   * @param int $financialTypeId
+   * @param int $relationTypeId
    *
    * @return mixed
    */
@@ -567,4 +599,27 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     return $submittedValues;
   }
 
+  /**
+   * Common block for setting up the parts of a form that relate to credit / debit card
+   * @throws Exception
+   */
+  protected function assignPaymentRelatedVariables() {
+    try {
+      if ($this->_contactID) {
+        list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+        $this->assign('displayName', $this->userDisplayName);
+      }
+      if ($this->_mode) {
+        $this->assignProcessors();
+
+        $this->assignBillingType();
+
+        $this->_fields = array();
+        CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
+      }
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Error::fatal($e->getMessage());
+    }
+  }
 }

@@ -41,10 +41,10 @@
 class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   public $_contactId = NULL;
 
-  /*
-     * always show public groups
-     */
-
+  /**
+   * Always show public groups
+   * @var bool
+   */
   public $_onlyPublicGroups = TRUE;
 
   public $_edit = TRUE;
@@ -67,7 +67,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
     if (!$check) {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/dashboard', 'reset=1'));
-      break;
     }
 
     $this->_contactId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -80,7 +79,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     }
     elseif ($this->_contactId != $userID) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::VIEW)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to view this contact'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this contact.'));
       }
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
         $this->_edit = FALSE;
@@ -88,14 +87,13 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     }
   }
 
-  /*
-     * Heart of the viewing process. The runner gets all the meta data for
-     * the contact and calls the appropriate type of page to view.
-     *
-     * @return void
-     * @access public
-     *
-     */
+  /**
+   * Heart of the viewing process. The runner gets all the meta data for
+   * the contact and calls the appropriate type of page to view.
+   *
+   * @return void
+   * @access public
+   */
   function preProcess() {
     if (!$this->_contactId) {
       CRM_Core_Error::fatal(ts('You must be logged in to view this page.'));
@@ -112,7 +110,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   }
 
   /**
-   * Function to build user dashboard
+   * Build user dashboard
    *
    * @return void
    * @access public
@@ -203,7 +201,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   }
 
   /**
-   * perform actions and display for user dashboard
+   * Perform actions and display for user dashboard
    *
    * @return void
    *
@@ -236,6 +234,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
         CRM_Core_Action::VIEW => array(
           'name' => ts('Dashboard'),
           'url' => 'civicrm/user',
+          'class' => 'no-popup',
           'qs' => 'reset=1&id=%%cbid%%',
           'title' => ts('View Relationship'),
         ),

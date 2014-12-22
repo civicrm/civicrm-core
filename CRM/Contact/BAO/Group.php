@@ -35,7 +35,7 @@
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -51,7 +51,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Contact_BAO_Group object
+   * @return CRM_Contact_BAO_Group object
    * @access public
    * @static
    */
@@ -67,7 +67,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Function to delete the group and all the object that connect to
+   * Delete the group and all the object that connect to
    * this group. Incredibly destructive
    *
    * @param int $id group id
@@ -201,12 +201,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Get the list of member for a group id
    *
-   * @param $groupID
+   * @param int $groupID
    * @param bool $useCache
    *
-   * @internal param int $lngGroupId this is group id
-   *
-   * @return array $aMembers this arrray contains the list of members for this group id
+   * @return array $aMembers this array contains the list of members for this group id
    * @access public
    * @static
    */
@@ -226,7 +224,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Returns array of group object(s) matching a set of one or Group properties.
    *
-   * @param null $params
+   * @param array $params Limits the set of groups returned.
    * @param array $returnProperties Which properties should be included in the returned group objects.
    *                                       (member_count should be last element.)
    *
@@ -234,9 +232,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param null $offset
    * @param null $rowCount
    *
-   * @internal param array $param Array of one or more valid property_name=>value pairs.
-   *                                       Limits the set of groups returned.
-   * @return  An array of group objects.
+   * @return array of group objects.
    *
    * @access public
    *
@@ -307,7 +303,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * make sure that the user has permission to access this group
+   * Make sure that the user has permission to access this group
    *
    * @param int $id   the id of the object
    *
@@ -507,7 +503,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * given a saved search compute the clause and the tables
+   * Given a saved search compute the clause and the tables
    * and store it for future use
    */
   function buildClause() {
@@ -556,7 +552,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id        id of the database record
    * @param boolean  $isActive  value we want to set the is_active field
@@ -569,7 +565,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * build the condition to retrieve groups.
+   * Build the condition to retrieve groups.
    *
    * @param string $groupType type of group(Access/Mailing) OR the key of the group
    * @param bool|\boolen $excludeHidden exclude hidden groups.
@@ -608,12 +604,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * get permission relevant clauses
+   * Get permission relevant clauses
    * CRM-12209
-   *
-   * @internal param $existingClauses
-   *
-   * @internal param $clauses
    *
    * @param bool $force
    *
@@ -831,12 +823,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     $query = "
-        SELECT groups.*, createdBy.sort_name as created_by, IF(groups.saved_search_id, COUNT(smart_contacts.id), COUNT(contacts.id)) as `count` {$select}
+        SELECT groups.*, createdBy.sort_name as created_by {$select}
         FROM  civicrm_group groups
-        LEFT JOIN civicrm_group_contact contacts
-          ON contacts.group_id = groups.id AND contacts.status = 'Added'
-        LEFT JOIN civicrm_group_contact_cache smart_contacts
-          ON smart_contacts.group_id = groups.id
         LEFT JOIN civicrm_contact createdBy
           ON createdBy.id = groups.created_id
         {$from}
@@ -861,7 +849,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $links = self::actionLinks();
 
     $allTypes = CRM_Core_OptionGroup::values('group_type');
-    $values = array();
+    $values = $groupsToCount = array();
 
     $visibility = CRM_Core_SelectValues::ufVisibility();
 
@@ -873,7 +861,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       if ($permission) {
         $newLinks = $links;
-        $values[$object->id] = array('class' => array());
+        $values[$object->id] = array(
+          'class' => array(),
+          'count' => '0',
+        );
         CRM_Core_DAO::storeValues($object, $values[$object->id]);
         if ($object->saved_search_id) {
           $values[$object->id]['title'] .= ' (' . ts('Smart Group') . ')';
@@ -917,7 +908,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
         $values[$object->id]['visibility'] = $visibility[$values[$object->id]['visibility']];
 
-        $values[$object->id]['count'] = $object->count;
+        $groupsToCount[$object->saved_search_id ? 'civicrm_group_contact_cache' : 'civicrm_group_contact'][] = $object->id;
 
         if (isset($values[$object->id]['group_type'])) {
           $groupTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -970,6 +961,18 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           $contactUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$object->created_id}");
           $values[$object->id]['created_by'] = "<a href='{$contactUrl}'>{$object->created_by}</a>";
         }
+      }
+    }
+
+    // Get group counts
+    foreach ($groupsToCount as $table => $groups) {
+      $where = "group_id IN (" . implode(',', $groups) . ")";
+      if ($table == 'civicrm_group_contact') {
+        $where .= " AND status = 'Added'";
+      }
+      $dao = CRM_Core_DAO::executeQuery("SELECT group_id, COUNT(id) as `count` FROM $table WHERE $where GROUP BY group_id");
+      while($dao->fetch()) {
+        $values[$dao->group_id]['count'] = $dao->count;
       }
     }
 
@@ -1112,7 +1115,7 @@ WHERE  id IN $groupIdString
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return null|string
    */
@@ -1132,7 +1135,7 @@ WHERE {$whereClause}";
 
   /**
    * Generate permissioned where clause for group search
-   * @param $params
+   * @param array $params
    * @param bool $sortBy
    * @param bool $excludeHidden
    *
@@ -1223,7 +1226,7 @@ WHERE {$whereClause}";
   }
 
   /**
-   * Function to define action links
+   * Define action links
    *
    * @return array $links array of action links
    * @access public
@@ -1265,7 +1268,7 @@ WHERE {$whereClause}";
 
   /**
    * @param $whereClause
-   * @param $whereParams
+   * @param array $whereParams
    *
    * @return string
    */

@@ -35,10 +35,28 @@
 class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
     parent::__construct($title, $modal, NULL, FALSE, TRUE);
+
+    if (!defined('CIVICRM_CIVIMAIL_UI_LEGACY')) {
+      // New:            civicrm/mailing/send?reset=1
+      // Re-use:         civicrm/mailing/send?reset=1&mid=%%mid%%
+      // Continue:       civicrm/mailing/send?reset=1&mid=%%mid%%&continue=true
+      $mid = CRM_Utils_Request::retrieve('mid', 'Positive');
+      $continue = CRM_Utils_Request::retrieve('continue', 'String');
+      if (!$mid) {
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/new'));
+      }
+      if ($mid && $continue) {
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $mid));
+      }
+      if ($mid && !$continue) {
+        CRM_Core_Error::fatal('Not implemented: Re-use mailing');
+        // CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $mid));
+      }
+    }
 
     $mailingID = CRM_Utils_Request::retrieve('mid', 'String', $this, FALSE, NULL);
 

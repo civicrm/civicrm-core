@@ -204,10 +204,19 @@
       this.options.url = this.options.url || document.location.href;
       this._originalUrl = this.options.url;
     },
-    _onFailure: function(data) {
+    _onFailure: function(data, status) {
+      var msg, title = ts('Network Error');
       this.options.block && this.element.unblock();
       this.element.trigger('crmAjaxFail', data);
-      CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
+      switch (status) {
+        case 'Forbidden':
+          title = ts('Access Denied');
+          msg = ts('Ensure you are still logged in and have permission to access this feature.');
+          break;
+        default:
+          msg = ts('Unable to reach the server. Please refresh this page in your browser and try again.');
+      }
+      CRM.alert(msg, title, 'error');
     },
     _onError: function(data) {
       this.element.attr('data-unsaved-changes', 'false').trigger('crmAjaxError', data);
@@ -257,14 +266,14 @@
           return;
         }
         data.url = url;
-        that.element.trigger('crmBeforeLoad', data);
+        that.element.trigger('crmUnload').trigger('crmBeforeLoad', data);
         that._beforeRemovingContent();
         that.element.html(data.content);
         that._handleOrderLinks();
         that.element.trigger('crmLoad', data);
         that.options.crmForm && that.element.trigger('crmFormLoad', data);
-      }).fail(function() {
-        that._onFailure();
+      }).fail(function(data, msg, status) {
+        that._onFailure(data, status);
       });
     },
     // Perform any cleanup needed before removing/replacing content
@@ -280,7 +289,7 @@
       this.options.crmForm && $('form', this.element).ajaxFormUnbind();
     },
     _destroy: function() {
-      this.element.removeClass('crm-ajax-container');
+      this.element.removeClass('crm-ajax-container').trigger('crmUnload');
       this._beforeRemovingContent();
       if (this._originalContent !== null) {
         this.element.empty().append(this._originalContent);
@@ -310,6 +319,18 @@
       // HACK: jQuery UI doesn't support relative height
       if (typeof settings.dialog.height === 'string' && settings.dialog.height.indexOf('%') > 0) {
         settings.dialog.height = parseInt($(window).height() * (parseFloat(settings.dialog.height)/100), 10);
+      }
+      // Increase percent width on small screens
+      if (typeof settings.dialog.width === 'string' && settings.dialog.width.indexOf('%') > 0) {
+        var screenWidth = $(window).width(),
+          percentage = parseInt(settings.dialog.width.replace('%', ''), 10),
+          gap = 100-percentage;
+        if (screenWidth < 701) {
+          settings.dialog.width = '100%';
+        }
+        else if (screenWidth < 1400) {
+          settings.dialog.width = '' + parseInt(percentage+gap-((screenWidth - 700)/7*(gap)/100), 10) + '%';
+        }
       }
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
       $(settings.target)

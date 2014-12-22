@@ -43,7 +43,7 @@ class CRM_Campaign_Task {
   CONST INTERVIEW = 1, RESERVE = 2, RELEASE = 3, PRINT_VOTERS = 4;
 
   /**
-   * the task array
+   * The task array
    *
    * @var array
    * @static
@@ -51,7 +51,7 @@ class CRM_Campaign_Task {
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array
    *
    * @var array
    * @static
@@ -124,7 +124,7 @@ class CRM_Campaign_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level
    * of the user
    *
    * @param int $permission

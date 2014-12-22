@@ -8,7 +8,7 @@ class Event extends PHPUnit_Framework_Testcase {
    * Helper function to create
    * an Event
    *
-   * @param $contactId
+   * @param int $contactId
    *
    * @return mixed $event id of created Event
    */
@@ -36,8 +36,7 @@ class Event extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to delete an Event
    *
-   * @param $eventId
-   * @internal param int $eventID id of the event to delete
+   * @param int $eventId
    * @return boolean true if event deleted, false otherwise
    */
   static function delete($eventId) {

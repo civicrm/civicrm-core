@@ -40,7 +40,7 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   protected $_components;
 
   /**
-   * Function to build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -66,7 +66,7 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields  the input form values
    * @param array $files   the uploaded files if any
@@ -120,7 +120,7 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
 
   /**
    * @param $dsn
-   * @param $fileName
+   * @param string $fileName
    * @param bool $lineMode
    */
   public static function loadCaseSampleData($dsn, $fileName, $lineMode = FALSE) {

@@ -647,8 +647,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $pageId
-   * @param $cid
+   * @param int $pageId
+   * @param int $cid
    * @param $pageTitle
    */
   function _testOrganization($pageId, $cid, $pageTitle) {
@@ -678,8 +678,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $pageId
-   * @param $cid
+   * @param int $pageId
+   * @param int $cid
    * @param $pageTitle
    */
   function _testAnomoyousOganization($pageId, $cid, $pageTitle) {
@@ -753,8 +753,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $pageId
-   * @param $cid
+   * @param int $pageId
+   * @param int $cid
    * @param $pageTitle
    */
   function _testUserWithOneRelationship($pageId, $cid, $pageTitle) {
@@ -999,8 +999,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $pageId
-   * @param $cid
+   * @param int $pageId
+   * @param int $cid
    * @param $pageTitle
    */
   function _testUserWithMoreThanOneRelationship($pageId, $cid, $pageTitle) {
@@ -1475,8 +1475,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $pageId
-   * @param $cid
+   * @param int $pageId
+   * @param int $cid
    * @param $pageTitle
    */
   function _testOrganizationWithImageUpload($pageId, $cid, $pageTitle) {

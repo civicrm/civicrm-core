@@ -42,7 +42,7 @@ require_once 'CRM/Core/I18n.php';
 class CRM_Core_Menu {
 
   /**
-   * the list of menu items
+   * The list of menu items
    *
    * @var array
    * @static
@@ -50,7 +50,7 @@ class CRM_Core_Menu {
   static $_items = NULL;
 
   /**
-   * the list of permissioned menu items
+   * The list of permissioned menu items
    *
    * @var array
    * @static
@@ -103,7 +103,7 @@ class CRM_Core_Menu {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $menu
    *
    * @throws Exception
@@ -322,7 +322,7 @@ class CRM_Core_Menu {
             ',' => '_', '/' => '_',
           )
         ),
-        'url' => CRM_Utils_System::url($path, $query, 
+        'url' => CRM_Utils_System::url($path, $query,
             FALSE, // absolute
             NULL, // fragment
             TRUE, // htmlize
@@ -723,7 +723,6 @@ UNION (
     $args = array();
 
     $elements = explode(',', $pathArgs);
-    //CRM_Core_Error::debug( 'e', $elements );
     foreach ($elements as $keyVal) {
       list($key, $val) = explode('=', $keyVal, 2);
       $arr[$key] = $val;

@@ -58,7 +58,7 @@ class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_For
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   function buildForm(&$form) {
 
@@ -207,8 +207,8 @@ WHERE  $where
 
 
   /*
-     * Functions below generally don't need to be modified
-     */
+   * Functions below generally don't need to be modified
+   */
   /**
    * @return mixed
    */

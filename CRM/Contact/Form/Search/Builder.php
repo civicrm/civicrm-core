@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
   /**
-   * number of columns in where
+   * Number of columns in where
    *
    * @var int
    * @access public
@@ -47,7 +47,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   public $_columnCount;
 
   /**
-   * number of blocks to be shown
+   * Number of blocks to be shown
    *
    * @var int
    * @access public
@@ -55,7 +55,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   public $_blockCount;
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public
@@ -105,7 +105,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     }
     // Add javascript
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Search/Builder.js')
+      ->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Search/Builder.js', 1, 'html-header')
       ->addSetting(array(
         'searchBuilder' => array(
           // Index of newly added/expanded block (1-based index)
@@ -137,13 +137,11 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param $values
    * @param $files
    * @param $self
-   *
-   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -182,7 +180,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             foreach ($grpId as $val) {
               $error = CRM_Utils_Type::validate($val, 'Integer', FALSE);
               if ($error != $val) {
-                $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter valid value.");
+                $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a valid value.");
                 break;
               }
             }
@@ -443,7 +441,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       'member_is_pay_later' => 'yesno',
       'is_override' => 'yesno',
     );
-    $entities = array('contact', 'address', 'activity', 'participant', 'pledge', 'member', 'contribution');
+    $entities = array('contact', 'address', 'activity', 'participant', 'pledge', 'member', 'contribution', 'case', 'grant');
     CRM_Contact_BAO_Query_Hook::singleton()->alterSearchBuilderOptions($entities, $options);
     foreach ($entities as $entity) {
       $fields = civicrm_api3($entity, 'getfields');

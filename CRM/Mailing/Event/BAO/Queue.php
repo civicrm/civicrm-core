@@ -35,7 +35,7 @@
 class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -53,7 +53,9 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   public static function create($params) {
     $eq = new CRM_Mailing_Event_BAO_Queue();
     $eq->copyValues($params);
-    $eq->hash = self::hash($params);
+    if (empty($params['id']) && empty($params['hash'])) {
+      $eq->hash = self::hash($params);
+    }
     $eq->save();
     return $eq;
   }
@@ -69,7 +71,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    */
   public static function hash($params) {
     $jobId     = $params['job_id'];
-    $emailId   = $params['email_id'];
+    $emailId   = CRM_Utils_Array::value('email_id', $params, '');
     $contactId = $params['contact_id'];
 
     return substr(sha1("{$jobId}:{$emailId}:{$contactId}:" . time()),
@@ -270,7 +272,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * @param $queueID
+   * @param int $queueID
    *
    * @return array
    */
@@ -299,7 +301,7 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param null $now
    */
   static function bulkCreate($params, $now = NULL) {

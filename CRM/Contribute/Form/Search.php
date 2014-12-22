@@ -43,7 +43,7 @@
 class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * the params that are sent to the query
+   * The params that are sent to the query
    *
    * @var array
    * @access protected
@@ -51,7 +51,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   protected $_queryParams;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -59,7 +59,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
    * @access protected
    * @var boolean
@@ -69,13 +69,13 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   protected $_defaults;
 
   /**
-   * prefix for the controller
+   * Prefix for the controller
    *
    */
   protected $_prefix = "contribute_";
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later
    *
    * @return void
    * @access public
@@ -174,7 +174,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -261,7 +261,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $this->fixFormValues();
 
     // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['contribution_test']) && $this->_force) {
+    if (empty($this->_formValues['contribution_test']) && $this->_force && !empty($this->_context) && $this->_context == 'dashboard') {
       $this->_formValues["contribution_test"] = 0;
     }
 

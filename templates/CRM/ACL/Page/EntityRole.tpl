@@ -47,7 +47,7 @@
         <thead>
         <tr class="columnheader">
             <th id="sortable">{ts}ACL Role{/ts}</th>
-            <th>{ts}Assigned To{/ts}</th>
+            <th>{ts}Assigned to{/ts}</th>
             <th>{ts}Enabled?{/ts}</th>
             <th></th>
         </tr>

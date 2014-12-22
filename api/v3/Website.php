@@ -44,7 +44,7 @@
  * @example WebsiteCreate.php
  * {@example WebsiteCreate.php}
  *
- * @param $params
+ * @param array $params
  *
  * @return array of newly created website property values.
  * @access public

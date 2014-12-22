@@ -118,7 +118,7 @@ WHERE  id = $id
 
   /**
    * @param $tree
-   * @param $id
+   * @param int $id
    *
    * @return bool
    */
@@ -141,7 +141,7 @@ WHERE  id = $id
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $groups
    *
    * @return array
@@ -168,7 +168,7 @@ WHERE  id = $id
   /**
    * @param $potential
    * @param $tree
-   * @param $id
+   * @param int $id
    * @param $token
    */
   static function invalidate(&$potential, &$tree, $id, $token) {
@@ -188,7 +188,7 @@ WHERE  id = $id
   /**
    * @param $all
    * @param $tree
-   * @param $id
+   * @param int $id
    * @param $token
    */
   static function getAll(&$all, &$tree, $id, $token) {

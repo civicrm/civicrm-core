@@ -52,7 +52,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected $_id;
 
   /**
-   * the profile group are are interested in
+   * The profile group are are interested in
    *
    * @var int
    * @access protected
@@ -105,7 +105,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected $_allFields = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    *
    * @param int $id the contact id
    * @param int $gid the group id

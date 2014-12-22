@@ -49,12 +49,12 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   protected $_single = FALSE;
 
   /**
-   * cache shared address message so we don't query twice
+   * Cache shared address message so we don't query twice
    */
   protected $_sharedAddressMessage = NULL;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form
    *
    * @return void
    * @access public
@@ -141,7 +141,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -174,7 +174,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields  the input form values
    * @param array $files   the uploaded files if any
@@ -194,7 +194,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -287,6 +287,5 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       $session->replaceUserContext(CRM_Utils_System::url($urlString, $urlParams));
     }
   }
-  //end of function
 }
 

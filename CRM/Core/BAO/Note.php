@@ -39,13 +39,13 @@
 class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
 
   /**
-   * const the max number of notes we display at any given time
+   * Const the max number of notes we display at any given time
    * @var int
    */
   CONST MAX_NOTES = 3;
 
   /**
-   * given a note id, retrieve the note text
+   * Given a note id, retrieve the note text
    *
    * @param int  $id   id of the note to retrieve
    *
@@ -59,7 +59,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * given a note id, retrieve the note subject
+   * Given a note id, retrieve the note subject
    *
    * @param int  $id   id of the note to retrieve
    *
@@ -73,7 +73,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * given a note id, decide if the note should be displayed based on privacy setting
+   * Given a note id, decide if the note should be displayed based on privacy setting
    *
    * @param object  $note Either the id of the note to retrieve, or the CRM_Core_DAO_Note object itself
    *
@@ -125,7 +125,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * takes an associative array and creates a note object
+   * Takes an associative array and creates a note object
    *
    * the function extract all the params it needs to initialize the create a
    * note object. the params array could contain additional unused name/value
@@ -241,7 +241,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param array $values output values of the object
    * @param int $numNotes the maximum number of notes to return (0 if all)
    *
-   * @internal param array $ids the array that holds all the db ids
    * @return object $notes  Object of CRM_Core_BAO_Note
    * @access public
    * @static
@@ -280,7 +279,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * Function to delete the notes
+   * Delete the notes
    *
    * @param int $id note id
    * @param boolean $showStatus do we need to set status or not
@@ -329,7 +328,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * delete all records for this contact id
+   * Delete all records for this contact id
    *
    * @param int  $id ID of the contact for which note needs to be deleted.
    *
@@ -352,7 +351,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * retrieve all records for this entity-id
+   * Retrieve all records for this entity-id
    *
    * @param int $id ID of the relationship for which records needs to be retrieved.
    *
@@ -386,11 +385,9 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * Function to get log record count for a Contact
+   * Get log record count for a Contact
    *
-   * @param $contactID
-   *
-   * @internal param int $contactId Contact ID
+   * @param int $contactID
    *
    * @return int $count count of log records
    *
@@ -412,7 +409,7 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * Function to get all descendent notes of the note with given ID
+   * Get all descendent notes of the note with given ID
    *
    * @param int $parentId ID of the note to start from
    * @param int $maxDepth Maximum number of levels to descend into the tree; if not given, will include all descendents.
@@ -517,15 +514,14 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * given a note id, get a list of the ids of all notes that are descendents of that note
+   * Given a note id, get a list of the ids of all notes that are descendents of that note
    *
    * @param int $parentId Id of the given note
    * @param array $ids (reference) one-dimensional array to store found descendent ids
    *
    * @return array $ids One-dimensional array containing ids of all desendent notes
    */
-  public static function getDescendentIds($parentId, &$ids = array(
-    )) {
+  public static function getDescendentIds($parentId, &$ids = array()) {
     // get direct children of given parentId note
     $note               = new CRM_Core_DAO_Note();
     $note->entity_table = 'civicrm_note';
@@ -540,11 +536,9 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * function to delete all note related to contact when contact is deleted
+   * Delete all note related to contact when contact is deleted
    *
    * @param int $contactID contact id whose notes to be deleted
-   *
-   * @internal param array $deleteNoteID to store all deleted note ids
    *
    * @return void
    * @static

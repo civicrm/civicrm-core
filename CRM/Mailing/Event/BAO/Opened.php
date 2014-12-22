@@ -35,7 +35,7 @@
 class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
@@ -81,7 +81,8 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    */
   public static function getTotalCount($mailing_id,
     $job_id = NULL,
-    $is_distinct = FALSE
+    $is_distinct = FALSE,
+    $toDate = NULL
   ) {
     $dao = new CRM_Core_DAO();
 
@@ -101,6 +102,10 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
                     ON  $job.mailing_id = $mailing.id
                     AND $job.is_test = 0
             WHERE       $mailing.id = " . CRM_Utils_Type::escape($mailing_id, 'Integer');
+
+    if (!empty($toDate)) {
+      $query .= " AND $open.time_stamp <= $toDate";
+    }
 
     if (!empty($job_id)) {
       $query .= " AND $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer');
@@ -125,8 +130,6 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * Get opened count for each mailing for a given set of mailing IDs
    *
    * @param $mailingIDs
-   *
-   * @internal param int $contactID ID of the mailing
    *
    * @return array          Opened count per mailing ID
    * @access public
@@ -212,7 +215,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * @param int $rowCount Number of rows
    * @param array $sort sort array
    *
-   * @param null $contact_id
+   * @param int $contact_id
    *
    * @return array                Result set
    * @access public
@@ -221,7 +224,6 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
   public static function &getRows($mailing_id, $job_id = NULL,
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $contact_id= NULL
   ) {
-
     $dao = new CRM_Core_Dao();
 
     $open    = self::getTableName();
@@ -279,7 +281,6 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
       //Added "||$rowCount" to avoid displaying all records on first page
       $query .= ' LIMIT ' . CRM_Utils_Type::escape($offset, 'Integer') . ', ' . CRM_Utils_Type::escape($rowCount, 'Integer');
     }
-
     $dao->query($query);
 
     $results = array();
@@ -297,4 +298,3 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     return $results;
   }
 }
-

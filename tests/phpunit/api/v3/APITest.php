@@ -166,7 +166,7 @@ class api_v3_APITest extends CiviUnitTestCase {
   }
 
   /**
-   * test exception is thrown
+   * Test exception is thrown
    */
   function testv3WrapperException(){
     try{

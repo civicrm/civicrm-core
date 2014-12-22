@@ -39,7 +39,7 @@
 class CRM_Price_Form_Set extends CRM_Core_Form {
 
   /**
-   * the set id saved to the session for an update
+   * The set id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -47,7 +47,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   protected $_sid;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @param null
    *
@@ -79,7 +79,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule
    *
    * @param array $fields  the input form values
    * @param array $files   the uploaded files if any
@@ -103,13 +103,13 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     // gives the ascii value
     $asciiValue = ord($title{0});
     if ($asciiValue >= 48 && $asciiValue <= 57) {
-      $errors['title'] = ts("Set's Name should not start with digit");
+      $errors['title'] = ts("Name cannot not start with a digit");
     }
     return empty($errors) ? TRUE : $errors;
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @param null
    *
@@ -231,7 +231,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null

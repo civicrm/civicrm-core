@@ -41,7 +41,7 @@ class CRM_Core_Page_AJAX_Location {
    * FIXME: we should make this method like getLocBlock() OR use the same method and
    * remove this one.
    *
-   * Function to obtain the location of given contact-id.
+   * obtain the location of given contact-id.
    * This method is used by on-behalf-of form to dynamically generate poulate the
    * location field values for selected permissioned contact.
    */
@@ -157,17 +157,16 @@ class CRM_Core_Page_AJAX_Location {
 
       if (!empty($defaults)) {
         foreach ($profileFields as $key => $val) {
-
           if (array_key_exists($key, $defaults)) {
             $htmlType = CRM_Utils_Array::value('html_type', $val);
             if ($htmlType == 'Radio') {
-              $elements["onbehalf[{$key}]"]['type'] = $htmlType;
-              $elements["onbehalf[{$key}]"]['value'] = $defaults[$key];
+              $elements["onbehalf_{$key}"]['type'] = $htmlType;
+              $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
             }
             elseif ($htmlType == 'CheckBox') {
+              $elements["onbehalf_{$key}"]['type'] = $htmlType;
               foreach ($defaults[$key] as $k => $v) {
-                $elements["onbehalf[{$key}][{$k}]"]['type'] = $htmlType;
-                $elements["onbehalf[{$key}][{$k}]"]['value'] = $v;
+                $elements["onbehalf_{$key}"]['value'][$k] = $v;
               }
             }
             elseif ($htmlType == 'Multi-Select') {

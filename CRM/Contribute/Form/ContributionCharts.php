@@ -62,7 +62,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   }
 
   /**
-   * Build the form
+   * Build the form object
    *
    * @access public
    *
@@ -99,7 +99,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated
    *
    * @access public
    *
@@ -202,7 +202,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
         elseif ($chartKey == 'by_year') {
           if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] != 1 || $config->fiscalYearStart['d'] != 1)) {
             $startDate = date('Ymd', mktime(0, 0, 0, $config->fiscalYearStart['M'], $config->fiscalYearStart['d'], substr($index,0,4)));
-            $endDate   = date('Ymd', mktime(0, 0, 0, $config->fiscalYearStart['M'], $config->fiscalYearStart['d'], substr($index,0,4)+1));
+            $endDate   = date('Ymd', mktime(0, 0, 0, $config->fiscalYearStart['M'], $config->fiscalYearStart['d'], (substr($index,0,4)) + 1));
           }
           else {
             $startDate = CRM_Utils_Date::format(array('Y' => substr($index,0,4)));

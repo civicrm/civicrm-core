@@ -1,4 +1,4 @@
-{* 
+{*
 Display a table of remotely-available extensions
 
 Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl

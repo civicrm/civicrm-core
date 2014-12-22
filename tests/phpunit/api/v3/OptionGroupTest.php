@@ -137,7 +137,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * success test for updating an existing Option Group
+   * Success test for updating an existing Option Group
    */
   public function testCreateUpdateOptionGroup() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
@@ -147,7 +147,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * success test for deleting an existing Option Group
+   * Success test for deleting an existing Option Group
    */
   public function testDeleteOptionGroup() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);

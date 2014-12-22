@@ -44,7 +44,7 @@
     {/if}
     {if $form.first_name}
       <div class="crm-inline-edit-field">
-        {$form.first_name.label}<br /> 
+        {$form.first_name.label}<br />
         {$form.first_name.html}
       </div>
     {/if}

@@ -83,10 +83,10 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 
     // go for the chicken combo (obviously)
     //      $this->click('CIVICRM_QFID_chicken_Chicken');
-    
+
     $this->waitForElementPresent('send_receipt');
     $this->assertTrue($this->isChecked("send_receipt"), 'Send Confirmation and Receipt checkbox should be checked by default but is not checked.');
-    
+
     // Clicking save.
     $this->clickLink('_qf_Participant_upload-bottom');
 
@@ -402,9 +402,9 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $firstName
-   * @param $lastName
-   * @param $processorId
+   * @param string $firstName
+   * @param string $lastName
+   * @param int $processorId
    */
   function _fillParticipantDetails($processorId) {
     $contact = $this->createDialogContact();

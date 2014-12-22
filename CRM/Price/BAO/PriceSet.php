@@ -39,9 +39,8 @@
  */
 class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
 
-  
   /**
-   * static field for default price set details
+   * Static field for default price set details
    *
    * @var array
    * @static
@@ -49,18 +48,18 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   static $_defaultPriceSet = NULL;
 
   /**
-   * class constructor
+   * Class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
   /**
-   * takes an associative array and creates a price set object
+   * Takes an associative array and creates a price set object
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Price_DAO_PriceSet object
+   * @return CRM_Price_DAO_PriceSet object
    * @access public
    * @static
    */
@@ -77,16 +76,12 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Price_DAO_PriceSet object
+   * @return CRM_Price_DAO_PriceSet object
    * @access public
    * @static
    */
@@ -95,7 +90,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param  int $id id of the database record
    * @param $isActive
@@ -481,7 +476,7 @@ WHERE     ct.id = cp.financial_type_id AND
    *
    * An array containing price set details (including price fields) is returned
    *
-   * @param $setID
+   * @param int $setID
    * @param bool $required
    * @param bool $validOnly
    *
@@ -610,10 +605,10 @@ WHERE  id = %1";
 
   /**
    * @param CRM_Core_Form $form
-   * @param $id
+   * @param int $id
    * @param string $entityTable
    * @param bool $validOnly
-   * @param null $priceSetId
+   * @param int $priceSetId
    *
    * @return bool|false|int|null
    */
@@ -711,7 +706,7 @@ WHERE  id = %1";
 
   /**
    * @param $fields
-   * @param $params
+   * @param array $params
    * @param $lineItem
    * @param string $component
    */
@@ -887,7 +882,7 @@ WHERE  id = %1";
   }
 
   /**
-   * Function to build the price set form.
+   * Build the price set form.
    *
    * @param CRM_Core_Form $form
    *
@@ -896,7 +891,6 @@ WHERE  id = %1";
    */
   static function buildPriceSet(&$form) {
     $priceSetId = $form->get('priceSetId');
-    $userid = $form->getVar('_userID');
     if (!$priceSetId) {
       return;
     }
@@ -953,6 +947,7 @@ WHERE  id = %1";
       ) {
         $options = CRM_Utils_Array::value('options', $field);
         if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component = 'membership') {
+          $userid = $form->getVar('_membershipContactID');
           $checklifetime = self::checkCurrentMembership($options, $userid);
           if ($checklifetime) {
             $form->assign('ispricelifetime', TRUE);
@@ -974,7 +969,7 @@ WHERE  id = %1";
   }
 
   /**
-   * Function to check the current Membership
+   * Check the current Membership
    * having end date null.
    */
   static function checkCurrentMembership(&$options, $userid) {
@@ -1004,9 +999,9 @@ WHERE  id = %1";
   }
 
   /**
-   * Function to set daefult the price set fields.
+   * Set daefult the price set fields.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $defaults
    *
    * @return array $defaults
@@ -1060,7 +1055,7 @@ WHERE  id = %1";
         // past price sets discounts are made inaccessible by this as the discount_id is set to NULL
         // on the participant record
         if (CRM_Price_BAO_PriceSet::removeFrom('civicrm_' . $entityName, $entity->id)) {
-          CRM_Core_BAO_Discount::del($this->_id,'civicrm_' . $entityName);
+          CRM_Core_BAO_Discount::del($entity->id,'civicrm_' . $entityName);
         }
       }
     }
@@ -1152,7 +1147,7 @@ WHERE  id = %1";
     if ($sid && self::eventPriceSetDomainID()) {
       $domain_id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $sid, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domain_id) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
     }
     return TRUE;
@@ -1222,7 +1217,7 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * Function to check if auto renew option should be shown
+   * Check if auto renew option should be shown
    *
    * @param int $priceSetId price set id
    *
@@ -1269,7 +1264,7 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * Function to retrieve auto renew frequency and interval
+   * Retrieve auto renew frequency and interval
    *
    * @param int $priceSetId price set id
    *
@@ -1301,7 +1296,7 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * update the is_quick_config flag in the db
+   * Update the is_quick_config flag in the db
    *
    * @param  int      $id             id of the database record
    * @param  boolean  $isQuickConfig  value we want to set the is_quick_config field
@@ -1358,13 +1353,9 @@ WHERE       ps.id = %1
   /**
    * Copy priceSet when event/contibution page is copied
    *
-   * @params string $baoName  BAO name
-   * @params int $id old event/contribution page id
-   * @params int $newId newly created event/contribution page id
-   *
-   * @param string $baoName
-   * @param integer $id
-   * @param integer $newId
+   * @param string $baoName  BAO name
+   * @param int $id old event/contribution page id
+   * @param int $newId newly created event/contribution page id
    */
   static function copyPriceSet($baoName, $id, $newId) {
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($baoName, $id);

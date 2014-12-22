@@ -49,7 +49,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   }
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @access public
    */
@@ -60,7 +60,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * form snippet. It should add all fields necesarry to get the data
    * uploaded to the temporary table in the DB.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void (operates directly on form argument)
    * @access public
@@ -83,7 +83,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission
    *
    * @access public
    */

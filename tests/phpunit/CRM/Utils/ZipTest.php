@@ -158,7 +158,7 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $expectedBaseDirName
+   * @param string $expectedBaseDirName
    * @param $dirs
    * @param $files
    */

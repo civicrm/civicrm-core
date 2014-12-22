@@ -43,7 +43,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   static $_links = NULL;
 
   /**
-   * casid set if called from case context
+   * Casid set if called from case context
    *
    * @var int
    */

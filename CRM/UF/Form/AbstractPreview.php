@@ -41,7 +41,7 @@
 class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
 
   /**
-   * the fields needed to build this form
+   * The fields needed to build this form
    *
    * @var array
    */
@@ -93,7 +93,7 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @return void
    * @access public

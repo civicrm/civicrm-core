@@ -39,7 +39,7 @@
 class CRM_Price_Form_Option extends CRM_Core_Form {
 
   /**
-   * the price field id saved to the session for an update
+   * The price field id saved to the session for an update
    *
    * @var int
    * @access protected
@@ -47,7 +47,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   protected $_fid;
 
   /**
-   * option value  id, used when editing the Option
+   * Option value  id, used when editing the Option
    *
    * @var int
    * @access protected
@@ -55,7 +55,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   protected $_oid;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built
    *
    * @param null
    *
@@ -73,7 +73,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null
@@ -116,7 +116,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object
    *
    * @param null
    *
@@ -146,6 +146,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       // hidden Option Id for validation use
       $this->add('hidden', 'optionId', $this->_oid);
 
+      // Needed for i18n dialog
+      $this->assign('optionId', $this->_oid);
+
       //hidden field ID for validation use
       $this->add('hidden', 'fieldId', $this->_fid);
 
@@ -170,7 +173,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
           '' => ' ') + $membershipTypes, FALSE,
           array('onClick' => "calculateRowValues( );")
         );
-        $this->add('text', 'membership_num_terms', ts('Number of terms'), $attributes['membership_num_terms']);
+        $this->add('text', 'membership_num_terms', ts('Number of Terms'), $attributes['membership_num_terms']);
       }
       else {
         $allComponents = explode(CRM_Core_DAO::VALUE_SEPARATOR, $extendComponentId);
@@ -178,7 +181,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         if (in_array($eventComponentId, $allComponents)) {
           $this->isEvent = TRUE;
           // count
-          $this->add('text', 'count', ts('Participants Count'));
+          $this->add('text', 'count', ts('Participant Count'));
           $this->addRule('count', ts('Please enter a valid Max Participants.'), 'positiveInteger');
 
           $this->add('text', 'max_value', ts('Max Participants'));
@@ -269,12 +272,12 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form
    *
    * @param array $fields posted values of the form
    *
    * @param $files
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise

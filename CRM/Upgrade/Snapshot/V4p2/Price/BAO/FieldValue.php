@@ -40,13 +40,13 @@
 class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue {
 
   /**
-   * insert/update a new entry in the database.
+   * Insert/update a new entry in the database.
    *
    * @param array $params (reference), array $ids
    *
    * @param $ids
    *
-   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
    * @access public
    * @static
    */
@@ -75,7 +75,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @param $ids
    *
-   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
    * @access public
    * @static
    */
@@ -116,7 +116,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param array $params   (reference ) an assoc array
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
    * @access public
    * @static
    */
@@ -169,7 +169,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db
    *
    * @param int      $id         Id of the database record
    * @param boolean  $is_active  Value we want to set the is_active field
@@ -184,7 +184,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
   }
 
   /**
-   * delete all values of the given field id
+   * Delete all values of the given field id
    *
    * @param  int    $fieldId    Price field id
    *

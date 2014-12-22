@@ -39,7 +39,7 @@
 class CRM_Core_BAO_Preferences {
 
   /**
-   * @param $params
+   * @param array $params
    */
   static function fixAndStoreDirAndURL(&$params) {
     $sql = "
@@ -78,7 +78,7 @@ AND    v.is_active = 1
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param string $type
    */
   static function storeDirectoryOrURLPreferences(&$params, $type = 'directory') {
@@ -111,7 +111,7 @@ AND    v.name = %3
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param bool $setInConfig
    */
   static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
