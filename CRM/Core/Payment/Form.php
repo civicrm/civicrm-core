@@ -320,7 +320,7 @@ class CRM_Core_Payment_Form {
   public function validatePaymentInstrument($values, &$errors, $form) {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($values['payment_processor'],'live');
     $payment = CRM_Core_Payment::singleton('live', $paymentProcessor, $form); 
-    $payment->validatePaymentInstrument($values, &$errors);
+    $payment->validatePaymentInstrument($values, $errors);
   }
 
   /**
