@@ -821,7 +821,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     if (!empty($values['payment_processor_id'])) {
       // make sure that credit card number and cvv are valid
-      CRM_Core_Payment_Form::validateCreditCard($values, $errorMsg);
+      CRM_Core_Payment_Form::validatePaymentInstrument($values, $errorMsg, $self);
     }
 
     if (!empty($values['record_contribution'])) {
