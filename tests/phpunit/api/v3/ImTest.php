@@ -45,6 +45,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     $this->_entity     = 'im';
     $this->_contactID  = $this->organizationCreate();
@@ -54,13 +55,6 @@ class api_v3_ImTest extends CiviUnitTestCase {
       'location_type_id' => 1,
       'provider_id' => 1,
     );
-  }
-
-  function tearDown() {
-    $this->quickCleanup(array(
-      'civicrm_im',
-      'civicrm_contact'
-    ));
   }
 
   public function testCreateIm() {
