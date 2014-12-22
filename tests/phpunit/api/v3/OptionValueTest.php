@@ -35,10 +35,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
-
-  function tearDown() {}
-
 
   public function testGetCount() {
     $result = $this->callAPISuccess('option_value', 'getcount', array());
