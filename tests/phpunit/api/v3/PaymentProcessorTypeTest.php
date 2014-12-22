@@ -49,16 +49,17 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   function setUp() {
 
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_apiversion = 3;
   }
 
-  function tearDown() {
-
-    $tablesToTruncate = array(
-      'civicrm_payment_processor_type',
-    );
-    $this->quickCleanup($tablesToTruncate);
-  }
+//  function tearDown() {
+//
+//    $tablesToTruncate = array(
+//      'civicrm_payment_processor_type',
+//    );
+//    $this->quickCleanup($tablesToTruncate);
+//  }
 
   ///////////////// civicrm_payment_processor_type_add methods
 
