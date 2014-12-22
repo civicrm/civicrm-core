@@ -36,26 +36,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_APITest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
 
-
   protected $_apiversion =3;
-
-  /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   *
-   * @access protected
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  protected function tearDown() {}
 
   function testAPIReplaceVariables() {
     $result = array();
