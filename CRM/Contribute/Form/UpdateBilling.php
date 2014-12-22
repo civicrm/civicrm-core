@@ -230,7 +230,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
     // make sure that credit card number and cvv are valid
-    CRM_Core_Payment_Form::validateCreditCard($fields, $errors);
+    CRM_Core_Payment_Form::validatePaymentInstrument($fields, $errors, $self);
 
     return empty($errors) ? TRUE : $errors;
   }
