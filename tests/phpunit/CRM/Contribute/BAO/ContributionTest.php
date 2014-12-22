@@ -34,16 +34,6 @@ require_once 'CiviTest/Custom.php';
  * Class CRM_Contribute_BAO_ContributionTest
  */
 class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Contribution BAOs',
-      'description' => 'Test all Contribute_BAO_Contribution methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

@@ -36,17 +36,6 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'PaymentProcessor Create',
-      'description' => 'Test all PaymentProcessor Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);

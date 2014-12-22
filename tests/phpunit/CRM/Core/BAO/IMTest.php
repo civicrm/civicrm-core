@@ -6,17 +6,6 @@ require_once 'CiviTest/Contact.php';
  * Class CRM_Core_BAO_IMTest
  */
 class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'IM BAOs',
-      'description' => 'Test all Core_BAO_IM methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
   }

@@ -36,17 +36,6 @@ class api_v3_ProductTest extends CiviUnitTestCase {
 
   protected $_entity = 'Product';
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Product Tests',
-      'description' => 'Test product API',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->useTransaction();

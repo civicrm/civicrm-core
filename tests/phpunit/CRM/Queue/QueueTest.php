@@ -32,16 +32,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Ensure that various queue implementations comply with the interface
  */
 class CRM_Queue_QueueTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'SQL Queue',
-      'description' => 'Test SQL-backed queue items',
-      'group' => 'Queue',
-    );
-  }
 
   /* ----------------------- Queue providers ----------------------- */
 

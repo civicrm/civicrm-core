@@ -49,17 +49,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   protected $_entity;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Relationship Create',
-      'description' => 'Test all Relationship Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->_cId_a = $this->individualCreate();

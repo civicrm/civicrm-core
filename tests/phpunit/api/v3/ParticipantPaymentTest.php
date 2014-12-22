@@ -45,18 +45,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   protected $_participantPaymentID;
   protected $_contributionTypeId;
 
-
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Participant Create',
-      'description' => 'Test all Participant Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);

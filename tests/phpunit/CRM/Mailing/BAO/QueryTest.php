@@ -6,16 +6,6 @@ require_once 'CiviTest/Contact.php';
  *  Include dataProvider for tests
  */
 class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Mailing BAO Query',
-      'description' => 'Test all Mailing_BAO_Query methods.',
-      'group' => 'CiviMail BAO Query Tests',
-    );
-  }
 
   /**
    * @return CRM_Mailing_BAO_QueryTestDataProvider

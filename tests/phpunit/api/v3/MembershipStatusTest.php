@@ -39,17 +39,6 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   protected $_apiversion =3;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'MembershipStatus Calc',
-      'description' => 'Test all MembershipStatus Calc API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->_contactID = $this->individualCreate();

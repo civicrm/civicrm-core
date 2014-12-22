@@ -47,17 +47,6 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     parent::__construct();
   }
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Note Create',
-      'description' => 'Test all Note Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
 
     $this->_apiversion = 3;

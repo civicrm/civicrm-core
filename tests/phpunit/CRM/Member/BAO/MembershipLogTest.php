@@ -34,16 +34,6 @@ require_once 'CiviTest/Membership.php';
  *  @package   CiviCRM
  */
 class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'MembershipLog Test',
-      'description' => 'Test all Membership Log methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

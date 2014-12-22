@@ -54,17 +54,6 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   protected function tearDown() {}
 
   /**
-   *  test info
-   */
-  function get_info() {
-    return array(
-      'name' => 'ParticipantStatus BAOs',
-      'description' => 'Test all Event_BAO_ParticipantStatusType methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  /**
    *  create() and deleteParticipantStatusType() method
    */
   function testCreateAndDelete() {

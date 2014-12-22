@@ -37,18 +37,6 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
   protected $_email;
   protected $_apiversion;
 
-
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Mailer Group',
-      'description' => 'Test all Mailer Group methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->_apiversion = 3;
