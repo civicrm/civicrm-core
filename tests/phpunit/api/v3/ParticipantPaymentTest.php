@@ -59,11 +59,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    $tablesToTruncate = array(
-      'civicrm_contribution',
-      'civicrm_contact',
-    );
-    $this->quickCleanup($tablesToTruncate);
+    $this->useTransaction(TRUE);
     $event = $this->eventCreate(NULL);
     $this->_eventID = $event['id'];
     $this->_contactID = $this->individualCreate();
@@ -77,23 +73,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 
     $this->_contactID3 = $this->individualCreate();
     $this->_participantID4 = $this->participantCreate(array('contactID' => $this->_contactID3, 'eventID' => $this->_eventID));
-  }
-
-  function tearDown() {
-    $this->eventDelete($this->_eventID);
-    $this->quickCleanup(
-      array(
-        'civicrm_contact',
-        'civicrm_contribution',
-        'civicrm_participant',
-        'civicrm_participant_payment',
-        'civicrm_line_item',
-        'civicrm_financial_item',
-        'civicrm_financial_trxn',
-        'civicrm_entity_financial_trxn',
-      ),
-      TRUE
-    );
   }
 
   ///////////////// civicrm_participant_payment_create methods
