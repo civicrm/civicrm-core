@@ -54,16 +54,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  protected function tearDown() {
-    $this->quickCleanup(array('civicrm_system_log'));
+    $this->useTransaction(TRUE);
   }
 
   ///////////////// civicrm_domain_get methods
