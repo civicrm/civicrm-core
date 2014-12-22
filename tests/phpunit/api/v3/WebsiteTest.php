@@ -45,6 +45,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction();
 
     $this->_entity     = 'website';
     $this->_contactID  = $this->organizationCreate();
@@ -53,13 +54,6 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
       'url' => 'website.com',
       'website_type_id' => 1,
     );
-  }
-
-  function tearDown() {
-    $this->quickCleanup(array(
-      'civicrm_website',
-      'civicrm_contact'
-    ));
   }
 
   public function testCreateWebsite() {
