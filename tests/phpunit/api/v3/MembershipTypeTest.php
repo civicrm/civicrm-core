@@ -51,13 +51,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_apiversion = 3;
     $this->_contactID = $this->organizationCreate(NULL);
-  }
-
-  function tearDown() {
-    $tablesToTruncate = array('civicrm_contact');
-    $this->quickCleanup($tablesToTruncate);
   }
 
   function testGetWithoutId() {
