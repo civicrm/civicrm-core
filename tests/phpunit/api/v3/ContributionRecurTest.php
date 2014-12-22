@@ -46,6 +46,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->ids['contact'][0] = $this->individualCreate();
     $this->params = array(
       'contact_id' => $this->ids['contact'][0],
@@ -57,21 +58,6 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'frequency_unit' => 'day',
     );
-  }
-
-  function tearDown() {
-    foreach ($this->ids as $entity => $entities) {
-      foreach ($entities as $id) {
-        $this->callAPISuccess($entity, 'delete', array('id' => $id));
-      }
-    }
-    $tablesToTruncate = array(
-      'civicrm_financial_type',
-      'civicrm_contribution',
-      'civicrm_contribution_recur',
-      'civicrm_membership',
-    );
-    $this->quickCleanup($tablesToTruncate);
   }
 
   public function testCreateContributionRecur() {
