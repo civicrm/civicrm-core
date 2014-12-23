@@ -50,7 +50,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad();
 
     // We should get no results. But check the options are all still set
-    $this->waitForTextPresent('None found.');
+    $this->waitForTextPresent('No matches found for:');
     foreach (array($groupName, 'United States', 'Male') as $i => $label) {
       $this->waitForElementPresent("//span[@id='crm_search_value_1_$i']/select/option[2]");
       $this->assertSelectedLabel("//span[@id='crm_search_value_1_$i']/select", $label);
