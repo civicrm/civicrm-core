@@ -1839,27 +1839,29 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
       CRM_Price_BAO_LineItem::format($id, $params, $values, $submittedLineItems);
       $submittedFieldId[] = CRM_Utils_Array::retrieveValueRecursive($submittedLineItems, 'price_field_id');
     }
-    $insertLines = $submittedLineItems;
+    if (!empty($submittedLineItems)) {
+      $insertLines = $submittedLineItems;
 
-    $submittedFieldValueIds = array_keys($submittedLineItems);
-    $updateLines = array();
-    foreach ($previousLineItems as $id => $previousLineItem) {
-      // check through the submitted items if the previousItem exists,
-      // if found in submitted items, do not use it for new item creations
-      if (in_array($previousLineItem['price_field_value_id'], $submittedFieldValueIds)) {
-        // if submitted line items are existing don't fire INSERT query
-        unset($insertLines[$previousLineItem['price_field_value_id']]);
-        // for updating the line items i.e. use-case - once deselect-option selecting again
-        if ($previousLineItem['line_total'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total']) {
-          $updateLines[$previousLineItem['price_field_value_id']] = $submittedLineItems[$previousLineItem['price_field_value_id']];
-          $updateLines[$previousLineItem['price_field_value_id']]['id'] = $id;
+      $submittedFieldValueIds = array_keys($submittedLineItems);
+      $updateLines = array();
+      foreach ($previousLineItems as $id => $previousLineItem) {
+        // check through the submitted items if the previousItem exists,
+        // if found in submitted items, do not use it for new item creations
+        if (in_array($previousLineItem['price_field_value_id'], $submittedFieldValueIds)) {
+          // if submitted line items are existing don't fire INSERT query
+          unset($insertLines[$previousLineItem['price_field_value_id']]);
+          // for updating the line items i.e. use-case - once deselect-option selecting again
+          if (($previousLineItem['line_total'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total']) ||
+            ($submittedLineItems[$previousLineItem['price_field_value_id']]['line_total'] == 0 && $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'] == 1)) {
+            $updateLines[$previousLineItem['price_field_value_id']] = $submittedLineItems[$previousLineItem['price_field_value_id']];
+            $updateLines[$previousLineItem['price_field_value_id']]['id'] = $id;
+          }
         }
       }
+
+      $submittedFields = implode(', ', $submittedFieldId);
+      $submittedFieldValues = implode(', ', $submittedFieldValueIds);
     }
-
-    $submittedFields = implode(', ', $submittedFieldId);
-    $submittedFieldValues = implode(', ', $submittedFieldValueIds);
-
     if (!empty($submittedFields) && !empty($submittedFieldValues)) {
       $updateLineItem = "UPDATE civicrm_line_item li
 INNER JOIN civicrm_financial_item fi
@@ -1925,7 +1927,16 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
         }
       }
     }
-
+    elseif (empty($submittedFields) && empty($submittedFieldValues)){
+      $updateLineItem = "UPDATE civicrm_line_item li
+        INNER JOIN civicrm_financial_item fi
+        ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
+        SET li.qty = 0,
+        li.line_total = 0.00,
+        li.tax_amount = NULL
+        WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId})";
+      CRM_Core_DAO::executeQuery($updateLineItem);
+    }
     if (!empty($updateLines)) {
       foreach ($updateLines as $valueId => $vals) {
         if (isset($vals['tax_amount'])) {
@@ -1950,11 +1961,13 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     // insert new 'adjusted amount' transaction entry and update contribution entry.
     // ensure entity_financial_trxn table has a linking of it.
     // insert new line items
-    foreach ($insertLines as $valueId => $lineParams) {
-      $lineParams['entity_table'] = 'civicrm_participant';
-      $lineParams['entity_id'] = $participantId;
-      $lineParams['contribution_id'] = $contributionId;
-      $lineObj = CRM_Price_BAO_LineItem::create($lineParams);
+    if (!empty($insertLines)) {
+      foreach ($insertLines as $valueId => $lineParams) {
+        $lineParams['entity_table'] = 'civicrm_participant';
+        $lineParams['entity_id'] = $participantId;
+        $lineParams['contribution_id'] = $contributionId;
+        $lineObj = CRM_Price_BAO_LineItem::create($lineParams);
+      }
     }
 
     // the recordAdjustedAmt code would execute over here
@@ -1980,15 +1993,17 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     $fetchCon = array('id' => $contributionId);
     $updatedContribution = CRM_Contribute_BAO_Contribution::retrieve($fetchCon, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     // insert financial items
-    foreach ($insertLines as $valueId => $lineParams) {
-      $lineParams['entity_table'] = 'civicrm_participant';
-      $lineParams['entity_id'] = $participantId;
-      $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams, CRM_Core_DAO::$_nullArray);
-      // insert financial items
-      // ensure entity_financial_trxn table has a linking of it.
-      $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution);
-      if (isset($lineObj->tax_amount)) {
-        CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE);
+    if (!empty($insertLines)) {
+      foreach ($insertLines as $valueId => $lineParams) {
+        $lineParams['entity_table'] = 'civicrm_participant';
+        $lineParams['entity_id'] = $participantId;
+        $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams, CRM_Core_DAO::$_nullArray);
+        // insert financial items
+        // ensure entity_financial_trxn table has a linking of it.
+        $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution);
+        if (isset($lineObj->tax_amount)) {
+          CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE);
+        }
       }
     }
 

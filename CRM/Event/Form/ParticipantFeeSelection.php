@@ -129,10 +129,17 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->_eventId);
 
     $priceSetValues = CRM_Event_Form_EventFees::setDefaultPriceSet($this->_participantId, $this->_eventId, FALSE);
+    $priceFieldId = (array_keys($this->_values['fee']));
     if (!empty($priceSetValues)) {
       $defaults[$this->_participantId] = array_merge($defaults[$this->_participantId], $priceSetValues);
     }
-
+    else {
+      foreach($priceFieldId as $key => $value) {
+        if (!empty($value) && ($this->_values['fee'][$value]['html_type'] == 'Radio' || $this->_values['fee'][$value]['html_type'] == 'Select') && !$this->_values['fee'][$value]['is_required']) {
+          $defaults[$this->_participantId]['price_'.array_keys($this->_values['fee'])[$key]] = 0;
+        }
+      }
+    }
     $this->assign('totalAmount', CRM_Utils_Array::value('fee_amount', $defaults[$this->_participantId]));
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $fee_level = $defaults[$this->_participantId]['fee_level'];
