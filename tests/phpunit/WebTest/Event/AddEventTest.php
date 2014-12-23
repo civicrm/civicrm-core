@@ -681,7 +681,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->click('css=li#tab_reminder a');
     $this->waitForElementPresent("newScheduleReminder");
     $this->click("newScheduleReminder");
-    $this->waitForElementPresent("_qf_ScheduleReminders_upload-bottom");
+    $this->waitForElementPresent("_qf_ScheduleReminders_next-bottom");
     $this->type("title", "Event Reminder for " . $eventTitle);
     $this->select('entity', 'label=Registered');
 
@@ -701,10 +701,10 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->type("text_message", "This is the test text version here!!!");
     //click on save
-    $this->click('_qf_ScheduleReminders_upload-bottom');
+    $this->click('_qf_ScheduleReminders_next-bottom');
     $this->waitForElementPresent("link=Add Reminder");
 
-    $this->waitForElementPresent("link=Edit");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[7]/span/a[1]");
 
     $verifyText = array(
       1 => 'Event Reminder for ' . $eventTitle,
