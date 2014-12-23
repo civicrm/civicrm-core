@@ -552,7 +552,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
     // make sure that credit card number and cvv are valid
-    CRM_Core_Payment_Form::validatePaymentInstrument($self->_params[0], $errors, $self);
+    CRM_Core_Payment_Form::validateCreditCard($self->_params[0], $errors);
 
     if ($errors) {
       return FALSE;

@@ -313,17 +313,6 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * Validate the payment instrument values before passing it to the payment processor
-   * We want this to be overrideable by the payment processor, and default to using
-   * this object's validCreditCard for credit cards (implemented as the default in the Payment class).
-   */
-  public function validatePaymentInstrument($values, &$errors, $form) {
-    $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($values['payment_processor'],'live');
-    $payment = CRM_Core_Payment::singleton('live', $paymentProcessor, $form);
-    $payment->validatePaymentInstrument($values, $errors);
-  }
-
-  /**
    * The credit card pseudo constant results only the CC label, not the key ID
    * So we normalize the name to use it as a CSS class.
    */
