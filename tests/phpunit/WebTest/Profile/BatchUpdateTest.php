@@ -405,8 +405,8 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Reserve_next_reserveToInterview-top');
     $this->clickLink('_qf_Reserve_next_reserveToInterview-top', '_qf_Interview_cancel_interview');
 
-    $this->isElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='{$Name2}']");
-    $this->isElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='{$Name1}']");
+    $this->isElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[2][text()='{$Name2}']");
+    $this->isElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[2][text()='{$Name1}']");
 
     //edition to be done here
     // selecting first check of profile
