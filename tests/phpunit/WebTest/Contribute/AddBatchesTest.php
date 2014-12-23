@@ -116,17 +116,103 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     $this->_verifyData($data, "Membership");
   }
 
+
+  function testBatchAddPledge() {
+    $this->webtestLogin();
+
+    // create a new pledge for contact
+    $contact = WebTest_Pledge_StandaloneAddTest::testStandalonePledgeAdd();
+
+    $itemCount = 2;
+    $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
+    // create contact
+    $batchTitle = 'Batch-' . substr(sha1(rand()), 0, 7);
+
+    //Open Live Contribution Page
+    $this->openCiviPage("batch", "reset=1");
+    $this->click("xpath=//div[@class='crm-submit-buttons']/a");
+    $this->waitForElementPresent("_qf_Batch_next");
+    $this->click("title");
+    $this->type("title", $batchTitle);
+    $this->select("type_id", "Pledge");
+    $this->type("item_count", $itemCount);
+    $this->type("total", 200);
+    $this->click("_qf_Batch_next");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    // Add Contact Details
+    $data = array();
+    for ($i = 1; $i <= $itemCount; $i++) {
+      if ($i == 2) {
+        $data[$i] = array('contact' => $contact, 'amount' => 100);
+      }
+      else {
+        $data[$i] = array(
+          'first_name' => 'Ma' . substr(sha1(rand()), 0, 7),
+          'last_name' => 'An' . substr(sha1(rand()), 0, 7),
+          'amount' => 100,
+        );
+      }
+      $data[$i] += array(
+        'membership_type' => 'General',
+        'financial_type' => 'Member Dues',
+        'soft_credit_first_name' => 'Ar' . substr(sha1(rand()), 0, 7),
+        'soft_credit_last_name' => 'Ki' . substr(sha1(rand()), 0, 7),
+        'soft_credit_amount' => 10,
+        'soft_credit_type' => $softCreditTypes[$i],
+      );
+      $this->_fillData($data[$i], $i, "Pledge Payment");
+    }
+    $this->click("_qf_Entry_cancel");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->_verifyData($data, "Pledge");
+  }
+
   /**
    * @param $data
    * @param $row
    * @param $type
    */
   function _fillData($data, $row, $type) {
-    $email = $data['first_name'] . '@example.com';
-    $this->webtestNewDialogContact($data['first_name'], $data['last_name'], $email, 4,
-      "s2id_primary_contact_id_{$row}", $row, 'primary');
+    if (!empty($data['contact'])) {
+      $this->select2("s2id_primary_contact_id_{$row}", $data['contact']['email']);
+    }
+    else {
+      $email = $data['first_name'] . '@example.com';
+      $this->webtestNewDialogContact($data['first_name'], $data['last_name'], $email, 4, "s2id_primary_contact_id_{$row}", $row, 'primary');
+    }
 
-    if ($type == "Contribution") {
+    if ($type == "Pledge Payment") {
+      $this->select("field_{$row}_financial_type", $data['financial_type']);
+      $this->type("field_{$row}_total_amount", $data['amount']);
+      $this->webtestFillDateTime("field_{$row}_receive_date", "+1 week");
+      $this->type("field_{$row}_contribution_source", substr(sha1(rand()), 0, 10));
+      $this->select("field_{$row}_payment_instrument", "Check");
+      $this->type("field_{$row}_check_number", rand());
+      $this->click("field[{$row}][send_receipt]");
+      $this->click("field_{$row}_invoice_id");
+      $this->type("field_{$row}_invoice_id", substr(sha1(rand()), 0, 10));
+      $softcreditemail = $data['soft_credit_first_name'] . '@example.com';
+      $this->webtestNewDialogContact($data['soft_credit_first_name'],
+        $data['soft_credit_last_name'],
+        $softcreditemail, 4,
+        "s2id_soft_credit_contact_id_{$row}",
+        $row,
+        'soft_credit'
+      );
+      $this->type("soft_credit_amount_{$row}", $data['soft_credit_amount']);
+      $this->select("soft_credit_type_{$row}", $data['soft_credit_type']);
+      if (!empty($data['contact'])) {
+        $pledgeID = CRM_Pledge_BAO_Pledge::getContactPledges($data['contact']['id']);
+        $this->select("open_pledges_{$row}", "value={$pledgeID[0]}");
+        $this->click("css=span#{$row}.pledge-adjust-option a");sleep(5);
+        $this->select("option_type_{$row}", "value=1");
+        $this->click("css=span#{$row}.pledge-adjust-option a");
+        $this->type("field_{$row}_total_amount", $data['amount']);
+      }
+	  }
+    elseif ($type == "Contribution") {
       $this->select("field_{$row}_financial_type", $data['financial_type']);
       $this->type("field_{$row}_total_amount", $data['amount']);
       $this->webtestFillDateTime("field_{$row}_receive_date", "+1 week");
