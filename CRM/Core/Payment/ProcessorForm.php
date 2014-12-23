@@ -106,7 +106,9 @@ class CRM_Core_Payment_ProcessorForm {
    */
   static function buildQuickform(&$form) {
     //@todo document why this addHidden is here
-    $form->addElement('hidden', 'hidden_processor', 1);
+    if (!empty($form->_paymentProcessorID)) {
+      $form->addElement('hidden', 'hidden_processor', 1);
+    }
     CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, empty($form->_isBillingAddressRequiredForPayLater));
   }
 }
