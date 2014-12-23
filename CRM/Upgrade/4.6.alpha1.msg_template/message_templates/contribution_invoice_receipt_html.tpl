@@ -13,7 +13,7 @@
     <center>
       <table style = "padding-right:19px;font-family: Arial, Verdana, sans-serif;" width = "500" height = "100" border = "0" cellpadding = "2" cellspacing = "1">
   <tr>
-    <td style = "padding-left:15px;" ><b><font size = "4" align = "center">TAX INVOICE</font></b></td>
+    <td style = "padding-left:15px;" ><b><font size = "4" align = "center">INVOICE</font></b></td>
           <td colspan = "1"></td>
           <td style = "padding-left:70px;"><b><font size = "1" align = "center" >Invoice Date:</font></b></td>
           <td><font size = "1" align = "right">{$domain_organization}</font></td>
@@ -35,7 +35,7 @@
         <tr>
           <td style = "padding-left:17px;"><font size = "1" align = "center">{$street_address}   {$supplemental_address_1}</font></td>
           <td colspan = "1"></td>
-          <td style = "padding-left:70px;"><b><font size = "1" align = "right">Incoice Number:</font></b></td>
+          <td style = "padding-left:70px;"><b><font size = "1" align = "right">Invoice Number:</font></b></td>
     <td ><font size = "1" align = "right">{if $domain_supplemental_address_2 }{$domain_supplemental_address_2}{/if}
     {if $domain_state }{$domain_state}{/if}</font></td>
         </tr>
