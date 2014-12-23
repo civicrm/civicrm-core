@@ -220,6 +220,7 @@ ORDER BY target_entity_type, target_entity_id
       $pcpBlock[] = array(
         'pageId' => $pcpBlockDao->target_entity_id,
         'pageTitle' => $pageTitle,
+        'component' => $pcpBlockDao->target_entity_type,
         'action' => $action,
       );
     }
