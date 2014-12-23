@@ -125,7 +125,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
 
     $this->isTextPresent("Your subscription request has been submitted for");
     //check if profile is saved
-    $this->waitForText('crm-notification-container','Your information has been saved.');
+    $this->isTextPresent("Your information has been saved.");
 
     // delete the profile
     $this->openCiviPage('admin/uf/group', 'reset=1');
@@ -136,8 +136,8 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
    * @param $profileTitle
    */
   function _testdeleteProfile($profileTitle) {
-    $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[5]/a[text()='Delete']");
-    $this->click("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[5]/a[text()='Delete']");
+    $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div[1]/table/tbody//tr/td[1]/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[5]/a[text()='Delete']");
+    $this->click("xpath=//div[@id='user-profiles']/div/div[1]/table/tbody//tr/td[1]/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[5]/a[text()='Delete']");
     $this->waitForElementPresent('_qf_Group_next-bottom');
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('newCiviCRMProfile-bottom');
