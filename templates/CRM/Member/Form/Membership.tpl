@@ -378,6 +378,8 @@
         var taxRates = JSON.parse(taxRates);
         var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
         var currency = '{/literal}{$currency}{literal}';
+	var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
+	taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         if ( term ) {
           if (!taxRate) {
             var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
@@ -397,7 +399,7 @@
       cj("#total_amount").val( allMemberships[memType]['total_amount'] );
           }
         }
-        var taxMessage = taxRate!=undefined ? 'Includes '+taxTerm+' amount of '+currency+''+feeTotal.toFixed(2):'';
+        var taxMessage = taxRate!=undefined ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount:'';
         cj('.totaltaxAmount').html(taxMessage);
       }
 
