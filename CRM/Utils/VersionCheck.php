@@ -184,7 +184,8 @@ class CRM_Utils_VersionCheck {
     $localVersionDate = CRM_Utils_Array::value('date', $thisVersion, 0);
     foreach ($this->versionInfo as $majorVersion) {
       foreach ($majorVersion['releases'] as $release) {
-        if (!empty($release['security']) && $release['date'] > $localVersionDate) {
+        if (!empty($release['security']) && $release['date'] > $localVersionDate
+          && version_compare($this->localVersion, $release['version']) < 0) {
           if (!$this->ignoreDate || $this->ignoreDate < $release['date']) {
             return TRUE;
           }
