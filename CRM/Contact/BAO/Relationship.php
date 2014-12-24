@@ -1493,7 +1493,8 @@ cr.relationship_type_id IN (%2) AND
 cr.is_permission_a_b    = 1 AND
 IF(cr.end_date IS NULL, 1, (DATEDIFF( CURDATE( ), cr.end_date ) <= 0)) AND
 cr.is_active = 1 AND
-cc.id = cr.contact_id_b";
+cc.id = cr.contact_id_b AND 
+cc.is_deleted = 0";
 
       if (!empty($name)) {
         $name   = CRM_Utils_Type::escape($name, 'String');
