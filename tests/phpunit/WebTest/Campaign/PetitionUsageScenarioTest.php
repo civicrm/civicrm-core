@@ -253,7 +253,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $this->type("petition_title", $title);
     $this->click("xpath=//div[@class='crm-accordion-body']/table/tbody/tr[2]/td/a[text()='Search']");
 
-    $this->waitForElementPresent("xpath=//table[@class='petitions dataTable no-footer']/tbody/tr/td[10]/span[2][text()='more']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[10]/span[2][text()='more']");
     $this->click("xpath=//table[@class='petitions dataTable no-footer']/tbody/tr/td[10]/span[2][text()='more']/ul/li[3]/a[text()='Signatures']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
