@@ -169,7 +169,7 @@
           <tr class="crm-membership-form-block-total_amount">
             <td class="label">{$form.total_amount.label}</td>
             <td>{$form.total_amount.html}<br />
-              <span class="description">{ts}Membership payment amount.{/ts}</span></td>
+              <span class="description">{ts}Membership payment amount.{/ts}</span><div class="totaltaxAmount"></div></td>
           </tr>
           <tr class="crm-membership-form-block-contribution-contact">
             <td class="label">{$form.is_different_contribution_contact.label}</td>
@@ -233,7 +233,7 @@
                 <tr class="crm-membership-form-block-total_amount">
                   <td class="label">{$form.total_amount.label}</td>
                   <td>{$form.total_amount.html}<br />
-                    <span class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span></td>
+                    <span class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span><div class="totaltaxAmount"></div></td>
                 </tr>
                 <tr class="crm-membership-form-block-receive_date">
                   <td class="label">{$form.receive_date.label}</td>
@@ -341,7 +341,6 @@
 
     {literal}
     <script type="text/javascript">
-
       function setPaymentBlock(mode, checkboxEvent) {
         var memType = parseInt(cj('#membership_type_id_1').val( ));
         var isPriceSet = 0;
@@ -375,9 +374,12 @@
         cj("#financial_type_id").val(allMemberships[memType]['financial_type_id']);
         var term = cj('#num_terms').val();
         var taxRates = '{/literal}{$taxRates}{literal}';
+        var taxTerm = '{/literal}{$taxTerm}{literal}';
         var taxRates = JSON.parse(taxRates);
         var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
-
+        var currency = '{/literal}{$currency}{literal}';
+	var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
+	taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         if ( term ) {
           if (!taxRate) {
             var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
@@ -393,9 +395,12 @@
       cj("#total_amount").val( feeTotal );
           }
           else {
+      var feeTotal = allMemberships[memType]['total_amount'];
       cj("#total_amount").val( allMemberships[memType]['total_amount'] );
           }
         }
+        var taxMessage = taxRate!=undefined ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount:'';
+        cj('.totaltaxAmount').html(taxMessage);
       }
 
 
