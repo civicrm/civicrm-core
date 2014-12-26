@@ -303,7 +303,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['pwd']       = $this->_paymentProcessor['password'];
     $args['version']   = 3.0;
     $args['signature'] = $this->_paymentProcessor['signature'];
-    $args['subject']   = $this->_paymentProcessor['subject'];
+    $args['subject']   = CRM_Utils_Array::value('subject', $this->_paymentProcessor);
     $args['method']    = $method;
   }
 
