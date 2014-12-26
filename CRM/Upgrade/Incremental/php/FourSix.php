@@ -112,4 +112,58 @@ class CRM_Upgrade_Incremental_php_FourSix {
     $queue->createItem($task, array('weight' => -1));
   }
 
+  function upgrade_4_6_alpha3($rev) {
+    // task to process sql
+    $this->addTask(ts('Adding column reference date and updating with '), 'updateReferenceDate');
+  }
+
+  // CRM-15728, Add new column reference_date to civicrm_action_log in order to track
+  // actual action_start_date for membership entity for only those schedule reminders which are not repeatable
+  static function updateReferenceDate(CRM_Queue_TaskContext $ctx) {
+    $query = "ALTER TABLE `civicrm_action_log`
+    ADD COLUMN `reference_date` date COMMENT 'Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)'";
+    CRM_Core_DAO::executeQuery($query);
+
+    $query = "SELECT schedule.* FROM civicrm_action_schedule schedule
+ LEFT JOIN civicrm_action_mapping mapper ON mapper.id = schedule.mapping_id AND
+ mapper.entity = 'civicrm_membership' AND is_repeat = 0";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()) {
+      if (empty($dao->start_action_date)) {
+        continue;
+      }
+
+      $referenceColumn = str_replace('membership_', "m.", $dao->start_action_date);
+      $where = array(
+        'reminder.reference_date IS NOT NULL',
+        '( m.is_override IS NULL OR m.is_override = 0 )',
+        'reminder.action_date_time >= DATE_SUB(reminder.action_date_time, INTERVAL 9 MONTH)'
+      );
+      $value = implode(', ', explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($dao->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)));
+      if (!empty($value)) {
+        $where[] = "m.membership_type_id IN ({$value})";
+      }
+      else {
+        $where[] = "m.membership_type_id IS NULL";
+      }
+
+      // Update reference_date with action_start_date chosen,
+      // only to those which falls under date limits configured on schedule reminder
+      $startDateClause = array();
+      $op = ($dao->start_action_condition == 'before' ? '<=' : '>=');
+      $operator = ($dao->start_action_condition == 'before' ? 'DATE_SUB' : 'DATE_ADD');
+      $date = $operator . "({$referenceColumn}, INTERVAL {$dao->start_action_offset} {$dao->start_action_unit})";
+      $where[] = "NOW() >= {$date}";
+      $where[] = "DATE_SUB(NOW(), INTERVAL 1 DAY ) <= {$date}";
+
+      $sql = "UPDATE civicrm_action_log reminder
+ LEFT JOIN civicrm_membership m ON reminder.entity_id = m.id
+ SET reminder.reference_date = {$referenceColumn}
+
+ WHERE " . implode(" AND ", $where);
+      CRM_Core_DAO::executeQuery($sql);
+    }
+
+    return TRUE;
+  }
 }

@@ -961,6 +961,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       // $limitWhere - this filtering applies only for
       // 'limit to' option
       $select = $join = $where = $limitWhere = array();
+      $selectColumns = "contact_id, entity_id, entity_table, action_schedule_id";
       $limitTo = $actionSchedule->limit_to;
       $value = explode(CRM_Core_DAO::VALUE_SEPARATOR,
         trim($actionSchedule->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)
@@ -1097,6 +1098,13 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id');
         $mStatus = implode(',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
+
+        // We are not tracking the reference date for 'repeated' schedule reminders as
+        // it will violate the repeat use-case, for further details please check CRM-15376
+        if ($actionSchedule->start_action_date && $actionSchedule->is_repeat == FALSE) {
+          $select[] = $dateField;
+          $selectColumns = "reference_date, " . $selectColumns;
+        }
       }
 
       if ($mapping->entity == 'civicrm_contact') {
@@ -1250,14 +1258,47 @@ reminder.action_schedule_id = %1";
       }
 
       $query = "
-INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
+INSERT INTO civicrm_action_log ({$selectColumns})
 {$selectClause}
 {$fromClause}
 {$joinClause}
 LEFT JOIN {$reminderJoinClause}
 {$whereClause} {$limitWhereClause} AND {$dateClause} {$notINClause}
 ";
+
+      // In some cases reference_date got outdated due to many reason
+      // e.g. In Membership renewal end_date got extended which means reference date mismatches with the end_date
+      // in other words reference_date != end_date where end_date may be used as the start_action_date criteria
+      // for some schedule reminder so in order to send new reminder we INSERT new record with new reference_date value
+      // via UNION operation
+      if (strpos($selectColumns, 'reference_date') !== FALSE) {
+        $query .= "
+UNION
+{$selectClause}
+{$fromClause}
+{$joinClause}
+LEFT JOIN {$reminderJoinClause}
+{$whereClause} {$limitWhereClause} {$notINClause} AND
+ (reminder.reference_date IS NOT NULL AND reminder.reference_date != {$dateField})
+";
+
+        //Those reminders which are sent in past and there reference_date doesn't reflect the
+        //newly changed entity's action_start_date, we need to update those so that we never
+        //get new reminder redundantly as because of the above usage of UNION clause
+        $updateQuery = "UPDATE civicrm_action_log reminder
+ INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id AND
+ reminder.reference_date IS NOT NULL AND reminder.action_date_time IS NOT NULL
+ SET reminder.reference_date = {$dateField}
+ WHERE reminder.action_schedule_id = %1 AND reminder.reference_date IS NOT NULL AND reminder.reference_date != {$dateField}
+";
+        }
+
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
+
+      if (!empty($updateQuery)) {
+        CRM_Core_DAO::executeQuery($updateQuery, array(1 => array($actionSchedule->id, 'Integer')));
+      }
+
       $isSendToAdditionalContacts = (!is_null($limitTo) && $limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) ? TRUE : FALSE;
       if ($isSendToAdditionalContacts) {
         $contactTable = "civicrm_contact c";

@@ -361,7 +361,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'body_html' => '<p>body sched_membership_end_2month</p>',
       'body_text' => 'body sched_membership_end_2month',
       'end_action' => '',
-      'end_date' => '',
+      'end_date' => 'membership_end_date',
       'end_frequency_interval' => '4',
       'end_frequency_unit' => 'month',
       'entity_status' => '',
@@ -700,7 +700,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testMembershipEndDateNoMatch() {
     // creates membership with end_date = 20120615
-    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership_past'], array('status_id' => 3)));
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 3)));
     $this->assertTrue(is_numeric($membership->id));
     $result = $this->callAPISuccess('Email', 'create', array(
       'contact_id' => $membership->contact_id,
@@ -843,6 +843,63 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ));
   }
 
+  function testMembership_referenceDate() {
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
+
+    $this->assertTrue(is_numeric($membership->id));
+    $result = $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $membership->contact_id,
+      'email' => 'member@example.com',
+    ));
+
+    $result = $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
+    $this->assertAPISuccess($result);
+
+    $actionSchedule = $this->fixtures['sched_membership_join_2week'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    // start_date=2012-03-15 ; schedule is 2 weeks after start_date
+    $this->assertCronRuns(array(
+      array( // After the 2-week mark, send an email
+        'time' => '2012-03-29 01:00:00',
+        'recipients' => array(array('member@example.com')),
+      )
+    ));
+
+    //check if reference date is set to membership's join date
+    //as per the action_start_date chosen for current schedule reminder
+    $this->assertEquals('2012-03-15',
+      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $membership->contact_id, 'reference_date', 'contact_id')
+    );
+
+    //change current membership join date that may signifies as memberhip renewal activity
+    $membership->join_date = '2012-03-29';
+    $membership->save();
+
+    //change the email id of chosen membership contact to assert
+    //recipient of not the previously sent mail but the new one
+    $result = $this->callAPISuccess('Email', 'create', array(
+      'is_primary' => 1,
+      'contact_id' => $membership->contact_id,
+      'email' => 'member2@example.com'
+    ));
+    $this->assertAPISuccess($result);
+
+    $this->assertCronRuns(array(
+      array( // After the 2-week of the changed join date 2012-03-29, send an email
+        'time' => '2012-04-12 01:00:00',
+        'recipients' => array(array('member2@example.com')
+),
+      ),
+    ));
+
+    //To check whether the reference date is being changed to new join_date
+    $this->assertEquals('2012-03-29',
+      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $membership->contact_id, 'reference_date', 'contact_id', TRUE)
+    );
+  }
 
   public function testContactCustomDateAnniv() {
     $group = array(
