@@ -50,7 +50,7 @@
   <field>
     <name>entity_value</name>
     <type>varchar</type>
-    <length>64</length>
+    <length>255</length>
     <comment>Entity value</comment>
     <add>3.4</add>
   </field>
