@@ -87,3 +87,8 @@ a.crmMailing-submit-button div:hover {
 a.crmMailing-submit-button:hover {
   text-decoration: none;
 }
+
+.crm-container .ui-widget {
+  font-size: 13px;
+}
+
