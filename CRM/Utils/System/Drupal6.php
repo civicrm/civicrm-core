@@ -741,10 +741,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     do {
       $cmsRoot = $firstVar . '/' . implode('/', $pathVars);
       $cmsIncludePath = "$cmsRoot/includes";
-      //stop as we found bootstrap.
-      if (@opendir($cmsIncludePath) &&
-        file_exists("$cmsIncludePath/bootstrap.inc")
-      ) {
+      // Stop if we found bootstrap.
+      //
+      // @TODO What is opendir() here for?
+      if (opendir($cmsIncludePath) && file_exists("$cmsIncludePath/bootstrap.inc")) {
         $valid = TRUE;
         break;
       }
