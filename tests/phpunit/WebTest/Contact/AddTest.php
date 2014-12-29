@@ -203,7 +203,9 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->select("phone_1_phone_type_id", "value=" . $this->webtestGetFirstValueForOptionGroup('phone_type'));
 
     //fill in IM
-    $this->assertElementContainsText('im_1_provider_id', "Yahoo MSN AIM GTalk Jabber Skype");
+    foreach (array('Yahoo', 'MSN', 'AIM', 'GTalk', 'Jabber', 'Skype') as $option) {
+      $this->assertSelectHasOption('im_1_provider_id', $option);
+    }
     $this->type("im_1_name", "testSkype");
     $this->select("im_1_location_type_id", "value=3");
     $this->select("im_1_provider_id", "value=6");
