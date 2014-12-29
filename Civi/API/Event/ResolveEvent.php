@@ -33,14 +33,16 @@ namespace Civi\API\Event;
  */
 class ResolveEvent extends Event {
   /**
-   * @param $apiRequest
+   * @param array $apiRequest
+   *   The full description of the API request.
    */
-  function __construct($apiRequest) {
+  public function __construct($apiRequest) {
     parent::__construct(NULL, $apiRequest);
   }
 
   /**
    * @param \Civi\API\Provider\ProviderInterface $apiProvider
+   *   The API provider responsible for executing the request.
    */
   public function setApiProvider($apiProvider) {
     $this->apiProvider = $apiProvider;
@@ -48,6 +50,7 @@ class ResolveEvent extends Event {
 
   /**
    * @param array $apiRequest
+   *   The full description of the API request.
    */
   public function setApiRequest($apiRequest) {
     $this->apiRequest = $apiRequest;

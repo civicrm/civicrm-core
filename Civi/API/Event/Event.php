@@ -34,19 +34,25 @@ namespace Civi\API\Event;
 class Event extends \Symfony\Component\EventDispatcher\Event {
   /**
    * @var \Civi\API\Provider\ProviderInterface
+   *   The API provider responsible for executing the request.
    */
   protected $apiProvider;
 
   /**
    * @var array
+   *   The full description of the API request.
+   *
+   * @see \Civi\API\Request::create
    */
   protected $apiRequest;
 
   /**
-   * @param $apiProvider
-   * @param $apiRequest
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
+   *   The API responsible for executing the request.
+   * @param array $apiRequest
+   *   The full description of the API request.
    */
-  function __construct($apiProvider, $apiRequest) {
+  public function __construct($apiProvider, $apiRequest) {
     $this->apiProvider = $apiProvider;
     $this->apiRequest = $apiRequest;
   }

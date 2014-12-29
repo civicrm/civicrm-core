@@ -39,11 +39,14 @@ class ExceptionEvent extends Event {
   private $exception;
 
   /**
-   * @param $exception
-   * @param $apiProvider
-   * @param $apiRequest
+   * @param \Exception $exception
+   *   The exception which arose while processing the API request.
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
+   *   The API provider responsible for executing the request.
+   * @param array $apiRequest
+   *   The full description of the API request.
    */
-  function __construct($exception, $apiProvider, $apiRequest) {
+  public function __construct($exception, $apiProvider, $apiRequest) {
     $this->exception = $exception;
     parent::__construct($apiProvider, $apiRequest);
   }
