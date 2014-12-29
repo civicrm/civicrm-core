@@ -31,16 +31,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for linking to resource files
  */
 class CRM_Core_ErrorTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name'    => 'Errors',
-      'description' => 'Tests for error handling',
-      'group'     => 'Core',
-    );
-  }
 
   function setUp() {
     parent::setUp();

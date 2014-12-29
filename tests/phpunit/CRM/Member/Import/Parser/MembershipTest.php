@@ -45,17 +45,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * @var String
    */
   protected $_membershipTypeID = NULL;
-  /**
-   * Describe test class
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'MembershipParserTest',
-      'description' => 'Test import parser function',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

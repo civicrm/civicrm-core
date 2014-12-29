@@ -49,22 +49,8 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
   public function setUp() {
     //  Connect to the database
     parent::setUp();
-
+    $this->useTransaction(TRUE);
   }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  function tearDown() {
-    $tablesToTruncate = array(
-      'civicrm_action_schedule',
-    );
-    $this->quickCleanup($tablesToTruncate, TRUE);
-  }
-
 
   function testSimpleActionScheduleCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');

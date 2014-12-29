@@ -33,17 +33,6 @@ Links:
 ',
   );
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'HtmlToText Test',
-      'description' => 'Test htmlToText Function',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
   }

@@ -56,17 +56,6 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   protected function tearDown() {}
 
   /**
-   *  test info
-   */
-  function get_info() {
-    return array(
-      'name' => 'PledgeBlock BAOs',
-      'description' => 'Test all Pledge_BAO_PledgeBlock methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  /**
    *  create() and deletepledgeblock() method
    */
   function testCreateAndDeletePledgeBlock() {

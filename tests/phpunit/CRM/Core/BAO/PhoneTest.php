@@ -35,16 +35,6 @@ require_once 'CiviTest/Event.php';
  * Class CRM_Core_BAO_PhoneTest
  */
 class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Phone BAOs',
-      'description' => 'Test all Core_BAO_Phone methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

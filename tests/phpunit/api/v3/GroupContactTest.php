@@ -40,23 +40,13 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   protected $_groupId1;
 
   /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Group Contact Create',
-      'description' => 'Test all Group Contact Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
-  /**
    * Set up for group contact tests
    *
    * @todo set up calls function that doesn't work @ the moment
    */
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     $this->_contactId = $this->individualCreate();
 
@@ -90,14 +80,6 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
         'in_method' => 'API',
       ),
     );
-  }
-
-  function tearDown() {
-    $tablesToTruncate = array(
-      'civicrm_contact',
-      'civicrm_group',
-    );
-    $this->quickCleanup($tablesToTruncate);
   }
 
   ///////////////// civicrm_group_contact_get methods
@@ -179,7 +161,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   function testDelete() {
     $params = array(
       'contact_id' => $this->_contactId,
-      'group_id' => 1,
+      'group_id' => $this->_groupId1,
     );
 
     $result = $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);

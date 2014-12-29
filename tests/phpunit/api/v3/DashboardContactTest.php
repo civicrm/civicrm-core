@@ -46,20 +46,7 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
   public function setUp() {
     //  Connect to the database
     parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  function tearDown() {
-    $tablesToTruncate = array(
-      'civicrm_dashboard',
-      'civicrm_dashboard_contact',
-    );
-    $this->quickCleanup($tablesToTruncate, TRUE);
+    $this->useTransaction(TRUE);
   }
 
   function testDashboardContactCreate() {

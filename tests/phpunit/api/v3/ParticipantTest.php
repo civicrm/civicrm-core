@@ -50,17 +50,6 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_params;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Participant Create',
-      'description' => 'Test all Participant Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     $this->_apiversion = 3;
     parent::setUp();

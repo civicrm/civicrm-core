@@ -37,6 +37,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_params = array(
       'name' => 'our test Option Group',
       'is_reserved' => 1,
@@ -44,7 +45,6 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {}
   /*
   * Good to test option group as a representative on the Camel Case
   */
@@ -118,6 +118,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
       'name' => 'civicrm_rolback_test',
       'is_reserved' => 1,
       'is_active' => 1,
+      'is_transactional' => 'nest', // executing within useTransactional() test case
       'api.OptionValue.create' => array(
         'label' => 'invalid entry',
         'value' => 35,

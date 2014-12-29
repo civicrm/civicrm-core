@@ -51,17 +51,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   protected $objects;
   public $DBResetRequired = FALSE;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'BaseIPN test',
-      'description' => 'Test BaseIPN methods (via subclass A.net).',
-      'group' => 'Payment Processor Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->input = $this->ids = $this->objects = array();

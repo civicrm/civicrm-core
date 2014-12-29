@@ -36,19 +36,9 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'PaymentProcessor Create',
-      'description' => 'Test all PaymentProcessor Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     // Create dummy processor
     $params = array(
       'name' => 'API_Test_PP_Type',
@@ -66,15 +56,6 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
       'is_recur' => 0,
       'domain_id' => 1,
     );
-  }
-
-  function tearDown() {
-
-    $tablesToTruncate = array(
-      'civicrm_payment_processor',
-      'civicrm_payment_processor_type',
-    );
-    $this->quickCleanup($tablesToTruncate);
   }
 
   ///////////////// civicrm_payment_processor_add methods

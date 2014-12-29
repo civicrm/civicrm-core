@@ -31,17 +31,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for field options
  */
 class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'FieldOptions',
-      'description' => 'Tests for field-specific option values',
-      'group' => 'Core',
-    );
-  }
-
   function setUp() {
     parent::setUp();
   }

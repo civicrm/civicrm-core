@@ -6,17 +6,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_RegionTest
  */
 class CRM_Core_RegionTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name'    => 'Region',
-      'description' => 'Smarty-region rendering test',
-      'group'     => 'Core',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     require_once 'CRM/Core/Smarty.php';

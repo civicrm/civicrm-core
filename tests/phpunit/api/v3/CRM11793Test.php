@@ -12,14 +12,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  *  @package   CiviCRM
  */
 class api_v3_CRM11793Test extends CiviUnitTestCase {
-  /**
-   *  Constructor
-   *
-   *  Initialize configuration
-   */
-  function __construct() {
-    parent::__construct();
-  }
 
   /**
    *  Test setup for every test

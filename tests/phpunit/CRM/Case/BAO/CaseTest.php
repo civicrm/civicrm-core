@@ -5,16 +5,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Case_BAO_CaseTest
  */
 class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Case BAOs',
-      'description' => 'Test Case_BAO_Case methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

@@ -21,17 +21,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
   protected $_params = array();
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Contact BAOs',
-      'description' => 'Test all Contact_BAO_Contact methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->_params = array(

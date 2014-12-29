@@ -69,18 +69,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    */
   protected $_contactID4 = NULL;
 
-  /**
-   * Describe test class
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'MembershipParserTest',
-      'description' => 'Test import parser function',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
 

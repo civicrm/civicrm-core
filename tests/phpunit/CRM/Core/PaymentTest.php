@@ -32,16 +32,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_PaymentTest
  */
 class CRM_Core_PaymentTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Payment Test',
-      'description' => 'Test Payment methods.',
-      'group' => 'Payment Processor Tests',
-    );
-  }
 
   /**
    * Test the payment method is adequately logged - we don't expect the processing to succeed

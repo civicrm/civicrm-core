@@ -6,17 +6,6 @@ require_once 'CiviTest/Contact.php';
  * Class CRM_Core_BAO_OpenIDTest
  */
 class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'OpenID BAOs',
-      'description' => 'Test all Core_BAO_OpenID methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
   function tearDown() {
     // If we truncate only contact, then stale domain and openid records will be left.
     // If we truncate none of these tables, then contactDelete() will incrementally

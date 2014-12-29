@@ -45,15 +45,6 @@ class api_v3_DomainTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
 
-
-  /**
-   *  Constructor
-   *
-   *  Initialize configuration
-   */ function __construct() {
-    parent::__construct();
-  }
-
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
@@ -62,6 +53,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     // taken from form code - couldn't find good method to use
     $params['entity_id'] = 1;
@@ -99,16 +91,6 @@ class api_v3_DomainTest extends CiviUnitTestCase {
       'domain_version' => '4.2',
       'contact_id' => $domContact['id'],
     );
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  protected function tearDown() {
-
   }
 
   ///////////////// civicrm_domain_get methods

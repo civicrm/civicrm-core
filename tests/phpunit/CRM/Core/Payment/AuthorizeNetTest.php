@@ -33,16 +33,6 @@ require_once 'CiviTest/AuthorizeNet.php';
  * Class CRM_Core_Payment_AuthorizeNetTest
  */
 class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Authorize.net processing',
-      'description' => 'Test Authorize.ne methods.',
-      'group' => 'Payment Processor Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

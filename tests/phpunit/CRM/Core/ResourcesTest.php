@@ -31,16 +31,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for linking to resource files
  */
 class CRM_Core_ResourcesTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name'    => 'Resources',
-      'description' => 'Tests for linking to resource files',
-      'group'     => 'Core',
-    );
-  }
 
   /**
    * @var CRM_Core_Resources

@@ -36,6 +36,8 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
 
 
   function setUp() {
+    parent::setUp();
+    $this->useTransaction(TRUE);
     $phoneBankActivity = $this->callAPISuccess('Option_value', 'Get', array('label' => 'PhoneBank', 'sequential' => 1));
     $phoneBankActivityTypeID = $phoneBankActivity['values'][0]['value'];
     $surveyParams = array(
@@ -49,11 +51,6 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
       'sequential' =>'1',
       'survey_id' => $surveyID
     );
-    parent::setUp();
-  }
-
-  function tearDown() {
-    $this->quickCleanup(array('civicrm_survey'));
   }
 
   /**
