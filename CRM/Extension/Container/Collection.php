@@ -66,9 +66,13 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   public $k2c;
 
   /**
-   * @param array $containers array($name => CRM_Extension_Container_Interface) in order from highest priority (winners) to lowest priority (losers)
+   * @param array $containers
+   *   Array($name => CRM_Extension_Container_Interface) in order from highest
+   *   priority (winners) to lowest priority (losers).
    * @param CRM_Utils_Cache_Interface $cache
-   * @param string $cacheKey unique name for this container
+   *   Cache in which to store extension metadata.
+   * @param string $cacheKey
+   *   Unique name for this container.
    */
   public function __construct($containers, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $this->containers = $containers;
@@ -124,7 +128,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   /**
    * Get the container which defines a particular key
    *
-   * @param $key
+   * @param string $key
+   *   Extension name.
    *
    * @throws CRM_Extension_Exception_MissingException
    * @return CRM_Extension_Container_Interface
@@ -133,7 +138,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
     $k2c = $this->getKeysToContainer();
     if (isset($k2c[$key]) && isset($this->containers[$k2c[$key]])) {
       return $this->containers[$k2c[$key]];
-    } else {
+    }
+    else {
       throw new CRM_Extension_Exception_MissingException("Unknown extension: $key");
     }
   }
