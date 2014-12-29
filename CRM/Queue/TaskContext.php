@@ -33,11 +33,10 @@ class CRM_Queue_TaskContext {
   /**
    * @var CRM_Queue_Queue
    */
-  var $queue;
+  public $queue;
 
   /**
    * @var Log
    */
-  var $log;
+  public $log;
 }
-
