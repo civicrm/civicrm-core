@@ -3913,8 +3913,15 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 -- Add missing Peruvian State (Amazonas)
 (NULL, 1169, "AMA", "Amazonas"),
 
+<<<<<<< HEAD
 -- Add missing Indonesian provinces (Kalimantan Tengah, Sulawesi Barat, Kalimantan Utara) and revised outdated names in code above
 (NULL, 1102, "KT", "Kalimantan Tengah"), -- added, updated abbreviation
 (NULL, 1102, "SR", "Sulawesi Barat"), -- added, updated abbreviation
 (NULL, 1102, "KU", "Kalimantan Utara"); -- added
 
+=======
+-- Add missing Indonesian provinces (Kalimantan Tengah, Sulawesi Barat) and revised outdated names in code above
+(NULL, 1102, "KT", "Kalimantan Tengah"), -- added, updated abbreviation
+(NULL, 1102, "SR", "Sulawesi Barat") -- added, updated abbreviation
+(NULL, 1102, "KU", "Kalimantan Utara"); -- added
+>>>>>>> origin/master
