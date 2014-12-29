@@ -45,8 +45,9 @@ class XDebugSubscriber implements EventSubscriberInterface {
 
   /**
    * @param \Civi\API\Event\RespondEvent $event
+   *   API response event.
    */
-  function onApiRespond(\Civi\API\Event\RespondEvent $event) {
+  public function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
     $result = $event->getResponse();
     if (function_exists('xdebug_time_index')

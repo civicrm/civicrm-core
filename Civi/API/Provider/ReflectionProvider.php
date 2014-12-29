@@ -26,6 +26,7 @@
 */
 
 namespace Civi\API\Provider;
+
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -39,10 +40,12 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   public static function getSubscribedEvents() {
     return array(
       Events::RESOLVE => array(
-        array('onApiResolve', Events::W_EARLY), // TODO decide if we really want to override others
+        // TODO decide if we really want to override others
+        array('onApiResolve', Events::W_EARLY),
       ),
       Events::AUTHORIZE => array(
-        array('onApiAuthorize', Events::W_EARLY), // TODO decide if we really want to override others
+        // TODO decide if we really want to override others
+        array('onApiAuthorize', Events::W_EARLY),
       ),
     );
   }
@@ -59,11 +62,13 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
 
   /**
    * @param \Civi\API\Kernel $apiKernel
+   *   The API kernel.
    */
   public function __construct($apiKernel) {
     $this->apiKernel = $apiKernel;
     $this->actions = array(
-      // FIXME: We really need to deal with the api's lack of uniformity wrt case (Entity or entity)
+      // FIXME: We really need to deal with the api's lack of uniformity wrt
+      // case (Entity or entity).
       'Entity' => array('get', 'getactions'),
       'entity' => array('get', 'getactions'),
       '*' => array('getactions'), // 'getfields'
@@ -72,6 +77,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
 
   /**
    * @param \Civi\API\Event\ResolveEvent $event
+   *   API resolution event.
    */
   public function onApiResolve(\Civi\API\Event\ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
@@ -80,17 +86,20 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
       $apiRequest['is_metadata'] = TRUE;
       $event->setApiRequest($apiRequest);
       $event->setApiProvider($this);
-      $event->stopPropagation(); // TODO decide if we really want to override others
+      $event->stopPropagation();
+      // TODO decide if we really want to override others
     }
   }
 
   /**
    * @param \Civi\API\Event\AuthorizeEvent $event
+   *   API authorization event.
    */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
     $apiRequest = $event->getApiRequest();
     if (isset($apiRequest['is_metadata'])) {
-      // if (\CRM_Core_Permission::check('access AJAX API') || \CRM_Core_Permission::check('access CiviCRM')) {
+      // if (\CRM_Core_Permission::check('access AJAX API')
+      //   || \CRM_Core_Permission::check('access CiviCRM')) {
       $event->authorize();
       $event->stopPropagation();
       // }
@@ -107,26 +116,28 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
     switch ($apiRequest['action']) {
       case 'getactions':
         return civicrm_api3_create_success($this->apiKernel->getActionNames($apiRequest['version'], $apiRequest['entity']), $apiRequest['params'], $apiRequest['entity'], $apiRequest['action']);
-//      case 'getfields':
-//        return $this->doGetFields($apiRequest);
+
+      //case 'getfields':
+      //  return $this->doGetFields($apiRequest);
+
       default:
     }
 
     // We shouldn't get here because onApiResolve() checks $this->actions
-    throw new \API_Exception("Unsupported action ("  . $apiRequest['entity'] . '.' . $apiRequest['action'] . ']');
+    throw new \API_Exception("Unsupported action (" . $apiRequest['entity'] . '.' . $apiRequest['action'] . ']');
   }
 
   /**
    * {inheritdoc}
    */
-  function getEntityNames($version) {
+  public function getEntityNames($version) {
     return array('Entity');
   }
 
   /**
    * {inheritdoc}
    */
-  function getActionNames($version, $entity) {
+  public function getActionNames($version, $entity) {
     $entity = _civicrm_api_get_camel_name($entity, $version);
     return isset($this->actions[$entity]) ? $this->actions[$entity] : $this->actions['*'];
   }

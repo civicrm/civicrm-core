@@ -34,12 +34,14 @@ namespace Civi\API;
  *
  * Event subscribers which are concerned about the order of execution should assign
  * a weight to their subscription (such as W_EARLY, W_MIDDLE, or W_LATE).
+ * W_LATE).
  */
 class Events {
 
   /**
    * Determine whether the API request is allowed for the current user.
-   * For successful execution, at least one listener must invoke $event->authorize().
+   * For successful execution, at least one listener must invoke
+   * $event->authorize().
    *
    * @see AuthorizeEvent
    */
@@ -47,7 +49,8 @@ class Events {
 
   /**
    * Determine which API provider executes the given request. For successful
-   * execution, at least one listener must invoke $event->setProvider($provider).
+   * execution, at least one listener must invoke
+   * $event->setProvider($provider).
    *
    * @see ResolveEvent
    */

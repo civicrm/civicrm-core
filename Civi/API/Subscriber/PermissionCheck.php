@@ -30,8 +30,9 @@ use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * For any API requests that correspond to a Doctrine entity ($apiRequest['doctrineClass']), check
- * permissions specified in Civi\API\Annotation\Permission.
+ * For any API requests that correspond to a Doctrine entity
+ * ($apiRequest['doctrineClass']), check permissions specified in
+ * Civi\API\Annotation\Permission.
  */
 class PermissionCheck implements EventSubscriberInterface {
   /**
@@ -47,6 +48,7 @@ class PermissionCheck implements EventSubscriberInterface {
 
   /**
    * @param \Civi\API\Event\AuthorizeEvent $event
+   *   API authorization event.
    *
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -74,7 +76,8 @@ class PermissionCheck implements EventSubscriberInterface {
         if (is_array($permissions)) {
           $permissions = implode(' and ', $permissions);
         }
-        // FIXME: Generating the exception ourselves allows for detailed error but doesn't play well with multiple authz subscribers.
+        // FIXME: Generating the exception ourselves allows for detailed error
+        // but doesn't play well with multiple authz subscribers.
         throw new \Civi\API\Exception\UnauthorizedException("API permission check failed for {$apiRequest['entity']}/{$apiRequest['action']} call; insufficient permission: require $permissions");
       }
 

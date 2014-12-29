@@ -37,12 +37,16 @@ class AuthorizeEvent extends Event {
    */
   private $authorized = FALSE;
 
+  /**
+   * Mark the request as authorized.
+   */
   public function authorize() {
     $this->authorized = TRUE;
   }
 
   /**
-   * @return boolean
+   * @return bool
+   *   TRUE if the request has been authorized.
    */
   public function isAuthorized() {
     return $this->authorized;

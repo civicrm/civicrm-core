@@ -35,22 +35,26 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 interface ProviderInterface {
   /**
    * @param array $apiRequest
+   *   The full description of the API request.
    * @return array structured response data (per civicrm_api3_create_success)
    * @see civicrm_api3_create_success
    * @throws \API_Exception
    */
-  function invoke($apiRequest);
+  public function invoke($apiRequest);
 
   /**
    * @param int $version
+   *   API version.
    * @return array<string>
    */
-  function getEntityNames($version);
+  public function getEntityNames($version);
 
   /**
    * @param int $version
+   *   API version.
    * @param string $entity
+   *   API entity.
    * @return array<string>
    */
-  function getActionNames($version, $entity);
+  public function getActionNames($version, $entity);
 }
