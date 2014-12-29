@@ -784,9 +784,7 @@ AND    u.status = 1
       $cmsRoot = $firstVar . '/' . implode('/', $pathVars);
       $cmsIncludePath = "$cmsRoot/includes";
       // Stop if we find bootstrap.
-      //
-      // @TODO What is opendir() here for?
-      if (opendir($cmsIncludePath) && file_exists("$cmsIncludePath/bootstrap.inc")) {
+      if (file_exists("$cmsIncludePath/bootstrap.inc")) {
         $valid = TRUE;
         break;
       }
