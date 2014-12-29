@@ -26,8 +26,8 @@
 */
 
 /**
- * To ensure that PHP errors or unhandled exceptions are reported in JSON format,
- * wrap this around your code. For example:
+ * To ensure that PHP errors or unhandled exceptions are reported in JSON
+ * format, wrap this around your code. For example:
  *
  * @code
  * $errorContainer = new CRM_Queue_ErrorPolicy();
@@ -42,12 +42,13 @@
  * will be necessary to get reuse from the other parts of this class.
  */
 class CRM_Queue_ErrorPolicy {
-  var $active;
+  public $active;
 
   /**
-   * @param null $level
+   * @param null|int $level
+   *   PHP error level to capture (e.g. E_PARSE|E_USER_ERROR).
    */
-  function __construct($level = NULL) {
+  public function __construct($level = NULL) {
     register_shutdown_function(array($this, 'onShutdown'));
     if ($level === NULL) {
       $level = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
@@ -55,7 +56,10 @@ class CRM_Queue_ErrorPolicy {
     $this->level = $level;
   }
 
-  function activate() {
+  /**
+   * Enable the error policy.
+   */
+  public function activate() {
     $this->active = TRUE;
     $this->backup = array();
     foreach (array(
@@ -68,7 +72,10 @@ class CRM_Queue_ErrorPolicy {
     $this->errorScope = CRM_Core_TemporaryErrorScope::useException();
   }
 
-  function deactivate() {
+  /**
+   * Disable the error policy.
+   */
+  public function deactivate() {
     $this->errorScope = NULL;
     restore_error_handler();
     foreach (array(
@@ -79,11 +86,15 @@ class CRM_Queue_ErrorPolicy {
   }
 
   /**
-   * @param $callable
+   * Execute the callable. Activate and deactivate the error policy
+   * automatically.
+   *
+   * @param callable|array|string $callable
+   *   A callback function.
    *
    * @return mixed
    */
-  function call($callable) {
+  public function call($callable) {
     $this->activate();
     try {
       $result = $callable();
@@ -100,7 +111,7 @@ class CRM_Queue_ErrorPolicy {
    *
    * @see set_error_handler
    */
-  function onError($errno, $errstr, $errfile, $errline) {
+  public function onError($errno, $errstr, $errfile, $errline) {
     if (!(error_reporting() & $errno)) {
       return TRUE;
     }
@@ -113,7 +124,7 @@ class CRM_Queue_ErrorPolicy {
    * @see register_shutdown_function
    * @see error_get_last
    */
-  function onShutdown() {
+  public function onShutdown() {
     if (!$this->active) {
       return;
     }
@@ -126,9 +137,10 @@ class CRM_Queue_ErrorPolicy {
   /**
    * Print a fatal error
    *
-   * @param $error
+   * @param array $error
+   *   The PHP error (with "type", "message", etc).
    */
-  function reportError($error) {
+  public function reportError($error) {
     $response = array(
       'is_error' => 1,
       'is_continue' => 0,
@@ -146,9 +158,10 @@ class CRM_Queue_ErrorPolicy {
   /**
    * Print an unhandled exception
    *
-   * @param $e
+   * @param Exception $e
+   *   The unhandled exception.
    */
-  function reportException(Exception $e) {
+  public function reportException(Exception $e) {
     CRM_Core_Error::debug_var('CRM_Queue_ErrorPolicy_reportException', CRM_Core_Error::formatTextException($e));
 
     $response = array(
@@ -171,4 +184,3 @@ class CRM_Queue_ErrorPolicy {
     CRM_Utils_JSON::output($response);
   }
 }
-
