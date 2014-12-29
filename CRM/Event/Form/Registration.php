@@ -1130,7 +1130,7 @@ WHERE  v.option_group_id = g.id
     $addParticipantNum = substr($form->_name, 12);
     foreach ($params as $pCnt => $values) {
       if ($values == 'skip' ||
-        $pCnt == $addParticipantNum
+        $pCnt === $addParticipantNum
       ) {
         continue;
       }
@@ -1315,6 +1315,7 @@ WHERE  v.option_group_id = g.id
         $opDbCount = CRM_Utils_Array::value('db_total_count', $options[$optId], 0);
         $total += $opDbCount;
         if ($optMax && $total > $optMax) {
+          $errors['soldOutOptions'][] = ts('Option %1 has sold out.', array(1 => $feeBlock[$fieldId]['options'][$optId]['label']));
           if ($opDbCount && ($opDbCount >= $optMax)) {
             $errors[$currentParticipantNum]["price_{$fieldId}"] =
               ts('Sorry, this option is currently sold out.');
