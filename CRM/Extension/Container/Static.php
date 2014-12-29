@@ -37,7 +37,8 @@
  */
 class CRM_Extension_Container_Static implements CRM_Extension_Container_Interface {
   /**
-   * @param $exts
+   * @param array $exts
+   *   Array(string $key => array $spec) List of extensions.
    */
   public function __construct($exts) {
     $this->exts = $exts;
@@ -87,14 +88,16 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
   }
 
   /**
-   * @param $key
+   * @param string $key
+   *   Extension name.
    *
    * @throws CRM_Extension_Exception_MissingException
    */
   protected function getExt($key) {
     if (isset($this->exts[$key])) {
       return $this->exts[$key];
-    } else {
+    }
+    else {
       throw new CRM_Extension_Exception_MissingException("Missing extension: $key");
     }
   }

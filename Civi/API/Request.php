@@ -37,9 +37,13 @@ class Request {
    * Create a formatted/normalized request object.
    *
    * @param string $entity
+   *   API entity name.
    * @param string $action
+   *   API action name.
    * @param array $params
+   *   API parameters.
    * @param mixed $extra
+   *   Who knows? ...
    *
    * @throws \API_Exception
    * @return array the request descriptor; keys:
@@ -145,11 +149,12 @@ class Request {
    * We must be sure that every request uses only one version of the API.
    *
    * @param array $params
+   *   API parameters.
    * @return int
    */
   protected static function parseVersion($params) {
     $desired_version = empty($params['version']) ? NULL : (int) $params['version'];
-    if (isset($desired_version) && is_integer($desired_version)) {
+    if (isset($desired_version) && is_int($desired_version)) {
       return $desired_version;
     }
     else {

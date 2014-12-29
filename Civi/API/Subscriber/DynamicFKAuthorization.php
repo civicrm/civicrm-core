@@ -31,16 +31,18 @@ use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Given an entity which dynamically attaches itself to another entity, determine if one has permission
- * to the other entity.
+ * Given an entity which dynamically attaches itself to another entity,
+ * determine if one has permission to the other entity.
  *
- * Example: Suppose one tries to manipulate a File which is attached to a Mailing. DynamicFKAuthorization will
- * enforce permissions on the File by imitating the permissions of the Mailing.
+ * Example: Suppose one tries to manipulate a File which is attached to a
+ * Mailing. DynamicFKAuthorization will enforce permissions on the File by
+ * imitating the permissions of the Mailing.
  *
- * Note: This enforces a constraint: all matching API calls must define either "id" (e.g. for the file)
- * or "entity_table".
+ * Note: This enforces a constraint: all matching API calls must define
+ * either "id" (e.g. for the file) or "entity_table".
  *
- * Note: The permission guard does not exactly authorize the request, but it may veto authorization.
+ * Note: The permission guard does not exactly authorize the request, but it
+ * may veto authorization.
  */
 class DynamicFKAuthorization implements EventSubscriberInterface {
 
@@ -93,12 +95,19 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
 
   /**
    * @param \Civi\API\Kernel $kernel
-   * @param string $entityName the entity for which we want to manage permissions (e.g. "File" or "Note")
-   * @param array $actions the actions for which we want to manage permissions (e.g. "create", "get", "delete")
-   * @param string $lookupDelegateSql see docblock in DynamicFKAuthorization::$lookupDelegateSql
-   * @param array|NULL $allowedDelegates e.g. "civicrm_mailing","civicrm_activity"; NULL to allow any
+   *   The API kernel.
+   * @param string $entityName
+   *   The entity for which we want to manage permissions (e.g. "File" or
+   *   "Note").
+   * @param array $actions
+   *   The actions for which we want to manage permissions (e.g. "create",
+   *   "get", "delete").
+   * @param string $lookupDelegateSql
+   *   See docblock in DynamicFKAuthorization::$lookupDelegateSql.
+   * @param array|NULL $allowedDelegates
+   *   e.g. "civicrm_mailing","civicrm_activity"; NULL to allow any.
    */
-  function __construct($kernel, $entityName, $actions, $lookupDelegateSql, $allowedDelegates = NULL) {
+  public function __construct($kernel, $entityName, $actions, $lookupDelegateSql, $allowedDelegates = NULL) {
     $this->kernel = $kernel;
     $this->entityName = $entityName;
     $this->actions = $actions;
@@ -108,6 +117,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
 
   /**
    * @param \Civi\API\Event\AuthorizeEvent $event
+   *   API authorization event.
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -129,9 +139,11 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
         }
         elseif ($isValidId) {
           throw new \API_Exception("Failed to match record to related entity");
-        } elseif (!$isValidId && strtolower($apiRequest['action']) == 'get') {
-          // This matches will be an empty set; doesn't make a difference if we reject or accept
-          // To pass SyntaxConformanceTest, we won't veto "get" on empty-set
+        }
+        elseif (!$isValidId && strtolower($apiRequest['action']) == 'get') {
+          // The matches will be an empty set; doesn't make a difference if we
+          // reject or accept.
+          // To pass SyntaxConformanceTest, we won't veto "get" on empty-set.
           return;
         }
       }
@@ -151,10 +163,14 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
   }
 
   /**
-   * @param string $action e.g. "create"
-   * @param string $entityTable e.g. "civicrm_mailing"
+   * @param string $action
+   *   The API action (e.g. "create").
+   * @param string $entityTable
+   *   The target entity table (e.g. "civicrm_mailing").
    * @param int|NULL $entityId
+   *   The target entity ID.
    * @param array $apiRequest
+   *   The full API request.
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -179,12 +195,17 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
   }
 
   /**
-   * If the request attempts to change the entity_table/entity_id of an existing record, then generate an error.
+   * If the request attempts to change the entity_table/entity_id of an
+   * existing record, then generate an error.
    *
-   * @param int $fileId the main record being changed
-   * @param string $entityTable the saved FK
-   * @param int $entityId the saved FK
+   * @param int $fileId
+   *   The main record being changed.
+   * @param string $entityTable
+   *   The saved FK.
+   * @param int $entityId
+   *   The saved FK.
    * @param array $apiRequest
+   *   The full API request.
    * @throws \API_Exception
    */
   public function preventReassignment($fileId, $entityTable, $entityId, $apiRequest) {
@@ -199,8 +220,10 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
   }
 
   /**
-   * @param string $entityTable e.g. "civicrm_mailing" or "civicrm_activity"
-   * @return string|NULL e.g. "Mailing" or "Activity"
+   * @param string $entityTable
+   *   The target entity table (e.g. "civicrm_mailing" or "civicrm_activity").
+   * @return string|NULL
+   *   The target entity name (e.g. "Mailing" or "Activity").
    */
   public function getDelegatedEntityName($entityTable) {
     if ($this->allowedDelegates === NULL || in_array($entityTable, $this->allowedDelegates)) {
@@ -216,19 +239,24 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
   }
 
   /**
-   * @param string $action e.g. "create" ("When running *create* on a file...")
-   * @return string e.g. "create" ("Check for *create* permission on the mailing to which it is attached.")
+   * @param string $action
+   *   API action name -- e.g. "create" ("When running *create* on a file...").
+   * @return string
+   *   e.g. "create" ("Check for *create* permission on the mailing to which
+   *   it is attached.")
    */
   public function getDelegatedAction($action) {
     switch ($action) {
       case 'get':
         // reading attachments requires reading the other entity
         return 'get';
-        break;
+
       case 'create':
       case 'delete':
-        // creating/updating/deleting attachments requires editing the other entity
+        // creating/updating/deleting an attachment requires editing
+        // the other entity
         return 'create';
+
       default:
         return $action;
     }
@@ -236,11 +264,12 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
 
   /**
    * @param int $id
+   *   e.g. file ID.
    * @return array (0 => bool $isValid, 1 => string $entityTable, 2 => int $entityId)
    */
   public function getDelegate($id) {
     $query = \CRM_Core_DAO::executeQuery($this->lookupDelegateSql, array(
-      1 => array($id, 'Positive')
+      1 => array($id, 'Positive'),
     ));
     if ($query->fetch()) {
       return array($query->is_valid, $query->entity_table, $query->entity_id);
@@ -252,6 +281,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
 
   /**
    * @param array $apiRequest
+   *   The full API request.
    * @return bool
    */
   public function isTrusted($apiRequest) {
