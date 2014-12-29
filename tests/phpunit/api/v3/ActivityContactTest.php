@@ -45,23 +45,17 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
   function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     $this->_contactID    = $this->organizationCreate();
     $activity            = $this->activityCreate();
     $this->_activityID   = $activity['id'];
     CRM_Core_PseudoConstant::flush();
-    $this->quickCleanup(array('civicrm_activity_contact'));
     $this->_params = array(
       'contact_id' => $this->_contactID,
       'activity_id' => $this->_activityID,
       'record_type_id' => 2,
     );
-  }
-
-  function tearDown() {
-    $params['activity_id'] = $this->_activityID;
-    $this->callAPISuccess('activity', 'delete', $params);
-    $this->contactDelete($this->_contactID);
   }
 
   public function testCreateActivityContact() {

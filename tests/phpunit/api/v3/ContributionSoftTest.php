@@ -52,6 +52,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     $this->_individualId = $this->individualCreate();
     $this->_softIndividual1Id = $this->individualCreate();
@@ -81,22 +82,6 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
     );
-  }
-
-  function tearDown() {
-    $this->quickCleanup(array(
-      'civicrm_contribution',
-      'civicrm_event',
-      'civicrm_contribution_page',
-      'civicrm_participant',
-      'civicrm_participant_payment',
-      'civicrm_line_item',
-      'civicrm_financial_trxn',
-      'civicrm_financial_item',
-      'civicrm_entity_financial_trxn',
-      'civicrm_contact',
-      'civicrm_contribution_soft'
-    ));
   }
 
   /**

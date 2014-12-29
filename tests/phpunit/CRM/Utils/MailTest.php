@@ -5,16 +5,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Utils_MailTest
  */
 class CRM_Utils_MailTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Mail Test',
-      'description' => 'Test RFC822 formatting',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

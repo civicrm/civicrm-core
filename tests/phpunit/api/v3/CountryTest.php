@@ -43,10 +43,10 @@ class api_v3_CountryTest extends CiviUnitTestCase {
   function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
-    $this->quickCleanup(array('civicrm_country'));
+    $this->useTransaction(TRUE);
     $this->_params = array(
       'name' => 'Made Up Land',
-      'iso_code' => 'ML',
+      'iso_code' => 'ZZ',
       'region_id' => 1,
     );
   }

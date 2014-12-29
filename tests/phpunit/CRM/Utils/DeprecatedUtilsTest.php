@@ -8,17 +8,6 @@ require_once 'CRM/Utils/DeprecatedUtils.php';
  */
 class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name'      => 'Deprecated Utils Test',
-      'description' => 'Test functions that were copied from api v2 to support BAO code',
-      'group'      => 'CiviCRM BAO Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
   }

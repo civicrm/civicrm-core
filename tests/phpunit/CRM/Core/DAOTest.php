@@ -6,16 +6,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_DAOTest
  */
 class CRM_Core_DAOTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name'    => 'DAO',
-      'description' => 'Test core DAO functions',
-      'group'     => 'Core',
-    );
-  }
 
   function testGetReferenceColumns() {
     // choose CRM_Core_DAO_Email as an arbitrary example

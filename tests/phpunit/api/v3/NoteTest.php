@@ -39,30 +39,12 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   protected $_noteID;
   protected $_note;
 
-
-  /**
-   *
-   */
-  function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Note Create',
-      'description' => 'Test all Note Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
 
     $this->_apiversion = 3;
     //  Connect to the database
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     $this->_contactID = $this->organizationCreate(NULL);
 
@@ -75,13 +57,6 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'subject' => 'Test Note',    );
     $this->_note = $this->noteCreate($this->_contactID);
     $this->_noteID = $this->_note['id'];
-  }
-
-  function tearDown() {
-    $tablesToTruncate = array(
-      'civicrm_note', 'civicrm_contact',
-    );
-    $this->quickCleanup($tablesToTruncate);
   }
 
   ///////////////// civicrm_note_get methods

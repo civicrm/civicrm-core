@@ -66,17 +66,6 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
   );
 
   /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Contact Custom Search Group',
-      'description' => 'Test all CRM_Contact_Form_Search_Custom_Group methods.',
-      'group' => 'CiviCRM Custom Search Tests',
-    );
-  }
-
-  /**
    * @return CRM_Contact_Form_Search_Custom_GroupTestDataProvider
    */
   public function dataProvider() {

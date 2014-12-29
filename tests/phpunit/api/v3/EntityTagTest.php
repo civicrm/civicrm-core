@@ -53,16 +53,13 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     $this->_individualID = $this->individualCreate();
     $this->_tag = $this->tagCreate();
     $this->_tagID = $this->_tag['id'];
     $this->_householdID = $this->houseHoldCreate();
     $this->_organizationID = $this->organizationCreate();
-  }
-
-  function tearDown() {
-    $this->quickCleanup(array('civicrm_tag', 'civicrm_entity_tag'));
   }
 
   function testAddEmptyParams() {

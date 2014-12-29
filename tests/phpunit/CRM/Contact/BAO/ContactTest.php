@@ -7,17 +7,6 @@ require_once 'CiviTest/Custom.php';
  * Class CRM_Contact_BAO_ContactTest
  */
 class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Contact BAOs',
-      'description' => 'Test all Contact_BAO_Contact methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
   }

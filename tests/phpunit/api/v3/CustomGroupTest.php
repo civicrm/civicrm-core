@@ -42,17 +42,6 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
   public $DBResetRequired = TRUE;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Custom Group Create',
-      'description' => 'Test all Custom Group Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     $this->_entity     = 'CustomGroup';
     $this->_params     = array(

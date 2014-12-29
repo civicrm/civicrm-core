@@ -31,17 +31,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_SignerTest extends CiviUnitTestCase {
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name'      => 'Signer Test',
-      'description' => 'Test array-signing functions',
-      'group'      => 'CiviCRM BAO Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
   }

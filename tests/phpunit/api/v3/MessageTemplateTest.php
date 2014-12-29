@@ -43,7 +43,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
-    $this->quickCleanup(array('civicrm_msg_template'));
+    $this->useTransaction(TRUE);
     $template = CRM_Core_DAO::createTestObject('CRM_Core_DAO_MessageTemplate')->toArray();
     $this->params = array(
       'msg_title' => $template['msg_title'],
@@ -55,7 +55,6 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
       'is_reserved' => $template['is_reserved'],
     );
   }
-  function tearDown() {}
 
    /**
    * Test create function succeeds

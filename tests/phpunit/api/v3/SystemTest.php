@@ -38,15 +38,6 @@ class api_v3_SystemTest extends CiviUnitTestCase {
   const TEST_CACHE_PATH = 'api/v3/system';
 
   /**
-   *  Constructor
-   *
-   *  Initialize configuration
-   */
-  function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    *
@@ -54,16 +45,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  protected function tearDown() {
-    $this->quickCleanup(array('civicrm_system_log'));
+    $this->useTransaction(TRUE);
   }
 
   ///////////////// civicrm_domain_get methods

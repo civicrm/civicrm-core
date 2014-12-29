@@ -40,18 +40,6 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   protected $CustomGroupIndividual;
   protected $individualStudent;
 
-
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Custom Data For Contact Subtype',
-      'description' => 'Test Custom Data for Contact Subtype.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     //  Create Group For Individual  Contact Type

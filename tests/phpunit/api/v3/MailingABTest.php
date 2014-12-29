@@ -40,17 +40,6 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   protected $_entity = 'MailingAB';
   protected $_groupID;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Mailer',
-      'description' => 'Test all Mailer methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);

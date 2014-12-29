@@ -37,17 +37,6 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   protected $_apiversion;
 
   /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Group Organization',
-      'description' => 'Test all Group Organization API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
-  /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    *
@@ -56,29 +45,10 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   protected function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_groupID = $this->groupCreate();
 
     $this->_orgID = $this->organizationCreate(NULL);
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  protected function tearDown() {
-    //  Truncate the tables
-    $this->quickCleanup(
-      array(
-        'civicrm_group',
-        'civicrm_group_organization',
-        'civicrm_contact',
-        'civicrm_uf_group',
-        'civicrm_uf_join',
-        'civicrm_uf_match',
-      )
-    );
   }
 
   ///////////////// civicrm_group_organization_get methods

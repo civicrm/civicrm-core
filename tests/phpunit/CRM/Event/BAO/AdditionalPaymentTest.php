@@ -36,16 +36,6 @@ require_once 'CiviTest/Participant.php';
  * Class CRM_Event_BAO_AdditionalPaymentTest
  */
 class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Additional Payment BAOs test',
-      'description' => 'BAOs testing done for addtional payment logic check',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

@@ -39,17 +39,6 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   protected $_contributionPageID;
   protected $_paymentProcessorID;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'PaypalPro IPN processing',
-      'rescription' => 'PaypalPro IPN methods.',
-      'group' => 'Payment Processor Tests',
-    );
-  }
-
   function setUp() {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorCreate();

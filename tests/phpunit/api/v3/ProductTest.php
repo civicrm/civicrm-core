@@ -36,26 +36,17 @@ class api_v3_ProductTest extends CiviUnitTestCase {
 
   protected $_entity = 'Product';
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Product Tests',
-      'description' => 'Test product API',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
   function setUp() {
+    parent::setUp();
+    $this->useTransaction();
     $this->_params = array(
       'name' => 'my product',
     );
   }
 
-  function tearDown() {
-    $this->quickCleanup(array('civicrm_product'), TRUE);
-  }
+//  function tearDown() {
+//    $this->quickCleanup(array('civicrm_product'), TRUE);
+//  }
 
   function testGetFields() {
     $fields = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));

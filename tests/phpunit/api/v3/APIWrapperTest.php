@@ -48,6 +48,7 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_apiWrappers', array($this, 'onApiWrappers'));
   }
 

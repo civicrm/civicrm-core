@@ -5,16 +5,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Contact_BAO_ContactType_ContactTest
  */
 class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Contact Subtype',
-      'description' => 'Test Contact for subtype.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   function setUp() {
     parent::setUp();

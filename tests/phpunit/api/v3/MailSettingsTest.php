@@ -49,9 +49,8 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
       'is_default' => 1,
     );
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
-
-  function tearDown() {}
 
   /**
    * Test creation

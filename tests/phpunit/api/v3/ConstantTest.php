@@ -43,15 +43,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_ConstantTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-
-  /**
-   *  Constructor
-   *
-   *  Initialize configuration
-   */ function __construct() {
-    parent::__construct();
-  }
-
   /**
    *  Test setup for every test
    *

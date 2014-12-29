@@ -32,16 +32,6 @@ require_once 'CRM/Core/BAO/RecurringEntity.php';
  * Class CRM_Core_BAO_RecurringEntityTest
  */
 class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Recurring Entity BAOs',
-      'description' => 'Test all CRM_Event_BAO_RecurringEntity methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   /**
    * Sets up the fixture, for example, opens a network connection.
