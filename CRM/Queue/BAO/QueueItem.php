@@ -45,7 +45,7 @@ class CRM_Queue_BAO_QueueItem extends CRM_Queue_DAO_QueueItem {
    *
    * @return bool TRUE if table now exists
    */
-  static function findCreateTable() {
+  public static function findCreateTable() {
     $checkTableSql = "show tables like 'civicrm_queue_item'";
     $foundName = CRM_Core_DAO::singleValueQuery($checkTableSql);
     if ($foundName == 'civicrm_queue_item') {
@@ -63,4 +63,3 @@ class CRM_Queue_BAO_QueueItem extends CRM_Queue_DAO_QueueItem {
     return ($foundName == 'civicrm_queue_item');
   }
 }
-

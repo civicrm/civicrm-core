@@ -34,6 +34,7 @@ namespace Civi\API\Event;
 class PrepareEvent extends Event {
   /**
    * @param array $apiRequest
+   *   The full description of the API request.
    * @return RespondEvent
    */
   public function setApiRequest($apiRequest) {

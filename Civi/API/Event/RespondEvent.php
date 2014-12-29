@@ -38,11 +38,14 @@ class RespondEvent extends Event {
   private $response;
 
   /**
-   * @param $apiProvider
-   * @param $apiRequest
-   * @param $response
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
+   *   The API provider responsible for executing the request.
+   * @param array $apiRequest
+   *   The full description of the API request.
+   * @param mixed $response
+   *   The response to return to the client.
    */
-  function __construct($apiProvider, $apiRequest, $response) {
+  public function __construct($apiProvider, $apiRequest, $response) {
     $this->response = $response;
     parent::__construct($apiProvider, $apiRequest);
   }
@@ -56,6 +59,7 @@ class RespondEvent extends Event {
 
   /**
    * @param mixed $response
+   *   The response to return to the client.
    */
   public function setResponse($response) {
     $this->response = $response;
