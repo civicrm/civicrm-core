@@ -3915,6 +3915,6 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 
 -- Add missing Indonesian provinces (Kalimantan Tengah, Sulawesi Barat, Kalimantan Utara) and revised outdated names in code above
 (NULL, 1102, "KT", "Kalimantan Tengah"), -- added, updated abbreviation
-(NULL, 1102, "SR", "Sulawesi Barat") -- added, updated abbreviation
+(NULL, 1102, "SR", "Sulawesi Barat"), -- added, updated abbreviation
 (NULL, 1102, "KU", "Kalimantan Utara"); -- added
 
