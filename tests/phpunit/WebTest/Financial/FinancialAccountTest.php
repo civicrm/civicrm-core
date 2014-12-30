@@ -44,7 +44,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $financialAccountTitle = 'Financial Account '.substr(sha1(rand()), 0, 4);
     $financialAccountDescription = "{$financialAccountTitle} Description";
     $accountingCode = 1033;
-    $financialAccountType = 'Expenses';
+    $financialAccountType = 'Liability';
     $taxDeductible = FALSE;
     $isActive = TRUE;
     $isTax = TRUE;
@@ -92,7 +92,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $editfinancialAccount = $financialAccountTitle;
     $financialAccountTitle .= ' Edited';
     $orgNameEdit = FALSE;
-    $financialAccountType = 'Revenue';
+    $financialAccountType = 'Liability';
 
     if ($orgNameEdit) {
       $orgNameEdit = 'NGO '.substr(sha1(rand()), 0, 7);
