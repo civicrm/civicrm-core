@@ -45,7 +45,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * Related component whose financial payment is being processed
    *
    * @var string
-   * @public
    */
   protected $_component = NULL;
 

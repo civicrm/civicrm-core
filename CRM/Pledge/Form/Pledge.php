@@ -44,7 +44,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * The id of the pledge that we are proceessing
    *
    * @var int
-   * @public
    */
   public $_id;
 
@@ -52,25 +51,21 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * The id of the contact associated with this pledge
    *
    * @var int
-   * @public
    */
   public $_contactID;
 
   /**
    * The Pledge values if an existing pledge
-   * @public
    */
   public $_values;
 
   /**
    * The Pledge frequency Units
-   * @public
    */
   public $_freqUnits;
 
   /**
    * Is current pledge pending.
-   * @public
    */
   public $_isPending = FALSE;
 

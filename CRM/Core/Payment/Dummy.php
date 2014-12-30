@@ -83,7 +83,6 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    * @param  array $params assoc array of input parameters for this transaction
    *
    * @return array the result in a nice formatted array (or an error object)
-   * @public
    */
   public function doDirectPayment(&$params) {
     // Invoke hook_civicrm_paymentProcessor
@@ -155,7 +154,6 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    * This function checks to see if we have the right config values
    *
    * @return string the error message if any
-   * @public
    */
   public function checkConfig() {
     return NULL;

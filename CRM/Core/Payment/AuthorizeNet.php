@@ -98,7 +98,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @param  array $params assoc array of input parameters for this transaction
    *
    * @return array the result in a nice formatted array (or an error object)
-   * @public
    */
   public function doDirectPayment(&$params) {
     if (!defined('CURLOPT_SSLCERT')) {
@@ -210,8 +209,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
   /**
    * Submit an Automated Recurring Billing subscription
-   *
-   * @public
    */
   public function doRecurPayment() {
     $template = CRM_Core_Smarty::singleton();
@@ -615,7 +612,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * This function checks to see if we have the right config values
    *
    * @return string the error message if any
-   * @public
    */
   public function checkConfig() {
     $error = array();

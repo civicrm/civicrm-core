@@ -1685,7 +1685,6 @@ ORDER BY name";
    *
    * @return int the country id that the state belongs to
    * @static
-   * @public
    */
   public static function countryIDForStateID($stateID) {
     if (empty($stateID)) {

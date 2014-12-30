@@ -110,7 +110,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param  array $params assoc array of input parameters for this transaction
    *
    * @return array the result in an nice formatted array (or an error object)
-   * @public
    */
   public function setExpressCheckOut(&$params) {
     $args = array();
@@ -154,7 +153,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param  string $token the key associated with this transaction
    *
    * @return array the result in an nice formatted array (or an error object)
-   * @public
    */
   public function getExpressCheckoutDetails($token) {
     $args = array();
@@ -197,7 +195,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @internal param string $token the key associated with this transaction
    *
    * @return array the result in an nice formatted array (or an error object)
-   * @public
    */
   public function doExpressCheckout(&$params) {
     $args = array();
@@ -315,7 +312,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *
    * @param string $component
    * @return array the result in an nice formatted array (or an error object)
-   * @public
    */
   public function doDirectPayment(&$params, $component = 'contribute') {
     $args = array();
@@ -392,7 +388,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * This function checks to see if we have the right config values
    *
    * @return string the error message if any
-   * @public
    */
   public function checkConfig() {
     $error = array();
@@ -442,7 +437,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param  string $method method to check for.
    *
    * @return boolean
-   * @public
    */
   public function isSupported($method = 'cancelSubscription') {
     if ($this->_paymentProcessor['payment_processor_type'] != 'PayPal') {

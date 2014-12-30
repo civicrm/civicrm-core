@@ -43,7 +43,6 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    * The type of pcp component.
    *
    * @var int
-   * @protected
    */
   public $_component = 'event';
 

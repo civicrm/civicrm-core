@@ -60,7 +60,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * The default values for the form
    *
    * @var array
-   * @protected
    */
   protected $_defaults;
 

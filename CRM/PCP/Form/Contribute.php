@@ -43,7 +43,6 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * The type of pcp component.
    *
    * @var int
-   * @protected
    */
   public $_component = 'contribute';
 

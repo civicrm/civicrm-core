@@ -198,7 +198,6 @@ class CRM_Core_Report_Excel {
    * @param boolean $saveFile -
    *
    * @return void
-   * @public
    * @static
    */
   public static function writeCSVFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE, $saveFile = NULL) {

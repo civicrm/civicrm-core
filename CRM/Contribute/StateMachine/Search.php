@@ -38,7 +38,6 @@ class CRM_Contribute_StateMachine_Search extends CRM_Core_StateMachine {
    * The task that the wizard is currently processing
    *
    * @var string
-   * @protected
    */
   protected $_task;
 

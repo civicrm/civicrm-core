@@ -444,7 +444,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return array an array of array of values for this option group
    * @static
-   * @public
    */
   public static function getOptionValuesArray($optionGroupID) {
     // check if we can get the field values from the system cache
@@ -477,7 +476,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return array an associative array of label, value pairs
    * @static
-   * @public
    */
   public static function getOptionValuesAssocArray($optionGroupID) {
     $optionValues = self::getOptionValuesArray($optionGroupID);
@@ -496,7 +494,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return array an associative array of label, value pairs
    * @static
-   * @public
    */
   public static function getOptionValuesAssocArrayFromName($optionGroupName) {
     $dao = new CRM_Core_DAO_OptionGroup();

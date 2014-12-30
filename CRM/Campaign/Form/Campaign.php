@@ -64,7 +64,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    * The id of the campaign we are proceessing
    *
    * @var int
-   * @protected
    */
   protected $_campaignId;
 

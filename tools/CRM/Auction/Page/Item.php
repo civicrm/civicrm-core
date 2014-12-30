@@ -44,7 +44,6 @@ class CRM_Auction_Page_Item extends CRM_Core_Page {
    * the id of the auction for this item
    *
    * @var int
-   * @protected
    */
   public $_aid;
 

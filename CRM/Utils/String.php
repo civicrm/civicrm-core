@@ -608,7 +608,6 @@ class CRM_Utils_String {
    * @param string $string the input string
    *
    * @return string the cleaned up string
-   * @public
    * @static
    */
   public static function purifyHTML($string) {

@@ -129,7 +129,6 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Add entry to log table
    *
    * @return void
-   * @protected
    */
   protected function log() {
     CRM_Core_BAO_Log::register($this->_contactId,
@@ -143,7 +142,6 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Prepares ajaxResponse
    *
    * @return void
-   * @protected
    */
   protected function response() {
     // Load changelog footer from template

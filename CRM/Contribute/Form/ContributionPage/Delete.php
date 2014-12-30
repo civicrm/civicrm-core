@@ -42,7 +42,6 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
    * Page title
    *
    * @var string
-   * @protected
    */
   protected $_title;
 

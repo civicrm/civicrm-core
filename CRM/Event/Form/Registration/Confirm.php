@@ -44,7 +44,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * The values for the contribution db object
    *
    * @var array
-   * @protected
    */
   public $_values;
 
@@ -52,7 +51,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * The total amount
    *
    * @var float
-   * @public
    */
   public $_totalAmount;
 

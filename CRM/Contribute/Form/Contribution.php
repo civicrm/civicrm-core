@@ -42,7 +42,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the contribution that we are processing
    *
    * @var int
-   * @public
    */
   public $_id;
 
@@ -50,7 +49,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the premium that we are processing
    *
    * @var int
-   * @public
    */
   public $_premiumID = NULL;
 
@@ -63,7 +61,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the note
    *
    * @var int
-   * @public
    */
   public $_noteID;
 
@@ -71,7 +68,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the contact associated with this contribution
    *
    * @var int
-   * @public
    */
   public $_contactID;
 
@@ -79,7 +75,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the pledge payment that we are processing
    *
    * @var int
-   * @public
    */
   public $_ppID;
 
@@ -87,7 +82,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the pledge that we are processing
    *
    * @var int
-   * @public
    */
   public $_pledgeID;
 
@@ -96,7 +90,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * financial transaction
    *
    * @var boolean
-   * @public
    */
   public $_online = FALSE;
 
@@ -104,7 +97,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Stores all product option
    *
    * @var array
-   * @public
    */
   public $_options;
 
@@ -112,7 +104,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Storage of parameters from form
    *
    * @var array
-   * @public
    */
   public $_params;
 

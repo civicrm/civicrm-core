@@ -42,7 +42,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * The id of the contact associated with this contribution
    *
    * @var int
-   * @public
    */
   public $_contactID;
 
@@ -51,7 +50,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * The id of the contribution object that is created when the form is submitted
    *
    * @var int
-   * @public
    */
   public $_contributionID;
 

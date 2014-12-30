@@ -1764,7 +1764,6 @@ class CRM_Utils_Date {
    *
    * @return the time in UTC
    * @static
-   * @public
    */
   public static function getUTCTime($offset = 0) {
     $originalTimezone = date_default_timezone_get();

@@ -43,7 +43,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * The id of the event we are proceessing
    *
    * @var int
-   * @protected
    */
   public $_id;
 

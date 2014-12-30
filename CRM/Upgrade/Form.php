@@ -48,7 +48,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * Upgrade for multilingual
    *
    * @var boolean
-   * @public
    */
   public $multilingual = FALSE;
 
@@ -56,7 +55,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * Locales available for multilingual upgrade
    *
    * @var array
-   * @public
    */
   public $locales;
 
@@ -64,7 +62,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * Number to string mapper
    *
    * @var array
-   * @public
    */
   static $_numberMap = array(
     0 => 'Zero',

@@ -52,7 +52,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The id of the event we are proceessing
    *
    * @var int
-   * @protected
    */
   public $_eventId;
 
@@ -60,7 +59,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The array of ids of all the participant we are proceessing
    *
    * @var int
-   * @protected
    */
   protected $_participantIDS = NULL;
 
@@ -68,7 +66,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The id of the participant we are proceessing
    *
    * @var int
-   * @protected
    */
   protected $_participantId;
 
@@ -76,7 +73,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Is participant able to walk registration wizard.
    *
    * @var Boolean
-   * @protected
    */
   public $_allowConfirmation;
 
@@ -84,7 +80,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Is participant requires approval
    *
    * @var Boolean
-   * @public
    */
   public $_requireApproval;
 
@@ -92,7 +87,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Is event configured for waitlist.
    *
    * @var Boolean
-   * @public
    */
   public $_allowWaitlist;
 
@@ -101,7 +95,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * when there are pre-registered.
    *
    * @var array
-   * @public
    */
   public $_additionalParticipantIds;
 
@@ -117,7 +110,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The values for the contribution db object
    *
    * @var array
-   * @protected
    */
   public $_values;
 
@@ -125,7 +117,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The paymentProcessor attributes for this page
    *
    * @var array
-   * @protected
    */
   public $_paymentProcessor;
 
@@ -133,7 +124,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The params submitted by the form and computed by the app
    *
    * @var array
-   * @protected
    */
   protected $_params;
 
@@ -141,7 +131,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The fields involved in this contribution page
    *
    * @var array
-   * @protected
    */
   public $_fields;
 
@@ -149,7 +138,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The billing location id for this contribiution page
    *
    * @var int
-   * @protected
    */
   public $_bltID;
 
@@ -157,7 +145,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Price Set ID, if the new price set method is used
    *
    * @var int
-   * @protected
    */
   public $_priceSetId = NULL;
 
@@ -165,7 +152,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Array of fields for the price set
    *
    * @var array
-   * @protected
    */
   public $_priceSet;
 
@@ -176,7 +162,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /* Is event already full.
      *
      * @var boolean
-     * @protected
      */
 
   public $_isEventFull;
