@@ -4100,6 +4100,35 @@ div.m ul#civicrm-menu,
   min-height: 5em;
 }
 
+.crm-editable-form {
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  overflow: visible;
+}
+
+.crm-editable-form input,
+.crm-editable-form textarea {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.crm-editable-form button {
+  position: absolute;
+  bottom: -22px;
+  text-align: center;
+  height: 23px;
+  width: 32px;
+}
+
+.crm-editable-form button[type=submit] {
+  left: 0;
+}
+
+.crm-editable-form button[type=cancel] {
+  left: 32px;
+}
+
 /*crm-10345*/
 .crm-container .field-action {
   word-wrap: normal;
