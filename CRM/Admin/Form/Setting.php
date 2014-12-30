@@ -139,20 +139,22 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
     foreach ($this->_settings as $setting => $group){
       $settingMetaData = civicrm_api('setting', 'getfields', array('version' => 3, 'name' => $setting));
-      if(isset($settingMetaData['values'][$setting]['quick_form_type'])){
-        $add = 'add' . $settingMetaData['values'][$setting]['quick_form_type'];
+      $props = $settingMetaData['values'][$setting];
+      if(isset($props['quick_form_type'])){
+        $add = 'add' . $props['quick_form_type'];
         if($add == 'addElement'){
           $this->$add(
-            $settingMetaData['values'][$setting]['html_type'],
+            $props['html_type'],
             $setting,
-            ts($settingMetaData['values'][$setting]['title']),
-            CRM_Utils_Array::value('html_attributes', $settingMetaData['values'][$setting], array())
+            ts($props['title']),
+            CRM_Utils_Array::value($props['html_type'] == 'select' ? 'option_values' : 'html_attributes', $props, array()),
+            $props['html_type'] == 'select' ? CRM_Utils_Array::value('html_attributes', $props) : NULL
           );
         }
         else{
-          $this->$add($setting, ts($settingMetaData['values'][$setting]['title']));
+          $this->$add($setting, ts($props['title']));
         }
-        $this->assign("{$setting}_description", ts($settingMetaData['values'][$setting]['description']));
+        $this->assign("{$setting}_description", ts($props['description']));
         if($setting == 'max_attachments'){
           //temp hack @todo fix to get from metadata
           $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
