@@ -307,7 +307,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
                 array(
                       'type' => 'select',
                       'locator' => 'contribution_date_relative',
-                      'values' => array('This Day'),
+                      'values' => array('Today'),
             ),
           ),
         ),
