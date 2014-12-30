@@ -1,8 +1,8 @@
 'use strict';
 
 (function(root) {
-  var Comparitor = function() {};
-  Comparitor.prototype = {
+  var Comparator = function() {};
+  Comparator.prototype = {
     compare: function(actual, expected) {
       this.result = {
         'pass': true,
@@ -74,16 +74,16 @@
       return false;
     },
     register: function(jasmine) {
-      var comparitor = this;
+      var comparator = this;
       jasmine.addMatchers({
         toEqualData: function(expected) {
           return {
-            compare: $.proxy(comparitor.compare, comparitor)
+            compare: $.proxy(comparator.compare, comparator)
           }
         }
       });
     }
   };
-  var module = angular.module('crmJsonComparitor', []);
-  module.service('crmJsonComparitor', Comparitor);
+  var module = angular.module('crmJsonComparator', []);
+  module.service('crmJsonComparator', Comparator);
 })(angular);

@@ -10,9 +10,9 @@ describe('crmCaseType', function() {
       'REL_TYPE_CNAME': 'label_b_a'
     };
     module('crmCaseType');
-    module('crmJsonComparitor');
-    inject(function(crmJsonComparitor) {
-      crmJsonComparitor.register(jasmine);
+    module('crmJsonComparator');
+    inject(function(crmJsonComparator) {
+      crmJsonComparator.register(jasmine);
     });
   });
 
