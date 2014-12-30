@@ -43,7 +43,6 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
   /**
    * Making this public so we can reference it in the formRule
    * @var int
-   * @public
    */
   public $_surveyId;
 

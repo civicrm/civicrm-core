@@ -48,7 +48,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
    * The id of the entity that we are proceessing
    *
    * @var int
-   * @protected
    */
   protected $_entityId;
 
@@ -56,7 +55,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
    * The table name of the entity that we are proceessing
    *
    * @var string
-   * @protected
    */
   protected $_entityTable;
 
@@ -66,7 +64,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
    * The contact ID
    *
    * @var int
-   * @protected
    */
   protected $_contactID;
 

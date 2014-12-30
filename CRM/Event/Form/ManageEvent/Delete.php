@@ -42,7 +42,6 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
    * Page title
    *
    * @var string
-   * @protected
    */
   protected $_title;
 

@@ -46,7 +46,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * The id of the contact associated with this signature
    *
    * @var int
-   * @public
    */
   public $_contactId;
 
@@ -96,7 +95,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * The id of the survey (petition) we are proceessing
    *
    * @var int
-   * @protected
    */
   public $_surveyId;
 
@@ -111,7 +109,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * Values to use for custom profiles
    *
    * @var array
-   * @protected
    */
   public $_values;
 
@@ -119,7 +116,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * The params submitted by the form
    *
    * @var array
-   * @protected
    */
   protected $_params;
 

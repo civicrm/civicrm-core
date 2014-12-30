@@ -1999,7 +1999,6 @@ WHERE  id IN ( %1, %2 )
    *
    * @return array           - fatal is fieldID does not exists, else array of tableName, columnName
    * @static
-   * @public
    */
   public static function getTableColumnGroup($fieldID, $force = FALSE) {
     $cacheKey    = "CRM_Core_DAO_CustomField_CustomGroup_TableColumn_{$fieldID}";

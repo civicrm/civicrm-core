@@ -46,7 +46,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The values for the contribution db object
    *
    * @var array
-   * @protected
    */
   public $_values;
 
@@ -54,7 +53,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The values for the quickconfig for priceset
    *
    * @var boolean
-   * @protected
    */
   public $_quickConfig = NULL;
 
@@ -62,7 +60,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Price Set ID, if the new price set method is used
    *
    * @var int
-   * @protected
    */
   public $_priceSetId;
 
@@ -70,7 +67,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Array of fields for the price set
    *
    * @var array
-   * @protected
    */
   public $_priceSet;
 
@@ -78,7 +74,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The id of the participation that we are proceessing
    *
    * @var int
-   * @protected
    */
   public $_id;
 
@@ -86,7 +81,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The id of the note
    *
    * @var int
-   * @protected
    */
   protected $_noteId = NULL;
 
@@ -94,7 +88,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The id of the contact associated with this participation
    *
    * @var int
-   * @protected
    */
   public $_contactId;
 
@@ -102,7 +95,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Array of event values
    *
    * @var array
-   * @protected
    */
   protected $_event;
 

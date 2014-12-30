@@ -284,7 +284,6 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    * This function checks to see if we have the right config values
    *
    * @return string the error message if any
-   * @public
    */
   public function checkConfig() {
     $error = array();

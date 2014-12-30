@@ -435,7 +435,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * @internal param string $mode the mode we are operating in (live or test)
    *
    * @return string the error message if any
-   * @public
    */
   public function checkConfig() {
     $errorMsg = array();

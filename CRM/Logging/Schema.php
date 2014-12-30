@@ -653,7 +653,6 @@ COLS;
    * an audit trail
    *
    * @static
-   * @public
    */
   public static function disableLoggingForThisConnection( ) {
     // do this only if logging is enabled

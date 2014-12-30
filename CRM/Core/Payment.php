@@ -452,7 +452,6 @@ abstract class CRM_Core_Payment {
    * This function checks to see if we have the right config values
    *
    * @return string the error message if any
-   * @public
    */
   abstract function checkConfig();
 
@@ -479,7 +478,6 @@ abstract class CRM_Core_Payment {
 
   /**
    * Page callback for civicrm/payment/ipn
-   * @public
    */
   public static function handleIPN() {
     self::handlePaymentMethod(
@@ -498,7 +496,6 @@ abstract class CRM_Core_Payment {
    * processor & ideally the processor will be validating the results
    * Load requested payment processor and call that processor's handle<$method> method
    *
-   * @public
    * @param $method
    * @param array $params
    */
@@ -599,7 +596,6 @@ abstract class CRM_Core_Payment {
    * @param  string $method method to check for.
    *
    * @return boolean
-   * @public
    */
   public function isSupported($method = 'cancelSubscription') {
     return method_exists(CRM_Utils_System::getClassName($this), $method);

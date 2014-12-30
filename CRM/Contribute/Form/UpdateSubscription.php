@@ -64,7 +64,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    * The id of the contact associated with this recurring contribution
    *
    * @var int
-   * @public
    */
   public $_contactID;
 

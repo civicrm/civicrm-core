@@ -43,7 +43,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * The id of the case that we are proceessing
    *
    * @var int
-   * @protected
    */
   protected $_id;
 
@@ -51,7 +50,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * The id of the contact associated with this contribution
    *
    * @var int
-   * @protected
    */
   protected $_contactID;
 

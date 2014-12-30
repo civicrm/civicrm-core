@@ -61,7 +61,6 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    *
    * @return string the sql query which lists the groups that need to be refreshed
    * @static
-   * @public
    */
   public static function groupRefreshedClause($groupIDClause = null, $includeHiddenGroups = FALSE) {
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
@@ -99,7 +98,6 @@ AND     ( g.cache_date IS NULL OR
    *
    * @return string the sql query which lists the groups that need to be refreshed
    * @static
-   * @public
    */
   public static function shouldGroupBeRefreshed($groupID, $includeHiddenGroups = FALSE) {
     $query = self::groupRefreshedClause("g.id = %1", $includeHiddenGroups);
@@ -276,7 +274,6 @@ WHERE  id IN ( $groupIDs )
    * @param $groupID  int the groupID to delete cache entries, NULL for all groups
    * @param $onceOnly boolean run the function exactly once for all groups.
    *
-   * @public
    * @return void
    * @static
    */

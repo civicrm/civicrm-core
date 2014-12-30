@@ -43,7 +43,6 @@ class CRM_Case_Form_Activity_OpenCase {
    * The id of the client associated with this case
    *
    * @var int
-   * @public
    */
   public $_contactID;
 

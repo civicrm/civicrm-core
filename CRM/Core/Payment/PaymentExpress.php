@@ -92,7 +92,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    * @internal param string $mode the mode we are operating in (live or test)
    *
    * @return string the error message if any
-   * @public
    */
   public function checkConfig() {
     $config = CRM_Core_Config::singleton();

@@ -43,7 +43,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    * The id of the pledge payment that we are proceessing
    *
    * @var int
-   * @public
    */
   public $_id;
 
