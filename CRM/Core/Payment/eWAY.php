@@ -92,7 +92,7 @@
  **/
 class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
-  CONST CHARSET = 'UTF-8';
+  const CHARSET = 'UTF-8';
 
   /**
    * We only need one instance of this object. So we use the singleton

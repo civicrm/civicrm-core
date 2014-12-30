@@ -33,7 +33,7 @@
  *
  */
 class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
-  CONST CHARSET = 'iso-8859-1';
+  const CHARSET = 'iso-8859-1';
 
   protected $_mode = NULL;
 

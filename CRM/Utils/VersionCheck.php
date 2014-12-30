@@ -33,7 +33,7 @@
  *
  */
 class CRM_Utils_VersionCheck {
-  CONST
+  const
     PINGBACK_URL = 'http://latest.civicrm.org/stable.php?format=json',
     // timeout for when the connection or the server is slow
     CHECK_TIMEOUT = 5,

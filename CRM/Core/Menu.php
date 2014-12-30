@@ -66,7 +66,7 @@ class CRM_Core_Menu {
   );
 
   static $_menuCache = NULL;
-  CONST MENU_ITEM = 1;
+  const MENU_ITEM = 1;
 
   /**
    * This function fetches the menu items from xml and xmlMenu hooks

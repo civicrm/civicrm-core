@@ -47,7 +47,7 @@ class CRM_Core_Selector_Controller {
    * @var int
    */
   // move the values from the session to the template
-  CONST SESSION = 1, TEMPLATE = 2,
+  const SESSION = 1, TEMPLATE = 2,
   TRANSFER = 4, EXPORT = 8, SCREEN = 16, PDF = 32;
 
   /**

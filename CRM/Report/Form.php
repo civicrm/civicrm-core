@@ -33,12 +33,12 @@
  *
  */
 class CRM_Report_Form extends CRM_Core_Form {
-  CONST ROW_COUNT_LIMIT = 50;
+  const ROW_COUNT_LIMIT = 50;
 
   /**
    * Operator types - used for displaying filter elements
    */
-  CONST
+  const
     OP_INT = 1,
     OP_STRING = 2,
     OP_DATE = 4,

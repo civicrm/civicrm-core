@@ -49,7 +49,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
      */
   public $_values;
 
-  CONST NUM_OPTION = 11;
+  const NUM_OPTION = 11;
 
   public function preProcess() {
     parent::preProcess();

@@ -35,9 +35,9 @@
  */
 class CRM_Core_Payment_IATS extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
-  CONST CHARSET = 'UFT-8';
+  const CHARSET = 'UFT-8';
   /* check IATS website for additional supported currencies */
-  CONST CURRENCIES = 'CAD,USD,AUD,GBP,EUR,NZD';
+  const CURRENCIES = 'CAD,USD,AUD,GBP,EUR,NZD';
 
   /**
    * We only need one instance of this object. So we use the singleton

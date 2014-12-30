@@ -45,7 +45,7 @@ class CRM_Core_Block {
    *
    * @var int
    */
-  CONST
+  const
     CREATE_NEW = 1,
     RECENTLY_VIEWED = 2,
     DASHBOARD = 3,

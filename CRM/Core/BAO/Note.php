@@ -42,7 +42,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * Const the max number of notes we display at any given time
    * @var int
    */
-  CONST MAX_NOTES = 3;
+  const MAX_NOTES = 3;
 
   /**
    * Given a note id, retrieve the note text

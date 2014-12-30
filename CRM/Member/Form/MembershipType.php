@@ -42,7 +42,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   /**
    * Max number of contacts we will display for membership-organisation
    */
-  CONST MAX_CONTACTS = 50;
+  const MAX_CONTACTS = 50;
 
   function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0 );

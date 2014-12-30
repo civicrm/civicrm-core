@@ -39,7 +39,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    *
    * Used by both profile and edit contact
    */
-  CONST GROUP = 1, TAG = 2, ALL = 3;
+  const GROUP = 1, TAG = 2, ALL = 3;
 
   /**
    * This function is to build form elements

@@ -33,7 +33,7 @@
  *
  */
 class CRM_Upgrade_Form extends CRM_Core_Form {
-  CONST QUEUE_NAME = 'CRM_Upgrade';
+  const QUEUE_NAME = 'CRM_Upgrade';
 
   /**
    * Minimum size of MySQL's thread_stack option

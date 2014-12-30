@@ -39,7 +39,7 @@
  * $Id$
  */
 class CRM_Core_Payment_Realex extends CRM_Core_Payment {
-  CONST AUTH_APPROVED = '00';
+  const AUTH_APPROVED = '00';
 
   protected $_mode = NULL;
 

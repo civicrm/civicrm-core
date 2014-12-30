@@ -44,14 +44,14 @@ class CRM_Core_Permission {
    * @const
    * @var string
    */
-  CONST EDIT_GROUPS = 'edit contacts in ', VIEW_GROUPS = 'view contacts in ';
+  const EDIT_GROUPS = 'edit contacts in ', VIEW_GROUPS = 'view contacts in ';
 
   /**
    * The various type of permissions
    *
    * @var int
    */
-  CONST EDIT = 1, VIEW = 2, DELETE = 3, CREATE = 4, SEARCH = 5, ALL = 6, ADMIN = 7;
+  const EDIT = 1, VIEW = 2, DELETE = 3, CREATE = 4, SEARCH = 5, ALL = 6, ADMIN = 7;
 
   /**
    * A placeholder permission which always fails
@@ -68,7 +68,7 @@ class CRM_Core_Permission {
    *
    * @var int
    */
-  CONST AUTH_SRC_UNKNOWN = 0, AUTH_SRC_CHECKSUM = 1, AUTH_SRC_SITEKEY = 2, AUTH_SRC_LOGIN = 4;
+  const AUTH_SRC_UNKNOWN = 0, AUTH_SRC_CHECKSUM = 1, AUTH_SRC_SITEKEY = 2, AUTH_SRC_LOGIN = 4;
 
   /**
    * Get the current permission of this user

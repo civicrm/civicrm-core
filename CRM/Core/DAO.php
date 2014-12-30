@@ -51,7 +51,7 @@ class CRM_Core_DAO extends DB_DataObject {
   static $_nullArray = array();
 
   static $_dbColumnValueCache = NULL;
-  CONST NOT_NULL = 1, IS_NULL = 2,
+  const NOT_NULL = 1, IS_NULL = 2,
   DB_DAO_NOTNULL = 128,
   VALUE_SEPARATOR = "",
   BULK_INSERT_COUNT = 200,

@@ -33,7 +33,7 @@
  *
  */
 class CRM_Utils_Check {
-  CONST
+  const
     // How often to run checks and notify admins about issues.
     CHECK_TIMER = 86400;
 

@@ -104,22 +104,22 @@ class CRM_GCD {
    */
 
   // Set ADD_TO_DB = FALSE to do a dry run
-  CONST ADD_TO_DB = TRUE;
+  const ADD_TO_DB = TRUE;
 
-  CONST DATA_FILENAME = "sample_data.xml";
-  CONST NUM_DOMAIN = 1;
-  CONST NUM_CONTACT = 200;
-  CONST INDIVIDUAL_PERCENT = 80;
-  CONST HOUSEHOLD_PERCENT = 10;
-  CONST ORGANIZATION_PERCENT = 10;
-  CONST NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
-  CONST NUM_ACTIVITY = 150;
+  const DATA_FILENAME = "sample_data.xml";
+  const NUM_DOMAIN = 1;
+  const NUM_CONTACT = 200;
+  const INDIVIDUAL_PERCENT = 80;
+  const HOUSEHOLD_PERCENT = 10;
+  const ORGANIZATION_PERCENT = 10;
+  const NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
+  const NUM_ACTIVITY = 150;
 
   // Location types from the table crm_location_type
-  CONST HOME = 1;
-  CONST WORK = 2;
-  CONST MAIN = 3;
-  CONST OTHER = 4;
+  const HOME = 1;
+  const WORK = 2;
+  const MAIN = 3;
+  const OTHER = 4;
 
   /**
    * Class constructor

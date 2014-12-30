@@ -33,7 +33,7 @@
  *
  */
 class CRM_Utils_Mail_Incoming {
-  CONST
+  const
     EMAILPROCESSOR_CREATE_INDIVIDUAL = 1,
     EMAILPROCESSOR_OVERRIDE = 2,
     EMAILPROCESSOR_IGNORE = 3;

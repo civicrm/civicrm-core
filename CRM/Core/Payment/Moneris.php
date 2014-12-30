@@ -35,7 +35,7 @@
  */
 class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
-  CONST CHARSET = 'UFT-8';
+  const CHARSET = 'UFT-8';
 
   /**
    * We only need one instance of this object. So we use the singleton

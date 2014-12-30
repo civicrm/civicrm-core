@@ -37,7 +37,7 @@ require_once 'packages/When/When.php';
 
 class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
-  CONST RUNNING = 1;
+  const RUNNING = 1;
   public $schedule = array();
   public $scheduleId = NULL;
   public $scheduleFormValues = array();

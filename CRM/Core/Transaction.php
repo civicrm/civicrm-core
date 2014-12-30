@@ -87,10 +87,10 @@ class CRM_Core_Transaction {
   /**
    * These constants represent phases at which callbacks can be invoked
    */
-  CONST PHASE_PRE_COMMIT = 1;
-  CONST PHASE_POST_COMMIT = 2;
-  CONST PHASE_PRE_ROLLBACK = 4;
-  CONST PHASE_POST_ROLLBACK = 8;
+  const PHASE_PRE_COMMIT = 1;
+  const PHASE_POST_COMMIT = 2;
+  const PHASE_PRE_ROLLBACK = 4;
+  const PHASE_POST_ROLLBACK = 8;
 
   /**
    * Whether commit() has been called on this instance

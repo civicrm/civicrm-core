@@ -33,7 +33,7 @@
  *
  */
 class CRM_Utils_Type {
-  CONST
+  const
     T_INT        = 1,
     T_STRING     = 2,
     T_ENUM       = 2,
@@ -51,7 +51,7 @@ class CRM_Utils_Type {
     T_CCNUM      = 8192,
     T_MEDIUMBLOB = 16384;
 
-  CONST
+  const
     TWO       = 2,
     FOUR      = 4,
     SIX       = 6,

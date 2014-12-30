@@ -38,7 +38,7 @@
  *
  */
 class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
-  CONST RULES_COUNT = 5;
+  const RULES_COUNT = 5;
   protected $_contactType;
   protected $_defaults = array();
   protected $_fields = array();

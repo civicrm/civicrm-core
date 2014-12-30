@@ -35,7 +35,7 @@
  *
  */
 class CRM_Core_BAO_CustomQuery {
-  CONST PREFIX = 'custom_value_';
+  const PREFIX = 'custom_value_';
 
   /**
    * The set of custom field ids

@@ -38,7 +38,7 @@
  *
  */
 class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
-  CONST EMAIL_THANK = 1, EMAIL_CONFIRM = 2, MODE_CREATE = 4;
+  const EMAIL_THANK = 1, EMAIL_CONFIRM = 2, MODE_CREATE = 4;
 
   protected $_mode;
 

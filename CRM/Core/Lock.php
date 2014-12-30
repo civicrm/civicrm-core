@@ -35,7 +35,7 @@
 class CRM_Core_Lock {
 
   // lets have a 3 second timeout for now
-  CONST TIMEOUT = 3;
+  const TIMEOUT = 3;
 
   protected $_hasLock = FALSE;
 

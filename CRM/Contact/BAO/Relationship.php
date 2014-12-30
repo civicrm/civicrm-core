@@ -39,7 +39,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @var int
    */
-  CONST PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
+  const PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
 
   /**
    * Takes an associative array and creates a relationship object

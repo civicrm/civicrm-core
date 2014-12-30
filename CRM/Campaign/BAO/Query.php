@@ -35,7 +35,7 @@
  */
 class CRM_Campaign_BAO_Query {
   //since normal activity clause clause get collides.
-  CONST
+  const
     CIVICRM_ACTIVITY = 'civicrm_survey_activity',
     CIVICRM_ACTIVITY_TARGET = 'civicrm_survey_activity_target',
     CIVICRM_ACTIVITY_ASSIGNMENT = 'civicrm_survey_activity_assignment';

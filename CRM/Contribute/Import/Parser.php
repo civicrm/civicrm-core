@@ -39,7 +39,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * Contribution-specific result codes
    * @see CRM_Import_Parser result code constants
    */
-  CONST SOFT_CREDIT = 512, SOFT_CREDIT_ERROR = 1024, PLEDGE_PAYMENT = 2048, PLEDGE_PAYMENT_ERROR = 4096;
+  const SOFT_CREDIT = 512, SOFT_CREDIT_ERROR = 1024, PLEDGE_PAYMENT = 2048, PLEDGE_PAYMENT_ERROR = 4096;
 
   protected $_fileName;
 

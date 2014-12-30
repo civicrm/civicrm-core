@@ -33,7 +33,7 @@
  *
  */
 class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
-  CONST ROW_COUNT_LIMIT = 10;
+  const ROW_COUNT_LIMIT = 10;
 
   protected $_summary = NULL;
 

@@ -41,7 +41,7 @@ abstract class CRM_Core_Payment {
    * FORM   - we collect it on the same page
    * BUTTON - the processor collects it and sends it back to us via some protocol
    */
-  CONST
+  const
     BILLING_MODE_FORM = 1,
     BILLING_MODE_BUTTON = 2,
     BILLING_MODE_NOTIFY = 4;
@@ -54,7 +54,7 @@ abstract class CRM_Core_Payment {
    * or both
    *
    */
-  CONST
+  const
     PAYMENT_TYPE_CREDIT_CARD = 1,
     PAYMENT_TYPE_DIRECT_DEBIT = 2;
 
@@ -63,7 +63,7 @@ abstract class CRM_Core_Payment {
    * START, END
    *
    */
-  CONST
+  const
     RECURRING_PAYMENT_START = 'START',
     RECURRING_PAYMENT_END = 'END';
 

@@ -33,7 +33,7 @@
  *
  */
 class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
-  CONST
+  const
     NUM_ROWS_TO_INSERT = 100;
 
   /**

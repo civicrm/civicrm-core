@@ -38,7 +38,7 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
   /**
    *
    */
-  CONST REPORT_GROUP_NAME = 'report_template';
+  const REPORT_GROUP_NAME = 'report_template';
 
   /**
    *

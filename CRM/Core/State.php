@@ -74,7 +74,7 @@ class CRM_Core_State {
    * bring in more complexity to the framework. For now, lets keep it simple
    * @var int
    */
-  CONST START = 1, FINISH = 2, SIMPLE = 4;
+  const START = 1, FINISH = 2, SIMPLE = 4;
 
   /**
    * Constructor
