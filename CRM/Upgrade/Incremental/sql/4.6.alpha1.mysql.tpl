@@ -120,3 +120,6 @@ VALUES
 
 -- CRM-15557--
 ALTER TABLE civicrm_line_item MODIFY COLUMN qty decimal(20,2);
+
+-- CRM-15740
+ALTER TABLE `civicrm_mailing_trackable_url` CHANGE `url` `url` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT;
