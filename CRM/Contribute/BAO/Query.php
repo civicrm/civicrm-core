@@ -108,6 +108,12 @@ class CRM_Contribute_BAO_Query {
       $query->_tables['contribution_batch'] = 1;
     }
 
+    if (!empty($query->_returnProperties['contribution_source'])) {
+      $query->_select['contribution_source'] = "civicrm_contribution.source as contribution_source";
+      $query->_element['contribution_source'] = 1;
+      $query->_tables['civicrm_contribution'] = 1;
+    }
+
     // get contribution_status
     if (!empty($query->_returnProperties['contribution_status_id'])) {
       $query->_select['contribution_status_id'] = "contribution_status.value as contribution_status_id";

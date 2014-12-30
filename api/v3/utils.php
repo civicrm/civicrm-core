@@ -1848,6 +1848,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
         2100, array('field' => $fieldName, "max_length"=>$fieldInfo['maxlength'])
       );
     }
+    $params[$fieldName] = $fieldValue;
   }
 }
 
@@ -1969,6 +1970,8 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
  */
 function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldName, $fieldInfo) {
   $options = CRM_Utils_Array::value('options', $fieldInfo);
+  $pseudoconstant = CRM_Utils_Array::value('pseudoconstant', $fieldInfo);
+
   if (!$options) {
     if (strtolower($entity) == 'profile' && !empty($fieldInfo['entity'])) {
       // we need to get the options from the entity the field relates to
@@ -1976,6 +1979,12 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
     }
     $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldInfo['name'], 'context' => 'validate'));
     $options = CRM_Utils_Array::value('values', $options, array());
+
+    if (count($options) == 0 && isset($pseudoconstant['table'])) {
+        $pseudoParams = $pseudoconstant;
+        unset($pseudoParams['table']);
+        $options = CRM_Core_PseudoConstant::get(CRM_Core_DAO_AllCoreTables::getClassForTable($pseudoconstant['table']), $fieldName, $pseudoParams);
+    }
   }
 
   // If passed a value-separated string, explode to an array, then re-implode after matching values
@@ -2013,7 +2022,8 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
  */
 function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldName) {
   // If option is a key, no need to translate
-  if (array_key_exists($value, $options)) {
+  // or if no options are avaiable for pseudoconstant 'table' property
+  if (array_key_exists($value, $options) || !$options) {
     return;
   }
 
