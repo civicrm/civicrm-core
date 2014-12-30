@@ -123,3 +123,13 @@ ALTER TABLE civicrm_line_item MODIFY COLUMN qty decimal(20,2);
 
 -- CRM-15740
 ALTER TABLE `civicrm_mailing_trackable_url` CHANGE `url` `url` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT;
+
+-- CRM-15765 missing Indonesian provinces and revise outdated names
+INSERT INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`, `name`)
+VALUES (NULL, 1102, "SR", "Sulawesi Barat"), (NULL, 1102, "KT", "Kalimantan Tengah"), (NULL, 1102, "KU", "Kalimantan Utara");
+
+UPDATE `civicrm_state_province` SET `name`='Kepulauan Bangka Belitung' WHERE `id` = 3056;
+UPDATE `civicrm_state_province` SET `name`='Papua Barat', `abbreviation`='PB' WHERE `id` = 3060;
+UPDATE `civicrm_state_province` SET `name`='DKI Jakarta' WHERE `id` = 3083;
+UPDATE `civicrm_state_province` SET `name`='DI Yogyakarta' WHERE `id` = 3085;
+UPDATE `civicrm_state_province` SET `abbreviation`='KI' WHERE `id` = 3066;
