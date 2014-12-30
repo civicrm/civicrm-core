@@ -1538,17 +1538,17 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (3053, 1099, "TB", "Tatabánya"),
 (3054, 1099, "ZE", "Zalaegerszeg"),
 (3055, 1102, "BA", "Bali"),
-(3056, 1102, "BB", "Bangka Belitung"),
+(3056, 1102, "BB", "Kepulauan Bangka Belitung"), -- changed from "Bangka Belitung"
 (3057, 1102, "BT", "Banten"),
 (3058, 1102, "BE", "Bengkulu"),
 (3059, 1102, "GO", "Gorontalo"),
-(3060, 1102, "IJ", "Irian Jaya"),
+(3060, 1102, "PB", "Papua Barat"), -- changed from "IJ" and "Irian Jaya"
 (3061, 1102, "JA", "Jambi"),
 (3062, 1102, "JB", "Jawa Barat"),
 (3063, 1102, "JT", "Jawa Tengah"),
 (3064, 1102, "JI", "Jawa Timur"),
 (3065, 1102, "KB", "Kalimantan Barat"),
-(3066, 1102, "KT", "Kalimantan Timur"),
+(3066, 1102, "KI", "Kalimantan Timur"), -- updated abbreviation
 (3067, 1102, "KS", "Kalimantan Selatan"),
 (3068, 1102, "KR", "Kepulauan Riau"),
 (3069, 1102, "LA", "Lampung"),
@@ -1565,9 +1565,9 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (3080, 1102, "SB", "Sumatra Barat"),
 (3081, 1102, "SS", "Sumatra Selatan"),
 (3082, 1102, "SU", "Sumatera Utara"),
-(3083, 1102, "JK", "Jakarta Raya"),
+(3083, 1102, "JK", "DKI Jakarta"), -- changed from "Jakarta Raya" 
 (3084, 1102, "AC", "Aceh"),
-(3085, 1102, "YO", "Yogyakarta"),
+(3085, 1102, "YO", "DI Yogyakarta"), -- changed from "Yogyakarta"
 (3086, 1105, "C", "Cork"),
 (3087, 1105, "CE", "Clare"),
 (3088, 1105, "CN", "Cavan"),
@@ -3911,4 +3911,9 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1044, "AP", "Arica y Parinacota"),
 
 -- Add missing Peruvian State (Amazonas)
-(NULL, 1169, "AMA", "Amazonas");
+(NULL, 1169, "AMA", "Amazonas"),
+
+-- Add missing Indonesian provinces (Kalimantan Tengah, Sulawesi Barat, Kalimantan Utara) and revised outdated names in code above
+(NULL, 1102, "KT", "Kalimantan Tengah"), -- added, updated abbreviation
+(NULL, 1102, "SR", "Sulawesi Barat"), -- added, updated abbreviation
+(NULL, 1102, "KU", "Kalimantan Utara"); -- added
