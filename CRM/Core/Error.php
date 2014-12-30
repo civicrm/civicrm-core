@@ -76,10 +76,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Status code of various types of errors
    * @var const
    */
-  CONST FATAL_ERROR = 2;
-  CONST DUPLICATE_CONTACT = 8001;
-  CONST DUPLICATE_CONTRIBUTION = 8002;
-  CONST DUPLICATE_PARTICIPANT = 8003;
+  const FATAL_ERROR = 2;
+  const DUPLICATE_CONTACT = 8001;
+  const DUPLICATE_CONTRIBUTION = 8002;
+  const DUPLICATE_PARTICIPANT = 8003;
 
   /**
    * We only need one instance of this object. So we use the singleton

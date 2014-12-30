@@ -42,7 +42,7 @@
  *
  */
 class CRM_Profile_Form extends CRM_Core_Form {
-  CONST
+  const
     MODE_REGISTER = 1,
     MODE_SEARCH   = 2,
     MODE_CREATE   = 4,

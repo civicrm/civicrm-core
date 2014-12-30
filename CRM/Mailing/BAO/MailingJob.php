@@ -39,7 +39,7 @@ require_once 'Mail.php';
  * Class CRM_Mailing_BAO_MailingJob
  */
 class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
-  CONST MAX_CONTACTS_TO_PROCESS = 1000;
+  const MAX_CONTACTS_TO_PROCESS = 1000;
 
   /**
    * (Dear God Why) Keep a global count of mails processed within the current

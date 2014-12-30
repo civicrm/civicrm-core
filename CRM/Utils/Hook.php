@@ -37,18 +37,18 @@ abstract class CRM_Utils_Hook {
 
   // Allowed values for dashboard hook content placement
   // Default - place content below activity list
-  CONST DASHBOARD_BELOW = 1;
+  const DASHBOARD_BELOW = 1;
   // Place content above activity list
-  CONST DASHBOARD_ABOVE = 2;
+  const DASHBOARD_ABOVE = 2;
   // Don't display activity list at all
-  CONST DASHBOARD_REPLACE = 3;
+  const DASHBOARD_REPLACE = 3;
 
   // by default - place content below existing content
-  CONST SUMMARY_BELOW = 1;
+  const SUMMARY_BELOW = 1;
   // pace hook content above
-  CONST SUMMARY_ABOVE = 2;
+  const SUMMARY_ABOVE = 2;
   // create your own summarys
-  CONST SUMMARY_REPLACE = 3;
+  const SUMMARY_REPLACE = 3;
 
   static $_nullObject = NULL;
 

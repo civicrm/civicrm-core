@@ -38,7 +38,7 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
   /**
    *
    */
-  CONST CUSTOM_SEARCH_GROUP_NAME = 'custom_search';
+  const CUSTOM_SEARCH_GROUP_NAME = 'custom_search';
 
   /**
    *

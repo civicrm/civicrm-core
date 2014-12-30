@@ -42,7 +42,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   /**
    * Constants for number of friend contacts
    */
-  CONST NUM_OPTION = 3;
+  const NUM_OPTION = 3;
 
   /**
    * The id of the entity that we are proceessing

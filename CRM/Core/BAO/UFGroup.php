@@ -37,7 +37,7 @@
  *
  */
 class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
-  CONST PUBLIC_VISIBILITY = 1,
+  const PUBLIC_VISIBILITY = 1,
     ADMIN_VISIBILITY = 2,
     LISTINGS_VISIBILITY = 4;
 

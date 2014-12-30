@@ -51,7 +51,7 @@ class CRM_Extension_Mapper {
   /**
    * An URL for public extensions repository
    */
-  //CONST DEFAULT_EXTENSIONS_REPOSITORY = 'http://civicrm.org/extdir/ver={ver}|cms={uf}';
+  //const DEFAULT_EXTENSIONS_REPOSITORY = 'http://civicrm.org/extdir/ver={ver}|cms={uf}';
 
   /**
    * Extension info file name

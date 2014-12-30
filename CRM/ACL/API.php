@@ -39,12 +39,12 @@ class CRM_ACL_API {
    *
    * @var int
    */
-  CONST EDIT = 1;
-  CONST VIEW = 2;
-  CONST DELETE = 3;
-  CONST CREATE = 4;
-  CONST SEARCH = 5;
-  CONST ALL = 6;
+  const EDIT = 1;
+  const VIEW = 2;
+  const DELETE = 3;
+  const CREATE = 4;
+  const SEARCH = 5;
+  const ALL = 6;
 
   /**
    * Given a permission string, check for access requirements

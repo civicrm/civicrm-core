@@ -41,7 +41,7 @@ class CRM_Export_BAO_Export {
   // increase this number a lot to avoid making too many queries
   // LIMIT is not much faster than a no LIMIT query
   // CRM-7675
-  CONST EXPORT_ROW_COUNT = 10000;
+  const EXPORT_ROW_COUNT = 10000;
 
   /**
    * Get the list the export fields

@@ -53,7 +53,7 @@ class CRM_Utils_Sort {
    *
    * @var int
    */
-  CONST ASCENDING = 1, DESCENDING = 2, DONTCARE = 4,
+  const ASCENDING = 1, DESCENDING = 2, DONTCARE = 4,
 
   /**
    * The name for the sort GET/POST param

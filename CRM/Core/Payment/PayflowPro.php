@@ -14,7 +14,7 @@
  */
 class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   // (not used, implicit in the API, might need to convert?)
-  CONST
+  const
   CHARSET = 'UFT-8';
 
   /**

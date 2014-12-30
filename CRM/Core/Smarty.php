@@ -45,7 +45,7 @@ if (!class_exists('Smarty')) {
  *
  */
 class CRM_Core_Smarty extends Smarty {
-  CONST
+  const
     // use print.tpl and bypass the CMS. Civi prints a valid html file
     PRINT_PAGE = 1,
     // this and all the below bypasses the CMS html surrounding it and assumes we will embed this within other pages

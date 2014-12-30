@@ -44,7 +44,7 @@ class CRM_Utils_Recent {
    *
    * @int
    */
-  CONST MAX_ITEMS = 10, STORE_NAME = 'CRM_Utils_Recent';
+  const MAX_ITEMS = 10, STORE_NAME = 'CRM_Utils_Recent';
 
   /**
    * The list of recently viewed items

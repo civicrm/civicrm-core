@@ -42,12 +42,12 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
   /**
    * Constants for number of options for data types of multiple option.
    */
-  CONST NUM_OPTION = 11;
+  const NUM_OPTION = 11;
 
   /**
    * Constants for number of discounts for the event.
    */
-  CONST NUM_DISCOUNT = 6;
+  const NUM_DISCOUNT = 6;
 
   /**
    * Page action

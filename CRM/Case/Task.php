@@ -39,7 +39,7 @@
  *
  */
 class CRM_Case_Task {
-  CONST DELETE_CASES = 1, PRINT_CASES = 2, EXPORT_CASES = 3, RESTORE_CASES = 4;
+  const DELETE_CASES = 1, PRINT_CASES = 2, EXPORT_CASES = 3, RESTORE_CASES = 4;
 
   /**
    * The task array

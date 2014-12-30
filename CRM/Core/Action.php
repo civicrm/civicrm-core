@@ -45,7 +45,7 @@ class CRM_Core_Action {
    *
    * @access public
    */
-  CONST
+  const
     NONE = 0,
     ADD = 1,
     UPDATE = 2,

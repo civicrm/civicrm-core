@@ -41,7 +41,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
   /**
    * Various Contact types
    */
-  CONST
+  const
     EXPORT_ALL = 1,
     EXPORT_SELECTED = 2,
     EXPORT_MERGE_DO_NOT_MERGE = 0,
@@ -51,7 +51,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
   /**
    * Export modes
    */
-  CONST
+  const
     CONTACT_EXPORT = 1,
     CONTRIBUTE_EXPORT = 2,
     MEMBER_EXPORT = 3,

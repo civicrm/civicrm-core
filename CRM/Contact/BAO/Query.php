@@ -43,7 +43,7 @@ class CRM_Contact_BAO_Query {
    *
    * @var int
    */
-  CONST
+  const
     MODE_CONTACTS = 1,
     MODE_CONTRIBUTE = 2,
     MODE_MEMBER = 8,

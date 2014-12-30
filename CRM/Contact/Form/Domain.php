@@ -72,7 +72,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * @var int
    * @const
    */
-  CONST LOCATION_BLOCKS = 1;
+  const LOCATION_BLOCKS = 1;
 
   function preProcess() {
     CRM_Utils_System::setTitle(ts('Organization Address and Contact Info'));

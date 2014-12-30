@@ -46,7 +46,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    * @var int
    * @const
    */
-  CONST LOCATION_BLOCKS = 1;
+  const LOCATION_BLOCKS = 1;
 
   /**
    * The variable, for storing the location array

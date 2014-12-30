@@ -33,7 +33,7 @@
  *
  */
 class CRM_Utils_Migrate_ExportJSON {
-  CONST CHUNK_SIZE = 128;
+  const CHUNK_SIZE = 128;
 
   protected $_contactIDs;
 

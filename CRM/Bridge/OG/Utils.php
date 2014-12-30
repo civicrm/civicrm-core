@@ -33,7 +33,7 @@
  *
  */
 class CRM_Bridge_OG_Utils {
-  CONST aclEnabled = 1, syncFromCiviCRM = 1;
+  const aclEnabled = 1, syncFromCiviCRM = 1;
 
   /**
    * @return int

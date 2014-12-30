@@ -53,7 +53,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * Constants for static parameters of the pager
    */
-  CONST ROWCOUNT = 50, PAGE_ID = 'crmPID', PAGE_ID_TOP = 'crmPID', PAGE_ID_BOTTOM = 'crmPID_B', PAGE_ROWCOUNT = 'crmRowCount';
+  const ROWCOUNT = 50, PAGE_ID = 'crmPID', PAGE_ID_TOP = 'crmPID', PAGE_ID_BOTTOM = 'crmPID_B', PAGE_ROWCOUNT = 'crmRowCount';
 
   /**
    * The output of the pager. This is a name/value array with various keys

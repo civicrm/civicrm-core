@@ -38,7 +38,7 @@
  * one or a group of contact ids.
  */
 class CRM_Contact_Form_Task_SMSCommon {
-  CONST RECIEVED_SMS_ACTIVITY_SUBJECT = "SMS Received";
+  const RECIEVED_SMS_ACTIVITY_SUBJECT = "SMS Received";
 
   public $_contactDetails = array();
 

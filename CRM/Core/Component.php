@@ -40,7 +40,7 @@ class CRM_Core_Component {
    * End part (filename) of the component information class'es name
    * that needs to be present in components main directory.
    */
-  CONST COMPONENT_INFO_CLASS = 'Info';
+  const COMPONENT_INFO_CLASS = 'Info';
 
   private static $_info = NULL;
 

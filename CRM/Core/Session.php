@@ -49,7 +49,7 @@ class CRM_Core_Session {
    * @var string
    */
   protected $_key = 'CiviCRM';
-  CONST USER_CONTEXT = 'userContext';
+  const USER_CONTEXT = 'userContext';
 
   /**
    * This is just a reference to the real session. Allows us to

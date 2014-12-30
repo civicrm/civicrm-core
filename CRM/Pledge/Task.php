@@ -39,7 +39,7 @@
  *
  */
 class CRM_Pledge_Task {
-  CONST DELETE_PLEDGES = 1, PRINT_PLEDGES = 2, EXPORT_PLEDGES = 3;
+  const DELETE_PLEDGES = 1, PRINT_PLEDGES = 2, EXPORT_PLEDGES = 3;
 
   /**
    * The task array

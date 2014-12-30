@@ -40,7 +40,7 @@
  *
  */
 class CRM_Campaign_Task {
-  CONST INTERVIEW = 1, RESERVE = 2, RELEASE = 3, PRINT_VOTERS = 4;
+  const INTERVIEW = 1, RESERVE = 2, RELEASE = 3, PRINT_VOTERS = 4;
 
   /**
    * The task array

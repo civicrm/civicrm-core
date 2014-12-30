@@ -18,11 +18,11 @@
  * begin at one, so always delete one from the "Position in Response"
  */
 class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
-  CONST CHARSET = 'iso-8859-1';
-  CONST AUTH_APPROVED = 1;
-  CONST AUTH_DECLINED = 2;
-  CONST AUTH_ERROR = 3;
-  CONST TIMEZONE = 'America/Denver';
+  const CHARSET = 'iso-8859-1';
+  const AUTH_APPROVED = 1;
+  const AUTH_DECLINED = 2;
+  const AUTH_ERROR = 3;
+  const TIMEZONE = 'America/Denver';
 
   protected $_mode = NULL;
 

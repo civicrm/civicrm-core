@@ -38,7 +38,7 @@
  *
  */
 class CRM_Activity_Task {
-  CONST
+  const
     DELETE_ACTIVITIES = 1,
     PRINT_ACTIVITIES = 2,
     EXPORT_ACTIVITIES = 3,

@@ -133,7 +133,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @var const string
    */
-  CONST ATTR_SPACING = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+  const ATTR_SPACING = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 
   /**
    * All checkboxes are defined with a common prefix. This allows us to
@@ -143,7 +143,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @var string|int
    */
-  CONST CB_PREFIX = 'mark_x_', CB_PREFIY = 'mark_y_', CB_PREFIZ = 'mark_z_', CB_PREFIX_LEN = 7;
+  const CB_PREFIX = 'mark_x_', CB_PREFIY = 'mark_y_', CB_PREFIZ = 'mark_z_', CB_PREFIX_LEN = 7;
 
   /**
    * @internal to keep track of chain-select fields
