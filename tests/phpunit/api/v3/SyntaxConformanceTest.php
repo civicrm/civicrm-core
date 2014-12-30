@@ -1061,6 +1061,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             $optionValue = $this->callAPISuccess('option_value', 'create', array('option_group_id' => $optionGroupID, 'label' => 'new option value'));
             $options['values'][] = $optionValue['id'];
           }
+          if (isset($specs['pseudoconstant']['table'])) {
+            //some psedoconstant property is based on other entity attributes
+            //as the there may or maynot be records for such entity, so we are considering empty records for now
+            //e.g. pcp_id property will be table=civicrm_pcp, keyColumn=id and labelColumn=title
+            continue;
+          }
         }
         $entity[$field] = array_rand($options['values']);
       }
