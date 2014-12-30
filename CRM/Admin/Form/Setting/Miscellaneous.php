@@ -158,9 +158,12 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     $config = CRM_Core_Config::singleton();
     $params = $this->controller->exportValues($this->_name);
 
-    // update upload max size in DB
-    $params['maxImportFileSize'] = CRM_Core_Config_Defaults::formatUnitSize(ini_get('upload_max_filesize'));
-    CRM_Core_BAO_ConfigSetting::create($params);
+    // update upload max size in $config
+    // Fixme: why are we storing this php setting in $config?
+    $hiddenSettings = array(
+      'maxImportFileSize' => CRM_Core_Config_Defaults::formatUnitSize(ini_get('upload_max_filesize'))
+    );
+    CRM_Core_BAO_ConfigSetting::create($hiddenSettings);
 
     // get current logging status
     $values = $this->exportValues();
