@@ -71,19 +71,19 @@ class CRM_Core_Session {
   /**
    * Constructor
    *
-   * Since we are now a client / module of drupal, drupal takes care
-   * of initiating the php session handler session_start ().
+   * The CMS takes care of initiating the php session handler session_start().
    *
-   * When using CiviCRM standalone (i.e. w/o Drupal), we start the session
+   * When using CiviCRM standalone (w/o a CMS), we start the session
    * in index.php and then pass it off to here.
    *
    * All crm code should always use the session using
-   * CRM_Core_Session. we prefix stuff to avoid collisions with drupal and also
-   * collisions with other crm modules!!
+   * CRM_Core_Session. we prefix stuff to avoid collisions with the CMS and also
+   * collisions with other crm modules!
+   *
    * This constructor is invoked whenever any module requests an instance of
    * the session and one is not available.
    *
-   * @return \CRM_Core_Session
+   * @return CRM_Core_Session
    */
   function __construct() {
     $this->_session = null;
@@ -106,7 +106,7 @@ class CRM_Core_Session {
    * Creates an array in the session. All variables now will be stored
    * under this array
    *
-   * @param boolean isRead is this a read operation, in this case, the session will not be touched
+   * @param boolean $isRead is this a read operation, in this case, the session will not be touched
    *
    * @access private
    *
@@ -122,6 +122,7 @@ class CRM_Core_Session {
           return;
         }
         $config =& CRM_Core_Config::singleton();
+        // FIXME: This belongs in CRM_Utils_System_*
         if ($config->userSystem->is_drupal && function_exists('drupal_session_start')) {
           // https://issues.civicrm.org/jira/browse/CRM-14356
           if (! (isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == true)) {
@@ -175,8 +176,8 @@ class CRM_Core_Session {
   /**
    * Creates a session local scope
    *
-   * @param string  prefix local scope name
-   * @param boolean isRead is this a read operation, in this case, the session will not be touched
+   * @param string $prefix local scope name
+   * @param boolean $isRead is this a read operation, in this case, the session will not be touched
    *
    * @access public
    *
@@ -197,7 +198,7 @@ class CRM_Core_Session {
   /**
    * Resets the session local scope
    *
-   * @param string local scope name
+   * @param string $prefix local scope name
    * @access public
    *
    * @return void
@@ -260,8 +261,8 @@ class CRM_Core_Session {
    *
    * @access public
    *
-   * @param  string name  : name  of the variable
-   * @param  string prefix : adds another level of scope to the session
+   * @param string $name  : name  of the variable
+   * @param string $prefix : adds another level of scope to the session
    *
    * @return mixed
    *
@@ -293,8 +294,8 @@ class CRM_Core_Session {
    *
    * @access public
    *
-   * @param  array  vars : associative array to store name/value pairs
-   * @param  string  Strip prefix from the key before putting it in the return
+   * @param array $vars associative array to store name/value pairs
+   * @param string $prefix will be stripped from the key before putting it in the return
    *
    * @return void
    *
@@ -325,8 +326,8 @@ class CRM_Core_Session {
    *
    * @access public
    *
-   * @param  string name : name of the timer
-   * @param  int expire  : expiry time (in seconds)
+   * @param string $name : name of the timer
+   * @param int $expire  : expiry time (in seconds)
    *
    * @return mixed
    *
@@ -383,7 +384,7 @@ class CRM_Core_Session {
   /**
    * Replace the userContext of the stack with the passed one
    *
-   * @param string the url to return to when done
+   * @param string $userContext the url to return to when done
    *
    * @return void
    *
@@ -404,9 +405,7 @@ class CRM_Core_Session {
   /**
    * Pops the top userContext stack
    *
-   * @param void
-   *
-   * @return the top of the userContext stack (also pops the top element)
+   * @return string the top of the userContext stack (also pops the top element)
    *
    */
   function popUserContext() {
@@ -418,9 +417,7 @@ class CRM_Core_Session {
   /**
    * Reads the top userContext stack
    *
-   * @param void
-   *
-   * @return the top of the userContext stack
+   * @return string the top of the userContext stack
    *
    */
   function readUserContext() {
@@ -433,6 +430,7 @@ class CRM_Core_Session {
 
   /**
    * Dumps the session to the log
+   * @param int $all
    */
   function debug($all = 1) {
     $this->initialize();
@@ -447,7 +445,7 @@ class CRM_Core_Session {
   /**
    * Fetches status messages
    *
-   * @param $reset boolean should we reset the status variable?
+   * @param bool $reset should we reset the status variable?
    *
    * @return string        the status message if any
    */
@@ -525,7 +523,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * @param string $names
+   * @param string|array $names
    */
   static function registerAndRetrieveSessionObjects($names) {
     if (!is_array($names)) {
@@ -559,7 +557,7 @@ class CRM_Core_Session {
 
   /**
    * Retrieve contact id of the logged in user
-   * @return integer | NULL contact ID of logged in user
+   * @return integer|NULL contact ID of logged in user
    */
   static function getLoggedInContactID() {
     $session = CRM_Core_Session::singleton();
@@ -573,9 +571,9 @@ class CRM_Core_Session {
    * @return bool
    */
   function isEmpty() {
-    // check if session is empty, if so we dont cache
+    // check if session is empty, if so we don't cache
     // stuff that we can get away with
     // helps proxies like varnish
-    return empty($_SESSION) ? TRUE : FALSE;
+    return empty($_SESSION);
   }
 }

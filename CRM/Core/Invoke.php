@@ -367,15 +367,21 @@ class CRM_Core_Invoke {
   /**
    * Show the message about CiviCRM versions
    *
-   * @param obj: $template (reference)
+   * @param CRM_Core_Smarty $template
    */
   static function versionCheck($template) {
     if (CRM_Core_Config::isUpgradeMode()) {
       return;
     }
-    $versionCheck = CRM_Utils_VersionCheck::singleton();
-    $newerVersion = $versionCheck->newerVersion();
+    $newerVersion = $securityUpdate = NULL;
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, 1) & 1) {
+      $newerVersion = CRM_Utils_VersionCheck::singleton()->isNewerVersionAvailable();
+    }
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityUpdateAlert', NULL, 3) & 1) {
+      $securityUpdate = CRM_Utils_VersionCheck::singleton()->isSecurityUpdateAvailable();
+    }
     $template->assign('newer_civicrm_version', $newerVersion);
+    $template->assign('security_update', $securityUpdate);
   }
 
   /**
