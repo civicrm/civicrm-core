@@ -348,7 +348,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @static
    * @access public
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $fieldMessage = NULL;
     $contactORContributionId = $self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE ? 'contribution_id' : 'contribution_contact_id';

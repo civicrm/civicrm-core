@@ -122,7 +122,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
     if (!isset($defaults['weight']) || !$defaults['weight']) {
@@ -331,7 +331,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if ($self->_gName == 'case_status' && empty($fields['grouping'])) {
       $errors['grouping'] = ts('Status class is a required field');

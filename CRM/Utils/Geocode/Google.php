@@ -65,7 +65,7 @@ class CRM_Utils_Geocode_Google {
    * @return boolean true if we modified the address, false otherwise
    * @static
    */
-  static function format(&$values, $stateName = FALSE) {
+  public static function format(&$values, $stateName = FALSE) {
     // we need a valid country, else we ignore
     if (empty($values['country'])) {
       return FALSE;

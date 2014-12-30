@@ -50,7 +50,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     $session         = CRM_Core_Session::singleton();
     $config          = CRM_Core_Config::singleton();
     $permissionCheck = FALSE;
@@ -334,7 +334,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     if ($this->_id) {
       $templateFile = "CRM/PCP/Page/{$this->_id}/PCPInfo.tpl";
       $template = &CRM_Core_Page::getTemplate();

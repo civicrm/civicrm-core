@@ -44,7 +44,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_entity = 'mailing';
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $params = array(
       'first_name' => 'abc1',
@@ -54,7 +54,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     $this->_contact = $this->callAPISuccess("contact", "create", $params);
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->callAPISuccess("contact", "delete", array('id' => $this->_contact['id']));
     parent::tearDown();
   }
@@ -163,7 +163,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
   /**
    * Test that the API returns only the "Bounced" mailings when instructed to do so
    */
-  function testMailingContactBounced( ) {
+  public function testMailingContactBounced( ) {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     //Create the User
     $op->execute($this->_dbconn,

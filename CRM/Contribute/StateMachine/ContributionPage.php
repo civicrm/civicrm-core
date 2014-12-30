@@ -47,7 +47,7 @@ class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine
    *
    * @return CRM_Contribute_StateMachine_ContributionPage
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $session = CRM_Core_Session::singleton();

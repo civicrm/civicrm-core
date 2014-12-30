@@ -51,7 +51,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_Job';
   }
 
@@ -60,7 +60,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     return self::$_links;
   }
 
@@ -75,7 +75,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - Scheduled Jobs Log'));
     $breadCrumb = array(array('title' => ts('Administration'),
@@ -96,7 +96,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    * @access public
    * @static
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
 
     $jid = CRM_Utils_Request::retrieve('jid', 'Positive', $this);
 
@@ -138,7 +138,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_Job';
   }
 
@@ -147,7 +147,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Scheduled Jobs';
   }
 
@@ -158,7 +158,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/job';
   }
 }

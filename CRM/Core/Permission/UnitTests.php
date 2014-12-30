@@ -49,7 +49,7 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
    * @return boolean true if yes, else false
    * @access public
    */
-  function check($str) {
+  public function check($str) {
     if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
       return FALSE;
     }

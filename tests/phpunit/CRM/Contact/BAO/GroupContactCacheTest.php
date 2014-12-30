@@ -39,7 +39,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   /**
    * Manually add and remove contacts from a smart group
    */
-  function testManualAddRemove() {
+  public function testManualAddRemove() {
     // Create smart group $g
     $params = array(
       'name' => 'Deceased Contacts',
@@ -95,7 +95,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * Allow removing contact from a parent group even if contact is in
    * a child group. (CRM-8858)
    */
-  function testRemoveFromParentSmartGroup() {
+  public function testRemoveFromParentSmartGroup() {
     // Create smart group $parent
     $params = array(
       'name' => 'Deceased Contacts',
@@ -167,7 +167,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * @param $expectedContactIds array(int)
    * @param $groupId int
    */
-  function assertCacheMatches($expectedContactIds, $groupId) {
+  public function assertCacheMatches($expectedContactIds, $groupId) {
     $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
     $params = array(1 => array($groupId, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
@@ -230,7 +230,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   /**
    * @param $objects array DAO or BAO objects
    */
-  function registerTestObjects($objects) {
+  public function registerTestObjects($objects) {
     //if (is_object($objects)) {
     //  $objects = array($objects);
     //}
@@ -240,7 +240,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     }
   }
 
-  function deleteTestObjects() {
+  public function deleteTestObjects() {
     // Note: You might argue that the FK relations between test
     // objects could make this problematic; however, it should
     // behave intuitively as long as we mentally split our

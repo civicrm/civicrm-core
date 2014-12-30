@@ -42,7 +42,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -56,7 +56,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
     $membershipStatus->copyValues($params);
     if ($membershipStatus->find(TRUE)) {
@@ -75,7 +75,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipStatus', $id, 'is_active', $is_active);
   }
 
@@ -90,7 +90,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @access public
    * @static
    */
-  static function create($params){
+  public static function create($params){
     $ids = array();
     if(!empty($params['id'])){
       $ids['membershipStatus']  = $params['id'];
@@ -117,7 +117,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    *
    * @return object
    */
-  static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipStatus', $ids));
     if (!$id) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
@@ -155,7 +155,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * Get defaults for new entity
    * @return array
    */
-  static function getDefaults() {
+  public static function getDefaults() {
     return array(
       'is_active' => FALSE,
       'is_current_member' => FALSE,
@@ -190,7 +190,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @throws CRM_Core_Exception
    * @static
    */
-  static function del($membershipStatusId) {
+  public static function del($membershipStatusId) {
     //check dependencies
     //checking if membership status is present in some other table
     $check = FALSE;

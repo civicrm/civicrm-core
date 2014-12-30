@@ -121,7 +121,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   public $_cdType;
 
-  function preProcess() {
+  public function preProcess() {
     //custom data related code
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
     $this->assign('cdType', FALSE);
@@ -218,7 +218,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
@@ -282,7 +282,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function addRules() {
+  public function addRules() {
     if ($this->_cdType) {
       return;
     }
@@ -549,7 +549,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @access public
    * @static
    */
-  static function dateRule($params) {
+  public static function dateRule($params) {
     $errors = array();
 
     // check start and end date

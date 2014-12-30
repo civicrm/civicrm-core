@@ -35,7 +35,7 @@ class WebTest_Generic_CheckFindTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCheckDashboardElements() {
+  public function testCheckDashboardElements() {
     $this->webtestLogin();
 
     $this->openCiviPage("contact/search", "reset=1", "_qf_Basic_refresh");

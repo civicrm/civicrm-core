@@ -13,7 +13,7 @@ class PaypalPro extends PHPUnit_Framework_Testcase {
    * callAPISuccess won't work
    * I have duplicated this on the main test class as a work around
    */
-  static function create() {
+  public static function create() {
 
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
     $paymentParams = array(
@@ -45,7 +45,7 @@ class PaypalPro extends PHPUnit_Framework_Testcase {
    * to be deleted
    * @return boolean true if payment processor deleted, false otherwise
    */
-  static function delete($id) {
+  public static function delete($id) {
     $pp = new CRM_Financial_DAO_PaymentProcessor();
     $pp->id = $id;
     if ($pp->find(TRUE)) {

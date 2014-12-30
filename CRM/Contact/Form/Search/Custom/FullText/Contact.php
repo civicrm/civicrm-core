@@ -34,11 +34,11 @@
  */
 class CRM_Contact_Form_Search_Custom_FullText_Contact extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
-  function __construct() {
+  public function __construct() {
     parent::__construct('Contact', ts('Contacts'));
   }
 
-  function isActive() {
+  public function isActive() {
     return CRM_Core_Permission::check('view all contacts');
   }
 
@@ -60,7 +60,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Contact extends CRM_Contact_Form_S
    * @param string $entityIDTableName
    * @return array list tables/queries (for runQueries)
    */
-  function prepareQueries($queryText, $entityIDTableName) {
+  public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
     $contactSQL = array();

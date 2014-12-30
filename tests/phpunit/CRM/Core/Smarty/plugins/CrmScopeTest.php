@@ -6,7 +6,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_Smarty_plugins_CrmScopeTest
  */
 class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     require_once 'CRM/Core/Smarty.php';
 
@@ -18,7 +18,7 @@ class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function scopeCases() {
+  public function scopeCases() {
     $cases = array();
     $cases[] = array('', '{crmScope}{/crmScope}');
     $cases[] = array('', '{crmScope x=1}{/crmScope}');
@@ -36,7 +36,7 @@ class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
   /**
    * @dataProvider scopeCases
    */
-  function testBlank($expected, $input) {
+  public function testBlank($expected, $input) {
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:' . $input);
     $this->assertEquals($expected, $actual, "Process input=[$input]");

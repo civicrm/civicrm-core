@@ -66,7 +66,7 @@ class Manager {
    * @param CRM_Core_DAO $dao handle for the DB connection that will execute transaction statements
    *   (all we really care about is the query() function)
    */
-  function __construct($dao) {
+  public function __construct($dao) {
     $this->dao = $dao;
   }
 

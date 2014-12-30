@@ -181,7 +181,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     CRM_Utils_System::setTitle(ts('Find Respondents To %1', array(1 => ucfirst($this->_operation))));
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     //load the default survey for all actions.
     if (empty($this->_defaults)) {
       $defaultSurveyId = key(CRM_Campaign_BAO_Survey::getSurveys(TRUE, TRUE));
@@ -200,7 +200,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     //build the search form.
     CRM_Campaign_BAO_Query::buildSearchForm($this);
@@ -258,7 +258,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
    * @return void
    * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -333,7 +333,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     $controller->run();
   }
 
-  function formatParams() {
+  public function formatParams() {
     $interviewerId = CRM_Utils_Array::value('survey_interviewer_id', $this->_formValues);
     if ($interviewerId) {
       $this->set('interviewerId', $interviewerId);
@@ -396,7 +396,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     $this->_formValues['campaign_search_voter_for'] = $this->_operation;
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
@@ -446,7 +446,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return array
    */
-  function voterClause() {
+  public function voterClause() {
     $params = array('campaign_search_voter_for' => $this->_operation);
 
     $clauseFields = array(

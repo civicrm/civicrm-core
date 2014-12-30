@@ -35,7 +35,7 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContributionImportIndividual() {
+  public function testContributionImportIndividual() {
 
     $this->webtestLogin();
 
@@ -51,7 +51,7 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Contribution', $headers, $rows, 'Individual', 'Insert new contributions', $fieldMapper);
   }
 
-  function testContributionImportOrganization() {
+  public function testContributionImportOrganization() {
 
     $this->webtestLogin();
 
@@ -65,7 +65,7 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Contribution', $headers, $rows, 'Organization', 'Insert new contributions', $fieldMapper);
   }
 
-  function testContributionImportHousehold() {
+  public function testContributionImportHousehold() {
 
     $this->webtestLogin();
 
@@ -82,7 +82,7 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _contributionIndividualCSVData() {
+  public function _contributionIndividualCSVData() {
     $firstName1 = substr(sha1(rand()), 0, 7);
     $email1 = 'mail_' . substr(sha1(rand()), 0, 7) . '@example.com';
     $this->webtestAddContact($firstName1, 'Anderson', $email1);
@@ -122,7 +122,7 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _contributionHouseholdCSVData() {
+  public function _contributionHouseholdCSVData() {
     $household1 = substr(sha1(rand()), 0, 7) . ' home';
     $this->webtestAddHousehold($household1, TRUE);
 
@@ -160,7 +160,7 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _contributionOrganizationCSVData() {
+  public function _contributionOrganizationCSVData() {
     $organization1 = substr(sha1(rand()), 0, 7) . ' org';
     $this->webtestAddOrganization($organization1, TRUE);
 

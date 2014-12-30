@@ -40,7 +40,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function browse() {
+  public function browse() {
 
     $count = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, NULL, NULL, TRUE);
 
@@ -78,7 +78,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function edit($groupId = NULL) {
+  public function edit($groupId = NULL) {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Contact_Form_GroupContact',
       ts('Contact\'s Groups'),
@@ -105,7 +105,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
     $controller->run();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
 
@@ -124,7 +124,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
@@ -156,7 +156,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    *
    * @return bool
    */
-  static function del($groupContactId, $status, $contactID) {
+  public static function del($groupContactId, $status, $contactID) {
     $groupId = CRM_Contact_BAO_GroupContact::getGroupId($groupContactId);
 
     switch ($status) {

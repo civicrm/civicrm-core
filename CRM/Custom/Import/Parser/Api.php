@@ -19,11 +19,11 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   /**
    * Class constructor
    */
-  function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
+  public function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
     parent::__construct();
     $this->_mapperKeys = &$mapperKeys;
   }
-  function setFields() {
+  public function setFields() {
     $customGroupID = $this->_multipleCustomData;
     $importableFields = $this->getGroupFieldsForImport($customGroupID, $this);
     $this->_fields = array_merge(array('do_not_import' => array('title' => ts('- do not import -')), 'contact_id' => array('title' => ts('Contact ID'))), $importableFields);
@@ -35,7 +35,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @return void
    * @access public
    */
-  function init() {
+  public function init() {
     $this->setFields();
     $fields = $this->_fields;
     $hasLocationType = FALSE;
@@ -57,7 +57,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @return boolean
    * @access public
    */
-  function mapField(&$values) {
+  public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
   }
 
@@ -69,7 +69,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @return boolean      the result of this processing
    * @access public
    */
-  function preview(&$values) {
+  public function preview(&$values) {
     return $this->summary($values);
   }
 
@@ -81,7 +81,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * (non-PHPdoc)
    * @see CRM_Custom_Import_Parser_BaseClass::summary()
    */
-  function summary(&$values) {
+  public function summary(&$values) {
    $erroneousField = NULL;
    $response      = $this->setActiveFieldValues($values, $erroneousField);
    $errorRequired = FALSE;
@@ -130,7 +130,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @return boolean      the result of this processing
    * @access public
    */
-  function import($onDuplicate, &$values) {
+  public function import($onDuplicate, &$values) {
     $response = $this->summary($values);
     if ($response != CRM_Import_Parser::VALID) {
       $importRecordParams = array(
@@ -177,7 +177,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * Although the api will accept any strtotime valid string CiviCRM accepts at least one date format
    * not supported by strtotime so we should run this through a conversion
    */
-  function formatDateParams() {
+  public function formatDateParams() {
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
     $setDateFields = array_intersect_key($this->_params, array_flip($this->_dateFields));
@@ -192,7 +192,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * Set import entity
    * @param string $entity
    */
-  function setEntity($entity) {
+  public function setEntity($entity) {
     $this->_entity = $entity;
     $this->_multipleCustomData = $entity;
   }
@@ -203,7 +203,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @return void
    * @access public
    */
-  function fini() {}
+  public function fini() {}
 
   /**
    * Return the field ids and names (with groups) for import purpose.
@@ -215,7 +215,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @access public
    * @static
    */
-   function getGroupFieldsForImport( $id ) {
+   public function getGroupFieldsForImport( $id ) {
     $importableFields = array();
     $params = array('custom_group_id' => $id);
     $allFields = civicrm_api3('custom_field', 'get', $params);

@@ -63,7 +63,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @return \CRM_Core_Payment_Realex
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Realex');
@@ -87,7 +87,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @return object
    * @static
    */
-  static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
+  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_Realex($mode, $paymentProcessor);
@@ -100,7 +100,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @throws Exception
    */
-  function setExpressCheckOut(&$params) {
+  public function setExpressCheckOut(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -109,7 +109,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @throws Exception
    */
-  function getExpressCheckoutDetails($token) {
+  public function getExpressCheckoutDetails($token) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -118,7 +118,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @throws Exception
    */
-  function doExpressCheckout(&$params) {
+  public function doExpressCheckout(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -127,7 +127,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @throws Exception
    */
-  function doTransferCheckout(&$params) {
+  public function doTransferCheckout(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -139,7 +139,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @return array the result in a nice formatted array (or an error object)
    * @public
    */
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
 
     if (!defined('CURLOPT_SSLCERT')) {
       return self::error(9001, ts('RealAuth requires curl with SSL support'));
@@ -283,7 +283,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @return array An array of the result with following keys:
    */
-  function xml_parse_into_assoc($xml) {
+  public function xml_parse_into_assoc($xml) {
     $input = array();
     $result = array();
 
@@ -322,7 +322,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @return array
    */
-  function _xml_parse($input, $depth = 1) {
+  public function _xml_parse($input, $depth = 1) {
     $output = array();
     $children = array();
 
@@ -352,7 +352,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   /**
    *  Format the params from the form ready for sending to Realex.  Also perform some validation
    */
-  function setRealexFields(&$params) {
+  public function setRealexFields(&$params) {
     if ((int)$params['amount'] <= 0) {
       return self::error(9001, ts('Amount must be positive'));
     }
@@ -452,7 +452,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @return bool                  True if ID exists, else false
    */
-  function _checkDupe($invoiceId) {
+  public function _checkDupe($invoiceId) {
     $contribution = new CRM_Contribute_DAO_Contribution();
     $contribution->invoice_id = $invoiceId;
     return $contribution->find();
@@ -466,7 +466,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @return mixed value of the field, or empty string if the field is
    * not set
    */
-  function _getParam($field) {
+  public function _getParam($field) {
     if (isset($this->_params[$field])) {
       return $this->_params[$field];
     }
@@ -484,7 +484,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @return bool false if value is not a scalar, true if successful
    */
-  function _setParam($field, $value) {
+  public function _setParam($field, $value) {
     if (!is_scalar($value)) {
       return FALSE;
     }
@@ -499,7 +499,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @return object
    */
-  function &error($errorCode = NULL, $errorMessage = NULL) {
+  public function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
 
     if ($errorCode) {
@@ -532,7 +532,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @return string the error message if any
    * @public
    */
-  function checkConfig() {
+  public function checkConfig() {
     $error = array();
     if (empty($this->_paymentProcessor['user_name'])) {
       $error[] = ts('Merchant ID is not set for this payment processor');

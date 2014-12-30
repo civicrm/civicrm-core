@@ -44,7 +44,7 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
    * @return object the partcipant payment record
    * @static
    */
-  static function create(&$params, &$ids) {
+  public static function create(&$params, &$ids) {
     if (isset($ids['id'])) {
       CRM_Utils_Hook::pre('edit', 'ParticipantPayment', $ids['id'], $params);
     }
@@ -92,7 +92,7 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
    * @static
    * @access public
    */
-  static function deleteParticipantPayment($params) {
+  public static function deleteParticipantPayment($params) {
     $participantPayment = new CRM_Event_DAO_ParticipantPayment();
 
     $valid = FALSE;

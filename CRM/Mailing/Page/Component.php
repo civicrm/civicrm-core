@@ -52,7 +52,7 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Mailing_BAO_Component';
   }
 
@@ -61,7 +61,7 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -90,7 +90,7 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Mailing_Form_Component';
   }
 
@@ -99,7 +99,7 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Mailing Components';
   }
 
@@ -110,7 +110,7 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return CRM_Utils_System::currentPath();
   }
 
@@ -119,7 +119,7 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    * @param null $pageArgs
    * @param null $sort
    */
-  function run($args = NULL, $pageArgs = NULL, $sort = NULL) {
+  public function run($args = NULL, $pageArgs = NULL, $sort = NULL) {
     return parent::run($args, $pageArgs, "component_type, is_default desc, name");
   }
 }

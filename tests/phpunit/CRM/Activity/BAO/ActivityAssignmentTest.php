@@ -56,7 +56,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   /**
    *  Pass zero as an id and make sure no Assignees are retrieved
    */
-  function testRetrieveAssigneeIdsByActivityIdNoId() {
+  public function testRetrieveAssigneeIdsByActivityIdNoId() {
     $activity = $this->activityCreate();
     $activityId = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId(0);
 
@@ -66,7 +66,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   /**
    *  Pass null as an id and make sure no Assignees are retrieved
    */
-  function testRetrieveAssigneeIdsByActivityIdNullId() {
+  public function testRetrieveAssigneeIdsByActivityIdNullId() {
     $activity = $this->activityCreate();
     $activityId = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId(Null);
 
@@ -76,7 +76,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   /**
    *  Pass a string as an id and make sure no Assignees are retrieved
    */
-  function testRetrieveAssigneeIdsByActivityIdString() {
+  public function testRetrieveAssigneeIdsByActivityIdString() {
     $activity = $this->activityCreate();
     $activityId = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId('test');
 
@@ -86,7 +86,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   /**
    *  Pass a known activity id as an id and make sure 1 Assignees is retrieved
    */
-  function testRetrieveAssigneeIdsByActivityIdOneId() {
+  public function testRetrieveAssigneeIdsByActivityIdOneId() {
     $activity = $this->activityCreate();
     $activityId = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($activity['id']);
 
@@ -96,7 +96,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   /**
    *  Pass zero as an id and make sure no Assignees are retrieved
    */
-  function testGetAssigneeNamesNoId() {
+  public function testGetAssigneeNamesNoId() {
     $activity = $this->activityCreate();
     $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(0);
 
@@ -106,7 +106,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   /**
    *  Pass Null as an id and make sure no Assignees are retrieved
    */
-  function testGetAssigneeNamesNullId() {
+  public function testGetAssigneeNamesNullId() {
     $activity = $this->activityCreate();
     $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(Null);
 
@@ -116,7 +116,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   /**
    *  Pass a known activity id as an id and make sure 1 Assignees is retrieved
    */
-  function testGetAssigneeNamesOneId() {
+  public function testGetAssigneeNamesOneId() {
     $activity = $this->activityCreate();
     $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(array($activity['id']));
     $this->assertEquals(count($assignees), 1, '1 assignee names retrieved');

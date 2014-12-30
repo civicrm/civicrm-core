@@ -63,7 +63,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * @return \CRM_Mailing_Selector_Browse
   @access public
    */
-  function __construct() {
+  public function __construct() {
   }
 
   /**
@@ -73,7 +73,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * @access public
    *
    */
-  static function &links() {
+  public static function &links() {
     return self::$_links;
   }
 
@@ -85,7 +85,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    *
    * @access public
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;
     $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
     $params['status'] = ts('Mailings %%StatusMessage%%');
@@ -103,7 +103,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * @return array the column headers that need to be displayed
    * @access public
    */
-  function &getColumnHeaders($action = NULL, $output = NULL) {
+  public function &getColumnHeaders($action = NULL, $output = NULL) {
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $job = CRM_Mailing_BAO_MailingJob::getTableName();
     if (!isset(self::$_columnHeaders)) {
@@ -188,7 +188,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * @return int Total number of rows
    * @access public
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     $job        = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailing    = CRM_Mailing_BAO_Mailing::getTableName();
     $mailingACL = CRM_Mailing_BAO_Mailing::mailingACL();
@@ -220,7 +220,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
    *
    * @return int   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     static $actionLinks = NULL;
     if (empty($actionLinks)) {
       $cancelExtra  = ts('Are you sure you want to cancel this mailing?');
@@ -421,14 +421,14 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
    *
    * @return string name of the file
    */
-  function getExportFileName($output = 'csv') {
+  public function getExportFileName($output = 'csv') {
     return ts('CiviMail Mailings');
   }
 
   /**
    * @param $parent
    */
-  function setParent($parent) {
+  public function setParent($parent) {
     $this->_parent = $parent;
   }
 
@@ -438,7 +438,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
    *
    * @return int|string
    */
-  function whereClause(&$params, $sortBy = TRUE) {
+  public function whereClause(&$params, $sortBy = TRUE) {
     $values = $clauses = array();
     $isFormSubmitted   = $this->_parent->get('hidden_find_mailings');
 
@@ -579,7 +579,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     return implode(' AND ', $clauses);
   }
 
-  function pagerAtoZ() {
+  public function pagerAtoZ() {
 
     $params = array();
     $whereClause = $this->whereClause($params, FALSE);

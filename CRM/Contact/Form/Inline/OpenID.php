@@ -105,7 +105,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
    * @return array $errors@static
    * @access public
    */
-  static function formRule($fields, $errors) {
+  public static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
     if (!empty($fields['openid']) && is_array($fields['openid'])) {
       foreach ($fields['openid'] as $instance => $blockValues) {

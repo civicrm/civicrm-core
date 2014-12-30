@@ -54,7 +54,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviCRM Extensions'));
         $destination = CRM_Utils_System::url( 'civicrm/admin/extensions',
                                               'reset=1' );
@@ -68,7 +68,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_Extension';
   }
 
@@ -77,7 +77,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::ADD => array(
@@ -121,7 +121,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
@@ -134,7 +134,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     $mapper = CRM_Extension_System::singleton()->getMapper();
     $manager = CRM_Extension_System::singleton()->getManager();
 
@@ -243,7 +243,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_Extensions';
   }
 
@@ -252,7 +252,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'CRM_Admin_Form_Extensions';
   }
 
@@ -263,7 +263,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/extensions';
   }
 
@@ -275,7 +275,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * @return string
    * @access public
    */
-  function userContextParams($mode = NULL) {
+  public function userContextParams($mode = NULL) {
     return 'reset=1&action=browse';
   }
 

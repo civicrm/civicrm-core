@@ -128,7 +128,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function browse() {
+  public function browse() {
     $customOption = array();
     CRM_Price_BAO_PriceFieldValue::getValues($this->_fid, $customOption);
     $config = CRM_Core_Config::singleton();
@@ -208,7 +208,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function edit($action) {
+  public function edit($action) {
     $oid = CRM_Utils_Request::retrieve('oid', 'Positive',
       $this, FALSE, 0
     );
@@ -264,7 +264,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function run() {
+  public function run() {
 
     // get the field id
     $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive',

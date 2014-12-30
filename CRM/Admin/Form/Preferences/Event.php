@@ -38,7 +38,7 @@
  *
  */
 class CRM_Admin_Form_Preferences_Event extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviEvent Component Settings'));
     // pass "wiki" as 6th param to docURL2 if you are linking to a page in wiki.civicrm.org
     $docLink = CRM_Utils_System::docURL2("CiviEvent Cart Checkout", NULL, NULL, NULL, NULL, "wiki");

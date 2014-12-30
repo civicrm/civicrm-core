@@ -45,7 +45,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
    *
    * @return array|null
    */
-  static function &lastModified($id, $table = 'civicrm_contact') {
+  public static function &lastModified($id, $table = 'civicrm_contact') {
 
     $log = new CRM_Core_DAO_Log();
 
@@ -73,7 +73,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
    *
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
 
     $log = new CRM_Core_DAO_Log();
     $log->copyValues($params);
@@ -159,7 +159,7 @@ UPDATE civicrm_log
    * @access public
    * @static
    */
-  static function getContactLogCount($contactID) {
+  public static function getContactLogCount($contactID) {
     $query = "SELECT count(*) FROM civicrm_log
                    WHERE civicrm_log.entity_table = 'civicrm_contact' AND civicrm_log.entity_id = {$contactID}";
     return CRM_Core_DAO::singleValueQuery($query);
@@ -173,7 +173,7 @@ UPDATE civicrm_log
    * @access public
    * @static
    */
-  static function useLoggingReport() {
+  public static function useLoggingReport() {
     // first check if logging is enabled
     $config = CRM_Core_Config::singleton();
     if (!$config->logging) {

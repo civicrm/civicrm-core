@@ -47,7 +47,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     // actions buttom contextMenu
@@ -94,7 +94,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -113,7 +113,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * @return void
    * @access public
    */
-  function edit() {
+  public function edit() {
     // set the userContext stack
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->_contactId);
@@ -131,7 +131,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * @return void
    * @access public
    */
-  function view() {
+  public function view() {
     // Add js for tabs, in-place editing, and jstree for tags
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/Contact/Page/View/Summary.js', 2, 'html-header')
@@ -421,7 +421,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     if ($this->_contactId) {
       $contactSubtypes = $this->get('contactSubtype') ?
         explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->get('contactSubtype')) : array();

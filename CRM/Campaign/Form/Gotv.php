@@ -103,7 +103,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     if ($this->_search) {
       return;
     }
@@ -150,7 +150,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
     $this->validateIds();
   }
 
-  function validateIds() {
+  public function validateIds() {
     $errorMessages = array();
     //check for required permissions.
     if (!CRM_Core_Permission::check('manage campaign') &&

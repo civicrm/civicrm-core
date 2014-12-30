@@ -37,7 +37,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -51,7 +51,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @access public
    * @static
    */
-  static function del($entityId,$entityTable) {
+  public static function del($entityId,$entityTable) {
     // delete all discount records with the selected discounted id
     $discount = new CRM_Core_DAO_Discount( );
     $discount->entity_id    = $entityId;
@@ -74,7 +74,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $discount = new CRM_Core_DAO_Discount( );
     $discount->copyValues($params);
     $discount->save();
@@ -91,7 +91,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @return array    $optionGroupIDs option group Ids associated with discount
    *
    */
-  static function getOptionGroup($entityId, $entityTable) {
+  public static function getOptionGroup($entityId, $entityTable) {
     $optionGroupIDs    = array();
     $dao = new CRM_Core_DAO_Discount( );
     $dao->entity_id    = $entityId;
@@ -112,7 +112,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @return integer  $dao->id       discount id of the set which matches
    *                                 the date criteria
    */
-  static function findSet($entityID, $entityTable) {
+  public static function findSet($entityID, $entityTable) {
     if (empty($entityID) || empty($entityTable)) {
       // adding this here, to trap errors if values are not sent
       CRM_Core_Error::fatal();

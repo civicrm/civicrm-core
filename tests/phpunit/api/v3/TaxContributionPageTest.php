@@ -180,7 +180,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->quickCleanup(array(
       'civicrm_contribution',
       'civicrm_contribution_soft',
@@ -200,7 +200,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     CRM_Core_PseudoConstant::flush('taxRates');
   }
 
-  function setUpContributionPage() {
+  public function setUpContributionPage() {
     $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     if (empty($this->_ids['price_set'])) {
       $priceSet = $this->callAPISuccess('price_set', 'create', $this->_priceSetParams);
@@ -240,7 +240,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   /**
    * Online and offline contrbution from above created contrbution page
    */
-  function testCreateContributionOnline() {
+  public function testCreateContributionOnline() {
     $this->setUpContributionPage();
     $params = array(
       'contact_id' => $this->_individualId,
@@ -268,7 +268,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords($contribution, 'online');
   }
 
-  function testCreateContributionChainedLineItems() {
+  public function testCreateContributionChainedLineItems() {
     $this->setUpContributionPage();
     $params = array(
       'contact_id' => $this->_individualId,
@@ -311,7 +311,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals(2, $lineItems['count']);
   }
 
-  function testCreateContributionPayLaterOnline() {
+  public function testCreateContributionPayLaterOnline() {
     $this->setUpContributionPage();
     $params = array(
       'contact_id' => $this->_individualId,
@@ -336,7 +336,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2, 'In line ' . __LINE__);
     $this->_checkFinancialRecords($contribution, 'payLater');
   }
-  function testCreateContributionPendingOnline() {
+  public function testCreateContributionPendingOnline() {
     $this->setUpContributionPage();
     $params = array(
       'contact_id' => $this->_individualId,
@@ -366,7 +366,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * Updation of contrbution
    * Function tests that line items, financial records are updated when contribution amount is changed
    */
-  function testCreateUpdateContributionChangeTotal() {
+  public function testCreateUpdateContributionChangeTotal() {
     $this->setUpContributionPage();
     $this->contributionParams = array(
       'contact_id' => $this->_individualId,
@@ -412,7 +412,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    *
    * @return null|string
    */
-  function _getFinancialTrxnAmount($contId) {
+  public function _getFinancialTrxnAmount($contId) {
     $query = "SELECT
      SUM( ft.total_amount ) AS total
      FROM civicrm_financial_trxn AS ft
@@ -428,7 +428,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    *
    * @return null|string
    */
-  function _getFinancialItemAmount($contId) {
+  public function _getFinancialItemAmount($contId) {
     $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
     $query = "SELECT
      SUM(amount)
@@ -443,7 +443,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * @param array $params
    * @param $context
    */
-  function _checkFinancialRecords($params, $context) {
+  public function _checkFinancialRecords($params, $context) {
     $entityParams = array(
       'entity_id' => $params['id'],
       'entity_table' => 'civicrm_contribution',
@@ -506,7 +506,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * @param array $params
    * @param int $financialTypeId
    */
-  function _getFinancialAccountId($financialTypeId) {
+  public function _getFinancialAccountId($financialTypeId) {
     $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
 
     $searchParams = array(
@@ -521,7 +521,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_contribution_delete methods
-  function testDeleteContribution() {
+  public function testDeleteContribution() {
     $contributionID = $this->contributionCreate($this->_individualId, $this->financialtypeID, 'dfsdf', 12389);
     $params = array(
       'id' => $contributionID,

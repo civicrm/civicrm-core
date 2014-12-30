@@ -35,7 +35,7 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testMembershipTypeScenario1() {
+  public function testMembershipTypeScenario1() {
     // Scenario 1
     // Rollover Date < Start Date
     // Join Date > Rollover Date and Join Date < Start Date
@@ -191,7 +191,7 @@ SELECT end_event_adjust_interval
     );
   }
 
-  function testMembershipTypeScenario2() {
+  public function testMembershipTypeScenario2() {
     // Scenario 2
     // Rollover Date < Join Date
 
@@ -347,7 +347,7 @@ SELECT end_event_adjust_interval
     );
   }
 
-  function testMembershipTypeScenario3() {
+  public function testMembershipTypeScenario3() {
     // Scenario 3
     // Standard Fixed scenario - Jan 1 Fixed Period Start and October 31 rollover
     // Join Date is later than Rollover Date
@@ -496,7 +496,7 @@ SELECT end_event_adjust_interval
     );
   }
 
-  function testMembershipTypeScenario4() {
+  public function testMembershipTypeScenario4() {
     // Scenario 4
     // Standard Fixed scenario - Jan 1 Fixed Period Start and October 31 rollover
     // Join Date is earlier than Rollover Date

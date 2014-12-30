@@ -112,7 +112,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    *
    * @return \CRM_Core_Payment_eWAY *******************************************************
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     // require Standaard eWAY API libraries
     require_once 'eWAY/eWAY_GatewayRequest.php';
     require_once 'eWAY/eWAY_GatewayResponse.php';
@@ -135,7 +135,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * @return object
    * @static
    */
-  static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
+  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_eWAY($mode, $paymentProcessor);
@@ -147,7 +147,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * This function sends request and receives response from
    * eWAY payment process
    **********************************************************/
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
     if (CRM_Utils_Array::value('is_recur', $params) == TRUE) {
       CRM_Core_Error::fatal(ts('eWAY - recurring payments not implemented'));
     }
@@ -431,7 +431,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    *
    * @return bool                 True if ID exists, else false
    */
-  function _checkDupe($invoiceId) {
+  public function _checkDupe($invoiceId) {
     $contribution = new CRM_Contribute_DAO_Contribution();
     $contribution->invoice_id = $invoiceId;
     return $contribution->find();
@@ -440,7 +440,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   /*************************************************************************************************
    * This function checks the eWAY response status - returning a boolean false if status != 'true'
    *************************************************************************************************/
-  function isError(&$response) {
+  public function isError(&$response) {
     $status = $response->Status();
 
     if ((stripos($status, "true")) === FALSE) {
@@ -452,7 +452,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   /**************************************************
    * Produces error message and returns from class
    **************************************************/
-  function &errorExit($errorCode = NULL, $errorMessage = NULL) {
+  public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
 
     if ($errorCode) {
@@ -467,7 +467,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   /**************************************************
    * NOTE: 'doTransferCheckout' not implemented
    **************************************************/
-  function doTransferCheckout(&$params, $component) {
+  public function doTransferCheckout(&$params, $component) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -488,7 +488,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    */
   //function checkConfig( $mode )          // CiviCRM V1.9 Declaration
   // CiviCRM V2.0 Declaration
-  function checkConfig() {
+  public function checkConfig() {
     $errorMsg = array();
 
     if (empty($this->_paymentProcessor['user_name'])) {
@@ -514,7 +514,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * @param $p_request
    * @param $p_response
    */
-  function send_alert_email($p_eWAY_tran_num, $p_trxn_out, $p_trxn_back, $p_request, $p_response) {
+  public function send_alert_email($p_eWAY_tran_num, $p_trxn_out, $p_trxn_back, $p_request, $p_response) {
     // Initialization call is required to use CiviCRM APIs.
     civicrm_initialize(TRUE);
 

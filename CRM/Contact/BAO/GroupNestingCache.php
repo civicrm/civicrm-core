@@ -102,7 +102,7 @@ WHERE  id = $id
    *
    * @return bool
    */
-  static function checkCyclicGraph(&$tree) {
+  public static function checkCyclicGraph(&$tree) {
     // lets keep this simple, we should probably use a graph algoritm here at some stage
 
     // foreach group that has a parent or a child, ensure that
@@ -122,7 +122,7 @@ WHERE  id = $id
    *
    * @return bool
    */
-  static function isCyclic(&$tree, $id) {
+  public static function isCyclic(&$tree, $id) {
     $parents = $children = array();
     self::getAll($parent, $tree, $id, 'parents');
     self::getAll($child, $tree, $id, 'children');
@@ -146,7 +146,7 @@ WHERE  id = $id
    *
    * @return array
    */
-  static function getPotentialCandidates($id, &$groups) {
+  public static function getPotentialCandidates($id, &$groups) {
     $tree = CRM_Core_BAO_Cache::getItem('contact groups', 'nestable tree hierarchy');
 
     if ($tree === NULL) {
@@ -171,7 +171,7 @@ WHERE  id = $id
    * @param int $id
    * @param $token
    */
-  static function invalidate(&$potential, &$tree, $id, $token) {
+  public static function invalidate(&$potential, &$tree, $id, $token) {
     unset($potential[$id]);
 
     if (!isset($tree[$id]) ||
@@ -191,7 +191,7 @@ WHERE  id = $id
    * @param int $id
    * @param $token
    */
-  static function getAll(&$all, &$tree, $id, $token) {
+  public static function getAll(&$all, &$tree, $id, $token) {
     // if seen before, dont do anything
     if (isset($all[$id])) {
       return;
@@ -212,7 +212,7 @@ WHERE  id = $id
   /**
    * @return string
    */
-  static function json() {
+  public static function json() {
     $tree = CRM_Core_BAO_Cache::getItem('contact groups', 'nestable tree hierarchy');
 
     if ($tree === NULL) {

@@ -105,7 +105,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
    * @return array $errors@static
    * @access public
    */
-  static function formRule($fields, $errors) {
+  public static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
     if (!empty($fields['im']) && is_array($fields['im'])) {
       foreach ($fields['im'] as $instance => $blockValues) {

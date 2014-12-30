@@ -640,7 +640,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return int
    * @access public
    */
-  function getAction() {
+  public function getAction() {
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       return CRM_Core_Action::VIEW | CRM_Core_Action::PREVIEW;
     }
@@ -657,7 +657,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @return void
    */
-  function setDefaultValues() {}
+  public function setDefaultValues() {}
 
   /**
    * Process the form
@@ -1048,7 +1048,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @return null|string
    */
-  function wrangleFinancialTypeID($contributionTypeId) {
+  public function wrangleFinancialTypeID($contributionTypeId) {
     if (isset($paymentParams['financial_type'])) {
       $contributionTypeId = $paymentParams['financial_type'];
     }
@@ -1522,7 +1522,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @return mixed
    */
-  static function processRecurringContribution(&$form, &$params, $contactID, $contributionType, $online = TRUE) {
+  public static function processRecurringContribution(&$form, &$params, $contactID, $contributionType, $online = TRUE) {
     // return if this page is not set for recurring
     // or the user has not chosen the recurring option
 
@@ -1613,7 +1613,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return void
    * @access public
    */
-  static function processOnBehalfOrganization(&$behalfOrganization, &$contactID, &$values, &$params, $fields = NULL) {
+  public static function processOnBehalfOrganization(&$behalfOrganization, &$contactID, &$values, &$params, $fields = NULL) {
     $isCurrentEmployer = FALSE;
     $dupeIDs = array();
     $orgID = NULL;
@@ -1719,7 +1719,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @static
    * @access public
    */
-  static function processPcpSoft(&$params, &$contribution) {
+  public static function processPcpSoft(&$params, &$contribution) {
     //add soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
     if (!empty($params['soft_credit_to'])) {
       $contributionSoftParams = array();
@@ -1753,7 +1753,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @static
    * @access public
    */
-  static function processPcp(&$page, $params) {
+  public static function processPcp(&$page, $params) {
     $params['pcp_made_through_id'] = $page->_pcpId;
     $page->assign('pcpBlock', TRUE);
     if (!empty($params['pcp_display_in_roll']) && empty($params['pcp_roll_nickname'])) {
@@ -1909,7 +1909,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @throws CiviCRM_API3_Exception
    */
-  static function submit($params) {
+  public static function submit($params) {
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_id = $params['id'];
     if (!empty($params['contact_id'])) {
@@ -1955,7 +1955,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    * @throws CiviCRM_API3_Exception
    */
-  static function getFormParams($id, array $params) {
+  public static function getFormParams($id, array $params) {
     if(!isset($params['is_pay_later'])) {
       if (!empty($params['payment_processor'])) {
         $params['is_pay_later'] = 0;

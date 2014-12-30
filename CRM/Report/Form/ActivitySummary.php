@@ -44,7 +44,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -170,7 +170,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -275,7 +275,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -326,7 +326,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $this->_where = " WHERE civicrm_option_group.name = 'activity_type' AND
                                 {$this->_aliases['civicrm_activity']}.is_test = 0 AND
                                 {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
@@ -376,7 +376,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = array();
     if (is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
@@ -423,7 +423,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
    *
    * @return array
    */
-  function formRule($fields, $files, $self) {
+  public function formRule($fields, $files, $self) {
     $errors = array();
     $contactFields = array('sort_name', 'email', 'phone');
     if (!empty($fields['group_bys'])) {
@@ -454,7 +454,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     return $errors;
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     parent::postProcess();
@@ -463,7 +463,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
 
     $entryFound = FALSE;

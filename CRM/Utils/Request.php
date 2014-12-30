@@ -52,7 +52,7 @@ class CRM_Utils_Request {
   /**
    * Class constructor
    */
-  function __construct() {}
+  public function __construct() {}
 
   /**
    * Retrieve a value from the request (GET/POST/REQUEST)
@@ -68,7 +68,7 @@ class CRM_Utils_Request {
    * @access public
    * @static
    */
-  static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
+  public static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
 
     // hack to detect stuff not yet converted to new style
     if (!is_string($type)) {
@@ -127,7 +127,7 @@ class CRM_Utils_Request {
    *
    * @return array
    */
-  static function exportValues() {
+  public static function exportValues() {
     // For more discussion of default $_REQUEST handling, see:
     // http://www.php.net/manual/en/reserved.variables.request.php
     // http://www.php.net/manual/en/ini.core.php#ini.request-order

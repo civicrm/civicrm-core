@@ -42,7 +42,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -55,7 +55,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $priceSetBAO = new CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set();
     $priceSetBAO->copyValues($params);
     if (self::eventPriceSetDomainID()) {
@@ -74,7 +74,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $params, $defaults);
   }
 
@@ -88,7 +88,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    * @static
    * @access public
    */
-  static function setIsActive($id, $isActive) {
+  public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $id, 'is_active', $isActive);
   }
 
@@ -554,7 +554,7 @@ WHERE  id = %1";
    *
    * @return bool|false|int|null
    */
-  static function initSet(&$form, $id, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
+  public static function initSet(&$form, $id, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
     if (!$priceSetId) {
       $priceSetId = self::getFor($entityTable, $id);
     }
@@ -651,7 +651,7 @@ WHERE  id = %1";
    * @param array $params
    * @param $lineItem
    */
-  static function processAmount(&$fields, &$params, &$lineItem) {
+  public static function processAmount(&$fields, &$params, &$lineItem) {
     // using price set
     $totalPrice = 0;
     $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
@@ -1114,7 +1114,7 @@ return 0;
   /**
    * @return object
    */
-  static function eventPriceSetDomainID() {
+  public static function eventPriceSetDomainID() {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
            'event_price_set_domain_id',
            NULL, FALSE
@@ -1131,7 +1131,7 @@ return 0;
    * @static
    * @access public
    */
-  static function setIsQuickConfig($id, $isQuickConfig) {
+  public static function setIsQuickConfig($id, $isQuickConfig) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $id, 'is_quick_config', $isQuickConfig);
   }
 }

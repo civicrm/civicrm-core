@@ -35,7 +35,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     parent::setUp();
   }
 
-  function testOfflineRecurContribution() {
+  public function testOfflineRecurContribution() {
     $this->webtestLogin();
 
     // We need a payment processor

@@ -35,7 +35,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContactReferenceField() {
+  public function testContactReferenceField() {
     $this->webtestLogin();
 
     /* add new group */

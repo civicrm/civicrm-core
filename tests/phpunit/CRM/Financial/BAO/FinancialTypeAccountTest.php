@@ -31,7 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->organizationCreate();
   }
@@ -39,7 +39,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   /**
    * Check method add()
    */
-  function testAdd() {
+  public function testAdd() {
     $params = array(
       'name' => 'TestFinancialAccount_1',
       'accounting_code' => 4800,
@@ -75,7 +75,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   /**
    * Check method del()
    */
-  function testDel() {
+  public function testDel() {
     $params = array(
       'name' => 'TestFinancialAccount_2',
       'is_deductible' => 0,
@@ -105,7 +105,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   /**
    * Check method getFinancialAccount()
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     $params = array(
       'name' => 'TestFinancialAccount_3',
       'is_deductible' => 0,
@@ -134,7 +134,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   /**
    * Check method getFinancialAccount()
    */
-  function testGetFinancialAccount() {
+  public function testGetFinancialAccount() {
     $params = array(
       'name' => 'TestFinancialAccount',
       'accounting_code' => 4800,
@@ -163,7 +163,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   /**
    * Check method getInstrumentFinancialAccount()
    */
-  function testGetInstrumentFinancialAccount() {
+  public function testGetInstrumentFinancialAccount() {
     $paymentInstrumentValue = 1;
     $params = array(
       'name' => 'Donations',

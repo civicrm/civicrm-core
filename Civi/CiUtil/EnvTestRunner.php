@@ -8,7 +8,7 @@ class EnvTestRunner {
   protected $phpunit;
   protected $envTestSuite;
 
-  function __construct($phpunit = "phpunit", $envTestSuite = 'EnvTests') {
+  public function __construct($phpunit = "phpunit", $envTestSuite = 'EnvTests') {
     $this->phpunit = $phpunit;
     $this->envTestSuite = $envTestSuite;
   }

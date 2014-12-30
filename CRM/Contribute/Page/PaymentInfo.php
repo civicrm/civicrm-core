@@ -33,7 +33,7 @@
  *
  */
 class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
-  function preProcess() {
+  public function preProcess() {
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -46,7 +46,7 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
     $this->assign('component', $this->_component);
   }
 
-  function browse() {
+  public function browse() {
     $getTrxnInfo = $this->_context == 'transaction' ? TRUE : FALSE;
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, $getTrxnInfo, TRUE);
     if ($this->_context == 'payment_info') {
@@ -64,7 +64,7 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     if ($this->_action) {
       $this->browse();

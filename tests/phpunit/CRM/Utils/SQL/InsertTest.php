@@ -5,7 +5,7 @@
    * Class CRM_Utils_SQL_SelectTest
    */
 class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
-  function testRow_twice() {
+  public function testRow_twice() {
     $insert = CRM_Utils_SQL_Insert::into('foo')
       ->row(array('first' => '1', 'second' => '2' ))
       ->row(array('second' => '2b', 'first' => '1b'))
@@ -18,7 +18,7 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
     $this->assertLike($expected, $insert->toSQL());
   }
 
-  function testRows() {
+  public function testRows() {
     $insert = CRM_Utils_SQL_Insert::into('foo')
       ->row(array('first' => '1', 'second' => '2' ))
       ->rows(array(
@@ -42,7 +42,7 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
    * @param $actual
    * @param string $message
    */
-  function assertLike($expected, $actual, $message = '') {
+  public function assertLike($expected, $actual, $message = '') {
     $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expected)));
     $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actual)));
     $this->assertEquals($expected, $actual, $message);

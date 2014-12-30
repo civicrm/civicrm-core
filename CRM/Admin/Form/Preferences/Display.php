@@ -38,7 +38,7 @@
  *
  */
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
 
     $this->_varNames = array(
@@ -111,7 +111,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     parent::cbsDefaultValues($defaults);
 

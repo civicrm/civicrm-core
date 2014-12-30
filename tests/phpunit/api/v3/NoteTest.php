@@ -39,7 +39,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   protected $_noteID;
   protected $_note;
 
-  function setUp() {
+  public function setUp() {
 
     $this->_apiversion = 3;
     //  Connect to the database
@@ -65,7 +65,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    * Check retrieve note with empty parameter array
    * Error expected
    */
-  function testGetWithEmptyParams() {
+  public function testGetWithEmptyParams() {
     $this->callAPISuccess('note', 'get', array());
   }
 
@@ -73,7 +73,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    * Check retrieve note with missing patrameters
    * Error expected
    */
-  function testGetWithoutEntityId() {
+  public function testGetWithoutEntityId() {
     $params = array(
       'entity_table' => 'civicrm_contact',
     );
@@ -83,7 +83,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   /**
    * Check civicrm_note_get
    */
-  function testGet() {
+  public function testGet() {
     $entityId = $this->_noteID;
     $params = array(
       'entity_table' => 'civicrm_contact',
@@ -99,7 +99,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    * Check create with empty parameter array
    * Error Expected
    */
-  function testCreateWithEmptyNoteField() {
+  public function testCreateWithEmptyNoteField() {
     $this->_params['note'] = "";
     $result = $this->callAPIFailure('note', 'create', $this->_params,
       'Mandatory key(s) missing from params array: note');
@@ -109,7 +109,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    * Check create with partial params
    * Error expected
    */
-  function testCreateWithoutEntityId() {
+  public function testCreateWithoutEntityId() {
     unset($this->_params['entity_id']);
     $result = $this->callAPIFailure('note', 'create', $this->_params,
       'Mandatory key(s) missing from params array: entity_id');
@@ -119,7 +119,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    * Check create with partially empty params
    * Error expected
    */
-  function testCreateWithEmptyEntityId() {
+  public function testCreateWithEmptyEntityId() {
     $this->_params['entity_id'] = "";
     $result = $this->callAPIFailure('note', 'create', $this->_params,
       'Mandatory key(s) missing from params array: entity_id');
@@ -128,7 +128,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   /**
    * Check civicrm_note_create
    */
-  function testCreate() {
+  public function testCreate() {
 
     $result = $this->callAPIAndDocument('note', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['note'], 'Hello!!! m testing Note', 'in line ' . __LINE__);
@@ -140,7 +140,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->noteDelete($note);
   }
 
-  function testCreateWithApostropheInString() {
+  public function testCreateWithApostropheInString() {
     $params = array(
       'entity_table' => 'civicrm_contact',
       'entity_id' => $this->_contactID,
@@ -164,7 +164,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   /**
    * Check civicrm_note_create - tests used of default set to now
    */
-  function testCreateWithoutModifiedDate() {
+  public function testCreateWithoutModifiedDate() {
     unset($this->_params['modified_date']);
     $apiResult = $this->callAPISuccess('note', 'create', $this->_params);
     $this->assertAPISuccess($apiResult);
@@ -181,7 +181,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    * Please don't copy & paste this - is of marginal value
    * better to put time into the function on Syntax Conformance class that tests this
    */
-  function testUpdateWithEmptyParams() {
+  public function testUpdateWithEmptyParams() {
     $note = $this->callAPIFailure('note', 'create', array());
   }
 
@@ -189,7 +189,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    * Check update with missing parameter (contact id)
    * Error expected
    */
-  function testUpdateWithoutContactId() {
+  public function testUpdateWithoutContactId() {
     $params = array(
       'entity_id' => $this->_contactID,
       'entity_table' => 'civicrm_contact',    );
@@ -201,7 +201,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   /**
    * Check civicrm_note_update
    */
-  function testUpdate() {
+  public function testUpdate() {
     $params = array(
       'id' => $this->_noteID,
       'contact_id' => $this->_contactID,
@@ -225,7 +225,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    * Check delete with empty parametes array
    * Error expected
    */
-  function testDeleteWithEmptyParams() {
+  public function testDeleteWithEmptyParams() {
     $deleteNote = $this->callAPIFailure('note', 'delete', array(), 'Mandatory key(s) missing from params array: id');
   }
 
@@ -233,7 +233,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    * Check delete with wrong id
    * Error expected
    */
-  function testDeleteWithWrongID() {
+  public function testDeleteWithWrongID() {
     $params = array(
       'id' => 0,
     );
@@ -244,7 +244,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   /**
    * Check civicrm_note_delete
    */
-  function testDelete() {
+  public function testDelete() {
     $additionalNote = $this->noteCreate($this->_contactID);
 
     $params = array(

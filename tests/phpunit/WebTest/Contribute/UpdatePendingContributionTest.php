@@ -35,7 +35,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     parent::setUp();
   }
 
-  function testUpdatePendingContribution() {
+  public function testUpdatePendingContribution() {
     $this->webtestLogin();
 
     //Offline Pay Later Contribution
@@ -76,7 +76,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
   /**
    * @return array of contact details
    */
-  function _testOfflineContribution() {
+  public function _testOfflineContribution() {
     // Create a contact to be used as soft creditor
     $softCreditFname = substr(sha1(rand()), 0, 7);
     $softCreditLname = substr(sha1(rand()), 0, 7);
@@ -183,7 +183,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
   /**
    * @param array $contact
    */
-  function _testOnlineContribution($contact) {
+  public function _testOnlineContribution($contact) {
 
     // Use default payment processor
     $processorName = 'Test Processor';

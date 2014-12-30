@@ -34,7 +34,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     parent::setUp();
   }
 
-  function testOnlineMultpiplePaymentProcessor() {
+  public function testOnlineMultpiplePaymentProcessor() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -116,7 +116,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
 
   }
 
-  function testOnlineMultiplePaymentProcessorWithPayLater() {
+  public function testOnlineMultiplePaymentProcessorWithPayLater() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();

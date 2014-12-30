@@ -54,7 +54,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
     $priceFieldBAO->copyValues($params);
@@ -78,7 +78,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     if(empty($params['id']) && empty($params['name'])) {
       $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
     }
@@ -177,7 +177,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_PriceField', $params, $defaults);
   }
 
@@ -192,11 +192,11 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceField', $id, 'is_active', $is_active);
   }
 
-  static function freezeIfEnabled(&$element, $fieldOptions) {
+  public static function freezeIfEnabled(&$element, $fieldOptions) {
     if (!empty($fieldOptions['is_full'])) {
       $element->freeze();
     }
@@ -645,7 +645,7 @@ WHERE
   /**
    * @return array
    */
-  static function &htmlTypes() {
+  public static function &htmlTypes() {
     static $htmlTypes = NULL;
     if (!$htmlTypes) {
       $htmlTypes = array(

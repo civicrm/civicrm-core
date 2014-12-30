@@ -45,7 +45,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    * @return boolean true if yes, else false
    * @access public
    */
-  function check($str) {
+  public function check($str) {
     $config = CRM_Core_Config::singleton();
 
     $translated = $this->translateJoomlaPermission($str);
@@ -75,7 +75,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    * @internal param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:example.action:com_some_asset"
    * @return ALWAYS_DENY_PERMISSION|ALWAYS_ALLOW_PERMISSION|array(0 => $joomlaAction, 1 => $joomlaAsset)
    */
-  function translateJoomlaPermission($perm) {
+  public function translateJoomlaPermission($perm) {
     if ($perm === CRM_Core_Permission::ALWAYS_DENY_PERMISSION || $perm === CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
       return $perm;
     }
@@ -103,7 +103,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    * @static
    * @access public
    */
-  function checkGroupRole($array) {
+  public function checkGroupRole($array) {
     return FALSE;
   }
 }

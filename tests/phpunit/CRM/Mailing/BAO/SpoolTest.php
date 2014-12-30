@@ -15,12 +15,12 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
 
   protected static $bodytext = 'Unit tests keep children safe.';
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_mut = new CiviMailUtils( $this, true );
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->_mut->stop();
     parent::tearDown();
   }
@@ -29,7 +29,7 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
   /**
    * Basic send
    */
-  function testSend() {
+  public function testSend() {
     $contact_params_1 = array(
       'first_name' => substr(sha1(rand()), 0, 7),
       'last_name' => 'Anderson',

@@ -11,7 +11,7 @@ class CRM_Dedupe_BAO_QueryBuilder {
    *
    * @return string
    */
-  static function internalFilters( $rg, $strID1 = 'contact1.id', $strID2 = 'contact2.id' ) {
+  public static function internalFilters( $rg, $strID1 = 'contact1.id', $strID2 = 'contact2.id' ) {
     // Add a contact id filter for dedupe by group requests and add logic
     // to remove duplicate results with opposing orders, i.e. 1,2 and 2,1
     if( !empty($rg->contactIds) ) {

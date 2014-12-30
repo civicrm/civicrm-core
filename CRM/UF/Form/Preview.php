@@ -52,7 +52,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
    * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $flag = FALSE;
     $gid = $this->get('id');
     $this->set('gid', $gid);

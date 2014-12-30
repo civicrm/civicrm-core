@@ -192,7 +192,7 @@ SELECT id
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
     CRM_Utils_System::setTitle(ts('Contribution Amounts') . " ($title)");
@@ -283,7 +283,7 @@ SELECT id
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     //as for separate membership payment we has to have
     //contribution amount section enabled, hence to disable it need to

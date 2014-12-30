@@ -49,7 +49,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @access public
    *
    */
-  function createUser(&$params, $mail) {
+  public function createUser(&$params, $mail) {
     $user = \Drupal::currentUser();
     $user_register_conf = \Drupal::config('user.settings')->get('register');
     $verify_mail_conf = \Drupal::config('user.settings')->get('verify_mail');
@@ -117,7 +117,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @param integer $ufID  User ID in CMS
    * @param string $email Primary contact email address
    */
-  function updateCMSName($ufID, $email) {
+  public function updateCMSName($ufID, $email) {
     $user = user_load($ufID);
     if ($user && $user->getEmail() != $email) {
       $user->setEmail($email);
@@ -138,7 +138,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * @return void
    */
-  static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
+  public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     // If we are given a name, let's check to see if it already exists.
     if (!empty($params['name'])) {
       $name = $params['name'];
@@ -180,7 +180,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return string $destination destination value for URL
    *
    */
-  function getLoginDestination(&$form) {
+  public function getLoginDestination(&$form) {
     $args = NULL;
 
     $id = $form->get('id');
@@ -233,7 +233,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return void
    * @access public
    */
-  function setTitle($title, $pageTitle = NULL) {
+  public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
       $pageTitle = $title;
     }
@@ -252,7 +252,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return void
    * @access public
    */
-  function appendBreadCrumb($breadcrumbs) {
+  public function appendBreadCrumb($breadcrumbs) {
     $civicrmPageState = \Drupal::service('civicrm.page_state');
     foreach ($breadcrumbs as $breadcrumb) {
       $civicrmPageState->addBreadcrumb($breadcrumb['title'], $breadcrumb['url']);
@@ -265,7 +265,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return void
    * @access public
    */
-  function resetBreadCrumb() {
+  public function resetBreadCrumb() {
     \Drupal::service('civicrm.page_state')->resetBreadcrumbs();
   }
 
@@ -277,7 +277,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return void
    * @access public
    */
-  function addHTMLHead($header) {
+  public function addHTMLHead($header) {
     \Drupal::service('civicrm.page_state')->addHtmlHeader($header);
   }
 
@@ -389,7 +389,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * @return bool
    */
-  function formatResourceUrl(&$url) {
+  public function formatResourceUrl(&$url) {
     // Remove leading slash if present.
     $url = ltrim($url, '/');
 
@@ -412,7 +412,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return void
    * @access public
    */
-  function mapConfigToSSL() {
+  public function mapConfigToSSL() {
   }
 
   /**
@@ -425,7 +425,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @param bool $forceBackend A joomla jack (unused)
    * @return string
    */
-  function url($path = '', $query = '', $absolute = FALSE, $fragment = '', $htmlize = FALSE, $frontend = FALSE, $forceBackend = FALSE) {
+  public function url($path = '', $query = '', $absolute = FALSE, $fragment = '', $htmlize = FALSE, $frontend = FALSE, $forceBackend = FALSE) {
     $query = html_entity_decode($query);
     $url = \Drupal\civicrm\CivicrmHelper::parseURL("{$path}?{$query}");
 
@@ -462,7 +462,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * This always bootstraps Drupal
    */
-  function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+  public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     (new CRM_Utils_System_Drupal8())->loadBootStrap(array(), FALSE);
 
     $uid = \Drupal::service('user.auth')->authenticate($name, $password);
@@ -474,7 +474,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Load user into session
    */
-  function loadUser($username) {
+  public function loadUser($username) {
     $user = user_load_by_name($username);
     if (!$user) {
       return FALSE;
@@ -499,7 +499,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @param string $username
    * @return int|NULL
    */
-  function getUfId($username) {
+  public function getUfId($username) {
     if ($id = user_load_by_name($username)->id()) {
       return $id;
     }
@@ -512,11 +512,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * @access public
    */
-  function setMessage($message) {
+  public function setMessage($message) {
     drupal_set_message($message);
   }
 
-  function permissionDenied() {
+  public function permissionDenied() {
     \Drupal::service('civicrm.page_state')->setAccessDenied();
   }
 
@@ -524,7 +524,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * In previous versions, this function was the controller for logging out. In Drupal 8, we rewrite the route
    * to hand off logout to the standard Drupal logout controller. This function should therefore never be called.
    */
-  function logout() {
+  public function logout() {
     // Pass
   }
 
@@ -539,7 +539,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return bool
    * @Todo Handle setting cleanurls configuration for CiviCRM?
    */
-  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+  public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     static $run_once = FALSE;
     if ($run_once) return TRUE; else $run_once = TRUE;
 
@@ -580,7 +580,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * @return NULL|string
    */
-  function cmsRootPath($path = NULL) {
+  public function cmsRootPath($path = NULL) {
     if (defined('DRUPAL_ROOT')) {
       return DRUPAL_ROOT;
     }
@@ -635,7 +635,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return string
    *
    */
-  function getDefaultBlockLocation() {
+  public function getDefaultBlockLocation() {
     return 'sidebar_first';
   }
 }

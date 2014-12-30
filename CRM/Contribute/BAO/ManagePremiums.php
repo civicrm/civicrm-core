@@ -42,7 +42,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -56,7 +56,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $premium = new CRM_Contribute_DAO_Product();
     $premium->copyValues($params);
     if ($premium->find(TRUE)) {
@@ -76,7 +76,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     if (!$is_active) {
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->product_id = $id;
@@ -96,7 +96,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    *
    * @return object
    */
-  static function add(&$params, &$ids) {
+  public static function add(&$params, &$ids) {
     // CRM-14283 - strip protocol and domain from image URLs
     $image_type = array('image', 'thumbnail');
     foreach ($image_type as $key) {
@@ -133,7 +133,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    * @static
    */
 
-  static function del($productID) {
+  public static function del($productID) {
     //check dependencies
     $premiumsProduct = new CRM_Contribute_DAO_PremiumsProduct();
     $premiumsProduct->product_id = $productID;

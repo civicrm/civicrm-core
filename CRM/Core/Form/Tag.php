@@ -127,7 +127,7 @@ class CRM_Core_Form_Tag {
    * @access public
    * @static
    */
-  static function postProcess(&$params, $entityId, $entityTable = 'civicrm_contact', &$form) {
+  public static function postProcess(&$params, $entityId, $entityTable = 'civicrm_contact', &$form) {
     if ($form && !empty($form->_entityTagValues)) {
       $existingTags = $form->_entityTagValues;
     }

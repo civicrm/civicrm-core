@@ -76,7 +76,7 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     if ($this->_search) {
       return;
     }

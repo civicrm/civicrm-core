@@ -23,7 +23,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
   protected $fixtures;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->modules = array(
       'one' => new CRM_Core_Module('com.example.one', TRUE),
@@ -58,7 +58,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->apiKernel->registerApiProvider($this->adhocProvider);
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
     CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_managed');
     CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_option_value WHERE name like "CRM_Example_%"');
@@ -70,7 +70,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * to (1) create 'foo' entity, (2) create 'bar' entity', (3) remove 'foo'
    * entity
    */
-  function testAddRemoveEntitiesModule_UpdateAlways_DeleteAlways() {
+  public function testAddRemoveEntitiesModule_UpdateAlways_DeleteAlways() {
     $decls = array();
 
     // create first managed entity ('foo')
@@ -119,7 +119,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Set up an active module with one managed-entity and, over
    * time, the content of the entity changes
    */
-  function testModifyDeclaration_UpdateAlways() {
+  public function testModifyDeclaration_UpdateAlways() {
     $decls = array();
 
     // create first managed entity ('foo')
@@ -145,7 +145,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Set up an active module with one managed-entity and, over
    * time, the content of the entity changes
    */
-  function testModifyDeclaration_UpdateNever() {
+  public function testModifyDeclaration_UpdateNever() {
     $decls = array();
 
     // create first managed entity ('foo')
@@ -175,7 +175,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * ensure that the policy is followed (ie the entity is not
    * deleted).
    */
-  function testRemoveDeclaration_CleanupNever() {
+  public function testRemoveDeclaration_CleanupNever() {
     $decls = array();
 
     // create first managed entity ('foo')
@@ -204,7 +204,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * ensure that the policy is followed (ie the entity is not
    * deleted).
    */
-  function testRemoveDeclaration_CleanupUnused() {
+  public function testRemoveDeclaration_CleanupUnused() {
     $decls = array();
 
     // create first managed entity ('foo')
@@ -255,7 +255,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   /**
    * Setup an active module with a malformed entity declaration
    */
-  function testInvalidDeclarationModule() {
+  public function testInvalidDeclarationModule() {
     // create first managed entity ('foo')
     $decls = array();
     $decls[] = array(
@@ -280,7 +280,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   /**
    * Setup an active module with a malformed entity declaration
    */
-  function testMissingName() {
+  public function testMissingName() {
     // create first managed entity ('foo')
     $decls = array();
     $decls[] = array(
@@ -305,7 +305,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   /**
    * Setup an active module with a malformed entity declaration
    */
-  function testMissingEntity() {
+  public function testMissingEntity() {
     // create first managed entity ('foo')
     $decls = array();
     $decls[] = array(
@@ -331,7 +331,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Setup an active module with an entity -- then disable and re-enable the
    * module
    */
-  function testDeactivateReactivateModule() {
+  public function testDeactivateReactivateModule() {
     // create first managed entity ('foo')
     $decls = array();
     $decls[] = $this->fixtures['com.example.one-foo'];
@@ -365,7 +365,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Setup an active module with an entity -- then entirely uninstall the
    * module
    */
-  function testUninstallModule() {
+  public function testUninstallModule() {
     // create first managed entity ('foo')
     $decls = array();
     $decls[] = $this->fixtures['com.example.one-foo'];

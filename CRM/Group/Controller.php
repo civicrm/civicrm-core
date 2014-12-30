@@ -37,7 +37,7 @@ class CRM_Group_Controller extends CRM_Core_Controller {
   /**
    * Class constructor
    */
-  function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
+  public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
     parent::__construct($title, $modal);
 
     $this->_stateMachine = new CRM_Group_StateMachine($this, $action);
@@ -71,7 +71,7 @@ class CRM_Group_Controller extends CRM_Core_Controller {
   /**
    * @return mixed
    */
-  function run() {
+  public function run() {
     return parent::run();
   }
 

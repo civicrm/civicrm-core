@@ -87,7 +87,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->set('searchFormName', 'Search');
 
     // set the button names
@@ -170,7 +170,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     $this->addElement('text', 'sort_name', ts('Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
@@ -206,7 +206,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * @return void
    * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -286,7 +286,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     $controller->run();
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     if (!$this->_force) {
       return;
     }
@@ -395,7 +395,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return null
    */
-  function getFormValues() {
+  public function getFormValues() {
     return NULL;
   }
 

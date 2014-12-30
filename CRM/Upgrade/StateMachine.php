@@ -49,7 +49,7 @@ class CRM_Upgrade_StateMachine extends CRM_Core_StateMachine {
    * @internal param \CRM_Upgrade_Controller_base $object
    * @return \CRM_Upgrade_StateMachine CRM_Upgrade_StateMachine_Base
    */
-  function __construct(&$controller, &$pages, $action = CRM_Core_Action::NONE) {
+  public function __construct(&$controller, &$pages, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $this->_pages = &$pages;

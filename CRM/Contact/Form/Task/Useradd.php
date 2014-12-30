@@ -54,7 +54,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
    */
   public $_email;
 
-  function preProcess() {
+  public function preProcess() {
     $params = $defaults = $ids = array();
 
     $this->_contactId   = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
@@ -73,7 +73,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults['contactID'] = $this->_contactId;
     $defaults['name'] = $this->_displayName;
@@ -139,7 +139,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
    *
    * @static
    */
-  static function usernameRule($params) {
+  public static function usernameRule($params) {
     $config = CRM_Core_Config::singleton();
     $errors = array();
     $check_params = array(

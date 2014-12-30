@@ -40,7 +40,7 @@ class CRM_Case_Page_AJAX {
   /**
    * Retrieve unclosed cases.
    */
-  static function unclosedCases() {
+  public static function unclosedCases() {
     $params = array(
       'limit' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10),
       'sort_name' => CRM_Utils_Type::escape(CRM_Utils_Array::value('term', $_GET, ''), 'String'),
@@ -64,7 +64,7 @@ class CRM_Case_Page_AJAX {
     CRM_Utils_JSON::output($results);
   }
 
-  function processCaseTags() {
+  public function processCaseTags() {
 
     $caseId = CRM_Utils_Type::escape($_POST['case_id'], 'Positive');
     $tags = CRM_Utils_Type::escape($_POST['tag'], 'String');
@@ -123,7 +123,7 @@ class CRM_Case_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  function caseDetails() {
+  public function caseDetails() {
     $caseId = CRM_Utils_Type::escape($_GET['caseId'], 'Positive');
 
     if (!CRM_Case_BAO_Case::accessCase($caseId, FALSE)) {
@@ -157,7 +157,7 @@ class CRM_Case_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  function addClient() {
+  public function addClient() {
     $caseId = CRM_Utils_Type::escape($_POST['caseID'], 'Positive');
     $contactId = CRM_Utils_Type::escape($_POST['contactID'], 'Positive');
 
@@ -200,7 +200,7 @@ class CRM_Case_Page_AJAX {
   /**
    * Delete relationships specific to case and relationship type
    */
-  static function deleteCaseRoles() {
+  public static function deleteCaseRoles() {
     $caseId  = CRM_Utils_Type::escape($_POST['case_id'], 'Positive');
     $relType = CRM_Utils_Type::escape($_POST['rel_type'], 'Positive');
 

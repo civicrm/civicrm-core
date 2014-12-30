@@ -32,7 +32,7 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
  */
 class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
 
-  function testFinancialAccount() {
+  public function testFinancialAccount() {
     // To Add Financial Account
 
     // class attributes.

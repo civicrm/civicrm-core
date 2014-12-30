@@ -35,7 +35,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testLoggingReport() {
+  public function testLoggingReport() {
     $this->webtestLogin();
 
     //enable the logging
@@ -274,7 +274,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
   /**
    * @param $data
    */
-  function verifyReportData($data) {
+  public function verifyReportData($data) {
     foreach ($data as $value) {
       // check for the row contains proper data
       $actionPath = ($value['action'] == 'Update') ? "td[1]/a[2]" : "td[1][contains(text(), '{$value['action']}')]";
@@ -292,7 +292,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
    * @param $dataForReportDetail
    * @param array $filters
    */
-  function detailReportCheck($dataForReportDetail, $filters = array()) {
+  public function detailReportCheck($dataForReportDetail, $filters = array()) {
     foreach ($dataForReportDetail as $value) {
       $this->waitForElementPresent("xpath=//table/tbody//tr/td[2][contains(text(), '{$value['log_type']}')]/../td[4]/a[contains(text(), '{$value['altered_contact']}')]/../../td[1]/a[2]");
       $this->click("xpath=//table/tbody//tr/td[2][contains(text(), '{$value['log_type']}')]/../td[4]/a[contains(text(), '{$value['altered_contact']}')]/../../td[1]/a[2]");

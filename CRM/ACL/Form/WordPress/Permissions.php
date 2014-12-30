@@ -45,7 +45,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    * @access public
    * @return void
    */
-  function buildQuickForm( ) {
+  public function buildQuickForm( ) {
 
     CRM_Utils_System::setTitle( 'Wordpress Access Control' );
 
@@ -175,7 +175,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    * @access public
    * @return array   civicrm permissions
    */
-  static function getPermissionArray(){
+  public static function getPermissionArray(){
     global $civicrm_root;
 
     $permissions = CRM_Core_Permission::basicPermissions();

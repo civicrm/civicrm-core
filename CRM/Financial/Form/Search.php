@@ -36,7 +36,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
 
   public $_batchStatus;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_batchStatus = CRM_Utils_Request::retrieve('batchStatus', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL);
     $this->assign('batchStatus', $this->_batchStatus);
   }
@@ -44,7 +44,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $status = CRM_Utils_Request::retrieve('status', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1);
     $defaults['batch_update'] = $status;
@@ -119,7 +119,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
     parent::buildQuickForm();
   }
 
-  function postProcess() {
+  public function postProcess() {
     $batchIds = array();
     foreach ($_POST as $key => $value) {
       if (substr($key,0,6) == "check_") {

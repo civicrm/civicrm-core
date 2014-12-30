@@ -119,11 +119,11 @@ class CRM_Core_Transaction {
    *   - If true, then make a new nested transaction ("SAVEPOINT")
    *   - If false, then attach to the existing transaction
    */
-  function __construct($nest = FALSE) {
+  public function __construct($nest = FALSE) {
     \Civi\Core\Transaction\Manager::singleton()->inc($nest);
   }
 
-  function __destruct() {
+  public function __destruct() {
     $this->commit();
   }
 
@@ -134,7 +134,7 @@ class CRM_Core_Transaction {
    *
    * @return \CRM_Core_Exception this
    */
-  function commit() {
+  public function commit() {
     if (!$this->_pseudoCommitted) {
       $this->_pseudoCommitted = TRUE;
       \Civi\Core\Transaction\Manager::singleton()->dec();

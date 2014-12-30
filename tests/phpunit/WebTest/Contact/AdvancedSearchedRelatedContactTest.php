@@ -35,7 +35,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     parent::setUp();
   }
 
-  function testSearchRelatedContact() {
+  public function testSearchRelatedContact() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -145,7 +145,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
    * @param $eventTitle
    * @param $eventDescription
    */
-  function _testAddEventInfo($eventTitle, $eventDescription) {
+  public function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
     $this->select("event_type_id", "value=1");
@@ -173,7 +173,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
   /**
    * @param $streetAddress
    */
-  function _testAddLocation($streetAddress) {
+  public function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Location_upload-bottom");
@@ -199,7 +199,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
    * @param bool $priceSet
    * @param int $processorId
    */
-  function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorId) {
+  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorId) {
     // Go to Fees tab
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
@@ -234,7 +234,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
    * @param string $relatedName
    * @param $relType
    */
-  function _testAddRelationship($ContactName, $relatedName, $relType) {
+  public function _testAddRelationship($ContactName, $relatedName, $relType) {
 
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type("sort_name", $ContactName);
@@ -289,7 +289,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
   /**
    * @param $relType
    */
-  function _testSearchResult($relType) {
+  public function _testSearchResult($relType) {
 
     //search related contact using Advanced Search
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
@@ -303,7 +303,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->assertElementContainsText('search-status', '2 Contacts');
   }
 
- function testAdvanceSearchForLog() {
+ public function testAdvanceSearchForLog() {
     $this->webtestLogin();
 
     $Pdate     = date('F jS, Y h:i:s A', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1,   date( 'Y' )) );

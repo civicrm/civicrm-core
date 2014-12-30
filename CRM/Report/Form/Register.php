@@ -66,7 +66,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if ($this->_action & CRM_Core_Action::DELETE) {
       return $defaults;
@@ -144,7 +144,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $dupeClass = FALSE;
     $reportUrl = new CRM_Core_DAO_OptionValue();

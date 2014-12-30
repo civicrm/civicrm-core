@@ -38,7 +38,7 @@
  *
  */
 class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviMember Component Settings'));
     $this->_varNames = array(
       CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME => array(
@@ -61,7 +61,7 @@ class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
    * @return void
    * @access public
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
   }
 }

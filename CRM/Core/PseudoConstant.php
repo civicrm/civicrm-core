@@ -454,7 +454,7 @@ class CRM_Core_PseudoConstant {
    *   NULL if the given key has no corresponding option
    *   String if label is found
    */
-  static function getLabel($baoName, $fieldName, $key) {
+  public static function getLabel($baoName, $fieldName, $key) {
     $values = $baoName::buildOptions($fieldName, 'get');
     if ($values === FALSE) {
       return FALSE;
@@ -474,7 +474,7 @@ class CRM_Core_PseudoConstant {
    *   NULL if the given key has no corresponding option
    *   String if label is found
    */
-  static function getName($baoName, $fieldName, $key) {
+  public static function getName($baoName, $fieldName, $key) {
     $values = $baoName::buildOptions($fieldName, 'validate');
     if ($values === FALSE) {
       return FALSE;
@@ -494,7 +494,7 @@ class CRM_Core_PseudoConstant {
    *   NULL if the given key has no corresponding option
    *   String|Number if key is found
    */
-  static function getKey($baoName, $fieldName, $value) {
+  public static function getKey($baoName, $fieldName, $value) {
     $values = $baoName::buildOptions($fieldName, 'validate');
     if ($values === FALSE) {
       return FALSE;
@@ -507,7 +507,7 @@ class CRM_Core_PseudoConstant {
    * @param $fieldSpec
    * @return string|null
    */
-  static function getOptionEditUrl($fieldSpec) {
+  public static function getOptionEditUrl($fieldSpec) {
     // If it's an option group, that's easy
     if (!empty($fieldSpec['pseudoconstant']['optionGroupName'])) {
       return 'civicrm/admin/options/' . $fieldSpec['pseudoconstant']['optionGroupName'];
@@ -1687,7 +1687,7 @@ ORDER BY name";
    * @static
    * @public
    */
-  static function countryIDForStateID($stateID) {
+  public static function countryIDForStateID($stateID) {
     if (empty($stateID)) {
       return CRM_Core_DAO::$_nullObject;
     }

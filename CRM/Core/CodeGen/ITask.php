@@ -9,10 +9,10 @@ interface CRM_Core_CodeGen_ITask {
    *
    * @param $config is currently the CRM_Core_CodeGen_Main object.
    */
-  function setConfig($config);
+  public function setConfig($config);
 
   /**
    * Perform the task.
    */
-  function run();
+  public function run();
 }

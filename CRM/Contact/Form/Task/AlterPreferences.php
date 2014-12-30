@@ -46,7 +46,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-   function buildQuickForm() {
+   public function buildQuickForm() {
     // add select for preferences
 
     $options = array(ts('Add Selected Options'), ts('Remove selected options'));
@@ -62,7 +62,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
     $this->addDefaultButtons(ts('Set Privacy Options'));
   }
 
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Task_AlterPreferences', 'formRule'));
   }
 
@@ -73,7 +73,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
    *
    * @return array the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     $defaults['actionTypeOption'] = 0;
@@ -86,7 +86,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
    *
    * @return array
    */
-  static function formRule($form, $rule) {
+  public static function formRule($form, $rule) {
     $errors = array();
     if (empty($form['pref']) && empty($form['contact_taglist'])) {
       $errors['_qf_default'] = ts("Please select at least one privacy option.");

@@ -129,7 +129,7 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
    * A wrapper for getTemplateFileName that includes calling the hook to
    * prevent us from having to copy & paste the logic of calling the hook
    */
-  function getHookedTemplateFileName() {
+  public function getHookedTemplateFileName() {
     $pageTemplateFile = $this->getTemplateFileName();
     CRM_Utils_Hook::alterTemplateFile(get_class($this), $this, 'page', $pageTemplateFile);
     return $pageTemplateFile;

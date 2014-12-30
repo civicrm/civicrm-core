@@ -11,7 +11,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_post', array($this, 'onPost'));
   }
@@ -20,7 +20,7 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
    * If reload option is missing, then 'create' returns the inputted nick_name -- despite the
    * fact that the hook manipulated the actual DB content.
    */
-  function testNoReload() {
+  public function testNoReload() {
     $result = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
       'first_name' => 'First',
@@ -34,7 +34,7 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
   /**
    * When the reload option is unrecognized, generate an error
    */
-  function testReloadInvalid() {
+  public function testReloadInvalid() {
     $this->callAPIFailure('contact', 'create', array(
       'contact_type' => 'Individual',
       'first_name' => 'First',
@@ -50,7 +50,7 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
    * If reload option is set, then 'create' returns the final nick_name -- even if it
    * differs from the inputted nick_name.
    */
-  function testReloadDefault() {
+  public function testReloadDefault() {
     $result = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
       'first_name' => 'First',
@@ -68,7 +68,7 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
    * When the reload option is combined with chaining, the reload should munge
    * the chain results.
    */
-  function testReloadNoChainInterference() {
+  public function testReloadNoChainInterference() {
     $result = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
       'first_name' => 'First',
@@ -94,7 +94,7 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
    * @param int $objectId
    * @param $objectRef
    */
-  function onPost($op, $objectName, $objectId, &$objectRef) {
+  public function onPost($op, $objectName, $objectId, &$objectRef) {
     if ($op == 'create' && $objectName == 'Individual') {
       CRM_Core_DAO::executeQuery(
         "UPDATE civicrm_contact SET nick_name = 'munged' WHERE id = %1",

@@ -37,7 +37,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
   protected $_email;
   protected $_apiversion;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_apiversion = 3;

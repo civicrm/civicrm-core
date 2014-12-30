@@ -101,7 +101,7 @@ class CRM_Case_XMLProcessor {
    *
    * @return array
    */
-  function &allActivityTypes($indexName = TRUE, $all = FALSE) {
+  public function &allActivityTypes($indexName = TRUE, $all = FALSE) {
     if (self::$activityTypes === NULL) {
       self::$activityTypes = CRM_Case_PseudoConstant::caseActivityType($indexName, $all);
     }
@@ -111,7 +111,7 @@ class CRM_Case_XMLProcessor {
   /**
    * @return array
    */
-  function &allRelationshipTypes() {
+  public function &allRelationshipTypes() {
     if (self::$relationshipTypes === NULL) {
       $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE);
 

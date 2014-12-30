@@ -38,7 +38,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for Individuals Subtype.
    */
-  function testIndividualSubtypeImport() {
+  public function testIndividualSubtypeImport() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -120,7 +120,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for Organization Subtype.
    */
-  function testOrganizationSubtypeImport() {
+  public function testOrganizationSubtypeImport() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -196,7 +196,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for Household Subtype.
    */
-  function testHouseholdSubtypeImport() {
+  public function testHouseholdSubtypeImport() {
     $this->webtestLogin();
 
     // Create Household Subtype
@@ -278,7 +278,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /**
    * @return string
    */
-  function _createHouseholdSubtype() {
+  public function _createHouseholdSubtype() {
 
     // Visit to create contact subtype
     $this->openCiviPage("admin/options/subtype", "action=add&reset=1");
@@ -298,7 +298,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _individualSubtypeCSVData() {
+  public function _individualSubtypeCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -346,7 +346,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _organizationSubtypeCSVData() {
+  public function _organizationSubtypeCSVData() {
     $headers = array(
       'organization_name' => 'Organization Name',
       'email' => 'Email',
@@ -388,7 +388,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _householdSubtypeCSVData() {
+  public function _householdSubtypeCSVData() {
     $headers = array(
       'household_name' => 'Household Name',
       'email' => 'Email',

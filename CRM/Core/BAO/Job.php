@@ -41,7 +41,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -54,7 +54,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @access public
    * @static
    */
-  static function create($params) {
+  public static function create($params) {
     $job = new CRM_Core_DAO_Job();
     $job->copyValues($params);
     return $job->save();
@@ -72,7 +72,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $job = new CRM_Core_DAO_Job();
     $job->copyValues($params);
     if ($job->find(TRUE)) {
@@ -93,7 +93,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_Job', $id, 'is_active', $is_active);
   }
 
@@ -106,7 +106,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @access public
    * @static
    */
-  static function del($jobID) {
+  public static function del($jobID) {
     if (!$jobID) {
       CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
     }
@@ -127,7 +127,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    *
    * CRM-10513
    */
-  static function cleanup($maxEntriesToKeep = 1000, $minDaysToKeep = 30) {
+  public static function cleanup($maxEntriesToKeep = 1000, $minDaysToKeep = 30) {
     // Prevent the job log from getting too big
     // For now, keep last minDays days and at least maxEntries records
     $query = 'SELECT COUNT(*) FROM civicrm_job_log';

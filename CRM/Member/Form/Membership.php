@@ -751,7 +751,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    * @access public
    * @static
    */
-  static function formRule($params, $files, $self) {
+  public static function formRule($params, $files, $self) {
     $errors = array();
 
     $priceSetId = CRM_Utils_Array::value('price_set_id', $params);
@@ -1709,7 +1709,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    * @return boolean true if mail was sent successfully
    * @static
    */
-  static function emailReceipt(&$form, &$formValues, &$membership) {
+  public static function emailReceipt(&$form, &$formValues, &$membership) {
     // retrieve 'from email id' for acknowledgement
     $receiptFrom = $formValues['from_email_address'];
 

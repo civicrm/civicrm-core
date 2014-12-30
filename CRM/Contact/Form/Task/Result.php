@@ -46,7 +46,7 @@ class CRM_Contact_Form_Task_Result extends CRM_Contact_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $session = CRM_Core_Session::singleton();
 
     //this is done to unset searchRows variable assign during AddToHousehold and AddToOrganization

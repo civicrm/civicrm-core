@@ -47,7 +47,7 @@ Class CRM_Core_Form_Date {
    * @static
    * @access public
    */
-  static function buildAllowedDateFormats(&$form) {
+  public static function buildAllowedDateFormats(&$form) {
 
     $dateOptions = array();
 
@@ -238,7 +238,7 @@ Class CRM_Core_Form_Date {
    *
    * @return null
    */
-  static function addDateRangeToForm(&$form, $fieldName, $selector, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE) {
+  public static function addDateRangeToForm(&$form, $fieldName, $selector, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE) {
     $form->add('select',
       "{$fieldName}_relative",
       ts('Relative Date Range'),

@@ -174,7 +174,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    *
    * @return array|bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
     if (CRM_Utils_Array::value('monetaryThousandSeparator', $fields) ==
       CRM_Utils_Array::value('monetaryDecimalPoint', $fields)
@@ -212,7 +212,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     return empty($errors) ? TRUE : $errors;
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     parent::setDefaultValues();
 
     // CRM-1496

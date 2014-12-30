@@ -39,7 +39,7 @@ class WebTest_Release_UpgradeScript extends WebTest_Release_ReleaseTestCase {
     parent::setUp();
   }
 
-  function testUpgrade() {
+  public function testUpgrade() {
     $this->webtestLogin();
     $this->open($this->settings->upgradeURL);
     $this->waitForTextPresent("Upgrade CiviCRM to Version");

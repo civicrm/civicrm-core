@@ -52,7 +52,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     $soft_credit_types = CRM_Core_OptionGroup::values('soft_credit_type', TRUE, FALSE, FALSE, NULL, 'name');
 
@@ -225,7 +225,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    * @static
    * @access public
    */
-  static function formRule($values, $files, $self) {
+  public static function formRule($values, $files, $self) {
     $errors = array();
     $contributionPageId = $self->_id;
     //CRM-4286

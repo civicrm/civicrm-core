@@ -7,7 +7,7 @@ class CRM_Event_Badge_Logo extends CRM_Event_Badge {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
     // A4
     $pw           = 210;

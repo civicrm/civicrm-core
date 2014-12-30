@@ -46,7 +46,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
     CRM_Utils_System::setTitle(ts('Thank-you and Receipting') . " ($title)");
     return parent::setDefaultValues();
@@ -102,7 +102,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $options) {
+  public static function formRule($fields, $files, $options) {
     $errors = array();
 
     // if is_email_receipt is set, the receipt message must be non-empty

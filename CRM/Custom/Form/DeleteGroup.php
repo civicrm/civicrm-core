@@ -58,7 +58,7 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
    * @return void
    * @acess protected
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
 
     $defaults = array();

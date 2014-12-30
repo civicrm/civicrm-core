@@ -36,7 +36,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomSameFieldAdd() {
+  public function testCustomSameFieldAdd() {
     $this->open($this->sboxPath);
     $this->webtestLogin();
 
@@ -44,7 +44,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->_testCustomAdd();
   }
 
-  function _testCustomAdd() {
+  public function _testCustomAdd() {
     //CRM-7564 : Different gropus can contain same custom fields
     $this->open($this->sboxPath . "civicrm/admin/custom/group?action=add&reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());

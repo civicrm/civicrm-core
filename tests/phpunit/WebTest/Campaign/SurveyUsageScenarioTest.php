@@ -35,7 +35,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testSurveyUsageScenario() {
+  public function testSurveyUsageScenario() {
     $this->webtestLogin('admin');
 
     // Create new group
@@ -301,7 +301,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]",'1 Result');
   }
 
-  function testSurveyReportTest() {
+  public function testSurveyReportTest() {
     $this->webtestLogin('admin');
 
     // Enable CiviCampaign module if necessary

@@ -8,7 +8,7 @@ class CRM_Event_Cart_StateMachine_Checkout extends CRM_Core_StateMachine {
    * @param object $controller
    * @param const|int $action
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $cart = CRM_Event_Cart_BAO_Cart::find_or_create_for_current_session();

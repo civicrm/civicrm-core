@@ -116,7 +116,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
     $this->assign('cdType', FALSE);
     $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this);
@@ -240,7 +240,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    *
    * @return array the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
       if ($this->_copyValueId) {
         // cached tree is fetched

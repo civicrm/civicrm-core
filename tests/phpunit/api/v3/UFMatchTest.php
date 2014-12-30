@@ -73,7 +73,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
       );
   }
 
-  function tearDown() {
+  public function tearDown() {
     //  Truncate the tables
     $this->quickCleanup(
       array(
@@ -97,7 +97,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['contact_id'], 69);
   }
 
-  function testGetUFMatchIDWrongParam() {
+  public function testGetUFMatchIDWrongParam() {
     $params = 'a string';
     $result = $this->callAPIFailure('uf_match', 'get', $params);
   }
@@ -113,7 +113,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['uf_id'], 42);
   }
 
-  function testGetUFIDWrongParam() {
+  public function testGetUFIDWrongParam() {
     $params = 'a string';
     $result = $this->callAPIFailure('uf_match', 'get', $params);
   }
@@ -121,19 +121,19 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   /**
    *  Test civicrm_activity_create() using example code
    */
-  function testUFMatchGetExample() {
+  public function testUFMatchGetExample() {
     require_once 'api/v3/examples/UFMatch/Get.php';
     $result = UF_match_get_example();
     $expectedResult = UF_match_get_expectedresult();
     $this->assertEquals($result, $expectedResult);
   }
 
-  function testCreate() {
+  public function testCreate() {
     $result = $this->callAPISuccess('uf_match', 'create', $this->_params);
     $this->getAndCheck($this->_params, $result['id'], 'uf_match');
   }
 
-  function testDelete() {
+  public function testDelete() {
     $result = $this->callAPISuccess('uf_match', 'create', $this->_params);
     $this->assertEquals(1, $this->callAPISuccess('uf_match', 'getcount', array(      'id' => $result['id'],
       )));

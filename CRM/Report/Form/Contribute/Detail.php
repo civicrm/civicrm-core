@@ -50,7 +50,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
     $config = CRM_Core_Config::singleton();
@@ -333,11 +333,11 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $this->_columnHeaders = array();
 
     parent::select();
@@ -346,7 +346,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $this->_select = str_replace("sum({$this->_aliases['civicrm_contribution']}.total_amount)", "{$this->_aliases['civicrm_contribution']}.total_amount", $this->_select);
   }
 
-  function orderBy() {
+  public function orderBy() {
     parent::orderBy();
 
     // please note this will just add the order-by columns to select query, and not display in column-headers.
@@ -363,7 +363,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   /**
    * @param bool $softcredit
    */
-  function from($softcredit = FALSE) {
+  public function from($softcredit = FALSE) {
     $this->_from = "
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
@@ -444,7 +444,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
 
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_contribution']}.id ";
   }
 
@@ -453,7 +453,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     $totalAmount = $average = array();
@@ -534,7 +534,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     return $statistics;
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
 
@@ -640,7 +640,7 @@ UNION ALL
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $checkList = array();
     $entryFound = FALSE;
@@ -809,7 +809,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
     }
   }
 
-  function sectionTotals() {
+  public function sectionTotals() {
 
     // Reports using order_bys with sections must populate $this->_selectAliases in select() method.
     if (empty($this->_selectAliases)) {

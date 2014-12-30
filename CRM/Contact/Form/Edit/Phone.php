@@ -49,7 +49,7 @@ class CRM_Contact_Form_Edit_Phone {
    * @access public
    * @static
    */
-  static function buildQuickForm(&$form, $addressBlockCount = NULL, $blockEdit = FALSE) {
+  public static function buildQuickForm(&$form, $addressBlockCount = NULL, $blockEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
     if (!$addressBlockCount) {
       $blockId = ($form->get('Phone_Block_Count')) ? $form->get('Phone_Block_Count') : 1;

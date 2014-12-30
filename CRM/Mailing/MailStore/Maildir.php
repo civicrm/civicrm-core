@@ -48,7 +48,7 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
    *
    * @return \CRM_Mailing_MailStore_Maildir
    */
-  function __construct($dir) {
+  public function __construct($dir) {
     $this->_dir = $dir;
 
     $this->_ignored = $this->maildir(implode(DIRECTORY_SEPARATOR, array('CiviMail.ignored', date('Y'), date('m'), date('d'))));
@@ -63,7 +63,7 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
    *
    * @return array      array of ezcMail objects
    */
-  function fetchNext($count = 0) {
+  public function fetchNext($count = 0) {
     $mails = array();
     $parser = new ezcMailParser;
     //set property text attachment as file CRM-5408
@@ -100,7 +100,7 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
    * @throws Exception
    * @return void
    */
-  function markIgnored($file) {
+  public function markIgnored($file) {
     if ($this->_debug) {
       print "moving $file to ignored folder\n";
     }
@@ -118,7 +118,7 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
    * @throws Exception
    * @return void
    */
-  function markProcessed($file) {
+  public function markProcessed($file) {
     if ($this->_debug) {
       print "moving $file to processed folder\n";
     }

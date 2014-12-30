@@ -40,7 +40,7 @@ class CRM_Dedupe_Merger {
   /**
    * @return array
    */
-  static function relTables() {
+  public static function relTables() {
     static $relTables;
 
     $config = CRM_Core_Config::singleton();
@@ -158,7 +158,7 @@ class CRM_Dedupe_Merger {
   /**
    * Returns the related tables groups for which a contact has any info entered
    */
-  static function getActiveRelTables($cid) {
+  public static function getActiveRelTables($cid) {
     $cid = (int) $cid;
     $groups = array();
 
@@ -191,7 +191,7 @@ class CRM_Dedupe_Merger {
   /**
    * Return tables and their fields referencing civicrm_contact.contact_id explicitly
    */
-  static function cidRefs() {
+  public static function cidRefs() {
     static $cidRefs;
     if (!$cidRefs) {
       $sql = "
@@ -222,7 +222,7 @@ WHERE
   /**
    * Return tables and their fields referencing civicrm_contact.contact_id with entity_id
    */
-  static function eidRefs() {
+  public static function eidRefs() {
     static $eidRefs;
     if (!$eidRefs) {
       // FIXME: this should be generated dynamically from the schema
@@ -245,7 +245,7 @@ WHERE
   /**
    * Return tables using locations
    */
-  static function locTables() {
+  public static function locTables() {
     static $locTables;
     if (!$locTables) {
       $locTables = array( 'civicrm_email', 'civicrm_address', 'civicrm_phone' );
@@ -261,7 +261,7 @@ WHERE
    * @param string $request 'relTables' or 'cidRefs'
    * @see CRM-13836
    */
-  static function getMultiValueCustomSets($request) {
+  public static function getMultiValueCustomSets($request) {
     static $data = NULL;
     if ($data === NULL) {
       $data = array(
@@ -290,7 +290,7 @@ WHERE
    * Tables which require custom processing should declare functions to call here.
    * Doing so will override normal processing.
    */
-  static function cpTables() {
+  public static function cpTables() {
     static $tables;
     if (!$tables) {
       $tables = array(
@@ -307,7 +307,7 @@ WHERE
   /**
    * Return payment related table.
    */
-  static function paymentTables() {
+  public static function paymentTables() {
     static $tables;
     if (!$tables) {
       $tables = array('civicrm_pledge', 'civicrm_membership', 'civicrm_participant');
@@ -319,7 +319,7 @@ WHERE
   /**
    * Return payment update Query.
    */
-  static function paymentSql($tableName, $mainContactId, $otherContactId) {
+  public static function paymentSql($tableName, $mainContactId, $otherContactId) {
     $sqls = array();
     if (!$tableName || !$mainContactId || !$otherContactId) {
       return $sqls;
@@ -371,7 +371,7 @@ INNER JOIN  civicrm_participant participant ON ( participant.id = payment.partic
    *
    * @return array
    */
-  static function operationSql($mainId, $otherId, $tableName, $tableOperations = array(), $mode = 'add') {
+  public static function operationSql($mainId, $otherId, $tableName, $tableOperations = array(), $mode = 'add') {
     $sqls = array();
     if (!$tableName || !$mainId || !$otherId) {
       return $sqls;
@@ -416,7 +416,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @static
    */
-  static function moveContactBelongings($mainId, $otherId, $tables = FALSE, $tableOperations = array()) {
+  public static function moveContactBelongings($mainId, $otherId, $tables = FALSE, $tableOperations = array()) {
     $cidRefs = self::cidRefs();
     $eidRefs = self::eidRefs();
     $cpTables = self::cpTables();
@@ -523,7 +523,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @return array
    * @static
    */
-  static function findDifferences($main, $other) {
+  public static function findDifferences($main, $other) {
     $result = array(
       'contact' => array(),
       'custom' => array(),
@@ -566,7 +566,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @static
    * @access public
    */
-  static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $redirectForPerformance = FALSE) {
+  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $redirectForPerformance = FALSE) {
     $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
     $cacheKeyString = "merge {$contactType}";
     $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
@@ -611,7 +611,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @static
    * @access public
    */
-  static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe',
+  public static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe',
     $autoFlip = TRUE, $redirectForPerformance = FALSE
   ) {
     $cacheKeyString = CRM_Utils_Array::value('cache_key_string', $cacheParams);
@@ -698,7 +698,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @static
    * @access public
    */
-  static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe') {
+  public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe') {
     $conflicts = array();
     $migrationData = array(
       'old_migration_info' => $migrationInfo,
@@ -806,7 +806,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @static
    * @access public
    */
-  static function getRowsElementsAndInfo($mainId, $otherId) {
+  public static function getRowsElementsAndInfo($mainId, $otherId) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
 
     // Fetch contacts
@@ -1204,7 +1204,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @static
    * @access public
    */
-  static function moveAllBelongings($mainId, $otherId, $migrationInfo) {
+  public static function moveAllBelongings($mainId, $otherId, $migrationInfo) {
     if (empty($migrationInfo)) {
       return FALSE;
     }
@@ -1582,7 +1582,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * @return array of field names which will be compared, so everything except ID.
    */
-  static function getContactFields() {
+  public static function getContactFields() {
     $contactFields = CRM_Contact_DAO_Contact::fields();
     $invalidFields = array('api_key', 'contact_is_deleted', 'created_date', 'display_name', 'hash', 'id', 'modified_date',
       'primary_contact_id', 'sort_name', 'user_unique_id');
@@ -1601,7 +1601,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param contactId
    */
-  static function addMembershipToRealtedContacts($contactID) {
+  public static function addMembershipToRealtedContacts($contactID) {
     $dao = new CRM_Member_DAO_Membership();
     $dao->contact_id = $contactID;
     $dao->is_test = 0;

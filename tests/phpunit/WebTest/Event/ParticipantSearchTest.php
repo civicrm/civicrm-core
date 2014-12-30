@@ -38,14 +38,14 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
   /**
    * @param $strings
    */
-  function _checkStrings(&$strings) {
+  public function _checkStrings(&$strings) {
     // search for elements
     foreach ($strings as $string) {
       $this->assertTrue($this->isTextPresent($string), "Could not find $string on page");
     }
   }
 
-  function testParticipantSearchForm() {
+  public function testParticipantSearchForm() {
     $this->webtestLogin();
 
     // visit event search page
@@ -68,7 +68,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->_checkStrings($stringsToCheck);
   }
 
-  function testParticipantSearchForce() {
+  public function testParticipantSearchForce() {
     $this->webtestLogin();
 
     // visit event search page
@@ -79,7 +79,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Select Records"), "A forced event search did not return any results");
   }
 
-  function testParticipantSearchEmpty() {
+  public function testParticipantSearchEmpty() {
     $this->webtestLogin();
 
     // visit event search page
@@ -99,7 +99,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->_checkStrings($stringsToCheck);
   }
 
-  function testParticipantSearchEventName() {
+  public function testParticipantSearchEventName() {
     $this->webtestLogin();
 
     // visit event search page
@@ -120,7 +120,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->_checkStrings($stringsToCheck);
   }
 
-  function testParticipantSearchEventDate() {
+  public function testParticipantSearchEventDate() {
 
     $this->webtestLogin();
 
@@ -144,7 +144,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->_checkStrings($stringsToCheck);
   }
 
-  function testParticipantSearchEventDateAndType() {
+  public function testParticipantSearchEventDateAndType() {
 
     $this->webtestLogin();
 
@@ -174,7 +174,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->_checkStrings($stringsToCheck);
   }
 
-  function testParticipantSearchCustomField() {
+  public function testParticipantSearchCustomField() {
 
     $this->webtestLogin();
 
@@ -200,7 +200,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->_checkStrings($stringsToCheck);
   }
 
-  function testParticipantSearchForceAndView() {
+  public function testParticipantSearchForceAndView() {
 
     $this->webtestLogin();
 
@@ -225,7 +225,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->_checkStrings($stringsToCheck);
   }
 
-  function testParticipantSearchForceAndEdit() {
+  public function testParticipantSearchForceAndEdit() {
 
     $this->webtestLogin();
 

@@ -35,7 +35,7 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testPCPAdd() {
+  public function testPCPAdd() {
     // open browser, login
     $this->webtestLogin();
 

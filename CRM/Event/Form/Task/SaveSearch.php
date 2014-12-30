@@ -66,7 +66,7 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Smart Group'));
     // get the qill
     $query = new CRM_Event_BAO_Query($this->get('formValues'));

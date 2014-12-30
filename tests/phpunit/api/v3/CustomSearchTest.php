@@ -8,7 +8,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_CustomSearchTest extends CiviUnitTestCase {
   protected $_apiversion;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
     $this->useTransaction(TRUE);

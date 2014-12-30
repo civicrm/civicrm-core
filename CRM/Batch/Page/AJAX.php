@@ -41,7 +41,7 @@ class CRM_Batch_Page_AJAX {
   /**
    * Save record
    */
-  function batchSave() {
+  public function batchSave() {
     // save the entered information in 'data' column
     $batchId = CRM_Utils_Type::escape($_POST['batch_id'], 'Positive');
 
@@ -54,7 +54,7 @@ class CRM_Batch_Page_AJAX {
   /**
    * Retrieve records
    */
-  static function getBatchList() {
+  public static function getBatchList() {
     $sortMapper = array(
       0 => 'batch.title',
       1 => 'batch.type_id',

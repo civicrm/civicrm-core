@@ -99,7 +99,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
    *
    * @access public
    */
-  function __construct($format, $unit = 'mm') {
+  public function __construct($format, $unit = 'mm') {
     if (is_array($format)) {
       // Custom format
       $tFormat = $format;
@@ -124,7 +124,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
    * @param $objectinstance
    * @param string $methodname
    */
-  function SetGenerator($objectinstance, $methodname = 'generateLabel') {
+  public function SetGenerator($objectinstance, $methodname = 'generateLabel') {
     $this->generatorMethod = $methodname;
     $this->generatorObject = $objectinstance;
   }
@@ -135,7 +135,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
    *
    * @return float|int|mixed
    */
-  function getFormatValue($name, $convert = FALSE) {
+  public function getFormatValue($name, $convert = FALSE) {
     if (isset($this->format[$name])) {
       $value = $this->format[$name];
       $metric = $this->format['metric'];
@@ -157,7 +157,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
    * @param $format
    * @param $unit
    */
-  function LabelSetFormat(&$format, $unit) {
+  public function LabelSetFormat(&$format, $unit) {
     $this->defaults = CRM_Core_BAO_LabelFormat::getDefaultValues();
     $this->format = &$format;
     $this->formatName = $this->getFormatValue('name');
@@ -189,7 +189,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   /**
    * @param $text
    */
-  function generateLabel($text) {
+  public function generateLabel($text) {
     $args = array(
       'w' => $this->width,
       'h' => 0,
@@ -236,7 +236,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   /**
    * @param $texte
    */
-  function AddPdfLabel($texte) {
+  public function AddPdfLabel($texte) {
     if ($this->countX == $this->xNumber) {
       // Page full, we start a new one
       $this->AddPage();
@@ -262,7 +262,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
     }
   }
 
-  function getFontNames() {
+  public function getFontNames() {
     // Define labels for TCPDF core fonts
     $fontLabel = array(
       'courier' => ts('Courier'),

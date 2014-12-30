@@ -42,7 +42,7 @@
  */
 class CRM_Core_Config_Defaults {
 
-  function setCoreVariables() {
+  public function setCoreVariables() {
     global $civicrm_root;
 
     // set of base directories relying on $civicrm_root

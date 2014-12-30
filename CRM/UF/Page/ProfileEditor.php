@@ -7,11 +7,11 @@ require_once 'CRM/Core/Page.php';
  * widgets
  */
 class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
-  function run() {
+  public function run() {
     CRM_Core_Error::fatal('This is not a real page!');
   }
 
-  static function registerProfileScripts() {
+  public static function registerProfileScripts() {
     static $loaded = FALSE;
     if ($loaded || CRM_Core_Resources::isAjaxMode()) {
       return;
@@ -66,7 +66,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    *
    * @param array $entityTypes strings, e.g. "IndividualModel", "ActivityModel"
    */
-  static function registerSchemas($entityTypes) {
+  public static function registerSchemas($entityTypes) {
     // TODO in cases where registerSchemas is called multiple times for same entity, be more efficient
     CRM_Core_Resources::singleton()->addSettingsFactory(function () use ($entityTypes) {
       return array(
@@ -78,7 +78,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   /**
    * AJAX callback
    */
-  static function getSchemaJSON() {
+  public static function getSchemaJSON() {
     $entityTypes = explode(',', $_REQUEST['entityTypes']);
     CRM_Utils_JSON::output(self::getSchema($entityTypes));
   }
@@ -93,7 +93,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    * @see js/model/crm.core.js
    * @see js/model/crm.mappedcore.js
    */
-  static function getSchema($entityTypes) {
+  public static function getSchema($entityTypes) {
     // FIXME: Depending on context (eg civicrm/profile/create vs search-columns), it may be appropriate to
     // pick importable or exportable fields
 
@@ -180,7 +180,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    * @see js/model/crm.core.js
    * @see js/model/crm.mappedcore.js
    */
-  static function convertCiviModelToBackboneModel($extends, $title, $availableFields) {
+  public static function convertCiviModelToBackboneModel($extends, $title, $availableFields) {
     $locationFields = CRM_Core_BAO_UFGroup::getLocationFields();
 
     $result = array(

@@ -38,7 +38,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Class constructor
    */
-  function __construct( ) {
+  public function __construct( ) {
     parent::__construct( );
   }
 
@@ -52,7 +52,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
     $financialItem->copyValues($params);
     if ($financialItem->find(TRUE)) {
@@ -73,7 +73,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @static
    * @return void
    */
-  static function add($lineItem, $contribution, $taxTrxnID = FALSE) {
+  public static function add($lineItem, $contribution, $taxTrxnID = FALSE) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
     $itemStatus = NULL;
@@ -137,7 +137,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @static
    * @return object
    */
-  static function create(&$params, $ids = NULL, $trxnIds = NULL) {
+  public static function create(&$params, $ids = NULL, $trxnIds = NULL) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
     
     if (!empty($ids['id'])) {
@@ -186,7 +186,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @access public
    * @static
    */
-  static function createEntityTrxn($params) {
+  public static function createEntityTrxn($params) {
     $entity_trxn = new CRM_Financial_DAO_EntityFinancialTrxn();
     $entity_trxn->copyValues($params);
     $entity_trxn->save();
@@ -203,7 +203,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @access public
    * @static
    */
-  static function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
+  public static function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
     $financialItem = new CRM_Financial_DAO_EntityFinancialTrxn();
     $financialItem->copyValues($params);
     //retrieve last entry from civicrm_entity_financial_trxn
@@ -242,7 +242,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @access public
    * @static
    */
-  static function checkContactPresent($contactIds, &$error) {
+  public static function checkContactPresent($contactIds, &$error) {
     if (empty($contactIds)) {
       return FALSE;
     }

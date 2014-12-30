@@ -51,7 +51,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
   /**
    * Create a sample batch
    */
-  function batchCreate() {
+  public function batchCreate() {
     $params = $this->_params;
     $params['name'] = $params['title'] = 'Batch_433397';
     $params['status_id'] = 1;
@@ -73,7 +73,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
   /**
    * Test civicrm_batch_create - success expected.
    */
-  function testCreate() {
+  public function testCreate() {
     $params = array(
       'name' => 'New_Batch_03',
       'title' => 'New Batch 03',
@@ -91,7 +91,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
   /**
    * Test civicrm_batch_create with id.
    */
-  function testUpdate() {
+  public function testUpdate() {
     $params = array(
       'name' => 'New_Batch_04',
       'title' => 'New Batch 04',
@@ -109,7 +109,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
   /**
    * Test civicrm_batch_delete using the old $params['batch_id'] syntax.
    */
-  function testBatchDeleteOldSyntax() {
+  public function testBatchDeleteOldSyntax() {
     $batchID = $this->batchCreate();
     $params = array(
       'batch_id' => $batchID,
@@ -120,7 +120,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
   /**
    * Test civicrm_batch_delete using the new $params['id'] syntax
    */
-  function testBatchDeleteCorrectSyntax() {
+  public function testBatchDeleteCorrectSyntax() {
     $batchID = $this->batchCreate();
     $params = array(
       'id' => $batchID,

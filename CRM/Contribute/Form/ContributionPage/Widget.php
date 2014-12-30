@@ -37,7 +37,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
 
   protected $_widget;
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     $this->_widget = new CRM_Contribute_DAO_Widget();
@@ -139,7 +139,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
   /**
    *
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     // check if there is a widget already created
     if ($this->_widget) {
@@ -164,7 +164,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     return $defaults;
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Widget');
 
     $this->addElement('checkbox',
@@ -236,7 +236,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     return empty($errors) ? TRUE : $errors;
   }
 
-  function postProcess() {
+  public function postProcess() {
     //to reset quickform elements of next (pcp) page.
     if ($this->controller->getNextName('Widget') == 'PCP') {
       $this->controller->resetPage('PCP');

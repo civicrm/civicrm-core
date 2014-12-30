@@ -245,7 +245,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $config = CRM_Core_Config::singleton();
     $defaults = array(
       'dataSource' => 'CRM_Import_DataSource_CSV',

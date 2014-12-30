@@ -40,7 +40,7 @@ class CRM_Contact_Page_View_Tag extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function browse() {
+  public function browse() {
     $controller = new CRM_Core_Controller_Simple('CRM_Tag_Form_Tag', ts('Contact Tags'), $this->_action);
     $controller->setEmbedded(TRUE);
 
@@ -54,7 +54,7 @@ class CRM_Contact_Page_View_Tag extends CRM_Core_Page {
     $controller->run();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
 
@@ -72,7 +72,7 @@ class CRM_Contact_Page_View_Tag extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $this->browse();

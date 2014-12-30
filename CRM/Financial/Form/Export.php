@@ -69,7 +69,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     // this mean it's a batch action
@@ -118,7 +118,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
    * @access public
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // this mean it's a batch action
     if (!empty($this->_batchIds)) {
       $batchNames = CRM_Batch_BAO_Batch::getBatchNames($this->_batchIds);

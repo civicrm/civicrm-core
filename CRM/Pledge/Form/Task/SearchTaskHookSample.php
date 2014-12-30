@@ -44,7 +44,7 @@ class CRM_Pledge_Form_Task_SearchTaskHookSample extends CRM_Pledge_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $rows = array();
     // display name and pledge details of all selected contacts

@@ -138,12 +138,12 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
 
     $this->addDefaultButtons(ts('Release Respondents'), 'done');
   }
 
-  function postProcess() {
+  public function postProcess() {
     $deleteActivityIds = array();
     foreach ($this->_contactIds as $cid) {
       if (array_key_exists($cid, $this->_surveyActivities)) {

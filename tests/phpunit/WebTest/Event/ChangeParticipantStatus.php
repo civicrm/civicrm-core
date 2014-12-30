@@ -35,7 +35,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testParticipationAdd() {
+  public function testParticipationAdd() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -98,7 +98,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
   /**
    * @param string $firstName
    */
-  function addParticipant($firstName) {
+  public function addParticipant($firstName) {
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", '_qf_Participant_upload-bottom');
 
     // Type contact last name in contact auto-complete, wait for dropdown and click first result

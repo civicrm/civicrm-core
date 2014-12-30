@@ -48,7 +48,7 @@ class CRM_Activity_Controller_Search extends CRM_Core_Controller {
   /**
    * Class constructor
    */
-  function __construct($title = NULL, $modal = TRUE, $action = CRM_Core_Action::NONE) {
+  public function __construct($title = NULL, $modal = TRUE, $action = CRM_Core_Action::NONE) {
 
     parent::__construct($title, $modal);
 

@@ -40,7 +40,7 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function browse() {
+  public function browse() {
     $loggingReport = CRM_Core_BAO_Log::useLoggingReport();
     $this->assign('useLogging', $loggingReport);
 
@@ -73,7 +73,7 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
     $this->assign_by_ref('log', $logEntries);
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
 
@@ -93,7 +93,7 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $this->browse();

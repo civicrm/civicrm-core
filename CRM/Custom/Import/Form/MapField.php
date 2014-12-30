@@ -65,7 +65,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
    * @static
    * @access public
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
     $fieldMessage = NULL;
     if (!array_key_exists('savedMapping', $fields)) {

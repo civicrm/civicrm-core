@@ -61,7 +61,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE
     );
@@ -170,7 +170,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
@@ -180,7 +180,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = '') {
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/View.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();
@@ -209,7 +209,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -224,7 +224,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
   /**
    * @return string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }

@@ -191,7 +191,7 @@ class CRM_Extension_Downloader {
    *
    * @return bool
    */
-  function validateFiles($key, $extractedZipPath) {
+  public function validateFiles($key, $extractedZipPath) {
     $filename = $extractedZipPath . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME;
     if (!is_readable($filename)) {
       CRM_Core_Session::setStatus(ts('Failed reading data from %1 during installation', array(1 => $filename)), ts('Installation Error'), 'error');

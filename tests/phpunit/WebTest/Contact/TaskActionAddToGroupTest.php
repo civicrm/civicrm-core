@@ -35,7 +35,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddContactsToGroup() {
+  public function testAddContactsToGroup() {
 
     $this->webtestLogin();
     $newGroupName = 'Group_' . substr(sha1(rand()), 0, 7);
@@ -104,7 +104,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
   }
 
-  function testMultiplePageContactSearchAddContactsToGroup() {
+  public function testMultiplePageContactSearchAddContactsToGroup() {
     $this->webtestLogin();
     $newGroupName = 'Group_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($newGroupName);

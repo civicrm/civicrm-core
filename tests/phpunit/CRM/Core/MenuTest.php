@@ -7,7 +7,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Core_MenuTest extends CiviUnitTestCase {
 
-  function pathArguments() {
+  public function pathArguments() {
     $cases = array(); // array(0 => string $input, 1 => array $expectedOutput)
     //$cases[] = array(NULL, array());
     //$cases[] = array('', array());
@@ -38,7 +38,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
    * @param $expectedArray
    * @dataProvider pathArguments
    */
-  function testGetArrayForPathArgs($inputString, $expectedArray) {
+  public function testGetArrayForPathArgs($inputString, $expectedArray) {
     $actual = CRM_Core_Menu::getArrayForPathArgs($inputString);
     $this->assertEquals($expectedArray, $actual);
   }

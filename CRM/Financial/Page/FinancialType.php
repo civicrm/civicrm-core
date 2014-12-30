@@ -52,7 +52,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Financial_BAO_FinancialType';
   }
 
@@ -61,7 +61,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::BROWSE  => array(
@@ -108,7 +108,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, false, 'browse'); // default to 'browse'
 
@@ -133,7 +133,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     // get all financial types sorted by weight
     $financialType = array();
     $dao = new CRM_Financial_DAO_FinancialType();
@@ -198,7 +198,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Financial_Form_FinancialType';
   }
 
@@ -207,7 +207,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Financial Types';
   }
 
@@ -218,7 +218,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = null) {
+  public function userContext($mode = null) {
     return 'civicrm/admin/financial/financialType';
   }
 }

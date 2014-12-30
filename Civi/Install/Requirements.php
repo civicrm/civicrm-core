@@ -153,7 +153,7 @@ class Requirements {
   /**
    * @return array
    */
-  function checkServerVariables() {
+  public function checkServerVariables() {
     $results = array(
       'title' => 'CiviCRM PHP server variables',
       'severity' => $this::REQUIREMENT_OK,
@@ -467,7 +467,7 @@ class Requirements {
    *
    * @return array
    */
-  function checkMysqlLockTables($db_config) {
+  public function checkMysqlLockTables($db_config) {
     $results = array(
       'title' => 'CiviCRM MySQL Lock Tables',
       'severity' => $this::REQUIREMENT_OK,

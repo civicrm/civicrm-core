@@ -46,7 +46,7 @@ class CRM_Dashlet_Page_Activity extends CRM_Core_Page {
    *
    * @access public
    */
-  function run() {
+  public function run() {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
     $this->assign('contactID', $contactID);

@@ -47,7 +47,7 @@ class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
    * @return actionLog array
    * @access public
    */
-  static function create($params) {
+  public static function create($params) {
     $actionLog = new CRM_Core_DAO_ActionLog();
 
     $params['action_date_time'] = CRM_Utils_Array::value('action_date_time', $params, date('YmdHis'));

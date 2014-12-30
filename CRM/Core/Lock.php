@@ -54,7 +54,7 @@ class CRM_Core_Lock {
    *
    * @return \CRM_Core_Lock the lock object
    */
-  function __construct($name, $timeout = NULL, $serverWideLock = FALSE) {
+  public function __construct($name, $timeout = NULL, $serverWideLock = FALSE) {
     $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->dsn);
     $database = $dsnArray['database'];
@@ -80,14 +80,14 @@ class CRM_Core_Lock {
     $this->acquire();
   }
 
-  function __destruct() {
+  public function __destruct() {
     $this->release();
   }
 
   /**
    * @return bool
    */
-  function acquire() {
+  public function acquire() {
     if (defined('CIVICRM_LOCK_DEBUG')) {
       CRM_Core_Error::debug_log_message('acquire lock for ' . $this->_name);
     }
@@ -108,7 +108,7 @@ class CRM_Core_Lock {
   /**
    * @return null|string
    */
-  function release() {
+  public function release() {
     if ($this->_hasLock) {
       $this->_hasLock = FALSE;
 
@@ -121,7 +121,7 @@ class CRM_Core_Lock {
   /**
    * @return null|string
    */
-  function isFree() {
+  public function isFree() {
     $query = "SELECT IS_FREE_LOCK( %1 )";
     $params = array(1 => array($this->_name, 'String'));
     return CRM_Core_DAO::singleValueQuery($query, $params);
@@ -130,7 +130,7 @@ class CRM_Core_Lock {
   /**
    * @return bool
    */
-  function isAcquired() {
+  public function isAcquired() {
     return $this->_hasLock;
   }
 
@@ -147,7 +147,7 @@ class CRM_Core_Lock {
    * @throws CRM_Core_Exception
    * @return boolean
    */
-  function hackyHandleBrokenCode($jobLog) {
+  public function hackyHandleBrokenCode($jobLog) {
     if (stristr($this->_name, 'job')) {
       throw new CRM_Core_Exception('lock aquisition for ' . $this->_name . 'attempted when ' . $jobLog . 'is not released');
     }

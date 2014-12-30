@@ -33,7 +33,7 @@
  *
  */
 class CRM_Core_I18n_Form extends CRM_Core_Form {
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
     global $tsLocale;
     $this->_locales = array_keys($config->languageLimit);
@@ -87,11 +87,11 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
    * @return array reference to the array of default values
    *
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
-  function postProcess() {
+  public function postProcess() {
     $values = $this->exportValues();
     $table  = $values['table'];
     $field  = $values['field'];

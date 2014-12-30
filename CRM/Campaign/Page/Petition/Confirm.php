@@ -37,7 +37,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
    * @return string
    * @throws Exception
    */
-  function run() {
+  public function run() {
     CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
     
     $contact_id   = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);

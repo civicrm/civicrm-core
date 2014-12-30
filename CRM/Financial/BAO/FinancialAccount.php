@@ -44,7 +44,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -58,7 +58,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->copyValues($params);
     if ($financialAccount->find(TRUE)) {
@@ -77,7 +77,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialAccount', $id, 'is_active', $is_active);
   }
 
@@ -91,7 +91,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @static
    * @return object
    */
-  static function add(&$params, &$ids = array()) {
+  public static function add(&$params, &$ids = array()) {
     if(empty($params['id'])) {
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
@@ -121,7 +121,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @param int $financialAccountId
    * @static
    */
-  static function del($financialAccountId) {
+  public static function del($financialAccountId) {
     //checking if financial type is present
     $check = FALSE;
 
@@ -161,7 +161,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @return accounting code
    * @static
    */
-  static function getAccountingCode($financialTypeId) {
+  public static function getAccountingCode($financialTypeId) {
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
     $query = "SELECT cfa.accounting_code
 FROM civicrm_financial_type cft
@@ -188,7 +188,7 @@ WHERE cft.id = %1
    * @return integer count
    * @static
    */
-  static function getARAccounts($financialAccountId, $financialAccountTypeId = NULL, $accountTypeCode = 'ar') {
+  public static function getARAccounts($financialAccountId, $financialAccountTypeId = NULL, $accountTypeCode = 'ar') {
     if (!$financialAccountTypeId) {
       $financialAccountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
       $financialAccountTypeId = array_search('Asset', $financialAccountType);

@@ -2,7 +2,7 @@
 namespace Civi\CiUtil\Command;
 
 class LsCommand {
-  static function main($argv) {
+  public static function main($argv) {
     $paths = $argv;
     array_shift($paths);
     foreach (\Civi\CiUtil\PHPUnitScanner::findTestsByPath($paths) as $test) {

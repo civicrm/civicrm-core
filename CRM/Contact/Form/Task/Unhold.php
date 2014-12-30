@@ -11,11 +11,11 @@ class CRM_Contact_Form_Task_Unhold extends CRM_Contact_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->addDefaultButtons(ts('Unhold Email'), 'done');
   }
 

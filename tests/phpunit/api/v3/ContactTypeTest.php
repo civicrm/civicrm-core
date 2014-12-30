@@ -37,7 +37,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_ContactTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_apiversion = 3;
@@ -76,7 +76,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
    * Test add methods with valid data
    * success expected
    */
-  function testContactCreate() {
+  public function testContactCreate() {
 
     // check for Type:Individual Subtype:sub_individual
     $contactParams = array(
@@ -119,7 +119,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   /**
    * Test add with invalid data
    */
-  function testContactAddInvalidData() {
+  public function testContactAddInvalidData() {
 
     // check for Type:Individual Subtype:sub_household
     $contactParams = array(
@@ -144,7 +144,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
    * Test update with no subtype to valid subtype
    * success expected
    */
-  function testContactUpdateNoSubtypeValid() {
+  public function testContactUpdateNoSubtypeValid() {
 
     // check for Type:Individual
     $contactParams = array(
@@ -209,7 +209,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   /**
    * Test update with no subtype to invalid subtype
    */
-  function testContactUpdateNoSubtypeInvalid() {
+  public function testContactUpdateNoSubtypeInvalid() {
 
     // check for Type:Individual
     $contactParams = array(
@@ -257,7 +257,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
    * Test update with no subtype to valid subtype
    * success expected
    */
-  function testContactUpdateSubtypeValid() {
+  public function testContactUpdateSubtypeValid() {
 
     $params = array(
       'label' => 'sub2_individual',
@@ -346,7 +346,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   /**
    * Test update with no subtype to invalid subtype
    */
-  function testContactUpdateSubtypeInvalid() {
+  public function testContactUpdateSubtypeInvalid() {
 
     // check for Type:Individual subtype:sub_individual
     $contactParams = array(

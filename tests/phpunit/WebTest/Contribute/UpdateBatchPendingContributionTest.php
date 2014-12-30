@@ -35,7 +35,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     parent::setUp();
   }
 
-  function testBatchUpdatePendingContribution() {
+  public function testBatchUpdatePendingContribution() {
     $this->webtestLogin();
     $this->_testOfflineContribution();
     $this->_testOfflineContribution();
@@ -73,7 +73,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->webtestVerifyTabularData($expected);
   }
 
-  function testParticipationAdd() {
+  public function testParticipationAdd() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -133,7 +133,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
   /**
    * @param string $firstName
    */
-  function _addParticipant($firstName) {
+  public function _addParticipant($firstName) {
 
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", '_qf_Participant_upload-bottom');
 
@@ -188,7 +188,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     );
   }
 
-  function _testOfflineContribution() {
+  public function _testOfflineContribution() {
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
     // create new contact using dialog

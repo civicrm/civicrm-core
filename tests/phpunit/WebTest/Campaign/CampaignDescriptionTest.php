@@ -35,7 +35,7 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCreateCampaign() {
+  public function testCreateCampaign() {
     // Fixme: testing a theory that this test was failing due to permissions
     $this->webtestLogin('admin');
 
@@ -81,7 +81,7 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $this->assertEquals($campaignDescription, $fetchedVaue);
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
 
     $this->enableComponents(array('CiviCampaign'));

@@ -51,7 +51,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Contribute_BAO_Premium';
   }
 
@@ -60,7 +60,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
       $deleteExtra = ts('Are you sure you want to remove this product form this page?');
@@ -101,7 +101,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
@@ -131,7 +131,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
    * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     // get all custom groups sorted by weight
     $premiums = array();
     $pageID = CRM_Utils_Request::retrieve('id', 'Positive',
@@ -201,7 +201,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Contribute_Form_ContributionPage_Premium';
   }
 
@@ -210,7 +210,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Configure Premiums';
   }
 
@@ -221,7 +221,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return CRM_Utils_System::currentPath();
   }
 }

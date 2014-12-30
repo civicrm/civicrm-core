@@ -45,7 +45,7 @@ class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $statusMsg = NULL;
     $contactIds = array();

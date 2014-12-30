@@ -140,7 +140,7 @@ class CRM_Core_Permission_Base {
    * @access public
    */
 
-  function check($str) {
+  public function check($str) {
     //no default behaviour
   }
 
@@ -153,7 +153,7 @@ class CRM_Core_Permission_Base {
    * @access public
    */
 
-  function checkGroupRole($array) {
+  public function checkGroupRole($array) {
     return FALSE;
   }
 
@@ -201,7 +201,7 @@ class CRM_Core_Permission_Base {
    * @throws CRM_Core_Exception
    * @see CRM_Core_Permission::getCorePermissions
    */
-  function upgradePermissions($permissions) {
+  public function upgradePermissions($permissions) {
     throw new CRM_Core_Exception("Unimplemented method: CRM_Core_Permission_*::upgradePermissions");
   }
 
@@ -217,7 +217,7 @@ class CRM_Core_Permission_Base {
    * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    * @see CRM_Core_Permission::getCorePermissions
    */
-  static function getModulePermissions($module) {
+  public static function getModulePermissions($module) {
     $return_permissions = array();
     $fn_name = "{$module}_civicrm_permission";
     if (function_exists($fn_name)) {
@@ -234,7 +234,7 @@ class CRM_Core_Permission_Base {
    *
    * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
-  function getAllModulePermissions() {
+  public function getAllModulePermissions() {
     $permissions = array();
     CRM_Utils_Hook::permission($permissions);
     return $permissions;

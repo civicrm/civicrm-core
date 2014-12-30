@@ -58,7 +58,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     $participantNo = substr($this->_name, 12);
@@ -96,7 +96,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $unsetSubmittedOptions = array();
     $discountId = NULL;
     //fix for CRM-3088, default value for discount set.
@@ -375,7 +375,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     //get the button name.
     $button = substr($self->controller->getButtonName(), -4);
@@ -517,7 +517,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    *
    * @return bool
    */
-  function validatePaymentValues($self, $fields) {
+  public function validatePaymentValues($self, $fields) {
 
     if (!empty($self->_params[0]['bypass_payment']) ||
       $self->_allowWaitlist ||
@@ -753,7 +753,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * @return boolean ture on success.
    * @access public
    */
-  function isLastParticipant($isButtonJs = FALSE) {
+  public function isLastParticipant($isButtonJs = FALSE) {
     $participant = $isButtonJs ? $this->_params[0]['additional_participants'] : $this->_params[0]['additional_participants'] + 1;
     if (count($this->_params) == $participant) {
       return TRUE;
@@ -765,7 +765,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * Reset values for all options those are full.
    *
    **/
-  function resetElementValue($optionFullIds = array()) {
+  public function resetElementValue($optionFullIds = array()) {
     if (!is_array($optionFullIds) ||
       empty($optionFullIds) ||
       !$this->isSubmitted()
@@ -824,7 +824,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * @param string $elementName
    * @param array $optionIds
    */
-  function resetSubmittedValue($elementName, $optionIds = array()) {
+  public function resetSubmittedValue($elementName, $optionIds = array()) {
     if (empty($elementName) ||
       !$this->elementExists($elementName) ||
       !$this->getSubmitValue($elementName)

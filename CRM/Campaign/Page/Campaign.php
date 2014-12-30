@@ -53,7 +53,7 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
    * @return array $_actionLinks
    *
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
       $deleteExtra = ts('Are you sure you want to delete this Campaign?');
@@ -85,7 +85,7 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
     return self::$_actionLinks;
   }
 
-  function browse() {
+  public function browse() {
 
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaignSummary();
 
@@ -127,7 +127,7 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     if (!CRM_Core_Permission::check('administer CiviCampaign')) {
       CRM_Utils_System::permissionDenied();
     }

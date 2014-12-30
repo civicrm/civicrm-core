@@ -50,7 +50,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
   protected $_params = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive',
       $this, FALSE
     );
@@ -100,7 +100,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     foreach ($this->_varNames as $groupName => $settings) {
@@ -115,7 +115,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   /**
    * @param $defaults
    */
-  function cbsDefaultValues(&$defaults) {
+  public function cbsDefaultValues(&$defaults) {
 
     foreach ($this->_varNames as $groupName => $groupValues) {
       foreach ($groupValues as $settingName => $fieldValue) {

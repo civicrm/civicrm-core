@@ -51,7 +51,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    *
    * @return string classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Batch_BAO_Batch';
   }
 
@@ -60,7 +60,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array();
     }
@@ -78,7 +78,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->set("context", $context);
     // assign vars to templates
@@ -104,7 +104,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    *
    * @return string classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Financial_Form_FinancialBatch';
   }
 
@@ -113,7 +113,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Accounting Batch';
   }
 
@@ -126,7 +126,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = null) {
+  public function userContext($mode = null) {
     $context = $this->get("context");
     if ($mode == CRM_Core_Action::UPDATE || ($mode = CRM_Core_Action::ADD & isset($context))) {
       return "civicrm/financial/financialbatches";
@@ -139,7 +139,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    *
    * @return string
    */
-  function userContextParams($mode = NULL) {
+  public function userContextParams($mode = NULL) {
     $context = $this->get("context");
     if ($mode == CRM_Core_Action::UPDATE || ($mode = CRM_Core_Action::ADD & isset($context))) {
       return "reset=1&batchStatus={$context}";

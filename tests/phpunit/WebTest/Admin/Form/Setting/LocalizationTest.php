@@ -35,7 +35,7 @@ class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testDefaultCountryIsEnabled() {
+  public function testDefaultCountryIsEnabled() {
     $this->webtestLogin();
     $this->openCiviPage("admin/setting/localization", "reset=1");
     $this->addSelection("countryLimit-t", "label=United States");

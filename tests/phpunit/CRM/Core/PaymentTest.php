@@ -36,7 +36,7 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
   /**
    * Test the payment method is adequately logged - we don't expect the processing to succeed
    */
-  function testHandlePaymentMethodLogging() {
+  public function testHandlePaymentMethodLogging() {
     $params = array('processor_name' => 'Paypal', 'data' => 'blah');
     try {
       CRM_Core_Payment::handlePaymentMethod('method', $params);

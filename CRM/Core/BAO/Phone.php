@@ -50,7 +50,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @return object
    * @throws API_Exception
    */
-  static function create($params) {
+  public static function create($params) {
     // Ensure mysql phone function exists
     CRM_Core_DAO::checkSqlFunctionsExist();
 
@@ -74,7 +74,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     // Ensure mysql phone function exists
     CRM_Core_DAO::checkSqlFunctionsExist();
 
@@ -99,7 +99,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @access public
    * @static
    */
-  static function &getValues($entityBlock) {
+  public static function &getValues($entityBlock) {
     $getValues = CRM_Core_BAO_Block::getValues('phone', $entityBlock);
     return $getValues;
   }
@@ -117,7 +117,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @access public
    * @static
    */
-  static function allPhones($id, $updateBlankLocInfo = FALSE, $type = NULL, $filters = array()) {
+  public static function allPhones($id, $updateBlankLocInfo = FALSE, $type = NULL, $filters = array()) {
     if (!$id) {
       return NULL;
     }
@@ -189,7 +189,7 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
    * @access public
    * @static
    */
-  static function allEntityPhones($entityElements, $type = NULL) {
+  public static function allEntityPhones($entityElements, $type = NULL) {
     if (empty($entityElements)) {
       return NULL;
     }
@@ -242,7 +242,7 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
    * return void
    * @static
    */
-  static function setOptionToNull($optionId) {
+  public static function setOptionToNull($optionId) {
     if (!$optionId) {
       return;
     }
@@ -270,7 +270,7 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
   /**
    * Call common delete function
    */
-  static function del($id) {
+  public static function del($id) {
     // Ensure mysql phone function exists
     CRM_Core_DAO::checkSqlFunctionsExist();
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Phone', $id);

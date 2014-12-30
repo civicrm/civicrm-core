@@ -42,7 +42,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   /**
    * @return array|null
    */
-  static function entityTable() {
+  public static function entityTable() {
     if (!self::$_entityTable) {
       self::$_entityTable = array(
         'civicrm_contact' => ts('Contact'),
@@ -57,7 +57,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
    *
    * @return CRM_ACL_DAO_EntityRole
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $dao = new CRM_ACL_DAO_EntityRole();
     $dao->copyValues($params);
     $dao->save();
@@ -68,7 +68,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
    * @param array $params
    * @param $defaults
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     CRM_Core_DAO::commonRetrieve('CRM_ACL_DAO_EntityRole', $params, $defaults);
   }
 
@@ -81,7 +81,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_ACL_DAO_EntityRole', $id, 'is_active', $is_active);
   }
 
@@ -93,7 +93,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
    * @access public
    * @static
    */
-  static function del($entityRoleId) {
+  public static function del($entityRoleId) {
     $entityDAO = new CRM_ACL_DAO_EntityRole();
     $entityDAO->id = $entityRoleId;
     $entityDAO->find(TRUE);

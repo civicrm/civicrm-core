@@ -35,7 +35,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testIndividualAdd() {
+  public function testIndividualAdd() {
     $this->webtestLogin();
 
     $selection1 = 'Student';
@@ -216,7 +216,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
   /**
    * Add custom fields for a contact sub-type
    */
-  function _addCustomData($contactSubType) {
+  public function _addCustomData($contactSubType) {
     $this->openCiviPage("admin/custom/group", "action=add&reset=1");
 
     //fill custom group title

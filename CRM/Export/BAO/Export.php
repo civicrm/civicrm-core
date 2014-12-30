@@ -1178,7 +1178,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
    *
    * @return string name of the file
    */
-  static function getExportFileName($output = 'csv', $mode = CRM_Export_Form_Select::CONTACT_EXPORT) {
+  public static function getExportFileName($output = 'csv', $mode = CRM_Export_Form_Select::CONTACT_EXPORT) {
     switch ($mode) {
       case CRM_Export_Form_Select::CONTACT_EXPORT:
         return ts('CiviCRM Contact Search');
@@ -1210,7 +1210,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
    * Handle import error file creation.
    *
    */
-  static function invoke() {
+  public static function invoke() {
     $type = CRM_Utils_Request::retrieve('type', 'Positive', CRM_Core_DAO::$_nullObject);
     $parserName = CRM_Utils_Request::retrieve('parser', 'String', CRM_Core_DAO::$_nullObject);
     if (empty($parserName) || empty($type)) {
@@ -1252,7 +1252,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
    * @param $formValues
    * @param $order
    */
-  static function exportCustom($customSearchClass, $formValues, $order) {
+  public static function exportCustom($customSearchClass, $formValues, $order) {
     $ext = CRM_Extension_System::singleton()->getMapper();
     if (!$ext->isExtensionClass($customSearchClass)) {
       require_once (str_replace('_', DIRECTORY_SEPARATOR, $customSearchClass) . '.php');
@@ -1301,7 +1301,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
    * @param $sqlColumns
    * @param $field
    */
-  static function sqlColumnDefn(&$query, &$sqlColumns, $field) {
+  public static function sqlColumnDefn(&$query, &$sqlColumns, $field) {
     if (substr($field, -4) == '_a_b' || substr($field, -4) == '_b_a') {
       return;
     }
@@ -1427,7 +1427,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
    * @param $details
    * @param $sqlColumns
    */
-  static function writeDetailsToTable($tableName, &$details, &$sqlColumns) {
+  public static function writeDetailsToTable($tableName, &$details, &$sqlColumns) {
     if (empty($details)) {
       return;
     }
@@ -1475,7 +1475,7 @@ VALUES $sqlValueString
    *
    * @return string
    */
-  static function createTempTable(&$sqlColumns) {
+  public static function createTempTable(&$sqlColumns) {
     //creating a temporary table for the search result that need be exported
     $exportTempTable = CRM_Core_DAO::createTempTableName('civicrm_export', TRUE);
 
@@ -1521,7 +1521,7 @@ CREATE TABLE {$exportTempTable} (
    * @param $sqlColumns
    * @param array $exportParams
    */
-  static function mergeSameAddress($tableName, &$headerRows, &$sqlColumns, $exportParams) {
+  public static function mergeSameAddress($tableName, &$headerRows, &$sqlColumns, $exportParams) {
     // check if any records are present based on if they have used shared address feature,
     // and not based on if city / state .. matches.
     $sql = "
@@ -1629,7 +1629,7 @@ WHERE  id IN ( $deleteIDString )
    *
    * @return array
    */
-  static function _replaceMergeTokens($contactId, $exportParams) {
+  public static function _replaceMergeTokens($contactId, $exportParams) {
     $greetings = array();
     $contact = NULL;
 
@@ -1692,7 +1692,7 @@ WHERE  id IN ( $deleteIDString )
    *
    * @return array
    */
-  static function _buildMasterCopyArray($sql, $exportParams, $sharedAddress = FALSE) {
+  public static function _buildMasterCopyArray($sql, $exportParams, $sharedAddress = FALSE) {
     static $contactGreetingTokens = array();
 
     $addresseeOptions = CRM_Core_OptionGroup::values('addressee');
@@ -1797,7 +1797,7 @@ WHERE  id IN ( $deleteIDString )
    * @param array  $sqlColumns array of names of the table columns of the temp table
    * @param string $prefix name of the relationship type that is prefixed to the table columns
    */
-  static function mergeSameHousehold($exportTempTable, &$headerRows, &$sqlColumns, $prefix) {
+  public static function mergeSameHousehold($exportTempTable, &$headerRows, &$sqlColumns, $prefix) {
     $prefixColumn = $prefix . '_';
     $allKeys      = array_keys($sqlColumns);
     $replaced     = array();
@@ -1878,7 +1878,7 @@ GROUP BY civicrm_primary_id ";
    * @param null $saveFile
    * @param string $batchItems
    */
-  static function writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode, $saveFile = null, $batchItems = '') {
+  public static function writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode, $saveFile = null, $batchItems = '') {
     $writeHeader = TRUE;
     $offset      = 0;
     $limit       = self::EXPORT_ROW_COUNT;
@@ -1945,7 +1945,7 @@ LIMIT $offset, $limit
    * or have no street address
    *
    */
-  static function postalMailingFormat($exportTempTable, &$headerRows, &$sqlColumns, $exportParams) {
+  public static function postalMailingFormat($exportTempTable, &$headerRows, &$sqlColumns, $exportParams) {
     $whereClause = array();
 
     if (array_key_exists('is_deceased', $sqlColumns)) {
@@ -1997,7 +1997,7 @@ WHERE  {$whereClause}";
   /**
    * Build componentPayment fields.
    */
-  static function componentPaymentFields() {
+  public static function componentPaymentFields() {
     static $componentPaymentFields;
     if (!isset( $componentPaymentFields)) {
       $componentPaymentFields = array(

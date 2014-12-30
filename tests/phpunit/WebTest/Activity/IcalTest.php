@@ -41,7 +41,7 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneActivityAdd() {
+  public function testStandaloneActivityAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/setting/preferences/display", "reset=1", "name=activity_assignee_notification_ics");

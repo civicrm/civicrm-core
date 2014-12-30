@@ -54,7 +54,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @access public
    * @static
    */
-  static function getNoteText($id) {
+  public static function getNoteText($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'note');
   }
 
@@ -68,7 +68,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @access public
    * @static
    */
-  static function getNoteSubject($id) {
+  public static function getNoteSubject($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'subject');
   }
 
@@ -82,7 +82,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @access public
    * @static
    */
-  static function getNotePrivacyHidden($note) {
+  public static function getNotePrivacyHidden($note) {
     if (CRM_Core_Permission::check('view all notes')) {
       return FALSE;
     }
@@ -138,7 +138,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @access public
    * @static
    */
-  static function &add(&$params, $ids = array()) {
+  public static function &add(&$params, $ids = array()) {
     $dataExists = self::dataExists($params);
     if (!$dataExists) {
       return CRM_Core_DAO::$_nullObject;
@@ -225,7 +225,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @access public
    * @static
    */
-  static function dataExists(&$params) {
+  public static function dataExists(&$params) {
     // return if no data present
     if (!strlen($params['note'])) {
       return FALSE;
@@ -245,7 +245,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @access public
    * @static
    */
-  static function &getValues(&$params, &$values, $numNotes = self::MAX_NOTES) {
+  public static function &getValues(&$params, &$values, $numNotes = self::MAX_NOTES) {
     if (empty($params)) {
       return NULL;
     }
@@ -287,7 +287,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @return mixed|null $return no of deleted notes on success, false otherwise@access public
    * @static
    */
-  static function del($id, $showStatus = TRUE) {
+  public static function del($id, $showStatus = TRUE) {
     $return   = NULL;
     $recent   = array($id);
     $note     = new CRM_Core_DAO_Note();
@@ -394,7 +394,7 @@ ORDER BY  modified_date desc";
    * @access public
    * @static
    */
-  static function getContactNoteCount($contactID) {
+  public static function getContactNoteCount($contactID) {
     $note               = new CRM_Core_DAO_Note();
     $note->entity_id    = $contactID;
     $note->entity_table = 'civicrm_contact';
@@ -543,7 +543,7 @@ ORDER BY  modified_date desc";
    * @return void
    * @static
    */
-  static function cleanContactNotes($contactID) {
+  public static function cleanContactNotes($contactID) {
     $params = array(1 => array($contactID, 'Integer'));
 
     // delete all notes related to contribution

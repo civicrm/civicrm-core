@@ -56,7 +56,7 @@ class CRM_Campaign_BAO_Query {
    * @return array self::$_campaignFields  an associative array of campaign fields
    * @static
    */
-  static function &getFields() {
+  public static function &getFields() {
     if (!isset(self::$_campaignFields)) {
       self::$_campaignFields = array();
     }
@@ -72,7 +72,7 @@ class CRM_Campaign_BAO_Query {
    * @return void
    * @access public
    */
-  static function select(&$query) {
+  public static function select(&$query) {
     self::$_applySurveyClause = FALSE;
     if (is_array($query->_params)) {
       foreach ($query->_params as $values) {
@@ -147,7 +147,7 @@ class CRM_Campaign_BAO_Query {
   /**
    * @param $query
    */
-  static function where(&$query) {
+  public static function where(&$query) {
     //get survey clause in force,
     //only when we have survey id.
     if (!self::$_applySurveyClause) {
@@ -168,7 +168,7 @@ class CRM_Campaign_BAO_Query {
    * @param $values
    * @param $query
    */
-  static function whereClauseSingle(&$values, &$query) {
+  public static function whereClauseSingle(&$values, &$query) {
     //get survey clause in force,
     //only when we have survey id.
     if (!self::$_applySurveyClause) {
@@ -221,7 +221,7 @@ class CRM_Campaign_BAO_Query {
    *
    * @return null|string
    */
-  static function from($name, $mode, $side) {
+  public static function from($name, $mode, $side) {
     $from = NULL;
     //get survey clause in force,
     //only when we have survey id.
@@ -308,18 +308,18 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
   /**
    * @param $tables
    */
-  static function tableNames(&$tables) {}
+  public static function tableNames(&$tables) {}
 
   /**
    * @param $row
    * @param int $id
    */
-  static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {}
 
   /**
    * @param $tables
    */
-  static function info(&$tables) {
+  public static function info(&$tables) {
     //get survey clause in force,
     //only when we have survey id.
     if (!self::$_applySurveyClause) {
@@ -344,7 +344,7 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
    * @return void
    * @static
    */
-  static function buildSearchForm(&$form) {
+  public static function buildSearchForm(&$form) {
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Address');
     $className = CRM_Utils_System::getClassName($form);

@@ -35,7 +35,7 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomAdd() {
+  public function testCustomAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/custom/group", "action=add&reset=1");

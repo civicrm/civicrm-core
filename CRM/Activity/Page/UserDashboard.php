@@ -44,7 +44,7 @@ class CRM_Activity_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoar
    * return null
    * @access public
    */
-  function listActivities() {
+  public function listActivities() {
 
     $controller =
       new CRM_Core_Controller_Simple(
@@ -72,7 +72,7 @@ class CRM_Activity_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoar
    * return null
    * @access public
    */
-  function run() {
+  public function run() {
     parent::preProcess();
     $this->listActivities();
   }

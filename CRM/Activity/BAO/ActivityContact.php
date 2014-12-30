@@ -42,7 +42,7 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -76,7 +76,7 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    *
    * @access public
    */
-  static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
+  public static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
     $names = array();
     $ids   = array();
 
@@ -116,7 +116,7 @@ AND        contact_a.is_deleted = 0
    *
    * @access public
    */
-  static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
+  public static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
     $activityContact = array();
     if (!CRM_Utils_Rule::positiveInteger($activityID) ||
         !CRM_Utils_Rule::positiveInteger($recordTypeID)) {
@@ -161,7 +161,7 @@ AND        civicrm_contact.is_deleted = 0
   /**
    * @return array|null
    */
-  function links() {
+  public function links() {
     $link = array('activity_id' => 'civicrm_activity:id');
     return $link;
   }

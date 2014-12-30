@@ -73,7 +73,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @return Object             DAO object on success, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_ContributionPage', $id, 'is_active', $is_active);
   }
 
@@ -81,7 +81,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param int $id
    * @param $values
    */
-  static function setValues($id, &$values) {
+  public static function setValues($id, &$values) {
     $params = array(
       'id' => $id,
     );
@@ -122,7 +122,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @access public
    * @static
    */
-  static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
+  public static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
     $gIds = $params = array();
     $email = NULL;
     if (isset($values['custom_pre_id'])) {
@@ -435,7 +435,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    *
    * @return array
    */
-  function composeMessage($tplParams, $contactID, $isTest) {
+  public function composeMessage($tplParams, $contactID, $isTest) {
     $sendTemplateParams = array(
       'groupName' => $tplParams['membershipID'] ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
       'valueName' => $tplParams['membershipID'] ? 'membership_online_receipt' : 'contribution_online_receipt',
@@ -468,7 +468,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @access public
    * @static
    */
-  static function recurringNotify($type, $contactID, $pageID, $recur, $autoRenewMembership = FALSE) {
+  public static function recurringNotify($type, $contactID, $pageID, $recur, $autoRenewMembership = FALSE) {
     $value = array();
     if ($pageID) {
       CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id', $pageID, $value, array(
@@ -615,7 +615,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @access public
    * @static
    */
-  static function copy($id) {
+  public static function copy($id) {
     $fieldsFix = array(
       'prefix' => array(
         'title' => ts('Copy of') . ' ',
@@ -712,7 +712,7 @@ WHERE entity_table = 'civicrm_contribution_page'
    * @access public
    * @static
    */
-  static function checkRecurPaymentProcessor($contributionPageId) {
+  public static function checkRecurPaymentProcessor($contributionPageId) {
     //FIXME
     $sql = "
   SELECT pp.is_recur
@@ -736,7 +736,7 @@ WHERE entity_table = 'civicrm_contribution_page'
    * @access public
    * @static
    */
-  static function getSectionInfo($contribPageIds = array()) {
+  public static function getSectionInfo($contribPageIds = array()) {
     $info = array();
     $whereClause = NULL;
     if (is_array($contribPageIds) && !empty($contribPageIds)) {
@@ -903,7 +903,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    * @param int $userID contact id for contributor
    * @return array $pdfHtml
    */
-  static function addInvoicePdfToEmail($contributionId, $userID) {
+  public static function addInvoicePdfToEmail($contributionId, $userID) {
     $contributionID = array($contributionId);
     $contactId = array($userID);
     $pdfParams = array(
@@ -921,7 +921,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    *
    * @return bool isSeparateMembershipPayment
    */
-  static function getIsMembershipPayment($id) {
+  public static function getIsMembershipPayment($id) {
     $membershipBlocks = civicrm_api3('membership_block', 'get', array('entity_table' => 'civicrm_contribution_page', 'entity_id' => $id, 'sequential' => TRUE));
     if(!$membershipBlocks['count']) {
       return FALSE;

@@ -35,7 +35,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAdvanceSearch() {
+  public function testAdvanceSearch() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -170,7 +170,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   /*
    * Check for CRM-9873
    */
-  function testActivitySearchByTypeTest() {
+  public function testActivitySearchByTypeTest() {
     $this->webtestLogin();
     $this->openCiviPage('contact/search/advanced', 'reset=1');
     $this->clickAjaxLink("activity", 'activity_subject');
@@ -214,7 +214,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   /**
    * @param string $firstName
    */
-  function submitSearch($firstName) {
+  public function submitSearch($firstName) {
     $this->clickLink("_qf_Advanced_refresh");
     // verify unique name
     $this->waitForText("xpath=//div[@class='crm-search-results']/table/tbody", preg_quote("adv$firstName, $firstName"));
@@ -227,7 +227,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   /*
    * Check for CRM-14952
    */
-  function testStateSorting() {
+  public function testStateSorting() {
     $this->webtestLogin();
     $this->openCiviPage('contact/search/advanced', 'reset=1', 'group');
     $this->select2("group", "Newsletter", TRUE);
@@ -252,7 +252,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
    * @param string $groupName
    * @param $tagName
    */
-  function addBasicSearchDetail($firstName, $groupName, $tagName) {
+  public function addBasicSearchDetail($firstName, $groupName, $tagName) {
     // fill partial sort name
     $this->type("sort_name", "$firstName");
     // select subtype
@@ -277,7 +277,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   /**
    * @param $firstName
    */
-  function addAddressSearchDetail($firstName) {
+  public function addAddressSearchDetail($firstName) {
     // select location type (home and main)
     $this->multiselect2('location_type', array('Home', 'Main'));
     // fill street address
@@ -298,7 +298,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   /**
    * @param $firstName
    */
-  function addActivitySearchDetail($firstName) {
+  public function addActivitySearchDetail($firstName) {
     // check activity types
     $checkActivityTypes = array("Contribution", "Event Registration", "Membership Signup");
     foreach ($checkActivityTypes as $labels) {
@@ -316,7 +316,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   // function to fill demographic search details
-  function addDemographicSearchDetail() {
+  public function addDemographicSearchDetail() {
     // fill birth date range
     $this->select("birth_date_relative","value=0");
     $this->webtestFillDate("birth_date_low", "-3 year");
@@ -334,7 +334,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   /**
    * @param $firstName
    */
-  function addContributionSearchDetail($firstName) {
+  public function addContributionSearchDetail($firstName) {
     // fill contribution date range
     $this->select("contribution_date_relative","value=0");
     $this->webtestFillDate("contribution_date_low", "-1 day");
@@ -356,7 +356,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   // function to fill participant search details
-  function addParticipantSearchDetail() {
+  public function addParticipantSearchDetail() {
     // fill event name
     $this->select2("event_id", "Fall Fundraiser Dinner");
     // fill event type
@@ -376,7 +376,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   /**
    * @param $firstName
    */
-  function addMemberSearchDetail($firstName) {
+  public function addMemberSearchDetail($firstName) {
     // check membership type (Student)
     $this->click("xpath=//div[@id='memberForm']/table/tbody/tr[1]/td[1]/div[1]//div/label[text()='Student']");
     // check membership status (completed)
@@ -403,7 +403,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   /**
    * @param $firstName
    */
-  function addPledgeSearchDetail($firstName) {
+  public function addPledgeSearchDetail($firstName) {
     // fill pledge schedule date range
     $this->select("pledge_payment_date_relative","value=0");
     $this->webtestFillDate("pledge_payment_date_low", "-1 day");
@@ -431,7 +431,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   /**
    * @param null $firstName
    */
-  function createDetailContact($firstName = NULL) {
+  public function createDetailContact($firstName = NULL) {
     if (!$firstName) {
       $firstName = substr(sha1(rand()), 0, 7);
     }

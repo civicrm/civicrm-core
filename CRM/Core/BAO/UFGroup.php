@@ -58,7 +58,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_UFGroup', $params, $defaults);
   }
 
@@ -69,7 +69,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return string  contact type
    */
-  static function getContactType($id) {
+  public static function getContactType($id) {
 
     $validTypes = array_filter(array_keys(CRM_Core_SelectValues::contactType()));
     $validSubTypes = CRM_Contact_BAO_ContactType::subTypeInfo();
@@ -117,7 +117,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_UFGroup', $id, 'is_active', $is_active);
   }
 
@@ -133,7 +133,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @static
    * @access public
    */
-  static function getRegistrationFields($action, $mode, $ctype = NULL) {
+  public static function getRegistrationFields($action, $mode, $ctype = NULL) {
     if ($mode & CRM_Profile_Form::MODE_REGISTER) {
       $ufGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup('User Registration');
     }
@@ -694,7 +694,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @static
    * @access public
    */
-  static function isValid($userID, $title, $register = FALSE, $action = NULL) {
+  public static function isValid($userID, $title, $register = FALSE, $action = NULL) {
     if ($register) {
       $controller = new CRM_Core_Controller_Simple('CRM_Profile_Form_Dynamic',
         ts('Dynamic Form Creator'),
@@ -1385,7 +1385,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return object
    */
-  static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
     $fields = array('is_active', 'add_captcha', 'is_map', 'is_update_dupe', 'is_edit_link', 'is_uf_link', 'is_cms_user');
     foreach ($fields as $field) {
       $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
@@ -1427,7 +1427,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @access public
    * @static
    */
-  static function createUFJoin(&$params, $ufGroupId) {
+  public static function createUFJoin(&$params, $ufGroupId) {
     $groupTypes = CRM_Utils_Array::value('uf_group_type', $params);
 
     // get ufjoin records for uf group
@@ -1544,7 +1544,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @access public
    * @static
    */
-  static function addUFJoin(&$params) {
+  public static function addUFJoin(&$params) {
     $ufJoin = new CRM_Core_DAO_UFJoin();
     $ufJoin->copyValues($params);
     $ufJoin->save();
@@ -1560,7 +1560,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @access public
    * @static
    */
-  static function delUFJoin(&$params) {
+  public static function delUFJoin(&$params) {
     $ufJoin = new CRM_Core_DAO_UFJoin();
     $ufJoin->copyValues($params);
     $ufJoin->delete();
@@ -1575,7 +1575,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @access public
    * @static
    */
-  static function getWeight($ufGroupId = NULL) {
+  public static function getWeight($ufGroupId = NULL) {
     //calculate the weight
     $p = array();
     if (!$ufGroupId) {
@@ -1682,7 +1682,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @static
    * @access public
    */
-  static function filterUFGroups($ufGroupId, $contactID = NULL) {
+  public static function filterUFGroups($ufGroupId, $contactID = NULL) {
     if (!$contactID) {
       $session = CRM_Core_Session::singleton();
       $contactID = $session->get('userID');
@@ -2483,7 +2483,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @static
    * @access public
    */
-  static function getProfiles($types, $onlyPure = FALSE) {
+  public static function getProfiles($types, $onlyPure = FALSE) {
     $profiles = array();
     $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
@@ -2512,7 +2512,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @static
    * @access public
    */
-  static function getValidProfiles($required, $optional = NULL) {
+  public static function getValidProfiles($required, $optional = NULL) {
     if (!is_array($required) || empty($required)) {
       return;
     }
@@ -2543,7 +2543,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @static
    * @access public
    */
-  static function checkValidProfile($ufId, $required = NULL) {
+  public static function checkValidProfile($ufId, $required = NULL) {
     $validProfile = FALSE;
     if (!$ufId) {
       return $validProfile;
@@ -2584,7 +2584,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return mixed $defaults@static
    * @access public
    */
-  static function setRegisterDefaults(&$fields, &$defaults) {
+  public static function setRegisterDefaults(&$fields, &$defaults) {
     $config = CRM_Core_Config::singleton();
     foreach ($fields as $name => $field) {
       if (substr($name, 0, 8) == 'country-') {
@@ -2610,7 +2610,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return void
    * @access public
    */
-  static function copy($id) {
+  public static function copy($id) {
     $fieldsFix = array('prefix' => array('title' => ts('Copy of ')));
     $copy = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFGroup',
       array('id' => $id),
@@ -2669,7 +2669,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @access public
    */
 
-  static function commonSendMail($contactID, &$values) {
+  public static function commonSendMail($contactID, &$values) {
     if (!$contactID || !$values) {
       return;
 
@@ -2729,7 +2729,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return array
    * @access public
    */
-  function checkFieldsEmptyValues($gid, $cid, $params, $skipCheck = FALSE) {
+  public function checkFieldsEmptyValues($gid, $cid, $params, $skipCheck = FALSE) {
     if ($gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid) || $skipCheck) {
         $values = array();
@@ -2763,7 +2763,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return void
    * @access public
    */
-  function profileDisplay($gid, $values, $template) {
+  public function profileDisplay($gid, $values, $template) {
     $groupTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gid, 'title');
     $template->assign('grouptitle', $groupTitle);
     if (count($values)) {
@@ -2782,7 +2782,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @access public
    * @static
    */
-  static function formatFields($params, $contactId = NULL) {
+  public static function formatFields($params, $contactId = NULL) {
     if ($contactId) {
       // get the primary location type id and email
       list($name, $primaryEmail, $primaryLocationType) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactId);
@@ -2915,7 +2915,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return array list of calculated group type
    */
-  static function calculateGroupType($gId, $includeTypeValues = FALSE, $ignoreFieldId = NULL) {
+  public static function calculateGroupType($gId, $includeTypeValues = FALSE, $ignoreFieldId = NULL) {
     //get the profile fields.
     $ufFields = self::getFields($gId, FALSE, NULL, NULL, NULL, TRUE, NULL, TRUE);
     return self::_calculateGroupType($ufFields, $includeTypeValues, $ignoreFieldId);
@@ -2930,7 +2930,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return array list of calculated group type
    */
-  static function _calculateGroupType($ufFields, $includeTypeValues = FALSE, $ignoreFieldId = NULL) {
+  public static function _calculateGroupType($ufFields, $includeTypeValues = FALSE, $ignoreFieldId = NULL) {
     $groupType = $groupTypeValues = $customFieldIds = array();
     if (!empty($ufFields)) {
       foreach ($ufFields as $fieldName => $fieldValue) {
@@ -2998,7 +2998,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return Boolean
    */
-  static function updateGroupTypes($gId, $groupTypes = array()) {
+  public static function updateGroupTypes($gId, $groupTypes = array()) {
     if (!is_array($groupTypes) || !$gId) {
       return FALSE;
     }
@@ -3064,7 +3064,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return string
    * @throws CRM_Core_Exception
    */
-  static function encodeGroupType($coreTypes, $subTypes, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
+  public static function encodeGroupType($coreTypes, $subTypes, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
     $groupTypeExpr = '';
     if ($coreTypes) {
       $groupTypeExpr .= implode(',', $coreTypes);
@@ -3227,7 +3227,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return array
    */
-  static function getCreateLinks($profiles = '', $appendProfiles = array()) {
+  public static function getCreateLinks($profiles = '', $appendProfiles = array()) {
     // Default to contact profiles
     if (!$profiles) {
       $profiles = array('new_individual', 'new_organization', 'new_household');
@@ -3270,7 +3270,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return array  returns array
    * @static
    */
-  static function profileGroups($profileID) {
+  public static function profileGroups($profileID) {
     $groupTypes = array();
     $profileTypes = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileID, 'group_type');
     if ($profileTypes) {
@@ -3289,7 +3289,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return array  $subscribeGroupIds  This contains array of groups for subscription
    */
-  static function getDoubleOptInGroupIds(&$params, $contactId = NULL) {
+  public static function getDoubleOptInGroupIds(&$params, $contactId = NULL) {
     $config = CRM_Core_Config::singleton();
     $subscribeGroupIds = array();
 
@@ -3363,7 +3363,7 @@ SELECT  group_id
    * @static
    * @access public
    */
-  static function checkForMixProfiles($profileIds) {
+  public static function checkForMixProfiles($profileIds) {
     $mixProfile = FALSE;
 
     $contactTypes = array('Individual', 'Household', 'Organization');
@@ -3414,7 +3414,7 @@ SELECT  group_id
    * @static
    * @access public
    */
-  static function showOverlayProfile() {
+  public static function showOverlayProfile() {
     $showOverlay = TRUE;
 
     // get the id of overlay profile
@@ -3442,7 +3442,7 @@ SELECT  group_id
    * @static
    * @access public
    */
-  static function groupTypeValues($profileId, $groupType = NULL) {
+  public static function groupTypeValues($profileId, $groupType = NULL) {
     $groupTypeValue = array();
     $groupTypes = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileId, 'group_type');
 
@@ -3484,7 +3484,7 @@ SELECT  group_id
   /**
    * @return bool|object
    */
-  static function isProfileDoubleOptin() {
+  public static function isProfileDoubleOptin() {
     // check for double optin
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviMail', $config->enableComponents)) {
@@ -3498,7 +3498,7 @@ SELECT  group_id
   /**
    * @return bool|object
    */
-  static function isProfileAddToGroupDoubleOptin() {
+  public static function isProfileAddToGroupDoubleOptin() {
     // check for add to group double optin
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviMail', $config->enableComponents)) {
@@ -3515,7 +3515,7 @@ SELECT  group_id
    * @return array profileIds profile ids
    * @static
    */
-  static function getBatchProfiles() {
+  public static function getBatchProfiles() {
     $query = "SELECT id
       FROM civicrm_uf_group
       WHERE name IN ('contribution_batch_entry', 'membership_batch_entry')";
@@ -3535,7 +3535,7 @@ SELECT  group_id
    *
    * @return array|null
    */
-  static function shiftMultiRecordFields(&$source, &$destination, $returnMultiSummaryFields = FALSE) {
+  public static function shiftMultiRecordFields(&$source, &$destination, $returnMultiSummaryFields = FALSE) {
     $multiSummaryFields = $returnMultiSummaryFields ? array( ) : NULL;
     foreach ($source as $field => $properties) {
       if (!CRM_Core_BAO_CustomField::getKeyID($field)) {
@@ -3561,7 +3561,7 @@ SELECT  group_id
    *
    * @static
    */
-  static function reformatProfileFields(&$fields) {
+  public static function reformatProfileFields(&$fields) {
     //reformat fields array
     foreach ($fields as $name => $field) {
       //reformat phone and extension field

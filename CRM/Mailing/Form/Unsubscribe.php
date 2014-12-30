@@ -34,7 +34,7 @@
  */
 class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
 
-  function preProcess() {
+  public function preProcess() {
 
     $this->_type = 'unsubscribe';
 
@@ -80,7 +80,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
 
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
     CRM_Utils_System::setTitle(ts('Please Confirm Your Unsubscribe from this Mailing/Group'));
 
@@ -102,7 +102,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $this->addButtons($buttons);
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $values = $this->exportValues();
 

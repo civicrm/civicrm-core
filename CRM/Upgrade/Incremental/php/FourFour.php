@@ -41,7 +41,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
    *
    * @return bool
    */
-  function verifyPreDBstate(&$errors) {
+  public function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
@@ -57,7 +57,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
    *
    * @return void
    */
-  function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.4.beta1') {
       $apiCalls = self::getConfigArraysAsAPIParams(FALSE);
       $oversizedEntries = 0;
@@ -81,7 +81,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
    * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
    * @return void
    */
-  function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.4.1') {
       $config = CRM_Core_Config::singleton();
       if (!empty($config->useIDS)) {
@@ -112,7 +112,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
    *
    * @return bool
    */
-  function upgrade_4_4_alpha1($rev) {
+  public function upgrade_4_4_alpha1($rev) {
     // task to process sql
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.alpha1')), 'task_4_4_x_runSql', $rev);
 
@@ -125,7 +125,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
   /**
    * @param $rev
    */
-  function upgrade_4_4_beta1($rev) {
+  public function upgrade_4_4_beta1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'task_4_4_x_runSql', $rev);
 
     // add new 'data' column in civicrm_batch
@@ -154,7 +154,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
   /**
    * @param $rev
    */
-  function upgrade_4_4_1($rev) {
+  public function upgrade_4_4_1($rev) {
     $config = CRM_Core_Config::singleton();
     // CRM-13327 upgrade handling for the newly added name badges
     $ogID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'name_badge', 'id', 'name');
@@ -256,7 +256,7 @@ VALUES {$insertStatus}";
    *
    * @return bool
    */
-  function upgrade_4_4_4($rev) {
+  public function upgrade_4_4_4($rev) {
     $fkConstraint = array();
     if (!CRM_Core_DAO::checkFKConstraintInFormat('civicrm_activity_contact', 'activity_id')) {
       $fkConstraint[] = "ADD CONSTRAINT `FK_civicrm_activity_contact_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `civicrm_activity` (`id`) ON DELETE CASCADE";
@@ -333,7 +333,7 @@ ALTER TABLE civicrm_dashboard
   /**
    * @param $rev
    */
-  function upgrade_4_4_6($rev){
+  public function upgrade_4_4_6($rev){
     $sql = "SELECT count(*) AS count FROM INFORMATION_SCHEMA.STATISTICS where ".
       "TABLE_SCHEMA = database() AND INDEX_NAME = 'index_image_url' AND TABLE_NAME = 'civicrm_contact';";
     $dao = CRM_Core_DAO::executeQuery($sql);
@@ -358,7 +358,7 @@ ALTER TABLE civicrm_dashboard
    *
    * @return bool
    */
-  function upgrade_4_4_7($rev, $originalVer, $latestVer) {
+  public function upgrade_4_4_7($rev, $originalVer, $latestVer) {
     // For WordPress/Joomla(?), cleanup broken image_URL from 4.4.6 upgrades - https://issues.civicrm.org/jira/browse/CRM-14971
     $exBackendUrl = CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=XXX', TRUE); // URL formula from 4.4.6 upgrade
     $exFrontendUrl = CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=XXX', TRUE, NULL, TRUE, TRUE);
@@ -374,7 +374,7 @@ ALTER TABLE civicrm_dashboard
     $this->addTask(ts('Update saved search information'), 'changeSavedSearch');
   }
 
-  static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId){
+  public static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId){
     $dao = self::findContactImageUrls($startId, $endId);
     $failures = array();
     while ($dao->fetch()){
@@ -403,7 +403,7 @@ ALTER TABLE civicrm_dashboard
     return TRUE;
   }
 
-  static function changeSavedSearch(CRM_Queue_TaskContext $ctx) {
+  public static function changeSavedSearch(CRM_Queue_TaskContext $ctx) {
     $membershipStatuses = array_flip(CRM_Member_PseudoConstant::membershipStatus());
 
     $dao = new CRM_Contact_DAO_SavedSearch();
@@ -459,7 +459,7 @@ ALTER TABLE civicrm_dashboard
    * @param int $endId
    * @return bool
    */
-  static function cleanupBackendImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId) {
+  public static function cleanupBackendImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $dao = self::findContactImageUrls($startId, $endId);
     while ($dao->fetch()) {
       $imageUrl = str_replace('&amp;', '&', $dao->image_url);
@@ -516,7 +516,7 @@ AND image_URL IS NOT NULL
    *
    * @return bool TRUE for success
    */
-  static function activityContacts(CRM_Queue_TaskContext $ctx) {
+  public static function activityContacts(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();
 
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
@@ -626,7 +626,7 @@ WHERE       source_contact_id IS NOT NULL";
    * @return bool TRUE for success
    * @see http://issues.civicrm.org/jira/browse/CRM-13187
    */
-  static function wordReplacements(CRM_Queue_TaskContext $ctx) {
+  public static function wordReplacements(CRM_Queue_TaskContext $ctx) {
     $query = "
 CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Word replacement ID',
@@ -658,7 +658,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * @return bool TRUE for success
    * @see http://issues.civicrm.org/jira/browse/CRM-13655
    */
-  static function wordReplacements_patch(CRM_Queue_TaskContext $ctx, $rev) {
+  public static function wordReplacements_patch(CRM_Queue_TaskContext $ctx, $rev) {
     if (CRM_Core_DAO::checkConstraintExists('civicrm_word_replacement', 'UI_find')) {
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement DROP FOREIGN KEY FK_civicrm_word_replacement_domain_id;");
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement DROP KEY FK_civicrm_word_replacement_domain_id;");
@@ -674,7 +674,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
   /**
    * (Queue Task Callback)
    */
-  static function task_4_4_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
+  public static function task_4_4_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
 
@@ -719,7 +719,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * @return array Each item is $params for WordReplacement.create
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
-  static function getConfigArraysAsAPIParams($rebuildEach) {
+  public static function getConfigArraysAsAPIParams($rebuildEach) {
     $wordReplacementCreateParams = array();
     // get all domains
     $result = civicrm_api3('domain', 'get', array(
@@ -814,7 +814,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * @param array $params
    * @return bool TRUE if $params is valid
    */
-  static function isValidWordReplacement($params) {
+  public static function isValidWordReplacement($params) {
     $result = strlen($params['find_word']) <= self::MAX_WORD_REPLACEMENT_SIZE && strlen($params['replace_word']) <= self::MAX_WORD_REPLACEMENT_SIZE;
     if (!$result) {
       CRM_Core_Error::debug_var('invalidWordReplacement', $params);

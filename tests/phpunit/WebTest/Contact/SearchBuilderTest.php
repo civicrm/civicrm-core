@@ -35,7 +35,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testSearchBuilderOptions() {
+  public function testSearchBuilderOptions() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
@@ -57,7 +57,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
   }
 
-  function testSearchBuilderRLIKE() {
+  public function testSearchBuilderRLIKE() {
     $this->webtestLogin();
 
     // Adding contact
@@ -75,7 +75,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
   /**
    * @param null $firstName
    */
-  function createDetailContact($firstName = NULL) {
+  public function createDetailContact($firstName = NULL) {
 
     if (!$firstName) {
       $firstName = substr(sha1(rand()), 0, 7);
@@ -112,7 +112,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$firstName adv$firstName"));
   }
 
-  function testSearchBuilderContacts() {
+  public function testSearchBuilderContacts() {
     $this->webtestLogin();
 
     //Individual
@@ -219,7 +219,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
    * @param string $op
    * @param null $count
    */
-  function _searchBuilder($field, $fieldValue = NULL, $name = NULL, $op = '=', $count = NULL) {
+  public function _searchBuilder($field, $fieldValue = NULL, $name = NULL, $op = '=', $count = NULL) {
     // search builder using contacts(not using contactType)
     $this->openCiviPage("contact/search/builder", "reset=1");
     $this->enterValues(1, 1, 'Contacts', $field, NULL, $op, "$fieldValue");
@@ -239,7 +239,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
   /**
    * Enter form values in a Search Builder row
    */
-  function enterValues($set, $row, $entity, $field, $loc, $op, $value = '') {
+  public function enterValues($set, $row, $entity, $field, $loc, $op, $value = '') {
     if ($set > 1 && $row == 1) {
       $this->click('addBlock');
     }
@@ -285,7 +285,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
    * @param null $count
    * @param $field
    */
-  function _advancedSearch($fieldValue = NULL, $name = NULL, $contactType = NULL, $count = NULL, $field) {
+  public function _advancedSearch($fieldValue = NULL, $name = NULL, $contactType = NULL, $count = NULL, $field) {
     //advanced search by selecting the contactType
     $this->openCiviPage("contact/search/advanced", "reset=1");
     if (isset($contactType)) {
@@ -337,7 +337,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
    * @param null $streetName
    * @param null $postalCode
    */
-  function _createContact($contactType, $name, $email, $streetName = NULL, $postalCode = NULL) {
+  public function _createContact($contactType, $name, $email, $streetName = NULL, $postalCode = NULL) {
     $this->openCiviPage('contact/add', array('reset' => 1, 'ct' => $contactType), '_qf_Contact_cancel');
 
     if ($contactType == 'Individual') {
@@ -375,7 +375,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
    * Webtest for CRM-12148
    *
    */
-  function testSearchBuilderfinancialType() {
+  public function testSearchBuilderfinancialType() {
     $this->webtestLogin();
 
     // add financial type
@@ -431,7 +431,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
    * Webtest for CRM-12588
    *
    */
-  function testSearchBuilderMembershipType() {
+  public function testSearchBuilderMembershipType() {
     $this->webtestLogin();
 
     // create first contact

@@ -42,7 +42,7 @@ class CRM_Event_Page_AJAX {
    * Building EventFee combo box
    * FIXME: This ajax callback could be eliminated in favor of an entityRef field but the priceFieldValue api doesn't currently support filtering on entity_table
    */
-  function eventFee() {
+  public function eventFee() {
     $name = trim(CRM_Utils_Type::escape($_GET['term'], 'String'));
 
     if (!$name) {

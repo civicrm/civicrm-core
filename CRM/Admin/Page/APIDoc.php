@@ -41,7 +41,7 @@ class CRM_Admin_Page_APIDoc extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     CRM_Utils_System::setTitle(ts('API Parameters'));
     return parent::run();
   }
@@ -49,7 +49,7 @@ class CRM_Admin_Page_APIDoc extends CRM_Core_Page {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     return 'CRM/Core/APIDoc.tpl';
   }
 
@@ -60,7 +60,7 @@ class CRM_Admin_Page_APIDoc extends CRM_Core_Page {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/api/doc';
   }
 }

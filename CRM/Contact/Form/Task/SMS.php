@@ -54,7 +54,7 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
    */
   public $_templates = NULL;
 
-  function preProcess() {
+  public function preProcess() {
 
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 

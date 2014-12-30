@@ -37,7 +37,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
   protected $id;
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     $this->params = array(
       'domain_id' => 1,
       'name' => "my mail setting",

@@ -43,7 +43,7 @@ class CRM_Core_QuickForm_Action_Back extends CRM_Core_QuickForm_Action {
    * @return \CRM_Core_QuickForm_Action_Back
    * @access public
    */
-  function __construct(&$stateMachine) {
+  public function __construct(&$stateMachine) {
     parent::__construct($stateMachine);
   }
 
@@ -56,7 +56,7 @@ class CRM_Core_QuickForm_Action_Back extends CRM_Core_QuickForm_Action {
    * @return void
    * @access public
    */
-  function perform(&$page, $actionName) {
+  public function perform(&$page, $actionName) {
     $this->_stateMachine->perform($page, $actionName, 'Back');
   }
 }

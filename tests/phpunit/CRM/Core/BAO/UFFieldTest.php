@@ -7,7 +7,7 @@ require_once 'CiviTest/Contact.php';
  */
 class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $this->quickCleanup(array('civicrm_uf_group', 'civicrm_uf_field'));

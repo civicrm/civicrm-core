@@ -46,7 +46,7 @@ class CRM_Event_Badge {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->style        = array('width' => 0.1, 'cap' => 'round', 'join' => 'round', 'dash' => '2,2', 'color' => array(0, 0, 200));
     $this->format       = '5160';
     $this->imgExtension = 'png';
@@ -58,7 +58,7 @@ class CRM_Event_Badge {
   /**
    * @param bool $debug
    */
-  function setDebug($debug = TRUE) {
+  public function setDebug($debug = TRUE) {
     if (!$debug) {
       $this->debug = FALSE;
       $this->border = 0;
@@ -107,7 +107,7 @@ class CRM_Event_Badge {
    *
    * @return string
    */
-  function getImageFileName($eventID, $img = FALSE) {
+  public function getImageFileName($eventID, $img = FALSE) {
     global $civicrm_root;
     $path = "CRM/Event/Badge";
     if ($img == FALSE) {
@@ -139,7 +139,7 @@ class CRM_Event_Badge {
   /**
    * @param bool $img
    */
-  function printBackground($img = FALSE) {
+  public function printBackground($img = FALSE) {
     $x = $this->pdf->GetAbsX();
     $y = $this->pdf->GetY();
     if ($this->debug) {
@@ -168,7 +168,7 @@ class CRM_Event_Badge {
     $this->pdf->MultiCell($this->pdf->width, $this->pdf->lineHeight, $txt);
   }
 
-  function pdfExtraFormat() {}
+  public function pdfExtraFormat() {}
 
   /**
    * Create labels (pdf)
@@ -178,7 +178,7 @@ class CRM_Event_Badge {
    * @return  null
    * @access  public
    */
-  function createLabels(&$participants) {
+  public function createLabels(&$participants) {
 
     $this->pdf = new CRM_Utils_PDF_Label($this->format, 'mm');
     $this->pdfExtraFormat();

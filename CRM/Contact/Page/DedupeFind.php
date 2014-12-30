@@ -43,7 +43,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Dedupe_BAO_RuleGroup';
   }
 
@@ -52,7 +52,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {}
+  public function &links() {}
 
   /**
    * Browse all rule groups
@@ -60,7 +60,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
    * @return void
    * @access public
    */
-  function run() {
+  public function run() {
     $gid     = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
     $action  = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 0);
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -317,7 +317,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
    * @return void
    * @access public
    */
-  function browse() {
+  public function browse() {
     $this->assign('main_contacts', $this->_mainContacts);
 
     if ($this->_cid) {
@@ -334,7 +334,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
    *
    * @return string  classname of edit form
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Contact_Form_DedupeFind';
   }
 
@@ -343,7 +343,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
    *
    * @return string  name of this page
    */
-  function editName() {
+  public function editName() {
     return 'DedupeFind';
   }
 
@@ -354,7 +354,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
    *
    * @return string  user context
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/contact/dedupefind';
   }
 }

@@ -29,7 +29,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   protected $_params = array();
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_ids['payment_processor'] = $this->paymentProcessorCreate();
     $this->_params = array(
@@ -62,7 +62,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     );
   }
 
-  function teardown() {
+  public function teardown() {
     $this->quickCleanup(array('civicrm_contribution_recur', 'civicrm_payment_processor'));
   }
 
@@ -70,7 +70,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    * Test that an object can be retrieved & saved (per CRM-14986)
    * this has been causing a DB error so we are checking for absence of error
    */
-  function testFindSave() {
+  public function testFindSave() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
     $dao = new CRM_Contribute_BAO_ContributionRecur();
     $dao->id = $contributionRecur['id'];
@@ -83,7 +83,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    * Test cancellation works per CRM-14986
    * we are checking for absence of error
    */
-  function testCancelRecur() {
+  public function testCancelRecur() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
     CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($contributionRecur['id'], CRM_Core_DAO::$_nullObject);
   }

@@ -85,7 +85,7 @@ class CRM_Utils_Cache_Memcached {
    *
    * @return \CRM_Utils_Cache_Memcached
    */
-  function __construct($config) {
+  public function __construct($config) {
     if (isset($config['host'])) {
       $this->_host = $config['host'];
     }
@@ -115,7 +115,7 @@ class CRM_Utils_Cache_Memcached {
    * @return bool
    * @throws Exception
    */
-  function set($key, &$value) {
+  public function set($key, &$value) {
     $key = $this->cleanKey($key);
     if (!$this->_cache->set($key, $value, $this->_timeout)) {
       CRM_Core_Error::debug( 'Result Code: ', $this->_cache->getResultMessage());
@@ -130,7 +130,7 @@ class CRM_Utils_Cache_Memcached {
    *
    * @return mixed
    */
-  function &get($key) {
+  public function &get($key) {
     $key = $this->cleanKey($key);
     $result = $this->_cache->get($key);
     return $result;
@@ -141,7 +141,7 @@ class CRM_Utils_Cache_Memcached {
    *
    * @return mixed
    */
-  function delete($key) {
+  public function delete($key) {
     $key = $this->cleanKey($key);
     return $this->_cache->delete($key);
   }
@@ -151,7 +151,7 @@ class CRM_Utils_Cache_Memcached {
    *
    * @return mixed|string
    */
-  function cleanKey($key) {
+  public function cleanKey($key) {
     $key = preg_replace('/\s+|\W+/', '_', $this->_prefix . $key);
     if ( strlen($key) > self::MAX_KEY_LEN ) {
       $md5Key = md5($key);  // this should be 32 characters in length
@@ -164,7 +164,7 @@ class CRM_Utils_Cache_Memcached {
   /**
    * @return mixed
    */
-  function flush() {
+  public function flush() {
     return $this->_cache->flush();
   }
 }

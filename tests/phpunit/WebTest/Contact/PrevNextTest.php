@@ -35,7 +35,7 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testPrevNext() {
+  public function testPrevNext() {
     $this->webtestLogin();
 
     /* add new group */

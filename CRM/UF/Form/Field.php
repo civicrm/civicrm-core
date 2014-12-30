@@ -629,7 +629,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @static
    * @access public
    */
-  static function formRuleSubType($fieldType, $groupType, $errors) {
+  public static function formRuleSubType($fieldType, $groupType, $errors) {
     if (in_array($fieldType, array(
       'Participant', 'Contribution', 'Membership', 'Activity'))) {
       $individualSubTypes = CRM_Contact_BAO_ContactType::subTypes('Individual');
@@ -672,7 +672,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @static
    * @access public
    */
-  static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
+  public static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
     // fix me : check object $customField
     if (in_array($fieldType, array(
           'Participant', 'Contribution', 'Membership', 'Activity', 'Case'))) {
@@ -717,7 +717,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @static
    * @access public
    */
-  static function formRulePrimaryCheck($fields, $profileFieldName, $groupFields, &$errors) {
+  public static function formRulePrimaryCheck($fields, $profileFieldName, $groupFields, &$errors) {
     //FIXME: This may need to also apply to website fields if they are refactored to allow more than one per profile
     $checkPrimary = array('phone' => 'civicrm_phone.phone', 'phone_and_ext' => 'civicrm_phone.phone');
     $whereCheck = NULL;
@@ -757,7 +757,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @static
    * @access public
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $is_required     = CRM_Utils_Array::value('is_required', $fields, FALSE);
     $is_registration = CRM_Utils_Array::value('is_registration', $fields, FALSE);
     $is_view         = CRM_Utils_Array::value('is_view', $fields, FALSE);

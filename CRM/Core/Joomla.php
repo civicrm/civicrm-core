@@ -46,7 +46,7 @@ class CRM_Core_Joomla {
    * @access public
    * @static
    */
-  static function sidebarLeft() {
+  public static function sidebarLeft() {
     $config = CRM_Core_Config::singleton();
 
     if ($config->userFrameworkFrontend) {

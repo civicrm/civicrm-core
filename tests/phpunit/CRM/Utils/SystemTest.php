@@ -7,11 +7,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_SystemTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testUrlQueryString() {
+  public function testUrlQueryString() {
     $config = CRM_Core_Config::singleton();
     $this->assertTrue($config->userSystem instanceof CRM_Utils_System_UnitTests);
     $expected = '/index.php?q=civicrm/foo/bar&foo=ab&bar=cd%26ef';
@@ -19,7 +19,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testUrlQueryArray() {
+  public function testUrlQueryArray() {
     $config = CRM_Core_Config::singleton();
     $this->assertTrue($config->userSystem instanceof CRM_Utils_System_UnitTests);
     $expected = '/index.php?q=civicrm/foo/bar&foo=ab&bar=cd%26ef';

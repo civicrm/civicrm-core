@@ -181,7 +181,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * @access protected
    * @static
    */
-  static function &validContext() {
+  public static function &validContext() {
     if (!(self::$_validContext)) {
       self::$_validContext = array(
         'smog' => 'Show members of group',
@@ -201,12 +201,12 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @return bool
    */
-  static function isSearchContext($context) {
+  public static function isSearchContext($context) {
     $searchContext = CRM_Utils_Array::value($context, self::validContext());
     return $searchContext ? TRUE : FALSE;
   }
 
-  static function setModeValues() {
+  public static function setModeValues() {
     if (!self::$_modeValues) {
       self::$_modeValues = array(
         1 => array(
@@ -290,7 +290,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @return mixed
    */
-  static function getModeValue($mode = 1) {
+  public static function getModeValue($mode = 1) {
     self::setModeValues();
 
     if (!array_key_exists($mode, self::$_modeValues)) {
@@ -303,7 +303,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return array
    */
-  static function getModeSelect() {
+  public static function getModeSelect() {
     self::setModeValues();
 
     $select = array();
@@ -334,7 +334,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     CRM_Core_Resources::singleton()
       // jsTree is needed for tags popup
@@ -483,7 +483,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     // set the various class variables
 
     $this->_group = CRM_Core_PseudoConstant::group();
@@ -729,7 +729,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return array
    */
-  function &getFormValues() {
+  public function &getFormValues() {
     return $this->_formValues;
   }
 
@@ -739,7 +739,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * @return void
    * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     /*
      * sometime we do a postProcess early on, so we dont need to repeat it
      * this will most likely introduce some more bugs :(
@@ -868,7 +868,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return null
    */
-  function &returnProperties() {
+  public function &returnProperties() {
     return CRM_Core_DAO::$_nullObject;
   }
 
@@ -878,7 +878,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * @return string
    * @access public
    */
-  function getTitle() {
+  public function getTitle() {
     return ts('Search');
   }
 }

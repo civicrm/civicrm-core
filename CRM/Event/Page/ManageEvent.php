@@ -61,7 +61,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_actionLinks)) {
       // helper variable for nicer formatting
       $copyExtra = ts('Are you sure you want to make a copy of this Event?');
@@ -104,7 +104,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    *
    * @return array (reference) of tab links
    */
-  static function &tabs($enableCart) {
+  public static function &tabs($enableCart) {
     $cacheKey = $enableCart ? 1 : 0;
     if (!(self::$_tabLinks)) {
       self::$_tabLinks = array();
@@ -189,7 +189,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
@@ -245,7 +245,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    *
    * @return void
    */
-  function browse() {
+  public function browse() {
     $this->assign('includeWysiwygEditor', TRUE);
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
@@ -401,7 +401,7 @@ ORDER BY start_date desc
    * @return void
    * @access public
    */
-  function copy() {
+  public function copy() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE, 0, 'GET');
 
     $urlString = 'civicrm/event/manage';
@@ -416,7 +416,7 @@ ORDER BY start_date desc
     return CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
   }
 
-  function search() {
+  public function search() {
     if (isset($this->_action) &
       (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
@@ -440,7 +440,7 @@ ORDER BY start_date desc
    *
    * @return string
    */
-  function whereClause(&$params, $sortBy = TRUE, $force) {
+  public function whereClause(&$params, $sortBy = TRUE, $force) {
     $values    = array();
     $clauses   = array();
     $title     = $this->get('title');
@@ -532,7 +532,7 @@ ORDER BY start_date desc
    * @param $whereClause
    * @param array $whereParams
    */
-  function pager($whereClause, $whereParams) {
+  public function pager($whereClause, $whereParams) {
 
     $params['status'] = ts('Event %%StatusMessage%%');
     $params['csvString'] = NULL;
@@ -558,7 +558,7 @@ SELECT count(id)
    * @param $whereClause
    * @param array $whereParams
    */
-  function pagerAtoZ($whereClause, $whereParams) {
+  public function pagerAtoZ($whereClause, $whereParams) {
 
     $query = "
    SELECT DISTINCT UPPER(LEFT(title, 1)) as sort_name

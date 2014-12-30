@@ -46,14 +46,14 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   protected $_entity = 'PledgePayment';
   public $DBResetRequired = TRUE;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_individualId = $this->individualCreate();
     $this->_pledgeID = $this->pledgeCreate($this->_individualId);
     $this->_contributionID = $this->contributionCreate($this->_individualId);
   }
 
-  function tearDown() {
+  public function tearDown() {
     $tablesToTruncate = array(
       'civicrm_contribution',
       'civicrm_contact',
@@ -65,7 +65,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $this->quickCleanup($tablesToTruncate);
   }
 
-  function testGetPledgePayment() {
+  public function testGetPledgePayment() {
     $params = array();
     $result = $this->callAPIAndDocument('pledge_payment', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(5, $result['count'], " in line " . __LINE__);
@@ -74,7 +74,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   /**
    * Test that passing in a single variable works
    */
-  function testGetSinglePledgePayment() {
+  public function testGetSinglePledgePayment() {
     $createparams = array(
       'contact_id' => $this->_individualId,
       'pledge_id' => $this->_pledgeID,
@@ -92,7 +92,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   /**
    * Test that passing in a single variable works:: status_id
    */
-  function testGetSinglePledgePaymentByStatusID() {
+  public function testGetSinglePledgePaymentByStatusID() {
     $createparams = array(
       'contact_id' => $this->_individualId,
       'pledge_id' => $this->_pledgeID,
@@ -111,7 +111,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   /**
    * Test that creating a payment will add the contribution ID
    */
-  function testCreatePledgePayment() {
+  public function testCreatePledgePayment() {
     //check that 5 pledge payments exist at the start
     $beforeAdd = $this->callAPISuccess('pledge_payment', 'get', array());
     $this->assertEquals(5, $beforeAdd['count'], " in line " . __LINE__);
@@ -157,7 +157,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   /**
    * Test checks behaviour when more payments are created than should be possible
    */
-  function testCreatePledgePaymentAllCreated() {
+  public function testCreatePledgePaymentAllCreated() {
     $params = array(
       'pledge_id' => $this->_pledgeID,
       'status_id' => 1,
@@ -200,7 +200,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
    * Test that creating a payment will add the contribution ID where only one pledge payment
    * in schedule
    */
-  function testCreatePledgePaymentWhereOnlyOnePayment() {
+  public function testCreatePledgePaymentWhereOnlyOnePayment() {
     $pledgeParams = array(
       'contact_id' => $this->_individualId,
       'pledge_create_date' => date('Ymd'),
@@ -237,7 +237,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $this->assertEquals(1, $afterAdd['count'], " in line " . __LINE__);
   }
 
-  function testUpdatePledgePayment() {
+  public function testUpdatePledgePayment() {
     $params = array(
       'pledge_id' => $this->_pledgeID,
       'contribution_id' => $this->_contributionID,
@@ -254,7 +254,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $this->getAndCheck(array_merge($params,$updateparams), $result['id'], $this->_entity);
   }
 
-  function testDeletePledgePayment() {
+  public function testDeletePledgePayment() {
     $params = array(
       'contact_id' => $this->_individualId,
       'pledge_id' => $this->_pledgeID,
@@ -271,7 +271,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('pledge_payment', 'delete', $deleteParams, __FUNCTION__, __FILE__);
   }
 
-  function testGetFields() {
+  public function testGetFields() {
     $result = $this->callAPISuccess('PledgePayment', 'GetFields', array());
     $this->assertType('array', $result);
   }

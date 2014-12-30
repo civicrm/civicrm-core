@@ -586,7 +586,7 @@ class CRM_Core_Resources {
    *
    * @return string javascript content
    */
-  static function outputLocalizationJS() {
+  public static function outputLocalizationJS() {
     CRM_Core_Page_AJAX::setJsHeaders();
     $config = CRM_Core_Config::singleton();
     $vars = array(
@@ -689,7 +689,7 @@ class CRM_Core_Resources {
   /**
    * @return bool - is this page request an ajax snippet?
    */
-  static function isAjaxMode() {
+  public static function isAjaxMode() {
     return in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(CRM_Core_Smarty::PRINT_SNIPPET, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON));
   }
 
@@ -699,7 +699,7 @@ class CRM_Core_Resources {
    * @TODO: Provide a sane way to extend this list for other entities - a hook or??
    * @return array
    */
-  static function getEntityRefFilters() {
+  public static function getEntityRefFilters() {
     $filters = array();
 
     $filters['event'] = array(

@@ -32,7 +32,7 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class api_v3_CaseTypeTest extends CiviCaseTestCase {
 
-  function setUp() {
+  public function setUp() {
     $this->quickCleanup(array('civicrm_case_type'));
     parent::setUp();
 
@@ -67,7 +67,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    * This method is called after a test is executed.
    *
    */
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
     $this->quickCleanup(array('civicrm_case_type'));
   }
@@ -75,14 +75,14 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Check with empty array
    */
-  function testCaseTypeCreateEmpty() {
+  public function testCaseTypeCreateEmpty() {
     $this->callAPIFailure('CaseType', 'create', array());
   }
 
   /**
    * Check if required fields are not passed
    */
-  function testCaseTypeCreateWithoutRequired() {
+  public function testCaseTypeCreateWithoutRequired() {
     $params = array(
       'name' => 'this case should fail',
     );
@@ -99,7 +99,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    * Test create methods with valid data
    * success expected
    */
-  function testCaseTypeCreate() {
+  public function testCaseTypeCreate() {
     // Create Case Type
     $params = array(
       'title' => 'Application',
@@ -120,7 +120,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Create a case with an invalid name
    */
-  function testCaseTypeCreate_invalidName() {
+  public function testCaseTypeCreate_invalidName() {
     // Create Case Type
     $params = array(
       'title' => 'Application',
@@ -136,7 +136,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Test update (create with id) function with valid parameters
    */
-  function testCaseTypeUpdate() {
+  public function testCaseTypeUpdate() {
     // Create Case Type
     $params =  array(
       'title' => 'Application',
@@ -162,7 +162,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Test delete function with valid parameters
    */
-  function testCaseTypeDelete_New() {
+  public function testCaseTypeDelete_New() {
     // Create Case Type
     $params =  array(
       'title' => 'Application',
@@ -184,7 +184,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    * Test create methods with xml file
    * success expected
    */
-  function testCaseTypeCreateWithDefinition() {
+  public function testCaseTypeCreateWithDefinition() {
     // Create Case Type
     $params = $this->fixtures['Application_with_Definition'];
     $result = $this->callAPISuccess('CaseType', 'create', $params);
@@ -203,7 +203,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Create a CaseType+case then delete the CaseType.
    */
-  function testCaseTypeDelete_InUse() {
+  public function testCaseTypeDelete_InUse() {
     // Create Case Type
     $params = $this->fixtures['Application_with_Definition'];
     $createCaseType = $this->callAPISuccess('CaseType', 'create', $params);

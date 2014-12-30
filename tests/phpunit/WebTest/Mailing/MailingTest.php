@@ -35,7 +35,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddMailing() {
+  public function testAddMailing() {
     $this->webtestLogin();
 
     //----do create test mailing group
@@ -286,7 +286,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     // //------ end unsubscribe -------
   }
 
-  function testAdvanceSearchAndReportCheck() {
+  public function testAdvanceSearchAndReportCheck() {
 
     $this->webtestLogin();
 
@@ -495,7 +495,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
    * @param $criteriaCheck
    * @param $mailingReportUrl
    */
-  function criteriaCheck($criteriaCheck, $mailingReportUrl) {
+  public function criteriaCheck($criteriaCheck, $mailingReportUrl) {
     foreach($criteriaCheck as $key => $infoFilter) {
       foreach($infoFilter as $entity => $dataToCheck) {
         $this->open($mailingReportUrl);
@@ -514,7 +514,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
    * @param $dataToCheck
    * @param $entity
    */
-  function _verifyCriteria($summaryInfo, $dataToCheck, $entity) {
+  public function _verifyCriteria($summaryInfo, $dataToCheck, $entity) {
     foreach($dataToCheck as $key => $value) {
       if ($entity == 'report') {
         if ($key == 'report_name') {

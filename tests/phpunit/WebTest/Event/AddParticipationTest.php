@@ -35,7 +35,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testEventParticipationAdd() {
+  public function testEventParticipationAdd() {
     $this->webtestLogin();
 
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
@@ -122,7 +122,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     );
   }
 
-  function testEventParticipationAddWithMultipleRoles() {
+  public function testEventParticipationAddWithMultipleRoles() {
     $this->webtestLogin();
 
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
@@ -316,7 +316,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//table/tbody/tr/td[text()='Total Amount']/following-sibling::td/strong", preg_quote('$ 800.00'), 'In line ' . __LINE__);
   }
 
-  function testEventAddMultipleParticipants() {
+  public function testEventAddMultipleParticipants() {
     $this->webtestLogin();
 
     $processorId = $this->webtestAddPaymentProcessor();
@@ -352,7 +352,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 }
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
 
     $customSets = array(
@@ -368,7 +368,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
    * Webtest for CRM-10983
    *
    */
-  function testCheckDuplicateCustomDataLoad() {
+  public function testCheckDuplicateCustomDataLoad() {
     $this->webtestLogin();
 
     $customSets = array(
@@ -406,7 +406,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
    * @param string $lastName
    * @param int $processorId
    */
-  function _fillParticipantDetails($processorId) {
+  public function _fillParticipantDetails($processorId) {
     $contact = $this->createDialogContact();
 
     $this->select('payment_processor_id', "value={$processorId}");

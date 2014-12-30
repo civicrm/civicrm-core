@@ -76,7 +76,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->_pid) {

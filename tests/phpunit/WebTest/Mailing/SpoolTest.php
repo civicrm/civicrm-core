@@ -38,7 +38,7 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testSpooledMailing() {
+  public function testSpooledMailing() {
 
     $this->webtestLogin();
 

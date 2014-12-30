@@ -88,7 +88,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->set('searchFormName', 'Search');
 
     /**
@@ -175,7 +175,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     $this->addElement('text', 'sort_name', ts('Participant Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
@@ -267,7 +267,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @return void
    * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -364,7 +364,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @access public
    * @see valid_date
    */
-  function addRules() {}
+  public function addRules() {}
 
   /**
    * Set the default form values
@@ -373,13 +373,13 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    *
    * @return array the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults = $this->_formValues;
     return $defaults;
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
@@ -458,7 +458,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return null
    */
-  function getFormValues() {
+  public function getFormValues() {
     return NULL;
   }
 

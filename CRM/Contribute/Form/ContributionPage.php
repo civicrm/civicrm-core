@@ -247,7 +247,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    *
    * @return array defaults
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     //some child classes calling setdefaults directly w/o preprocess.
     $this->_values = $this->get('values');
     if (!is_array($this->_values)) {
@@ -357,7 +357,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     }
   }
 
-  function endPostProcess() {
+  public function endPostProcess() {
     // make submit buttons keep the current working tab opened, or save and next tab
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $className = CRM_Utils_String::getClassName($this->_name);
@@ -444,7 +444,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     if ($this->controller->getPrint() || $this->getVar('_id') <= 0 ||
       ($this->_action & CRM_Core_Action::DELETE) ||
       (CRM_Utils_String::getClassName($this->_name) == 'AddProduct')

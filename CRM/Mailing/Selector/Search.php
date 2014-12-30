@@ -195,7 +195,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    * @access public
    *
    */
-  static function &links() {
+  public static function &links() {
     if (!(self::$_links)) {
     list($context, $key) = func_get_args();
     $extraParams = ($key) ? "&key={$key}" : NULL;
@@ -233,7 +233,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    *
    * @access public
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $params['status'] = ts('Mailing Recipient') . ' %%StatusMessage%%';
     $params['csvString'] = NULL;
     if ($this->_limit) {
@@ -255,7 +255,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    * @return int Total number of rows
    * @access public
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     return $this->_query->searchQuery(0, 0, NULL,
       TRUE, FALSE,
       FALSE, FALSE,
@@ -275,7 +275,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    *
    * @return int   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     $result = $this->_query->searchQuery($offset, $rowCount, $sort,
       FALSE, FALSE,
       FALSE, FALSE,
@@ -391,14 +391,14 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
   /**
    * @return mixed
    */
-  function alphabetQuery() {
+  public function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
   /**
    * @return string
    */
-  function &getQuery() {
+  public function &getQuery() {
     return $this->_query;
   }
 
@@ -409,7 +409,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    *
    * @return string name of the file
    */
-  function getExportFileName($output = 'csv') {
+  public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Mailing Search');
   }
 }

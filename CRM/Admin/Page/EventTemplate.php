@@ -51,7 +51,7 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Event_BAO_Event';
   }
 
@@ -60,7 +60,7 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
       self::$_links = array(
@@ -89,7 +89,7 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
    * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     //get all event templates.
     $allEventTemplates = array();
 
@@ -146,7 +146,7 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_EventTemplate';
   }
 
@@ -155,7 +155,7 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Event Templates';
   }
 
@@ -166,7 +166,7 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/eventTemplate';
   }
 }

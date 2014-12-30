@@ -37,7 +37,7 @@ class CRM_Report_Form_Contribute_LoggingSummary extends CRM_Logging_ReportSummar
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
       'civicrm_contact_altered_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -178,7 +178,7 @@ class CRM_Report_Form_Contribute_LoggingSummary extends CRM_Logging_ReportSummar
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // cache for id → is_deleted mapping
     $isDeleted = array();
 
@@ -216,7 +216,7 @@ class CRM_Report_Form_Contribute_LoggingSummary extends CRM_Logging_ReportSummar
     }
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
             FROM `{$this->loggingDB}`.log_civicrm_contribution {$this->_aliases['log_civicrm_contribution']}
             LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact_altered_by']}

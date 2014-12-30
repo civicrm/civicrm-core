@@ -42,7 +42,7 @@ class CRM_Event_Page_ParticipantListing_Simple extends CRM_Core_Page {
 
   protected $_pager;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this, TRUE);
 
     // retrieve Event Title and include it in page title
@@ -59,7 +59,7 @@ class CRM_Event_Page_ParticipantListing_Simple extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $fromClause = "
@@ -112,7 +112,7 @@ LIMIT    $offset, $rowCount";
    * @param $whereClause
    * @param array $whereParams
    */
-  function pager($fromClause, $whereClause, $whereParams) {
+  public function pager($fromClause, $whereClause, $whereParams) {
 
     $params = array();
 
@@ -139,7 +139,7 @@ SELECT count( civicrm_contact.id )
   /**
    * @return string
    */
-  function orderBy() {
+  public function orderBy() {
     static $headers = NULL;
     if (!$headers) {
       $headers = array();

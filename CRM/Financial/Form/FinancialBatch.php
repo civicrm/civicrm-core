@@ -157,7 +157,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
     if ($this->_id) {
@@ -183,7 +183,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * @static
    * @access public
    */
-  static function formRule($values, $files, $self) {
+  public static function formRule($values, $files, $self) {
     $errors = array();
     if (!empty($values['contact_name']) && !is_numeric($values['created_id'])) {
       $errors['contact_name'] = ts('Please select a valid contact.');
@@ -303,7 +303,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * @static
    * @access public
    */
-  function checkPermissions($action, $permissions, $createdID, $userContactID, $actionName) {
+  public function checkPermissions($action, $permissions, $createdID, $userContactID, $actionName) {
     if ((CRM_Core_Permission::check($permissions[0]) || CRM_Core_Permission::check($permissions[1]))) {
       if (CRM_Core_Permission::check($permissions[0]) && $userContactID != $createdID && !CRM_Core_Permission::check($permissions[1])) {
         CRM_Core_Error::statusBounce(ts('You dont have permission to %1 this batch'), array(1 => $actionName));

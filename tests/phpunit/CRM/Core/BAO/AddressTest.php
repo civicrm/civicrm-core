@@ -33,7 +33,7 @@ require_once 'CiviTest/Contact.php';
  * Class CRM_Core_BAO_AddressTest
  */
 class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $this->quickCleanup(array('civicrm_contact', 'civicrm_address'));
@@ -42,7 +42,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * Create() method (create and update modes)
    */
-  function testCreate() {
+  public function testCreate() {
     $contactId = Contact::createIndividual();
 
     $params = array();
@@ -106,7 +106,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * Add() method ( )
    */
-  function testAdd() {
+  public function testAdd() {
     $contactId = Contact::createIndividual();
 
     $fixParams = array(
@@ -145,7 +145,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * AllAddress() method ( )
    */
-  function testallAddress() {
+  public function testallAddress() {
     $contactId = Contact::createIndividual();
 
     $fixParams = array(
@@ -203,7 +203,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * AllAddress() method ( ) with null value
    */
-  function testnullallAddress() {
+  public function testnullallAddress() {
     $contactId = Contact::createIndividual();
 
     $fixParams = array(
@@ -241,7 +241,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * GetValues() method (get Address fields)
    */
-  function testGetValues() {
+  public function testGetValues() {
     $contactId = Contact::createIndividual();
 
     $params = array();
@@ -281,7 +281,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * ParseStreetAddress() method (get street address parsed)
    */
-  function testParseStreetAddress() {
+  public function testParseStreetAddress() {
 
     // valid Street address to be parsed ( without locale )
     $street_address = "54A Excelsior Ave. Apt 1C";

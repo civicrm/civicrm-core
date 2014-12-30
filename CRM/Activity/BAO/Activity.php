@@ -661,7 +661,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @access public
    * @static
    */
-  static function &getActivities($input) {
+  public static function &getActivities($input) {
     //step 1: Get the basic activity data
     $bulkActivityTypeID = CRM_Core_OptionGroup::getValue(
       'activity_type',
@@ -909,7 +909,7 @@ ORDER BY    fixed_sort_order
    * @return array of component id and name.
    * @static
    **/
-  static function activityComponents() {
+  public static function activityComponents() {
     $components = array();
     $compInfo = CRM_Core_Component::getEnabledComponents();
     foreach ($compInfo as $compObj) {
@@ -950,7 +950,7 @@ ORDER BY    fixed_sort_order
    * @access public
    * @static
    */
-  static function &getActivitiesCount($input) {
+  public static function &getActivitiesCount($input) {
     $input['count'] = TRUE;
     list($sqlClause, $params) = self::getActivitySQLClause($input);
 
@@ -987,7 +987,7 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
    * @access public
    * @static
    */
-  static function getActivitySQLClause($input) {
+  public static function getActivitySQLClause($input) {
     $params = array();
     $sourceWhere = $targetWhere = $assigneeWhere = $caseWhere = 1;
 
@@ -1647,7 +1647,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @access public
    * @static
    */
-  static function &importableFields($status = FALSE) {
+  public static function &importableFields($status = FALSE) {
     if (!self::$_importableFields) {
       if (!self::$_importableFields) {
         self::$_importableFields = array();
@@ -1700,7 +1700,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @return array    array of activity fields
    * @access public
    */
-  static function getContactActivity($contactId) {
+  public static function getContactActivity($contactId) {
     $activities = array();
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
@@ -1891,7 +1891,7 @@ SELECT  display_name
    * @return int $parentId  Id of parent activity otherwise false.
    * @access public
    */
-  static function getParentActivity($activityId) {
+  public static function getParentActivity($activityId) {
     static $parentActivities = array();
 
     $activityId = CRM_Utils_Type::escape($activityId, 'Integer');
@@ -1918,7 +1918,7 @@ SELECT  display_name
    * @return int $params  count of prior activities otherwise false.
    * @access public
    */
-  static function getPriorCount($activityID) {
+  public static function getPriorCount($activityID) {
     static $priorCounts = array();
 
     $activityID = CRM_Utils_Type::escape($activityID, 'Integer');
@@ -1956,7 +1956,7 @@ AND id < {$activityID}
    * @return array $result  prior activities info.
    * @access public
    */
-  static function getPriorAcitivities($activityID, $onlyPriorRevisions = FALSE) {
+  public static function getPriorAcitivities($activityID, $onlyPriorRevisions = FALSE) {
     static $priorActivities = array();
 
     $activityID = CRM_Utils_Type::escape($activityID, 'Integer');
@@ -2005,7 +2005,7 @@ AND cl.modified_id  = c.id
    * @return int current activity id.
    * @access public
    */
-  static function getLatestActivityId($activityID) {
+  public static function getLatestActivityId($activityID) {
     static $latestActivityIds = array();
 
     $activityID = CRM_Utils_Type::escape($activityID, 'Integer');
@@ -2039,7 +2039,7 @@ AND cl.modified_id  = c.id
    *
    * @access public
    */
-  static function createFollowupActivity($activityId, $params) {
+  public static function createFollowupActivity($activityId, $params) {
     if (!$activityId) {
       return;
     }
@@ -2079,7 +2079,7 @@ AND cl.modified_id  = c.id
    *
    * @static
    */
-  static function getFileForActivityTypeId($activityTypeId, $crmDir = 'Activity') {
+  public static function getFileForActivityTypeId($activityTypeId, $crmDir = 'Activity') {
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
 
     if ($activityTypes[$activityTypeId]['name']) {
@@ -2131,7 +2131,7 @@ AND cl.modified_id  = c.id
    * @access public
    * @static
    */
-  static function &exportableFields($name = 'Activity') {
+  public static function &exportableFields($name = 'Activity') {
     if (!isset(self::$_exportableFields[$name])) {
       self::$_exportableFields[$name] = array();
 
@@ -2185,7 +2185,7 @@ AND cl.modified_id  = c.id
    * @return array array of activity profile Fields
    * @access public
    */
-  static function getProfileFields() {
+  public static function getProfileFields() {
     $exportableFields = self::exportableFields('Activity');
     $skipFields = array(
       'activity_id',
@@ -2567,7 +2567,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
    *
    * @param array $params
    */
-  static function copyExtendedActivityData($params) {
+  public static function copyExtendedActivityData($params) {
     // attach custom data to the new activity
     $customParams = $htmlType = array();
     $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($params['activityID'], 'Activity');
@@ -2641,7 +2641,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   /**
    * @param array $params
    */
-  function setApiFilter(&$params) {
+  public function setApiFilter(&$params) {
     if (CRM_Utils_Array::value('target_contact_id', $params)) {
       $this->selectAdd();
       $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');

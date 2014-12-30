@@ -244,7 +244,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * @static
    * @access public
    */
-  static function formRule($values, $files, $self) {
+  public static function formRule($values, $files, $self) {
     $errorMsg = array();
     $errorFlag = FALSE;
     if ($self->_action == CRM_Core_Action::DELETE) {

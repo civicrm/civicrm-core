@@ -192,7 +192,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
    * @access public
    * @return \CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
    */
-    function __construct()
+    public function __construct()
     {
         $this->__table = 'civicrm_price_field';
         parent::__construct();
@@ -203,7 +203,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
      * @access public
      * @return array
      */
-    function links()
+    public function links()
     {
         if (!(self::$_links)) {
             self::$_links = array(
@@ -336,7 +336,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
      * @static
      * @return string
      */
-    static function getTableName()
+    public static function getTableName()
     {
         return CRM_Core_DAO::getLocaleTableName(self::$_tableName);
     }
@@ -346,7 +346,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
      * @access public
      * @return boolean
      */
-    function getLog()
+    public function getLog()
     {
         return self::$_log;
     }
@@ -418,7 +418,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
      *
      * @return string  the display value of the enum
      */
-    static function tsEnum($field, $value)
+    public static function tsEnum($field, $value)
     {
         static $translations = null;
         if (!$translations) {
@@ -439,7 +439,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
      * @param array $values (reference)  the array up for enhancing
      * @return void
      */
-    static function addDisplayEnums(&$values)
+    public static function addDisplayEnums(&$values)
     {
         $enumFields = & Snapshot_v4p2_Price_DAO_Field::getEnums();
         foreach($enumFields as $enum) {

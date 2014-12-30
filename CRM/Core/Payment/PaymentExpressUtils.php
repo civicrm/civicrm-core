@@ -44,7 +44,7 @@ class CRM_Core_Payment_PaymentExpressUtils {
    *
    * @return string
    */
-  static function _valueXml($element, $value = NULL) {
+  public static function _valueXml($element, $value = NULL) {
     $nl = "\n";
 
     if (is_array($element)) {
@@ -63,7 +63,7 @@ class CRM_Core_Payment_PaymentExpressUtils {
    *
    * @return mixed
    */
-  static function _xmlElement($xml, $name) {
+  public static function _xmlElement($xml, $name) {
     $value = preg_replace('/.*<' . $name . '[^>]*>(.*)<\/' . $name . '>.*/', '\1', $xml);
     return $value;
   }
@@ -74,7 +74,7 @@ class CRM_Core_Payment_PaymentExpressUtils {
    *
    * @return mixed|null
    */
-  static function _xmlAttribute($xml, $name) {
+  public static function _xmlAttribute($xml, $name) {
     $value = preg_replace('/<.*' . $name . '="([^"]*)".*>/', '\1', $xml);
     return $value != $xml ? $value : NULL;
   }
@@ -85,7 +85,7 @@ class CRM_Core_Payment_PaymentExpressUtils {
    *
    * @return resource
    */
-  static function &_initCURL($query, $url) {
+  public static function &_initCURL($query, $url) {
     $curl = curl_init();
 
     curl_setopt($curl, CURLOPT_URL, $url);

@@ -46,7 +46,7 @@ class CRM_Dashlet_Page_CaseDashboard extends CRM_Core_Page {
    *
    * @access public
    */
-  function run() {
+  public function run() {
 
     //check for civicase access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {

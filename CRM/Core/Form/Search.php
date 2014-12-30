@@ -80,7 +80,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   /**
    * Common buildform tasks required by all searches
    */
-  function buildQuickform() {
+  public function buildQuickform() {
     $resources = CRM_Core_Resources::singleton();
 
     if ($resources->ajaxPopupsEnabled) {
@@ -104,7 +104,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   /**
    * Add checkboxes for each row plus a master checkbox
    */
-  function addRowSelectors($rows) {
+  public function addRowSelectors($rows) {
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
     foreach ($rows as $row) {
       $this->addElement('checkbox', $row['checkbox'], NULL, NULL, array('class' => 'select-row'));
@@ -115,7 +115,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Add actions menu to search results form
    * @param $tasks
    */
-  function addTaskMenu($tasks) {
+  public function addTaskMenu($tasks) {
     if (is_array($tasks) && !empty($tasks)) {
       $tasks = array('' => ts('Actions')) + $tasks;
       $this->add('select', 'task', NULL, $tasks, FALSE, array('class' => 'crm-select2 crm-action-menu huge crm-search-result-actions'));

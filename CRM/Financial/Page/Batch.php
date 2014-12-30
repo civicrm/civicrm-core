@@ -51,7 +51,7 @@ class CRM_Financial_Page_Batch extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Batch_BAO_Batch';
   }
 
@@ -60,14 +60,14 @@ class CRM_Financial_Page_Batch extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {}
+  public function &links() {}
 
   /**
    * Get name of edit form
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Financial_Form_FinancialBatch';
   }
 
@@ -76,7 +76,7 @@ class CRM_Financial_Page_Batch extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return ts('Accounting Batch Processing');
   }
 
@@ -87,7 +87,7 @@ class CRM_Financial_Page_Batch extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return CRM_Utils_System::currentPath();
   }
 
@@ -97,13 +97,13 @@ class CRM_Financial_Page_Batch extends CRM_Core_Page_Basic {
    * @return void
    * @access public
    */
-  function browse() {
+  public function browse() {
     $status = CRM_Utils_Request::retrieve('status', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1);
     $this->assign('status', $status);
     $this->search();
   }
 
-  function search() {
+  public function search() {
     if ($this->_action &
       (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |

@@ -379,7 +379,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @static
    * @access public
    */
-  static function contributionChartMonthly($param) {
+  public static function contributionChartMonthly($param) {
     if ($param) {
       $param = array(1 => array($param, 'Integer'));
     }
@@ -420,7 +420,7 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
    * @static
    * @access public
    */
-  static function contributionChartYearly() {
+  public static function contributionChartYearly() {
     $config = CRM_Core_Config::singleton();
     $yearClause = "year(contrib.receive_date) as contribYear";
     if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] != 1 || $config->fiscalYearStart['d'] != 1)) {
@@ -460,7 +460,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
    * @param int $contactID
    * @param $mail
    */
-  static function createCMSUser(&$params, $contactID, $mail) {
+  public static function createCMSUser(&$params, $contactID, $mail) {
     // lets ensure we only create one CMS user
     static $created = FALSE;
 
@@ -483,7 +483,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
    *
    * @return bool
    */
-  static function _fillCommonParams(&$params, $type = 'paypal') {
+  public static function _fillCommonParams(&$params, $type = 'paypal') {
     if (array_key_exists('transaction', $params)) {
       $transaction = &$params['transaction'];
     }
@@ -555,7 +555,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
    *
    * @return array
    */
-  static function formatAPIParams($apiParams, $mapper, $type = 'paypal', $category = TRUE) {
+  public static function formatAPIParams($apiParams, $mapper, $type = 'paypal', $category = TRUE) {
     $type = strtolower($type);
 
     if (!in_array($type, array(
@@ -753,7 +753,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
    *
    * @return bool
    */
-  static function processAPIContribution($params) {
+  public static function processAPIContribution($params) {
     if (empty($params) || array_key_exists('error', $params)) {
       return FALSE;
     }
@@ -836,7 +836,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
    *
    * @return mixed
    */
-  static function getFirstLastDetails($contactID) {
+  public static function getFirstLastDetails($contactID) {
     static $_cache;
 
     if (!$_cache) {

@@ -61,7 +61,7 @@ class CRM_Utils_Recent {
    * @access public
    * @static
    */
-  static function initialize() {
+  public static function initialize() {
     if (!self::$_recent) {
       $session = CRM_Core_Session::singleton();
       self::$_recent = $session->get(self::STORE_NAME);
@@ -78,7 +78,7 @@ class CRM_Utils_Recent {
    * @access public
    * @static
    */
-  static function &get() {
+  public static function &get() {
     self::initialize();
     return self::$_recent;
   }
@@ -155,7 +155,7 @@ class CRM_Utils_Recent {
    * @access public
    * @static
    */
-  static function del($recentItem) {
+  public static function del($recentItem) {
     self::initialize();
     $tempRecent = self::$_recent;
 
@@ -183,7 +183,7 @@ class CRM_Utils_Recent {
    * @access public
    * @static
    */
-  static function delContact($id) {
+  public static function delContact($id) {
     self::initialize();
 
     $tempRecent = self::$_recent;

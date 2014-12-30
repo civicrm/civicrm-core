@@ -45,7 +45,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->set('contactIds', $this->_contactIds);
     parent::preProcess();
   }
@@ -57,7 +57,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Make Mailing Labels'));
 
     //add select for label
@@ -99,7 +99,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    * @return array   array of default values
    * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $format = CRM_Core_BAO_LabelFormat::getDefaultValues();
     $defaults['label_name'] = CRM_Utils_Array::value('name', $format);
@@ -366,7 +366,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    *
    * @return bool
    */
-  function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
+  public function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
     foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
       if (!empty($contact[$key])) {
         return TRUE;
@@ -384,7 +384,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    * @return  null
    * @access  public
    */
-  function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
+  public function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
     $pdf->Open();
     $pdf->AddPage();
@@ -410,7 +410,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    * @return array of returnProperties
    * @access  public
    */
-  function getReturnProperties(&$format) {
+  public function getReturnProperties(&$format) {
     $returnProperties = array();
     $matches = array();
     preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
@@ -433,7 +433,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   /**
    * @param $rows
    */
-  function mergeSameAddress(&$rows) {
+  public function mergeSameAddress(&$rows) {
     $uniqueAddress = array();
     foreach (array_keys($rows) as $rowID) {
       // load complete address as array key

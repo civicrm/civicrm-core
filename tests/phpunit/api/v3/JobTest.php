@@ -47,7 +47,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public $_entity = 'Job';
   public $_params = array();
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_params = array(
@@ -65,7 +65,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Check with no name
    */
-  function testCreateWithoutName() {
+  public function testCreateWithoutName() {
     $params = array(
       'is_active' => 1,    );
     $result = $this->callAPIFailure('job', 'create', $params,
@@ -76,7 +76,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Create job with an invalid "run_frequency" value
    */
-  function testCreateWithInvalidFrequency() {
+  public function testCreateWithInvalidFrequency() {
     $params = array(
       'sequential' => 1,
       'name' => 'API_Test_Job',
@@ -93,7 +93,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Create job
    */
-  function testCreate() {
+  public function testCreate() {
     $result = $this->callAPIAndDocument('job', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['values'][0]['id'], 'in line ' . __LINE__);
 
@@ -106,7 +106,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Check with empty array
    */
-  function testDeleteEmpty() {
+  public function testDeleteEmpty() {
     $params = array();
     $result = $this->callAPIFailure('job', 'delete', $params);
   }
@@ -114,14 +114,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Check with No array
    */
-  function testDeleteParamsNotArray() {
+  public function testDeleteParamsNotArray() {
     $result = $this->callAPIFailure('job', 'delete', 'string');
   }
 
   /**
    * Check if required fields are not passed
    */
-  function testDeleteWithoutRequired() {
+  public function testDeleteWithoutRequired() {
     $params = array(
       'name' => 'API_Test_PP',
       'title' => 'API Test Payment Processor',
@@ -135,7 +135,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Check with incorrect required fields
    */
-  function testDeleteWithIncorrectData() {
+  public function testDeleteWithIncorrectData() {
     $params = array(
       'id' => 'abcd',    );
     $result = $this->callAPIFailure('job', 'delete', $params);
@@ -144,7 +144,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Check job delete
    */
-  function testDelete() {
+  public function testDelete() {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
     $params = array('id' => $createResult['id'],);
     $result = $this->callAPIAndDocument('job', 'delete', $params, __FUNCTION__, __FILE__);
@@ -283,7 +283,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param int $id
    * @param array $params
    */
-  function hookPreRelationship($op, $objectName, $id, &$params ) {
+  public function hookPreRelationship($op, $objectName, $id, &$params ) {
     if($op == 'delete') {
       return;
     }

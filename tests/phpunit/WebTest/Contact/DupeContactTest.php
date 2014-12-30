@@ -35,7 +35,7 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testDuplicateContactAdd() {
+  public function testDuplicateContactAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');

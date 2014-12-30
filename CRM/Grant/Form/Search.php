@@ -167,7 +167,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     $this->addElement('text', 'sort_name', ts('Name or Email'), array('class' => 'twenty') + CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
@@ -203,7 +203,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
    * @return void
    * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -280,11 +280,11 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
    *
    * @return array the default array reference
    */
-  function &setDefaultValues() {
+  public function &setDefaultValues() {
     return $this->_formValues;
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
@@ -317,7 +317,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return null
    */
-  function getFormValues() {
+  public function getFormValues() {
     return NULL;
   }
 

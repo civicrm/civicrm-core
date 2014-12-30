@@ -54,7 +54,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $id = CRM_Utils_Array::value('id', $params);
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
@@ -97,7 +97,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $lineItem = new CRM_Price_BAO_LineItem();
     $lineItem->copyValues($params);
     if ($lineItem->find(TRUE)) {
@@ -113,7 +113,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    *
    * @return null|string
    */
-  static function getLineTotal($entityId, $entityTable) {
+  public static function getLineTotal($entityId, $entityTable) {
     $sqlLineItemTotal = "SELECT SUM(li.line_total + COALESCE(li.tax_amount,0))
 FROM civicrm_line_item li
 WHERE li.entity_table = '{$entityTable}'
@@ -129,7 +129,7 @@ AND li.entity_id = {$entityId}
    *
    * @return array
    */
-  static function getLineItemsByContributionID($contributionID) {
+  public static function getLineItemsByContributionID($contributionID) {
      return self::getLineItems($contributionID,'contribution', NULL, TRUE, TRUE, " WHERE contribution_id = " . (int) $contributionID);
   }
 
@@ -150,7 +150,7 @@ AND li.entity_id = {$entityId}
    *
    * @return array of line items
    */
-  static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL , $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
+  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL , $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
     $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
@@ -270,7 +270,7 @@ AND li.entity_id = {$entityId}
    * @return void
    * @access static
    */
-  static function format($fid, &$params, &$fields, &$values) {
+  public static function format($fid, &$params, &$fields, &$values) {
     if (empty($params["price_{$fid}"])) {
       return;
     }
@@ -363,7 +363,7 @@ AND li.entity_id = {$entityId}
    * @return void
    * @static
    */
-  static function processPriceSet($entityId, $lineItem, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
+  public static function processPriceSet($entityId, $lineItem, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
     if (!$entityId || !is_array($lineItem)
       || CRM_Utils_system::isNull($lineItem)
     ) {
@@ -472,7 +472,7 @@ AND li.entity_id = {$entityId}
    * @return void
    * @static
    */
-  static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {
+  public static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {
 
     if (!$entityId) {
       $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet($entityTable);

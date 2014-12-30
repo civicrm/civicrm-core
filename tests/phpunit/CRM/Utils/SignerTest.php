@@ -31,11 +31,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_SignerTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testSignValidate() {
+  public function testSignValidate() {
     $cases = array();
     $cases[] = array(
       'signParams' => array(

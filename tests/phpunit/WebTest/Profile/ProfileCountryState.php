@@ -35,7 +35,7 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStateCountry() {
+  public function testStateCountry() {
     $this->webtestLogin();
     $config = CRM_Core_Config::singleton();
     // Add new profile.

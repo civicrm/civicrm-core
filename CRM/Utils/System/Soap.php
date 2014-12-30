@@ -55,7 +55,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @return void
    * @access public
    */
-  function setTitle($title, $pageTitle) {
+  public function setTitle($title, $pageTitle) {
     return;
   }
 
@@ -68,7 +68,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @static
    * @access public
    */
-  function checkPermission($str) {
+  public function checkPermission($str) {
     return TRUE;
   }
 
@@ -81,7 +81,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @return void
    * @access public
    */
-  function appendBreadCrumb($title, $url) {
+  public function appendBreadCrumb($title, $url) {
     return;
   }
 
@@ -93,7 +93,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @return void
    * @access public
    */
-  function addHTMLHead($head) {
+  public function addHTMLHead($head) {
     return;
   }
 
@@ -111,7 +111,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @access public
    *
    */
-  function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
+  public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
     if (isset(self::$ufClass)) {
       $className = self::$ufClass;
       $url = $className::url($path, $query, $absolute, $fragment);
@@ -130,7 +130,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @return string the url to post the form
    * @access public
    */
-  function postURL($action) {
+  public function postURL($action) {
     return NULL;
   }
 
@@ -142,7 +142,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @return void
    * @access public
    */
-  function setEmail(&$user) {}
+  public function setEmail(&$user) {}
 
   /**
    * Authenticate a user against the real UF
@@ -153,7 +153,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @return array            Result array
    * @access public
    */
-  function &authenticate($name, $pass) {
+  public function &authenticate($name, $pass) {
     if (isset(self::$ufClass)) {
       $className = self::$ufClass;
       $result =& $className::authenticate($name, $pass);
@@ -184,7 +184,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @return null  as the language is set elsewhere
    */
-  function getUFLocale() {
+  public function getUFLocale() {
     return NULL;
   }
 

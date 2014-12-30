@@ -35,7 +35,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddAndEditField() {
+  public function testAddAndEditField() {
     $this->webtestLogin();
 
     // Add a contact

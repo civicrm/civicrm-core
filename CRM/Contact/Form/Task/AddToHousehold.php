@@ -45,7 +45,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     /*
          * initialize the task and row fields
          */
@@ -60,7 +60,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
 
     CRM_Utils_System::setTitle(ts('Add Members to Household'));
     $this->addElement('text', 'name', ts('Find Target Household'));
@@ -185,7 +185,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-  function search(&$form, &$params) {
+  public function search(&$form, &$params) {
     //max records that will be listed
     $searchValues = array();
     if (!empty($params['rel_contact'])) {

@@ -37,7 +37,7 @@ class CRM_Utils_Api {
    * @return string
    * @throws CRM_Core_Exception
    */
-  static function getEntityName($classNameOrObject) {
+  public static function getEntityName($classNameOrObject) {
     require_once 'api/api.php';
     $className = is_string($classNameOrObject) ? $classNameOrObject : get_class($classNameOrObject);
 

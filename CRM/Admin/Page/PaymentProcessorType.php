@@ -51,7 +51,7 @@ class CRM_Admin_Page_PaymentProcessorType extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Financial_BAO_PaymentProcessorType';
   }
 
@@ -60,7 +60,7 @@ class CRM_Admin_Page_PaymentProcessorType extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -95,7 +95,7 @@ class CRM_Admin_Page_PaymentProcessorType extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_PaymentProcessorType';
   }
 
@@ -104,7 +104,7 @@ class CRM_Admin_Page_PaymentProcessorType extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Payment Processor Type';
   }
 
@@ -115,7 +115,7 @@ class CRM_Admin_Page_PaymentProcessorType extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/paymentProcessorType';
   }
 }

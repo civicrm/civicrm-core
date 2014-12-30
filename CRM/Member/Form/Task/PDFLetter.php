@@ -56,7 +56,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->skipOnHold = $this->skipDeceased = FALSE;
     parent::preProcess();
     $this->setContactIDs();
@@ -68,7 +68,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * (non-PHPdoc)
    * @see CRM_Core_Form::setDefaultValues()
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return  CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
   }
 

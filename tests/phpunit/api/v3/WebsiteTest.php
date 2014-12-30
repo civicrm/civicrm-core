@@ -43,7 +43,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction();
 

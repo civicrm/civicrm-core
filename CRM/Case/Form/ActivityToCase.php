@@ -45,7 +45,7 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_activityId = CRM_Utils_Request::retrieve('activityId', 'Positive', CRM_Core_DAO::$_nullObject);
     if (!$this->_activityId) {
       CRM_Core_Error::fatal('required activity id is missing.');
@@ -64,7 +64,7 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $params = array('id' => $this->_activityId);
 

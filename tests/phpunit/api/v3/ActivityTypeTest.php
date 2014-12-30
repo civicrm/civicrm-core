@@ -36,7 +36,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');
     parent::setUp();
@@ -46,7 +46,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   /**
    *  Test civicrm_activity_type_get()
    */
-  function testActivityTypeGet() {
+  public function testActivityTypeGet() {
     $params = array();
     $result = $this->callAPIAndDocument('activity_type', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values']['1'], 'Meeting', 'In line ' . __LINE__);
@@ -56,7 +56,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   /**
    *  Test civicrm_activity_type_create()
    */
-  function testActivityTypeCreate() {
+  public function testActivityTypeCreate() {
     $params = array(
       'weight' => '2',
       'label' => 'send out letters',
@@ -71,7 +71,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   /**
    *  Test civicrm_activity_type_create - check id
    */
-  function testActivityTypecreatecheckId() {
+  public function testActivityTypecreatecheckId() {
     $params = array(
       'label' => 'type_create',
       'weight' => '2',
@@ -84,7 +84,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   /**
    *  Test civicrm_activity_type_delete()
    */
-  function testActivityTypeDelete() {
+  public function testActivityTypeDelete() {
     $params = array(
       'label' => 'type_create_delete',
       'weight' => '2',

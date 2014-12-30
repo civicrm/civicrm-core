@@ -40,7 +40,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   protected $_entity = 'MailingAB';
   protected $_groupID;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_mailingID_A = $this->createMailing();

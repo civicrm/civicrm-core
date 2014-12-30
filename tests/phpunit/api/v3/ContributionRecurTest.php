@@ -44,7 +44,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->ids['contact'][0] = $this->individualCreate();

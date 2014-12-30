@@ -36,7 +36,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
 
     $logTypes = array();
@@ -160,7 +160,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // cache for id → is_deleted mapping
     $isDeleted = array();
     $newRows   = array();
@@ -237,7 +237,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
   /**
    * @param null $logTable
    */
-  function from( $logTable = null ) {
+  public function from( $logTable = null ) {
     static $entity = null;
     if ( $logTable ) {
       $entity = $logTable;

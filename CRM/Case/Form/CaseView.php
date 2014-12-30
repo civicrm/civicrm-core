@@ -200,7 +200,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     return $defaults;
   }
@@ -503,7 +503,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    * @param CRM_Core_Form $form
    * @param array $aTypes to include acivities related to current case id $form->_caseID
    */
-  static function activityForm($form, $aTypes = array()) {
+  public static function activityForm($form, $aTypes = array()) {
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($form->_contactID, $form->_caseID);
     //build reporter select
     $reporters = array("" => ts(' - any reporter - '));

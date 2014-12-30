@@ -35,7 +35,7 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     parent::setUp();
   }
 
-  function testOfflineAutoRenewMembership() {
+  public function testOfflineAutoRenewMembership() {
     $this->webtestLogin();
 
     // We need a payment processor

@@ -44,7 +44,7 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase{
    *
    * @return bool
    */
-  function check($str, $contactID = NULL) {
+  public function check($str, $contactID = NULL) {
     $str = $this->translatePermission($str, 'Drupal', array(
       'view user account' => 'access user profiles',
     ));

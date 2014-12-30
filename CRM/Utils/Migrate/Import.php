@@ -36,7 +36,7 @@ class CRM_Utils_Migrate_Import {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
   }
 
   /**
@@ -46,7 +46,7 @@ class CRM_Utils_Migrate_Import {
    * @throws CRM_Core_Exception
    * @return void;
    */
-  function run($file) {
+  public function run($file) {
     // read xml file
     $dom = new DomDocument();
     if (! $dom->load($file)) {
@@ -63,7 +63,7 @@ class CRM_Utils_Migrate_Import {
    * @param SimpleXMLElement $xml
    * @return void
    */
-  function runXmlElement($xml) {
+  public function runXmlElement($xml) {
     $idMap = array(
       'custom_group' => array(),
       'option_group' => array(),
@@ -100,7 +100,7 @@ class CRM_Utils_Migrate_Import {
    *
    * @return bool
    */
-  function copyData(&$dao, &$xml, $save = FALSE, $keyName = NULL) {
+  public function copyData(&$dao, &$xml, $save = FALSE, $keyName = NULL) {
     if ($keyName) {
       if (isset($xml->$keyName)) {
         $dao->$keyName = (string ) $xml->$keyName;
@@ -138,7 +138,7 @@ class CRM_Utils_Migrate_Import {
    * @param $xml
    * @param $idMap
    */
-  function optionGroups(&$xml, &$idMap) {
+  public function optionGroups(&$xml, &$idMap) {
     foreach ($xml->OptionGroups as $optionGroupsXML) {
       foreach ($optionGroupsXML->OptionGroup as $optionGroupXML) {
         $optionGroup = new CRM_Core_DAO_OptionGroup();
@@ -152,7 +152,7 @@ class CRM_Utils_Migrate_Import {
    * @param $xml
    * @param $idMap
    */
-  function optionValues(&$xml, &$idMap) {
+  public function optionValues(&$xml, &$idMap) {
     foreach ($xml->OptionValues as $optionValuesXML) {
       foreach ($optionValuesXML->OptionValue as $optionValueXML) {
         $optionValue = new CRM_Core_DAO_OptionValue();
@@ -175,7 +175,7 @@ WHERE      v.option_group_id = %1
   /**
    * @param $xml
    */
-  function relationshipTypes(&$xml) {
+  public function relationshipTypes(&$xml) {
 
     foreach ($xml->RelationshipTypes as $relationshipTypesXML) {
       foreach ($relationshipTypesXML->RelationshipType as $relationshipTypeXML) {
@@ -188,7 +188,7 @@ WHERE      v.option_group_id = %1
   /**
    * @param $xml
    */
-  function contributionTypes(&$xml) {
+  public function contributionTypes(&$xml) {
 
     foreach ($xml->ContributionTypes as $contributionTypesXML) {
       foreach ($contributionTypesXML->ContributionType as $contributionTypeXML) {
@@ -202,7 +202,7 @@ WHERE      v.option_group_id = %1
    * @param $xml
    * @param $idMap
    */
-  function customGroups(&$xml, &$idMap) {
+  public function customGroups(&$xml, &$idMap) {
     foreach ($xml->CustomGroups as $customGroupsXML) {
       foreach ($customGroupsXML->CustomGroup as $customGroupXML) {
         $customGroup = new CRM_Core_DAO_CustomGroup();
@@ -334,7 +334,7 @@ AND        v.name = %1
    * @param $xml
    * @param $idMap
    */
-  function customFields(&$xml, &$idMap) {
+  public function customFields(&$xml, &$idMap) {
     // Re-index by group id so we can build out the custom fields one table
     // at a time, and then rebuild the table triggers at the end, rather than
     // rebuilding the table triggers after each field is added (which is
@@ -385,7 +385,7 @@ AND        v.name = %1
    * @param $xml
    * @param $idMap
    */
-  function dbTemplateString(&$xml, &$idMap) {
+  public function dbTemplateString(&$xml, &$idMap) {
     foreach ($xml->Persistent as $persistentXML) {
       foreach ($persistentXML->Persistent as $persistent) {
         $persistentObj = new CRM_Core_DAO_Persistent();
@@ -402,7 +402,7 @@ AND        v.name = %1
    * @param $xml
    * @param $idMap
    */
-  function profileGroups(&$xml, &$idMap) {
+  public function profileGroups(&$xml, &$idMap) {
     foreach ($xml->ProfileGroups as $profileGroupsXML) {
       foreach ($profileGroupsXML->ProfileGroup as $profileGroupXML) {
         $profileGroup = new CRM_Core_DAO_UFGroup();
@@ -419,7 +419,7 @@ AND        v.name = %1
    *
    * @throws Exception
    */
-  function profileFields(&$xml, &$idMap) {
+  public function profileFields(&$xml, &$idMap) {
     foreach ($xml->ProfileFields as $profileFieldsXML) {
       foreach ($profileFieldsXML->ProfileField as $profileFieldXML) {
         $profileField = new CRM_Core_DAO_UFField();
@@ -461,7 +461,7 @@ AND        f.column_name = %2
    * @param $xml
    * @param $idMap
    */
-  function profileJoins(&$xml, &$idMap) {
+  public function profileJoins(&$xml, &$idMap) {
     foreach ($xml->ProfileJoins as $profileJoinsXML) {
       foreach ($profileJoinsXML->ProfileJoin as $profileJoinXML) {
         $profileJoin = new CRM_Core_DAO_UFJoin();

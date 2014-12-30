@@ -49,7 +49,7 @@ class CRM_Admin_Page_CMSUser extends CRM_Core_Page {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     //if javascript is enabled
     if (CRM_Utils_Request::retrieve('confirmed', 'Boolean',
         $this, '', '', 'GET'

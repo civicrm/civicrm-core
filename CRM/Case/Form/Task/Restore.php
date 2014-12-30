@@ -64,7 +64,7 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->addDefaultButtons(ts('Restore Cases'), 'done');
   }
 

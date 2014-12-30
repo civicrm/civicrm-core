@@ -129,7 +129,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    * @return array   array of default values
    * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     $pageType = CRM_Utils_Request::retrieve('page_type', 'String', $this);
@@ -201,7 +201,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    * @static
    * @access public
    */
-  static function formRule($fields, $files, $form) {}
+  public static function formRule($fields, $files, $form) {}
 
   /**
    * Process the form

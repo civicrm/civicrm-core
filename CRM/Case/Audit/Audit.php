@@ -218,7 +218,7 @@ class CRM_Case_Audit_Audit {
    * @return mixed
    */
   static
-  function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
+  public function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
     /*
 $fh = fopen('C:/temp/audit2.xml', 'w');
 fwrite($fh, $xmlString);

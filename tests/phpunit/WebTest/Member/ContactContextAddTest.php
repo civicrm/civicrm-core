@@ -35,7 +35,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContactMemberAdd() {
+  public function testContactMemberAdd() {
     $this->webtestLogin();
 
     // Create a membership type to use for this test (defaults for this helper function are rolling 1 year membership)
@@ -158,7 +158,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($verifyData);
   }
 
-  function testMemberAddWithLifeTimeMembershipType() {
+  public function testMemberAddWithLifeTimeMembershipType() {
     $this->webtestLogin();
 
     // Create a membership type to use for this test (defaults for this helper function are rolling 1 year membership)

@@ -5,40 +5,40 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Utils_SQL_SelectTest
  */
 class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
-  function testGetDefault() {
+  public function testGetDefault() {
     $select = CRM_Utils_SQL_Select::from('foo bar');
     $this->assertLike('SELECT * FROM foo bar', $select->toSQL());
   }
 
-  function testGetFields() {
+  public function testGetFields() {
     $select = CRM_Utils_SQL_Select::from('foo')
       ->select('bar')
       ->select(array('whiz', 'bang'));
     $this->assertLike('SELECT bar, whiz, bang FROM foo', $select->toSQL());
   }
 
-  function testWherePlain() {
+  public function testWherePlain() {
     $select = CRM_Utils_SQL_Select::from('foo')
       ->where('foo = bar')
       ->where(array('whiz = bang', 'frob > nicate'));
     $this->assertLike('SELECT * FROM foo WHERE (foo = bar) AND (whiz = bang) AND (frob > nicate)', $select->toSQL());
   }
 
-  function testWhereArg() {
+  public function testWhereArg() {
     $select = CRM_Utils_SQL_Select::from('foo')
       ->where('foo = @value', array('@value' => 'not"valid'))
       ->where(array('whiz > @base', 'frob != @base'), array('@base' => 'in"valid'));
     $this->assertLike('SELECT * FROM foo WHERE (foo = "not\\"valid") AND (whiz > "in\\"valid") AND (frob != "in\\"valid")', $select->toSQL());
   }
 
-  function testGroupByPlain() {
+  public function testGroupByPlain() {
     $select = CRM_Utils_SQL_Select::from('foo')
       ->groupBy("bar_id")
       ->groupBy(array('whiz_id*2', 'lower(bang)'));
     $this->assertLike('SELECT * FROM foo GROUP BY bar_id, whiz_id*2, lower(bang)', $select->toSQL());
   }
 
-  function testHavingPlain() {
+  public function testHavingPlain() {
     $select = CRM_Utils_SQL_Select::from('foo')
       ->groupBy("bar_id")
       ->having('count(id) > 2')
@@ -46,7 +46,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('SELECT * FROM foo GROUP BY bar_id HAVING (count(id) > 2) AND (sum(id) > 10) AND (avg(id) < 200)', $select->toSQL());
   }
 
-  function testHavingArg() {
+  public function testHavingArg() {
     $select = CRM_Utils_SQL_Select::from('foo')
       ->groupBy("bar_id")
       ->having('count(id) > #mincnt', array('#mincnt' => 2))
@@ -54,33 +54,33 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('SELECT * FROM foo GROUP BY bar_id HAVING (count(id) > 2) AND (sum(id) > 10) AND (avg(id) < 10)', $select->toSQL());
   }
 
-  function testOrderByPlain() {
+  public function testOrderByPlain() {
     $select = CRM_Utils_SQL_Select::from('foo bar')
       ->orderBy('first asc')
       ->orderBy(array('second desc', 'third'));
     $this->assertLike('SELECT * FROM foo bar ORDER BY first asc, second desc, third', $select->toSQL());
   }
 
-  function testLimit_defaultOffset() {
+  public function testLimit_defaultOffset() {
     $select = CRM_Utils_SQL_Select::from('foo bar')
       ->limit(20);
     $this->assertLike('SELECT * FROM foo bar LIMIT 20 OFFSET 0', $select->toSQL());
   }
 
-  function testLimit_withOffset() {
+  public function testLimit_withOffset() {
     $select = CRM_Utils_SQL_Select::from('foo bar')
       ->limit(20, 60);
     $this->assertLike('SELECT * FROM foo bar LIMIT 20 OFFSET 60', $select->toSQL());
   }
 
-  function testLimit_disable() {
+  public function testLimit_disable() {
     $select = CRM_Utils_SQL_Select::from('foo bar')
       ->limit(20, 60)
       ->limit(NULL, NULL);
     $this->assertLike('SELECT * FROM foo bar', $select->toSQL());
   }
 
-  function testBig() {
+  public function testBig() {
     $select = CRM_Utils_SQL_Select::from('foo')
       ->select('foo.id')
       ->join('rel1', 'INNER JOIN rel1_table rel1 ON foo.id = rel1.foo_id')
@@ -103,7 +103,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     );
   }
 
-  function testInterpolate() {
+  public function testInterpolate() {
     $actual = CRM_Utils_SQL_Select::from('ignore')->interpolate(
       '@escaped !unescaped #validated',
       array(
@@ -115,7 +115,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('"foo\"bar" concat(foo,bar) 15.2', $actual);
   }
 
-  function testInterpolateArray() {
+  public function testInterpolateArray() {
     $actual = CRM_Utils_SQL_Select::from('ignore')->interpolate(
       '(@escaped) (!unescaped) (#validated)',
       array(
@@ -127,7 +127,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('("foo\\"bar", "whiz", "null", NULL, "bang") (foo"bar, bar) (1, 10, NULL, 100.1)', $actual);
   }
 
-  function testInterpolateBadNumber() {
+  public function testInterpolateBadNumber() {
     try {
       $result = CRM_Utils_SQL_Select::from('ignore')->interpolate('#num', array(
         '#num' => '5not-a-number5'
@@ -147,7 +147,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     }
   }
 
-  function testInterpolateBadKey() {
+  public function testInterpolateBadKey() {
     try {
       $result = CRM_Utils_SQL_Select::from('ignore')->interpolate('this is a {var}', array(
         '{var}' => 'not a well-formed variable name'
@@ -163,7 +163,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
    * @param $actual
    * @param string $message
    */
-  function assertLike($expected, $actual, $message = '') {
+  public function assertLike($expected, $actual, $message = '') {
     $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expected)));
     $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actual)));
     $this->assertEquals($expected, $actual, $message);

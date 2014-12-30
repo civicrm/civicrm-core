@@ -62,7 +62,7 @@ class CRM_Utils_String {
    * @return string (or null)
    * @static
    */
-  static function titleToVar($title, $maxLength = 31) {
+  public static function titleToVar($title, $maxLength = 31) {
     $variable = self::munge($title, '_', $maxLength);
 
     if (CRM_Utils_Rule::title($variable, $maxLength)) {
@@ -87,7 +87,7 @@ class CRM_Utils_String {
    * @return string returns the manipulated string
    * @static
    */
-  static function munge($name, $char = '_', $len = 63) {
+  public static function munge($name, $char = '_', $len = 63) {
     // replace all white space and non-alpha numeric with $char
     // we only use the ascii character set since mysql does not create table names / field names otherwise
     // CRM-11744
@@ -110,7 +110,7 @@ class CRM_Utils_String {
    *
    * @return string string
    */
-  static function convertStringToCamel($string) {
+  public static function convertStringToCamel($string) {
     $fragments = explode('_', $string);
     foreach ($fragments as & $fragment) {
       $fragment = ucfirst($fragment);
@@ -133,7 +133,7 @@ class CRM_Utils_String {
    * @access public
    * @static
    */
-  static function rename($name, $len = 4) {
+  public static function rename($name, $len = 4) {
     $rand = substr(uniqid(), 0, $len);
     return substr_replace($name, $rand, -$len, $len);
   }
@@ -150,7 +150,7 @@ class CRM_Utils_String {
    * @return string the last component
    * @static
    */
-  static function getClassName($string, $char = '_') {
+  public static function getClassName($string, $char = '_') {
     $names = array();
     if (!is_array($string)) {
       $names = explode($char, $string);
@@ -172,7 +172,7 @@ class CRM_Utils_String {
    * @access public
    * @static
    */
-  static function append(&$str, $delim, $name) {
+  public static function append(&$str, $delim, $name) {
     if (empty($name)) {
       return;
     }
@@ -210,7 +210,7 @@ class CRM_Utils_String {
    * @access public
    * @static
    */
-  static function isAscii($str, $utf8 = TRUE) {
+  public static function isAscii($str, $utf8 = TRUE) {
     if (!function_exists('mb_detect_encoding')) {
       // eliminate all white space from the string
       $str = preg_replace('/\s+/', '', $str);
@@ -253,7 +253,7 @@ class CRM_Utils_String {
    * @access public
    * @static
    */
-  static function regex($str, $regexRules) {
+  public static function regex($str, $regexRules) {
     //redact the regular expressions
     if (!empty($regexRules) && isset($str)) {
       static $matches, $totalMatches, $match = array();
@@ -291,7 +291,7 @@ class CRM_Utils_String {
    *
    * @return mixed
    */
-  static function redaction($str, $stringRules) {
+  public static function redaction($str, $stringRules) {
     //redact the strings
     if (!empty($stringRules)) {
       foreach ($stringRules as $match => $replace) {
@@ -312,7 +312,7 @@ class CRM_Utils_String {
    *
    * @return boolean
    */
-  static function isUtf8($str) {
+  public static function isUtf8($str) {
     if (!function_exists(mb_detect_encoding)) {
       // eliminate all white space from the string
       $str = preg_replace('/\s+/', '', $str);
@@ -342,7 +342,7 @@ class CRM_Utils_String {
    * @access public
    * @static
    */
-  static function match($url1, $url2) {
+  public static function match($url1, $url2) {
     $url1 = strtolower($url1);
     $url2 = strtolower($url2);
 
@@ -366,7 +366,7 @@ class CRM_Utils_String {
    * @access public
    * @static
    */
-  static function extractURLVarValue($query) {
+  public static function extractURLVarValue($query) {
     $config = CRM_Core_Config::singleton();
     $urlVar = $config->userFrameworkURLVar;
 
@@ -391,7 +391,7 @@ class CRM_Utils_String {
    * @access public
    * @static
    */
-  static function strtobool($str) {
+  public static function strtobool($str) {
     if (!is_scalar($str)) {
       return FALSE;
     }
@@ -411,7 +411,7 @@ class CRM_Utils_String {
    * @access public
    * @static
    */
-  static function strtoboolstr($str) {
+  public static function strtoboolstr($str) {
     if (!is_scalar($str)) {
       return FALSE;
     }
@@ -436,7 +436,7 @@ class CRM_Utils_String {
    * @access public
    * @static
    */
-  static function htmlToText($html) {
+  public static function htmlToText($html) {
     require_once 'packages/html2text/rcube_html2text.php';
     $token_html = preg_replace('!\{([a-z_.]+)\}!i', 'token:{$1}', $html);
     $converter = new rcube_html2text($token_html);
@@ -449,7 +449,7 @@ class CRM_Utils_String {
    * @param $string
    * @param array $params
    */
-  static function extractName($string, &$params) {
+  public static function extractName($string, &$params) {
     $name = trim($string);
     if (empty($name)) {
       return;
@@ -504,7 +504,7 @@ class CRM_Utils_String {
    *
    * @return array
    */
-  static function &makeArray($string) {
+  public static function &makeArray($string) {
     $string = trim($string);
 
     $values = explode("\n", $string);
@@ -526,7 +526,7 @@ class CRM_Utils_String {
    *
    * @return string       only the first alternative found (or the text without alternatives)
    */
-  static function stripAlternatives($full) {
+  public static function stripAlternatives($full) {
     $matches = array();
     preg_match('/-ALTERNATIVE ITEM 0-(.*?)-ALTERNATIVE ITEM 1-.*-ALTERNATIVE END-/s', $full, $matches);
 
@@ -550,7 +550,7 @@ class CRM_Utils_String {
    * @access public
    * @static
    */
-  static function stripSpaces($string) {
+  public static function stripSpaces($string) {
     return (empty($string)) ? $string : preg_replace("/\s{2,}/", " ", trim($string));
   }
 
@@ -611,7 +611,7 @@ class CRM_Utils_String {
    * @public
    * @static
    */
-  static function purifyHTML($string) {
+  public static function purifyHTML($string) {
     static $_filter = null;
     if (!$_filter) {
       $config = HTMLPurifier_Config::createDefault();
@@ -634,7 +634,7 @@ class CRM_Utils_String {
    *
    * @return string
    */
-  static function ellipsify($string, $maxLen) {
+  public static function ellipsify($string, $maxLen) {
     $len = strlen($string);
     if ($len <= $maxLen) {
       return $string;

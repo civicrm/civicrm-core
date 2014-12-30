@@ -6,12 +6,12 @@ class CsvPrinter {
   var $headers;
   var $hasHeader = FALSE;
 
-  function __construct($file, $headers) {
+  public function __construct($file, $headers) {
     $this->file = fopen($file, "w");
     $this->headers = $headers;
   }
 
-  function printHeader() {
+  public function printHeader() {
     if ($this->hasHeader) {
       return;
     }
@@ -23,7 +23,7 @@ class CsvPrinter {
     $this->hasHeader = TRUE;
   }
 
-  function printRow($test, $values) {
+  public function printRow($test, $values) {
     $this->printHeader();
     $row = $values;
     array_unshift($row, $test);

@@ -47,7 +47,7 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     if (empty($params)) {
       return;
     }
@@ -312,7 +312,7 @@ Order By  camp.title";
    *
    * @static
    */
-  static function getCampaignSummary($params = array(), $onlyCount = FALSE) {
+  public static function getCampaignSummary($params = array(), $onlyCount = FALSE) {
     $campaigns = array();
 
     //build the limit and order clause.
@@ -460,7 +460,7 @@ SELECT  campaign.id               as id,
    *
    * @static
    */
-  static function getCampaignCount() {
+  public static function getCampaignCount() {
     return (int)CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_campaign');
   }
 
@@ -472,7 +472,7 @@ SELECT  campaign.id               as id,
    * @return array
    * @static
    */
-  static function getCampaignGroups($campaignId) {
+  public static function getCampaignGroups($campaignId) {
     static $campaignGroups;
     if (!$campaignId) {
       return array();
@@ -507,14 +507,14 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Campaign', $id, 'is_active', $is_active);
   }
 
   /**
    * @return bool
    */
-  static function accessCampaign() {
+  public static function accessCampaign() {
     static $allow = NULL;
 
     if (!isset($allow)) {

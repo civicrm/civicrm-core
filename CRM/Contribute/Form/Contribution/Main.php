@@ -193,7 +193,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    *
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     // check if the user is registered and we have a contact ID
     $contactID = $this->getContactID();
 
@@ -632,7 +632,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @access public
    */
-  function buildOnBehalfOrganization() {
+  public function buildOnBehalfOrganization() {
     if ($this->_membershipContactID) {
       $entityBlock = array('contact_id' => $this->_membershipContactID);
       CRM_Core_BAO_Location::getValues($entityBlock, $this->_defaults);
@@ -734,7 +734,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $amount = self::computeAmount($fields, $self);
 
@@ -1392,7 +1392,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register $form
    * @param bool $noFees
    */
-  static function preProcessPaymentOptions(&$form, $noFees = FALSE) {
+  public static function preProcessPaymentOptions(&$form, $noFees = FALSE) {
     $form->_snippet = CRM_Utils_Array::value('snippet', $_GET);
 
     $form->_paymentProcessors = $noFees ? array() : $form->get('paymentProcessors');

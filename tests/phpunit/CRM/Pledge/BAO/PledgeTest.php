@@ -58,7 +58,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   /**
    *  Test for Add/Update Pledge.
    */
-  function testAdd() {
+  public function testAdd() {
     $params = array(
       'contact_id' => $this->_contactId,
       'frequency_unit' => 'month',
@@ -86,7 +86,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   /**
    *  Retrieve a pledge based on a pledge id = 0
    */
-  function testRetrieveZeroPledeID() {
+  public function testRetrieveZeroPledeID() {
     $defaults = array();
     $params   = array('pledge_id' => 0);
     $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($params, $defaults);
@@ -97,7 +97,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   /**
    *  Retrieve a payment based on a Null pledge id random string
    */
-  function testRetrieveStringPledgeID() {
+  public function testRetrieveStringPledgeID() {
     $defaults = array();
     $params   = array('pledge_id' => 'random text');
     $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($params, $defaults);
@@ -108,7 +108,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   /**
    *  Test that payment retrieve wrks based on known pledge id
    */
-  function testRetrieveKnownPledgeID() {
+  public function testRetrieveKnownPledgeID() {
     $params = array(
       'contact_id' => $this->_contactId,
       'frequency_unit' => 'month',

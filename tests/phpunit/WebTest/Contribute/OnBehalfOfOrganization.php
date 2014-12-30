@@ -35,7 +35,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testOnBehalfOfOrganization() {
+  public function testOnBehalfOfOrganization() {
     $this->webtestLogin();
 
     // create new individual
@@ -111,7 +111,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->_testUserWithMoreThanOneRelationship($pageId, $cid, $pageTitle);
   }
 
-  function testOnBehalfOfOrganizationWithMembershipData() {
+  public function testOnBehalfOfOrganizationWithMembershipData() {
     $this->webtestLogin();
 
     // create new individual
@@ -442,7 +442,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->webtestLogout();
   }
 
-  function testOnBehalfOfOrganizationWithOrgData() {
+  public function testOnBehalfOfOrganizationWithOrgData() {
     $this->webtestLogin();
 
     $this->openCiviPage("profile/edit", "reset=1&gid=4");
@@ -560,7 +560,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
      $this->_testOrganization($pageId, $cid, $pageTitle);
   }
 
-  function testWithContactSubtypeDupe() {
+  public function testWithContactSubtypeDupe() {
     $this->webtestLogin();
 
     //create organisation
@@ -651,7 +651,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
    * @param int $cid
    * @param $pageTitle
    */
-  function _testOrganization($pageId, $cid, $pageTitle) {
+  public function _testOrganization($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
@@ -682,7 +682,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
    * @param int $cid
    * @param $pageTitle
    */
-  function _testAnomoyousOganization($pageId, $cid, $pageTitle) {
+  public function _testAnomoyousOganization($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
@@ -757,7 +757,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
    * @param int $cid
    * @param $pageTitle
    */
-  function _testUserWithOneRelationship($pageId, $cid, $pageTitle) {
+  public function _testUserWithOneRelationship($pageId, $cid, $pageTitle) {
     $this->webtestLogin('admin');
 
     // Create new group
@@ -1003,7 +1003,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
    * @param int $cid
    * @param $pageTitle
    */
-  function _testUserWithMoreThanOneRelationship($pageId, $cid, $pageTitle) {
+  public function _testUserWithMoreThanOneRelationship($pageId, $cid, $pageTitle) {
     $this->webtestLogin('admin');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -1378,7 +1378,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     );
   }
 
-  function testOnBehalfOfOrganizationWithImage() {
+  public function testOnBehalfOfOrganizationWithImage() {
     $this->webtestLogin();
 
     $this->openCiviPage("profile/edit", "reset=1&gid=4");
@@ -1479,7 +1479,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
    * @param int $cid
    * @param $pageTitle
    */
-  function _testOrganizationWithImageUpload($pageId, $cid, $pageTitle) {
+  public function _testOrganizationWithImageUpload($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", '_qf_Main_upload-bottom');
 

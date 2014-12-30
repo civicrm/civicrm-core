@@ -35,7 +35,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddNewProfile() {
+  public function testAddNewProfile() {
     $this->webtestLogin();
 
     // Add new profile.
@@ -121,7 +121,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->_testdeleteProfile($profileTitle);
   }
 
-  function testProfileAddContactstoGroup() {
+  public function testProfileAddContactstoGroup() {
     $this->webtestLogin();
 
     $permissions = array("edit-1-profile-listings-and-forms");
@@ -235,7 +235,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
   /**
    * @param $profileTitle
    */
-  function _testdeleteProfile($profileTitle) {
+  public function _testdeleteProfile($profileTitle) {
     //$this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul//li/a[text()='Delete']");
     $this->click("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul//li/a[text()='Delete']");
@@ -251,7 +251,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
    * Test to check profile description field
    * which has a rich text editor (CKEditor)
    */
-  function testCheckDescAndCreatedIdFields() {
+  public function testCheckDescAndCreatedIdFields() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 

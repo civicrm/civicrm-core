@@ -54,7 +54,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_ActionSchedule';
   }
 
@@ -100,7 +100,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_ScheduleReminders';
   }
 
@@ -109,7 +109,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'ScheduleReminders';
   }
 
@@ -120,7 +120,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/scheduleReminders';
   }
 
@@ -133,7 +133,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    * @access public
    * @static
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     // Get list of configured reminders
     $reminderList = CRM_Core_BAO_ActionSchedule::getList();
 

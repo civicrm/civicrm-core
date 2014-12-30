@@ -38,7 +38,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   /**
    * Check for Valid Street Address
    */
-  function testValidStreetAddressParsing() {
+  public function testValidStreetAddressParsing() {
     $this->webtestLogin();
 
     //Go to the URL of Address Setting to enable street address parsing option
@@ -93,7 +93,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   /**
    * Check for Invalid Street Address
    */
-  function testInvalidStreetAddressParsing() {
+  public function testInvalidStreetAddressParsing() {
     $this->webtestLogin();
 
     //Go to the URL of Address Setting to enable street address parsing option
@@ -149,7 +149,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   /**
    * Check Street Address when Address Parsing is Disabled
    */
-  function testStreetAddress() {
+  public function testStreetAddress() {
     $this->webtestLogin();
 
     //Go to the URL of Address Setting to enable street address parsing option
@@ -187,7 +187,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _validStreetAddressCSVData() {
+  public function _validStreetAddressCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -237,7 +237,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _invalidStreetAddressCSVData() {
+  public function _invalidStreetAddressCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',

@@ -36,7 +36,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
     // Create dummy processor
@@ -63,7 +63,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   /**
    * Check with no name
    */
-  function testPaymentProcessorCreateWithoutName() {
+  public function testPaymentProcessorCreateWithoutName() {
     $payProcParams = array(
       'is_active' => 1,
     );
@@ -73,7 +73,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   /**
    * Create payment processor
    */
-  function testPaymentProcessorCreate() {
+  public function testPaymentProcessorCreate() {
     $params = $this->_params;
     $result = $this->callAPIAndDocument('payment_processor', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['id'], 'in line ' . __LINE__);
@@ -86,7 +86,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   /**
    * Test  using example code
    */
-  function testPaymentProcessorCreateExample() {
+  public function testPaymentProcessorCreateExample() {
     require_once 'api/v3/examples/PaymentProcessor/Create.php';
     $result = payment_processor_create_example();
     $expectedResult = payment_processor_create_expectedresult();
@@ -98,7 +98,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   /**
    * Check payment processor delete
    */
-  function testPaymentProcessorDelete() {
+  public function testPaymentProcessorDelete() {
     $id = $this->testPaymentProcessorCreate();
     $params = array(
       'id' => $id,
@@ -112,7 +112,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   /**
    * Check with valid params array.
    */
-  function testPaymentProcessorsGet() {
+  public function testPaymentProcessorsGet() {
     $params = $this->_params;
     $params['user_name'] = 'test@test.com';
     $this->callAPISuccess('payment_processor', 'create', $params);

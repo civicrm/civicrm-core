@@ -53,7 +53,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    */
   protected $_BAOName;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
   }
@@ -112,7 +112,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $params = array();
 
@@ -161,7 +161,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    * @access public
    * @static
    */
-  static function dataRule($params, $files, $options) {
+  public static function dataRule($params, $files, $options) {
     if ($params['component_type'] == 'Header' || $params['component_type'] == 'Footer') {
       $InvalidTokens = array();
     }

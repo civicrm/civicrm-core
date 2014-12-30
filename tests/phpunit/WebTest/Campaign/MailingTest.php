@@ -35,7 +35,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCreateCampaign() {
+  public function testCreateCampaign() {
     // Log in as admin first to verify permissions for CiviCampaign
     $this->webtestLogin('admin');
 
@@ -105,7 +105,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
    * @param $campaignTitle
    * @param int $id
    */
-  function mailingAddTest($groupName, $campaignTitle, $id) {
+  public function mailingAddTest($groupName, $campaignTitle, $id) {
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");

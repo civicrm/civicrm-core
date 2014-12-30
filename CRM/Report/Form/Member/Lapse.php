@@ -50,7 +50,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
     $config = CRM_Core_Config::singleton();
@@ -195,11 +195,11 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -235,7 +235,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     //check for searching combination of dispaly columns and
     //grouping criteria
@@ -243,7 +243,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $this->_from = NULL;
 
     $this->_from = "
@@ -281,7 +281,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -334,11 +334,11 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
     }
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->beginPostProcess();
 
     // get the acl clauses built before we assemble the query
@@ -367,7 +367,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     $checkList = array();

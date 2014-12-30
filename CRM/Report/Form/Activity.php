@@ -47,7 +47,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     // There could be multiple contacts. We not clear on which contact id to display.
     // Lets hide it for now.
     $this->_exposeContactID = FALSE;
@@ -300,7 +300,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   /** adding address fields with dbAlias for order clause
    * @return array address fields
    */
-  function addressFields($orderBy = FALSE) {
+  public function addressFields($orderBy = FALSE) {
     $address = parent::addAddressFields(FALSE, TRUE);
     if ($orderBy) {
       foreach ($address['civicrm_address']['order_bys'] as $fieldName => $field) {
@@ -313,7 +313,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   /**
    * @param null $recordType
    */
-  function select($recordType = NULL) {
+  public function select($recordType = NULL) {
     if (!array_key_exists("contact_{$recordType}", $this->_params['fields']) &&
       $recordType != 'final'
     ) {
@@ -404,7 +404,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   /**
    * @param $recordType
    */
-  function from($recordType) {
+  public function from($recordType) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $activityTypeId = CRM_Core_DAO::getFieldValue("CRM_Core_DAO_OptionGroup", 'activity_type', 'id', 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
@@ -476,7 +476,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   /**
    * @param null $recordType
    */
-  function where($recordType = NULL) {
+  public function where($recordType = NULL) {
     $this->_where = " WHERE {$this->_aliases['civicrm_activity']}.is_test = 0 AND
                                 {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
                                 {$this->_aliases['civicrm_activity']}.is_current_revision = 1";
@@ -559,14 +559,14 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_activity']}.id";
   }
 
   /**
    * @param string $tableAlias
    */
-  function buildACLClause($tableAlias = 'contact_a') {
+  public function buildACLClause($tableAlias = 'contact_a') {
     //override for ACL( Since Contact may be source
     //contact/assignee or target also it may be null )
 
@@ -597,7 +597,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    *
    * @throws Exception
    */
-  function add2group($groupID) {
+  public function add2group($groupID) {
     if (CRM_Utils_Array::value("contact_target_op", $this->_params) == 'nll') {
       CRM_Core_Error::fatal(ts('Current filter criteria didn\'t have any target contact to add to group'));
     }
@@ -629,7 +629,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
     }
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->beginPostProcess();
 
     //Assign those recordtype to array which have filter operator as 'Is not empty' or 'Is empty'
@@ -721,7 +721,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
 
     $entryFound = FALSE;
@@ -889,7 +889,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
     }
   }
 
-  function sectionTotals() {
+  public function sectionTotals() {
     // Reports using order_bys with sections must populate $this->_selectAliases in select() method.
     if (empty($this->_selectAliases)) {
       return;

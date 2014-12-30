@@ -42,7 +42,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     // don’t display the ‘Add these Contacts to Group’ button
     $this->_add2groupSupported = FALSE;
 
@@ -205,11 +205,11 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = 'GROUP BY entity_log_civireport.log_conn_id, entity_log_civireport.log_user_id, EXTRACT(DAY_MICROSECOND FROM entity_log_civireport.log_date), entity_log_civireport.id';
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -229,7 +229,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
 
-  function where() {
+  public function where() {
     // reset where clause as its called multiple times, every time insert sql is built.
     $this->_whereClauses = array();
 
@@ -237,7 +237,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     $this->_where .= " AND (entity_log_civireport.log_action != 'Initialization')";
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->beginPostProcess();
     $rows = array();
 
@@ -352,7 +352,7 @@ ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
    *
    * @return string
    */
-  function getLogType($entity) {
+  public function getLogType($entity) {
     if (!empty($this->_logTables[$entity]['log_type'])) {
       return $this->_logTables[$entity]['log_type'];
     }
@@ -367,7 +367,7 @@ ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
    *
    * @return mixed|null|string
    */
-  function getEntityValue($id, $entity, $logDate) {
+  public function getEntityValue($id, $entity, $logDate) {
     if (!empty($this->_logTables[$entity]['bracket_info'])) {
       if (!empty($this->_logTables[$entity]['bracket_info']['entity_column'])) {
         $logTable = !empty($this->_logTables[$entity]['table_name']) ? $this->_logTables[$entity]['table_name'] : $entity;
@@ -419,7 +419,7 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
    *
    * @return null|string
    */
-  function getEntityAction($id, $connId, $entity, $oldAction) {
+  public function getEntityAction($id, $connId, $entity, $oldAction) {
     if (!empty($this->_logTables[$entity]['action_column'])) {
       $sql = "select {$this->_logTables[$entity]['action_column']} from `{$this->loggingDB}`.{$entity} where id = %1 AND log_conn_id = %2";
       $newAction = CRM_Core_DAO::singleValueQuery($sql, array(

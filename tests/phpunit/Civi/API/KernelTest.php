@@ -32,7 +32,7 @@ class KernelTest extends \CiviUnitTestCase {
     $this->kernel = new Kernel($this->dispatcher);
   }
 
-  function testNormalEvents() {
+  public function testNormalEvents() {
     $this->kernel->registerApiProvider($this->createWidgetFrobnicateProvider());
     $result = $this->kernel->run('Widget', 'frobnicate', array(
       'version' => self::MOCK_VERSION,
@@ -48,7 +48,7 @@ class KernelTest extends \CiviUnitTestCase {
     $this->assertEquals('frob', $result['values'][98]);
   }
 
-  function testResolveException() {
+  public function testResolveException() {
     $test = $this;
     $this->dispatcher->addListener(Events::RESOLVE, function () {
       throw new \API_Exception('Oh My God', 'omg', array('the' => 'badzes'));

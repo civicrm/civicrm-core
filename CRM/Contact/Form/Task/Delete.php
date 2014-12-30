@@ -59,7 +59,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive',
       $this, FALSE
@@ -147,7 +147,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $label = $this->_restore ? ts('Restore Contact(s)') : ts('Delete Contact(s)');
 
     if ($this->_single) {
@@ -184,7 +184,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     // CRM-12929
     $error = array();
     if ($self->_skipUndelete) {

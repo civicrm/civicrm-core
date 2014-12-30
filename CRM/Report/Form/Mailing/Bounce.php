@@ -63,7 +63,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array();
 
     $this->_columns['civicrm_contact'] = array(
@@ -200,12 +200,12 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->assign('chartSupported', TRUE);
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
 
@@ -247,12 +247,12 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}";
     // LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
@@ -282,12 +282,12 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     parent::where();
     $this->_where .= " AND {$this->_aliases['civicrm_mailing']}.sms_provider_id IS NULL";
   }
 
-  function groupBy() {
+  public function groupBy() {
     if (!empty($this->_params['charts'])) {
       $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_mailing']}.id";
     }
@@ -296,7 +296,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     }
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->beginPostProcess();
 
     // get the acl clauses built before we assemble the query
@@ -315,7 +315,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function buildChart(&$rows) {
+  public function buildChart(&$rows) {
     if (empty($rows)) {
       return;
     }
@@ -339,7 +339,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
   /**
    * @return array
    */
-  function bounce_type() {
+  public function bounce_type() {
 
     $data = array('' => '--Please Select--');
 
@@ -357,7 +357,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {

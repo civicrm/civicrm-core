@@ -59,7 +59,7 @@ class CRM_Core_I18n {
    *
    * @return \CRM_Core_I18n
    */
-  function __construct($locale) {
+  public function __construct($locale) {
     if ($locale != '' and $locale != 'en_US') {
       $config = CRM_Core_Config::singleton();
 
@@ -110,7 +110,7 @@ class CRM_Core_I18n {
    *
    * @return bool True if gettext is native
    */
-  function isNative() {
+  public function isNative() {
     return $this->_nativegettext;
   }
 
@@ -121,7 +121,7 @@ class CRM_Core_I18n {
    *
    * @return             array    of code/language name mappings
    */
-  static function languages($justEnabled = FALSE) {
+  public static function languages($justEnabled = FALSE) {
     static $all = NULL;
     static $enabled = NULL;
 
@@ -176,7 +176,7 @@ class CRM_Core_I18n {
    *
    * @return      string  modified string
    */
-  function strarg($str) {
+  public function strarg($str) {
     $tr = array();
     $p = 0;
     for ($i = 1; $i < func_num_args(); $i++) {
@@ -213,7 +213,7 @@ class CRM_Core_I18n {
    *
    * @return        string  the translated string
    */
-  function crm_translate($text, $params = array()) {
+  public function crm_translate($text, $params = array()) {
     if (isset($params['escape'])) {
       $escape = $params['escape'];
       unset($params['escape']);
@@ -344,7 +344,7 @@ class CRM_Core_I18n {
    *
    * @return         string  the translated string
    */
-  function translate($string) {
+  public function translate($string) {
     return ($this->_phpgettext) ? $this->_phpgettext->translate($string) : $string;
   }
 
@@ -380,7 +380,7 @@ class CRM_Core_I18n {
    *
    * @return        void
    */
-  function localizeTitles(&$array) {
+  public function localizeTitles(&$array) {
     foreach ($array as $key => $value) {
       if (is_array($value)) {
         $this->localizeTitles($value);
@@ -399,7 +399,7 @@ class CRM_Core_I18n {
    *
    * @return Boolean True if the domain was changed for an extension.
    */
-  function setGettextDomain($key) {
+  public function setGettextDomain($key) {
     /* No domain changes for en_US */
     if (! $this->_phpgettext) {
       return FALSE;
@@ -452,7 +452,7 @@ class CRM_Core_I18n {
   /**
    * Static instance provider - return the instance for the current locale.
    */
-  static function &singleton() {
+  public static function &singleton() {
     static $singleton = array();
 
     global $tsLocale;
@@ -468,7 +468,7 @@ class CRM_Core_I18n {
    *
    * @return string  the final LC_TIME that got set
    */
-  static function setLcTime() {
+  public static function setLcTime() {
     static $locales = array();
 
     global $tsLocale;

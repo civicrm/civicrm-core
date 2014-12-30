@@ -48,7 +48,7 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
    * @return array    array of default values
    * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     $ufJoinParams = array(

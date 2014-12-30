@@ -88,7 +88,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if ($this->_mailingID) {
       $defaults['approval_status_id'] = $this->_mailing->approval_status_id;

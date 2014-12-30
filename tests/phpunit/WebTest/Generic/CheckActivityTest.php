@@ -35,7 +35,7 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCheckDashboardElements() {
+  public function testCheckDashboardElements() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 

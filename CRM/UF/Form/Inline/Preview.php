@@ -52,7 +52,7 @@ class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
    * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     if ($_SERVER['REQUEST_METHOD'] != 'POST') {
       // CRM_Core_Controller validates qfKey for POST requests, but not necessarily
       // for GET requests. Allowing GET would therefore be CSRF vulnerability.

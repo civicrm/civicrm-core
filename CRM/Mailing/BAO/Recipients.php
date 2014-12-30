@@ -37,7 +37,7 @@ class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -46,7 +46,7 @@ class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
    *
    * @return null|string
    */
-  static function mailingSize($mailingID) {
+  public static function mailingSize($mailingID) {
     $sql = "
 SELECT count(*) as count
 FROM   civicrm_mailing_recipients
@@ -95,7 +95,7 @@ WHERE  mailing_id = %1
    * @param int $totalLimit
    *   Number of recipients to move
    */
-  static function updateRandomRecipients($sourceMailingId, $newMailingID, $totalLimit = NULL) {
+  public static function updateRandomRecipients($sourceMailingId, $newMailingID, $totalLimit = NULL) {
     $limitString = NULL;
     if ($totalLimit) {
       $limitString = "LIMIT 0, $totalLimit";
@@ -129,7 +129,7 @@ SET mr.mailing_id = $newMailingID
    * @param int $sourceMailingId
    * @param array $to (int $targetMailingId => int $count)
    */
-  static function reassign($sourceMailingId, $to) {
+  public static function reassign($sourceMailingId, $to) {
     foreach ($to as $targetMailingId => $count) {
       if ($count > 0) {
         CRM_Mailing_BAO_Recipients::updateRandomRecipients($sourceMailingId, $targetMailingId, $count);

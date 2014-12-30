@@ -542,7 +542,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
@@ -552,7 +552,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function assignToTemplate() {
+  public function assignToTemplate() {
     $name = CRM_Utils_Array::value('billing_first_name', $this->_params);
     if (!empty($this->_params['billing_middle_name'])) {
       $name .= " {$this->_params['billing_middle_name']}";
@@ -685,7 +685,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
+  public function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
     if ($id) {
       $contactID = $this->getContactID();
 
@@ -799,7 +799,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = NULL) {
+  public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_id) {
       $templateFile = "CRM/Contribute/Form/Contribution/{$this->_id}/{$this->_name}.{$suffix}tpl";
       $template = CRM_Core_Form::getTemplate();
@@ -819,7 +819,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -834,7 +834,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * @return string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }

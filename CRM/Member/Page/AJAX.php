@@ -41,7 +41,7 @@ class CRM_Member_Page_AJAX {
   /**
    * SetDefaults according to membership type
    */
-  static function getMemberTypeDefaults() {
+  public static function getMemberTypeDefaults() {
     if (!$_POST['mtype']) {
       $details['name'] = '';
       $details['auto_renew'] = '';

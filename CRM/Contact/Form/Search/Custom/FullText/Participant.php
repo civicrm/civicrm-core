@@ -34,11 +34,11 @@
  */
 class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
-  function __construct() {
+  public function __construct() {
     parent::__construct('Participant', ts('Participants'));
   }
 
-  function isActive() {
+  public function isActive() {
     $config = CRM_Core_Config::singleton();
     return in_array('CiviEvent', $config->enableComponents) &&
       CRM_Core_Permission::check('view event participants');
@@ -64,7 +64,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Fo
    * @param string $entityIDTableName
    * @return array list tables/queries (for runQueries)
    */
-  function prepareQueries($queryText, $entityIDTableName) {
+  public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
     $contactSQL = array();

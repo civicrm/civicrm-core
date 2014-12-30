@@ -180,7 +180,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     //Filters by source report template or by component
     $this->ovID   = CRM_Utils_Request::retrieve('ovid', 'Positive', $this);
     $this->compID = CRM_Utils_Request::retrieve('compid', 'Positive', $this);

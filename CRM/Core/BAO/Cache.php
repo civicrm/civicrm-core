@@ -62,7 +62,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @static
    * @access public
    */
-  static function &getItem($group, $path, $componentID = NULL) {
+  public static function &getItem($group, $path, $componentID = NULL) {
     if (self::$_cache === NULL) {
       self::$_cache = array();
     }
@@ -100,7 +100,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @static
    * @access public
    */
-  static function &getItems($group, $componentID = NULL) {
+  public static function &getItems($group, $componentID = NULL) {
     if (self::$_cache === NULL) {
       self::$_cache = array();
     }
@@ -142,7 +142,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @static
    * @access public
    */
-  static function setItem(&$data, $group, $path, $componentID = NULL) {
+  public static function setItem(&$data, $group, $path, $componentID = NULL) {
     if (self::$_cache === NULL) {
       self::$_cache = array();
     }
@@ -196,7 +196,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @static
    * @access public
    */
-  static function deleteGroup($group = NULL, $path = NULL, $clearAll = TRUE) {
+  public static function deleteGroup($group = NULL, $path = NULL, $clearAll = TRUE) {
     $dao = new CRM_Core_DAO_Cache();
 
     if (!empty($group)) {
@@ -238,7 +238,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @static
    * @access private
    */
-  static function storeSessionToCache($names, $resetSession = TRUE) {
+  public static function storeSessionToCache($names, $resetSession = TRUE) {
     foreach ($names as $key => $sessionName) {
       if (is_array($sessionName)) {
         $value = null;
@@ -281,7 +281,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   /**
    * @param string $names
    */
-  static function restoreSessionFromCache($names) {
+  public static function restoreSessionFromCache($names) {
     foreach ($names as $key => $sessionName) {
       if (is_array($sessionName)) {
         $value = self::getItem('CiviCRM Session',
@@ -314,7 +314,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @static
    * @access private
    */
-  static function cleanup($session = false, $table = false, $prevNext = false) {
+  public static function cleanup($session = false, $table = false, $prevNext = false) {
     // clean up the session cache every $cacheCleanUpNumber probabilistically
     $cleanUpNumber = 757;
 

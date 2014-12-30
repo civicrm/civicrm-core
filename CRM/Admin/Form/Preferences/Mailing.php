@@ -38,7 +38,7 @@
  *
  */
 class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviMail Component Settings'));
     $this->_varNames = array(
       CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME => array(
@@ -114,7 +114,7 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
     parent::preProcess();
   }
 
-  function postProcess() {
+  public function postProcess() {
     // check if mailing tab is enabled, if not prompt user to enable the tab if "write_activity_record" is disabled
     $params = $this->controller->exportValues($this->_name);
 

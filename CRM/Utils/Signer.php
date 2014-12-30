@@ -63,7 +63,7 @@ class CRM_Utils_Signer {
    * @param $secret string, private
    * @param $paramNames array, fields which should be part of the signature
    */
-  function __construct($secret, $paramNames) {
+  public function __construct($secret, $paramNames) {
     sort($paramNames); // ensure consistent serialization of payloads
     $this->secret = $secret;
     $this->paramNames = $paramNames;
@@ -78,7 +78,7 @@ class CRM_Utils_Signer {
    * @param $salt string, the salt (if known) or NULL (for auto-generated)
    * @return string, the full public token representing the signature
    */
-  function sign($params, $salt = NULL) {
+  public function sign($params, $salt = NULL) {
     $message = array();
     $message['secret'] = $this->secret;
     $message['payload'] = array();
@@ -111,7 +111,7 @@ class CRM_Utils_Signer {
    * @throws Exception
    * @return bool, TRUE iff all $paramNames for the submitted validate($params) and the original sign($params)
    */
-  function validate($token, $params) {
+  public function validate($token, $params) {
     list ($salt, $signature) = explode($this->signDelim, $token);
     if (strlen($salt) != self::SALT_LEN) {
       throw new Exception("Invalid salt [$token]=[$salt][$signature]");
@@ -123,7 +123,7 @@ class CRM_Utils_Signer {
   /**
    * @return string
    */
-  function createSalt() {
+  public function createSalt() {
     // It would be more secure to generate a new value but liable to run this
     // many times on certain admin pages; so instead we'll re-use the hash.
     return $this->defaultSalt;

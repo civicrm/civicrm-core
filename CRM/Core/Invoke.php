@@ -47,7 +47,7 @@ class CRM_Core_Invoke {
    * @static
    * @access public
    */
-  static function invoke($args) {
+  public static function invoke($args) {
     try {
       return self::_invoke($args);
     }
@@ -351,7 +351,7 @@ class CRM_Core_Invoke {
    * @static
    * @access public
    */
-  static function form($action, $contact_type, $contact_sub_type) {
+  public static function form($action, $contact_type, $contact_sub_type) {
     CRM_Utils_System::setUserContext(array('civicrm/contact/search/basic', 'civicrm/contact/view'));
     $wrapper = new CRM_Utils_Wrapper();
 
@@ -369,7 +369,7 @@ class CRM_Core_Invoke {
    *
    * @param CRM_Core_Smarty $template
    */
-  static function versionCheck($template) {
+  public static function versionCheck($template) {
     if (CRM_Core_Config::isUpgradeMode()) {
       return;
     }
@@ -390,7 +390,7 @@ class CRM_Core_Invoke {
    *
    * @throws Exception
    */
-  static function rebuildMenuAndCaches($triggerRebuild = FALSE, $sessionReset = FALSE) {
+  public static function rebuildMenuAndCaches($triggerRebuild = FALSE, $sessionReset = FALSE) {
     $config = CRM_Core_Config::singleton();
     $config->clearModuleList();
 

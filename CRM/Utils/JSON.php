@@ -42,7 +42,7 @@ class CRM_Utils_JSON {
    * Output json to the client
    * @param mixed $input
    */
-  static function output($input) {
+  public static function output($input) {
     header('Content-Type: application/json');
     echo json_encode($input);
     CRM_Utils_System::civiExit();
@@ -59,7 +59,7 @@ class CRM_Utils_JSON {
    * @return string $jsonObject JSON array
    * @static
    */
-  static function encode($params, $identifier = 'id') {
+  public static function encode($params, $identifier = 'id') {
     $buildObject = array();
     foreach ($params as $value) {
       $name = addslashes($value['name']);
@@ -81,7 +81,7 @@ class CRM_Utils_JSON {
    *
    * @return json encode string
    */
-  static function encodeSelector(&$params, $page, $total, $selectorElements) {
+  public static function encodeSelector(&$params, $page, $total, $selectorElements) {
     $json = "";
     $json .= "{\n";
     $json .= "page: $page,\n";
@@ -125,7 +125,7 @@ class CRM_Utils_JSON {
    * @return string
    *
    */
-  static function encodeDataTableSelector($params, $sEcho, $iTotal, $iFilteredTotal, $selectorElements) {
+  public static function encodeDataTableSelector($params, $sEcho, $iTotal, $iFilteredTotal, $selectorElements) {
     $sOutput = '{';
     $sOutput .= '"sEcho": ' . intval($sEcho) . ', ';
     $sOutput .= '"iTotalRecords": ' . $iTotal . ', ';

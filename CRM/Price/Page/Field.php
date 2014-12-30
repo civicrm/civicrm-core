@@ -120,7 +120,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function browse() {
+  public function browse() {
     $resourceManager = CRM_Core_Resources::singleton();
     if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
       $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
@@ -225,7 +225,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function edit($action) {
+  public function edit($action) {
     // create a simple controller for editing price data
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Field', ts('Price Field'), $action);
 
@@ -250,7 +250,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function run() {
+  public function run() {
 
     // get the group id
     $this->_sid = CRM_Utils_Request::retrieve('sid', 'Positive',
@@ -345,7 +345,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function preview($fid) {
+  public function preview($fid) {
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Preview', ts('Preview Form Field'), CRM_Core_Action::PREVIEW);
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=browse&sid=' . $this->_sid));

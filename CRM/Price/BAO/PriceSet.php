@@ -50,7 +50,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -63,7 +63,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     if(empty($params['id']) && empty($params['name'])) {
       $params['name'] = CRM_Utils_String::munge($params['title'], '_', 242);
     }
@@ -85,7 +85,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_PriceSet', $params, $defaults);
   }
 
@@ -101,7 +101,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @static
    * @access public
    */
-  static function setIsActive($id, $isActive) {
+  public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_active', $isActive);
   }
 
@@ -579,7 +579,7 @@ WHERE  id = %1";
    * @throws CRM_Core_Exception
    * @return int
    */
-  static function getOnlyPriceFieldID(array $priceSet) {
+  public static function getOnlyPriceFieldID(array $priceSet) {
     if(count($priceSet['fields']) > 1) {
       throw new CRM_Core_Exception(ts('expected only one price field to be in priceset but multiple are present'));
     }
@@ -594,7 +594,7 @@ WHERE  id = %1";
    * @throws CRM_Core_Exception
    * @return int
    */
-  static function getOnlyPriceFieldValueID(array $priceSet) {
+  public static function getOnlyPriceFieldValueID(array $priceSet) {
     $priceFieldID = self::getOnlyPriceFieldID($priceSet);
     if(count($priceSet['fields'][$priceFieldID]['options']) > 1) {
       throw new CRM_Core_Exception(ts('expected only one price field to be in priceset but multiple are present'));
@@ -612,7 +612,7 @@ WHERE  id = %1";
    *
    * @return bool|false|int|null
    */
-  static function initSet(&$form, $id, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
+  public static function initSet(&$form, $id, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
     if (!$priceSetId) {
       $priceSetId = self::getFor($entityTable, $id);
     }
@@ -710,7 +710,7 @@ WHERE  id = %1";
    * @param $lineItem
    * @param string $component
    */
-  static function processAmount(&$fields, &$params, &$lineItem, $component = '') {
+  public static function processAmount(&$fields, &$params, &$lineItem, $component = '') {
     // using price set
     $totalPrice = $totalTax = 0;
     $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
@@ -889,7 +889,7 @@ WHERE  id = %1";
    * @return void
    * @access public
    */
-  static function buildPriceSet(&$form) {
+  public static function buildPriceSet(&$form) {
     $priceSetId = $form->get('priceSetId');
     if (!$priceSetId) {
       return;
@@ -972,7 +972,7 @@ WHERE  id = %1";
    * Check the current Membership
    * having end date null.
    */
-  static function checkCurrentMembership(&$options, $userid) {
+  public static function checkCurrentMembership(&$options, $userid) {
     if (!$userid || empty($options)) {
       return;
     }
@@ -1007,7 +1007,7 @@ WHERE  id = %1";
    * @return array $defaults
    * @access public
    */
-  static function setDefaultPriceSet(&$form, &$defaults) {
+  public static function setDefaultPriceSet(&$form, &$defaults) {
     if (!isset($form->_priceSet) || empty($form->_priceSet['fields'])) {
       return $defaults;
     }
@@ -1034,7 +1034,7 @@ WHERE  id = %1";
    * @param CRM_Core_DAO $entity object for given entity
    * @param string $entityName name of entity - e.g event
    */
-  static function setPriceSets(&$params, $entity, $entityName) {
+  public static function setPriceSets(&$params, $entity, $entityName) {
     if(empty($params['price_set_id']) || !is_array($params['price_set_id'])) {
       return;
     }
@@ -1098,7 +1098,7 @@ WHERE  id = %1";
    * @access public
    * @static
    */
-  static function copy($id) {
+  public static function copy($id) {
     $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_price_set");
 
     $title = ts('[Copy id %1]', array(1 => $maxId + 1));
@@ -1143,7 +1143,7 @@ WHERE  id = %1";
    *
    * @return bool
    */
-  static function checkPermission($sid) {
+  public static function checkPermission($sid) {
     if ($sid && self::eventPriceSetDomainID()) {
       $domain_id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $sid, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domain_id) {
@@ -1288,7 +1288,7 @@ GROUP BY     mt.member_of_contact_id";
   /**
    * @return object
    */
-  static function eventPriceSetDomainID() {
+  public static function eventPriceSetDomainID() {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
       'event_price_set_domain_id',
       NULL, FALSE
@@ -1305,7 +1305,7 @@ GROUP BY     mt.member_of_contact_id";
    * @static
    * @access public
    */
-  static function setIsQuickConfig($id, $isQuickConfig) {
+  public static function setIsQuickConfig($id, $isQuickConfig) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_quick_config', $isQuickConfig);
   }
 
@@ -1357,7 +1357,7 @@ WHERE       ps.id = %1
    * @param int $id old event/contribution page id
    * @param int $newId newly created event/contribution page id
    */
-  static function copyPriceSet($baoName, $id, $newId) {
+  public static function copyPriceSet($baoName, $id, $newId) {
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($baoName, $id);
     if ($priceSetId) {
       $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
@@ -1401,7 +1401,7 @@ WHERE       ps.id = %1
    *
    *
    */
-  static function setLineItem($field, $lineItem, $optionValueId) {
+  public static function setLineItem($field, $lineItem, $optionValueId) {
     if ($field['html_type'] == 'Text') {
       $taxAmount = $field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'];
     }

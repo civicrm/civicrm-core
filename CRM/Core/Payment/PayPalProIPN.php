@@ -67,7 +67,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @throws CRM_Core_Exception
    */
-  function __construct($inputData) {
+  public function __construct($inputData) {
     $this->setInputParameters($inputData);
     $this->setInvoiceData();
     parent::__construct();
@@ -82,7 +82,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @throws CRM_Core_Exception
    * @return unknown
    */
-  function getValue($name, $abort = TRUE) {
+  public function getValue($name, $abort = TRUE) {
     if ($abort && empty($this->_invoiceData[$name])) {
       throw new CRM_Core_Exception("Failure: Missing Parameter $name");
     }
@@ -94,7 +94,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Set $this->_invoiceData from the input array
    */
-  function setInvoiceData() {
+  public function setInvoiceData() {
     if(empty($this->_inputParameters['rp_invoice_id'])) {
       $this->_isPaymentExpress = TRUE;
       return;
@@ -138,7 +138,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @throws CRM_Core_Exception
    * @return Ambigous <mixed, NULL, value, unknown, array, number>
    */
-  function retrieve($name, $type, $location = 'POST', $abort = TRUE) {
+  public function retrieve($name, $type, $location = 'POST', $abort = TRUE) {
     $value = CRM_Utils_Type::validate(
       CRM_Utils_Array::value($name, $this->_inputParameters),
       $type,
@@ -158,7 +158,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @param boolean $first
    * @return void|boolean
    */
-  function recur(&$input, &$ids, &$objects, $first) {
+  public function recur(&$input, &$ids, &$objects, $first) {
     if (!isset($input['txnType'])) {
       CRM_Core_Error::debug_log_message("Could not find txn_type in input request");
       echo "Failure: Invalid parameters<p>";
@@ -318,7 +318,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @param bool $recur
    * @param bool $first
    */
-  function single(&$input, &$ids, &$objects, $recur = FALSE, $first = FALSE) {
+  public function single(&$input, &$ids, &$objects, $recur = FALSE, $first = FALSE) {
     $contribution = &$objects['contribution'];
 
     // make sure the invoice is valid and matches what we have in the contribution record
@@ -381,7 +381,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @todo the references to POST throughout this class need to be removed
    * @return void|boolean|Ambigous <void, boolean>
    */
-  function main() {
+  public function main() {
     CRM_Core_Error::debug_var('GET', $_GET, TRUE, TRUE);
     CRM_Core_Error::debug_var('POST', $_POST, TRUE, TRUE);
     if($this->_isPaymentExpress) {
@@ -464,7 +464,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    *
    * @throws CRM_Core_Exception
    */
-  function getInput(&$input, &$ids) {
+  public function getInput(&$input, &$ids) {
 
     if (!$this->getBillingID($ids)) {
       return FALSE;
@@ -510,7 +510,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * but let's assume knowledge on invoice id & schedule is enough for now esp for donations
    * only contribute is handled
    */
-  function handlePaymentExpress() {
+  public function handlePaymentExpress() {
    //@todo - loads of copy & paste / code duplication but as this not going into core need to try to
    // keep discreet
    // also note that a lot of the complexity above could be removed if we used
@@ -559,7 +559,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * Function check if transaction already exists
    * @param string $trxn_id
    */
-  function transactionExists($trxn_id) {
+  public function transactionExists($trxn_id) {
     if(CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_contribution WHERE trxn_id = %1",
       array(
         1 => array($trxn_id, 'String')

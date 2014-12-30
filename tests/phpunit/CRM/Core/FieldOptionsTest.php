@@ -31,7 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for field options
  */
 class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
@@ -39,7 +39,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
    * Assure CRM_Core_PseudoConstant::get() is working properly for a range of
    * DAO fields having a <pseudoconstant> tag in the XML schema.
    */
-  function testOptionValues() {
+  public function testOptionValues() {
     /**
      * baoName/field combinations to test
      * Format: array[BAO Name] = $properties, where properties is an array whose

@@ -125,11 +125,11 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       ),
     );
 
-  static function getStatus() {
+  public static function getStatus() {
     return self::$status;
   }
 
-  static function setStatus($status) {
+  public static function setStatus($status) {
     self::$status = $status;
   }
   /**
@@ -142,7 +142,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return object
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     if (CRM_Utils_Array::value('id', $params)) {
       CRM_Utils_Hook::pre('edit', 'RecurringEntity', $params['id'], $params);
     }
@@ -176,7 +176,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return object
    */
-  static function quickAdd($parentId, $entityId, $entityTable) {
+  public static function quickAdd($parentId, $entityId, $entityTable) {
     $params =
       array(
         'parent_id'    => $parentId,
@@ -195,7 +195,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return void
    */
-  function mode($mode) {
+  public function mode($mode) {
     if ($this->entity_id && $this->entity_table) {
       if ($this->find(TRUE)) {
         $this->mode = $mode;
@@ -213,7 +213,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return array
    */
-  function generate() {
+  public function generate() {
     $this->generateRecursiveDates();
 
     return $this->generateEntities();
@@ -224,7 +224,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return object When object
    */
-  function generateRecursion() {
+  public function generateRecursion() {
     // return if already generated
     if (is_a($this->recursion, 'When')) {
       return $this->recursion;
@@ -249,7 +249,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return array
    */
-  function generateEntities() {
+  public function generateEntities() {
     self::setStatus(self::RUNNING);
 
     $newEntities  = array();
@@ -315,7 +315,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return array array of dates
    */
-  function generateRecursiveDates() {
+  public function generateRecursiveDates() {
     $this->generateRecursion();
 
     $recursionDates = array();
@@ -814,7 +814,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return array
    */
-  function mapFormValuesToDB($formParams = array()) {
+  public function mapFormValuesToDB($formParams = array()) {
     $dbParams = array();
     if (CRM_Utils_Array::value('used_for', $formParams)) {
       $dbParams['used_for'] = $formParams['used_for'];
@@ -917,7 +917,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return array
    */
-  function getScheduleParams($scheduleReminderId) {
+  public function getScheduleParams($scheduleReminderId) {
     $scheduleReminderDetails = array();
     if ($scheduleReminderId) {
       //Get all the details from schedule reminder table
@@ -935,7 +935,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return object When object
    */
-  function getRecursionFromSchedule($scheduleReminderDetails = array()) {
+  public function getRecursionFromSchedule($scheduleReminderDetails = array()) {
     $r = new When();
     //If there is some data for this id
     if ($scheduleReminderDetails['repetition_frequency_unit']) {

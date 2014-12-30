@@ -7,7 +7,7 @@ require_once 'CiviTest/Custom.php';
  * Class CRM_Contact_BAO_ContactTest
  */
 class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
@@ -15,7 +15,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for add( )
    * test with empty params.
    */
-  function testAddWithEmptyParams() {
+  public function testAddWithEmptyParams() {
     $params = array( );
     $contact = CRM_Contact_BAO_Contact::add($params);
 
@@ -28,7 +28,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * test with names
    * (create and update modes)
    */
-  function testAddWithNames() {
+  public function testAddWithNames() {
     $firstName = 'Shane';
     $lastName  = 'Whatson';
     $params    = array(
@@ -69,7 +69,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * test with all contact params
    * (creat and update modes)
    */
-  function testAddWithAll() {
+  public function testAddWithAll() {
     //take the common contact params
     $params = $this->contactParams();
 
@@ -219,7 +219,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for add( )
    * test with All contact types.
    */
-  function testAddWithAllContactTypes() {
+  public function testAddWithAllContactTypes() {
     $firstName = 'Bill';
     $lastName  = 'Adams';
     $params    = array(
@@ -292,7 +292,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for create( )
    * test with missing params.
    */
-  function testCreateWithEmptyParams() {
+  public function testCreateWithEmptyParams() {
     $params = array(
       'first_name' => 'Bill',
       'last_name' => 'Adams',
@@ -308,7 +308,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * test with all params.
    * ( create and update modes ).
    */
-  function testCreateWithAll() {
+  public function testCreateWithAll() {
     //take the common contact params
     $params = $this->contactParams();
     $params['note'] = 'test note';
@@ -501,7 +501,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for resolveDefaults( )
    * test all pseudoConstant, stateProvince, country.
    */
-  function testResolveDefaults() {
+  public function testResolveDefaults() {
     $params = array(
       'prefix_id' => 3,
       'suffix_id' => 2,
@@ -538,7 +538,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for retrieve( )
    * test with all values.
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     //take the common contact params
     $params = $this->contactParams();
     $params['note'] = 'test note';
@@ -637,7 +637,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Test case for deleteContact( )
    */
-  function testDeleteContact() {
+  public function testDeleteContact() {
     $contactParams = $this->contactParams();
 
     //create custom data
@@ -724,7 +724,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * test with all params.
    * ( create and update modes )
    */
-  function testCreateProfileContact() {
+  public function testCreateProfileContact() {
     $fields = CRM_Contact_BAO_Contact::exportableFields('Individual');
 
     //current employer field for individual
@@ -1111,7 +1111,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Test case for getContactDetails( )
    */
-  function testGetContactDetails() {
+  public function testGetContactDetails() {
     //get the contact params
     $params = $this->contactParams();
 
@@ -1138,7 +1138,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for
    * importableFields( ) and exportableFields( )
    */
-  function testFields() {
+  public function testFields() {
     $allImpFileds = CRM_Contact_BAO_Contact::importableFields('All');
     $allExpFileds = CRM_Contact_BAO_Contact::importableFields('All');
     //Now check all fields
@@ -1164,7 +1164,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for getPrimaryEmail( )
    *
    */
-  function testGetPrimaryEmail() {
+  public function testGetPrimaryEmail() {
     //get the contact params
     $params = $this->contactParams();
     $params['email'][2] = $params['email'][1];
@@ -1188,7 +1188,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for getPrimaryOpenId( )
    *
    */
-  function testGetPrimaryOpenId() {
+  public function testGetPrimaryOpenId() {
     //get the contact params
     $params = $this->contactParams();
     $params['openid'][2] = $params['openid'][1];
@@ -1213,7 +1213,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for matchContactOnEmail( )
    *
    */
-  function testMatchContactOnEmail() {
+  public function testMatchContactOnEmail() {
     //get the contact params
     $params = $this->contactParams();
     //create contact
@@ -1235,7 +1235,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for getContactType( )
    *
    */
-  function testGetContactType() {
+  public function testGetContactType() {
     //get the contact params
     $params = $this->contactParams();
     //create contact
@@ -1255,7 +1255,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for displayName( )
    *
    */
-  function testDisplayName() {
+  public function testDisplayName() {
     //get the contact params
     $params = $this->contactParams();
 
@@ -1283,7 +1283,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test case for getDisplayAndImage( )
    *
    */
-  function testGetDisplayAndImage() {
+  public function testGetDisplayAndImage() {
     //get the contact params
     $params = $this->contactParams();
 
@@ -1429,7 +1429,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Ensure that created_date and modified_date are set
    */
-  function testTimestamps_contact() {
+  public function testTimestamps_contact() {
     $test = $this;
     $this->_testTimestamps(array(
       'UPDATE' => function ($contactId) use ($test) {
@@ -1447,7 +1447,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Ensure that civicrm_contact.modified_date is updated when manipulating a phone record
    */
-  function testTimestamps_email() {
+  public function testTimestamps_email() {
     $test = $this;
     $this->_testTimestamps(array(
       'INSERT' => function ($contactId) use ($test) {
@@ -1483,7 +1483,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Ensure that civicrm_contact.modified_date is updated when manipulating an email
    */
-  function testTimestamps_phone() {
+  public function testTimestamps_phone() {
     $test = $this;
     $this->_testTimestamps(array(
       'INSERT' => function ($contactId) use ($test) {
@@ -1520,7 +1520,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Ensure that civicrm_contact.modified_date is updated when contact-related
    * custom data
    */
-  function testTimestamps_custom() {
+  public function testTimestamps_custom() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $this->assertNotNull($customGroup);
     $fields = array(
@@ -1563,7 +1563,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    *
    * @param $callbacks array ($name => $callable)
    */
-  function _testTimestamps($callbacks) {
+  public function _testTimestamps($callbacks) {
     CRM_Core_DAO::triggerRebuild();
     $contactId = Contact::createIndividual();
 

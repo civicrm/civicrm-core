@@ -98,7 +98,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Admin_Form_MailSettings', 'formRule'));
   }
 
@@ -111,7 +111,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    * @static
    * @access public
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
     // Check for default from email address and organization (domain) name. Force them to change it.
     if ($fields['domain'] == 'EXAMPLE.ORG') {
@@ -128,7 +128,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    *
    * @return void
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Core_BAO_MailSettings::deleteMailSettings($this->_id);
       CRM_Core_Session::setStatus("", ts('Mail Setting Deleted.'), "success");

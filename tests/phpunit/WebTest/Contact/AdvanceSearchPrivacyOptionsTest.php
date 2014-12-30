@@ -35,7 +35,7 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     parent::setUp();
   }
 
-  function testSearchForPrivacyOptions() {
+  public function testSearchForPrivacyOptions() {
     $this->webtestLogin();
 
     $privacyOptions = array(
@@ -131,7 +131,7 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
    * @param $privacyOperator
    * @param $allPrivacyOptions
    */
-  function _addPrivacyCriteria($inEx, $privacyOptions, $privacyOperator, $allPrivacyOptions) {
+  public function _addPrivacyCriteria($inEx, $privacyOptions, $privacyOperator, $allPrivacyOptions) {
     $inExId = ($inEx == 'include') ? 'CIVICRM_QFID_2_privacy_toggle' : 'CIVICRM_QFID_1_privacy_toggle';
     $this->click($inExId);
     $this->select('privacy_operator', "{$privacyOperator}");
@@ -160,7 +160,7 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
    *
    * @return bool
    */
-  function _searchSortNameCriteria($firstName, $lastName) {
+  public function _searchSortNameCriteria($firstName, $lastName) {
     //type in the criteria
     $this->type("sort_name", "{$lastName}, {$firstName}");
 
@@ -177,7 +177,7 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
    *
    * @return string
    */
-  function getOptionVal($privacyOption) {
+  public function getOptionVal($privacyOption) {
     if ($privacyOption == 'do_not_phone') {
       $privacyOptionVal = 'Do not phone';
     }
@@ -201,7 +201,7 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
    * @param string $lastName
    * @param $options
    */
-  function _addIndividual($firstName, $lastName, $options) {
+  public function _addIndividual($firstName, $lastName, $options) {
 
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 

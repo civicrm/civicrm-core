@@ -38,7 +38,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
   /**
    * Test Signature in TinyMC.
    */
-  function testTinyMCE() {
+  public function testTinyMCE() {
     $this->webtestLogin();
 
     $this->openCiviPage('dashboard', 'reset=1', 'crm-recently-viewed');
@@ -93,7 +93,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
   /**
    *  Test Signature in CKEditor.
    */
-  function testCKEditor() {
+  public function testCKEditor() {
     $this->webtestLogin();
 
     $this->openCiviPage('dashboard', 'reset=1', 'crm-recently-viewed');
@@ -144,7 +144,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
   /**
    * Helper function to select Editor.
    */
-  function _selectEditor($editor) {
+  public function _selectEditor($editor) {
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1');
 
     // Change editor if not already selected
@@ -159,7 +159,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
   /**
    * Helper function for Check Signature in Editor.
    */
-  function _checkSignature($fieldName, $signature, $editor) {
+  public function _checkSignature($fieldName, $signature, $editor) {
     if ($editor == 'CKEditor') {
       $this->waitForElementPresent("xpath=//div[@id='cke_{$fieldName}']//iframe");
       $this->selectFrame("xpath=//div[@id='cke_{$fieldName}']//iframe");
@@ -175,7 +175,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
   /**
    * Helper function for Check Signature in Activity.
    */
-  function _checkActivity($subject, $signature) {
+  public function _checkActivity($subject, $signature) {
     $this->openCiviPage('activity/search', 'reset=1', '_qf_Search_refresh');
 
     $this->type('activity_subject', $subject);

@@ -42,7 +42,7 @@ class CRM_Utils_PDF_Utils {
    *
    * @return string|void
    */
-  static function html2pdf(&$text, $fileName = 'civicrm.pdf', $output = FALSE, $pdfFormat = NULL) {
+  public static function html2pdf(&$text, $fileName = 'civicrm.pdf', $output = FALSE, $pdfFormat = NULL) {
     if (is_array($text)) {
       $pages = &$text;
     }
@@ -124,7 +124,7 @@ class CRM_Utils_PDF_Utils {
     }
   }
 
-  static function _html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName, $stationery_path) {
+  public static function _html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName, $stationery_path) {
     // Documentation on the TCPDF library can be found at: http://www.tcpdf.org
     // This function also uses the FPDI library documented at: http://www.setasign.com/products/fpdi/about/
     // Syntax borrowed from https://github.com/jake-mw/CDNTaxReceipts/blob/master/cdntaxreceipts.functions.inc
@@ -178,7 +178,7 @@ class CRM_Utils_PDF_Utils {
    *
    * @return string
    */
-  static function _html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName) {
+  public static function _html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName) {
     require_once 'packages/dompdf/dompdf_config.inc.php';
     spl_autoload_register('DOMPDF_autoload');
     $dompdf = new DOMPDF();
@@ -202,7 +202,7 @@ class CRM_Utils_PDF_Utils {
    * @param $output
    * @param string $fileName
    */
-  static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
+  public static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
     require_once 'packages/snappy/src/autoload.php';
     $config = CRM_Core_Config::singleton();
     $snappy = new Knp\Snappy\Pdf($config->wkhtmltopdfPath);
@@ -235,7 +235,7 @@ class CRM_Utils_PDF_Utils {
    *
    * @return float|int
    */
-  static function convertMetric($value, $from, $to, $precision = NULL) {
+  public static function convertMetric($value, $from, $to, $precision = NULL) {
     switch ($from . $to) {
       case 'incm':
         $value *= 2.54;

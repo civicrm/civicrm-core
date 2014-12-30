@@ -94,7 +94,7 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
    * @return array   the default array reference
    * @access protected
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $groupId  = $this->get('groupId');
     $fieldId  = $this->get('fieldId');

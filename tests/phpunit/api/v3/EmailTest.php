@@ -37,7 +37,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
   protected $_entity;
   protected $_params;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     $this->_entity = 'Email';
     parent::setUp();

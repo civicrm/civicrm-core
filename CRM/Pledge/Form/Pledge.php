@@ -139,7 +139,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
     $fields = array();
@@ -457,7 +457,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     if ($fields['amount'] <= 0) {

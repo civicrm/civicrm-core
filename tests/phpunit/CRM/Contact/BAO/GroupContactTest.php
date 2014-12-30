@@ -57,7 +57,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   /**
    * Test case for add( )
    */
-  function testAdd() {
+  public function testAdd() {
 
     //creates a test group contact by recursively creation
     //lets create 10 groupContacts for fun
@@ -73,7 +73,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   /**
    * Test case for getGroupId( )
    */
-  function testGetGroupId() {
+  public function testGetGroupId() {
 
 
     //creates a test groupContact object
@@ -94,7 +94,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   /**
    *  Test case for contact search: CRM-6706, CRM-6586 Parent Group search should return contacts from child groups too.
    */
-  function testContactSearchByParentGroup() {
+  public function testContactSearchByParentGroup() {
     // create a parent group
     // TODO: This is not an API test!!
     $groupParams1 = array(
