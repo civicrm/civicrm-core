@@ -1758,7 +1758,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
       if ('unknown-user' === $realContactId) {
         throw new API_Exception("\"$fieldName\" \"{$fieldValue}\" cannot be resolved to a contact ID", 2002, array('error_field' => $fieldName,"type"=>"integer"));
       } elseif (is_numeric($realContactId)) {
-        $fieldValue = $realContactId;
+        $params[$fieldName]  = $fieldValue = $realContactId;
       }
     }
     if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
@@ -1779,7 +1779,6 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
         2100, array('field' => $fieldName, "max_length"=>$fieldInfo['maxlength'])
       );
     }
-    $params[$fieldName] = $fieldValue;
   }
 }
 
