@@ -489,7 +489,10 @@ class CiviCRM_For_WordPress_Shortcodes {
       return $title;
     }
 
-    $title = $this->post_titles[$post_id];
+    // shortcodes may or may not override title
+    if ( array_key_exists( $post_id, $this->post_titles ) ) {
+      $title = $this->post_titles[$post_id];
+    }
 
     return $title;
 
