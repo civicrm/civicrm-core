@@ -153,7 +153,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
 
         case 'multiselect2':
           foreach ($field['values'] as $op) {
-            $this->waitForVisible($fldLocator);
+            $this->waitForElementPresent($fldLocator);
             $this->multiselect2($fldLocator, $op);
           }
           break;
