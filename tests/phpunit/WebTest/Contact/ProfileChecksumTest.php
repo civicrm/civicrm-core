@@ -120,7 +120,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     foreach ($fields as $field) {
       $this->assertTrue($this->isElementPresent($field['element_name']), "Missing Field: {$field['label']}.");
       if (isset($field['html_type']) && $field['html_type'] == 'select') {
-        $this->waitForVisible($field['element_name']);
+        $this->waitForElementPresent($field['element_name']);
         $this->select($field['element_name'], "value={$field['update_value']}");
       }
       else {
