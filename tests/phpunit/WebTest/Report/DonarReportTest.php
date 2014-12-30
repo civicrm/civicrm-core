@@ -46,19 +46,26 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Create report
-    $this->click("css=div.crm-report_setting-accordion div.crm-accordion-header");
-    $this->waitForElementPresent("title");
 
     $reportName = 'ContributeDetail_' . substr(sha1(rand()), 0, 7);
     $reportDescription = "New Contribute Detail Report";
 
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[4]/a");
+    $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']");
+    $this->click("xpath=//div[@class='crm-submit-buttons']/input[@name='_qf_Detail_submit_save']");
+
     // Fill Report Title
-    $this->type("title", $reportName);
+    $this->waitForElementPresent("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']/table/tbody/tr[1]/td[2]/input[@type='text']");
+    $this->type("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']/table/tbody/tr[1]/td[2]/input[@type='text']", $reportName);
 
     // Fill Report Description
-    $this->type("description", $reportDescription);
+    $this->waitForElementPresent("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']/table/tbody/tr[2]/td[2]/input[@type='text']");
+    $this->type("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']/table/tbody/tr[2]/td[2]/input[@type='text']", $reportDescription);
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
 
     // We want navigation menu
+    $this->waitForElementPresent('_qf_Detail_submit_next');
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[6]/a");
     $this->click("is_navigation");
     $this->waitForElementPresent("parent_id");
 
@@ -84,9 +91,11 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
 
     //now select the criteria
     //click report criteria accordian
-    $this->click("css=div.crm-report_criteria-accordion div.crm-accordion-header");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[3]/a");
+    $this->waitForElementPresent('_qf_Detail_submit_next');
 
     //enter contribution amount
+    $this->waitForAjaxContent();
     $this->select('total_amount_op', "value=gte");
     $this->type('total_amount_value', "10");
 
