@@ -1,10 +1,8 @@
-/**
- * Copyright (C) 2012 Xavier Dutoit
- * Licensed to CiviCRM under the Academic Free License version 3.0.
- *
- * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Structure+convention+for+automagic+edit+in+place
- */
+// https://civicrm.org/licensing
 (function($) {
+  /**
+   * Helper fn to retrieve semantic data from markup
+   */
   $.fn.crmEditableEntity = function() {
     var
       el = this[0],
@@ -29,29 +27,30 @@
     return ret;
   };
 
+  /**
+   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Structure+convention+for+automagic+edit+in+place
+   */
   $.fn.crmEditable = function(options) {
     var checkable = function() {
       $(this).change(function() {
-        var info = $(this).crmEditableEntity();
+        var $el = $(this),
+          info = $el.crmEditableEntity();
         if (!info.field) {
           return false;
         }
-        var checked = $(this).is(':checked');
         var params = {
           sequential: 1,
           id: info.id,
           field: info.field,
-          value: checked ? 1 : 0
+          value: $el.is(':checked') ? 1 : 0
         };
-        CRM.api(info.entity, info.action, params, {
-          context: this,
-          error: function(data) {
-            editableSettings.error.call(this, info.entity, info.field, checked, data);
-          },
-          success: function(data) {
-            editableSettings.success.call(this, info.entity, info.field, checked, data);
-          }
-        });
+        CRM.api3(info.entity, info.action, params, true)
+          .fail(function(data) {
+            editableSettings.error.call($el[0], info.entity, info.field, checked, data);
+          })
+          .done(function(data) {
+            editableSettings.success.call($el[0], info.entity, info.field, checked, data);
+          });
       });
     };
 
@@ -70,7 +69,6 @@
       },
       success: function(entity, field, value, data, settings) {
         var $i = $(this);
-        CRM.status(ts('Saved'));
         $i.removeClass('crm-editable-saving crm-error');
         value = value === '' ? settings.placeholder : value;
         $i.html(value);
@@ -79,34 +77,43 @@
 
     var editableSettings = $.extend({}, defaults, options);
     return this.each(function() {
-      var $i = $(this);
-      var fieldName = "";
+      var $i,
+        fieldName = "";
 
       if (this.nodeName == "INPUT" && this.type == "checkbox") {
         checkable.call(this, this);
         return;
       }
 
+      // Table cell needs something inside it to look right
+      if ($(this).is('td')) {
+        $(this)
+          .removeClass('crm-editable')
+          .wrapInner('<div class="crm-editable" />');
+        $i = $('div.crm-editable', this)
+          .data($(this).data());
+        var field = this.className.match(/crmf-(\S*)/);
+        if (field) {
+          $i.data('field', field[1]);
+        }
+      }
+      else {
+        $i = $(this);
+      }
+
       var settings = {
-        tooltip: 'Click to edit...',
-        placeholder: '<span class="crm-editable-placeholder">Click to edit</span>',
+        tooltip: $i.data('tooltip') || ts('Click to edit'),
+        placeholder: $i.data('placeholder') || '<span class="crm-editable-placeholder">' + ts('Click to edit') + '</span>',
+        onblur: 'cancel',
+        cancel: '<button type="cancel"><span class="ui-icon ui-icon-closethick"></span></button>',
+        submit: '<button type="submit"><span class="ui-icon ui-icon-check"></span></button>',
+        cssclass: 'crm-editable-form',
         data: function(value, settings) {
           return value.replace(/<(?:.|\n)*?>/gm, '');
         }
       };
-      if ($i.data('placeholder')) {
-        settings.placeholder = $i.data('placeholder');
-      } else {
-        settings.placeholder = '<span class="crm-editable-placeholder">Click to edit</span>';
-      }
-      if ($i.data('tooltip')) {
-        settings.placeholder = $i.data('tooltip')
-      } else {
-        settings.tooltip = 'Click to edit...';
-      }
       if ($i.data('type')) {
         settings.type = $i.data('type');
-        settings.onblur = 'submit';
       }
       if ($i.data('options')) {
         settings.data = $i.data('options');
@@ -122,6 +129,7 @@
         $i.addClass('crm-editable-saving');
         var
           info = $i.crmEditableEntity(),
+          $el = $($i),
           params = {},
           action = $i.data('action') || info.action;
         if (!info.field) {
@@ -137,20 +145,33 @@
         else {
           params[info.field] = value;
         }
-        CRM.api(info.entity, action, params, {
-          context: this,
-          error: function(data) {
-            editableSettings.error.call(this, info.entity, info.field, value, data);
-          },
-          success: function(data) {
-            if ($i.data('options')) {
-              value = $i.data('options')[value];
+        CRM.api3(info.entity, action, params, true)
+          .done(function(data) {
+            if ($el.data('options')) {
+              value = $el.data('options')[value];
             }
-            $i.trigger('crmFormSuccess');
-            editableSettings.success.call(this, info.entity, info.field, value, data, settings);
-          }
-        });
+            $el.trigger('crmFormSuccess');
+            editableSettings.success.call($el[0], info.entity, info.field, value, data, settings);
+          })
+          .fail(function(data) {
+            editableSettings.error.call($el[0], info.entity, info.field, value, data);
+          });
       }, settings);
+
+      // CRM-15759 - Workaround broken textarea handling in jeditable 1.7.1
+      $i.click(function() {
+        $('textarea', this).off()
+          .on('blur', function() {
+            $i.find('button[type=cancel]').click();
+          })
+          .on('keydown', function (e) {
+            if (e.ctrlKey && e.keyCode == 13) {
+              // Ctrl-Enter pressed
+              $i.find('button[type=submit]').click();
+              e.preventDefault();
+            }
+          });
+      });
     });
   };
 
