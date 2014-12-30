@@ -70,8 +70,8 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=td.crm-report-civicrm_email_email', $emailId, "Email did not found!");
 
     // check criteria
-    $this->click("css=div.crm-report_criteria-accordion div.crm-accordion-header");
-    $this->waitForElementPresent("sort_name_value");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[3]/a");
+    $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']");
 
     // Is Contact Name filter?
     $this->assertContains($firstName, $this->getValue("sort_name_value"), "Filter Contact Name expected $firstName");
@@ -83,21 +83,28 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertEquals("on", $this->getValue("fields[phone]"));
 
     // Create report
-    $this->click("css=div.crm-report_setting-accordion div.crm-accordion-header");
-    $this->waitForElementPresent("title");
 
     $reportName = 'ContactSummary_' . substr(sha1(rand()), 0, 7);
     $reportDescription = "New Contact Summary Report";
     $emaiSubject = "Contact Summary Report";
     $emailCC = "tesmail@example.org";
 
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[4]/a");
+    $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']");
+    $this->click("_qf_Summary_submit_save");
+
     // Fill Report Title
-    $this->type("title", $reportName);
+    $this->waitForElementPresent("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']/table/tbody/tr[1]/td[2]/input[@type='text']");
+    $this->type("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']/table/tbody/tr[1]/td[2]/input[@type='text']", $reportName);
 
     // Fill Report Description
-    $this->type("description", $reportDescription);
+    $this->waitForElementPresent("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']/table/tbody/tr[2]/td[2]/input[@type='text']");
+    $this->type("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']/table/tbody/tr[2]/td[2]/input[@type='text']", $reportDescription);
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
+    $this->waitForElementPresent('_qf_Summary_submit_save');
 
     // Fill Email Subject
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[5]/a");
     $this->type("email_subject", $emaiSubject);
 
     // Fill Email To
@@ -107,13 +114,15 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->type("email_cc", $emailCC);
 
     // We want navigation menu
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[6]/a");
     $this->click("is_navigation");
-    $this->waitForElementPresent("parent_id");
 
     // Navigation menu under Reports section
+    $this->waitForElementPresent("parent_id");
     $this->select("parent_id", "label=Reports");
 
     // Set permission as access CiviCRM
+    $this->waitForElementPresent("permission");
     $this->select("permission", "value=access CiviCRM");
 
     // click to create report
@@ -140,7 +149,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=td.crm-report-civicrm_email_email', $emailId, "Email did not found!");
 
     // check report criteria
-    $this->click("css=div.crm-report_criteria-accordion div.crm-accordion-header");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[3]/a");
     $this->waitForElementPresent("sort_name_value");
 
     // Is Contact Name filter?
@@ -153,7 +162,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertEquals("on", $this->getValue("fields[phone]"));
 
     // Check Report settings
-    $this->click("css=div.crm-report_setting-accordion div.crm-accordion-header");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[4]/a");
     $this->waitForElementPresent("title");
 
     // Is correct Report Title?
@@ -163,6 +172,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertContains($reportDescription, $this->getValue("description"), "Report Description expected $reportDescription");
 
     // Is correct email Subject?
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[5]/a");
     $this->assertContains($emaiSubject, $this->getValue("email_subject"), "Email Subject expected $emaiSubject");
 
     // Is correct email to?
@@ -172,6 +182,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertContains($emailCC, $this->getValue("email_cc"), "Email CC expected $emailCC");
 
     // Is Navigation?
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[6]/a");
     $this->assertEquals("on", $this->getValue("is_navigation"));
 
     // Is correct Navigation Parent?
