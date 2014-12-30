@@ -2207,7 +2207,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->type("//*[@id='$fieldName']/../div/ul/li//input", $label);
       $this->typeKeys("//*[@id='$fieldName']/../div/ul/li//input", $label);
       $this->waitForElementPresent("//*[@class='select2-result-label']");
-      $this->clickAt("//*[@class='select2-results']/li[1]/div");
+      $this->clickAt("//*[contains(@class,'select2-result-selectable')]/div[contains(@class, 'select2-result-label')]");
     }
     else {
       if ($xpath) {
