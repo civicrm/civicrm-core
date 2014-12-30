@@ -140,7 +140,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * @static
    * @access public
    */
-  static function formRule( $values, $files, $self ) {
+  public static function formRule( $values, $files, $self ) {
     $errorMsg = array( );
     $financialAccountTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' "));
     if (isset($values['is_tax'])) {
@@ -180,7 +180,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id');

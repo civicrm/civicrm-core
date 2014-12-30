@@ -49,7 +49,7 @@ class CRM_ACL_Form_ACLBasic extends CRM_Admin_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->_id ||
@@ -115,7 +115,7 @@ SELECT object_table
    *
    * @return array|bool
    */
-  static function formRule($params) {
+  public static function formRule($params) {
     if ($params['entity_id'] == -1) {
       $errors = array('entity_id' => ts('Role is a required field'));
       return $errors;

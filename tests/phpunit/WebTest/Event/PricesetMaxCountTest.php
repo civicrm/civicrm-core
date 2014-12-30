@@ -35,7 +35,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testWithoutFieldCount() {
+  public function testWithoutFieldCount() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -226,7 +226,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->_checkConfirmationAndRegister();
   }
 
-  function testWithFieldCount() {
+  public function testWithFieldCount() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -425,7 +425,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->_checkConfirmationAndRegister();
   }
 
-  function testAdditionalParticipantWithoutFieldCount() {
+  public function testAdditionalParticipantWithoutFieldCount() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -710,7 +710,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->_checkConfirmationAndRegister();
   }
 
-  function testAdditionalParticipantWithFieldCount() {
+  public function testAdditionalParticipantWithFieldCount() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -1006,7 +1006,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
    * @param $setTitle
    * @param null $financialType
    */
-  function _testAddSet($setTitle, $financialType = NULL) {
+  public function _testAddSet($setTitle, $financialType = NULL) {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
@@ -1027,7 +1027,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
   /**
    * @param $fields
    */
-  function _testAddPriceFields($fields) {
+  public function _testAddPriceFields($fields) {
     $fieldCount = count($fields);
     $count = 1;
     $this->waitForElementPresent('label');
@@ -1085,7 +1085,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
    * @param $options
    * @param $fieldType
    */
-  function _testAddMultipleChoiceOptions($options, $fieldType) {
+  public function _testAddMultipleChoiceOptions($options, $fieldType) {
     foreach ($options as $oIndex => $oValue) {
       $this->type("option_label_{$oIndex}", $oValue['label']);
       $this->type("option_amount_{$oIndex}", $oValue['amount']);
@@ -1121,7 +1121,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
    *
    * @return string
    */
-  function _testAddEvent($params) {
+  public function _testAddEvent($params) {
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
     $this->select('event_type_id', "value={$params['event_type_id']}");
@@ -1199,7 +1199,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     return $this->getLocation();
   }
 
-  function _fillRegisterWithBillingInfo() {
+  public function _fillRegisterWithBillingInfo() {
     $this->waitForElementPresent('credit_card_type');
     $this->select('credit_card_type', 'value=Visa');
     $this->type('credit_card_number', '4111111111111111');
@@ -1218,7 +1218,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function _checkConfirmationAndRegister() {
+  public function _checkConfirmationAndRegister() {
     $confirmStrings = array('Event Fee(s)', 'Billing Name and Address', 'Credit Card Information');
     $this->assertStringsPresent($confirmStrings);
     $this->click('_qf_Confirm_next-bottom');

@@ -35,7 +35,7 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function teststreetAddressParsing() {
+  public function teststreetAddressParsing() {
     // Logging in.
     $this->webtestLogin();
 

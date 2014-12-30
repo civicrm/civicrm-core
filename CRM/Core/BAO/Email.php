@@ -46,7 +46,7 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    *
    * @return object
    */
-  static function create($params) {
+  public static function create($params) {
     // if id is set & is_primary isn't we can assume no change
     if (is_numeric(CRM_Utils_Array::value('is_primary', $params)) || empty($params['id'])) {
       CRM_Core_BAO_Block::handlePrimary($params, get_class());
@@ -66,7 +66,7 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Email', CRM_Utils_Array::value('id', $params), $params);
 
@@ -119,7 +119,7 @@ WHERE  contact_id = {$params['contact_id']}
    * @access public
    * @static
    */
-  static function &getValues($entityBlock) {
+  public static function &getValues($entityBlock) {
     return CRM_Core_BAO_Block::getValues('email', $entityBlock);
   }
 
@@ -134,7 +134,7 @@ WHERE  contact_id = {$params['contact_id']}
    * @access public
    * @static
    */
-  static function allEmails($id, $updateBlankLocInfo = FALSE) {
+  public static function allEmails($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {
       return NULL;
     }
@@ -191,7 +191,7 @@ ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
    * @access public
    * @static
    */
-  static function allEntityEmails(&$entityElements) {
+  public static function allEntityEmails(&$entityElements) {
     if (empty($entityElements)) {
       return NULL;
     }
@@ -239,7 +239,7 @@ ORDER BY e.is_primary DESC, email_id ASC ";
    * @return void
    * @static
    */
-  static function holdEmail(&$email) {
+  public static function holdEmail(&$email) {
     //check for update mode
     if ($email->id) {
       $params = array(1 => array($email->id, 'Integer'));
@@ -286,7 +286,7 @@ AND    reset_date IS NULL
    * @access public
    * @static
    */
-  static function getFromEmail() {
+  public static function getFromEmail() {
     $session         = CRM_Core_Session::singleton();
     $contactID       = $session->get('userID');
     $fromEmailValues = array();
@@ -323,14 +323,14 @@ AND    reset_date IS NULL
   /**
    * @return object
    */
-  static function isMultipleBulkMail() {
+  public static function isMultipleBulkMail() {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'civimail_multiple_bulk_emails', NULL, FALSE);
   }
 
   /**
    * Call common delete function
    */
-  static function del($id) {
+  public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);
   }
 }

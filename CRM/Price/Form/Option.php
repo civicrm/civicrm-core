@@ -81,7 +81,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @return array   array of default values
    * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_action == CRM_Core_Action::DELETE) {
       return;
     }
@@ -284,7 +284,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @static
    * @access public
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     $errors = array();
     if (!empty($fields['count']) && !empty($fields['max_value']) &&
       $fields['count'] > $fields['max_value']

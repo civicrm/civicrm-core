@@ -7,7 +7,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
   public $price_fields_for_event;
   public $_values = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     $this->cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -17,7 +17,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     }
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->price_fields_for_event = array();
     foreach ($this->cart->get_main_event_participants() as $participant) {
       $form = new CRM_Event_Cart_Form_MerParticipant($participant);
@@ -55,7 +55,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
    *
    * @return null
    */
-  static function primary_email_from_contact($contact) {
+  public static function primary_email_from_contact($contact) {
     foreach ($contact->email as $email) {
       if ($email['is_primary']) {
         return $email['email'];
@@ -70,7 +70,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
    *
    * @return array
    */
-  function build_price_options($event) {
+  public function build_price_options($event) {
     $price_fields_for_event = array();
     $base_field_name = "event_{$event->id}_amount";
     $price_set_id = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event->id);
@@ -91,7 +91,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
   /**
    * @return bool
    */
-  function validate() {
+  public function validate() {
     parent::validate();
     if ($this->_errors) {
       return FALSE;
@@ -184,7 +184,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     return $defaults;
   }
 
-  function postProcess() {
+  public function postProcess() {
     if (!array_key_exists('event', $this->_submitValues)) {
       return;
     }

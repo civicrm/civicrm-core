@@ -39,7 +39,7 @@ class CRM_Upgrade_Incremental_php_FourFive {
    *
    * @return bool
    */
-  function verifyPreDBstate(&$errors) {
+  public function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
@@ -55,7 +55,7 @@ class CRM_Upgrade_Incremental_php_FourFive {
    *
    * @return void
    */
-  function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
   }
 
   /**
@@ -65,7 +65,7 @@ class CRM_Upgrade_Incremental_php_FourFive {
    * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
    * @return void
    */
-  function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.5.alpha1') {
       $postUpgradeMessage .= '<br /><br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Contributions - Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Contributions - Recurring Start and End Notification</li><li>Contributions - Recurring Updates</li><li>Memberships - Receipt (on-line)</li><li>Memberships - Signup and Renewal Receipts (off-line)</li><li>Pledges - Acknowledgement</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages). (<a href="%1">learn more...</a>)', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Updating+System+Workflow+Message+Templates+after+Upgrades+-+method+1+-+kdiff'));
       $postUpgradeMessage .= '<br /><br />' . ts('This release allows you to view and edit multiple-record custom field sets in a table format which will be more usable in some cases. You can try out the format by navigating to Administer > Custom Data & Screens > Custom Fields. Click Settings for a custom field set and change Display Style to "Tab with Tables".');
@@ -84,7 +84,7 @@ class CRM_Upgrade_Incremental_php_FourFive {
    *
    * @return bool
    */
-  function upgrade_4_5_alpha1($rev) {
+  public function upgrade_4_5_alpha1($rev) {
     // task to process sql
     $this->addTask(ts('Migrate honoree information to module_data'), 'migrateHonoreeInfo');
     $this->addTask(ts('Upgrade DB to 4.5.alpha1: SQL'), 'task_4_5_x_runSql', $rev);
@@ -122,7 +122,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @return bool
    */
-  function upgrade_4_5_beta9($rev) {
+  public function upgrade_4_5_beta9($rev) {
     $this->addTask(ts('Upgrade DB to 4.5.beta9: SQL'), 'task_4_5_x_runSql', $rev);
 
     $entityTable = array(
@@ -156,7 +156,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @return bool
    */
-  static function task_4_5_0_fixLineItem(CRM_Queue_TaskContext $ctx, $startId, $endId, $entityTable) {
+  public static function task_4_5_0_fixLineItem(CRM_Queue_TaskContext $ctx, $startId, $endId, $entityTable) {
 
     $sqlParams = array(
       1 => array($startId, 'Integer'),
@@ -224,7 +224,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @return bool TRUE for success
    */
-  static function addNameFieldOptions(CRM_Queue_TaskContext $ctx) {
+  public static function addNameFieldOptions(CRM_Queue_TaskContext $ctx) {
     $query = "SELECT `value` FROM `civicrm_setting` WHERE `group_name` = 'CiviCRM Preferences' AND `name` = 'contact_edit_options'";
     $dao = CRM_Core_DAO::executeQuery($query);
     $dao->fetch();
@@ -247,7 +247,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @return bool TRUE for success
    */
-  static function migrateHonoreeInfo(CRM_Queue_TaskContext $ctx) {
+  public static function migrateHonoreeInfo(CRM_Queue_TaskContext $ctx) {
     $query = "ALTER TABLE `civicrm_uf_join`
     ADD COLUMN `module_data` longtext COMMENT 'Json serialized array of data used by the ufjoin.module'";
       CRM_Core_DAO::executeQuery($query);
@@ -304,7 +304,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
   /**
    * (Queue Task Callback)
    */
-  static function task_4_5_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
+  public static function task_4_5_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
 

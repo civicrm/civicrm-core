@@ -111,7 +111,7 @@ LEFT  JOIN civicrm_component comp
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $compID = CRM_Utils_Request::retrieve('compid', 'Positive', $this);
     $grouping = CRM_Utils_Request::retrieve('grp', 'String', $this);
     $rows = self::info($compID, $grouping);

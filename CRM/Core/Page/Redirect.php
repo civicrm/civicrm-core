@@ -12,7 +12,7 @@
  * @endcoe
  */
 class CRM_Core_Page_Redirect extends CRM_Core_Page {
-  function run($path = NULL, $pageArgs = array()) {
+  public function run($path = NULL, $pageArgs = array()) {
     $url = self::createUrl($path, $_REQUEST, $pageArgs, TRUE);
     // return $url;
     CRM_Utils_System::redirect($url);

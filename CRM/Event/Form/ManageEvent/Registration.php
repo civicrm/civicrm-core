@@ -56,7 +56,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_addProfileBottom = CRM_Utils_Array::value('addProfileBottom', $_GET, FALSE);
     $this->_profileBottomNum = CRM_Utils_Array::value('addProfileNum', $_GET, 0);
     $this->_addProfileBottomAdd = CRM_Utils_Array::value('addProfileBottomAdd', $_GET, FALSE);
@@ -97,7 +97,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_addProfileBottom || $this->_addProfileBottomAdd) {
       return;
     }
@@ -210,7 +210,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @return void
    */
-  function setShowHide($defaults) {
+  public function setShowHide($defaults) {
     $this->_showHide = new CRM_Core_ShowHideBlocks(array('registration' => 1),
       ''
     );
@@ -322,7 +322,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @static
    */
-  function buildRegistrationBlock(&$form) {
+  public function buildRegistrationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
     $attributes['intro_text']['click_wysiwyg'] = true;
     $form->addWysiwyg('intro_text', ts('Introductory Text'), $attributes['intro_text']);
@@ -354,7 +354,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @param string $label Label
    * @param array $configs Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes()
    **/
-  function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = null) {
+  public function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = null) {
     extract( ( is_null($configs) ) ? self::getProfileSelectorTypes() : $configs );
     $element = $prefix . "custom_post_id_multiple[$count]";
     $label .= '<br />'.ts('(bottom of page)');
@@ -366,7 +366,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @return array( 'allowCoreTypes' => array(), 'allowSubTypes' => array(), 'profileEntities' => array() )
    **/
-  static function getProfileSelectorTypes() {
+  public static function getProfileSelectorTypes() {
     $configs = array(
       'allowCoreTypes' => array(),
       'allowSubTypes' => array(),
@@ -397,7 +397,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @static
    */
-  function buildConfirmationBlock(&$form) {
+  public function buildConfirmationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
     $attributes['confirm_text']['click_wysiwyg'] = true;
     // CRM-11182 - Optional confirmation page for free events
@@ -425,7 +425,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @static
    */
-  function buildMailBlock(&$form) {
+  public function buildMailBlock(&$form) {
     $form->registerRule('emailList', 'callback', 'emailList', 'CRM_Utils_Rule');
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
     $form->addYesNo('is_email_confirm', ts('Send Confirmation Email?'), NULL, NULL, array('onclick' => "return showHideByValue('is_email_confirm','','confirmEmail','block','radio',false);"));
@@ -442,7 +442,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * @param CRM_Core_Form $form
    */
-  function buildThankYouBlock(&$form) {
+  public function buildThankYouBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
     $attributes['thankyou_text']['click_wysiwyg'] = true;
     $form->add('text', 'thankyou_title', ts('Title'), $attributes['thankyou_title']);
@@ -464,7 +464,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     if ($this->_addProfileBottom || $this->_addProfileBottomAdd) {
       return;
     }
@@ -482,7 +482,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @static
    * @access public
    */
-  static function formRule($values, $files, $form) {
+  public static function formRule($values, $files, $form) {
     if (!empty($values['is_online_registration'])) {
 
       if (!$values['confirm_title']) {
@@ -669,7 +669,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @param $profileIds
    * @return boolean
    */
-  static function getEmailFields($profileIds) {
+  public static function getEmailFields($profileIds) {
     $emailFields = array();
     foreach ($profileIds as $profileId) {
       if ($profileId && is_numeric($profileId)) {
@@ -690,7 +690,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @param $profileIds
    * @return boolean
    */
-  static function isProfileComplete($profileIds) {
+  public static function isProfileComplete($profileIds) {
     $profileReqFields = array();
     foreach ($profileIds as $profileId) {
       if ($profileId && is_numeric($profileId)) {
@@ -726,7 +726,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @return boolean
    */
 
-  function canProfilesDedupe($profileIds, $rgId = 0) {
+  public function canProfilesDedupe($profileIds, $rgId = 0) {
 
     // find the unsupervised rule
 
@@ -804,7 +804,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * Add additional profiles from the form to an array of profile ids.
    *
    */
-  static function addMultipleProfiles(&$profileIds, $values, $field) {
+  public static function addMultipleProfiles(&$profileIds, $values, $field) {
     if ($multipleProfiles = CRM_Utils_Array::value($field, $values)) {
       foreach ($multipleProfiles as $profileId) {
         $profileIds[] = $profileId;

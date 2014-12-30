@@ -68,7 +68,7 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     self::preProcessCommon($this);
   }
 
@@ -76,7 +76,7 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
    * @param CRM_Core_Form $form
    * @param bool $useTable
    */
-  static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form, $useTable = FALSE) {
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
     $form->_task = CRM_Utils_Array::value('task', $values);
@@ -146,7 +146,7 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
+  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
         array(
           'type' => $nextType,

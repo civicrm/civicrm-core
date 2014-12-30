@@ -43,7 +43,7 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @throws Exception
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
@@ -79,14 +79,14 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @return void
    */
-  static function setDefaultValues(&$form) {
+  public static function setDefaultValues(&$form) {
     return $defaults = array();
   }
 
   /**
    * @param CRM_Core_Form $form
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     $form->add('text', 'link_to_case_id', ts('Link To Case'), array('class' => 'huge'), TRUE);
   }
 
@@ -102,7 +102,7 @@ class CRM_Case_Form_Activity_LinkCases {
    * @static
    * @access public
    */
-  static function formRule($values, $files, $form) {
+  public static function formRule($values, $files, $form) {
     $errors = array();
 
     $linkCaseId = CRM_Utils_Array::value('link_to_case_id', $values);
@@ -130,7 +130,7 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @return void
    */
-  static function beginPostProcess(&$form, &$params) {}
+  public static function beginPostProcess(&$form, &$params) {}
 
   /**
    * Process the form submission
@@ -143,7 +143,7 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @return void
    */
-  static function endPostProcess(&$form, &$params, &$activity) {
+  public static function endPostProcess(&$form, &$params, &$activity) {
     $activityId = $activity->id;
     $linkCaseID = CRM_Utils_Array::value('link_to_case_id', $params);
 

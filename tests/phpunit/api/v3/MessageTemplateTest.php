@@ -40,7 +40,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   protected $params;
 
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
     $this->useTransaction(TRUE);

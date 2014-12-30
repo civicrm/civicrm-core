@@ -50,7 +50,7 @@ class CRM_Utils_ICalendar {
    * @return  Escaped text
    *
    */
-  static function formatText($text) {
+  public static function formatText($text) {
     $text = strip_tags($text);
     $text = str_replace("\"", "DQUOTE", $text);
     $text = str_replace("\\", "\\\\", $text);
@@ -70,7 +70,7 @@ class CRM_Utils_ICalendar {
    *
    * @return  Escaped date
    */
-  static function formatDate($date, $gdata = FALSE) {
+  public static function formatDate($date, $gdata = FALSE) {
 
     if ($gdata) {
       return date("Y-m-d\TH:i:s.000",
@@ -100,7 +100,7 @@ class CRM_Utils_ICalendar {
    *
    * @return void
    */
-  static function send($calendar, $content_type = 'text/calendar', $charset = 'us-ascii', $fileName = NULL, $disposition = NULL) {
+  public static function send($calendar, $content_type = 'text/calendar', $charset = 'us-ascii', $fileName = NULL, $disposition = NULL) {
     $config = CRM_Core_Config::singleton();
     $lang = $config->lcMessages;
     header("Content-Language: $lang");

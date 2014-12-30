@@ -460,7 +460,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    * @access public
    * @static
    */
-  static function formRule($params) {
+  public static function formRule($params) {
     $errors = array();
     if ($params['membership_type_id'][0] == 0) {
       $errors['membership_type_id'] = ts('Oops. It looks like you are trying to change the membership type while renewing the membership. Please click the "change membership type" link, and select a Membership Organization.');

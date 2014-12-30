@@ -70,7 +70,7 @@ class CRM_Admin_Form_ParticipantStatus extends CRM_Admin_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if (empty($defaults['weight'])) {
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Event_DAO_ParticipantStatusType');
@@ -82,7 +82,7 @@ class CRM_Admin_Form_ParticipantStatus extends CRM_Admin_Form {
     return $defaults;
   }
 
-  function postProcess() {
+  public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       if (CRM_Event_BAO_ParticipantStatusType::deleteParticipantStatusType($this->_id)) {
         CRM_Core_Session::setStatus(ts('Selected participant status has been deleted.'), ts('Record Deleted'), 'success');

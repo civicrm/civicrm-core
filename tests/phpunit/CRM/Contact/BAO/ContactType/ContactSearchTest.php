@@ -7,7 +7,7 @@ require_once 'CiviTest/Contact.php';
  */
 class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $students = 'indivi_student'.substr(sha1(rand()), 0, 7);
     $params = array(
@@ -90,7 +90,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
    * Search with only type
    * success expected.
    */
-  function testSearchWithType() {
+  public function testSearchWithType() {
 
     // for type:Individual
     $params   = array('contact_type' => 'Individual', 'version' => 3);
@@ -154,7 +154,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
    * Search with only subtype
    * success expected.
    */
-  function testSearchWithSubype() {
+  public function testSearchWithSubype() {
 
     // for subtype:Student
     $params   = array('contact_sub_type' => $this->student, 'version' => 3);
@@ -201,7 +201,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
    * Search with type as well as subtype
    * success expected.
    */
-  function testSearchWithTypeSubype() {
+  public function testSearchWithTypeSubype() {
 
     // for type:individual subtype:Student
     $params   = array('contact_sub_type' => $this->student, 'version' => 3);
@@ -247,7 +247,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
   /**
    * Search with invalid type or subtype
    */
-  function testSearchWithInvalidData() {
+  public function testSearchWithInvalidData() {
     // for invalid type
     $params   = array('contact_type' => 'Invalid' . CRM_Core_DAO::VALUE_SEPARATOR . 'Invalid', 'version' => 3);
     $result   = civicrm_api('contact', 'get', $params);
@@ -281,7 +281,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
   /**
    * Search with wrong type or subtype
    */
-  function testSearchWithWrongdData() {
+  public function testSearchWithWrongdData() {
 
     // for type:Individual subtype:Sponsor
     $defaults = array();

@@ -35,7 +35,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddActivityToCase() {
+  public function testAddActivityToCase() {
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 
@@ -81,7 +81,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->_testAddNewActivity($contact['first_name'], $subject, $customGroupTitle, $contact['sort_name']);
   }
 
-  function testLinkCases() {
+  public function testLinkCases() {
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 
@@ -192,7 +192,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
    * @param $customGroupTitle
    * @param $contactName
    */
-  function _testAddNewActivity($firstName, $caseSubject, $customGroupTitle, $contactName) {
+  public function _testAddNewActivity($firstName, $caseSubject, $customGroupTitle, $contactName) {
     $customDataParams = $this->_addCustomData($customGroupTitle);
     //$customDataParams = array( 'optionLabel_47d58', 'custom_8_-1' );
 
@@ -332,7 +332,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _addCustomData($customGroupTitle) {
+  public function _addCustomData($customGroupTitle) {
 
     $this->openCiviPage('admin/custom/group', 'reset=1');
 

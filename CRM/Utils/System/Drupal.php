@@ -49,7 +49,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @access public
    *
    */
-  function createUser(&$params, $mail) {
+  public function createUser(&$params, $mail) {
     $form_state = form_state_defaults();
 
     $form_state['input'] = array(
@@ -108,7 +108,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @param int $ufID
    * @param string $ufName
    */
-  function updateCMSName($ufID, $ufName) {
+  public function updateCMSName($ufID, $ufName) {
     // CRM-5555
     if (function_exists('user_load')) {
       $user = user_load($ufID);
@@ -128,7 +128,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *
    * @return void
    */
-  static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
+  public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
 
     $dao    = new CRM_Core_DAO();
@@ -187,7 +187,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *
    * @return null|string
    */
-  function getLoginDestination(&$form) {
+  public function getLoginDestination(&$form) {
     $args = NULL;
 
     $id = $form->get('id');
@@ -242,7 +242,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @return void
    * @access public
    */
-  function setTitle($title, $pageTitle = NULL) {
+  public function setTitle($title, $pageTitle = NULL) {
     if (arg(0) == 'civicrm') {
       if (!$pageTitle) {
         $pageTitle = $title;
@@ -262,7 +262,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @return void
    * @access public
    */
-  function appendBreadCrumb($breadCrumbs) {
+  public function appendBreadCrumb($breadCrumbs) {
     $breadCrumb = drupal_get_breadcrumb();
 
     if (is_array($breadCrumbs)) {
@@ -290,7 +290,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @return void
    * @access public
    */
-  function resetBreadCrumb() {
+  public function resetBreadCrumb() {
     $bc = array();
     drupal_set_breadcrumb($bc);
   }
@@ -303,7 +303,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @return void
    * @access public
    */
-  function addHTMLHead($header) {
+  public function addHTMLHead($header) {
     static $count = 0;
     if (!empty($header)) {
       $key = 'civi_' . ++$count;
@@ -421,7 +421,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @return void
    * @access public
    */
-  function mapConfigToSSL() {
+  public function mapConfigToSSL() {
     global $base_url;
     $base_url = str_replace('http://', 'https://', $base_url);
   }
@@ -434,7 +434,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @return string the url to post the form
    * @access public
    */
-  function postURL($action) {
+  public function postURL($action) {
     if (!empty($action)) {
       return $action;
     }
@@ -456,7 +456,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *  contactID, ufID, unique string ) if success
    * @access public
    */
-   static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+   public static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     require_once 'DB.php';
 
     $config = CRM_Core_Config::singleton();
@@ -535,7 +535,7 @@ AND    u.status = 1
    *
    * @return bool
    */
-  function loadUser($username) {
+  public function loadUser($username) {
     global $user;
 
     $user = user_load_by_name($username);
@@ -563,7 +563,7 @@ AND    u.status = 1
    *
    * FIXME: Document values accepted/required by $params
    */
-  function userLoginFinalize($params = array()){
+  public function userLoginFinalize($params = array()){
     user_login_finalize($params);
   }
 
@@ -573,7 +573,7 @@ AND    u.status = 1
    * @param string $username
    * @return int|NULL
    */
-  function getUfId($username) {
+  public function getUfId($username) {
     $user = user_load_by_name($username);
     if (empty($user->uid)) {
       return NULL;
@@ -588,19 +588,19 @@ AND    u.status = 1
    *
    * @access public
    */
-  function setMessage($message) {
+  public function setMessage($message) {
     drupal_set_message($message);
   }
 
   /**
    * @return mixed
    */
-  function logout() {
+  public function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
   }
 
-  function updateCategories() {
+  public function updateCategories() {
     // copied this from profile.module. Seems a bit inefficient, but i dont know a better way
     // CRM-3600
     cache_clear_all();
@@ -612,7 +612,7 @@ AND    u.status = 1
    *
    * @return string
    */
-  function getDefaultBlockLocation() {
+  public function getDefaultBlockLocation() {
     return 'sidebar_first';
   }
 
@@ -621,7 +621,7 @@ AND    u.status = 1
    *
    * @return string  with the locale or null for none
    */
-  function getUFLocale() {
+  public function getUFLocale() {
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
     // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
     // sometimes for CLI based on order called, this might not be set and/or empty
@@ -649,7 +649,7 @@ AND    u.status = 1
   /**
    * @return string
    */
-  function getVersion() {
+  public function getVersion() {
     return defined('VERSION') ? VERSION : 'Unknown';
   }
 
@@ -663,7 +663,7 @@ AND    u.status = 1
    *
    * @return bool
    */
-  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+  public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
     $cmsPath = $this->cmsRootPath($realPath);
 
@@ -763,7 +763,7 @@ AND    u.status = 1
   /**
    *
    */
-  function cmsRootPath($scriptFilename = NULL) {
+  public function cmsRootPath($scriptFilename = NULL) {
     $cmsRoot = $valid = NULL;
 
     if (!is_null($scriptFilename)) {
@@ -852,7 +852,7 @@ AND    u.status = 1
    * @return string $url, formatted url.
    * @static
    */
-  function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
+  public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
       return $url;
     }
@@ -923,7 +923,7 @@ AND    u.status = 1
    *
    * @return void
    */
-  function replacePermission($oldPerm, $newPerms) {
+  public function replacePermission($oldPerm, $newPerms) {
     $roles = user_roles(FALSE, $oldPerm);
     if (!empty($roles)) {
       foreach (array_keys($roles) as $rid) {
@@ -938,7 +938,7 @@ AND    u.status = 1
    *
    * @return array CRM_Core_Module
    */
-  function getModules() {
+  public function getModules() {
     $result = array();
     $q = db_query('SELECT name, status FROM {system} WHERE type = \'module\' AND schema_version <> -1');
     foreach ($q as $row) {
@@ -953,7 +953,7 @@ AND    u.status = 1
    * @param integer $ogID Organic Group ID
    * @param integer $drupalID drupal User ID
    */
-  function og_membership_create($ogID, $drupalID){
+  public function og_membership_create($ogID, $drupalID){
     if (function_exists('og_entity_query_alter')) {
       // sort-of-randomly chose a function that only exists in the // 7.x-2.x branch
       //
@@ -974,7 +974,7 @@ AND    u.status = 1
    * @param integer $ogID Organic Group ID
    * @param integer $drupalID drupal User ID
    */
-  function og_membership_delete($ogID, $drupalID) {
+  public function og_membership_delete($ogID, $drupalID) {
     if (function_exists('og_entity_query_alter')) {
       // sort-of-randomly chose a function that only exists in the 7.x-2.x branch
       // TODO: Find a more solid way to make this test
@@ -990,7 +990,7 @@ AND    u.status = 1
    * Over-ridable function to get timezone as a string eg.
    * @return string Timezone e.g. 'America/Los_Angeles'
    */
-  function getTimeZoneString() {
+  public function getTimeZoneString() {
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
@@ -1006,7 +1006,7 @@ AND    u.status = 1
    * Reset any system caches that may be required for proper CiviCRM
    * integration.
    */
-  function flush() {
+  public function flush() {
     drupal_flush_all_caches();
   }
 }

@@ -35,7 +35,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContactContextActivityAdd() {
+  public function testContactContextActivityAdd() {
     $this->webtestLogin();
 
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
@@ -147,7 +147,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     );
   }
 
-  function testSeparateActivityForMultiTargetContacts() {
+  public function testSeparateActivityForMultiTargetContacts() {
     $this->webtestLogin();
 
     //creating contacts

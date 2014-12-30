@@ -35,7 +35,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddPriceSet() {
+  public function testAddPriceSet() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -70,7 +70,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
    * @param $setHelp
    * @param string $financialType
    */
-  function _testAddSet($setTitle, $usedFor, $setHelp, $financialType = 'Event Fee') {
+  public function _testAddSet($setTitle, $usedFor, $setHelp, $financialType = 'Event Fee') {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
@@ -95,7 +95,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
    * @param $validateStrings
    * @param bool $dateSpecificFields
    */
-  function _testAddPriceFields(&$fields, &$validateStrings, $dateSpecificFields = FALSE) {
+  public function _testAddPriceFields(&$fields, &$validateStrings, $dateSpecificFields = FALSE) {
     $this->clickLinkSuppressPopup('newPriceField');
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
@@ -184,7 +184,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
    * @param $validateStrings
    * @param int $sid
    */
-  function _testVerifyPriceSet($validateStrings, $sid) {
+  public function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
     $this->openCiviPage('admin/price', 'reset=1');
@@ -196,7 +196,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent($validateStrings);
   }
 
-  function testRegisterWithPriceSet() {
+  public function testRegisterWithPriceSet() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -356,7 +356,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->click('_qf_ParticipantView_cancel-bottom');
   }
 
-  function testParticipantWithDateSpecificPriceSet() {
+  public function testParticipantWithDateSpecificPriceSet() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -505,7 +505,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
    *
    */
-  function testEventWithPriceSet() {
+  public function testEventWithPriceSet() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -680,7 +680,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
   }
 
 
-  function testDeletePriceSetforEventTemplate() {
+  public function testDeletePriceSetforEventTemplate() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -749,7 +749,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
   /**
    * @param array $expectedLineItems
    */
-  function _checkLineItems($expectedLineItems) {
+  public function _checkLineItems($expectedLineItems) {
     foreach ($expectedLineItems as $lineKey => $lineValue) {
       foreach ($lineValue as $key => $value) {
         $this->verifyText("xpath=//table/tbody//tr/td[text()='Selections']/following-sibling::td/table/tbody//tr[$lineKey]/td[$key]", preg_quote($value));

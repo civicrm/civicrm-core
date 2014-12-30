@@ -49,7 +49,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   public $_permission = NULL;
   public $_contactId = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
@@ -102,7 +102,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function view() {
+  public function view() {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Case_Form_CaseView',
       'View Case',
@@ -146,7 +146,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function browse() {
+  public function browse() {
 
     $controller = new CRM_Core_Controller_Simple('CRM_Case_Form_Search', ts('Case'), NULL);
     $controller->setEmbedded(TRUE);
@@ -170,7 +170,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function edit() {
+  public function edit() {
     $config = CRM_Core_Config::singleton();
 
     $controller = new CRM_Core_Controller_Simple(
@@ -191,7 +191,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function run() {
+  public function run() {
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullArray);
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
@@ -233,7 +233,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * @static
    */
   static
-  function &links() {
+  public function &links() {
     $config = CRM_Core_Config::singleton();
 
     if (!(self::$_links)) {
@@ -257,7 +257,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     return self::$_links;
   }
 
-  function setContext() {
+  public function setContext() {
     $context = $this->get('context');
     $url = NULL;
 

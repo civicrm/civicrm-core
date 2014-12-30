@@ -6,11 +6,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_StringTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testStripPathChars() {
+  public function testStripPathChars() {
     $testSet = array(
       '' => '',
       NULL => NULL,
@@ -28,7 +28,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     }
   }
 
-  function testExtractName() {
+  public function testExtractName() {
     $cases = array(
       array(
         'full_name' => 'Alan',
@@ -77,7 +77,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     }
   }
 
-  function testEllipsify() {
+  public function testEllipsify() {
     $maxLen = 5;
     $cases = array(
       '1' => '1',
@@ -89,7 +89,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     }
   }
 
-  function testRandom() {
+  public function testRandom() {
     for ($i = 0; $i < 4; $i++) {
       $actual = CRM_Utils_String::createRandom(4, 'abc');
       $this->assertEquals(4, strlen($actual));
@@ -121,7 +121,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function booleanDataProvider() {
+  public function booleanDataProvider() {
     $cases = array(); // array(0 => $input, 1 => $expectedOutput)
     $cases[] = array(TRUE, TRUE);
     $cases[] = array(FALSE, FALSE);
@@ -151,7 +151,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @param $expected bool
    * @dataProvider booleanDataProvider
    */
-  function testStrToBool($input, $expected) {
+  public function testStrToBool($input, $expected) {
     $actual = CRM_Utils_String::strtobool($input);
     $this->assertTrue($expected === $actual);
   }

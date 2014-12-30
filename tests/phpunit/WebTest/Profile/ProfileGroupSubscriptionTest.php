@@ -35,7 +35,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     parent::setUp();
   }
 
-  function testProfileGroupSubscription() {
+  public function testProfileGroupSubscription() {
     $this->webtestLogin();
 
     // Add new profile.
@@ -135,7 +135,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
   /**
    * @param $profileTitle
    */
-  function _testdeleteProfile($profileTitle) {
+  public function _testdeleteProfile($profileTitle) {
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div[1]/table/tbody//tr/td[1]/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[5]/a[text()='Delete']");
     $this->click("xpath=//div[@id='user-profiles']/div/div[1]/table/tbody//tr/td[1]/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[5]/a[text()='Delete']");
     $this->waitForElementPresent('_qf_Group_next-bottom');

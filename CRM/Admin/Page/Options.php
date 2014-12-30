@@ -88,7 +88,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     if (!self::$_gName && !empty($this->urlPath[3])) {
       self::$_gName = $this->urlPath[3];
     }
@@ -168,7 +168,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return self::$_gName ? 'CRM_Core_BAO_OptionValue' : 'CRM_Core_BAO_OptionGroup';
   }
 
@@ -177,7 +177,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -223,7 +223,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
@@ -236,7 +236,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     if (!self::$_gName) {
       return parent::browse();
     }
@@ -265,7 +265,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return self::$_gName ? 'CRM_Admin_Form_Options' : 'CRM_Admin_Form_OptionGroup';
   }
 
@@ -274,7 +274,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return self::$_gLabel;
   }
 
@@ -285,7 +285,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/options' . (self::$_gName ? '/' . self::$_gName : '');
   }
 }

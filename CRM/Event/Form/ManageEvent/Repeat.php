@@ -24,7 +24,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
   protected $_parentEventEndDate = NULL;
 
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     CRM_Core_Form_RecurringEntity::preProcess('civicrm_event');
     $this->assign('currentEventId', $this->_id);
@@ -80,7 +80,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    *
    * @return None
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     //Always pass current event's start date by default

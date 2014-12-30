@@ -187,7 +187,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    *
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id         = $this->get('id');
     $this->_profileIds = $this->get('profileIds');
     $this->_grid       = CRM_Utils_Request::retrieve('grid', 'Integer', $this);
@@ -413,7 +413,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultsValues() {
+  public function setDefaultsValues() {
     $this->_defaults = array();
     if ($this->_multiRecordProfile && ($this->_multiRecord == CRM_Core_Action::DELETE)) {
       return;
@@ -835,7 +835,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    *
    * @return array
    */
-  static function validateContactActivityProfile($activityId, $contactId, $gid) {
+  public static function validateContactActivityProfile($activityId, $contactId, $gid) {
     $errors = array();
     if (!$activityId) {
       $errors[] = 'Profile is using one or more activity fields, and is missing the activity Id (aid) in the URL.';
@@ -877,7 +877,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     CRM_Utils_Hook::validateProfile($form->_ufGroup['name']);
 
     $errors = array();
@@ -1313,7 +1313,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = NULL) {
+  public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Form/{$this->_gid}/{$this->_name}.{$suffix}tpl";
       $template = CRM_Core_Form::getTemplate();
@@ -1342,7 +1342,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -1357,7 +1357,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   /**
    * @return string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }

@@ -53,7 +53,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
 
     // UI for selecting columns to appear in the report list
     // Array containing the columns, group_bys and filters build and provided to Form
@@ -197,7 +197,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $groupBys = FALSE;
     $this->_columnHeaders = array();
@@ -328,7 +328,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM  civicrm_membership {$this->_aliases['civicrm_membership']}
 
@@ -344,13 +344,13 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
   // end of from
 
-  function where() {
+  public function where() {
     $this->_whereClauses[] = "{$this->_aliases['civicrm_membership']}.is_test = 0 AND
                               {$this->_aliases['civicrm_contact']}.is_deleted = 0";
     parent::where();
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "";
     if (is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
@@ -397,7 +397,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     $select = "
         SELECT COUNT({$this->_aliases['civicrm_contribution']}.total_amount ) as count,
@@ -450,14 +450,14 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
     return $statistics;
   }
 
-  function postProcess() {
+  public function postProcess() {
     parent::postProcess();
   }
 
   /**
    * @param $rows
    */
-  function buildChart(&$rows) {
+  public function buildChart(&$rows) {
     $graphRows = array();
     $count = 0;
     $membershipTypeValues = CRM_Member_PseudoConstant::membershipType();
@@ -535,7 +535,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {

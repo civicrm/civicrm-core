@@ -109,7 +109,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     $resourceManager = CRM_Core_Resources::singleton();
     if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
       $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
@@ -213,7 +213,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function edit($action) {
+  public function edit($action) {
     // create a simple controller for editing CiviCRM Profile data
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Field', ts('CiviCRM Profile Field'), $action);
 
@@ -238,7 +238,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the group id
     $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive',
       $this, FALSE, 0
@@ -289,7 +289,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function preview($fieldId, $groupId) {
+  public function preview($fieldId, $groupId) {
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Preview', ts('Preview Custom Data'), CRM_Core_Action::PREVIEW);
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/uf/group/field',

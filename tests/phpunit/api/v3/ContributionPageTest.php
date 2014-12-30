@@ -81,7 +81,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
+  public function tearDown() {
     foreach ($this->contactIds as $id) {
       $this->callAPISuccess('contact', 'delete', array('id' => $id));
     }
@@ -375,7 +375,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Set up membership contribution page
    * @param bool $isSeparatePayment
    */
-  function setUpMembershipContributionPage($isSeparatePayment = FALSE) {
+  public function setUpMembershipContributionPage($isSeparatePayment = FALSE) {
     $this->setUpMembershipBlockPriceSet();
     $this->params['payment_processor_id'] = $this->_ids['payment_processor'] = $this->paymentProcessorCreate(array(
       'payment_processor_type_id' => 'Dummy',
@@ -399,7 +399,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * The default data set does not include a complete default membership price set - not quite sure why
    * This function ensures it exists & populates $this->_ids with it's data
    */
-  function setUpMembershipBlockPriceSet() {
+  public function setUpMembershipBlockPriceSet() {
     $this->_ids['price_set'][] = $this->callAPISuccess('price_set', 'getvalue', array('name' => 'default_membership_type_amount', 'return' => 'id'));
     if (empty($this->_ids['membership_type'])) {
       $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 2)));
@@ -429,7 +429,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Help function to set up contribution page with some defaults
    */
-  function setUpContributionPage() {
+  public function setUpContributionPage() {
     $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     if (empty($this->_ids['price_set'])) {
       $priceSet = $this->callAPISuccess('price_set', 'create', $this->_priceSetParams);

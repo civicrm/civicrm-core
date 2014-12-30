@@ -54,7 +54,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     //create mode only as we don't support editing line items
 
     CRM_Utils_Hook::pre('create', 'LineItem', $params['entity_id'], $params);
@@ -82,7 +82,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $lineItem = new CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem();
     $lineItem->copyValues($params);
     if ($lineItem->find(TRUE)) {
@@ -103,7 +103,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    *
    * @return array of line items
    */
-  static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL) {
+  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL) {
     $selectClause = $whereClause = $fromClause = NULL;
 
     $selectClause = "
@@ -181,7 +181,7 @@ WHERE     %2.id = %1";
    * @return void
    * @access static
    */
-  static function format($fid, &$params, &$fields, &$values) {
+  public static function format($fid, &$params, &$fields, &$values) {
     if (empty($params["price_{$fid}"])) {
       return;
     }

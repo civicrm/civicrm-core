@@ -59,7 +59,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *
    * @return \CRM_Core_Payment_PaymentExpress
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
 
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
@@ -78,7 +78,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    * @return object
    * @static
    */
-  static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
+  public static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_PaymentExpress($mode, $paymentProcessor);
@@ -94,7 +94,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    * @return string the error message if any
    * @public
    */
-  function checkConfig() {
+  public function checkConfig() {
     $config = CRM_Core_Config::singleton();
 
     $error = array();
@@ -120,7 +120,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *
    * @throws Exception
    */
-  function setExpressCheckOut(&$params) {
+  public function setExpressCheckOut(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -129,7 +129,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *
    * @throws Exception
    */
-  function getExpressCheckoutDetails($token) {
+  public function getExpressCheckoutDetails($token) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -138,7 +138,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *
    * @throws Exception
    */
-  function doExpressCheckout(&$params) {
+  public function doExpressCheckout(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -151,7 +151,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    * @return array the result in an nice formatted array (or an error object)
    * @abstract
    */
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -165,7 +165,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    * @return void
    * @access public
    */
-  function doTransferCheckout(&$params, $component) {
+  public function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);
     $config = CRM_Core_Config::singleton();
     if ($component != 'contribute' && $component != 'event') {

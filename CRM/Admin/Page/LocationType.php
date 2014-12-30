@@ -53,7 +53,7 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_LocationType';
   }
 
@@ -62,7 +62,7 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -97,7 +97,7 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_LocationType';
   }
 
@@ -106,7 +106,7 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Location Types';
   }
 
@@ -117,7 +117,7 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/locationType';
   }
 }

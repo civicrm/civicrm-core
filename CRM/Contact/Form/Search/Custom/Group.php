@@ -48,7 +48,7 @@ class CRM_Contact_Form_Search_Custom_Group
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     $this->_formValues = $formValues;
     $this->_columns = array(
       ts('Contact ID') => 'contact_id',
@@ -84,7 +84,7 @@ class CRM_Contact_Form_Search_Custom_Group
     $this->_tags = (!empty($this->_includeTags) || !empty($this->_excludeTags));
   }
 
-  function __destruct() {
+  public function __destruct() {
     // mysql drops the tables when connectiomn is terminated
     // cannot drop tables here, since the search might be used
     // in other parts after the object is destroyed
@@ -93,7 +93,7 @@ class CRM_Contact_Form_Search_Custom_Group
   /**
    * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
 
     $this->setTitle(ts('Include / Exclude Search'));
 
@@ -160,7 +160,7 @@ class CRM_Contact_Form_Search_Custom_Group
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array( 'andOr' => '1' );
 
     if (!empty($this->_formValues)) {
@@ -264,7 +264,7 @@ class CRM_Contact_Form_Search_Custom_Group
    * @return string
    * @throws Exception
    */
-  function from() {
+  public function from() {
 
     $iGroups = $xGroups = $iTags = $xTags = 0;
 
@@ -567,7 +567,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
    *
    * @return string
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     if ($includeContactIDs) {
       $contactIDs = array();
 
@@ -598,7 +598,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
   /**
    * @return mixed
    */
-  function count() {
+  public function count() {
     $sql = $this->all();
 
     $dao = CRM_Core_DAO::executeQuery($sql);
@@ -613,35 +613,35 @@ WHERE  gcc.group_id = {$ssGroup->id}
    *
    * @return string
    */
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
   /**
    * @return array
    */
-  function &columns() {
+  public function &columns() {
     return $this->_columns;
   }
 
   /**
    * @return null
    */
-  function summary() {
+  public function summary() {
     return NULL;
   }
 
   /**
    * @return string
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
   /**
    * @param $title
    */
-  function setTitle($title) {
+  public function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
@@ -653,7 +653,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
   /**
    * @param string $tableAlias
    */
-  function buildACLClause($tableAlias = 'contact') {
+  public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 }

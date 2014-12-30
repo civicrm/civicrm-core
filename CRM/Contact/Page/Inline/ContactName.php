@@ -48,7 +48,7 @@ class CRM_Contact_Page_Inline_ContactName extends CRM_Core_Page {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 

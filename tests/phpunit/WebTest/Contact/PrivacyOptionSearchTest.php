@@ -35,7 +35,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testPrivacyOptionSearch() {
+  public function testPrivacyOptionSearch() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

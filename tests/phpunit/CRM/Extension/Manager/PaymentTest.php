@@ -34,7 +34,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
   // new test classes should be compliant.
   public $_eNoticeCompliant = FALSE;
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     if (class_exists('test_extension_manager_paymenttest')) {
       test_extension_manager_paymenttest::$counts = array();
@@ -46,7 +46,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     $this->quickCleanup(array('civicrm_payment_processor'));
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
     $this->system = NULL;
     $this->quickCleanup(array('civicrm_payment_processor'));
@@ -56,7 +56,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   /**
    * Install an extension with a valid type name
    */
-  function testInstallDisableUninstall() {
+  public function testInstallDisableUninstall() {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
     $manager->install(array('test.extension.manager.paymenttest'));
@@ -76,7 +76,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   /**
    * Install an extension with a valid type name
    */
-  function testInstallDisableEnable() {
+  public function testInstallDisableEnable() {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
 
@@ -98,7 +98,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
    * Install an extension and create a payment processor which uses it.
    * Attempts to uninstall fail
    */
-  function testInstall_Add_FailUninstall() {
+  public function testInstall_Add_FailUninstall() {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
 

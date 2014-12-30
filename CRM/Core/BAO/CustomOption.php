@@ -49,7 +49,7 @@ class CRM_Core_BAO_CustomOption {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $customOption = new CRM_Core_DAO_OptionValue();
     $customOption->copyValues($params);
     if ($customOption->find(TRUE)) {
@@ -117,7 +117,7 @@ class CRM_Core_BAO_CustomOption {
    * @static
    * @access public
    */
-  static function getOptionLabel($fieldId, $value, $htmlType = NULL, $dataType = NULL) {
+  public static function getOptionLabel($fieldId, $value, $htmlType = NULL, $dataType = NULL) {
     if (!$fieldId) {
       return NULL;
     }
@@ -168,7 +168,7 @@ WHERE  id = %1
    * @static
    * @access public
    */
-  static function del($optionId) {
+  public static function del($optionId) {
     // get the customFieldID
     $query = "
 SELECT f.id as id, f.data_type as dataType
@@ -212,7 +212,7 @@ WHERE  id = %1";
    *
    * @throws Exception
    */
-  static function updateCustomValues($params) {
+  public static function updateCustomValues($params) {
     $optionDAO = new CRM_Core_DAO_OptionValue();
     $optionDAO->id = $params['optionId'];
     $optionDAO->find(TRUE);
@@ -285,7 +285,7 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
    *
    * @return array
    */
-  static function valuesByID($customFieldID, $optionGroupID = NULL) {
+  public static function valuesByID($customFieldID, $optionGroupID = NULL) {
     if (!$optionGroupID) {
       $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
         $customFieldID,

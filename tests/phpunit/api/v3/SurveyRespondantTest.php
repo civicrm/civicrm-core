@@ -35,7 +35,7 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   protected $params;
 
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
     $phoneBankActivity = $this->callAPISuccess('Option_value', 'Get', array('label' => 'PhoneBank', 'sequential' => 1));

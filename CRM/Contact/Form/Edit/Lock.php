@@ -62,7 +62,7 @@ class CRM_Contact_Form_Edit_Lock {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $contactID = NULL) {
+  public static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();
 
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);

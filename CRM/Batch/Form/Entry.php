@@ -91,7 +91,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_batchId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
@@ -121,7 +121,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     if (!$this->_profileId) {
       CRM_Core_Error::fatal(ts('Profile for bulk data entry is missing.'));
     }
@@ -270,7 +270,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @static
    * @access public
    */
-  static function formRule($params, $files, $self) {
+  public static function formRule($params, $files, $self) {
     $errors = array();
     $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
 
@@ -323,7 +323,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Override default cancel action
    */
-  function cancelAction() {
+  public function cancelAction() {
     // redirect to batch listing
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/batch', 'reset=1'));
     CRM_Utils_System::civiExit();
@@ -336,7 +336,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (empty($this->_fields)) {
       return;
     }
@@ -849,7 +849,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return bool
    */
-  function testProcessMembership($params) {
+  public function testProcessMembership($params) {
     return $this->processMembership($params);
   }
 
@@ -862,7 +862,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return bool
    */
-  function testProcessContribution($params) {
+  public function testProcessContribution($params) {
     return $this->processContribution($params);
   }
 }

@@ -7,7 +7,7 @@ require_once 'CiviTest/Contact.php';
  */
 class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     //create contact subtypes
@@ -79,7 +79,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
     $this->organization_sponsor = Contact::create($params);
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->quickCleanup(array('civicrm_contact'));
 
     $query = "
@@ -94,7 +94,7 @@ DELETE FROM civicrm_contact_type
    * success expected
    *
    */
-  function testRelationshipTypeAddIndiviParent() {
+  public function testRelationshipTypeAddIndiviParent() {
     //check Individual to Parent RelationshipType
     $params = array(
       'name_a_b' => 'indivToparent',
@@ -112,7 +112,7 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($result->id);
   }
 
-  function testRelationshipTypeAddSponcorIndivi() {
+  public function testRelationshipTypeAddSponcorIndivi() {
     //check Sponcor to Individual RelationshipType
     $params = array(
       'name_a_b' => 'SponsorToIndiv',
@@ -130,7 +130,7 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($result->id);
   }
 
-  function testRelationshipTypeAddStudentSponcor() {
+  public function testRelationshipTypeAddStudentSponcor() {
     //check Student to Sponcer RelationshipType
     $params = array(
       'name_a_b' => 'StudentToSponser',
@@ -154,7 +154,7 @@ DELETE FROM civicrm_contact_type
    * Methods create relationshipe within same contact type with invalid Relationships
    *
    */
-  function testRelationshipCreateInvalidWithinSameType() {
+  public function testRelationshipCreateInvalidWithinSameType() {
     //check for Individual to Parent
     $relTypeParams = array(
       'name_a_b' => 'indivToparent',
@@ -182,7 +182,7 @@ DELETE FROM civicrm_contact_type
    * Methods create relationshipe within diff contact type with invalid Relationships
    *
    */
-  function testRelCreateInvalidWithinDiffTypeSpocorIndivi() {
+  public function testRelCreateInvalidWithinDiffTypeSpocorIndivi() {
     //check for Sponcer to Individual
     $relTypeParams = array(
       'name_a_b' => 'SponsorToIndiv',
@@ -206,7 +206,7 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($relType->id);
   }
 
-  function testRelCreateInvalidWithinDiffTypeStudentSponcor() {
+  public function testRelCreateInvalidWithinDiffTypeStudentSponcor() {
     //check for Student to Sponcer
     $relTypeParams = array(
       'name_a_b' => 'StudentToSponser',
@@ -236,7 +236,7 @@ DELETE FROM civicrm_contact_type
    * success expected
    *
    */
-  function testRelationshipCreateWithinSameType() {
+  public function testRelationshipCreateWithinSameType() {
     //check for Individual to Parent
     $relTypeParams = array(
       'name_a_b' => 'indivToparent',
@@ -265,7 +265,7 @@ DELETE FROM civicrm_contact_type
    * success expected
    *
    */
-  function testRelCreateWithinDiffTypeSponsorIndivi() {
+  public function testRelCreateWithinDiffTypeSponsorIndivi() {
     //check for Sponcer to Individual
     $relTypeParams = array(
       'name_a_b' => 'SponsorToIndiv',
@@ -289,7 +289,7 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($relType->id);
   }
 
-  function testRelCreateWithinDiffTypeStudentSponsor() {
+  public function testRelCreateWithinDiffTypeStudentSponsor() {
     //check for Student to Sponcer
     $relTypeParams = array(
       'name_a_b' => 'StudentToSponsor',

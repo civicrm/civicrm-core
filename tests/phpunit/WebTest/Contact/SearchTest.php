@@ -35,7 +35,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testQuickSearch() {
+  public function testQuickSearch() {
     $this->webtestLogin();
 
     // Adding contact
@@ -64,7 +64,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$displayName"), "Contact did not find!");
   }
 
-  function testQuickSearchPartial() {
+  public function testQuickSearchPartial() {
     $this->webtestLogin();
 
     // Adding contact
@@ -90,7 +90,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.crm-search-results > table.row-highlight', $sortName);
   }
 
-  function testContactSearch() {
+  public function testContactSearch() {
     $this->webtestLogin();
 
     // Create new tag.
@@ -156,7 +156,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
    *
    * @static
    */
-  static function addTag($tagName = 'New Tag', $self) {
+  public static function addTag($tagName = 'New Tag', $self) {
     $self->openCiviPage('admin/tag', array('reset' => 1, 'action' => 'add'), '_qf_Tag_next');
 
     // fill tag name
@@ -180,7 +180,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
   }
 
   // CRM-6586
-  function testContactSearchExport() {
+  public function testContactSearchExport() {
     $this->webtestLogin();
 
     // Create new  group

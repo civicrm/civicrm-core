@@ -58,7 +58,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
 
     $this->skipOnHold = $this->skipDeceased = FALSE;
     CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
@@ -98,7 +98,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   /**
    *
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if (isset($this->_activityId)) {
       $params = array('id' => $this->_activityId);

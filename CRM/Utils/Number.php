@@ -12,7 +12,7 @@ class CRM_Utils_Number {
    * @return float
    * @link https://dev.mysql.com/doc/refman/5.1/en/fixed-point-types.html
    */
-  static function createRandomDecimal($precision) {
+  public static function createRandomDecimal($precision) {
     list ($sigFigs, $decFigs) = $precision;
     $rand = rand(0, pow(10, $sigFigs) - 1);
     return $rand / pow(10, $decFigs);
@@ -28,7 +28,7 @@ class CRM_Utils_Number {
    * @return float
    * @link https://dev.mysql.com/doc/refman/5.1/en/fixed-point-types.html
    */
-  static function createTruncatedDecimal($keyValue, $precision) {
+  public static function createTruncatedDecimal($keyValue, $precision) {
     list ($sigFigs, $decFigs) = $precision;
     $sign = ($keyValue < 0) ? '-1' : 1;
     $val = str_replace('.', '', abs($keyValue)); // ex: -123.456 ==> 123456

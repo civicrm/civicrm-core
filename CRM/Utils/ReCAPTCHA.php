@@ -60,7 +60,7 @@ class CRM_Utils_ReCAPTCHA {
    * @static
    *
    */
-  static function &singleton() {
+  public static function &singleton() {
     if (self::$_singleton === NULL) {
       self::$_singleton = new CRM_Utils_ReCAPTCHA();
     }
@@ -70,13 +70,13 @@ class CRM_Utils_ReCAPTCHA {
   /**
    *
    */
-  function __construct() {}
+  public function __construct() {}
 
   /**
    * Add element to form
    *
    */
-  static function add(&$form) {
+  public static function add(&$form) {
     $error  = NULL;
     $config = CRM_Core_Config::singleton();
     $useSSL = FALSE;
@@ -120,7 +120,7 @@ class CRM_Utils_ReCAPTCHA {
    *
    * @return mixed
    */
-  static function validate($value, $form) {
+  public static function validate($value, $form) {
     $config = CRM_Core_Config::singleton();
 
     $resp = recaptcha_check_answer($config->recaptchaPrivateKey,

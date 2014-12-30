@@ -88,7 +88,7 @@ class CRM_Core_State {
    * @return CRM_Core_State
    * @access public
    */
-  function __construct($name, $type, $back, $next, &$stateMachine) {
+  public function __construct($name, $type, $back, $next, &$stateMachine) {
     $this->_name = $name;
     $this->_type = $type;
     $this->_back = $back;
@@ -97,7 +97,7 @@ class CRM_Core_State {
     $this->_stateMachine = &$stateMachine;
   }
 
-  function debugPrint() {
+  public function debugPrint() {
     CRM_Core_Error::debug("{$this->_name}, {$this->_type}", "{$this->_back}, {$this->_next}");
   }
 
@@ -109,7 +109,7 @@ class CRM_Core_State {
    * @return mixed does a jump to the back state
    * @access public
    */
-  function handleBackState(&$page) {
+  public function handleBackState(&$page) {
     if ($this->_type & self::START) {
       $page->handle('display');
     }
@@ -127,7 +127,7 @@ class CRM_Core_State {
    * @return mixed does a jump to the nextstate
    * @access public
    */
-  function handleNextState(&$page) {
+  public function handleNextState(&$page) {
     if ($this->_type & self::FINISH) {
       $page->handle('process');
     }
@@ -144,7 +144,7 @@ class CRM_Core_State {
    * @return string
    * @access public
    */
-  function getNextState() {
+  public function getNextState() {
     if ($this->_type & self::FINISH) {
       return NULL;
     }
@@ -163,7 +163,7 @@ class CRM_Core_State {
    * @return void
    * @access public
    */
-  function validate(&$data) {
+  public function validate(&$data) {
     $data['valid'][$this->_name] = TRUE;
   }
 
@@ -176,7 +176,7 @@ class CRM_Core_State {
    * @return void
    * @access public
    */
-  function invalidate(&$data) {
+  public function invalidate(&$data) {
     $data['valid'][$this->_name] = NULL;
   }
 
@@ -186,7 +186,7 @@ class CRM_Core_State {
    * @return string
    * @access public
    */
-  function getName() {
+  public function getName() {
     return $this->_name;
   }
 
@@ -198,7 +198,7 @@ class CRM_Core_State {
    * @return void
    * @access public
    */
-  function setName($name) {
+  public function setName($name) {
     $this->_name = $name;
   }
 
@@ -208,7 +208,7 @@ class CRM_Core_State {
    * @return int
    * @access public
    */
-  function getType() {
+  public function getType() {
     return $this->_type;
   }
 }

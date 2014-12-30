@@ -38,7 +38,7 @@
  *
  */
 class CRM_Admin_Form_Preferences_Campaign extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviCampaign Component Settings'));
     $this->_varNames = array(
       CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME => array(

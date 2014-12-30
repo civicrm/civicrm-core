@@ -37,7 +37,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -51,7 +51,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $event = new CRM_Event_DAO_Event();
     $event->copyValues($params);
     if ($event->find(TRUE)) {
@@ -70,7 +70,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $id, 'is_active', $is_active);
   }
 
@@ -84,7 +84,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *
    * @return object
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     CRM_Utils_System::flushCache();
     $financialTypeId = NULL;
     if (!empty($params['id'])) {
@@ -183,7 +183,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @static
    *
    */
-  static function del($id) {
+  public static function del($id) {
     if (!$id) {
       return NULL;
     }
@@ -233,7 +233,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @access public
    * @static
    */
-  static function deleteEventLocBlock($locBlockId, $eventId = NULL) {
+  public static function deleteEventLocBlock($locBlockId, $eventId = NULL) {
     $query = "SELECT count(ce.id) FROM civicrm_event ce WHERE ce.loc_block_id = $locBlockId";
 
     if ($eventId) {
@@ -316,7 +316,7 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
    *
    * @return array Array of event summary values
    */
-  static function getEventSummary() {
+  public static function getEventSummary() {
     $eventSummary = $eventIds = array();
     $config = CRM_Core_Config::singleton();
 
@@ -643,7 +643,7 @@ $event_summary_limit
    * @static
    * @access public
    */
-  static function &getMapInfo(&$id) {
+  public static function &getMapInfo(&$id) {
 
     $sql = "
 SELECT
@@ -898,7 +898,7 @@ WHERE civicrm_event.is_active = 1
    * @return void
    * @access public
    */
-  static function copy($id, $newEvent = NULL, $afterCreate = FALSE) {
+  public static function copy($id, $newEvent = NULL, $afterCreate = FALSE) {
 
     $defaults = $eventValues = array();
 
@@ -1013,7 +1013,7 @@ WHERE civicrm_event.is_active = 1
    * This is sometimes called in a loop (during event search)
    * hence we cache the values to prevent repeated calls to the db
    */
-  static function isMonetary($id) {
+  public static function isMonetary($id) {
     static $isMonetary = array();
     if (!array_key_exists($id, $isMonetary)) {
       $isMonetary[$id] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
@@ -1028,7 +1028,7 @@ WHERE civicrm_event.is_active = 1
    * This is sometimes called in a loop (during event search)
    * hence we cache the values to prevent repeated calls to the db
    */
-  static function usesPriceSet($id) {
+  public static function usesPriceSet($id) {
     static $usesPriceSet = array();
     if (!array_key_exists($id, $usesPriceSet)) {
       $usesPriceSet[$id] = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $id);
@@ -1048,7 +1048,7 @@ WHERE civicrm_event.is_active = 1
    * @return void
    * @access public
    */
-  static function sendMail($contactID, &$values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
+  public static function sendMail($contactID, &$values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
 
     $template = CRM_Core_Smarty::singleton();
     $gIds = array(
@@ -1426,7 +1426,7 @@ WHERE civicrm_event.is_active = 1
    * @access public
    * @static
    */
-  static function displayProfile(&$params, $gid, &$groupTitle, &$values, &$profileFields = array()) {
+  public static function displayProfile(&$params, $gid, &$groupTitle, &$values, &$profileFields = array()) {
     if ($gid) {
       $config = CRM_Core_Config::singleton();
       $session = CRM_Core_Session::singleton();
@@ -1805,7 +1805,7 @@ WHERE  id = $cfID
   /**
    * @return array
    */
-  static function getLocationEvents() {
+  public static function getLocationEvents() {
     $events = array();
 
     $query = "
@@ -1830,7 +1830,7 @@ ORDER BY sp.name, ca.city, ca.street_address ASC
    *
    * @return int|null|string
    */
-  static function countEventsUsingLocBlockId($locBlockId) {
+  public static function countEventsUsingLocBlockId($locBlockId) {
     if (!$locBlockId) {
       return 0;
     }
@@ -1851,7 +1851,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param integer $eventID
    * @return boolean
    */
-  static function validRegistrationRequest($values, $eventID) {
+  public static function validRegistrationRequest($values, $eventID) {
     // check that the user has permission to register for this event
     $hasPermission = CRM_Core_Permission::event(CRM_Core_Permission::EDIT,
       $eventID, 'register for events'
@@ -1865,7 +1865,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @return bool
    */
-  static function validRegistrationDate(&$values) {
+  public static function validRegistrationDate(&$values) {
     // make sure that we are between  registration start date and registration end date
     $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_start_date', $values));
     $endDate   = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_end_date', $values));
@@ -1896,7 +1896,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @return bool
    */
-  static function showHideRegistrationLink($values) {
+  public static function showHideRegistrationLink($values) {
 
     $session           = CRM_Core_Session::singleton();
     $contactID         = $session->get('userID');
@@ -1933,7 +1933,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @return bool
    */
-  static function checkRegistration($params) {
+  public static function checkRegistration($params) {
     $alreadyRegistered = FALSE;
     if (empty($params['contact_id'])) {
       return $alreadyRegistered;
@@ -1964,7 +1964,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @access public
    * @static
    */
-  static function checkPermission($eventId = NULL, $type = CRM_Core_Permission::VIEW) {
+  public static function checkPermission($eventId = NULL, $type = CRM_Core_Permission::VIEW) {
     static $permissions = NULL;
 
     if (empty($permissions)) {
@@ -2028,7 +2028,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @access public
    * @static
    */
-  static function getFromEmailIds($eventId = NULL) {
+  public static function getFromEmailIds($eventId = NULL) {
     $fromEmailValues['from_email_id'] = CRM_Core_BAO_Email::getFromEmail();
 
     if ($eventId) {
@@ -2062,7 +2062,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @access public
    * @static
    */
-  static function eventTotalSeats($eventId, $extraWhereClause = NULL) {
+  public static function eventTotalSeats($eventId, $extraWhereClause = NULL) {
     if (empty($eventId)) {
       return 0;
     }
@@ -2106,7 +2106,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    *
    * @return array of custom data defaults.
    */
-  static function getTemplateDefaultValues($templateId) {
+  public static function getTemplateDefaultValues($templateId) {
     $defaults = array();
     if (!$templateId) {
       return $defaults;
@@ -2132,7 +2132,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    *
    * @return object
    */
-  static function get_sub_events($event_id) {
+  public static function get_sub_events($event_id) {
     $params = array('parent_event_id' => $event_id);
     $defaults = array();
     return CRM_Event_BAO_Event::retrieve($params, $defaults);
@@ -2144,7 +2144,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    * @param int $eventID event id.
    * @param int $eventCampaignID campaign id of that event
    */
-  static function updateParticipantCampaignID($eventID, $eventCampaignID) {
+  public static function updateParticipantCampaignID($eventID, $eventCampaignID) {
     $params = array();
     $params[1] = array($eventID, 'Integer');
 

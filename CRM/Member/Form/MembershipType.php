@@ -44,7 +44,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    */
   const MAX_CONTACTS = 50;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0 );
     $this->_BAOName = 'CRM_Member_BAO_MembershipType';
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
@@ -220,7 +220,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * @access public
    * @static
    */
-  static function formRule($params) {
+  public static function formRule($params) {
     $errors = array();
 
     if (!$params['name']) {

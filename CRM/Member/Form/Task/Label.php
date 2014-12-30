@@ -45,7 +45,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $this->setContactIDs();
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Member/Form/Task/Label.js');
@@ -58,7 +58,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Contact_Form_Task_Label::buildQuickForm($this);
     $this->addElement('checkbox', 'per_membership', ts('Print one label per Membership (rather than per contact)'));
   }
@@ -71,7 +71,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
    * @return array   array of default values
    * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $format = CRM_Core_BAO_LabelFormat::getDefaultValues();
     $defaults['label_name'] = CRM_Utils_Array::value('name', $format);

@@ -37,19 +37,19 @@ class api_v3_GroupTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_groupID;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
 
     parent::setUp();
     $this->_groupID = $this->groupCreate();
   }
 
-  function tearDown() {
+  public function tearDown() {
 
     $this->groupDelete($this->_groupID);
   }
 
-  function testgroupCreateNoTitle() {
+  public function testgroupCreateNoTitle() {
     $params = array(
       'name' => 'Test Group No title ',
       'domain_id' => 1,
@@ -66,7 +66,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
   }
 
 
-  function testGetGroupWithEmptyParams() {
+  public function testGetGroupWithEmptyParams() {
     $group = $this->callAPISuccess('group', 'get', $params = array());
 
     $group = $group["values"];
@@ -76,7 +76,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->assertEquals($group[$this->_groupID]['visibility'], 'Public Pages');
   }
 
-  function testGetGroupParamsWithGroupId() {
+  public function testGetGroupParamsWithGroupId() {
     $params = array('id' => $this->_groupID);
     $group = $this->callAPISuccess('group', 'get', $params);
 
@@ -89,7 +89,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testGetGroupParamsWithGroupName() {
+  public function testGetGroupParamsWithGroupName() {
     $params = array(
       'name' => "Test Group 1",
     );
@@ -105,7 +105,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testGetGroupParamsWithReturnName() {
+  public function testGetGroupParamsWithReturnName() {
     $params = array();
     $params['id'] = $this->_groupID;
     $params['return.name'] = 1;
@@ -115,7 +115,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     );
   }
 
-  function testGetGroupParamsWithGroupTitle() {
+  public function testGetGroupParamsWithGroupTitle() {
     $params = array();
     $params['title'] = 'New Test Group Created';
     $group = $this->callAPISuccess('group', 'get', $params);
@@ -129,18 +129,18 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testGetNonExistingGroup() {
+  public function testGetNonExistingGroup() {
     $params = array();
     $params['title'] = 'No such group Exist';
     $group = $this->callAPISuccess('group', 'get', $params);
     $this->assertEquals(0, $group['count']);
   }
 
-  function testgroupdeleteParamsnoId() {
+  public function testgroupdeleteParamsnoId() {
     $group = $this->callAPIFailure('group', 'delete', array(), 'Mandatory key(s) missing from params array: id');
   }
 
-  function testgetfields() {
+  public function testgetfields() {
     $description = "demonstrate use of getfields to interrogate api";
     $params = array('action' => 'create');
     $result = $this->callAPIAndDocument('group', 'getfields', $params, __FUNCTION__, __FILE__, $description, 'getfields', 'getfields');

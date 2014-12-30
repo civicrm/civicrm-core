@@ -44,7 +44,7 @@ class CRM_Campaign_Form_Task_Print extends CRM_Campaign_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preprocess();
 
     // set print view, so that print templates are called
@@ -84,7 +84,7 @@ class CRM_Campaign_Form_Task_Print extends CRM_Campaign_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     //
     // just need to add a javacript to popup the window for printing
     //

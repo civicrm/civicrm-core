@@ -36,7 +36,7 @@ class api_v3_ProductTest extends CiviUnitTestCase {
 
   protected $_entity = 'Product';
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction();
     $this->_params = array(
@@ -48,12 +48,12 @@ class api_v3_ProductTest extends CiviUnitTestCase {
 //    $this->quickCleanup(array('civicrm_product'), TRUE);
 //  }
 
-  function testGetFields() {
+  public function testGetFields() {
     $fields = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertArrayHasKey('period_type', $fields['values']);
   }
 
-  function testGetOptions() {
+  public function testGetOptions() {
     $options = $this->callAPISuccess($this->_entity, 'getoptions', array('field' => 'period_type'));
     $this->assertArrayHasKey('rolling', $options['values']);
   }

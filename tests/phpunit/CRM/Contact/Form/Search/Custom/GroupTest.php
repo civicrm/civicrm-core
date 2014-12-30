@@ -72,11 +72,11 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     return new CRM_Contact_Form_Search_Custom_GroupTestDataProvider;
   }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function tearDown() {}
+  public function tearDown() {}
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::count()

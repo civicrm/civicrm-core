@@ -188,7 +188,7 @@ abstract class CRM_Import_Parser {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     $this->_maxLinesToProcess = 0;
     $this->_maxErrorCount = self::MAX_ERRORS;
   }
@@ -240,7 +240,7 @@ abstract class CRM_Import_Parser {
    *
    * @return int
    */
-  function setActiveFieldValues($elements, &$erroneousField) {
+  public function setActiveFieldValues($elements, &$erroneousField) {
     $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
     for ($i = 0; $i < $maxCount; $i++) {
       $this->_activeFields[$i]->setValue($elements[$i]);
@@ -270,7 +270,7 @@ abstract class CRM_Import_Parser {
    * @return array (reference) associative array of name/value pairs
    * @access public
    */
-  function &getActiveFieldParams() {
+  public function &getActiveFieldParams() {
     $params = array();
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
@@ -287,7 +287,7 @@ abstract class CRM_Import_Parser {
   /**
    * @return array
    */
-  function getSelectValues() {
+  public function getSelectValues() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_title;
@@ -298,7 +298,7 @@ abstract class CRM_Import_Parser {
   /**
    * @return array
    */
-  function getSelectTypes() {
+  public function getSelectTypes() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_hasLocationType)) {
@@ -311,7 +311,7 @@ abstract class CRM_Import_Parser {
   /**
    * @return array
    */
-  function getHeaderPatterns() {
+  public function getHeaderPatterns() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_headerPattern)) {
@@ -324,7 +324,7 @@ abstract class CRM_Import_Parser {
   /**
    * @return array
    */
-  function getDataPatterns() {
+  public function getDataPatterns() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_dataPattern;
@@ -342,7 +342,7 @@ abstract class CRM_Import_Parser {
    * @static
    * @access public
    */
-  static function encloseScrub(&$values, $enclosure = "'") {
+  public static function encloseScrub(&$values, $enclosure = "'") {
     if (empty($values)) {
       return;
     }
@@ -360,7 +360,7 @@ abstract class CRM_Import_Parser {
    * @return void
    * @access public
    */
-  function setMaxLinesToProcess($max) {
+  public function setMaxLinesToProcess($max) {
     $this->_maxLinesToProcess = $max;
   }
 
@@ -371,7 +371,7 @@ abstract class CRM_Import_Parser {
    * @return string
    * @static
    */
-  static function errorFileName($type) {
+  public static function errorFileName($type) {
     $fileName = NULL;
     if (empty($type)) {
       return $fileName;
@@ -411,7 +411,7 @@ abstract class CRM_Import_Parser {
    * @return string
    * @static
    */
-  static function saveFileName($type) {
+  public static function saveFileName($type) {
     $fileName = NULL;
     if (empty($type)) {
       return $fileName;

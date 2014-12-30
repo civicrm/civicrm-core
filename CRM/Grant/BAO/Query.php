@@ -37,7 +37,7 @@ class CRM_Grant_BAO_Query {
   /**
    * @return array
    */
-  static function &getFields() {
+  public static function &getFields() {
     $fields = array();
     $fields = CRM_Grant_BAO_Grant::exportableFields();
     return $fields;
@@ -51,7 +51,7 @@ class CRM_Grant_BAO_Query {
    * @return void
    * @access public
    */
-  static function select(&$query) {
+  public static function select(&$query) {
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_GRANT) || !empty($query->_returnProperties)) {
       if (!empty($query->_returnProperties['grant_status_id'])) {
         $query->_select['grant_status_id'] = 'grant_status.id as grant_status_id';
@@ -108,7 +108,7 @@ class CRM_Grant_BAO_Query {
    * @return void
    * @access public
    */
-  static function where(&$query) {
+  public static function where(&$query) {
     foreach ($query->_params as $id => $values) {
       if (!is_array($values) || count($values) != 5) {
         continue;
@@ -124,7 +124,7 @@ class CRM_Grant_BAO_Query {
    * @param $values
    * @param $query
    */
-  static function whereClauseSingle(&$values, &$query) {
+  public static function whereClauseSingle(&$values, &$query) {
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $val = $names = array();
@@ -283,7 +283,7 @@ class CRM_Grant_BAO_Query {
    *
    * @return null|string
    */
-  static function from($name, $mode, $side) {
+  public static function from($name, $mode, $side) {
     $from = NULL;
     switch ($name) {
       case 'civicrm_grant':
@@ -319,7 +319,7 @@ class CRM_Grant_BAO_Query {
    * @return string
    * @access public
    */
-  function qill() {
+  public function qill() {
     return (isset($this->_qill)) ? $this->_qill : "";
   }
 
@@ -362,7 +362,7 @@ class CRM_Grant_BAO_Query {
    * @return void
    * @static
    */
-  static function buildSearchForm(&$form) {
+  public static function buildSearchForm(&$form) {
 
     $grantType = CRM_Core_OptionGroup::values('grant_type');
     $form->add('select', 'grant_type_id', ts('Grant Type'), $grantType, FALSE,
@@ -427,11 +427,11 @@ class CRM_Grant_BAO_Query {
    * @param $row
    * @param int $id
    */
-  static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {}
 
   /**
    * @param $tables
    */
-  static function tableNames(&$tables) {}
+  public static function tableNames(&$tables) {}
 }
 

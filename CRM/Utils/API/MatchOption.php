@@ -174,7 +174,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
    *
    * @return array APIv3 $params
    */
-  function createGetParams($origParams, $keys) {
+  public function createGetParams($origParams, $keys) {
     $params = array('version' => 3);
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $origParams, '');

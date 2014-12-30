@@ -132,7 +132,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Search_Builder', 'formRule'), $this);
   }
 
@@ -147,7 +147,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * @static
    * @access public
    */
-  static function formRule($values, $files, $self) {
+  public static function formRule($values, $files, $self) {
     if (!empty($values['addMore']) || !empty($values['addBlock'])) {
       return TRUE;
     }
@@ -409,7 +409,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   /**
    * @return array
    */
-  static function fields() {
+  public static function fields() {
     $fields = array_merge(
       CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE),
       CRM_Core_Component::getQueryFields(),
@@ -425,7 +425,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * @return array: (string => string) key: field_name value: api entity name
    * Note: options are fetched via ajax using the api "getoptions" method
    */
-  static function fieldOptions() {
+  public static function fieldOptions() {
     // Hack to add options not retrieved by getfields
     // This list could go on and on, but it would be better to fix getfields
     $options = array(
@@ -476,7 +476,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * if using IS NULL/NOT NULL, an array with no array key is created
    * convert that to simple null so processing can proceed
    */
-  static function checkArrayKeyEmpty($val) {
+  public static function checkArrayKeyEmpty($val) {
     if (is_array($val)) {
       $v2empty = true;
       foreach ($val as $vk => $vv) {

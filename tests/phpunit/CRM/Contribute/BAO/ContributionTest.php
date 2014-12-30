@@ -35,17 +35,17 @@ require_once 'CiviTest/Custom.php';
  */
 class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function teardown() {
+  public function teardown() {
   }
 
   /**
    * Create() method (create and update modes)
    */
-  function testCreate() {
+  public function testCreate() {
     $contactId = Contact::createIndividual();
     $ids = array('contribution' => NULL);
 
@@ -92,7 +92,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * Create() method with custom data
    */
-  function testCreateWithCustomData() {
+  public function testCreateWithCustomData() {
     $contactId = Contact::createIndividual();
     $ids = array('contribution' => NULL);
 
@@ -164,7 +164,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * DeleteContribution() method
    */
-  function testDeleteContribution() {
+  public function testDeleteContribution() {
     $contactId = Contact::createIndividual();
     $ids = array('contribution' => NULL);
 
@@ -203,7 +203,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * Create honor-contact method
    */
-  function testcreateAndGetHonorContact() {
+  public function testcreateAndGetHonorContact() {
     $firstName = 'John_' . substr(sha1(rand()), 0, 7);
     $lastName  = 'Smith_' . substr(sha1(rand()), 0, 7);
     $email     = "{$firstName}.{$lastName}@example.com";
@@ -289,7 +289,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    * contribution batch update through profile
    * sortName();
    */
-  function testsortName() {
+  public function testsortName() {
     $params = array(
       'first_name' => 'Shane',
       'last_name' => 'Whatson',
@@ -345,7 +345,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    *
    * AddPremium();
    */
-  function testAddPremium() {
+  public function testAddPremium() {
     $contactId = Contact::createIndividual();
 
     $ids = array(
@@ -420,7 +420,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    * during the contribution import
    * checkDuplicateIds();
    */
-  function testcheckDuplicateIds() {
+  public function testcheckDuplicateIds() {
     $contactId = Contact::createIndividual();
 
     $ids = array('contribution' => NULL);

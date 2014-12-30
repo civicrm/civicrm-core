@@ -47,7 +47,7 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // add select for groups
     $group = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup();
     $groupElement = $this->add('select', 'group_id', ts('Select Group'), $group, TRUE, array('class' => 'crm-select2 huge'));
@@ -63,7 +63,7 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
    *
    * @return array the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->get('context') === 'smog') {

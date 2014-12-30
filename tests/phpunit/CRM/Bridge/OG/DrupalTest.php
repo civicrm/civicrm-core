@@ -43,7 +43,7 @@ class CRM_Bridge_OG_DrupalTest extends CiviUnitTestCase {
   /*
    * Test that one (ane only one) role (option value) is deleted by the updateCiviACLRole function
    */
-  function testACLRoleDeleteFunctionality() {
+  public function testACLRoleDeleteFunctionality() {
     $optionGroup = civicrm_api('OptionGroup', 'Get', array(
         'version' => 3,
         'name' => 'acl_role',

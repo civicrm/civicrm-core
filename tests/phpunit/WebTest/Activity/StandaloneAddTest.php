@@ -35,7 +35,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneActivityAdd() {
+  public function testStandaloneActivityAdd() {
     $this->webtestLogin();
 
     // Adding Anderson, Anthony and Summerson, Samuel for testStandaloneActivityAdd test
@@ -164,7 +164,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     );
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
     $triggerElement = array('name' => 'activity_type_id', 'type' => 'select');
     $customSets = array(
@@ -180,7 +180,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
    * @param $expected
    * @param null $xpathPrefix
    */
-  function VerifyTabularData($expected, $xpathPrefix = NULL) {
+  public function VerifyTabularData($expected, $xpathPrefix = NULL) {
     foreach ($expected as $label => $value) {
         $this->waitForElementPresent("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span");
         $this->verifyText("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span", preg_quote($value), 'In line ' . __LINE__);

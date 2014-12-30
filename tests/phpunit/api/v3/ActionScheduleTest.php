@@ -52,7 +52,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
   }
 
-  function testSimpleActionScheduleCreate() {
+  public function testSimpleActionScheduleCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
@@ -82,7 +82,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Check if required fields are not passed
    */
-  function testActionScheduleCreateWithoutRequired() {
+  public function testActionScheduleCreateWithoutRequired() {
     $params = array(
         'subject' => 'this case should fail',
         'scheduled_date_time' => date('Ymd'),
@@ -90,7 +90,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $result = $this->callAPIFailure('activity', 'create', $params);
   }
 
-  function testActionScheduleWithScheduledDatesCreate() {
+  public function testActionScheduleWithScheduledDatesCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);

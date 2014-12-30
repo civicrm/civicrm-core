@@ -68,7 +68,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @throws RuntimeException
    * @return \CRM_Utils_Cache_SqlGroup
    */
-  function __construct($config) {
+  public function __construct($config) {
     if (isset($config['group'])) {
       $this->group = $config['group'];
     } else {
@@ -89,7 +89,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @param string $key
    * @param mixed $value
    */
-  function set($key, &$value) {
+  public function set($key, &$value) {
     CRM_Core_BAO_Cache::setItem($value, $this->group, $key, $this->componentID);
     $this->frontCache[$key] = $value;
   }
@@ -99,7 +99,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    *
    * @return mixed
    */
-  function get($key) {
+  public function get($key) {
     if (! array_key_exists($key, $this->frontCache)) {
       $this->frontCache[$key] = CRM_Core_BAO_Cache::getItem($this->group, $key, $this->componentID);
     }
@@ -112,24 +112,24 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    *
    * @return mixed
    */
-  function getFromFrontCache($key, $default = NULL) {
+  public function getFromFrontCache($key, $default = NULL) {
     return CRM_Utils_Array::value($key, $this->frontCache, $default);
   }
 
   /**
    * @param string $key
    */
-  function delete($key) {
+  public function delete($key) {
     CRM_Core_BAO_Cache::deleteGroup($this->group, $key);
     unset($this->frontCache[$key]);
   }
 
-  function flush() {
+  public function flush() {
     CRM_Core_BAO_Cache::deleteGroup($this->group);
     $this->frontCache = array();
   }
 
-  function prefetch() {
+  public function prefetch() {
     $this->frontCache = CRM_Core_BAO_Cache::getItems($this->group, $this->componentID);
   }
 }

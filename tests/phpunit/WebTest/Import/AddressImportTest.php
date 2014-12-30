@@ -35,7 +35,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomAddressDataImport() {
+  public function testCustomAddressDataImport() {
     $this->webtestLogin();
 
     $firstName1 = 'Ma_' . substr(sha1(rand()), 0, 7);
@@ -73,7 +73,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _individualCustomCSVData($customDataParams, $firstName1) {
+  public function _individualCustomCSVData($customDataParams, $firstName1) {
 
     $headers = array(
       'first_name' => 'First Name',
@@ -109,7 +109,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _addCustomData() {
+  public function _addCustomData() {
 
     $this->openCiviPage('admin/custom/group', 'reset=1');
 
@@ -293,7 +293,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _createMultipleValueCustomField( $customFieldName, $type ){
+  public function _createMultipleValueCustomField( $customFieldName, $type ){
     $this->type('label', $customFieldName);
     $this->select("data_type[0]","value=0");
     $this->select("data_type[1]","value=".$type);

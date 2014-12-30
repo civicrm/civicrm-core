@@ -138,7 +138,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
     //load only custom data defaults.
@@ -306,7 +306,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    * @access public
    * @see valid_date
    */
-  static function formRule($fields, $files, $errors) {
+  public static function formRule($fields, $files, $errors) {
     $errors = array();
 
     return empty($errors) ? TRUE : $errors;

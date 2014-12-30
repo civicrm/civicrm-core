@@ -124,7 +124,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
@@ -207,7 +207,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function edit($sid, $action) {
+  public function edit($sid, $action) {
     // create a simple controller for editing price sets
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Set', ts('Price Set'), $action);
 
@@ -228,7 +228,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function preview($sid) {
+  public function preview($sid) {
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Preview', ts('Preview Price Set'), NULL);
     $session    = CRM_Core_Session::singleton();
     $context    = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -252,7 +252,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     // get all price sets
     $priceSet = array();
     $comps = array('CiviEvent' => ts('Event'),
@@ -321,7 +321,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function copy() {
+  public function copy() {
     $id = CRM_Utils_Request::retrieve('sid', 'Positive',
       $this, TRUE, 0, 'GET'
     );

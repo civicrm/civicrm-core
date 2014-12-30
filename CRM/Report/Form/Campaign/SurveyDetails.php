@@ -59,7 +59,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     //filter options for survey activity status.
     $responseStatus = array('' => '- Any -');
     self::$_surveyRespondentStatus = array();
@@ -291,11 +291,11 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
 
     //add the survey response fields.
@@ -332,7 +332,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(",\n", $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = " FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom} ";
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
@@ -378,7 +378,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -435,7 +435,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     }
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
 
@@ -614,7 +614,7 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
 
     //format the survey result data.
     $this->_formatSurveyResult($rows);

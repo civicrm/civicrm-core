@@ -50,7 +50,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $this->_columns = array(
       'civicrm_contact' => array(
@@ -346,12 +346,12 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->_csvSupported = FALSE;
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     $this->_component = array(
@@ -425,12 +425,12 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $group = " ";
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}";
@@ -538,7 +538,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
 
     foreach ($this->_columns as $tableName => $table) {
@@ -587,7 +587,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   /**
    * @return array
    */
-  function clauseComponent() {
+  public function clauseComponent() {
     $selectedContacts = implode(',', $this->_contactSelected);
     $contribution = $membership = $participant = NULL;
     $eligibleResult = $rows = $tempArray = array();
@@ -733,7 +733,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = array();
 
     $count = count($rows);
@@ -751,7 +751,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   /**
    * @param int $rowCount
    */
-  function limit($rowCount = self::ROW_COUNT_LIMIT) {
+  public function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
   }
 
@@ -759,11 +759,11 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   /**
    * @param int $rowCount
    */
-  function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+  public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     parent::setPager($rowCount);
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $this->beginPostProcess();
 
@@ -813,7 +813,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
 
     $entryFound = FALSE;
@@ -854,7 +854,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   /**
    * @param $componentRows
    */
-  function alterComponentDisplay(&$componentRows) {
+  public function alterComponentDisplay(&$componentRows) {
     // custom code to alter rows
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();

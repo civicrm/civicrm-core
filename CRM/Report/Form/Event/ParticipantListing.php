@@ -58,7 +58,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
@@ -408,7 +408,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   /**
    * @return array
    */
-  function getPriceLevels() {
+  public function getPriceLevels() {
     $query = "
 SELECT CONCAT(cv.label, ' (', ps.title, ')') label, cv.id
 FROM civicrm_price_field_value cv
@@ -431,11 +431,11 @@ ORDER BY  cv.label
   } //searches database for priceset values
 
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
 
@@ -488,12 +488,12 @@ ORDER BY  cv.label
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_participant {$this->_aliases['civicrm_participant']}
              LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']}
@@ -529,7 +529,7 @@ ORDER BY  cv.label
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -586,11 +586,11 @@ ORDER BY  cv.label
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_participant']}.id";
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     // get ready with post process params
     $this->beginPostProcess();
@@ -639,7 +639,7 @@ ORDER BY  cv.label
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
 
     $entryFound = FALSE;

@@ -117,7 +117,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * @return \CRM_Profile_Page_Dynamic
    * @access public
    */
-  function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
+  public function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
     parent::__construct();
 
     $this->_id = $id;
@@ -172,7 +172,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * @return array $_actionLinks
    *
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     return NULL;
   }
 
@@ -186,7 +186,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     $template = CRM_Core_Smarty::singleton();
     if ($this->_id && $this->_gid) {
 
@@ -391,7 +391,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = '') {
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Dynamic.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();
@@ -420,7 +420,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -435,7 +435,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * @return string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }

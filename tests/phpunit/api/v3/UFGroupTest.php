@@ -83,7 +83,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
+  public function tearDown() {
     //  Truncate the tables
     $this->quickCleanup(
       array(
@@ -113,7 +113,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testUFGroupCreate() {
+  public function testUFGroupCreate() {
 
     $result = $this->callAPIAndDocument('uf_group', 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result);
@@ -134,11 +134,11 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testUFGroupCreateWithWrongParams() {
+  public function testUFGroupCreateWithWrongParams() {
     $result = $this->callAPIFailure('uf_group', 'create', array('name' => 'A title-less group'));
   }
 
-  function testUFGroupUpdate() {
+  public function testUFGroupUpdate() {
     $params = array(
       'id' => $this->_ufGroupId,
       'add_captcha' => 1,
@@ -174,7 +174,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $params['group'], 'in line ' . __LINE__);
   }
 
-  function testUFGroupGet() {
+  public function testUFGroupGet() {
     $result = $this->callAPISuccess('uf_group', 'create', $this->params);
     $params = array('id' => $result['id']);
     $result = $this->callAPIAndDocument('uf_group', 'get', $params, __FUNCTION__, __FILE__);
@@ -195,11 +195,11 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testUFGroupUpdateWithEmptyParams() {
+  public function testUFGroupUpdateWithEmptyParams() {
     $result = $this->callAPIFailure('uf_group', 'create', array(), $this->_ufGroupId);
   }
 
-  function testUFGroupDelete() {
+  public function testUFGroupDelete() {
     $ufGroup = $this->callAPISuccess('uf_group', 'create', $this->params);
     $params = array('id' => $ufGroup['id']);
     $this->assertEquals(1, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);

@@ -64,7 +64,7 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
     // CRM-14716 - Pick up mailingID from session since most of the time it's not in the URL
     if (!$mailingID) {

@@ -101,7 +101,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $this->priceFieldID1 = $priceField1['id'];
   }
 
-  function tearDown() {
+  public function tearDown() {
     $tablesToTruncate = array(
         'civicrm_contact',
         'civicrm_contribution',

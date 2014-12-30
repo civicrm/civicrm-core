@@ -35,7 +35,7 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testSMSToContacts() {
+  public function testSMSToContacts() {
     $this->webtestLogin();
 
     // ADD a New Group

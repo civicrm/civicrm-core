@@ -35,7 +35,7 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddViaCreateProfile() {
+  public function testAddViaCreateProfile() {
     $this->webtestLogin();
 
     $this->openCiviPage('profile/create', 'reset=1&gid=1', '_qf_Edit_next');

@@ -52,7 +52,7 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $parentDefaults = parent::setDefaultValues();
 
     $eventId  = $this->_id;

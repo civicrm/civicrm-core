@@ -47,7 +47,7 @@ class CRM_Contact_Page_View_Useradd extends CRM_Core_Page {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     $controller = new CRM_Core_Controller_Simple('CRM_Contact_Form_Task_Useradd',
       ts('Add User'),
       CRM_Core_Action::ADD

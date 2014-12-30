@@ -12,7 +12,7 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
    * @return array of created pcp block
    *
    */
-  function create($contributionPageId) {
+  public function create($contributionPageId) {
     $profileParams = array(
       'group_type' => 'Individual,Contact',
       'title' => 'Test Supprorter Profile',
@@ -96,7 +96,7 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
    * @return boolean true if success, false otherwise
    *
    */
-  function delete($params) {
+  public function delete($params) {
 
     $delete_params = array('id' => $params['profileId']);
     $resulProfile = civicrm_api('uf_group', 'delete', $delete_params);

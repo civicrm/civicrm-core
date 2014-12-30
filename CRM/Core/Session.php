@@ -85,7 +85,7 @@ class CRM_Core_Session {
    *
    * @return CRM_Core_Session
    */
-  function __construct() {
+  public function __construct() {
     $this->_session = null;
   }
 
@@ -95,7 +95,7 @@ class CRM_Core_Session {
    * @return CRM_Core_Session
    * @static
    */
-  static function &singleton() {
+  public static function &singleton() {
     if (self::$_singleton === NULL) {
       self::$_singleton = new CRM_Core_Session;
     }
@@ -112,7 +112,7 @@ class CRM_Core_Session {
    *
    * @return void
    */
-  function initialize($isRead = FALSE) {
+  public function initialize($isRead = FALSE) {
     // lets initialize the _session variable just before we need it
     // hopefully any bootstrapping code will actually load the session from the CMS
     if (!isset($this->_session)) {
@@ -158,7 +158,7 @@ class CRM_Core_Session {
    *
    * @return void
    */
-  function reset($all = 1) {
+  public function reset($all = 1) {
     if ($all != 1) {
       $this->initialize();
 
@@ -183,7 +183,7 @@ class CRM_Core_Session {
    *
    * @return void
    */
-  function createScope($prefix, $isRead = FALSE) {
+  public function createScope($prefix, $isRead = FALSE) {
     $this->initialize($isRead);
 
     if ($isRead || empty($prefix)) {
@@ -203,7 +203,7 @@ class CRM_Core_Session {
    *
    * @return void
    */
-  function resetScope($prefix) {
+  public function resetScope($prefix) {
     $this->initialize();
 
     if (empty($prefix)) {
@@ -232,7 +232,7 @@ class CRM_Core_Session {
    * @return void
    *
    */
-  function set($name, $value = NULL, $prefix = NULL) {
+  public function set($name, $value = NULL, $prefix = NULL) {
     // create session scope
     $this->createScope($prefix);
 
@@ -267,7 +267,7 @@ class CRM_Core_Session {
    * @return mixed
    *
    */
-  function get($name, $prefix = NULL) {
+  public function get($name, $prefix = NULL) {
     // create session scope
     $this->createScope($prefix, TRUE);
 
@@ -300,7 +300,7 @@ class CRM_Core_Session {
    * @return void
    *
    */
-  function getVars(&$vars, $prefix = '') {
+  public function getVars(&$vars, $prefix = '') {
     // create session scope
     $this->createScope($prefix, TRUE);
 
@@ -332,7 +332,7 @@ class CRM_Core_Session {
    * @return mixed
    *
    */
-  function timer($name, $expire) {
+  public function timer($name, $expire) {
     $ts = $this->get($name, 'timer');
     if (!$ts || $ts < time() - $expire) {
       $this->set($name, time(), 'timer');
@@ -352,7 +352,7 @@ class CRM_Core_Session {
    * @access public
    *
    */
-  function pushUserContext($userContext, $check = TRUE) {
+  public function pushUserContext($userContext, $check = TRUE) {
     if (empty($userContext)) {
       return;
     }
@@ -391,7 +391,7 @@ class CRM_Core_Session {
    * @access public
    *
    */
-  function replaceUserContext($userContext) {
+  public function replaceUserContext($userContext) {
     if (empty($userContext)) {
       return;
     }
@@ -408,7 +408,7 @@ class CRM_Core_Session {
    * @return string the top of the userContext stack (also pops the top element)
    *
    */
-  function popUserContext() {
+  public function popUserContext() {
     $this->createScope(self::USER_CONTEXT);
 
     return array_pop($this->_session[$this->_key][self::USER_CONTEXT]);
@@ -420,7 +420,7 @@ class CRM_Core_Session {
    * @return string the top of the userContext stack
    *
    */
-  function readUserContext() {
+  public function readUserContext() {
     $this->createScope(self::USER_CONTEXT);
 
     $config = CRM_Core_Config::singleton();
@@ -432,7 +432,7 @@ class CRM_Core_Session {
    * Dumps the session to the log
    * @param int $all
    */
-  function debug($all = 1) {
+  public function debug($all = 1) {
     $this->initialize();
     if ($all != 1) {
       CRM_Core_Error::debug('CRM Session', $this->_session);
@@ -449,7 +449,7 @@ class CRM_Core_Session {
    *
    * @return string        the status message if any
    */
-  function getStatus($reset = FALSE) {
+  public function getStatus($reset = FALSE) {
     $this->initialize();
 
     $status = NULL;
@@ -493,7 +493,7 @@ class CRM_Core_Session {
    *
    * @return void
    */
-  static function setStatus($text, $title = '', $type = 'alert', $options = array()) {
+  public static function setStatus($text, $title = '', $type = 'alert', $options = array()) {
     // make sure session is initialized, CRM-8120
     $session = self::singleton();
     $session->initialize();
@@ -525,7 +525,7 @@ class CRM_Core_Session {
   /**
    * @param string|array $names
    */
-  static function registerAndRetrieveSessionObjects($names) {
+  public static function registerAndRetrieveSessionObjects($names) {
     if (!is_array($names)) {
       $names = array($names);
     }
@@ -543,7 +543,7 @@ class CRM_Core_Session {
   /**
    * @param bool $reset
    */
-  static function storeSessionObjects($reset = TRUE) {
+  public static function storeSessionObjects($reset = TRUE) {
     if (empty(self::$_managedNames)) {
       return;
     }
@@ -559,7 +559,7 @@ class CRM_Core_Session {
    * Retrieve contact id of the logged in user
    * @return integer|NULL contact ID of logged in user
    */
-  static function getLoggedInContactID() {
+  public static function getLoggedInContactID() {
     $session = CRM_Core_Session::singleton();
     if (!is_numeric($session->get('userID'))) {
       return NULL;
@@ -570,7 +570,7 @@ class CRM_Core_Session {
   /**
    * @return bool
    */
-  function isEmpty() {
+  public function isEmpty() {
     // check if session is empty, if so we don't cache
     // stuff that we can get away with
     // helps proxies like varnish

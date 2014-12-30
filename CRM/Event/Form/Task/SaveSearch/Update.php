@@ -45,7 +45,7 @@ class CRM_Event_Form_Task_SaveSearch_Update extends CRM_Event_Form_Task_SaveSear
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     $this->_id = $this->get('ssID');
@@ -64,7 +64,7 @@ class CRM_Event_Form_Task_SaveSearch_Update extends CRM_Event_Form_Task_SaveSear
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
 
     $defaults = array();
     $params = array();

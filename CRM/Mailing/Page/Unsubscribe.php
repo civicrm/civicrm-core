@@ -34,7 +34,7 @@
  */
 class CRM_Mailing_Page_Unsubscribe extends CRM_Mailing_Page_Common {
 
-  function run() {
+  public function run() {
     $this->_type = 'unsubscribe';
     return parent::run();
   }

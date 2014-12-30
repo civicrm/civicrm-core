@@ -37,7 +37,7 @@
  * This loads a smarty help file via ajax and returns as html
  */
 class CRM_Core_Page_Inline_Help {
-  function run() {
+  public function run() {
     $args = $_REQUEST;
     if (!empty($args['file']) && strpos($args['file'], '..') === FALSE) {
       $file = $args['file'] . '.hlp';

@@ -60,7 +60,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     $count = $this->get('count');

@@ -63,7 +63,7 @@ class CRM_Mailing_Task {
    * @static
    * @access public
    */
-  static function &tasks() {
+  public static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => array(
@@ -88,7 +88,7 @@ class CRM_Mailing_Task {
    * @static
    * @access public
    */
-  static function &taskTitles() {
+  public static function &taskTitles() {
     return array();
   }
 
@@ -101,7 +101,7 @@ class CRM_Mailing_Task {
    * @return array set of tasks that are valid for the user
    * @access public
    */
-  static function &permissionedTaskTitles($permission) {
+  public static function &permissionedTaskTitles($permission) {
     $task = array();
     return $task;
   }
@@ -116,7 +116,7 @@ class CRM_Mailing_Task {
    * @static
    * @access public
    */
-  static function getTask($value) {
+  public static function getTask($value) {
     self::tasks();
     if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
       // make the print task by default

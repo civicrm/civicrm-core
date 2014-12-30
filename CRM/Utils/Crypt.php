@@ -49,7 +49,7 @@ class CRM_Utils_Crypt {
    *   Base64-encoded ciphertext, or base64-encoded plaintext if encryption is
    *   disabled or unavailable.
    */
-  static function encrypt($string) {
+  public static function encrypt($string) {
     if (empty($string)) {
       return $string;
     }
@@ -83,7 +83,7 @@ class CRM_Utils_Crypt {
    *   Plaintext, or base64-decoded ciphertext if encryption is disabled or
    *   unavailable.
    */
-  static function decrypt($string) {
+  public static function decrypt($string) {
     if (empty($string)) {
       return $string;
     }

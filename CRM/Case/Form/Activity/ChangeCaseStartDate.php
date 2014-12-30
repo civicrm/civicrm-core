@@ -44,7 +44,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @throws Exception
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
@@ -63,7 +63,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @return void
    */
-  static function setDefaultValues(&$form) {
+  public static function setDefaultValues(&$form) {
     $defaults = array();
 
     $openCaseActivityType = CRM_Core_OptionGroup::getValue('activity_type',
@@ -91,7 +91,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
   /**
    * @param CRM_Core_Form $form
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
     $caseId = CRM_Utils_Array::first($form->_caseId);
@@ -113,7 +113,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    * @static
    * @access public
    */
-  static function formRule($values, $files, $form) {
+  public static function formRule($values, $files, $form) {
     return TRUE;
   }
 
@@ -127,7 +127,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @return void
    */
-  static function beginPostProcess(&$form, &$params) {
+  public static function beginPostProcess(&$form, &$params) {
     if ($form->_context == 'case') {
       $params['id'] = $form->_id;
     }
@@ -144,7 +144,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @return void
    */
-  static function endPostProcess(&$form, &$params, $activity) {
+  public static function endPostProcess(&$form, &$params, $activity) {
     if (!empty($params['start_date'])) {
       $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
     }

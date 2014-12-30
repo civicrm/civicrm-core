@@ -171,7 +171,7 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
    * 
    * Copied and adapted from: CRM/Utils/Hook/Drupal6.php
    */
-  function buildModuleList() {
+  public function buildModuleList() {
     if ($this->isBuilt === FALSE) {
     
       if ($this->wordpressModules === NULL) {

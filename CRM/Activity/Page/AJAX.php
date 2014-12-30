@@ -36,7 +36,7 @@
  * This class contains all the function that are called using AJAX (jQuery)
  */
 class CRM_Activity_Page_AJAX {
-  static function getCaseActivity() {
+  public static function getCaseActivity() {
     $caseID    = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
     $userID    = CRM_Utils_Type::escape($_GET['userID'], 'Integer');
@@ -71,7 +71,7 @@ class CRM_Activity_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  static function getCaseGlobalRelationships() {
+  public static function getCaseGlobalRelationships() {
     $sortMapper = array(
       0 => 'sort_name', 1 => 'phone', 2 => 'email',
     );
@@ -104,7 +104,7 @@ class CRM_Activity_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  static function getCaseClientRelationships() {
+  public static function getCaseClientRelationships() {
     $caseID    = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
 
@@ -165,7 +165,7 @@ class CRM_Activity_Page_AJAX {
   }
 
 
-  static function getCaseRoles() {
+  public static function getCaseRoles() {
     $caseID    = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
 
@@ -296,7 +296,7 @@ class CRM_Activity_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  static function convertToCaseActivity() {
+  public static function convertToCaseActivity() {
     $params = array('caseID', 'activityID', 'contactID', 'newSubject', 'targetContactIds', 'mode');
     $vals = array();
     foreach ($params as $param) {
@@ -311,7 +311,7 @@ class CRM_Activity_Page_AJAX {
    *
    * @return array
    */
-  static function _convertToCaseActivity($params) {
+  public static function _convertToCaseActivity($params) {
     if (!$params['activityID'] || !$params['caseID']) {
       return (array('error_msg' => 'required params missing.'));
     }
@@ -425,7 +425,7 @@ class CRM_Activity_Page_AJAX {
     return (array('error_msg' => $error_msg, 'newId' => $mainActivity->id));
   }
 
-  static function getContactActivity() {
+  public static function getContactActivity() {
     $contactID = CRM_Utils_Type::escape($_POST['contact_id'], 'Integer');
     $context = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
 

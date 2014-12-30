@@ -223,7 +223,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    *
    * @return string
    */
-  function getContactEmails($uids) {
+  public function getContactEmails($uids) {
     if (empty($uids)) {
       return '';
     }
@@ -257,7 +257,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * @access public
    *
    */
-  function checkGroupRole($array) {
+  public function checkGroupRole($array) {
     if (function_exists('user_load') && isset($array)) {
       $user = user_load( $GLOBALS['user']->uid);
       //if giver roles found in user roles - return true
@@ -316,7 +316,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * {@inheritdoc}
    *
    */
-  function upgradePermissions($permissions) {
+  public function upgradePermissions($permissions) {
     if (empty($permissions)) {
       throw new CRM_Core_Exception("Cannot upgrade permissions: permission list missing");
     }

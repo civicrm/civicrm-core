@@ -79,7 +79,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
    * @return void
    * @acess protected
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_srcFID = CRM_Utils_Request::retrieve('fid', 'Positive',
       $this, TRUE
     );
@@ -148,7 +148,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
    *
    * @return array|bool
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $self->_dstGID = $fields['dst_group_id'];
     $tmp           = CRM_Core_BAO_CustomField::_moveFieldValidate($self->_srcFID, $self->_dstGID);
     $errors        = array();

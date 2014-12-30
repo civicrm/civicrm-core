@@ -142,7 +142,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $this->_defaults = array();
 
     if ($this->_subscriptionDetails->contact_id) {
@@ -225,7 +225,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 

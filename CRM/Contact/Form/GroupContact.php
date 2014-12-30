@@ -53,7 +53,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    */
   protected $_contactId;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_contactId = $this->get('contactId');
     $this->_groupContactId = $this->get('groupContactId');
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);

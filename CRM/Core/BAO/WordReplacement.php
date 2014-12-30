@@ -47,7 +47,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
   /**
@@ -62,7 +62,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @static
    */
 
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_WordRepalcement', $params, $defaults);
   }
 
@@ -75,7 +75,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @access public
    * @static
    */
-  static function getWordReplacement($reset = NULL) {
+  public static function getWordReplacement($reset = NULL) {
     static $wordReplacement = NULL;
     if (!$wordReplacement || $reset) {
       $wordReplacement = new CRM_Core_BAO_WordReplacement();
@@ -97,7 +97,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @return WordReplacement array
    * @access public
    */
-  static function edit(&$params, &$id) {
+  public static function edit(&$params, &$id) {
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
     $wordReplacement->id = $id;
     $wordReplacement->copyValues($params);
@@ -116,7 +116,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @return WordReplacement array
    * @access public
    */
-  static function create($params) {
+  public static function create($params) {
     if(array_key_exists("domain_id",$params) === FALSE) {
       $params["domain_id"] = CRM_Core_Config::domainID();
     }
@@ -137,7 +137,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @return object
    * @static
    */
-  static function del($id) {
+  public static function del($id) {
     $dao = new CRM_Core_DAO_WordReplacement();
     $dao->id = $id;
     $dao->delete();
@@ -195,7 +195,7 @@ WHERE  domain_id = %1
   /**
    * Rebuild
    */
-  static function rebuild($clearCaches = TRUE) {
+  public static function rebuild($clearCaches = TRUE) {
     $id = CRM_Core_Config::domainID();
     $stringOverride = self::getAllAsConfigArray($id);
     $params = array('locale_custom_strings' => serialize($stringOverride));
@@ -231,7 +231,7 @@ WHERE  domain_id = %1
    * @return array Each item is $params for WordReplacement.create
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
-  static function getConfigArraysAsAPIParams($rebuildEach) {
+  public static function getConfigArraysAsAPIParams($rebuildEach) {
     $wordReplacementCreateParams = array();
     // get all domains
     $result = civicrm_api3('domain', 'get', array(

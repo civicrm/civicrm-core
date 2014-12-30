@@ -77,7 +77,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
     if ($id) {
       $this->_contributionIds = array($id);
@@ -235,7 +235,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @static
    * @access public
    */
-  static function formRule($values) {
+  public static function formRule($values) {
     $errors = array();
 
     if ($values['output'] == 'email_invoice' && empty($values['from_email_address'])) {
@@ -269,7 +269,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @static
    *
    */
-  static function printPDF($contribIDs, &$params, $contactIds, &$form) {
+  public static function printPDF($contribIDs, &$params, $contactIds, &$form) {
     // get all the details needed to generate a invoice
     $messageInvoice = array();
     $invoiceTemplate = CRM_Core_Smarty::singleton();
@@ -671,7 +671,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * Callback to perform action on Print Invoice button.
    */
-  static function getPrintPDF() {
+  public static function getPrintPDF() {
     $contributionId = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
     $contributionIDs = array($contributionId);
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);

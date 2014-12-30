@@ -58,7 +58,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Financial_BAO_FinancialTypeAccount';
   }
 
@@ -67,7 +67,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE  => array(
@@ -98,7 +98,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, false, 'browse'); // default to 'browse'
 
@@ -126,7 +126,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     // get all Financial Type Account data sorted by weight
     $financialType = array();
     $params = array();
@@ -207,7 +207,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function edit( $action ) {
+  public function edit( $action ) {
     // create a simple controller for editing CiviCRM Profile data
     $controller = new CRM_Core_Controller_Simple( 'CRM_Financial_Form_FinancialTypeAccount', ts('Financial Account Types'), $action );
 

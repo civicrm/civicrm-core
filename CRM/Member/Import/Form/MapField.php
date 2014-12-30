@@ -309,7 +309,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @static
    * @access public
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     if (!array_key_exists('savedMapping', $fields)) {

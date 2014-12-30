@@ -49,7 +49,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
 
   protected $tagID;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->tag = $this->tagCreate();
@@ -101,14 +101,14 @@ class api_v3_TagTest extends CiviUnitTestCase {
   /**
    * Test civicrm_tag_create with empty params.
    */
-  function testCreateEmptyParams() {
+  public function testCreateEmptyParams() {
     $result = $this->callAPIFailure('tag', 'create', array(),'Mandatory key(s) missing from params array: name');
   }
 
   /**
    * Test civicrm_tag_create
    */
-  function testCreatePasstagInParams() {
+  public function testCreatePasstagInParams() {
     $params = array(
       'tag' => 10,
       'name' => 'New Tag23',
@@ -121,7 +121,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
   /**
    * Test civicrm_tag_create - success expected.
    */
-  function testCreate() {
+  public function testCreate() {
     $params = array(
       'name' => 'Super Heros',
       'description' => 'Outside undie-wearers',
@@ -136,7 +136,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
    * Test civicrm_tag_create activity tag- success expected. Test checks that used_for is set
    * and not over-written by default on update
    */
-  function testCreateEntitySpecificTag() {
+  public function testCreateEntitySpecificTag() {
     $params = array(
       'name' => 'New Tag4',
       'description' => 'This is description for New Activity tag',
@@ -156,14 +156,14 @@ class api_v3_TagTest extends CiviUnitTestCase {
   /**
    * Test civicrm_tag_delete without tag id.
    */
-  function testDeleteWithoutTagId() {
+  public function testDeleteWithoutTagId() {
     $result = $this->callAPIFailure('tag', 'delete', array(), 'Mandatory key(s) missing from params array: id');
   }
 
   /**
    * Test civicrm_tag_delete .
    */
-  function testTagDeleteOldSyntax() {
+  public function testTagDeleteOldSyntax() {
     $params = array(
       'tag_id' => $this->tagID,
     );
@@ -174,7 +174,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
   /**
    * Test civicrm_tag_delete = $params['id'] is correct
    */
-  function testTagDeleteCorrectSyntax() {
+  public function testTagDeleteCorrectSyntax() {
     $params = array(
       'id' => $this->tagID,
     );
@@ -182,14 +182,14 @@ class api_v3_TagTest extends CiviUnitTestCase {
     unset($this->ids['tag']);
   }
 
-  function testTagGetfields() {
+  public function testTagGetfields() {
     $description = "demonstrate use of getfields to interrogate api";
     $params      = array('action' => 'create');
     $result      = $this->callAPIAndDocument('tag', 'getfields', $params, __FUNCTION__, __FILE__, $description, NULL, 'getfields');
     $this->assertEquals('civicrm_contact', $result['values']['used_for']['api.default']);
   }
 
-  function testTagGetList() {
+  public function testTagGetList() {
     $description = "Demonstrates use of api.getlist for autocomplete and quicksearch applications";
     $params = array(
       'input' => $this->tag['name'],

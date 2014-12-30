@@ -2,7 +2,7 @@
 namespace Civi\CiUtil\Command;
 
 class AntagonistCommand {
-  static function main($argv) {
+  public static function main($argv) {
     if (count($argv) != 3) {
       print "usage: {$argv[0]} <TargetTest::testFunc> </path/to/suite>\n";
       exit(1);
@@ -36,7 +36,7 @@ class AntagonistCommand {
    *  - expectedResults: array
    *  - actualResults: array
    */
-  static function findAntagonist($target, $candidateTests) {
+  public static function findAntagonist($target, $candidateTests) {
     //$phpUnit = new \Civi\CiUtil\EnvTestRunner('./scripts/phpunit', 'EnvTests');
     $phpUnit = new \Civi\CiUtil\EnvTestRunner('phpunit', 'tests/phpunit/EnvTests.php');
     $expectedResults = $phpUnit->run(array($target));

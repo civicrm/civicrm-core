@@ -116,7 +116,7 @@ class CRM_Core_Permission {
    * @static
    * @access public
    */
-  static function check($permissions) {
+  public static function check($permissions) {
     $permissions = (array) $permissions;
 
     foreach ($permissions as $permission) {
@@ -164,7 +164,7 @@ class CRM_Core_Permission {
    * @static
    * @access public
    */
-  static function checkGroupRole($array) {
+  public static function checkGroupRole($array) {
     $config = CRM_Core_Config::singleton();
     return $config->userPermissionClass->checkGroupRole($array);
   }
@@ -254,7 +254,7 @@ class CRM_Core_Permission {
    *
    * @return string
    */
-  static function customGroupClause($type = CRM_Core_Permission::VIEW, $prefix = NULL, $reset = FALSE) {
+  public static function customGroupClause($type = CRM_Core_Permission::VIEW, $prefix = NULL, $reset = FALSE) {
     if (self::customGroupAdmin()) {
       return ' ( 1 ) ';
     }
@@ -334,7 +334,7 @@ class CRM_Core_Permission {
    *
    * @return array|string
    */
-  static function ufGroupClause($type = CRM_Core_Permission::VIEW, $prefix = NULL, $returnUFGroupIds = FALSE) {
+  public static function ufGroupClause($type = CRM_Core_Permission::VIEW, $prefix = NULL, $returnUFGroupIds = FALSE) {
     $groups = self::ufGroup($type);
     if ($returnUFGroupIds) {
       return $groups;
@@ -390,7 +390,7 @@ class CRM_Core_Permission {
    *
    * @return string
    */
-  static function eventClause($type = CRM_Core_Permission::VIEW, $prefix = NULL) {
+  public static function eventClause($type = CRM_Core_Permission::VIEW, $prefix = NULL) {
     $events = self::event($type);
     if (empty($events)) {
       return ' ( 0 ) ';
@@ -406,7 +406,7 @@ class CRM_Core_Permission {
    *
    * @return bool
    */
-  static function access($module, $checkPermission = TRUE) {
+  public static function access($module, $checkPermission = TRUE) {
     $config = CRM_Core_Config::singleton();
 
     if (!in_array($module, $config->enableComponents)) {
@@ -434,7 +434,7 @@ class CRM_Core_Permission {
    *
    * @return bool
    */
-  static function checkActionPermission($module, $action) {
+  public static function checkActionPermission($module, $action) {
     //check delete related permissions.
     if ($action & CRM_Core_Action::DELETE) {
       $permissionName = "delete in $module";
@@ -467,7 +467,7 @@ class CRM_Core_Permission {
    *
    * @return bool
    */
-  static function checkMenu(&$args, $op = 'and') {
+  public static function checkMenu(&$args, $op = 'and') {
     if (!is_array($args)) {
       return $args;
     }
@@ -489,7 +489,7 @@ class CRM_Core_Permission {
    * @return bool|mixed
    * @throws Exception
    */
-  static function checkMenuItem(&$item) {
+  public static function checkMenuItem(&$item) {
     if (!array_key_exists('access_callback', $item)) {
       CRM_Core_Error::backtrace();
       CRM_Core_Error::fatal();
@@ -543,7 +543,7 @@ class CRM_Core_Permission {
    *
    * @return array
    */
-  static function &basicPermissions($all = FALSE) {
+  public static function &basicPermissions($all = FALSE) {
     static $permissions = NULL;
 
     if (!$permissions) {
@@ -583,7 +583,7 @@ class CRM_Core_Permission {
   /**
    * @return array
    */
-  static function getAnonymousPermissionsWarnings() {
+  public static function getAnonymousPermissionsWarnings() {
     static $permissions = array();
     if (empty($permissions)) {
       $permissions = array(
@@ -605,14 +605,14 @@ class CRM_Core_Permission {
    *
    * @return array
    */
-  static function validateForPermissionWarnings($anonymous_perms) {
+  public static function validateForPermissionWarnings($anonymous_perms) {
     return array_intersect($anonymous_perms, self::getAnonymousPermissionsWarnings());
   }
 
   /**
    * @return array
    */
-  static function getCorePermissions() {
+  public static function getCorePermissions() {
     $prefix = ts('CiviCRM') . ': ';
     $permissions = array(
       'add contacts' => $prefix . ts('add contacts'),
@@ -668,7 +668,7 @@ class CRM_Core_Permission {
    *
    * return boolean true/false.
    **/
-  static function giveMeAllACLs() {
+  public static function giveMeAllACLs() {
     if (CRM_Core_Permission::check('view all contacts') ||
       CRM_Core_Permission::check('edit all contacts')
     ) {
@@ -710,7 +710,7 @@ class CRM_Core_Permission {
    * @return int|null|string
    * @static
    */
-  static function getComponentName($permission) {
+  public static function getComponentName($permission) {
     $componentName = NULL;
     $permission = trim($permission);
     if (empty($permission)) {
@@ -765,7 +765,7 @@ class CRM_Core_Permission {
   /**
    * @return bool
    */
-  static function isMultisiteEnabled() {
+  public static function isMultisiteEnabled() {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
       'is_enabled'
     ) ? TRUE : FALSE;

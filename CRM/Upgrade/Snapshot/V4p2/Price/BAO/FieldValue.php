@@ -50,7 +50,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @access public
    * @static
    */
-  static function &add(&$params, $ids) {
+  public static function &add(&$params, $ids) {
 
     $fieldValueBAO = new CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue();
     $fieldValueBAO->copyValues($params);
@@ -79,7 +79,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @access public
    * @static
    */
-  static function create(&$params, $ids) {
+  public static function create(&$params, $ids) {
 
     if (!is_array($params) || empty($params)) {
       return;
@@ -120,7 +120,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue', $params, $defaults);
   }
 
@@ -137,7 +137,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @access public
    * @static
    */
-  static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
+  public static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
     $fieldValueDAO = new CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue();
     $fieldValueDAO->price_field_id = $fieldId;
     $fieldValueDAO->orderBy($orderBy, 'label');
@@ -179,7 +179,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue', $id, 'is_active', $is_active);
   }
 
@@ -193,7 +193,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @access public
    * @static
    */
-  static function deleteValues($fieldId) {
+  public static function deleteValues($fieldId) {
     if (!$fieldId) {
       return FALSE;
     }
@@ -213,7 +213,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @access public
    * @static
    */
-  static function del($id) {
+  public static function del($id) {
     if (!$id) {
       return FALSE;
     }

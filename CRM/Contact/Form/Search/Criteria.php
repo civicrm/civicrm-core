@@ -36,7 +36,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param CRM_Core_Form $form
    */
-  static function basic(&$form) {
+  public static function basic(&$form) {
     $form->addElement('hidden', 'hidden_basic', 1);
 
     if ($form->_searchOptions['contactType']) {
@@ -273,7 +273,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param CRM_Core_Form $form
    */
-  static function location(&$form) {
+  public static function location(&$form) {
     $config = CRM_Core_Config::singleton();
     // Build location criteria based on _submitValues if
     // available; otherwise, use $form->_formValues.
@@ -388,7 +388,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param CRM_Core_Form $form
    */
-  static function activity(&$form) {
+  public static function activity(&$form) {
     $form->add('hidden', 'hidden_activity', 1);
     CRM_Activity_BAO_Query::buildSearchForm($form);
   }
@@ -396,7 +396,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param CRM_Core_Form $form
    */
-  static function changeLog(&$form) {
+  public static function changeLog(&$form) {
     $form->add('hidden', 'hidden_changeLog', 1);
 
     // block for change log
@@ -411,14 +411,14 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param CRM_Core_Form $form
    */
-  static function task(&$form) {
+  public static function task(&$form) {
     $form->add('hidden', 'hidden_task', 1);
   }
 
   /**
    * @param $form
    */
-  static function relationship(&$form) {
+  public static function relationship(&$form) {
     $form->add('hidden', 'hidden_relationship', 1);
 
     $allRelationshipType = array();
@@ -468,7 +468,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param $form
    */
-  static function demographics(&$form) {
+  public static function demographics(&$form) {
     $form->add('hidden', 'hidden_demographics', 1);
     // radio button for gender
     $genderOptions = array();
@@ -493,7 +493,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param $form
    */
-  static function notes(&$form) {
+  public static function notes(&$form) {
     $form->add('hidden', 'hidden_notes', 1);
 
     $options = array(
@@ -518,7 +518,7 @@ class CRM_Contact_Form_Search_Criteria {
    *
    * @return void
    */
-  static function custom(&$form) {
+  public static function custom(&$form) {
     $form->add('hidden', 'hidden_custom', 1);
     $extends = array_merge(array('Contact', 'Individual', 'Household', 'Organization'),
       CRM_Contact_BAO_ContactType::subTypes()
@@ -552,7 +552,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param $form
    */
-  static function CiviCase(&$form) {
+  public static function CiviCase(&$form) {
     //Looks like obsolete code, since CiviCase is a component, but might be used by HRD
     $form->add('hidden', 'hidden_CiviCase', 1);
     CRM_Case_BAO_Query::buildSearchForm($form);

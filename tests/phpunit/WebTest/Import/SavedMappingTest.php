@@ -38,7 +38,7 @@ class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
   /**
    * Test Saved Import Mapping for Individuals.
    */
-  function testSaveIndividualMapping() {
+  public function testSaveIndividualMapping() {
 
     // Logging in.
     $this->webtestLogin();
@@ -87,7 +87,7 @@ class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _individualCSVData() {
+  public function _individualCSVData() {
     $headers = array(
       'individual_prefix' => 'Individual Prefix',
       'first_name' => 'First Name',

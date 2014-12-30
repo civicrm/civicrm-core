@@ -39,7 +39,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_entity = 'Mailing';
   protected $_contactID;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
@@ -55,7 +55,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
+  public function tearDown() {
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
     parent::tearDown();
   }

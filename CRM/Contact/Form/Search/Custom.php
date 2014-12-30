@@ -101,14 +101,14 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (method_exists($this->_customSearchClass, 'setDefaultValues')) {
       return $this->_customClass->setDefaultValues();
     }
     return $this->_formValues;
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->_customClass->buildForm($this);
 
     parent::buildQuickForm();
@@ -123,7 +123,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
 
     $ext = CRM_Extension_System::singleton()->getMapper();
 
@@ -137,7 +137,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->set('isAdvanced', '3');
     $this->set('isCustom', '1');
 
@@ -174,7 +174,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
    *
    * @return bool
    */
-  function isPermissioned($components) {
+  public function isPermissioned($components) {
     if (empty($components)) {
       return TRUE;
     }

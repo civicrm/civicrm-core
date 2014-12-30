@@ -24,7 +24,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    *
    * @return mixed
    */
-  function registerParticipant($params, &$participant, $event) {
+  public function registerParticipant($params, &$participant, $event) {
     $transaction = new CRM_Core_Transaction();
 
     // handle register date CRM-4320
@@ -128,7 +128,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     return $participant;
   }
 
-  function buildPaymentFields() {
+  public function buildPaymentFields() {
     $payment_processor_id = NULL;
     $can_pay_later = TRUE;
     $pay_later_text = "";
@@ -173,7 +173,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
 
     $this->line_items    = array();
     $this->sub_total     = 0;
@@ -238,7 +238,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param $event_in_cart
    * @param null $class
    */
-  function process_event_line_item(&$event_in_cart, $class = NULL) {
+  public function process_event_line_item(&$event_in_cart, $class = NULL) {
     $cost         = 0;
     $price_set_id = CRM_Price_BAO_PriceSet::getFor("civicrm_event", $event_in_cart->event_id);
     $amount_level = NULL;
@@ -272,7 +272,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param $event_in_cart
    * @param null $class
    */
-  function add_line_item($event_in_cart, $class = NULL) {
+  public function add_line_item($event_in_cart, $class = NULL) {
     $amount = 0;
     $cost = 0;
     $not_waiting_participants = array();
@@ -306,7 +306,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   /**
    * @return mixed
    */
-  function getDefaultFrom() {
+  public function getDefaultFrom() {
     $values = CRM_Core_OptionGroup::values('from_email_address');
     return $values[1];
   }
@@ -315,7 +315,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param $events_in_cart
    * @param array $params
    */
-  function emailReceipt($events_in_cart, $params) {
+  public function emailReceipt($events_in_cart, $params) {
     $contact_details    = CRM_Contact_BAO_Contact::getContactDetails($this->payer_contact_id);
     $state_province     = new CRM_Core_DAO_StateProvince();
     $state_province->id = $params["billing_state_province_id-{$this->_bltID}"];
@@ -388,7 +388,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    *
    * @return array|bool
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     if ($self->payment_required && empty($self->_submitValues['is_pay_later'])) {
@@ -409,7 +409,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   /**
    * @return bool
    */
-  function validate() {
+  public function validate() {
     if ($this->is_pay_later) {
       $this->_fields['credit_card_number']['is_required'] = FALSE;
       $this->_fields['cvv2']['is_required'] = FALSE;
@@ -419,14 +419,14 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     return parent::validate();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $params = $this->_submitValues;
     $this->is_pay_later = CRM_Utils_Array::value('is_pay_later', $params, FALSE) && !CRM_Utils_Array::value('payment_completed', $params);
 
     parent::preProcess();
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $transaction = new CRM_Core_Transaction();
     $trxnDetails = NULL;
@@ -565,7 +565,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @return array
    * @throws Exception
    */
-  function make_payment(&$params) {
+  public function make_payment(&$params) {
     $config = CRM_Core_Config::singleton();
     if (isset($params["billing_state_province_id-{$this->_bltID}"]) && $params["billing_state_province_id-{$this->_bltID}"]) {
       $params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($params["billing_state_province_id-{$this->_bltID}"]);
@@ -607,7 +607,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @return object
    * @throws Exception
    */
-  function record_contribution(&$mer_participant, &$params, $event) {
+  public function record_contribution(&$mer_participant, &$params, $event) {
     if (self::is_administrator() && !empty($params['payment_type'])) {
       $params['payment_instrument_id'] = $params['payment_type'];
     }
@@ -654,7 +654,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     return $contribution;
   }
 
-  function saveDataToSession() {
+  public function saveDataToSession() {
     $session_line_items = array();
     foreach ($this->line_items as $line_item) {
       $session_line_item = array();
@@ -675,7 +675,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
 
     $defaults = parent::setDefaultValues();
 

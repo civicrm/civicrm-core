@@ -86,14 +86,14 @@ class CRM_Mailing_MailStore {
    *
    * @return array  array of ezcMail objects
    */
-  function allMails() {
+  public function allMails() {
     return $this->fetchNext(0);
   }
 
   /**
    * Expunge the messages marked for deletion; stub function to be redefined by IMAP store
    */
-  function expunge() {}
+  public function expunge() {}
 
   /**
    * Return the next X messages from the mail store
@@ -102,7 +102,7 @@ class CRM_Mailing_MailStore {
    *
    * @return array      array of ezcMail objects
    */
-  function fetchNext($count = 1) {
+  public function fetchNext($count = 1) {
     if (isset($this->_transport->options->uidReferencing) and $this->_transport->options->uidReferencing) {
       $offset = array_shift($this->_transport->listUniqueIdentifiers());
     }
@@ -144,7 +144,7 @@ class CRM_Mailing_MailStore {
    * @throws Exception
    * @return string       path to the Maildir's cur directory
    */
-  function maildir($name) {
+  public function maildir($name) {
     $config = CRM_Core_Config::singleton();
     $dir = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $name;
     foreach (array(

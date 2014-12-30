@@ -274,7 +274,7 @@ class CRM_Utils_Address {
    *
    * @return array
    */
-  static function sequence($format) {
+  public static function sequence($format) {
     // also compute and store the address sequence
     $addressSequence = array(
       'address_name',

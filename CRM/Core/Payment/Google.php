@@ -68,7 +68,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *
    * @return \CRM_Core_Payment_Google
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Google Checkout');
@@ -84,7 +84,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @return object
    * @static
    */
-  static function &singleton($mode, &$paymentProcessor) {
+  public static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (!isset(self::$_singleton[$processorName]) || self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_Google($mode, $paymentProcessor);
@@ -98,7 +98,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @return string the error message if any
    * @public
    */
-  function checkConfig() {
+  public function checkConfig() {
     $config = CRM_Core_Config::singleton();
 
     $error = array();
@@ -128,7 +128,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @return array the result in an nice formatted array (or an error object)
    * @abstract
    */
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -142,7 +142,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @return void
    * @access public
    */
-  function doTransferCheckout(&$params, $component) {
+  public function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);
 
     if (!empty($params['is_recur']) &&
@@ -169,7 +169,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @param array $params
    * @param $component
    */
-  function doRecurCheckout(&$params, $component) {
+  public function doRecurCheckout(&$params, $component) {
     $intervalUnit = CRM_Utils_Array::value('frequency_unit', $params);
     if ($intervalUnit == 'week') {
       $intervalUnit = 'WEEKLY';
@@ -216,7 +216,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @access public
    *
    */
-  function submitPostParams($params, $component, $cart) {
+  public function submitPostParams($params, $component, $cart) {
     $url = rtrim($this->_paymentProcessor['url_site'], '/') . '/cws/v2/Merchant/' . $this->_paymentProcessor['user_name'] . '/checkout';
 
     if ($component == "event") {
@@ -304,7 +304,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @searchParamsnvpStr is the array of search params.
    * returns an associtive array containing the response from the server.
    */
-  function invokeAPI($paymentProcessor, $searchParams) {
+  public function invokeAPI($paymentProcessor, $searchParams) {
     $merchantID  = $paymentProcessor['user_name'];
     $merchantKey = $paymentProcessor['password'];
     $siteURL     = rtrim(str_replace('https://', '', $paymentProcessor['url_site']), '/');
@@ -358,7 +358,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *
    * @return string
    */
-  static function buildXMLQuery($searchParams) {
+  public static function buildXMLQuery($searchParams) {
     $xml = '<?xml version="1.0" encoding="UTF-8"?>
 <notification-history-request xmlns="http://checkout.google.com/schema/2">';
 
@@ -396,7 +396,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *
    * @return array
    */
-  static function getArrayFromXML($xmlData) {
+  public static function getArrayFromXML($xmlData) {
     require_once 'Google/library/xml-processing/gc_xmlparser.php';
     $xmlParser = new gc_XmlParser($xmlData);
     $root      = $xmlParser->GetRoot();
@@ -411,7 +411,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *
    * @return object
    */
-  function &error($errorCode = NULL, $errorMessage = NULL) {
+  public function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = &CRM_Core_Error::singleton();
     if ($errorCode) {
       $e->push($errorCode, 0, NULL, $errorMessage);
@@ -425,7 +425,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   /**
    * @return string
    */
-  function accountLoginURL() {
+  public function accountLoginURL() {
     return ($this->_mode == 'test') ? 'https://sandbox.google.com/checkout/sell' : 'https://checkout.google.com/';
   }
 
@@ -435,7 +435,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *
    * @return bool|object
    */
-  function cancelSubscription(&$message = '', $params = array()) {
+  public function cancelSubscription(&$message = '', $params = array()) {
     $orderNo = CRM_Utils_Array::value('subscriptionId', $params);
 
     $merchant_id  = $this->_paymentProcessor['user_name'];

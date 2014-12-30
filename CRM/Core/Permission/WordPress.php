@@ -45,7 +45,7 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
    * @return boolean true if yes, else false
    * @access public
    */
-  function check($str) {
+  public function check($str) {
     // Generic cms 'administer users' role tranlates to 'administrator' WordPress role
     $str = $this->translatePermission($str, 'WordPress', array(
       'administer users' => 'administrator',
@@ -99,7 +99,7 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
   /**
    * {@inheritdoc}
    */
-  function upgradePermissions($permissions) {
+  public function upgradePermissions($permissions) {
     return;
   }
 }

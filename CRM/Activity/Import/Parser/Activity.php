@@ -57,7 +57,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   /**
    * Class constructor
    */
-  function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
+  public function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
     parent::__construct();
     $this->_mapperKeys = &$mapperKeys;
   }
@@ -68,7 +68,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * @return void
    * @access public
    */
-  function init() {
+  public function init() {
     $activityContact = CRM_Activity_BAO_ActivityContact::import();
     $activityTarget['target_contact_id'] = $activityContact['contact_id'];
     $fields = array_merge(CRM_Activity_BAO_Activity::importableFields(),
@@ -135,7 +135,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * @return boolean
    * @access public
    */
-  function mapField(&$values) {
+  public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
   }
 
@@ -147,7 +147,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * @return boolean      the result of this processing
    * @access public
    */
-  function preview(&$values) {
+  public function preview(&$values) {
     return $this->summary($values);
   }
 
@@ -159,7 +159,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * @return boolean      the result of this processing
    * @access public
    */
-  function summary(&$values) {
+  public function summary(&$values) {
     $erroneousField = NULL;
     $response       = $this->setActiveFieldValues($values, $erroneousField);
     $index          = -1;
@@ -242,7 +242,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * @return boolean      the result of this processing
    * @access public
    */
-  function import($onDuplicate, &$values) {
+  public function import($onDuplicate, &$values) {
     // first make sure this is a valid line
     $response = $this->summary($values);
 
@@ -398,7 +398,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * @return void
    * @access public
    */
-  function fini() {}
+  public function fini() {}
 
 }
 

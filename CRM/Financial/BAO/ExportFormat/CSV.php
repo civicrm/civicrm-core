@@ -50,14 +50,14 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
    * @param array $exportParams
    */
-  function export($exportParams) {
+  public function export($exportParams) {
     $export = parent::export($exportParams);
 
     // Save the file in the public directory
@@ -79,7 +79,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    *
    * @return Object
    */
-  function generateExportQuery($batchId) {
+  public function generateExportQuery($batchId) {
     $sql = "SELECT
       ft.id as financial_trxn_id,
       ft.trxn_date,
@@ -132,7 +132,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    *
    * @return string
    */
-  function putFile($export) {
+  public function putFile($export) {
     $config = CRM_Core_Config::singleton();
     $fileName = $config->uploadDir.'Financial_Transactions_'.$this->_batchIds.'_'.date('YmdHis').'.'.$this->getFileExtension();
     $this->_downloadFile[] = $config->customFileUploadDir.CRM_Utils_File::cleanFileName(basename($fileName));
@@ -154,7 +154,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    * @param array $values
    * @return array
    */
-  function formatHeaders($values) {
+  public function formatHeaders($values) {
     $arrayKeys = array_keys($values);
     $headers = '';
     if (!empty($arrayKeys)) {
@@ -171,7 +171,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    * @param array $export
    *
    */
-  function makeCSV($export) {
+  public function makeCSV($export) {
     foreach ($export as $batchId => $dao) {
       $financialItems = array();
       $this->_batchIds = $batchId;
@@ -219,16 +219,16 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
   /**
    * @return string
    */
-  function getFileExtension() {
+  public function getFileExtension() {
     return 'csv';
   }
 
-  function exportACCNT() {
+  public function exportACCNT() {
   }
 
-  function exportCUST() {
+  public function exportCUST() {
   }
 
-  function exportTRANS() {
+  public function exportTRANS() {
   }
 }

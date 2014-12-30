@@ -96,7 +96,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $continue = CRM_Utils_Request::retrieve('continue', 'String', $this, FALSE, NULL);
 
     $defaults = array();
@@ -549,7 +549,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
    * @static
    * @access public
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
     if (isset($fields['includeGroups']) &&
       is_array($fields['includeGroups']) &&

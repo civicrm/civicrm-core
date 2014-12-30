@@ -9,7 +9,7 @@ abstract class CRM_Core_CodeGen_BaseTask implements CRM_Core_CodeGen_ITask {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
   }
 
   // TODO: this is the most rudimentary possible hack.  CG config should
@@ -17,7 +17,7 @@ abstract class CRM_Core_CodeGen_BaseTask implements CRM_Core_CodeGen_ITask {
   /**
    * @param is $config
    */
-  function setConfig($config) {
+  public function setConfig($config) {
     $this->config = $config;
     $this->tables = $this->config->tables;
   }

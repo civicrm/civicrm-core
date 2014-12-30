@@ -35,7 +35,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContactContextAdd() {
+  public function testContactContextAdd() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();

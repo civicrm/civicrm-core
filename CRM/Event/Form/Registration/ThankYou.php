@@ -46,7 +46,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $this->_params      = $this->get('params');
     $this->_lineItem    = $this->get('lineItem');
@@ -74,7 +74,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    * @return int
    * @access public
    */
-  function getAction() {
+  public function getAction() {
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       return CRM_Core_Action::VIEW | CRM_Core_Action::PREVIEW;
     }

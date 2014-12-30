@@ -42,7 +42,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -56,7 +56,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
     $paymentProcessorType->copyValues($params);
     if ($paymentProcessorType->find(TRUE)) {
@@ -77,7 +77,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_PaymentProcessorType', $id, 'is_active', $is_active);
   }
 
@@ -91,7 +91,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @static
    * @access public
    */
-  static function &getDefault() {
+  public static function &getDefault() {
     if (self::$_defaultPaymentProcessorType == NULL) {
       $params = array('is_default' => 1);
       $defaults = array();
@@ -110,7 +110,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
     $paymentProcessorType->copyValues($params);
 
@@ -178,7 +178,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @access public
    * @static
    */
-  static function del($paymentProcessorTypeId) {
+  public static function del($paymentProcessorTypeId) {
     $query = "
 SELECT pp.id processor_id
 FROM civicrm_payment_processor pp, civicrm_payment_processor_type ppt

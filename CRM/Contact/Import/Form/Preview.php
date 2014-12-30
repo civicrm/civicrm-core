@@ -199,7 +199,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * @static
    * @access public
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $invalidTagName = $invalidGroupName = FALSE;
 

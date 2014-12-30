@@ -34,7 +34,7 @@ require_once 'CiviTest/AuthorizeNet.php';
  */
 class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->paymentProcessor = new AuthorizeNet();
     $this->processorParams = $this->paymentProcessor->create();
@@ -54,7 +54,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = array( );
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->paymentProcessor->delete($this->processorParams->id);
     $this->quickCleanUpFinancialEntities();
   }
@@ -64,7 +64,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    *
    * Test works but not both due to some form of caching going on in the SmartySingleton
    */
-  function testCreateSingleNowDated() {
+  public function testCreateSingleNowDated() {
     $firstName  = 'John_' .  substr(sha1(rand()), 0, 7);
     $lastName   = 'Smith_' . substr(sha1(rand()), 0, 7);
     $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
@@ -195,7 +195,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   /**
    * Create a single post dated payment as a recurring transaction
    */
-  function testCreateSinglePostDated() {
+  public function testCreateSinglePostDated() {
     $start_date = date('Ymd', strtotime("+ 1 week"));
 
     $firstName  = 'John_' .  substr(sha1(rand()), 0, 7);

@@ -1054,7 +1054,7 @@ class CRM_Utils_Token {
    * @return array $tokens array of tokens mentioned in field@access public
    * @static
    */
-  static function getTokens($string) {
+  public static function getTokens($string) {
     $matches = array();
     $tokens = array();
     preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
@@ -1219,7 +1219,7 @@ class CRM_Utils_Token {
    * @param string $jobID
    * @return array contactDetails with hooks swapped out
    */
-  function getAnonymousTokenDetails($contactIDs = array(0),
+  public function getAnonymousTokenDetails($contactIDs = array(0),
     $returnProperties = NULL,
     $skipOnHold       = TRUE,
     $skipDeceased     = TRUE,
@@ -1306,7 +1306,7 @@ class CRM_Utils_Token {
    * Get Membership Token Details
    * @param array $membershipIDs array of membership IDS
    */
-  static function getMembershipTokenDetails($membershipIDs) {
+  public static function getMembershipTokenDetails($membershipIDs) {
     $memberships = civicrm_api3('membership', 'get', array('options' => array('limit' => 200000), 'membership_id' => array('IN' => (array) $membershipIDs)));
     return $memberships['values'];
   }
@@ -1315,7 +1315,7 @@ class CRM_Utils_Token {
    *
    * @access public
    */
-  static function replaceGreetingTokens(&$tokenString, $contactDetails = NULL, $contactId = NULL, $className = NULL, $escapeSmarty = FALSE) {
+  public static function replaceGreetingTokens(&$tokenString, $contactDetails = NULL, $contactId = NULL, $className = NULL, $escapeSmarty = FALSE) {
 
     if (!$contactDetails && !$contactId) {
       return;
@@ -1392,7 +1392,7 @@ class CRM_Utils_Token {
    *
    * @return array
    */
-  static function flattenTokens(&$tokens) {
+  public static function flattenTokens(&$tokens) {
     $flattenTokens = array();
 
     foreach (array(
@@ -1683,7 +1683,7 @@ class CRM_Utils_Token {
   /**
    * @return array: legacy_token => new_token
    */
-  static function legacyContactTokens() {
+  public static function legacyContactTokens() {
     return array(
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
@@ -1697,7 +1697,7 @@ class CRM_Utils_Token {
    * @param $tokens
    * @return array
    */
-  static function formatTokensForDisplay($tokens) {
+  public static function formatTokensForDisplay($tokens) {
     $sorted = $output = array();
 
     // Sort in ascending order by ignoring word case

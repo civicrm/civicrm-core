@@ -40,7 +40,7 @@ class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    * return null
    * @access public
    */
-  function listPledges() {
+  public function listPledges() {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Pledge_Form_Search',
       ts('Pledges'),
@@ -76,7 +76,7 @@ class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    * return null
    * @access public
    */
-  function run() {
+  public function run() {
     parent::preProcess();
     $this->listPledges();
   }

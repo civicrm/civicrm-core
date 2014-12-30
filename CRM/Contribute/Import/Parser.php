@@ -407,7 +407,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * @return void
    * @access public
    */
-  function setActiveFields($fieldKeys) {
+  public function setActiveFields($fieldKeys) {
     $this->_activeFieldCount = count($fieldKeys);
     foreach ($fieldKeys as $key) {
       if (empty($this->_fields[$key])) {
@@ -422,7 +422,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
   /**
    * @param array $elements
    */
-  function setActiveFieldSoftCredit($elements) {
+  public function setActiveFieldSoftCredit($elements) {
     for ($i = 0; $i < count($elements); $i++) {
       $this->_activeFields[$i]->_softCreditField = $elements[$i];
     }
@@ -431,7 +431,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
   /**
    * @param array $elements
    */
-  function setActiveFieldSoftCreditType($elements) {
+  public function setActiveFieldSoftCreditType($elements) {
     for ($i = 0; $i < count($elements); $i++) {
       $this->_activeFields[$i]->_softCreditType = $elements[$i];
     }
@@ -443,7 +443,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * @return array (reference ) associative array of name/value pairs
    * @access public
    */
-  function &getActiveFieldParams() {
+  public function &getActiveFieldParams() {
     $params = array();
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)) {
@@ -474,7 +474,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * @param string $headerPattern
    * @param string $dataPattern
    */
-  function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
+  public function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
     if (empty($name)) {
       $this->_fields['doNotImport'] = new CRM_Contribute_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
     }
@@ -501,7 +501,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * @return void
    * @access public
    */
-  function set($store, $mode = self::MODE_SUMMARY) {
+  public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('fileSize', $this->_fileSize);
     $store->set('lineCount', $this->_lineCount);
     $store->set('seperator', $this->_seperator);
@@ -570,7 +570,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * @return void
    * @access public
    */
-  static function exportCSV($fileName, $header, $data) {
+  public static function exportCSV($fileName, $header, $data) {
     $output = array();
     $fd = fopen($fileName, 'w');
 
@@ -607,7 +607,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    *
    * @return string
    */
-  static function errorFileName($type) {
+  public static function errorFileName($type) {
     $fileName = NULL;
     if (empty($type)) {
       return $fileName;
@@ -640,7 +640,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    *
    * @return string
    */
-  static function saveFileName($type) {
+  public static function saveFileName($type) {
     $fileName = NULL;
     if (empty($type)) {
       return $fileName;

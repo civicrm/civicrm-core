@@ -58,7 +58,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @return array $_actionLinks
    *
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!self::$_actionLinks) {
       // helper variable for nicer formatting
@@ -142,7 +142,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE,
@@ -195,7 +195,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function copy() {
+  public function copy() {
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive',
       $this, TRUE, 0, 'GET'
     );
@@ -210,7 +210,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function profile() {
+  public function profile() {
     $config = CRM_Core_Config::singleton();
 
     // reassign resource base to be the full url, CRM-4660
@@ -277,7 +277,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function edit($id, $action) {
+  public function edit($id, $action) {
     // create a simple controller for editing uf data
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Group', ts('CiviCRM Profile Group'), $action);
     $this->setContext($id, $action);
@@ -296,7 +296,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @access public
    * @static
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     $ufGroup = array();
     $allUFGroups = array();
     $allUFGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup();
@@ -392,7 +392,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function preview($id, $action) {
+  public function preview($id, $action) {
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Preview', ts('CiviCRM Profile Group Preview'), NULL);
     $controller->set('id', $id);
     $controller->setEmbedded(TRUE);
@@ -404,7 +404,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param int $id
    * @param $action
    */
-  function setContext($id, $action) {
+  public function setContext($id, $action) {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     //we need to differentiate context for update and preview profile.
@@ -428,7 +428,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    *
    * @return array
    */
-  static function extractGroupTypes($groupType) {
+  public static function extractGroupTypes($groupType) {
     $returnGroupTypes = array();
     if (!$groupType) {
       return $returnGroupTypes;

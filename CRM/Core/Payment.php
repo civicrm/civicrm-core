@@ -95,7 +95,7 @@ abstract class CRM_Core_Payment {
    * @static
    *
    */
-  static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
+  public static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     // make sure paymentProcessor is not empty
     // CRM-7424
     if (empty($paymentProcessor)) {
@@ -200,7 +200,7 @@ abstract class CRM_Core_Payment {
    * @param CRM_Core_Form $paymentForm
    *
    */
-  function setForm(&$paymentForm) {
+  public function setForm(&$paymentForm) {
     $this->_paymentForm = $paymentForm;
   }
 
@@ -209,7 +209,7 @@ abstract class CRM_Core_Payment {
    *
    * @return CRM_Core_Form  A form object
    */
-  function getForm() {
+  public function getForm() {
     return $this->_paymentForm;
   }
 
@@ -220,7 +220,7 @@ abstract class CRM_Core_Payment {
    *
    * @return null
    */
-  function getVar($name) {
+  public function getVar($name) {
     return isset($this->$name) ? $this->$name : NULL;
   }
 
@@ -461,7 +461,7 @@ abstract class CRM_Core_Payment {
    *
    * @return bool
    */
-  static function paypalRedirect(&$paymentProcessor) {
+  public static function paypalRedirect(&$paymentProcessor) {
     if (!$paymentProcessor) {
       return FALSE;
     }
@@ -481,7 +481,7 @@ abstract class CRM_Core_Payment {
    * Page callback for civicrm/payment/ipn
    * @public
    */
-  static function handleIPN() {
+  public static function handleIPN() {
     self::handlePaymentMethod(
       'PaymentNotification',
       array(
@@ -502,7 +502,7 @@ abstract class CRM_Core_Payment {
    * @param $method
    * @param array $params
    */
-  static function handlePaymentMethod($method, $params = array()) {
+  public static function handlePaymentMethod($method, $params = array()) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
       CRM_Core_Error::fatal("Either 'processor_id' or 'processor_name' param is required for payment callback");
     }
@@ -601,7 +601,7 @@ abstract class CRM_Core_Payment {
    * @return boolean
    * @public
    */
-  function isSupported($method = 'cancelSubscription') {
+  public function isSupported($method = 'cancelSubscription') {
     return method_exists(CRM_Utils_System::getClassName($this), $method);
   }
 
@@ -612,7 +612,7 @@ abstract class CRM_Core_Payment {
    *
    * @return string
    */
-  function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
+  public function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
     // Set URL
     switch ($action) {
       case 'cancel' :

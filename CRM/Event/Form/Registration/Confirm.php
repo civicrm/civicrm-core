@@ -62,7 +62,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     // lineItem isn't set until Register postProcess
@@ -212,7 +212,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @return int
    * @access public
    */
-  function getAction() {
+  public function getAction() {
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       return CRM_Core_Action::VIEW | CRM_Core_Action::PREVIEW;
     }
@@ -394,7 +394,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->addFormRule(array('CRM_Event_Form_Registration_Confirm', 'formRule'), $this);
   }
 
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $eventFull = CRM_Event_BAO_Participant::eventFull($self->_eventId, FALSE, CRM_Utils_Array::value('has_waitlist', $self->_values['event']));
     if ($eventFull && empty($self->_allowConfirmation)) {

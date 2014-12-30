@@ -48,7 +48,7 @@ class CRM_Event_Page_ICalendar extends CRM_Core_Page {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $id       = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
     $type     = CRM_Utils_Request::retrieve('type', 'Positive', $this, FALSE, 0);
     $start    = CRM_Utils_Request::retrieve('start', 'Positive', $this, FALSE, 0);

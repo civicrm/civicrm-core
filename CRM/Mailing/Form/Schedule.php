@@ -75,7 +75,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if ($this->_scheduleFormOnly) {
       $count = CRM_Mailing_BAO_Recipients::mailingSize($this->_mailingID);

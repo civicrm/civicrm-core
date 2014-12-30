@@ -72,7 +72,7 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
    *
    * @return array|bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
 
     if (CRM_Utils_Array::value('mailerJobSize', $fields) > 0) {

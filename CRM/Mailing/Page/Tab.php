@@ -54,7 +54,7 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
    * return null
    * @access public
    */
-  function browse() {
+  public function browse() {
   }
 
   /**
@@ -63,7 +63,7 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
@@ -87,7 +87,7 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
    * return null
    * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     $this->browse();
 

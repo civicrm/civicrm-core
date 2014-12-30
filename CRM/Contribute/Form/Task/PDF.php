@@ -139,7 +139,7 @@ AND    {$this->_componentClause}";
   /**
    * Set default values
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
     return array('pdf_format_id' => $defaultFormat['id'], 'receipt_update' => 1, 'override_privacy' => 0);
   }

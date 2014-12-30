@@ -86,7 +86,7 @@ class CRM_Extension_Info {
    * @param null $label
    * @param null $file
    */
-  function __construct($key = NULL, $type = NULL, $name = NULL, $label = NULL, $file = NULL) {
+  public function __construct($key = NULL, $type = NULL, $name = NULL, $label = NULL, $file = NULL) {
     $this->key       = $key;
     $this->type      = $type;
     $this->name      = $name;

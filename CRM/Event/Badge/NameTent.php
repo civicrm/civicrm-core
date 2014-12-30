@@ -41,7 +41,7 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
     // A4
     $pw            = 297;
@@ -58,7 +58,7 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
     //      $this->setDebug ();
   }
 
-  function pdfExtraFormat() {
+  public function pdfExtraFormat() {
     $this->pdf->setPageFormat('A4', 'L');
   }
 

@@ -35,7 +35,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneContributeAdd() {
+  public function testStandaloneContributeAdd() {
     $this->webtestLogin();
 
     // Create a contact to be used as soft creditor
@@ -181,7 +181,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     }
   }
 
-  function testfinancialTypeSearch() {
+  public function testfinancialTypeSearch() {
     $this->webtestLogin();
 
     $financialType = array(
@@ -214,7 +214,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
   /**
    * @param $financialType
    */
-  function addStandaloneContribution($financialType) {
+  public function addStandaloneContribution($financialType) {
 
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
@@ -277,7 +277,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     }
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
     $triggerElement = array('name' => 'financial_type_id', 'type' => 'select');
     $customSets = array(

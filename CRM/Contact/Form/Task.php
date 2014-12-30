@@ -94,7 +94,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     self::preProcessCommon($this);
   }
 
@@ -102,7 +102,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * @param CRM_Core_Form $form
    * @param bool $useTable
    */
-  static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form, $useTable = FALSE) {
 
     $form->_contactIds = array();
     $form->_contactTypes = array();
@@ -334,7 +334,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     return $defaults;
   }
@@ -345,7 +345,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function addRules() {
+  public function addRules() {
   }
 
   /**
@@ -380,7 +380,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
+  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
         array(
           'type' => $nextType,

@@ -41,7 +41,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @throws CRM_Core_Exception
    */
-  function __construct($inputData) {
+  public function __construct($inputData) {
     $this->setInputParameters($inputData);
     parent::__construct();
   }
@@ -51,7 +51,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return bool|void
    */
-  function main($component = 'contribute') {
+  public function main($component = 'contribute') {
 
     //we only get invoice num as a key player from payment gateway response.
     //for ARB we get x_subscription_id and x_subscription_paynum
@@ -97,7 +97,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return bool
    */
-  function recur(&$input, &$ids, &$objects, $first) {
+  public function recur(&$input, &$ids, &$objects, $first) {
     $this->_isRecurring = TRUE;
     $recur = &$objects['contributionRecur'];
 
@@ -206,7 +206,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @param $input
    * @param $ids
    */
-  function getInput(&$input, &$ids) {
+  public function getInput(&$input, &$ids) {
     $input['amount'] = $this->retrieve('x_amount', 'String');
     $input['subscription_id'] = $this->retrieve('x_subscription_id', 'Integer');
     $input['response_code'] = $this->retrieve('x_response_code', 'Integer');
@@ -247,7 +247,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @param $ids
    * @param $input
    */
-  function getIDs(&$ids, &$input) {
+  public function getIDs(&$ids, &$input) {
     $ids['contact'] = $this->retrieve('x_cust_id', 'Integer', FALSE, 0);
     $ids['contribution'] = $this->retrieve('x_invoice_num', 'Integer');
 
@@ -310,7 +310,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * @throws CRM_Core_Exception
    * @return mixed
    */
-  function retrieve($name, $type, $abort = TRUE, $default = NULL) {
+  public function retrieve($name, $type, $abort = TRUE, $default = NULL) {
     $value = CRM_Utils_Type::validate(
       empty($this->_inputParameters[$name]) ? $default : $this->_inputParameters[$name],
       $type,
@@ -328,7 +328,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    *
    * @return bool
    */
-  function checkMD5($ids, $input) {
+  public function checkMD5($ids, $input) {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ids['paymentProcessor'],
       $input['is_test'] ? 'test' : 'live'
     );

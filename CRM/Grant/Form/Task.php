@@ -82,7 +82,7 @@ class CRM_Grant_Form_Task extends CRM_Core_Form {
    * @param CRM_Core_Form $form
    * @param bool $useTable
    */
-  static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form, $useTable = FALSE) {
     $form->_grantIds = array();
 
     $values = $form->controller->exportValues('Search');
@@ -155,7 +155,7 @@ class CRM_Grant_Form_Task extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
+  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
         array(
           'type' => $nextType,

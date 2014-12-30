@@ -69,7 +69,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @return array  array of action links that we need to display for the browse screen
    * @access public
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
@@ -126,7 +126,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function browse() {
+  public function browse() {
     $resourceManager = CRM_Core_Resources::singleton();
     if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
       $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
@@ -209,7 +209,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function edit($action) {
+  public function edit($action) {
     // create a simple controller for editing custom dataCRM/Custom/Page/Field.php
     $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Field', ts('Custom Field'), $action);
 
@@ -234,7 +234,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function run() {
+  public function run() {
 
 
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
@@ -313,7 +313,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function preview($id) {
+  public function preview($id) {
     $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Preview', ts('Preview Custom Data'), CRM_Core_Action::PREVIEW);
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&action=browse&gid=' . $this->_gid));

@@ -39,7 +39,7 @@
 class CRM_SMS_Form_Upload extends CRM_Core_Form {
   public $_mailingID;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_mailingID = $this->get('mailing_id');
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $this->assign('isAdmin', 1);
@@ -54,7 +54,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
 
     //need to differentiate new/reuse mailing, CRM-2873
@@ -301,7 +301,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
    * @access public
    * @static
    */
-  static function formRule($params, $files, $self) {
+  public static function formRule($params, $files, $self) {
     if (!empty($_POST['_qf_Import_refresh'])) {
       return TRUE;
     }

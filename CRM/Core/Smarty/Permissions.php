@@ -10,7 +10,7 @@ class CRM_Core_Smarty_Permissions {
    *
    * @return bool
    */
-  function check($offset) {
+  public function check($offset) {
     return CRM_Core_Permission::check($offset);
   }
 

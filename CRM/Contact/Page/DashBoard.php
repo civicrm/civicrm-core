@@ -45,7 +45,7 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
    * @return void
    * @access public
    */
-  function run() {
+  public function run() {
     // Add dashboard js and css
     $resources = CRM_Core_Resources::singleton();
     $resources->addScriptFile('civicrm', 'js/jquery/jquery.dashboard.js', 0, 'html-header', FALSE);

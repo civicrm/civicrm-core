@@ -9,7 +9,7 @@ class CRM_Event_Cart_Form_Checkout_ConferenceEvents extends CRM_Event_Cart_Form_
   public $main_participant = NULL;
   public $contact_id = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $matches = array();
     preg_match("/.*_(\d+)_(\d+)/", $this->getAttribute('name'), $matches);
@@ -49,7 +49,7 @@ EOS;
     }
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     //drupal_add_css(drupal_get_path('module', 'jquery_ui') . '/jquery.ui/themes/base/jquery-ui.css');
     //variable_set('jquery_update_compression_type', 'none');
     //jquery_ui_add('ui.dialog');
@@ -110,7 +110,7 @@ EOS;
     $this->addButtons($buttons);
   }
 
-  function postProcess() {
+  public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
     $main_event_in_cart = $this->cart->get_event_in_cart_by_event_id($this->conference_event->id);

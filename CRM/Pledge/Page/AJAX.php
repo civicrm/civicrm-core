@@ -41,7 +41,7 @@ class CRM_Pledge_Page_AJAX {
   /**
    * Building Pledge Name combo box
    */
-  static function pledgeName() {
+  public static function pledgeName() {
 
     $getRecords = FALSE;
     if (isset($_GET['name']) && $_GET['name']) {
@@ -90,7 +90,7 @@ WHERE {$whereClause}
     * Function to setDefaults according to Pledge Id
     * for batch entry pledges
     */
-  function getPledgeDefaults() {
+  public function getPledgeDefaults() {
     $details = array();
     if (!empty($_POST['pid'])) {
       $pledgeID = CRM_Utils_Type::escape($_POST['pid'], 'Integer');

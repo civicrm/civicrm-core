@@ -92,7 +92,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     return $defaults;
   }
@@ -162,7 +162,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     return empty($errors) ? TRUE : $errors;

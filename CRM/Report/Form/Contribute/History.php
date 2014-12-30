@@ -57,7 +57,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $yearsInPast = 4;
     $date = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, 0);
     $count = $date['maxYear'];
@@ -240,11 +240,11 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
 
@@ -309,7 +309,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_contact  {$this->_aliases['civicrm_contact']}
              INNER JOIN civicrm_contribution   {$this->_aliases['civicrm_contribution']}
@@ -341,7 +341,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $whereClauses = $havingClauses = $relationshipWhere = array();
     $this->_relationshipWhere = '';
     $this->_statusClause = '';
@@ -418,7 +418,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contribution']}.contact_id, YEAR({$this->_aliases['civicrm_contribution']}.receive_date)";
   }
 
@@ -426,7 +426,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
    * @param int $rowCount
    */
-  function limit($rowCount = self::ROW_COUNT_LIMIT) {
+  public function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
   }
 
@@ -434,7 +434,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
    * @param int $rowCount
    */
-  function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+  public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     parent::setPager($rowCount);
   }
 
@@ -443,7 +443,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     $count = 0;
     foreach ($rows as $rownum => $row) {
@@ -473,7 +473,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if (!empty($fields['this_year_value']) &&
       !empty($fields['other_year_value']) &&
@@ -484,7 +484,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     return $errors;
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get ready with post process params
     $this->beginPostProcess();
     $this->fixReportParams();
@@ -513,7 +513,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
-  function fixReportParams() {
+  public function fixReportParams() {
     if (!empty($this->_params['this_year_value'])) {
       $this->_referenceYear['this_year'] = $this->_params['this_year_value'];
     }
@@ -525,7 +525,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function buildRows($sql, &$rows) {
+  public function buildRows($sql, &$rows) {
     $contactIds = array();
 
     $addWhere = '';
@@ -620,7 +620,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
    *
    * @return array
    */
-  function buildContributionRows($contactIds) {
+  public function buildContributionRows($contactIds) {
     $rows = array();
     if (empty($contactIds)) {
       return $rows;
@@ -673,7 +673,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
    *
    * @return array
    */
-  function buildRelationshipRows($contactIds) {
+  public function buildRelationshipRows($contactIds) {
     $relationshipRows = $relatedContactIds = array();
     if (empty($contactIds)) {
       return array($relationshipRows, $relatedContactIds);
@@ -720,7 +720,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
    *
    * @return array
    */
-  function getOperationPair($type = "string", $fieldName = NULL) {
+  public function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'this_year' || $fieldName == 'other_year') {
       return array(
         'calendar' => ts('Is Calendar Year'),
@@ -733,7 +733,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     if (empty($rows)) {
       return;
     }

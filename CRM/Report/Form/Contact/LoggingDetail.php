@@ -37,7 +37,7 @@ class CRM_Report_Form_Contact_LoggingDetail extends CRM_Logging_ReportDetail {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $logging        = new CRM_Logging_Schema;
     $this->tables[] = 'civicrm_contact';
     $this->tables   = array_merge($this->tables, array_keys($logging->customDataLogTables()));
@@ -61,7 +61,7 @@ class CRM_Report_Form_Contact_LoggingDetail extends CRM_Logging_ReportDetail {
     parent::__construct();
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $layout = CRM_Utils_Request::retrieve('layout', 'String', $this);
     $this->assign('layout', $layout);
 

@@ -53,7 +53,7 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     if ($this->get('register')) {
       $this->_mode = CRM_Profile_Form::MODE_REGISTER;
     }
@@ -106,7 +106,7 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     $errors = array();
 
     // if no values, return

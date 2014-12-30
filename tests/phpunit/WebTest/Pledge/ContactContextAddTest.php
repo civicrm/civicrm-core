@@ -35,7 +35,7 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContactContextAddTest() {
+  public function testContactContextAddTest() {
     $this->webtestLogin();
     // Disable pop-ups for this test. Running test w/ pop-ups causes a spurious failure. dgg
     $this->enableDisablePopups(FALSE);

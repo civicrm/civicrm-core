@@ -38,7 +38,7 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
   /**
    *  Test participant import for Individuals.
    */
-  function testMemberImportIndividual() {
+  public function testMemberImportIndividual() {
 
     $this->webtestLogin();
 
@@ -52,7 +52,7 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
   /**
    *  Test participant import for Households.
    */
-  function testMemberImportHousehold() {
+  public function testMemberImportHousehold() {
 
     $this->webtestLogin();
 
@@ -66,7 +66,7 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
   /**
    *  Test participant import for Organizations.
    */
-  function testMemberImportOrganization() {
+  public function testMemberImportOrganization() {
 
     $this->webtestLogin();
 
@@ -82,7 +82,7 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _memberIndividualCSVData() {
+  public function _memberIndividualCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 
     $firstName1 = substr(sha1(rand()), 0, 7);
@@ -128,7 +128,7 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _memberHouseholdCSVData() {
+  public function _memberHouseholdCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 
     $household1 = substr(sha1(rand()), 0, 7) . ' home';
@@ -172,7 +172,7 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _memberOrganizationCSVData() {
+  public function _memberOrganizationCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 
     $organization1 = substr(sha1(rand()), 0, 7) . ' org';

@@ -83,7 +83,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->_action & CRM_Core_Action::ADD) {

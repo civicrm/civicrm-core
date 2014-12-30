@@ -35,7 +35,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddPriceSet() {
+  public function testAddPriceSet() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -74,7 +74,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
    * @param $setHelp
    * @param null $financialType
    */
-  function _testAddSet($setTitle, $usedFor, $setHelp, $financialType = NULL) {
+  public function _testAddSet($setTitle, $usedFor, $setHelp, $financialType = NULL) {
     $this->openCiviPage("admin/price", "reset=1&action=add", '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
@@ -101,7 +101,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
    * @param $financialType
    * @param bool $dateSpecificFields
    */
-  function _testAddPriceFields(&$fields, &$validateString, $financialType, $dateSpecificFields = FALSE) {
+  public function _testAddPriceFields(&$fields, &$validateString, $financialType, $dateSpecificFields = FALSE) {
     $validateStrings[] = $financialType;
     $sid = $this->urlArg('sid');
     $this->openCiviPage('admin/price/field', "reset=1&action=add&sid=$sid", 'label');
@@ -187,7 +187,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
   /**
    * @return string
    */
-  function _testAddFinancialType() {
+  public function _testAddFinancialType() {
     //Add new Financial Type
     $financialType['name'] = 'FinancialType ' . substr(sha1(rand()), 0, 4);
     $financialType['is_deductible'] = TRUE;
@@ -200,7 +200,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
    * @param $validateStrings
    * @param int $sid
    */
-  function _testVerifyPriceSet($validateStrings, $sid) {
+  public function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
     $this->openCiviPage("admin/price", "reset=1");
@@ -211,7 +211,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent($validateStrings);
   }
 
-  function testContributeOfflineWithPriceSet() {
+  public function testContributeOfflineWithPriceSet() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -312,7 +312,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     }
   }
 
-  function testContributeOnlineWithPriceSet() {
+  public function testContributeOnlineWithPriceSet() {
     $this->webtestLogin();
 
     //add financial type of account type expense
@@ -434,7 +434,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
   }
 
-  function testContributeWithDateSpecificPriceSet() {
+  public function testContributeWithDateSpecificPriceSet() {
     $this->webtestLogin();
 
     //add financial type of account type expense
@@ -549,7 +549,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 
-  function testContributeOfflineforSoftcreditwithApi() {
+  public function testContributeOfflineforSoftcreditwithApi() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 

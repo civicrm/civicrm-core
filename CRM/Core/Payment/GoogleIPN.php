@@ -65,7 +65,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return mixed
    */
-  static function retrieve($name, $type, $object, $abort = TRUE) {
+  public static function retrieve($name, $type, $object, $abort = TRUE) {
     $value = CRM_Utils_Array::value($name, $object);
     if ($abort && $value === NULL) {
       CRM_Core_Error::debug_log_message("Could not find an entry for $name");
@@ -93,7 +93,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return \CRM_Core_Payment_GoogleIPN
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     parent::__construct();
 
     $this->_mode = $mode;
@@ -110,7 +110,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return void
    */
-  function newOrderNotify($dataRoot, $privateData, $component) {
+  public function newOrderNotify($dataRoot, $privateData, $component) {
     $ids = $input = $params = array();
 
     $input['component'] = strtolower($component);
@@ -251,7 +251,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return void
    */
-  function orderStateChange($status, $dataRoot, $privateData, $component) {
+  public function orderStateChange($status, $dataRoot, $privateData, $component) {
     $input = $objects = $ids = array();
     $input['component'] = strtolower($component);
 
@@ -343,7 +343,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    * @param $ids
    * @param $objects
    */
-  function completeRecur($input, $ids, $objects) {
+  public function completeRecur($input, $ids, $objects) {
     if ($ids['contributionRecur']) {
       $recur               = &$objects['contributionRecur'];
       $contributionCount   = CRM_Core_DAO::singleValueQuery("
@@ -402,7 +402,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    * @return object
    * @static
    */
-  static function &singleton($mode, $component, &$paymentProcessor) {
+  public static function &singleton($mode, $component, &$paymentProcessor) {
     if (self::$_singleton === NULL) {
       self::$_singleton = new CRM_Core_Payment_GoogleIPN($mode, $paymentProcessor);
     }
@@ -417,7 +417,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    * @return amount
    * @access public
    */
-  function getAmount($orderNo) {
+  public function getAmount($orderNo) {
     $contribution = new CRM_Contribute_DAO_Contribution();
     $contribution->invoice_id = $orderNo;
     if (!$contribution->find(TRUE)) {
@@ -441,7 +441,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    * @return array context of this call (test, module, payment processor id)
    * @static
    */
-  function getContext($privateData, $orderNo, $root, $response, $serial) {
+  public function getContext($privateData, $orderNo, $root, $response, $serial) {
     $contributionID = CRM_Utils_Array::value('contributionID', $privateData);
     $contribution = new CRM_Contribute_DAO_Contribution();
     if ($root == 'new-order-notification') {
@@ -508,7 +508,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    * a notification or request is sent by the Google Server.
    *
    */
-  static function main($xml_response) {
+  public static function main($xml_response) {
     require_once 'Google/library/googleresponse.php';
     require_once 'Google/library/googlerequest.php';
     require_once 'Google/library/googlemerchantcalculations.php';
@@ -654,7 +654,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    *
    * @return bool
    */
-  function getInput(&$input, &$ids, $dataRoot) {
+  public function getInput(&$input, &$ids, $dataRoot) {
     if (!$this->getBillingID($ids)) {
       return FALSE;
     }
@@ -684,7 +684,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    * Converts the comma separated name-value pairs in <merchant-private-data>
    * to an array of name-value pairs.
    */
-  static function stringToArray($str) {
+  public static function stringToArray($str) {
     $vars = $labels = array();
     $labels = explode(',', $str);
     foreach ($labels as $label) {

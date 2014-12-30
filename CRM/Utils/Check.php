@@ -51,7 +51,7 @@ class CRM_Utils_Check {
    *
    * @return CRM_Utils_Check
    */
-  static function &singleton() {
+  public static function &singleton() {
     if (!isset(self::$_singleton)) {
       self::$_singleton = new CRM_Utils_Check();
     }

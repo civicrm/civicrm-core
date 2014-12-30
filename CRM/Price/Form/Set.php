@@ -89,7 +89,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $options) {
+  public static function formRule($fields, $files, $options) {
     $errors = array();
     $count = count(CRM_Utils_Array::value('extends', $fields));
     //price sets configured for membership
@@ -239,7 +239,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    * @return array   array of default values
    * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array('is_active' => TRUE);
     if ($this->_sid) {
       $params = array('id' => $this->_sid);

@@ -37,7 +37,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   /**
    * Construct method
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -72,7 +72,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
     $contributionSoft->copyValues($params);
     if ($contributionSoft->find(TRUE)) {
@@ -89,7 +89,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *
    * @static
    */
-  static function del($params) {
+  public static function del($params) {
     //delete from contribution soft table
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
     foreach($params as $column => $value) {
@@ -104,7 +104,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *
    * @return array
    */
-  static function getSoftContributionTotals($contact_id, $isTest = 0) {
+  public static function getSoftContributionTotals($contact_id, $isTest = 0) {
     $query = '
     SELECT SUM(amount) as amount, AVG(total_amount) as average, cc.currency
     FROM civicrm_contribution_soft  ccs
@@ -148,7 +148,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @return array of soft contribution ids, amounts, and associated contact ids
    * @static
    */
-  static function getSoftContribution($contributionID, $all = FALSE) {
+  public static function getSoftContribution($contributionID, $all = FALSE) {
     $pcpFields = array(
       'pcp_id',
       'pcp_title',
@@ -203,7 +203,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *
    * @return array
    */
-  static function getSoftCreditIds($contributionID , $isPCP = FALSE) {
+  public static function getSoftCreditIds($contributionID , $isPCP = FALSE) {
     $query = "
   SELECT id
   FROM  civicrm_contribution_soft
@@ -240,7 +240,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @return array
    * @static
    */
-  static function getSoftContributionList($contact_id, $filter = NULL, $isTest = 0) {
+  public static function getSoftContributionList($contact_id, $filter = NULL, $isTest = 0) {
     $query = '
     SELECT ccs.id, ccs.amount as amount,
            ccs.contribution_id,
@@ -318,7 +318,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param int $honoreeprofileId
    * @param int $honorId
    */
-  static function formatHonoreeProfileFields($form, $params, $honoreeprofileId, $honorId = NULL) {
+  public static function formatHonoreeProfileFields($form, $params, $honoreeprofileId, $honorId = NULL) {
     $profileContactType = CRM_Core_BAO_UFGroup::getContactType($honoreeprofileId);
     $profileFields = CRM_Core_BAO_UFGroup::getFields($honoreeprofileId);
     $honoreeProfileFields = $values = array();

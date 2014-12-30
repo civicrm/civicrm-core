@@ -54,7 +54,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    * @access public
    * @static
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     // since the pcm - preferred comminication method is logically
     // grouped hence we'll use groups of HTML_QuickForm
 
@@ -141,7 +141,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     //CRM-4575
 
     $greetings = self::getGreetingFields($self->_contactType);
@@ -167,7 +167,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    *
    * @return void
    */
-  static function setDefaultValues(&$form, &$defaults) {
+  public static function setDefaultValues(&$form, &$defaults) {
 
     if (!empty($defaults['preferred_language'])) {
       $languages = CRM_Contact_BAO_Contact::buildOptions('preferred_language');
@@ -212,7 +212,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    * @return void
    * @access public
    */
-  static function getGreetingFields($contactType) {
+  public static function getGreetingFields($contactType) {
     if (empty(self::$greetings[$contactType])) {
       self::$greetings[$contactType] = array();
 

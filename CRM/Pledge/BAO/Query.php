@@ -37,7 +37,7 @@ class CRM_Pledge_BAO_Query {
   /**
    * @return array
    */
-  static function &getFields() {
+  public static function &getFields() {
     $fields = CRM_Pledge_BAO_Pledge::exportableFields();
     return $fields;
   }
@@ -50,7 +50,7 @@ class CRM_Pledge_BAO_Query {
    * @return void
    * @access public
    */
-  static function select(&$query) {
+  public static function select(&$query) {
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_PLEDGE) || !empty($query->_returnProperties['pledge_id'])) {
       $query->_select['pledge_id'] = 'civicrm_pledge.id as pledge_id';
       $query->_element['pledge_id'] = 1;
@@ -204,7 +204,7 @@ class CRM_Pledge_BAO_Query {
   /**
    * @param $query
    */
-  static function where(&$query) {
+  public static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
       if (empty($query->_params[$id][0])) {
@@ -224,7 +224,7 @@ class CRM_Pledge_BAO_Query {
    * @param $values
    * @param $query
    */
-  static function whereClauseSingle(&$values, &$query) {
+  public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     switch ($name) {
@@ -427,7 +427,7 @@ class CRM_Pledge_BAO_Query {
    *
    * @return null|string
    */
-  static function from($name, $mode, $side) {
+  public static function from($name, $mode, $side) {
     $from = NULL;
 
     switch ($name) {
@@ -467,7 +467,7 @@ class CRM_Pledge_BAO_Query {
    * @return string
    * @access public
    */
-  function qill() {
+  public function qill() {
     return (isset($this->_qill)) ? $this->_qill : "";
   }
 
@@ -508,7 +508,7 @@ class CRM_Pledge_BAO_Query {
   /**
    * This includes any extra fields that might need for export etc
    */
-  static function extraReturnProperties($mode) {
+  public static function extraReturnProperties($mode) {
     $properties = NULL;
 
     if ($mode & CRM_Contact_BAO_Query::MODE_PLEDGE) {
@@ -539,7 +539,7 @@ class CRM_Pledge_BAO_Query {
   /**
    * @param CRM_Core_Form $form
    */
-  static function buildSearchForm(&$form) {
+  public static function buildSearchForm(&$form) {
     // pledge related dates
     CRM_Core_Form_Date::buildDateRange($form, 'pledge_start_date', 1, '_low', '_high', ts('From'), FALSE);
     CRM_Core_Form_Date::buildDateRange($form, 'pledge_end_date', 1, '_low', '_high', ts('From'), FALSE);
@@ -628,12 +628,12 @@ class CRM_Pledge_BAO_Query {
    * @param $row
    * @param int $id
    */
-  static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {}
 
   /**
    * @param $tables
    */
-  static function tableNames(&$tables) {
+  public static function tableNames(&$tables) {
     //add status table
     if (!empty($tables['pledge_status']) || !empty($tables['civicrm_pledge_payment'])) {
       $tables = array_merge(array('civicrm_pledge' => 1), $tables);

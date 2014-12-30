@@ -48,7 +48,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   protected $_entity;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $baoObj = new CRM_Core_DAO();
     $baoObj->createTestObject('CRM_Pledge_BAO_Pledge', array(), 1, 0);
@@ -62,7 +62,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * (non-PHPdoc)
    * @see CiviUnitTestCase::tearDown()
    */
-  function tearDown() {
+  public function tearDown() {
     CRM_Utils_Hook::singleton()->reset();
     $tablesToTruncate = array(
       'civicrm_contact',
@@ -83,7 +83,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Function tests that an empty where hook returns no results
    */
-  function testContactGetNoResultsHook() {
+  public function testContactGetNoResultsHook() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
     $result = $this->callAPISuccess('contact', 'get', array(
       'check_permissions' => 1,
@@ -95,7 +95,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Function tests all results are returned
    */
-  function testContactGetAllResultsHook() {
+  public function testContactGetAllResultsHook() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $result = $this->callAPISuccess('contact', 'get', array(
       'check_permissions' => 1,
@@ -108,7 +108,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Function tests that deleted contacts are not returned
    */
-  function testContactGetPermissionHookNoDeleted() {
+  public function testContactGetPermissionHookNoDeleted() {
     $this->callAPISuccess('contact', 'create', array('id' => 2, 'is_deleted' => 1));
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $result = $this->callAPISuccess('contact', 'get', array(
@@ -121,7 +121,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Test permissions limited by hook
    */
-  function testContactGetHookLimitingHook() {
+  public function testContactGetHookLimitingHook() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlySecond'));
 
     $result = $this->callAPISuccess('contact', 'get', array(
@@ -134,7 +134,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Confirm that without check permissions we still get 2 contacts returned
    */
-  function testContactGetHookLimitingHookDontCheck() {
+  public function testContactGetHookLimitingHookDontCheck() {
     //
     $result = $this->callAPISuccess('contact', 'get', array(
       'check_permissions' => 0,
@@ -146,7 +146,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Check that id works as a filter
    */
-  function testContactGetIDFilter() {
+  public function testContactGetIDFilter() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $result = $this->callAPISuccess('contact', 'get', array(
       'sequential' => 1,
@@ -161,7 +161,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Check that address IS returned
    */
-  function testContactGetAddressReturned() {
+  public function testContactGetAddressReturned() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlySecond'));
     $fullresult = $this->callAPISuccess('contact', 'get', array(
       'sequential' => 1,
@@ -195,7 +195,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Check that pledge IS not returned
    */
-  function testContactGetPledgeIDNotReturned() {
+  public function testContactGetPledgeIDNotReturned() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $this->callAPISuccess('contact', 'get', array(
       'sequential' => 1,
@@ -211,7 +211,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Check that pledge IS not an allowable filter
    */
-  function testContactGetPledgeIDNotFiltered() {
+  public function testContactGetPledgeIDNotFiltered() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $this->callAPISuccess('contact', 'get', array(
       'sequential' => 1,
@@ -227,7 +227,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Check that chaining doesn't bypass permissions
    */
-  function testContactGetPledgeNotChainable() {
+  public function testContactGetPledgeNotChainable() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlySecond'));
     $this->callAPISuccess('contact', 'get', array(
       'sequential' => 1,
@@ -241,7 +241,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     );
   }
 
-  function setupCoreACL() {
+  public function setupCoreACL() {
     $this->createLoggedInUser();
     $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
     $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
@@ -251,7 +251,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @dataProvider entities
    * confirm that without check permissions we still get 2 contacts returned
    */
-  function testEntitiesGetHookLimitingHookNoCheck($entity) {
+  public function testEntitiesGetHookLimitingHookNoCheck($entity) {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
     $this->setUpEntities($entity);
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
@@ -266,7 +266,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @dataProvider entities
    * confirm that without check permissions we still get 2 entities returned
    */
-  function testEntitiesGetCoreACLLimitingHookNoCheck($entity) {
+  public function testEntitiesGetCoreACLLimitingHookNoCheck($entity) {
     $this->setupCoreACL();
     //CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
     $this->setUpEntities($entity);
@@ -281,7 +281,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @dataProvider entities
    * confirm that with check permissions we don't get entities
    */
-  function testEntitiesGetCoreACLLimitingCheck($entity) {
+  public function testEntitiesGetCoreACLLimitingCheck($entity) {
     $this->markTestIncomplete('this does not work in 4.4 but can be enabled in 4.5 or a security release of 4.4 including the important security fix CRM-14877');
     $this->setupCoreACL();
     $this->setUpEntities($entity);
@@ -297,7 +297,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @dataProvider entities
    * Function tests that an empty where hook returns no results
    */
-  function testEntityGetNoResultsHook($entity) {
+  public function testEntityGetNoResultsHook($entity) {
     $this->markTestIncomplete('hook acls only work with contacts so far');
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
     $this->setUpEntities($entity);
@@ -332,14 +332,14 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * No results returned
    */
-  function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
+  public function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
   }
 
   /**
    * All results returned
    * @implements CRM_Utils_Hook::aclWhereClause
    */
-  function aclWhereHookAllResults($type, &$tables, &$whereTables, &$contactID, &$where) {
+  public function aclWhereHookAllResults($type, &$tables, &$whereTables, &$contactID, &$where) {
     $where = " (1) ";
   }
 
@@ -347,7 +347,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * Full results returned
    * @implements CRM_Utils_Hook::aclWhereClause
    */
-  function aclWhereOnlySecond($type, &$tables, &$whereTables, &$contactID, &$where) {
+  public function aclWhereOnlySecond($type, &$tables, &$whereTables, &$contactID, &$where) {
     $where = " contact_a.id > 1";
   }
 }

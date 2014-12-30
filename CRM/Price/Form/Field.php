@@ -108,7 +108,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * @return array    array of default values
    * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     // is it an edit operation ?
     if (isset($this->_fid)) {
@@ -401,7 +401,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * @static
    * @access public
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
 
     // all option fields are of type "money"
     $errors = array();

@@ -69,7 +69,7 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     // CRM-11761 retrieve user's activity filter preferences
     $defaults = array();
     $session = CRM_Core_Session::singleton();

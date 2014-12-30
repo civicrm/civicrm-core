@@ -34,7 +34,7 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testEditContact() {
+  public function testEditContact() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 

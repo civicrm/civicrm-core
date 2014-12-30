@@ -40,7 +40,7 @@ class CRM_Upgrade_Incremental_php_FourThree {
    *
    * @return bool
    */
-  function verifyPreDBstate(&$errors) {
+  public function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
@@ -56,7 +56,7 @@ class CRM_Upgrade_Incremental_php_FourThree {
    *
    * @return void|bool
    */
-  function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.3.beta3') {
       //CRM-12084
       //sql for checking orphaned contribution records
@@ -118,7 +118,7 @@ WHERE {$key}.id IS NULL";
    * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
    * @return void
    */
-  function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.3.alpha1') {
       // check if CiviMember component is enabled
       $config = CRM_Core_Config::singleton();
@@ -245,7 +245,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
    *
    * @return bool
    */
-  function upgrade_4_3_alpha1($rev) {
+  public function upgrade_4_3_alpha1($rev) {
     self::task_4_3_alpha1_checkDBConstraints();
 
     // add indexes for civicrm_entity_financial_trxn
@@ -283,7 +283,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
   /**
    * @param $rev
    */
-  function upgrade_4_3_alpha2($rev) {
+  public function upgrade_4_3_alpha2($rev) {
     //CRM-11847
     $isColumnPresent = CRM_Core_DAO::checkFieldExists('civicrm_dedupe_rule_group', 'is_default');
     if ($isColumnPresent) {
@@ -295,14 +295,14 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
   /**
    * @param $rev
    */
-  function upgrade_4_3_alpha3($rev) {
+  public function upgrade_4_3_alpha3($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.alpha3')), 'task_4_3_x_runSql', $rev);
   }
 
   /**
    * @param $rev
    */
-  function upgrade_4_3_beta2($rev) {
+  public function upgrade_4_3_beta2($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta2')), 'task_4_3_x_runSql', $rev);
 
     // CRM-12002
@@ -317,7 +317,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
   /**
    * @param $rev
    */
-  function upgrade_4_3_beta3($rev) {
+  public function upgrade_4_3_beta3($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta3')), 'task_4_3_x_runSql', $rev);
     // CRM-12065
     $query = "SELECT id, form_values FROM civicrm_report_instance WHERE form_values LIKE '%contribution_type%'";
@@ -329,7 +329,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
   /**
    * @param $rev
    */
-  function upgrade_4_3_beta4($rev) {
+  public function upgrade_4_3_beta4($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta4')), 'task_4_3_x_runSql', $rev);
     // add indexes for civicrm_entity_financial_trxn
     // CRM-12141
@@ -339,7 +339,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
   /**
    * @param $rev
    */
-  function upgrade_4_3_beta5($rev) {
+  public function upgrade_4_3_beta5($rev) {
     // CRM-12205
     if (
       CRM_Core_DAO::checkTableExists('log_civicrm_financial_trxn') &&
@@ -366,14 +366,14 @@ ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFA
   /**
    * @param $rev
    */
-  function upgrade_4_3_4($rev) {
+  public function upgrade_4_3_4($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.4')), 'task_4_3_x_runSql', $rev);
   }
 
   /**
    * @param $rev
    */
-  function upgrade_4_3_5($rev) {
+  public function upgrade_4_3_5($rev) {
     // CRM-12156
     $config = CRM_Core_Config::singleton();
     $dbname  = DB::parseDSN($config->dsn);
@@ -401,7 +401,7 @@ ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`)
   /**
    * @param $rev
    */
-  function upgrade_4_3_6($rev) {
+  public function upgrade_4_3_6($rev) {
     //CRM-13094
     $this->addTask(ts('Add missing constraints'), 'addMissingConstraints', $rev);
     //CRM-13088
@@ -417,7 +417,7 @@ ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`)
   /**
    * @return bool
    */
-  function assignFinancialTypeToPriceRecords() {
+  public function assignFinancialTypeToPriceRecords() {
     $upgrade = new CRM_Upgrade_Form();
     //here we update price set entries
     $sqlFinancialIds = "
@@ -461,7 +461,7 @@ INNER JOIN civicrm_price_set ps ON (pf.price_set_id = ps.id)
   /**
    * @return bool
    */
-  static function _checkAndMigrateDefaultFinancialTypes() {
+  public static function _checkAndMigrateDefaultFinancialTypes() {
     $modifiedDefaults = FALSE;
     //insert types if not exists
     $sqlFetchTypes = "
@@ -493,7 +493,7 @@ ON DUPLICATE KEY UPDATE  is_active = 1
   /**
    * @return bool
    */
-  function createFinancialRecords() {
+  public function createFinancialRecords() {
     $upgrade = new CRM_Upgrade_Form();
 
     // update civicrm_entity_financial_trxn.amount = civicrm_financial_trxn.total_amount
@@ -837,7 +837,7 @@ FROM   civicrm_financial_item fi";
   /**
    * @return array
    */
-  function createDomainContacts() {
+  public function createDomainContacts() {
     $domainParams = $context = array();
     $query = "
 ALTER TABLE civicrm_domain ADD contact_id INT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to Contact ID. This is specifically not an FK to avoid circular constraints',
@@ -884,7 +884,7 @@ WHERE     cc.contact_type = 'Organization' AND cc.organization_name = %1
     return $context;
   }
 
-  function task_4_3_alpha1_checkDBConstraints() {
+  public function task_4_3_alpha1_checkDBConstraints() {
     //checking whether the foreign key exists before dropping it CRM-11260
     $config = CRM_Core_Config::singleton();
     $dbUf = DB::parseDSN($config->dsn);
@@ -936,7 +936,7 @@ ALTER TABLE civicrm_financial_account
    * Read creation and modification times from civicrm_log; add
    * them to civicrm_contact.
    */
-  function convertTimestamps(CRM_Queue_TaskContext $ctx, $startId, $endId) {
+  public function convertTimestamps(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $sql = "
       SELECT entity_id, min(modified_date) AS created, max(modified_date) AS modified
       FROM civicrm_log
@@ -967,7 +967,7 @@ ALTER TABLE civicrm_financial_account
   /**
    * Change index and add missing constraints for civicrm_contribution_recur
    */
-  function addMissingConstraints(CRM_Queue_TaskContext $ctx) {
+  public function addMissingConstraints(CRM_Queue_TaskContext $ctx) {
     $query = "SHOW KEYS FROM `civicrm_contribution_recur` WHERE key_name = 'UI_contrib_payment_instrument_id'";
     $dao = CRM_Core_DAO::executeQuery($query);
     if ($dao->N) {
@@ -999,7 +999,7 @@ ALTER TABLE civicrm_financial_account
    * CRM-12844
    *
    */
-  function updateFinancialTrxnData(CRM_Queue_TaskContext $ctx) {
+  public function updateFinancialTrxnData(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();
     $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id, cft.payment_processor_id,
 cft.id financial_trxn_id, cfi.entity_table, cft.from_financial_account_id, cft.to_financial_account_id
@@ -1061,7 +1061,7 @@ id IN (' . implode(',', $val) . ')';
    * CRM-12844
    *
    */
-  function updateLineItemData(CRM_Queue_TaskContext $ctx) {
+  public function updateLineItemData(CRM_Queue_TaskContext $ctx) {
     $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id,
 cc.financial_type_id contribution_financial_type,
 cli.financial_type_id line_financial_type_id,
@@ -1125,7 +1125,7 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
    * Replace contribution_type to financial_type in table
    * civicrm_saved_search and Structure civicrm_report_instance
    */
-  function replaceContributionTypeId(CRM_Queue_TaskContext $ctx, $query, $table) {
+  public function replaceContributionTypeId(CRM_Queue_TaskContext $ctx, $query, $table) {
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $formValues = unserialize($dao->form_values);
@@ -1205,7 +1205,7 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
    *
    * @return bool TRUE for success
    */
-  function task_4_3_x_checkConstraints(CRM_Queue_TaskContext $ctx) {
+  public function task_4_3_x_checkConstraints(CRM_Queue_TaskContext $ctx) {
     CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_financial_account` CHANGE `contact_id` `contact_id` INT( 10 ) UNSIGNED NULL DEFAULT NULL');
     $config = CRM_Core_Config::singleton();
     $dbname  = DB::parseDSN($config->dsn);
@@ -1264,7 +1264,7 @@ AND CONSTRAINT_SCHEMA = %1";
    *
    * @return bool TRUE for success
    */
-  function task_4_3_x_checkIndexes(CRM_Queue_TaskContext $ctx) {
+  public function task_4_3_x_checkIndexes(CRM_Queue_TaskContext $ctx) {
     $query = "
 SHOW KEYS
 FROM civicrm_entity_financial_trxn
@@ -1289,7 +1289,7 @@ ADD INDEX UI_entity_financial_trxn_entity_id (entity_id);
    *
    * @return bool TRUE for success
    */
-  static function phoneNumeric(CRM_Queue_TaskContext $ctx) {
+  public static function phoneNumeric(CRM_Queue_TaskContext $ctx) {
     CRM_Core_DAO::executeQuery(CRM_Contact_BAO_Contact::DROP_STRIP_FUNCTION_43);
     CRM_Core_DAO::executeQuery(CRM_Contact_BAO_Contact::CREATE_STRIP_FUNCTION_43);
     CRM_Core_DAO::executeQuery("UPDATE civicrm_phone SET phone_numeric = civicrm_strip_non_numeric(phone)");
@@ -1299,7 +1299,7 @@ ADD INDEX UI_entity_financial_trxn_entity_id (entity_id);
   /**
    * (Queue Task Callback)
    */
-  static function task_4_3_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
+  public static function task_4_3_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
 

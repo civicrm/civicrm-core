@@ -37,7 +37,7 @@ class CRM_Report_Form_Instance {
   /**
    * @param CRM_Core_Form $form
    */
-  static function buildForm(&$form) {
+  public static function buildForm(&$form) {
     // we should not build form elements in dashlet mode
     if ($form->_section) {
       return;
@@ -182,7 +182,7 @@ class CRM_Report_Form_Instance {
    *
    * @return array|bool
    */
-  static function formRule($fields, $errors, $self) {
+  public static function formRule($fields, $errors, $self) {
     // Validate both the "next" and "save" buttons for creating/updating a report
     $nextButton = $self->controller->getButtonName();
     $saveButton = str_replace('_next', '_save', $nextButton);
@@ -203,7 +203,7 @@ class CRM_Report_Form_Instance {
    * @param CRM_Core_Form $form
    * @param $defaults
    */
-  static function setDefaultValues(&$form, &$defaults) {
+  public static function setDefaultValues(&$form, &$defaults) {
     // we should not build form elements in dashlet mode
     if ($form->_section) {
       return;
@@ -269,7 +269,7 @@ class CRM_Report_Form_Instance {
    * @param CRM_Core_Form $form
    * @param bool $redirect
    */
-  static function postProcess(&$form, $redirect = TRUE) {
+  public static function postProcess(&$form, $redirect = TRUE) {
     $params = $form->getVar('_params');
     $instanceID = $form->getVar('_id');
 

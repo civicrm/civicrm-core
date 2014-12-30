@@ -38,7 +38,7 @@ class PostUpdate extends \Symfony\Component\EventDispatcher\Event {
    */
   public $object;
 
-  function __construct($object) {
+  public function __construct($object) {
     $this->object = $object;
   }
 }

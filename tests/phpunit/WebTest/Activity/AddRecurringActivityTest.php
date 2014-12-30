@@ -38,7 +38,7 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testRecurringActivity() {
+  public function testRecurringActivity() {
     $this->webtestLogin();
 
     //Adding new contact

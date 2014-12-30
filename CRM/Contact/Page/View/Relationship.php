@@ -59,7 +59,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    *
    * @access public
    */
-  function view() {
+  public function view() {
     $viewRelationship = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId, NULL, NULL, NULL, $this->_id);
     //To check whether selected contact is a contact_id_a in
     //relationship type 'a_b' in relationship table, if yes then
@@ -142,7 +142,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function browse() {
+  public function browse() {
     // do nothing :) we are using datatable for rendering relationship selectors
   }
 
@@ -152,7 +152,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function edit() {
+  public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Contact_Form_Relationship', ts('Contact Relationships'), $this->_action);
     $controller->setEmbedded(TRUE);
 
@@ -190,7 +190,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     $controller->run();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
@@ -209,7 +209,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $this->setContext();
@@ -243,7 +243,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     return parent::run();
   }
 
-  function setContext() {
+  public function setContext() {
     $context = CRM_Utils_Request::retrieve('context', 'String',
       $this, FALSE, 'search'
     );
@@ -269,7 +269,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function delete() {
+  public function delete() {
     // calls a function to delete relationship
     CRM_Contact_BAO_Relationship::del($this->_id);
   }
@@ -280,7 +280,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    * @return array (reference) of action links
    * @static
    */
-  static function &links() {
+  public static function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::VIEW => array(

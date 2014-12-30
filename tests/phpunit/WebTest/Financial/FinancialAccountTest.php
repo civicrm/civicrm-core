@@ -35,7 +35,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
   /**
    * Test To Add Financial Account class attributes.
    */
-  function testFinancialAccount() {
+  public function testFinancialAccount() {
     $this->webtestLogin();
 
     // Add new Financial Account

@@ -42,7 +42,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function browse() {
+  public function browse() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Search', ts('Pledges'), $this->_action);
     $controller->setEmbedded(TRUE);
     $controller->reset();
@@ -70,7 +70,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function view() {
+  public function view() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_PledgeView',
       'View Pledge',
       $this->_action
@@ -88,7 +88,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function edit() {
+  public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Pledge',
       'Create Pledge',
       $this->_action
@@ -100,7 +100,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     return $controller->run();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $context       = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -131,7 +131,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     // check if we can process credit card registration

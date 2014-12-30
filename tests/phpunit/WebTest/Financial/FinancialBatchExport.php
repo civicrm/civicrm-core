@@ -36,7 +36,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddFinancialBatch() {
+  public function testAddFinancialBatch() {
     // Log in using webtestLogin() method
     $this->webtestLogin('admin');
     $this->openCiviPage("financial/batch", "reset=1&action=add", '_qf_FinancialBatch_next-botttom');
@@ -66,7 +66,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
    *
    * @return null
    */
-  function _testAddBatch($setTitle, $setDescription, $setPaymentInstrument, $numberOfTrxn, $totalAmt) {
+  public function _testAddBatch($setTitle, $setDescription, $setPaymentInstrument, $numberOfTrxn, $totalAmt) {
     // Enter Optional Constraints
     $this->type('title', $setTitle);
     $this->type('description', $setDescription);
@@ -99,7 +99,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
   /**
    * @param $numberOfTrxn
    */
-  function _testAssignBatch($numberOfTrxn) {
+  public function _testAssignBatch($numberOfTrxn) {
     $this->select( "xpath=//div[@id='crm-transaction-selector-assign_length']/label/select[@name='crm-transaction-selector-assign_length']", "value=$numberOfTrxn" );
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
@@ -116,7 +116,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
    * @param int $batchId
    * @param $exportFormat
    */
-  function _testExportBatch($setTitle, $batchId, $exportFormat) {
+  public function _testExportBatch($setTitle, $batchId, $exportFormat) {
     $this->openCiviPage("financial/batch", "reset=1&action=export&id=$batchId");
     if ($exportFormat == 'CSV') {
       $this->click("xpath=//form[@id='FinancialBatch']/div[2]/table[@class='form-layout']/tbody/tr/td/input[2]");

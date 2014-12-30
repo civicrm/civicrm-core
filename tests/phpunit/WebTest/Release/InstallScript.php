@@ -39,7 +39,7 @@ class WebTest_Release_InstallScript extends WebTest_Release_ReleaseTestCase {
     parent::setUp();
   }
 
-  function testInstall() {
+  public function testInstall() {
     $this->webtestLogin();
     $this->open($this->settings->installURL);
 

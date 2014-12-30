@@ -7,7 +7,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Core_DAOTest extends CiviUnitTestCase {
 
-  function testGetReferenceColumns() {
+  public function testGetReferenceColumns() {
     // choose CRM_Core_DAO_Email as an arbitrary example
     $emailRefs = CRM_Core_DAO_Email::getReferenceColumns();
     $refsByTarget = array();
@@ -21,7 +21,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals('CRM_Core_Reference_Basic', get_class($contactRef));
   }
 
-  function testGetReferencesToTable() {
+  public function testGetReferencesToTable() {
     $refs = CRM_Core_DAO::getReferencesToTable(CRM_Financial_DAO_FinancialType::getTableName());
     $refsBySource = array();
     foreach ($refs as $refSpec) {
@@ -35,7 +35,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals('CRM_Core_Reference_Dynamic', get_class($genericRef));
   }
 
-  function testFindReferences() {
+  public function testFindReferences() {
     $params = array(
       'first_name' => 'Testy',
       'last_name' => 'McScallion',
@@ -69,7 +69,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function composeQueryExamples() {
+  public function composeQueryExamples() {
     $cases = array();
     // $cases[] = array('Input-SQL', 'Input-Params', 'Expected-SQL');
 
@@ -134,7 +134,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * @dataProvider composeQueryExamples
    */
-  function testComposeQuery($inputSql, $inputParams, $expectSql) {
+  public function testComposeQuery($inputSql, $inputParams, $expectSql) {
     $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
     $this->assertEquals($expectSql, $actualSql);
   }
@@ -146,7 +146,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   // 'SELECT * FROM whatever WHERE name = %1 AND title = %3 AND year LIKE '%2012'
   // $params[3] = array('Bob', 'String');
   // i.e. the place holder should be unique and should not contain in any other operational use in query
-  function testComposeQueryFailure() {
+  public function testComposeQueryFailure() {
     $cases[] = array(
       'SELECT * FROM whatever WHERE name = %1 AND title = %2 AND year LIKE \'%2012\' ',
       array(
@@ -163,7 +163,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function sqlNameDataProvider() {
+  public function sqlNameDataProvider() {
     return array(
       array('this is a long string', 30, FALSE, 'this is a long string'),
 
@@ -178,11 +178,11 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * @dataProvider sqlNameDataProvider
    */
-  function testShortenSQLName($inputData, $length, $makeRandom, $expectedResult) {
+  public function testShortenSQLName($inputData, $length, $makeRandom, $expectedResult) {
     $this->assertEquals($expectedResult, CRM_Core_DAO::shortenSQLName($inputData, $length, $makeRandom));
   }
 
-  function testFindById() {
+  public function testFindById() {
     $params = $this->sampleContact('Individual', 4);
     $existing_contact = CRM_Contact_BAO_Contact::add($params);
     $contact = CRM_Contact_BAO_Contact::findById($existing_contact->id);

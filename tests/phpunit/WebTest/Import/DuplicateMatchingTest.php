@@ -38,7 +38,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for Individuals Duplicate Matching.
    */
-  function testIndividualDuplicateMatchingImport() {
+  public function testIndividualDuplicateMatchingImport() {
     $this->webtestLogin();
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual", 'first_name');
@@ -139,7 +139,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for Organization Duplicate Matching.
    */
-  function testOrganizationDuplicateMatchingImport() {
+  public function testOrganizationDuplicateMatchingImport() {
     $this->webtestLogin();
 
     //create oranization
@@ -234,7 +234,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for Household Duplicate Matching.
    */
-  function testHouseholdDuplicateMatchingImport() {
+  public function testHouseholdDuplicateMatchingImport() {
     $this->webtestLogin();
 
     // create household
@@ -332,7 +332,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
    * @param $originalRows
    * @param $checkSummary
    */
-  function checkDuplicateContacts($originalHeaders, $originalRows, $checkSummary) {
+  public function checkDuplicateContacts($originalHeaders, $originalRows, $checkSummary) {
     $this->assertTrue($this->isTextPresent('CiviCRM has detected one record which is a duplicate of existing CiviCRM contact record. These records have not been imported.'));
 
     $checkSummary = array(
@@ -355,7 +355,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _individualDuplicateMatchingCSVData($individualFields) {
+  public function _individualDuplicateMatchingCSVData($individualFields) {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -406,7 +406,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _organizationDuplicateMatchingCSVData($organizationFields) {
+  public function _organizationDuplicateMatchingCSVData($organizationFields) {
     $headers = array(
       'organization_name' => 'Organization Name',
       'email' => 'Email',
@@ -450,7 +450,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _householdDuplicateMatchingCSVData($householdFields) {
+  public function _householdDuplicateMatchingCSVData($householdFields) {
     $headers = array(
       'household_name' => 'Household Name',
       'email' => 'Email',

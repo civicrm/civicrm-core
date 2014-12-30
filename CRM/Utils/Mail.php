@@ -58,7 +58,7 @@ class CRM_Utils_Mail {
    *
    * @return boolean true if a mail was sent, else false
    */
-  static function send(&$params) {
+  public static function send(&$params) {
     $returnPath       = CRM_Core_BAO_MailSettings::defaultReturnPath();
     $includeMessageId = CRM_Core_BAO_MailSettings::includeMessageId();
     $emailDomain      = CRM_Core_BAO_MailSettings::defaultDomain();
@@ -198,7 +198,7 @@ class CRM_Utils_Mail {
    *
    * @return string
    */
-  static function errorMessage($mailer, $result) {
+  public static function errorMessage($mailer, $result) {
     $message = '<p>' . ts('An error occurred when CiviCRM attempted to send an email (via %1). If you received this error after submitting on online contribution or event registration - the transaction was completed, but we were unable to send the email receipt.', array(
       1 => 'SMTP')) . '</p>' . '<p>' . ts('The mail library returned the following error message:') . '<br /><span class="font-red"><strong>' . $result->getMessage() . '</strong></span></p>' . '<p>' . ts('This is probably related to a problem in your Outbound Email Settings (Administer CiviCRM &raquo; System Settings &raquo; Outbound Email), OR the FROM email address specifically configured for your contribution page or event. Possible causes are:') . '</p>';
 
@@ -220,7 +220,7 @@ class CRM_Utils_Mail {
    * @param $headers
    * @param $message
    */
-  static function logger(&$to, &$headers, &$message) {
+  public static function logger(&$to, &$headers, &$message) {
     if (is_array($to)) {
       $toString = implode(', ', $to);
       $fileName = $to[0];
@@ -259,7 +259,7 @@ class CRM_Utils_Mail {
    * @return string          the plucked email address
    * @static
    */
-  static function pluckEmailFromHeader($header) {
+  public static function pluckEmailFromHeader($header) {
     preg_match('/<([^<]*)>$/', $header, $matches);
 
     if (isset($matches[1])) {
@@ -275,7 +275,7 @@ class CRM_Utils_Mail {
    * @access public
    * @static
    */
-  static function validOutBoundMail() {
+  public static function validOutBoundMail() {
     $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
       'mailing_backend'
     );
@@ -309,7 +309,7 @@ class CRM_Utils_Mail {
    *
    * @return mixed
    */
-  static function &setMimeParams(&$message, $params = NULL) {
+  public static function &setMimeParams(&$message, $params = NULL) {
     static $mimeParams = NULL;
     if (!$params) {
       if (!$mimeParams) {
@@ -333,7 +333,7 @@ class CRM_Utils_Mail {
    *
    * @return null|string
    */
-  static function formatRFC822Email($name, $email, $useQuote = FALSE) {
+  public static function formatRFC822Email($name, $email, $useQuote = FALSE) {
     $result = NULL;
 
     $name = trim($name);
@@ -371,7 +371,7 @@ class CRM_Utils_Mail {
    *
    * This code has been copied and adapted from ezc/Mail/src/tools.php
    */
-  static function formatRFC2822Name($name) {
+  public static function formatRFC2822Name($name) {
     $name = trim($name);
     if (!empty($name)) {
       // remove the quotes around the name part if they are already there
@@ -395,7 +395,7 @@ class CRM_Utils_Mail {
    *
    * @return array $attachments
    */
-  static function appendPDF($fileName, $html, $format = NULL) {
+  public static function appendPDF($fileName, $html, $format = NULL) {
     $pdf_filename = CRM_Core_Config::singleton()->templateCompileDir . CRM_Utils_File::makeFileName($fileName);
 
     //FIXME : CRM-7894

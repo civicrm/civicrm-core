@@ -67,7 +67,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     /*
      * initialize the task and row fields
      */
@@ -84,7 +84,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
 
     //create radio buttons to select existing group or add a new group
     $options = array(ts('Add Contact To Existing Group'), ts('Create New Group'));
@@ -157,7 +157,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
    *
    * @return array the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->_context === 'amtg') {
@@ -175,7 +175,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_task_AddToGroup', 'formRule'));
   }
 
@@ -188,7 +188,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
    * @static
    * @access public
    */
-  static function formRule($params) {
+  public static function formRule($params) {
     $errors = array();
 
     if (!empty($params['group_option']) && empty($params['title'])) {

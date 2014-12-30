@@ -51,7 +51,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return CRM_Financial_DAO_PaymentProcessor
    * @throws Exception
    */
-  static function create($params) {
+  public static function create($params) {
     // FIXME Reconcile with CRM_Admin_Form_PaymentProcessor::updatePaymentProcessor
     $processor = new CRM_Financial_DAO_PaymentProcessor();
     $processor->copyValues($params);
@@ -87,7 +87,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -103,7 +103,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
     $paymentProcessor->copyValues($params);
     if ($paymentProcessor->find(TRUE)) {
@@ -124,7 +124,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_PaymentProcessor', $id, 'is_active', $is_active);
   }
 
@@ -138,7 +138,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @static
    * @access public
    */
-  static function &getDefault() {
+  public static function &getDefault() {
     if (self::$_defaultPaymentProcessor == NULL) {
       $params = array('is_default' => 1);
       $defaults = array();
@@ -156,7 +156,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @access public
    * @static
    */
-  static function del($paymentProcessorID) {
+  public static function del($paymentProcessorID) {
     if (!$paymentProcessorID) {
       CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
     }
@@ -185,7 +185,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @static
    * @access public
    */
-  static function getPayment($paymentProcessorID, $mode) {
+  public static function getPayment($paymentProcessorID, $mode) {
     if (!$paymentProcessorID) {
       CRM_Core_Error::fatal(ts('Invalid value passed to getPayment function'));
     }
@@ -219,7 +219,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    * @throws Exception
    */
-  static function getPayments($paymentProcessorIDs, $mode) {
+  public static function getPayments($paymentProcessorIDs, $mode) {
     if (!$paymentProcessorIDs) {
       CRM_Core_Error::fatal(ts('Invalid value passed to getPayment function'));
     }
@@ -241,7 +241,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param array_type $processor2
    * @return number
    */
-    static function defaultComparison($processor1, $processor2){
+    public static function defaultComparison($processor1, $processor2){
       $p1 = CRM_Utils_Array::value('is_default', $processor1);
       $p2 = CRM_Utils_Array::value('is_default', $processor2);
       if ($p1 == $p2) {
@@ -260,7 +260,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @static
    * @access public
    */
-  static function buildPayment($dao, $mode) {
+  public static function buildPayment($dao, $mode) {
     $fields = array(
       'id', 'name', 'payment_processor_type_id', 'user_name', 'password',
       'signature', 'url_site', 'url_api', 'url_recur', 'url_button',
@@ -287,7 +287,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @throws CiviCRM_API3_Exception
    * @return array
    */
-  static function getAllPaymentProcessors($isExcludeTest, $reset = FALSE) {
+  public static function getAllPaymentProcessors($isExcludeTest, $reset = FALSE) {
     /**
      * $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($isExcludeTest ? 'test' : 'all');
     if (!$reset) {
@@ -324,7 +324,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *
    * @return array available processors
    */
-  static function getPaymentProcessors($capabilities = array(), $isIncludeTest = FALSE, $ids = array()) {
+  public static function getPaymentProcessors($capabilities = array(), $isIncludeTest = FALSE, $ids = array()) {
     $processors = self::getAllPaymentProcessors(!$isIncludeTest);
     if ($capabilities) {
       foreach ($processors as $index => $processor) {
@@ -353,7 +353,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *
    * @return bool
    */
-  static function hasPaymentProcessorSupporting($capabilities = array(), $isIncludeTest = FALSE) {
+  public static function hasPaymentProcessorSupporting($capabilities = array(), $isIncludeTest = FALSE) {
     $result = self::getPaymentProcessors($capabilities, $isIncludeTest);
     return (!empty($result)) ? TRUE : FALSE;
   }
@@ -369,7 +369,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @static
    * @access public
    */
-  static function getProcessorForEntity($entityID, $component = 'contribute', $type = 'id') {
+  public static function getProcessorForEntity($entityID, $component = 'contribute', $type = 'id') {
     $result = NULL;
     if (!in_array($component, array(
       'membership', 'contribute', 'recur'))) {

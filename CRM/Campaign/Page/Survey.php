@@ -45,7 +45,7 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
   /**
    * @return array
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
 
@@ -77,7 +77,7 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
     return self::$_actionLinks;
   }
 
-  function browse() {
+  public function browse() {
 
     $surveys = CRM_Campaign_BAO_Survey::getSurveySummary();
 
@@ -119,7 +119,7 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
     }

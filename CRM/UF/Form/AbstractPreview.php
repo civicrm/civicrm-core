@@ -78,7 +78,7 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
    *
    * @return array the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     foreach ($this->_fields as $name => $field) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($field['name'])) {

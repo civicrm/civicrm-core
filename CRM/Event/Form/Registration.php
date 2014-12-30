@@ -195,7 +195,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
 
@@ -480,7 +480,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function assignToTemplate() {
+  public function assignToTemplate() {
     //process only primary participant params
     $this->_params = $this->get('params');
     if (isset($this->_params[0])) {
@@ -580,7 +580,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function buildCustom($id, $name, $viewOnly = FALSE) {
+  public function buildCustom($id, $name, $viewOnly = FALSE) {
     if ($id) {
       $button    = substr($this->controller->getButtonName(), -4);
       $cid       = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -680,7 +680,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @throws Exception
    */
-  static function initEventFee(&$form, $eventID) {
+  public static function initEventFee(&$form, $eventID) {
     // get price info
 
     // retrive all active price set fields.
@@ -742,7 +742,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function confirmPostProcess($contactID = NULL, $contribution = NULL, $payment = NULL) {
+  public function confirmPostProcess($contactID = NULL, $contribution = NULL, $payment = NULL) {
     // add/update contact information
     $fields = array();
     unset($this->_params['note']);
@@ -1173,7 +1173,7 @@ WHERE  v.option_group_id = g.id
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = '') {
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_eventId) {
       $templateName = $this->_name;
       if (substr($templateName, 0, 12) == 'Participant_') {
@@ -1192,7 +1192,7 @@ WHERE  v.option_group_id = g.id
   /**
    * @return null|string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -1200,7 +1200,7 @@ WHERE  v.option_group_id = g.id
   /**
    * @return null|string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
@@ -1212,7 +1212,7 @@ WHERE  v.option_group_id = g.id
    * @param unknown_type $params
    * @return multitype:|Ambigous <multitype:, string, string>
    */
-  static function validatePriceSet(&$form, $params) {
+  public static function validatePriceSet(&$form, $params) {
     $errors = array();
     $hasOptMaxValue = FALSE;
     if (!is_array($params) || empty($params)) {
@@ -1349,7 +1349,7 @@ WHERE  v.option_group_id = g.id
   /**
    * @param int $participantID
    */
-  function processFirstParticipant($participantID) {
+  public function processFirstParticipant($participantID) {
     $this->_participantId = $participantID;
     $this->set('participantId', $this->_participantId);
 
@@ -1376,7 +1376,7 @@ WHERE  v.option_group_id = g.id
    *
    * @param string $redirect
    */
-  function checkValidEvent($redirect = NULL) {
+  public function checkValidEvent($redirect = NULL) {
     // is the event active (enabled)?
     if (!$this->_values['event']['is_active']) {
       // form is inactive, die a fatal death

@@ -44,7 +44,7 @@ class CRM_Case_Form_Task_SearchTaskHookSample extends CRM_Case_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $rows = array();
     // display name and email of all contact ids

@@ -22,7 +22,7 @@ class CRM_Utils_TimeTest extends CiviUnitTestCase {
    * @param bool $expectedResult
    * @dataProvider equalCases
    */
-  function testEquals($timeA, $timeB, $threshold, $expectedResult) {
+  public function testEquals($timeA, $timeB, $threshold, $expectedResult) {
     $actual = CRM_Utils_Time::isEqual($timeA, $timeB, $threshold);
     $this->assertEquals($expectedResult, $actual);
 

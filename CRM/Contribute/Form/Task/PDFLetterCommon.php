@@ -15,7 +15,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @return void
    */
-  static function postProcess(&$form) {
+  public static function postProcess(&$form) {
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
     $isPDF = FALSE;
     $emailParams = array();
@@ -139,7 +139,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @return bool
    */
-  static function isValidHTMLWithTableSeparator($tokens, $html) {
+  public static function isValidHTMLWithTableSeparator($tokens, $html) {
     $relevantEntities = array('contribution');
     foreach ($relevantEntities as $entity) {
       if (isset($tokens[$entity]) && is_array($tokens[$entity])) {
@@ -163,7 +163,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @return bool
    */
-  static function isHtmlTokenInTableCell($token, $entity, $textToSearch) {
+  public static function isHtmlTokenInTableCell($token, $entity, $textToSearch) {
     $tokenToMatch = $entity . '.' . $token;
     $dontCare = array();
     $within = preg_match_all("|<td.+?{".$tokenToMatch."}.+?</td|si", $textToSearch, $dontCare);
@@ -216,7 +216,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @return array:
    */
-  static function buildContributionArray($groupBy, $form, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator) {
+  public static function buildContributionArray($groupBy, $form, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator) {
     $contributions = $contacts = $notSent = array();
     $contributionIDs = $form->getVar('_contributionIds');
     if ($form->_includesSoftCredits) {
@@ -281,7 +281,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @return array
    */
-  static function combineContributions($existing, $contribution, $separator) {
+  public static function combineContributions($existing, $contribution, $separator) {
     foreach ($contribution as $field => $value) {
       $existing[$field] = isset($existing[$field]) ? $existing[$field] . $separator : '';
       $existing[$field]  .= $value;
@@ -298,7 +298,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param $groupBy
    * @param int $groupByID
    */
-  static function assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID) {
+  public static function assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID) {
     if (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY) {
       return;
     }
@@ -320,7 +320,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @return bool
    */
-  static function emailLetter($contact, $html, $is_pdf, $format = array(), $params = array()) {
+  public static function emailLetter($contact, $html, $is_pdf, $format = array(), $params = array()) {
     try {
       if(empty($contact['email'])) {
         return FALSE;

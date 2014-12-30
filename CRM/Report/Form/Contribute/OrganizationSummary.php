@@ -61,7 +61,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     self::validRelationships();
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array('CiviCampaign', $config->enableComponents);
@@ -211,11 +211,11 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $this->_columnHeaders = $select = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -249,7 +249,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
 
     $this->_from = NULL;
     $this->_from = "
@@ -276,7 +276,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -325,11 +325,11 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_relationship']}.$this->orgContact, {$this->_aliases['civicrm_relationship']}.$this->otherContact , {$this->_aliases['civicrm_contribution']}.id, {$this->_aliases['civicrm_relationship']}.relationship_type_id ";
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact_organization']}.organization_name, {$this->_aliases['civicrm_relationship']}.$this->orgContact, {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_relationship']}.$this->otherContact";
   }
 
@@ -338,7 +338,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     //hack filter display for relationship type
@@ -352,7 +352,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     return $statistics;
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->beginPostProcess();
     $this->buildACLClause(array($this->_aliases['civicrm_contact'], $this->_aliases['civicrm_contact_organization']));
     $sql = $this->buildQuery(TRUE);
@@ -366,7 +366,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   /**
    * Set variables to be accessed by API and form layer in processing
    */
-  function beginPostProcessCommon() {
+  public function beginPostProcessCommon() {
     $getRelationship = $this->_params['relationship_type_id_value'];
     $type = substr($getRelationship, -3);
     $this->relationshipId = intval((substr($getRelationship, 0, strpos($getRelationship, '_'))));
@@ -380,7 +380,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     }
   }
 
-  function validRelationships() {
+  public function validRelationships() {
     $this->relationTypes = $relationTypes = array();
 
     $params = array('contact_type_b' => 'Organization', 'version' => 3);
@@ -412,7 +412,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   /**
    * @param array $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $type = substr($this->_params['relationship_type_id_value'], -3);
 

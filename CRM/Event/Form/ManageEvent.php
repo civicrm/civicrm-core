@@ -96,7 +96,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviEvent', $config->enableComponents)) {
       $this->assign('CiviEvent', TRUE);
@@ -232,7 +232,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
@@ -329,7 +329,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     $this->add('hidden', 'is_template', $this->_isTemplate);
   }
 
-  function endPostProcess() {
+  public function endPostProcess() {
     // make submit buttons keep the current working tab opened.
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $className = CRM_Utils_String::getClassName($this->_name);
@@ -387,7 +387,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     if ($this->controller->getPrint() || $this->getVar('_id') <= 0 || $this->_action & CRM_Core_Action::DELETE) {
       return parent::getTemplateFileName();
     }
@@ -401,7 +401,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   /**
    * Pre-load libraries required by Online Registration Profile fields
    */
-  static function addProfileEditScripts() {
+  public static function addProfileEditScripts() {
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
     CRM_UF_Page_ProfileEditor::registerSchemas(array('IndividualModel', 'ParticipantModel'));
   }

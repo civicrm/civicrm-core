@@ -43,7 +43,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -57,7 +57,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $locationType = new CRM_Core_DAO_LocationType();
     $locationType->copyValues($params);
     if ($locationType->find(TRUE)) {
@@ -78,7 +78,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_LocationType', $id, 'is_active', $is_active);
   }
 
@@ -92,7 +92,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @static
    * @access public
    */
-  static function &getDefault() {
+  public static function &getDefault() {
     if (self::$_defaultLocationType == NULL) {
       $params = array('is_default' => 1);
       $defaults = array();
@@ -108,7 +108,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   /**
    * @return mixed|null
    */
-  static function getBilling() {
+  public static function getBilling() {
     if (self::$_billingLocationType == NULL) {
       $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
       self::$_billingLocationType = array_search('Billing', $locationTypes);
@@ -126,7 +126,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    *
    * @return object
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
     $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
@@ -152,7 +152,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @access public
    * @static
    */
-  static function del($locationTypeId) {
+  public static function del($locationTypeId) {
     $entity = array('address', 'phone', 'email', 'im');
     //check dependencies
     foreach ($entity as $key) {

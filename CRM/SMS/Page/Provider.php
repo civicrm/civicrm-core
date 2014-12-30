@@ -53,7 +53,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_SMS_BAO_Provider';
   }
 
@@ -62,7 +62,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -103,7 +103,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - SMS Provider'));
     $breadCrumb = array(array('title' => ts('SMS Provider'),
@@ -132,7 +132,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    * @access public
    * @static
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     $providers = CRM_SMS_BAO_Provider::getProviders();
     $rows = array();
     foreach ($providers as $provider) {
@@ -166,7 +166,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_SMS_Form_Provider';
   }
 
@@ -175,7 +175,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'SMS Provider';
   }
 
@@ -186,7 +186,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/sms/provider';
   }
 }

@@ -76,7 +76,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    *
    * @return array|bool
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     $errors = array();
 
     // poor man's query validation (case-insensitive regex matching on word boundaries)

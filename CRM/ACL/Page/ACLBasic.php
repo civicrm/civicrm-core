@@ -55,7 +55,7 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_ACL_BAO_ACL';
   }
 
@@ -64,7 +64,7 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -95,7 +95,7 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
@@ -133,7 +133,7 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
    * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
 
     // get all acl's sorted by weight
     $acl = array();
@@ -192,7 +192,7 @@ ORDER BY entity_id
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_ACL_Form_ACLBasic';
   }
 
@@ -201,7 +201,7 @@ ORDER BY entity_id
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Core ACLs';
   }
 
@@ -212,7 +212,7 @@ ORDER BY entity_id
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/acl/basic';
   }
 }

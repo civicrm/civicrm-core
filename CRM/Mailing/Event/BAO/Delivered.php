@@ -37,7 +37,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -237,7 +237,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    * @param $eventQueueIDs
    * @param null $time
    */
-  static function bulkCreate($eventQueueIDs, $time = NULL) {
+  public static function bulkCreate($eventQueueIDs, $time = NULL) {
     if (!$time) {
       $time = date('YmdHis');
     }

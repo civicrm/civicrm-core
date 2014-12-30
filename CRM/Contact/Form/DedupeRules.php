@@ -50,7 +50,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     // Ensure user has permission to be here
     if (!CRM_Core_Permission::check('administer dedupe rules')) {
       CRM_Utils_System::permissionDenied();
@@ -153,7 +153,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    * @static
    * @access public
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if (!empty($fields['is_reserved'])) {
       return TRUE;
@@ -185,7 +185,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 

@@ -38,7 +38,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   /**
    * @return string
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Contact_BAO_Group';
   }
 
@@ -48,7 +48,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @return array self::$_links array of action links
    * @access public
    */
-  function &links() {}
+  public function &links() {}
 
   /**
    * Return class name of edit form
@@ -56,7 +56,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @return string
    * @access public
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Group_Form_Edit';
   }
 
@@ -66,7 +66,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @return string
    * @access public
    */
-  function editName() {
+  public function editName() {
     return ts('Edit Group');
   }
 
@@ -76,7 +76,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @return string
    * @access public
    */
-  function deleteName() {
+  public function deleteName() {
     return 'Delete Group';
   }
 
@@ -88,7 +88,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @return string
    * @access public
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/group';
   }
 
@@ -100,7 +100,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @return string
    * @access public
    */
-  function userContextParams($mode = NULL) {
+  public function userContextParams($mode = NULL) {
     return 'reset=1&action=browse';
   }
 
@@ -113,7 +113,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @return string   the permission that the user has (or null)
    * @access public
    */
-  function checkPermission($id, $title) {
+  public function checkPermission($id, $title) {
     return CRM_Contact_BAO_Group::checkPermission($id, $title);
   }
 
@@ -126,7 +126,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @return void
    * @access public
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     $groupPermission = CRM_Core_Permission::check('edit groups') ? CRM_Core_Permission::EDIT : CRM_Core_Permission::VIEW;
     $this->assign('groupPermission', $groupPermission);
 
@@ -154,7 +154,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
     $this->search();
   }
 
-  function search() {
+  public function search() {
     if ($this->_action &
       (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |

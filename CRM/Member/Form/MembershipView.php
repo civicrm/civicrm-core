@@ -52,7 +52,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    *
    * @return text extra query parameters
    */
-  function addContext() {
+  public function addContext() {
     $extra = '';
     foreach (array('context', 'selectedChild') as $arg) {
       if ($value = CRM_Utils_Request::retrieve($arg, 'String', $this)) {
@@ -67,7 +67,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::DELETE => array(
@@ -94,7 +94,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    * @param array $owner primary membership info (membership_id, contact_id, membership_type ...)
    *
    */
-  function relAction($action, $owner) {
+  public function relAction($action, $owner) {
     switch ($action) {
       case 'delete':
         $id = CRM_Utils_Request::retrieve('mid', 'Positive', $this);

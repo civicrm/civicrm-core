@@ -35,7 +35,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCreateCampaign() {
+  public function testCreateCampaign() {
     $this->webtestLogin('admin');
 
     // Create new group
@@ -119,7 +119,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
    * @param $campaignTitle
    * @param int $id
    */
-  function onlineContributionAddTest($campaignTitle, $id) {
+  public function onlineContributionAddTest($campaignTitle, $id) {
     // Use default payment processor
     $processorName = 'Test Processor';
     $paymentProcessorId = $this->webtestAddPaymentProcessor($processorName);

@@ -76,7 +76,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
     parent::buildQuickForm();
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (!$this->_defaults) {
       parent::setDefaultValues();
 
@@ -96,7 +96,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
    *
    * @return array
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $tmpDir = trim($fields['newBaseDir']);
 
     $errors = array();
@@ -108,7 +108,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
     return $errors;
   }
 
-  function postProcess() {
+  public function postProcess() {
     if (!empty($_POST['_qf_UpdateConfigBackend_next_cleanup'])) {
 
       $config = CRM_Core_Config::singleton();

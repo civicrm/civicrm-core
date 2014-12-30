@@ -65,7 +65,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
@@ -77,7 +77,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $parentDefaults = parent::setDefaultValues();
 
     $eventId  = $this->_id;
@@ -401,7 +401,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Event_Form_ManageEvent_Fee', 'formRule'));
   }
 
@@ -414,7 +414,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    * @static
    * @access public
    */
-  static function formRule($values) {
+  public static function formRule($values) {
     $errors = array();
     if (!empty($values['is_discount'])) {
       $occurDiscount   = array_count_values($values['discount_name']);

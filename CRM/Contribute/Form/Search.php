@@ -165,7 +165,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $this->assign('contributionSummary', $this->get('summary'));
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (empty($this->_defaults
 ['contribution_status'])) {
       $this->_defaults['contribution_status'][1] = 1;
@@ -180,7 +180,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     // text for sort_name
     $this->addElement('text',
@@ -247,7 +247,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * @return void
    * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -374,7 +374,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $controller->run();
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)

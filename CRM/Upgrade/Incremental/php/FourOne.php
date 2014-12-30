@@ -41,7 +41,7 @@ class CRM_Upgrade_Incremental_php_FourOne {
    *
    * @return bool
    */
-  function verifyPreDBstate(&$errors) {
+  public function verifyPreDBstate(&$errors) {
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviCase', $config->enableComponents)) {
       if (!CRM_Core_DAO::checkTriggerViewPermission(TRUE, FALSE)) {
@@ -61,7 +61,7 @@ class CRM_Upgrade_Incremental_php_FourOne {
    *
    * @return void
    */
-  function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.1.alpha1') {
       $postUpgradeMessage .= '<br />' .
         ts('WARNING! CiviCRM 4.1 introduces an improved way of handling cron jobs. However the new method is NOT backwards compatible. <strong>Please notify your system administrator that all CiviCRM related cron jobs will cease to work, and will need to be re-configured (this includes sending CiviMail mailings, updating membership statuses, etc.).</strong> Refer to the <a href="%1">online documentation</a> for detailed instructions.', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC41/Managing+Scheduled+Jobs'));
@@ -79,7 +79,7 @@ class CRM_Upgrade_Incremental_php_FourOne {
   /**
    * @param $rev
    */
-  function upgrade_4_1_alpha1($rev) {
+  public function upgrade_4_1_alpha1($rev) {
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviCase', $config->enableComponents)) {
       if (!CRM_Case_BAO_Case::createCaseViews()) {
@@ -116,7 +116,7 @@ class CRM_Upgrade_Incremental_php_FourOne {
     CRM_Core_BAO_Navigation::resetNavigation();
   }
 
-  function transferPreferencesToSettings() {
+  public function transferPreferencesToSettings() {
     // first transfer system preferences
     $domainColumnNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
@@ -214,7 +214,7 @@ VALUES
     CRM_Core_DAO::executeQuery($sql);
   }
 
-  function createNewSettings() {
+  public function createNewSettings() {
     $domainColumns = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
         array('contact_ajax_check_similar', 1),
@@ -294,7 +294,7 @@ VALUES
   /**
    * @param array $params
    */
-  static function retrieveDirectoryAndURLPaths(&$params) {
+  public static function retrieveDirectoryAndURLPaths(&$params) {
 
     $sql = "
 SELECT v.name as valueName, v.value, g.name as optionName
@@ -322,7 +322,7 @@ AND    v.is_active = 1
   /**
    * @param $rev
    */
-  function upgrade_4_1_alpha2($rev) {
+  public function upgrade_4_1_alpha2($rev) {
     $dao = new CRM_Core_DAO_Setting();
     $dao->group_name = 'Directory Preferences';
     $dao->name = 'customTemplateDir';
@@ -342,7 +342,7 @@ AND    v.is_active = 1
   /**
    * @param $rev
    */
-  function upgrade_4_1_beta1($rev) {
+  public function upgrade_4_1_beta1($rev) {
     //CRM-9311
     $groupNames = array('directory_preferences', 'url_preferences');
     foreach ($groupNames as $groupName) {
@@ -413,7 +413,7 @@ AND    v.is_active = 1
   /**
    * @param $rev
    */
-  function upgrade_4_1_1($rev) {
+  public function upgrade_4_1_1($rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->assign('addDedupeEmail', !(CRM_Core_DAO::checkFieldExists('civicrm_mailing', 'dedupe_email')));
 
@@ -426,7 +426,7 @@ AND    v.is_active = 1
   /**
    * @return string
    */
-  function getTemplateMessage() {
+  public function getTemplateMessage() {
     return "Blah";
   }
 }

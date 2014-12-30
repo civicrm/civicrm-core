@@ -46,7 +46,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $setTab = CRM_Utils_Request::retrieve('setTab', 'Int', $this, FALSE, 0);
 
@@ -91,7 +91,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     $this->setPageTitle(ts('Scheduled Reminder'));
   }
 
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     return 'CRM/Admin/Page/ScheduleReminders.tpl';
   }
 }

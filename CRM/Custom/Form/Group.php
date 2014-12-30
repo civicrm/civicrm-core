@@ -121,7 +121,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     //validate group title as well as name.
@@ -183,7 +183,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @access public
    * @see valid_date
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Custom_Form_Group', 'formRule'), $this);
   }
 
@@ -412,7 +412,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @return array   array of default values
    * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = &$this->_defaults;
     $this->assign('showMaxMultiple', TRUE);
     if ($this->_action == CRM_Core_Action::ADD) {
@@ -535,7 +535,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *
    * @return array of relationship name.
    */
-  static function getFormattedList(&$list) {
+  public static function getFormattedList(&$list) {
     $relName = array();
 
     foreach ($list as $listItemKey => $itemValue) {

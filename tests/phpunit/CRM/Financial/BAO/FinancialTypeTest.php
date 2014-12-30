@@ -31,18 +31,18 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function teardown() {
+  public function teardown() {
     $this->financialAccountDelete('Donations');
   }
 
   /**
    * Check method add()
    */
-  function testAdd() {
+  public function testAdd() {
     $params = array(
       'name' => 'Donations',
       'is_active' => 1,
@@ -64,7 +64,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   /**
    * Check method retrive()
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     $params = array(
       'name' => 'Donations',
       'is_active' => 1,
@@ -83,7 +83,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   /**
    * Check method setIsActive()
    */
-  function testSetIsActive() {
+  public function testSetIsActive() {
     $params = array(
       'name' => 'Donations',
       'is_deductible' => 0,
@@ -106,7 +106,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   /**
    * Check method del()
    */
-  function testDel() {
+  public function testDel() {
     $params = array(
       'name' => 'Donations',
       'is_deductible' => 0,

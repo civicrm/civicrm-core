@@ -35,7 +35,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testMemberAdd() {
+  public function testMemberAdd() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -152,7 +152,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
   /**
    * @param array $memTypeParams
    */
-  function _addMembership($memTypeParams) {
+  public function _addMembership($memTypeParams) {
     // click through to the membership view screen
     $this->click("css=li#tab_member a");
     $this->waitForElementPresent("link=Add Membership");
@@ -189,7 +189,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
    * @param $profileTitle
    * @param array $customDataParams
    */
-  function _addProfile($profileTitle, $customDataParams) {
+  public function _addProfile($profileTitle, $customDataParams) {
 
     $this->openCiviPage("admin/uf/group", "reset=1");
 
@@ -227,7 +227,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _addCustomData() {
+  public function _addCustomData() {
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);
 
     $this->openCiviPage('admin/custom/group', 'reset=1');

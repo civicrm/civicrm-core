@@ -46,7 +46,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     //check permission for update.
@@ -62,7 +62,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $grantStatus = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id');
     $this->addElement('select', 'status_id', ts('Grant Status'), array('' => '') + $grantStatus);
 

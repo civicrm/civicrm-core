@@ -39,7 +39,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
 
     $this->_columns = array(
@@ -52,7 +52,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     $this->initialize();
   }
 
-  function initialize() {
+  public function initialize() {
     $this->_segmentSize = CRM_Utils_Array::value('segmentSize', $this->_formValues);
 
     $this->_includeGroups = CRM_Utils_Array::value('includeGroups', $this->_formValues);
@@ -76,7 +76,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   /**
    * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
     $form->add('text',
       'segmentSize',
       ts('Segment Size'),
@@ -118,7 +118,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   /**
    * @return null
    */
-  function summary() {
+  public function summary() {
     return NULL;
   }
 
@@ -153,7 +153,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   /**
    * @return string
    */
-  function from() {
+  public function from() {
     //define table name
     $randomNum = md5(uniqid());
     $this->_tableName = "civicrm_temp_custom_{$randomNum}";
@@ -335,21 +335,21 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
    *
    * @return string
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     return '(1)';
   }
 
   /**
    * @return string
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
   /**
    * @param $title
    */
-  function setTitle($title) {
+  public function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
@@ -364,14 +364,14 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   /**
    * @return mixed
    */
-  function count() {
+  public function count() {
     $sql = $this->all();
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     return $dao->N;
   }
 
-  function __destruct() {
+  public function __destruct() {
     // the temporary tables are dropped automatically
     // so we don't do it here
     // but let mysql clean up

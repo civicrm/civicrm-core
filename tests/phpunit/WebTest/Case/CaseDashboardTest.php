@@ -35,7 +35,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAllOrMyCases() {
+  public function testAllOrMyCases() {
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 

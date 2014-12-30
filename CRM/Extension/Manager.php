@@ -106,7 +106,7 @@ class CRM_Extension_Manager {
    * @param CRM_Extension_Mapper $mapper
    * @param $typeManagers
    */
-  function __construct(CRM_Extension_Container_Interface $fullContainer, $defaultContainer, CRM_Extension_Mapper $mapper, $typeManagers) {
+  public function __construct(CRM_Extension_Container_Interface $fullContainer, $defaultContainer, CRM_Extension_Mapper $mapper, $typeManagers) {
     $this->fullContainer = $fullContainer;
     $this->defaultContainer = $defaultContainer;
     $this->mapper = $mapper;

@@ -35,7 +35,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomDataImport() {
+  public function testCustomDataImport() {
     $this->webtestLogin();
 
     $firstName1 = 'Ma_' . substr(sha1(rand()), 0, 7);
@@ -113,7 +113,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _individualCustomCSVData($customDataParams, $firstName1) {
+  public function _individualCustomCSVData($customDataParams, $firstName1) {
     $headers = array(
       'first_name' => 'First Name',
       'last_name' => 'Last Name',
@@ -135,14 +135,14 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
    * @param $originalRows
    * @param $checkSummary
    */
-  function checkDuplicateContacts($originalHeaders, $originalRows, $checkSummary) {
+  public function checkDuplicateContacts($originalHeaders, $originalRows, $checkSummary) {
     $this->assertTrue($this->isTextPresent('CiviCRM has detected one record which is a duplicate of existing CiviCRM contact record. These records have not been imported.'));
   }
 
   /**
    * @return array
    */
-  function _addCustomData() {
+  public function _addCustomData() {
 
     $this->openCiviPage("admin/custom/group", "reset=1");
 

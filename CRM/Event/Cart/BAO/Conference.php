@@ -11,7 +11,7 @@ class CRM_Event_Cart_BAO_Conference {
    *
    * @return array|null
    */
-  static function get_participant_sessions($main_event_participant_id) {
+  public static function get_participant_sessions($main_event_participant_id) {
     $sql = <<<EOS
 SELECT sub_event.* FROM civicrm_participant main_participant
     JOIN civicrm_event sub_event ON sub_event.parent_event_id = main_participant.event_id

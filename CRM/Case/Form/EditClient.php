@@ -99,7 +99,7 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
   }
 
 
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array(get_class($this), 'formRule'), $this);
   }
 
@@ -110,7 +110,7 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
    *
    * @return array
    */
-  static function formRule($vals, $rule, $form) {
+  public static function formRule($vals, $rule, $form) {
     $errors = array();
     if (empty($vals['reassign_contact_id']) || $vals['reassign_contact_id'] == $form->get('cid')) {
       $errors['reassign_contact_id'] = ts("Please select a different contact.");

@@ -48,7 +48,7 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
    *
    * @return \CRM_Mailing_MailStore_Mbox
    */
-  function __construct($file) {
+  public function __construct($file) {
     $this->_transport = new ezcMailMboxTransport($file);
     flock($this->_transport->fh, LOCK_EX);
 
@@ -63,7 +63,7 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
    *
    * @return void
    */
-  function __destruct() {
+  public function __destruct() {
     if ($this->_leftToProcess === 0) {
       // FIXME: the ftruncate() call does not work for some reason
       if ($this->_debug) {
@@ -81,7 +81,7 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
    *
    * @return void
    */
-  function markIgnored($nr) {
+  public function markIgnored($nr) {
     if ($this->_debug) {
       print "copying message $nr to ignored folder\n";
     }
@@ -98,7 +98,7 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
    *
    * @return void
    */
-  function markProcessed($nr) {
+  public function markProcessed($nr) {
     if ($this->_debug) {
       print "copying message $nr to processed folder\n";
     }

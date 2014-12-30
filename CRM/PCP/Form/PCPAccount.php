@@ -119,7 +119,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $this->_defaults = array();
     if ($this->_contactID) {
       foreach ($this->_fields as $name => $dontcare) {
@@ -234,7 +234,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     foreach ($fields as $key => $value) {
       if (strpos($key, 'email-') !== FALSE && !empty($value)) {

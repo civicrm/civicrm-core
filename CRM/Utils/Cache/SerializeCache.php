@@ -42,7 +42,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
    *
    * @return \CRM_Utils_Cache_SerializeCache
    */
-  function __construct($config) {
+  public function __construct($config) {
     $this->_cache = array();
   }
 
@@ -51,7 +51,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
    *
    * @return string
    */
-  function fileName ($key) {
+  public function fileName ($key) {
     if (strlen($key) > 50)
       return CIVICRM_TEMPLATE_COMPILEDIR ."CRM_".md5($key).".php";
     return CIVICRM_TEMPLATE_COMPILEDIR .$key.".php";
@@ -62,7 +62,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
    *
    * @return mixed
    */
-  function get ($key) {
+  public function get ($key) {
     if (array_key_exists($key,$this->_cache))
       return $this->_cache[$key];
 
@@ -77,7 +77,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
    * @param string $key
    * @param mixed $value
    */
-  function set($key, &$value) {
+  public function set($key, &$value) {
     if (file_exists($this->fileName ($key))) {
       return;
     }
@@ -88,7 +88,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
   /**
    * @param string $key
    */
-  function delete($key) {
+  public function delete($key) {
     if (file_exists($this->fileName ($key))) {
       unlink ($this->fileName ($key));
     }
@@ -98,7 +98,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
   /**
    * @param null $key
    */
-  function flush($key =null) {
+  public function flush($key =null) {
     $prefix = "CRM_";
     if (!$handle = opendir(CIVICRM_TEMPLATE_COMPILEDIR)) {
       return; // die? Error?

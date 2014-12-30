@@ -88,7 +88,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     //CRM-4320.
@@ -144,7 +144,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_paymentProcessorID && $this->_snippet && !($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)) {
       // see function comment block for explanation of this. Note that CRM-15555 will require this to look at the billing form fields not the
       // billing_mode which
@@ -804,7 +804,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     //check that either an email or firstname+lastname is included in the form(CRM-9587)
     self::checkProfileComplete($fields, $errors, $self->_eventId);
@@ -944,7 +944,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * Check if profiles are complete when event registration occurs(CRM-9587)
    *
    */
-  static function checkProfileComplete($fields, &$errors, $eventId) {
+  public static function checkProfileComplete($fields, &$errors, $eventId) {
     $email = '';
     foreach ($fields as $fieldname => $fieldvalue) {
       if (substr($fieldname, 0, 6) == 'email-' && $fieldvalue) {
@@ -1399,7 +1399,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-  static function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
+  public static function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
     // CRM-3907, skip check for preview registrations
     // CRM-4320 participant need to walk wizard
     if (!$returnContactId &&

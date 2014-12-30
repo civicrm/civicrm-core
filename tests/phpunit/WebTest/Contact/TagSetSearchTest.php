@@ -35,7 +35,7 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testTagSetSearch() {
+  public function testTagSetSearch() {
     $this->webtestLogin();
 
     $tagSet1 = $this->_testAddTagSet();
@@ -117,7 +117,7 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _testAddTagSet() {
+  public function _testAddTagSet() {
     // Go to add tag set url.
     $this->openCiviPage('admin/tag', 'action=add&reset=1&tagset=1');
 

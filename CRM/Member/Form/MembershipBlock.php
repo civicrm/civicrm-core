@@ -51,7 +51,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     //parent::setDefaultValues();
     $defaults = array();
     if (isset($this->_id)) {
@@ -223,7 +223,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * @access public
    * @static
    */
-  static function formRule($params, $files, $contributionPageId = NULL) {
+  public static function formRule($params, $files, $contributionPageId = NULL) {
     $errors = array();
 
     if (!empty($params['member_price_set_id'])) {

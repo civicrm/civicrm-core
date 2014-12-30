@@ -59,7 +59,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_pledgeStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
     // Check if CiviCampaign is a) enabled and b) has active campaigns
     $config = CRM_Core_Config::singleton();
@@ -200,11 +200,11 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     parent::select();
   }
   /*
@@ -218,7 +218,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
    *
    * @return bool|string
    */
-  function selectClause(&$tableName, $tableKey, &$fieldName, &$field) {
+  public function selectClause(&$tableName, $tableKey, &$fieldName, &$field) {
     if ($fieldName == 'total_paid') {
       $this->_totalPaid = TRUE; // add pledge_payment join
       $this->_columnHeaders["{$tableName}_{$fieldName}"] = array(
@@ -241,14 +241,14 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     return FALSE;
   }
 
-  function groupBy() {
+  public function groupBy() {
     parent::groupBy();
     if (empty($this->_groupBy) && $this->_totalPaid) {
       $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_pledge']}.id, {$this->_aliases['civicrm_pledge']}.currency";
     }
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
             FROM civicrm_pledge {$this->_aliases['civicrm_pledge']}
                  LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
@@ -281,7 +281,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     //regenerate the from field without extra left join on pledge payments
     $this->_totalPaid = FALSE;
@@ -335,11 +335,11 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     return $statistics;
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = "ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id";
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -391,7 +391,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     }
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $this->beginPostProcess();
 
@@ -504,7 +504,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     $checkList = array();

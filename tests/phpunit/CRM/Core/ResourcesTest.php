@@ -42,7 +42,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    */
   protected $mapper;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     list ($this->basedir, $this->container, $this->mapper) = $this->_createMapper();
@@ -56,7 +56,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     civicrm_smarty_register_string_resource( );
   }
 
-  function testAddScriptFile() {
+  public function testAddScriptFile() {
     $this->res
       ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile')
       ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile') // extra
@@ -77,7 +77,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    *
    * FIXME: This can't work because the tests run in English and CRM_Core_Resources optimizes
    * away the English data from $settings['strings']
-  function testAddScriptFile_strings() {
+  public function testAddScriptFile_strings() {
     file_put_contents($this->mapper->keyToBasePath('com.example.ext') . '/hello.js', 'alert(ts("Hello world"));');
     $this->res->addScriptFile('com.example.ext', 'hello.js', 0, 'testAddScriptFile_strings');
     $settings = $this->res->getSettings();
@@ -86,7 +86,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   }
   */
 
-  function testAddScriptURL() {
+  public function testAddScriptURL() {
     $this->res
       ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')
       ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL') // extra
@@ -102,7 +102,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testAddScript() {
+  public function testAddScript() {
     $this->res
       ->addScript('alert("hi");', 0, 'testAddScript')
       ->addScript('alert("there");', 0, 'testAddScript')
@@ -117,7 +117,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testAddVars() {
+  public function testAddVars() {
     $this->res
       ->addVars('food', array('fruit' => array('mine' => 'apple', 'ours' => 'banana')))
       ->addVars('food', array('fruit' => array('mine' => 'new apple', 'yours' => 'orange')))
@@ -128,7 +128,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     );
   }
 
-  function testAddSetting() {
+  public function testAddSetting() {
     $this->res
       ->addSetting(array('fruit' => array('mine' => 'apple')))
       ->addSetting(array('fruit' => array('yours' => 'orange')))
@@ -142,7 +142,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertTrue(strpos($actual, $expected) !== FALSE);
   }
 
-  function testAddSettingFactory() {
+  public function testAddSettingFactory() {
     $this->res->addSettingsFactory(function()  {
       return array('fruit' => array('yours' => 'orange'));
     });
@@ -155,7 +155,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertTreeEquals($expected, $actual);
   }
 
-  function testAddSettingAndSettingFactory() {
+  public function testAddSettingAndSettingFactory() {
     $this->res->addSetting(array('fruit' => array('mine' => 'apple')));
 
     $muckableValue = array('fruit' => array('yours' => 'orange', 'theirs' => 'apricot'));
@@ -174,7 +174,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertTreeEquals($expected, $actual);
   }
 
-  function testCrmJS() {
+  public function testCrmJS() {
     $smarty = CRM_Core_Smarty::singleton();
 
     $actual = $smarty->fetch('string:{crmScript ext=com.example.ext file=foo%20bar.js region=testCrmJS}');
@@ -191,7 +191,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testAddStyleFile() {
+  public function testAddStyleFile() {
     $this->res
       ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile')
       ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile') // extra
@@ -207,7 +207,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testAddStyleURL() {
+  public function testAddStyleURL() {
     $this->res
       ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL')
       ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL') // extra
@@ -223,7 +223,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testAddStyle() {
+  public function testAddStyle() {
     $this->res
       ->addStyle('body { background: black; }', 0, 'testAddStyle')
       ->addStyle('body { text-color: black; }', 0, 'testAddStyle')
@@ -238,7 +238,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testCrmCSS() {
+  public function testCrmCSS() {
     $smarty = CRM_Core_Smarty::singleton();
 
     $actual = $smarty->fetch('string:{crmStyle ext=com.example.ext file=foo%20bar.css region=testCrmCSS}');
@@ -255,7 +255,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testGetURL() {
+  public function testGetURL() {
     $this->assertEquals(
       'http://core-app/dir/file%20name.txt',
       $this->res->getURL('civicrm', 'dir/file%20name.txt')
@@ -274,7 +274,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     );
   }
 
-  function testCrmResURL() {
+  public function testCrmResURL() {
     $smarty = CRM_Core_Smarty::singleton();
 
     $actual = $smarty->fetch('string:{crmResURL ext=com.example.ext file=foo%20bar.png}');
@@ -294,7 +294,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    * @internal param string $appendPathGarbage
    * @return array(string $basedir, CRM_Extension_Container_Interface, CRM_Extension_Mapper)
    */
-  function _createMapper(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
+  public function _createMapper(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $basedir = rtrim($this->createTempDir('ext-'), '/');
     mkdir("$basedir/com.example.ext");
     file_put_contents("$basedir/com.example.ext/info.xml", "<extension key='com.example.ext' type='report'><file>oddball</file></extension>");

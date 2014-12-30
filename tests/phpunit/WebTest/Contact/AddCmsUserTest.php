@@ -35,7 +35,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAuthenticAddUser() {
+  public function testAuthenticAddUser() {
 
     $this->webtestLogin('admin');
 
@@ -68,7 +68,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function testAnonymousAddUser() {
+  public function testAnonymousAddUser() {
     // Make sure Drupal account settings allow visitors to register for account w/o admin approval
     // login as admin
     $this->webtestLogin('admin');

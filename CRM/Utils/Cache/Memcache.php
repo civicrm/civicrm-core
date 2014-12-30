@@ -84,7 +84,7 @@ class CRM_Utils_Cache_Memcache {
    *
    * @return \CRM_Utils_Cache_Memcache
    */
-  function __construct($config) {
+  public function __construct($config) {
     if (isset($config['host'])) {
       $this->_host = $config['host'];
     }
@@ -113,7 +113,7 @@ class CRM_Utils_Cache_Memcache {
    *
    * @return bool
    */
-  function set($key, &$value) {
+  public function set($key, &$value) {
     if (!$this->_cache->set($this->_prefix . $key, $value, FALSE, $this->_timeout)) {
       return FALSE;
     }
@@ -125,7 +125,7 @@ class CRM_Utils_Cache_Memcache {
    *
    * @return mixed
    */
-  function &get($key) {
+  public function &get($key) {
     $result = $this->_cache->get($this->_prefix . $key);
     return $result;
   }
@@ -135,14 +135,14 @@ class CRM_Utils_Cache_Memcache {
    *
    * @return mixed
    */
-  function delete($key) {
+  public function delete($key) {
     return $this->_cache->delete($this->_prefix . $key);
   }
 
   /**
    * @return mixed
    */
-  function flush() {
+  public function flush() {
     return $this->_cache->flush();
   }
 }

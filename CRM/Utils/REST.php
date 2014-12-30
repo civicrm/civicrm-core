@@ -79,7 +79,7 @@ class CRM_Utils_REST {
    *
    * @return array
    */
-  static function error($message = 'Unknown Error') {
+  public static function error($message = 'Unknown Error') {
     $values = array(
       'error_message' => $message,
       'is_error' => 1,
@@ -93,7 +93,7 @@ class CRM_Utils_REST {
    *
    * @return array
    */
-  static function simple($params) {
+  public static function simple($params) {
     $values = array('is_error' => 0);
     $values += $params;
     return $values;
@@ -102,7 +102,7 @@ class CRM_Utils_REST {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     $result = self::handle();
     return self::output($result);
   }
@@ -110,7 +110,7 @@ class CRM_Utils_REST {
   /**
    * @return string
    */
-  function bootAndRun() {
+  public function bootAndRun() {
     $response = $this->loadCMSBootstrap();
     if (is_array($response)) {
       return self::output($response);
@@ -123,7 +123,7 @@ class CRM_Utils_REST {
    *
    * @return string
    */
-  static function output(&$result) {
+  public static function output(&$result) {
     $requestParams = CRM_Utils_Request::exportValues();
 
     $hier = FALSE;
@@ -183,7 +183,7 @@ class CRM_Utils_REST {
    *
    * @return string
    */
-  static function jsonFormated($json) {
+  public static function jsonFormated($json) {
     $tabcount   = 0;
     $result     = '';
     $inquote    = FALSE;
@@ -264,7 +264,7 @@ class CRM_Utils_REST {
   /**
    * @return array|int
    */
-  static function handle() {
+  public static function handle() {
     $requestParams = CRM_Utils_Request::exportValues();
 
     // Get the function name being called from the q parameter in the query string
@@ -341,7 +341,7 @@ class CRM_Utils_REST {
    *
    * @return array|int
    */
-  static function process(&$args, $params) {
+  public static function process(&$args, $params) {
     $params['check_permissions'] = TRUE;
     $fnName = $apiFile = NULL;
     // clean up all function / class names. they should be alphanumeric and _ only
@@ -402,7 +402,7 @@ class CRM_Utils_REST {
   /**
    * @return array|mixed|null
    */
-  static function &buildParamList() {
+  public static function &buildParamList() {
     $requestParams = CRM_Utils_Request::exportValues();
     $params = array();
 
@@ -435,7 +435,7 @@ class CRM_Utils_REST {
   /**
    * @param $pearError
    */
-  static function fatal($pearError) {
+  public static function fatal($pearError) {
     header('Content-Type: text/xml');
     $error = array();
     $error['code'] = $pearError->getCode();
@@ -452,7 +452,7 @@ class CRM_Utils_REST {
     CRM_Utils_System::civiExit();
   }
 
-  static function APIDoc() {
+  public static function APIDoc() {
 
     CRM_Utils_System::setTitle("API Parameters");
     $template = CRM_Core_Smarty::singleton();
@@ -461,7 +461,7 @@ class CRM_Utils_REST {
     );
   }
 
-  static function ajaxDoc() {
+  public static function ajaxDoc() {
     return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/api/explorer'));
   }
 
@@ -521,7 +521,7 @@ class CRM_Utils_REST {
    * http://example.org/civicrm/api/json?entity=Contact&action=Get"&json={"contact_type":"Individual","email.get.email":{}} to take all the emails from individuals
    * works for POST & GET (POST recommended)
    **/
-  static function ajaxJson() {
+  public static function ajaxJson() {
     $requestParams = CRM_Utils_Request::exportValues();
 
     require_once 'api/v3/utils.php';
@@ -571,7 +571,7 @@ class CRM_Utils_REST {
     CRM_Utils_System::civiExit();
   }
 
-  static function ajax() {
+  public static function ajax() {
     $requestParams = CRM_Utils_Request::exportValues();
 
     // this is driven by the menu system, so we can use permissioning to
@@ -635,7 +635,7 @@ class CRM_Utils_REST {
    * Callback for multiple ajax api calls from CRM.api3()
    * @return array
    */
-  static function processMultiple() {
+  public static function processMultiple() {
     $output = array();
     foreach (json_decode($_REQUEST['json'], TRUE) as $key => $call) {
       $args = array(
@@ -651,7 +651,7 @@ class CRM_Utils_REST {
   /**
    * @return array|NULL NULL if execution should proceed; array if the response is already known
    */
-  function loadCMSBootstrap() {
+  public function loadCMSBootstrap() {
     $requestParams = CRM_Utils_Request::exportValues();
     $q = CRM_Utils_array::value('q', $requestParams);
     $args = explode('/', $q);

@@ -105,7 +105,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
    * @return array $errors@static
    * @access public
    */
-  static function formRule($fields, $errors) {
+  public static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
     if (!empty($fields['email']) && is_array($fields['email'])) {
       foreach ($fields['email'] as $instance => $blockValues) {

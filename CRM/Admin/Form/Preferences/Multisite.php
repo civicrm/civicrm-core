@@ -38,7 +38,7 @@
  *
  */
 class CRM_Admin_Form_Preferences_Multisite extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
     $msDoc = CRM_Utils_System::docURL2('Multi Site Installation', NULL, NULL, NULL, NULL, "wiki");
     CRM_Utils_System::setTitle(ts('Multi Site Settings'));
     $this->_varNames = array(

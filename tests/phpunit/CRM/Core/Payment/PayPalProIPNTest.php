@@ -39,7 +39,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   protected $_contributionPageID;
   protected $_paymentProcessorID;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorCreate();
     $this->_contactID = $this->individualCreate();
@@ -53,14 +53,14 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $this->_contributionPageID = $contributionPage['id'];
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->quickCleanUpFinancialEntities();
   }
 
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
-  function testIPNPaymentRecurSuccess() {
+  public function testIPNPaymentRecurSuccess() {
     $this->setupRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
     $paypalIPN->main();
@@ -81,7 +81,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
-  function testIPNPaymentMembershipRecurSuccess() {
+  public function testIPNPaymentMembershipRecurSuccess() {
     $this->setupMembershipRecurringPaymentProcessorTransaction();
     $this->callAPISuccessGetSingle('membership_payment', array());
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
@@ -112,7 +112,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    * It seems likely that may change in future & this test will start failing (I point this out in the hope it
    * will help future debuggers)
    */
-  function testIPNPaymentCRM13743() {
+  public function testIPNPaymentCRM13743() {
     $this->setupRecurringPaymentProcessorTransaction();
     $firstPaymentParams = $this->getPaypalProRecurTransaction();
     $firstPaymentParams['txn_type'] = 'recurring_payment_failed';
@@ -150,7 +150,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    *
    * Obviously if the behaviour is fixed then the test should be updated!
    */
-  function testIPNPaymentExpressNoError() {
+  public function testIPNPaymentExpressNoError() {
     $this->setupRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalExpressTransactionIPN());
     try{
@@ -170,7 +170,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    * Get PaymentExpress IPN for a single transaction
    * @return array array representing a Paypal IPN POST
    */
-  function getPaypalExpressTransactionIPN() {
+  public function getPaypalExpressTransactionIPN() {
     return array(
       'mc_gross' => '200.00',
       'invoice' => $this->_invoiceID,
@@ -219,7 +219,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    * Get IPN results from follow on IPN transactions
    * @return array array representing a Paypal IPN POST
    */
-  function getSubsequentPaypalExpressTransaction() {
+  public function getSubsequentPaypalExpressTransaction() {
     return array(
       'mc_gross' => '5.00',
       'period_type' => ' Regular',
@@ -275,7 +275,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   /**
    *
    */
-  function getPaypalProRecurTransaction() {
+  public function getPaypalProRecurTransaction() {
     return array(
       'amount' => '15.00',
       'initial_payment_amount' => '0.00',
@@ -329,7 +329,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function getPaypalProRecurSubsequentTransaction() {
+  public function getPaypalProRecurSubsequentTransaction() {
     return array_merge($this->getPaypalProRecurTransaction(), array('txn_id' => 'secondone'));
   }
 }

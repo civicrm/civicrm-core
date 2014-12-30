@@ -25,25 +25,25 @@ class CRM_Core_CodeGen_Util_Smarty {
 
   private $compileDir;
 
-  function __destruct() {
+  public function __destruct() {
     if ($this->compileDir) {
       CRM_Core_CodeGen_Util_File::cleanTempDir($this->compileDir);
     }
   }
 
-  function setPluginDirs($pluginDirs) {
+  public function setPluginDirs($pluginDirs) {
     $this->smartyPluginDirs = $pluginDirs;
     $this->smarty = NULL;
   }
 
-  function getCompileDir() {
+  public function getCompileDir() {
     if ($this->compileDir === NULL) {
       $this->compileDir = CRM_Core_CodeGen_Util_File::createTempDir('templates_c_');
     }
     return $this->compileDir;
   }
 
-  function getSmarty() {
+  public function getSmarty() {
     if ($this->smarty === NULL) {
       require_once 'Smarty/Smarty.class.php';
       $this->smarty = new Smarty();

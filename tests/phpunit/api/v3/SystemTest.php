@@ -74,7 +74,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
   /**
    * Test system log function
    */
-  function testSystemLog() {
+  public function testSystemLog() {
     $this->callAPISuccess('system', 'log', array('level' => 'info', 'message' => 'We wish you a merry Christmas'));
     $result = $this->callAPISuccess('SystemLog', 'getsingle', array(
         'sequential' => 1,
@@ -87,7 +87,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
   /**
    * Test system log function
    */
-  function testSystemLogNoLevel() {
+  public function testSystemLogNoLevel() {
     $this->callAPISuccess('system', 'log', array('message' => 'We wish you a merry Christmas', 'level' => 'alert'));
     $result = $this->callAPISuccess('SystemLog', 'getsingle', array(
       'sequential' => 1,
@@ -97,7 +97,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     $this->assertEquals($result['level'], 'alert');
   }
 
-  function testSystemGet() {
+  public function testSystemGet() {
     $result = $this->callAPISuccess('system', 'get', array());
     $this->assertRegExp('/^[0-9]+\.[0-9]+\.[0-9a-z\-]+$/', $result['values'][0]['version']);
     $this->assertEquals('UnitTests', $result['values'][0]['uf']);

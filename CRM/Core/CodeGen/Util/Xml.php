@@ -9,7 +9,7 @@ class CRM_Core_CodeGen_Util_Xml {
    *
    * @return SimpleXMLElement|bool
    */
-  static function parse($file) {
+  public static function parse($file) {
     $dom = new DomDocument();
     $dom->load($file);
     $dom->xinclude();

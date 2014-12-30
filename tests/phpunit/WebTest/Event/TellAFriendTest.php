@@ -35,7 +35,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddEvent() {
+  public function testAddEvent() {
     // Log in using webtestLogin() method
     $this->webtestLogin('admin');
 
@@ -173,7 +173,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
    * @param $eventTitle
    * @param $eventDescription
    */
-  function _testAddEventInfo($eventTitle, $eventDescription) {
+  public function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
     $this->select("event_type_id", "value=1");
@@ -201,7 +201,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
   /**
    * @param $streetAddress
    */
-  function _testAddLocation($streetAddress) {
+  public function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Location_upload-bottom");
@@ -226,7 +226,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
    * @param $registerIntro
    * @param bool $multipleRegistrations
    */
-  function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
+  public function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
     // Go to Online Registration tab
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
@@ -256,7 +256,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
    * @param $thankYouMsg
    * @param $eventTitle
    */
-  function _testAddTellAFriend($subject, $thankYouMsg, $eventTitle) {
+  public function _testAddTellAFriend($subject, $thankYouMsg, $eventTitle) {
     // Go to Tell A Friend Tab
     $this->click('link=Tell a Friend');
     $this->waitForElementPresent('_qf_Event_cancel-bottom');

@@ -38,7 +38,7 @@ class WebTest_Event_AddRecurringEventTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testRecurringEvent() {
+  public function testRecurringEvent() {
     $this->webtestLogin();
 
     //Add repeat configuration for an event

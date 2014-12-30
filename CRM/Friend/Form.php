@@ -237,7 +237,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
    * @access public
    * @static
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
 
     $errors = array();
 

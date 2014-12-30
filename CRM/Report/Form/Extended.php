@@ -48,15 +48,15 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     parent::select();
   }
 
@@ -64,7 +64,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /*
    * From clause build where baseTable & fromClauses are defined
    */
-  function from() {
+  public function from() {
     if (!empty($this->_baseTable)) {
       $this->buildACLClause($this->_aliases['civicrm_contact']);
       $this->_from = "FROM {$this->_baseTable}   {$this->_aliases[$this->_baseTable]}";
@@ -85,11 +85,11 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function fromClauses() {
+  public function fromClauses() {
     return array();
   }
 
-  function groupBy() {
+  public function groupBy() {
     parent::groupBy();
     //@todo - need to re-visit this - bad behaviour from pa
     if ($this->_groupBy == 'GROUP BY') {
@@ -105,7 +105,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     }
   }
 
-  function orderBy() {
+  public function orderBy() {
     parent::orderBy();
   }
 
@@ -114,11 +114,11 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     return parent::statistics($rows);
   }
 
-  function postProcess() {
+  public function postProcess() {
     if (!empty($this->_aclTable) && !empty($this->_aliases[$this->_aclTable])) {
       $this->buildACLClause($this->_aliases[$this->_aclTable]);
     }
@@ -128,7 +128,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     parent::alterDisplay($rows);
 
     //THis is all generic functionality which can hopefully go into the parent class
@@ -172,7 +172,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function getLineItemColumns() {
+  public function getLineItemColumns() {
     return array(
       'civicrm_line_item' => array(
         'dao' => 'CRM_Price_BAO_LineItem',
@@ -221,7 +221,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function getPriceFieldValueColumns() {
+  public function getPriceFieldValueColumns() {
     return array(
       'civicrm_price_field_value' => array(
         'dao' => 'CRM_Price_BAO_PriceFieldValue',
@@ -261,7 +261,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function getPriceFieldColumns() {
+  public function getPriceFieldColumns() {
     return array(
       'civicrm_price_field' => array(
         'dao' => 'CRM_Price_BAO_PriceField',
@@ -298,7 +298,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function getParticipantColumns() {
+  public function getParticipantColumns() {
     static $_events = array();
     if (!isset($_events['all'])) {
       CRM_Core_PseudoConstant::populate($_events['all'], 'CRM_Event_DAO_Event', FALSE, 'title', 'is_active', "is_template IS NULL OR is_template = 0", 'end_date DESC');
@@ -371,7 +371,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function getMembershipColumns() {
+  public function getMembershipColumns() {
     return array(
       'civicrm_membership' => array(
         'dao' => 'CRM_Member_DAO_Membership',
@@ -413,7 +413,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function getMembershipTypeColumns() {
+  public function getMembershipTypeColumns() {
     return array(
       'civicrm_membership_type' => array(
         'dao' => 'CRM_Member_DAO_MembershipType',
@@ -434,7 +434,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function getEventColumns() {
+  public function getEventColumns() {
     return array(
       'civicrm_event' => array(
         'dao' => 'CRM_Event_DAO_Event',
@@ -495,7 +495,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function getContributionColumns() {
+  public function getContributionColumns() {
     return array(
       'civicrm_contribution' => array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -568,7 +568,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function getContactColumns() {
+  public function getContactColumns() {
     return array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -616,7 +616,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function getCaseColumns() {
+  public function getCaseColumns() {
     return array(
       'civicrm_case' => array(
         'dao' => 'CRM_Case_DAO_Case',
@@ -721,7 +721,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    *
    * @return array
    */
-  function getAddressColumns($options = array()) {
+  public function getAddressColumns($options = array()) {
     $defaultOptions = array(
       'prefix' => '',
       'prefix_label' => '',
@@ -926,7 +926,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @return array
    */
-  function getAvailableJoins() {
+  public function getAvailableJoins() {
     return array(
       'priceFieldValue_from_lineItem' => array(
         'leftTable' => 'civicrm_line_item',
@@ -1018,7 +1018,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /**
    * @param string $prefix
    */
-  function joinAddressFromContact($prefix = '') {
+  public function joinAddressFromContact($prefix = '') {
     $this->_from .= " LEFT JOIN civicrm_address {$this->_aliases[$prefix .
     'civicrm_address']}
       ON {$this->_aliases[$prefix .
@@ -1026,12 +1026,12 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     'civicrm_contact']}.id";
   }
 
-  function joinPriceFieldValueFromLineItem() {
+  public function joinPriceFieldValueFromLineItem() {
     $this->_from .= " LEFT JOIN civicrm_price_field_value {$this->_aliases['civicrm_price_field_value']}
                           ON {$this->_aliases['civicrm_line_item']}.price_field_value_id = {$this->_aliases['civicrm_price_field_value']}.id";
   }
 
-  function joinPriceFieldFromLineItem() {
+  public function joinPriceFieldFromLineItem() {
     $this->_from .= "
        LEFT JOIN civicrm_price_field {$this->_aliases['civicrm_price_field']}
       ON {$this->_aliases['civicrm_line_item']}.price_field_id = {$this->_aliases['civicrm_price_field']}.id
@@ -1041,7 +1041,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /*
    * Define join from line item table to participant table
    */
-  function joinParticipantFromLineItem() {
+  public function joinParticipantFromLineItem() {
     $this->_from .= " LEFT JOIN civicrm_participant {$this->_aliases['civicrm_participant']}
       ON ( {$this->_aliases['civicrm_line_item']}.entity_id = {$this->_aliases['civicrm_participant']}.id
       AND {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_participant')
@@ -1052,7 +1052,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    * Define join from line item table to Membership table. Seems to be still via contribution
    * as the entity. Have made 'inner' to restrict does that make sense?
    */
-  function joinMembershipFromLineItem() {
+  public function joinMembershipFromLineItem() {
     $this->_from .= " INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
       ON ( {$this->_aliases['civicrm_line_item']}.entity_id = {$this->_aliases['civicrm_contribution']}.id
       AND {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution')
@@ -1066,7 +1066,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /*
    * Define join from Participant to Contribution table
    */
-  function joinContributionFromParticipant() {
+  public function joinContributionFromParticipant() {
     $this->_from .= " LEFT JOIN civicrm_participant_payment pp
         ON {$this->_aliases['civicrm_participant']}.id = pp.participant_id
         LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
@@ -1077,7 +1077,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /*
    * Define join from Membership to Contribution table
    */
-  function joinContributionFromMembership() {
+  public function joinContributionFromMembership() {
     $this->_from .= " LEFT JOIN civicrm_membership_payment pp
         ON {$this->_aliases['civicrm_membership']}.id = pp.membership_id
         LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
@@ -1085,14 +1085,14 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
       ";
   }
 
-  function joinParticipantFromContribution() {
+  public function joinParticipantFromContribution() {
     $this->_from .= " LEFT JOIN civicrm_participant_payment pp
                           ON {$this->_aliases['civicrm_contribution']}.id = pp.contribution_id
         LEFT JOIN civicrm_participant {$this->_aliases['civicrm_participant']}
                           ON pp.participant_id = {$this->_aliases['civicrm_participant']}.id";
   }
 
-  function joinMembershipFromContribution() {
+  public function joinMembershipFromContribution() {
     $this->_from .= "
        LEFT JOIN civicrm_membership_payment pp
       ON {$this->_aliases['civicrm_contribution']}.id = pp.contribution_id
@@ -1100,14 +1100,14 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
       ON pp.membership_id = {$this->_aliases['civicrm_membership']}.id";
   }
 
-  function joinMembershipTypeFromMembership() {
+  public function joinMembershipTypeFromMembership() {
     $this->_from .= "
        LEFT JOIN civicrm_membership_type {$this->_aliases['civicrm_membership_type']}
       ON {$this->_aliases['civicrm_membership']}.membership_type_id = {$this->_aliases['civicrm_membership_type']}.id
       ";
   }
 
-  function joinContributionFromLineItem() {
+  public function joinContributionFromLineItem() {
 
     // this can be stored as a temp table & indexed for more speed. Not done at this state.
     // another option is to cache it but I haven't tried to put that code in yet (have used it before for one hour caching
@@ -1143,7 +1143,7 @@ LEFT JOIN civicrm_membership_payment pp
  ";
   }
 
-  function joinLineItemFromContribution() {
+  public function joinLineItemFromContribution() {
 
     // this can be stored as a temp table & indexed for more speed. Not done at this stage.
     // another option is to cache it but I haven't tried to put that code in yet (have used it before for one hour caching
@@ -1177,7 +1177,7 @@ WHERE   line_item_civireport.id IS NOT NULL
   ";
   }
 
-  function joinLineItemFromMembership() {
+  public function joinLineItemFromMembership() {
 
     // this can be stored as a temp table & indexed for more speed. Not done at this stage.
     // another option is to cache it but I haven't tried to put that code in yet (have used it before for one hour caching
@@ -1203,22 +1203,22 @@ WHERE   line_item_civireport.id IS NOT NULL
   ";
   }
 
-  function joinContactFromParticipant() {
+  public function joinContactFromParticipant() {
     $this->_from .= " LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                           ON {$this->_aliases['civicrm_participant']}.contact_id = {$this->_aliases['civicrm_contact']}.id";
   }
 
-  function joinContactFromMembership() {
+  public function joinContactFromMembership() {
     $this->_from .= " LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                           ON {$this->_aliases['civicrm_membership']}.contact_id = {$this->_aliases['civicrm_contact']}.id";
   }
 
-  function joinContactFromContribution() {
+  public function joinContactFromContribution() {
     $this->_from .= " LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                           ON {$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_contact']}.id";
   }
 
-  function joinEventFromParticipant() {
+  public function joinEventFromParticipant() {
     $this->_from .= "  LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']}
                     ON ({$this->_aliases['civicrm_event']}.id = {$this->_aliases['civicrm_participant']}.event_id ) AND
                        ({$this->_aliases['civicrm_event']}.is_template IS NULL OR
@@ -1234,7 +1234,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return string
    */
-  function alterNickName($value, &$row) {
+  public function alterNickName($value, &$row) {
     if (empty($row['civicrm_contact_id'])) {
       return;
     }
@@ -1253,7 +1253,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return array|string
    */
-  function alterContributionType($value, &$row) {
+  public function alterContributionType($value, &$row) {
     return is_string(CRM_Contribute_PseudoConstant::financialType($value, FALSE)) ? CRM_Contribute_PseudoConstant::financialType($value, FALSE) : '';
   }
 
@@ -1266,7 +1266,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return array
    */
-  function alterContributionStatus($value, &$row) {
+  public function alterContributionStatus($value, &$row) {
     return CRM_Contribute_PseudoConstant::contributionStatus($value);
   }
 
@@ -1279,7 +1279,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return array
    */
-  function alterEventType($value, &$row) {
+  public function alterEventType($value, &$row) {
     return CRM_Event_PseudoConstant::eventType($value);
   }
 
@@ -1289,7 +1289,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return array|string
    */
-  function alterEventID($value, &$row) {
+  public function alterEventID($value, &$row) {
     return is_string(CRM_Event_PseudoConstant::event($value, FALSE)) ? CRM_Event_PseudoConstant::event($value, FALSE) : '';
   }
 
@@ -1299,7 +1299,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return array|string
    */
-  function alterMembershipTypeID($value, &$row) {
+  public function alterMembershipTypeID($value, &$row) {
     return is_string(CRM_Member_PseudoConstant::membershipType($value, FALSE)) ? CRM_Member_PseudoConstant::membershipType($value, FALSE) : '';
   }
 
@@ -1309,7 +1309,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return array|string
    */
-  function alterMembershipStatusID($value, &$row) {
+  public function alterMembershipStatusID($value, &$row) {
     return is_string(CRM_Member_PseudoConstant::membershipStatus($value, FALSE)) ? CRM_Member_PseudoConstant::membershipStatus($value, FALSE) : '';
   }
 
@@ -1321,7 +1321,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return array
    */
-  function alterCountryID($value, &$row, $selectedfield, $criteriaFieldName) {
+  public function alterCountryID($value, &$row, $selectedfield, $criteriaFieldName) {
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
     $row[$selectedfield .
@@ -1340,7 +1340,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return array
    */
-  function alterCountyID($value, &$row, $selectedfield, $criteriaFieldName) {
+  public function alterCountyID($value, &$row, $selectedfield, $criteriaFieldName) {
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
     $row[$selectedfield .
@@ -1359,7 +1359,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return array
    */
-  function alterStateProvinceID($value, &$row, $selectedfield, $criteriaFieldName) {
+  public function alterStateProvinceID($value, &$row, $selectedfield, $criteriaFieldName) {
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
     $row[$selectedfield .
@@ -1378,7 +1378,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return mixed
    */
-  function alterContactID($value, &$row, $fieldname) {
+  public function alterContactID($value, &$row, $fieldname) {
     $row[$fieldname . '_link'] = CRM_Utils_System::url("civicrm/contact/view",
       'reset=1&cid=' . $value, $this->_absoluteUrl);
     return $value;
@@ -1389,7 +1389,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return array
    */
-  function alterParticipantStatus($value) {
+  public function alterParticipantStatus($value) {
     if (empty($value)) {
       return;
     }
@@ -1401,7 +1401,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return string
    */
-  function alterParticipantRole($value) {
+  public function alterParticipantRole($value) {
     if (empty($value)) {
       return;
     }
@@ -1418,7 +1418,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    *
    * @return mixed
    */
-  function alterPaymentType($value) {
+  public function alterPaymentType($value) {
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     return $paymentInstruments[$value];
   }

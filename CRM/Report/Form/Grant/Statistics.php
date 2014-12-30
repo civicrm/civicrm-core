@@ -47,7 +47,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
       'civicrm_grant' => array(
         'dao' => 'CRM_Grant_DAO_Grant',
@@ -208,7 +208,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function select() {
+  public function select() {
     $select = array();
 
     $this->_columnHeaders = array();
@@ -238,7 +238,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_grant {$this->_aliases['civicrm_grant']}
                         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
@@ -258,7 +258,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $whereClause = "
 WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
   AND {$this->_aliases['civicrm_grant']}.amount_total > 0";
@@ -307,7 +307,7 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = '';
 
     if (!empty($this->_params['fields']) &&
@@ -329,7 +329,7 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
     }
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get ready with post process params
     $this->beginPostProcess();
 
@@ -353,7 +353,7 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     $totalStatistics = $grantStatistics = array();
     $totalStatistics = parent::statistics($rows);
     $awardedGrantsAmount = $grantsReceived = $totalAmount = $awardedGrants = $grantReportsReceived = 0;

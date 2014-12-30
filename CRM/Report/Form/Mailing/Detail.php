@@ -43,7 +43,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array();
 
     $this->_columns['civicrm_contact'] = array(
@@ -252,7 +252,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function select() {
+  public function select() {
     $select = $columns = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -302,7 +302,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     ksort($this->_columnHeaders);
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']}";
 
@@ -423,7 +423,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     parent::where();
     $this->_where .= " AND {$this->_aliases['civicrm_mailing']}.sms_provider_id IS NULL";
   }
@@ -431,7 +431,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
   /**
    * @return array
    */
-  function mailingList() {
+  public function mailingList() {
 
     $data = array();
     $mailing = new CRM_Mailing_BAO_Mailing();
@@ -448,7 +448,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {

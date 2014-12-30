@@ -37,7 +37,7 @@
  * This class generates form components for Address Section
  */
 class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
 
     CRM_Utils_System::setTitle(ts('Settings - Addresses'));
 
@@ -93,7 +93,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults['address_standardization_provider'] = $this->_config->address_standardization_provider;
     $defaults['address_standardization_userid'] = $this->_config->address_standardization_userid;
@@ -158,7 +158,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
    *
    * @return bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $p = $fields['address_standardization_provider'];
     $u = $fields['address_standardization_userid'];
     $w = $fields['address_standardization_url'];

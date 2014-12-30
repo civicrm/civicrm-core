@@ -71,7 +71,7 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * @return boolean true if yes, else false
    * @access public
    */
-  function check($str, $contactID = NULL) {
+  public function check($str, $contactID = NULL) {
     $str = $this->translatePermission($str, 'Drupal6', array(
       'view user account' => 'access user profiles',
       'administer users' => 'administer users',
@@ -97,7 +97,7 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * @access public
    */
 
-  function checkGroupRole($array) {
+  public function checkGroupRole($array) {
     if (function_exists('user_load') && isset($array)) {
       $user = user_load(array('uid' => $GLOBALS['user']->uid));
       //if giver roles found in user roles - return true
@@ -188,7 +188,7 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    *
    * Does nothing in Drupal 6.
    */
-  function upgradePermissions($permissions) {
+  public function upgradePermissions($permissions) {
     // D6 allows us to be really lazy... things get cleaned up when the admin form is next submitted...
   }
 
@@ -200,7 +200,7 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    *
    * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
-  static function getModulePermissions($module) {
+  public static function getModulePermissions($module) {
     $return_permissions = array();
     $fn_name = "{$module}_civicrm_permission";
     if (function_exists($fn_name)) {

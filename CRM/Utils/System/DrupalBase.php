@@ -47,7 +47,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     /**
      * deprecated property to check if this is a drupal install. The correct method is to have functions on the UF classes for all UF specific
      * functions and leave the codebase oblivious to the type of CMS
@@ -66,7 +66,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * - $siteName,
    * - $siteRoot
    */
-  function getDefaultSiteSettings($dir){
+  public function getDefaultSiteSettings($dir){
     $config = CRM_Core_Config::singleton();
     $siteName = $siteRoot = NULL;
     $matches = array();
@@ -96,7 +96,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @return bool: TRUE for internal paths, FALSE for external. The drupal_add_js fn is able to add js more
    * efficiently if it is known to be in the drupal site
    */
-  function formatResourceUrl(&$url) {
+  public function formatResourceUrl(&$url) {
     $internal = FALSE;
     $base = CRM_Core_Config::singleton()->resourceBase;
     global $base_url;
@@ -130,7 +130,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @param string $url potential resource url based on standard folder assumptions
    * @return string $url with civicrm-core directory appended if not standard civi dir
    */
-  function appendCoreDirectoryToResourceBase($url) {
+  public function appendCoreDirectoryToResourceBase($url) {
     global $civicrm_root;
     $lastDirectory = basename($civicrm_root);
     if($lastDirectory != 'civicrm') {
@@ -220,7 +220,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @param object $user object as described by the CMS
    * @return mixed <NULL, number>
    */
-  function getUserIDFromUserObject($user) {
+  public function getUserIDFromUserObject($user) {
     return !empty($user->uid) ? $user->uid : NULL;
   }
 
@@ -230,7 +230,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
    *
    */
-  function getUniqueIdentifierFromUserObject($user) {
+  public function getUniqueIdentifierFromUserObject($user) {
     return empty($user->mail) ? NULL : $user->mail;
   }
 
@@ -239,7 +239,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * @return string $userID logged in user unique identifier
    */
-  function getLoggedInUniqueIdentifier() {
+  public function getLoggedInUniqueIdentifier() {
     global $user;
     return $this->getUniqueIdentifierFromUserObject($user);
   }
@@ -247,7 +247,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Action to take when access is not permitted
    */
-  function permissionDenied() {
+  public function permissionDenied() {
     drupal_access_denied();
   }
 
@@ -257,7 +257,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * @return string
    */
-  function getUserRecordUrl($contactID) {
+  public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
     if (CRM_Core_Session::singleton()->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account'))) {
       return CRM_Utils_System::url('user/' . $uid);
@@ -268,7 +268,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * Is the current user permitted to add a user
    * @return bool
    */
-  function checkPermissionAddUser() {
+  public function checkPermissionAddUser() {
     if (CRM_Core_Permission::check('administer users')) {
       return TRUE;
     }
@@ -278,7 +278,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Log error to CMS
    */
-  function logger($message) {
+  public function logger($message) {
     if (CRM_Core_Config::singleton()->userFrameworkLogging) {
       watchdog('civicrm', $message, NULL, WATCHDOG_DEBUG);
     }
@@ -287,14 +287,14 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Flush css/js caches
    */
-  function clearResourceCache() {
+  public function clearResourceCache() {
     _drupal_flush_css_js();
   }
 
   /**
    * Append to coreResourcesList
    */
-  function appendCoreResources(&$list) {
+  public function appendCoreResources(&$list) {
     $list[] = 'js/crm.drupal.js';
   }
 
@@ -302,7 +302,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * Reset any system caches that may be required for proper CiviCRM
    * integration.
    */
-  function flush() {
+  public function flush() {
     drupal_flush_all_caches();
   }
 
@@ -312,7 +312,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @return array CRM_Core_Module
    *
    */
-  function getModules() {
+  public function getModules() {
     $result = array();
     $q = db_query('SELECT name, status FROM {system} WHERE type = \'module\' AND schema_version <> -1');
     foreach ($q as $row) {
@@ -330,7 +330,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * @return void
    */
-  function replacePermission($oldPerm, $newPerms) {
+  public function replacePermission($oldPerm, $newPerms) {
     $roles = user_roles(FALSE, $oldPerm);
     if (!empty($roles)) {
       foreach (array_keys($roles) as $rid) {
@@ -347,7 +347,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @return string $url, formatted url.
    * @static
    */
-  function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
+  public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
       return $url;
     }
@@ -407,13 +407,13 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * GET CMS Version
    * @return string
    */
-  function getVersion() {
+  public function getVersion() {
     return defined('VERSION') ? VERSION : 'Unknown';
   }
 
   /**
    */
-  function updateCategories() {
+  public function updateCategories() {
     // copied this from profile.module. Seems a bit inefficient, but i dont know a better way
     // CRM-3600
     cache_clear_all();
@@ -426,7 +426,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @return string  with the locale or null for none
    *
    */
-  function getUFLocale() {
+  public function getUFLocale() {
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
     // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
     // sometimes for CLI based on order called, this might not be set and/or empty
@@ -460,7 +460,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * FIXME: Document values accepted/required by $params
    *
    */
-  function userLoginFinalize($params = array()){
+  public function userLoginFinalize($params = array()){
     user_login_finalize($params);
   }
 
@@ -472,7 +472,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @return string the url to post the form
    * @access public
    */
-  function postURL($action) {
+  public function postURL($action) {
     if (!empty($action)) {
       return $action;
     }

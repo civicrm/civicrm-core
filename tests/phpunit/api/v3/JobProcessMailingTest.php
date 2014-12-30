@@ -55,7 +55,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    */
   private $_mut;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
@@ -75,7 +75,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   /**
    *
    */
-  function tearDown() {
+  public function tearDown() {
     $this->_mut->stop();
 //    $this->quickCleanup(array('civicrm_mailing', 'civicrm_mailing_job', 'civicrm_contact'));
     CRM_Utils_Hook::singleton()->reset();
@@ -87,7 +87,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   /**
    * Check mailing is sent
    */
-  function testProcessMailing() {
+  public function testProcessMailing() {
     $this->createContactsInGroup(10, $this->_groupID);
     CRM_Core_Config::singleton()->mailerBatchLimit = 2;
     $this->callAPISuccess('mailing', 'create', $this->_params);
@@ -99,7 +99,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    * @param integer $count
    * @param integer $groupID
    */
-  function createContactsInGroup($count, $groupID) {
+  public function createContactsInGroup($count, $groupID) {
     for($i = 1; $i <= $count; $i++ ) {
       $contactID = $this->individualCreate(array('first_name' => $count, 'email' => 'mail' . $i . '@nul.com'));
       $this->callAPISuccess('group_contact', 'create', array('contact_id' => $contactID, 'group_id' => $groupID, 'status' => 'Added'));
@@ -112,7 +112,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  function getRecipients($start, $count) {
+  public function getRecipients($start, $count) {
     $recipients = array();
     for($i = $start; $i < ($start + $count); $i++ ) {
       $recipients[][0] = 'mail' . $i . '@nul.com';

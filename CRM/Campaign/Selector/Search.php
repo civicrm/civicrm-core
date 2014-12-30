@@ -190,7 +190,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *
    */
   static
-  function &links() {
+  public function &links() {
     return self::$_links = array();
   }
 
@@ -202,7 +202,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *
    * @access public
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;
     $params['status'] = ts('Respondents') . ' %%StatusMessage%%';
     $params['rowCount'] = ($this->_limit) ? $this->_limit : CRM_Utils_Pager::ROWCOUNT;
@@ -218,7 +218,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    * @return int Total number of rows
    * @access public
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     return $this->_query->searchQuery(0, 0, NULL,
       TRUE, FALSE,
       FALSE, FALSE, FALSE,
@@ -239,7 +239,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *
    * @return int   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     $result = $this->_query->searchQuery($offset, $rowCount, $sort,
       FALSE, FALSE,
       FALSE, FALSE,
@@ -274,7 +274,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   /**
    * @param $sort
    */
-  function buildPrevNextCache($sort) {
+  public function buildPrevNextCache($sort) {
     //for prev/next pagination
     $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
 
@@ -363,7 +363,7 @@ FROM {$from}
   /**
    * @return string
    */
-  function &getQuery() {
+  public function &getQuery() {
     return $this->_query;
   }
 
@@ -374,7 +374,7 @@ FROM {$from}
    *
    * @return string name of the file
    */
-  function getExportFileName($output = 'csv') {
+  public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Respondent Search');
   }
 }

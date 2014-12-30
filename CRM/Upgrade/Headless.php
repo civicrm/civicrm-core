@@ -40,7 +40,7 @@ class CRM_Upgrade_Headless {
    * @return array, with keys:
    *   - message: string, HTML-ish blob
    */
-  function run($enablePrint = TRUE) {
+  public function run($enablePrint = TRUE) {
     // lets get around the time limit issue if possible for upgrades
     if (!ini_get('safe_mode')) {
       set_time_limit(0);

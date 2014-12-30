@@ -227,7 +227,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     return $errors;
   }
@@ -275,7 +275,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
    *
    * @return mixed
    */
-  function emailReceipt(&$params) {
+  public function emailReceipt(&$params) {
     $updatedLineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant', NULL, FALSE);
     $lineItem = array();
     if ($updatedLineItem) {

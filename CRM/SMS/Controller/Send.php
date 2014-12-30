@@ -37,7 +37,7 @@ class CRM_SMS_Controller_Send extends CRM_Core_Controller {
   /**
    * Class constructor
    */
-  function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
+  public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
     parent::__construct($title, $modal, NULL, FALSE, TRUE);
 
     $mailingID = CRM_Utils_Request::retrieve('mid', 'String', $this, FALSE, NULL);

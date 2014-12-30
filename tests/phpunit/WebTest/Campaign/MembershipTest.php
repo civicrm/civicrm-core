@@ -35,7 +35,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCreateCampaign() {
+  public function testCreateCampaign() {
     $this->webtestLogin('admin');
 
     // Create new group
@@ -113,7 +113,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
    * @param $campaignTitle
    * @param int $id
    */
-  function memberAddTest($campaignTitle, $id) {
+  public function memberAddTest($campaignTitle, $id) {
     //Add new memebershipType
     $memTypeParams = $this->webtestAddMembershipType();
 

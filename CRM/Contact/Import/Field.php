@@ -143,7 +143,7 @@ class CRM_Contact_Import_Field {
    * @param null $relatedContactLocType
    * @param null $relatedContactPhoneType
    */
-  function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $columnPattern = '//', $dataPattern = '//', $hasLocationType = NULL, $phoneType = NULL, $related = NULL, $relatedContactType = NULL, $relatedContactDetails = NULL, $relatedContactLocType = NULL, $relatedContactPhoneType = NULL) {
+  public function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $columnPattern = '//', $dataPattern = '//', $hasLocationType = NULL, $phoneType = NULL, $related = NULL, $relatedContactType = NULL, $relatedContactDetails = NULL, $relatedContactLocType = NULL, $relatedContactPhoneType = NULL) {
     $this->_name = $name;
     $this->_title = $title;
     $this->_type = $type;
@@ -160,7 +160,7 @@ class CRM_Contact_Import_Field {
     $this->_value = NULL;
   }
 
-  function resetValue() {
+  public function resetValue() {
     $this->_value = NULL;
   }
 
@@ -168,14 +168,14 @@ class CRM_Contact_Import_Field {
    * The value is in string format. convert the value to the type of this field
    * and set the field value with the appropriate type
    */
-  function setValue($value) {
+  public function setValue($value) {
     $this->_value = $value;
   }
 
   /**
    * @return bool
    */
-  function validate() {
+  public function validate() {
     //  echo $this->_value."===========<br>";
     $message = '';
 

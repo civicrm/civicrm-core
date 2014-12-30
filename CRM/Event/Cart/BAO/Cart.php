@@ -46,7 +46,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   /**
    * @param $participant
    */
-  function add_participant_to_cart($participant) {
+  public function add_participant_to_cart($participant) {
     $event_in_cart = $this->get_event_in_cart_by_event_id($participant->event_id);
     if (!$event_in_cart) {
       $event_in_cart = $this->add_event($participant->event_id);
@@ -198,7 +198,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    *
    * @return int
    */
-  static function compare_event_dates($event_in_cart_1, $event_in_cart_2) {
+  public static function compare_event_dates($event_in_cart_1, $event_in_cart_2) {
     $date_1 = CRM_Utils_Date::unixTime($event_in_cart_1->event->start_date);
     $date_2 = CRM_Utils_Date::unixTime($event_in_cart_2->event->start_date);
 
@@ -299,7 +299,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    *
    * @return int
    */
-  function get_participant_index_from_id($participant_id) {
+  public function get_participant_index_from_id($participant_id) {
     foreach ($this->events_in_carts as $event_in_cart) {
       $index = 0;
       foreach ($event_in_cart->participants as $participant) {

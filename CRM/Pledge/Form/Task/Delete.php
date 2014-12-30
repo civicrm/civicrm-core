@@ -68,7 +68,7 @@ class CRM_Pledge_Form_Task_Delete extends CRM_Pledge_Form_Task {
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->addDefaultButtons(ts('Delete Pledges'), 'done');
   }
 

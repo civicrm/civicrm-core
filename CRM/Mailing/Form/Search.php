@@ -79,7 +79,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $statusVals = array();
     $parent = $this->controller->getParent();
 
@@ -103,7 +103,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
     return $defaults;
   }
 
-  function postProcess() {
+  public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
     CRM_Contact_BAO_Query::fixDateValues($params["mailing_relative"], $params['mailing_from'], $params['mailing_to']);

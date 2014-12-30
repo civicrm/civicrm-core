@@ -39,7 +39,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
 
   //Test that option to create a cms user is present on a contact who does not
   //have a cms account already( in this case, a new contact )
-  function testCreateContactLinkPresent() {
+  public function testCreateContactLinkPresent() {
 
     //login
     $this->webtestLogin('admin');
@@ -58,7 +58,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
 
   //Test that the action link is missing for users who already have a contact
   //record. The contact record for drupal user 1 is used
-  function testCreateContactLinkMissing() {
+  public function testCreateContactLinkMissing() {
 
     //login
     $this->webtestLogin('admin');
@@ -79,7 +79,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
   }
 
   //Test the ajax "check username availibity" link when adding cms user
-  function testCheckUsernameAvailability() {
+  public function testCheckUsernameAvailability() {
     $this->webtestLogin('admin');
 
     $email = $this->_createUserAndGotoForm();
@@ -102,7 +102,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
   }
 
   //Test form submission when the username is taken
-  function testTakenUsernameSubmission() {
+  public function testTakenUsernameSubmission() {
 
     //login
     $this->webtestLogin('admin');
@@ -126,7 +126,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
   }
 
   //Test form sumbission when user passwords dont match
-  function testMismatchPasswordSubmission() {
+  public function testMismatchPasswordSubmission() {
 
     //login
     $this->webtestLogin('admin');
@@ -149,7 +149,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->assertTrue($results['count'] == 0);
   }
 
-  function testMissingDataSubmission() {
+  public function testMissingDataSubmission() {
 
     //login
     $this->webtestLogin('admin');
@@ -178,7 +178,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
   }
 
   //Test a valid (username unique and passwords match) submission
-  function testValidSubmission() {
+  public function testValidSubmission() {
 
     //login
     $this->webtestLogin('admin');
@@ -208,7 +208,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
    * @param $password
    * @param $confirm_password
    */
-  function _fillCMSUserForm($username, $password, $confirm_password) {
+  public function _fillCMSUserForm($username, $password, $confirm_password) {
     $this->type("cms_name", $username);
     $this->type("cms_pass", $password);
     $this->type("cms_confirm_pass", $confirm_password);
@@ -217,7 +217,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
   /**
    * @return array
    */
-  function _createUserAndGoToForm() {
+  public function _createUserAndGoToForm() {
     $firstName = substr(sha1(rand()), 0, 7) . "John";
     $lastName = substr(sha1(rand()), 0, 7) . "Smith";
     $email = $this->webtestAddContact($firstName, $lastName, TRUE);

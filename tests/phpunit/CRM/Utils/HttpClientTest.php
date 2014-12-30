@@ -42,25 +42,25 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  function testFetchHttp() {
+  public function testFetchHttp() {
     $result = $this->client->fetch(self::VALID_HTTP_URL, $this->tmpFile);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $result);
     $this->assertRegExp(self::VALID_HTTP_REGEX, file_get_contents($this->tmpFile));
   }
 
-  function testFetchHttps_valid() {
+  public function testFetchHttps_valid() {
     $result = $this->client->fetch(self::VALID_HTTPS_URL, $this->tmpFile);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $result);
     $this->assertRegExp(self::VALID_HTTPS_REGEX, file_get_contents($this->tmpFile));
   }
 
-  function testFetchHttps_invalid_verify() {
+  public function testFetchHttps_invalid_verify() {
     $result = $this->client->fetch(self::SELF_SIGNED_HTTPS_URL, $this->tmpFile);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_DL_ERROR, $result);
     $this->assertEquals('', file_get_contents($this->tmpFile));
   }
 
-  function testFetchHttps_invalid_noVerify() {
+  public function testFetchHttps_invalid_noVerify() {
     $result = civicrm_api('Setting', 'create', array(
       'version' => 3,
       'verifySSL' => FALSE,
@@ -72,30 +72,30 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
     $this->assertRegExp(self::SELF_SIGNED_HTTPS_REGEX, file_get_contents($this->tmpFile));
   }
 
-  function testFetchHttp_badOutFile() {
+  public function testFetchHttp_badOutFile() {
     $result = $this->client->fetch(self::VALID_HTTP_URL, '/ba/d/path/too/utput');
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_WRITE_ERROR, $result);
   }
 
-  function testGetHttp() {
+  public function testGetHttp() {
     list($status, $data) = $this->client->get(self::VALID_HTTP_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $this->assertRegExp(self::VALID_HTTP_REGEX, $data);
   }
 
-  function testGetHttps_valid() {
+  public function testGetHttps_valid() {
     list($status, $data) = $this->client->get(self::VALID_HTTPS_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $this->assertRegExp(self::VALID_HTTPS_REGEX, $data);
   }
 
-  function testGetHttps_invalid_verify() {
+  public function testGetHttps_invalid_verify() {
     list($status, $data) = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_DL_ERROR, $status);
     $this->assertEquals('', $data);
   }
 
-  function testGetHttps_invalid_noVerify() {
+  public function testGetHttps_invalid_noVerify() {
     $result = civicrm_api('Setting', 'create', array(
       'version' => 3,
       'verifySSL' => FALSE,

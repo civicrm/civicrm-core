@@ -43,7 +43,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
    *
    * @throws Exception
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
 
     // unset search profile and other search params if set
@@ -99,7 +99,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
   /**
    * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
 
     $config = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
@@ -197,7 +197,7 @@ country.name           as country
   /**
    * @return string
    */
-  function from() {
+  public function from() {
     $f = "
 FROM      civicrm_contact contact_a
 LEFT JOIN civicrm_address address ON ( address.contact_id       = contact_a.id AND
@@ -226,7 +226,7 @@ LEFT JOIN civicrm_group_contact cgc ON ( cgc.contact_id = contact_a.id AND cgc.s
    *
    * @return string
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     $params = array();
     $clause = array();
 
@@ -255,14 +255,14 @@ AND cgc.group_id = {$this->_group}
   /**
    * @return string
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom/Proximity.tpl';
   }
 
   /**
    * @return array|null
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $config = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
     $stateprovinceDefault = $config->defaultContactStateProvince;
@@ -287,12 +287,12 @@ AND cgc.group_id = {$this->_group}
   /**
    * @param $row
    */
-  function alterRow(&$row) {}
+  public function alterRow(&$row) {}
 
   /**
    * @param $title
    */
-  function setTitle($title) {
+  public function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }

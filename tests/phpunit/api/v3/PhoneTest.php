@@ -42,7 +42,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
   protected $_params;
 
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
     $this->useTransaction();

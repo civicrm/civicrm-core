@@ -33,11 +33,11 @@ Links:
 ',
   );
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testHtmlToText() {
+  public function testHtmlToText() {
     foreach ($this->_testInput as $html => $text) {
       $output = CRM_Utils_String::htmlToText($html);
       $this->assertEquals(

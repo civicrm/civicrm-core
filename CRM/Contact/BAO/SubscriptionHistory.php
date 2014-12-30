@@ -46,7 +46,7 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 

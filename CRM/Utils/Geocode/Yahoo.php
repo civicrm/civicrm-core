@@ -66,7 +66,7 @@ class CRM_Utils_Geocode_Yahoo {
    * @return boolean true if we modified the address, false otherwise
    * @static
    */
-  static function format(&$values, $stateName = FALSE) {
+  public static function format(&$values, $stateName = FALSE) {
     CRM_Utils_System::checkPHPVersion(5, TRUE);
 
     $config = CRM_Core_Config::singleton();

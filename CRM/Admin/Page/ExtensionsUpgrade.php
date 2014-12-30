@@ -10,7 +10,7 @@ class CRM_Admin_Page_ExtensionsUpgrade extends CRM_Core_Page {
   const END_URL = 'civicrm/admin/extensions';
   const END_PARAMS = 'reset=1';
 
-  function run() {
+  public function run() {
     $queue = CRM_Extension_Upgrades::createQueue();
     $runner = new CRM_Queue_Runner(array(
       'title' => ts('Database Upgrades'),
@@ -27,7 +27,7 @@ class CRM_Admin_Page_ExtensionsUpgrade extends CRM_Core_Page {
   /**
    * Handle the final step of the queue
    */
-  static function onEnd(CRM_Queue_TaskContext $ctx) {
+  public static function onEnd(CRM_Queue_TaskContext $ctx) {
     CRM_Core_Error::debug_log_message('CRM_Admin_Page_ExtensionsUpgrade: Finish upgrades');
   }
 }

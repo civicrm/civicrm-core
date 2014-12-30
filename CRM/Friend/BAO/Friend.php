@@ -41,7 +41,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -58,7 +58,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $friend = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
     return $friend;
   }
@@ -74,7 +74,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @access public
    * @static
    */
-  static function retrieve(&$params, &$values) {
+  public static function retrieve(&$params, &$values) {
     $friend = new CRM_Friend_DAO_Friend();
 
     $friend->copyValues($params);
@@ -95,7 +95,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
 
     $mailParams = array();
@@ -243,7 +243,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @return void
    * @access public
    */
-  static function buildFriendForm($form) {
+  public static function buildFriendForm($form) {
     $form->addElement('checkbox', 'tf_is_active', ts('Tell a Friend enabled?'), NULL, array('onclick' => "friendBlock(this)"));
     // name
     $form->add('text', 'tf_title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'title'), TRUE);
@@ -274,7 +274,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *
    * @return booelan  whether anything was found
    */
-  static function getValues(&$defaults) {
+  public static function getValues(&$defaults) {
     if (empty($defaults)) {
       return NULL;
     }
@@ -294,7 +294,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @return void
    * @access public
    */
-  static function sendMail($contactID, &$values) {
+  public static function sendMail($contactID, &$values) {
     list($fromName, $email) = CRM_Contact_BAO_Contact::getContactDetails($contactID);
     // if no $fromName (only email collected from originating contact) - list returns single space
     if (trim($fromName) == '') {
@@ -345,7 +345,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @access public
    * @static
    */
-  static function addTellAFriend(&$params) {
+  public static function addTellAFriend(&$params) {
     $friendDAO = new CRM_Friend_DAO_Friend();
 
     $friendDAO->copyValues($params);

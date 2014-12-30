@@ -44,7 +44,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @access public
    *
    */
-  function getInfo() {
+  public function getInfo() {
     return array('title' => ts('Comma-Separated Values (CSV)'));
   }
 
@@ -53,7 +53,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *
    * @access public
    */
-  function preProcess(&$form) {}
+  public function preProcess(&$form) {}
 
   /**
    * This is function is called by the form object to get the DataSource's
@@ -65,7 +65,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @return void (operates directly on form argument)
    * @access public
    */
-  function buildQuickForm(&$form) {
+  public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
 
     $config = CRM_Core_Config::singleton();
@@ -87,7 +87,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *
    * @access public
    */
-  function postProcess(&$params, &$db, &$form) {
+  public function postProcess(&$params, &$db, &$form) {
     $file = $params['uploadFile']['name'];
     $result = self::_CsvToTable($db,
       $file,

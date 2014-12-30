@@ -59,7 +59,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
    * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
 
     $this->_onPopupClose = CRM_Utils_Request::retrieve('onPopupClose', 'String', $this);
@@ -319,7 +319,7 @@ SELECT module,is_reserved
    *
    * @return    boolean   true if no error found
    */
-  function validate() {
+  public function validate() {
     $errors = parent::validate();
 
     if (!$errors && !empty($_POST['errorURL'])) {

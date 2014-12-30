@@ -58,7 +58,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Test case for add( )
    */
-  function testAddSimple() {
+  public function testAddSimple() {
 
     $checkParams = $params = array(
       'title' => 'Group Uno',
@@ -76,7 +76,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     );
   }
 
-  function testAddSmart() {
+  public function testAddSmart() {
 
     $checkParams = $params = array(
       'title' => 'Group Dos',
@@ -100,7 +100,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    * Load all sql data sets & return an array of saved searches
    * @return array
    */
-  function dataProviderSavedSearch() {
+  public function dataProviderSavedSearch() {
 
     $this->loadSavedSearches();
     $results = CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM civicrm_group WHERE saved_search_id IS NOT NULL');
@@ -110,7 +110,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Load saved search sql files into the DB
    */
-  function loadSavedSearches() {
+  public function loadSavedSearches() {
     $dsn = CRM_Core_Config::singleton()->dsn;
     foreach (glob(dirname(__FILE__) . "/SavedSearchDataSets/*.sql") as $file) {
       CRM_Utils_File::sourceSQLFile($dsn, $file);
@@ -136,7 +136,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    *  Copy the output to a single sql file and place in the SavedSearchDataSets folder - use the group number as the prefix.
    *  Try to keep as much of the real world irregular glory as you can! Don't change the table ids to be number 1 as this can hide errors
    */
-  function testGroupData() {
+  public function testGroupData() {
     $groups = $this->dataProviderSavedSearch();
     foreach ($groups[0] as $groupID) {
       $group = new CRM_Contact_BAO_Group();

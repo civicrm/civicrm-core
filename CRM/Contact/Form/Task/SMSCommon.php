@@ -50,7 +50,7 @@ class CRM_Contact_Form_Task_SMSCommon {
   /**
    * @param CRM_Core_Form $form
    */
-  static function preProcessProvider(&$form) {
+  public static function preProcessProvider(&$form) {
     $form->_single = FALSE;
     $className = CRM_Utils_System::getClassName($form);
 
@@ -91,7 +91,7 @@ class CRM_Contact_Form_Task_SMSCommon {
    *
    * @return void
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
 
     $toArray = array();
 
@@ -310,7 +310,7 @@ class CRM_Contact_Form_Task_SMSCommon {
    * @access public
    *
    */
-  static function formRule($fields, $dontCare, $self) {
+  public static function formRule($fields, $dontCare, $self) {
     $errors = array();
 
     $template = CRM_Core_Smarty::singleton();
@@ -345,7 +345,7 @@ class CRM_Contact_Form_Task_SMSCommon {
    *
    * @return void
    */
-  static function postProcess(&$form) {
+  public static function postProcess(&$form) {
 
     // check and ensure that
     $thisValues = $form->controller->exportValues($form->getName());

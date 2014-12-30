@@ -33,7 +33,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Queue_RunnerTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     require_once 'CRM/Queue/Service.php';
     $this->queueService = CRM_Queue_Service::singleton(TRUE);
@@ -44,7 +44,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
     self::$_recordedValues = array();
   }
 
-  function tearDown() {
+  public function tearDown() {
     unset($this->queue);
     unset($this->queueService);
 
@@ -54,7 +54,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
     $this->quickCleanup($tablesToTruncate);
   }
 
-  function testRunAllNormal() {
+  public function testRunAllNormal() {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
         array('CRM_Queue_RunnerTest', '_recordValue'),
@@ -89,7 +89,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * Run a series of tasks; one of the tasks will insert more
    * TODOs at the start of the list
    */
-  function testRunAll_AddMore() {
+  public function testRunAll_AddMore() {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
         array('CRM_Queue_RunnerTest', '_recordValue'),
@@ -124,7 +124,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * Run a series of tasks; when one throws an
    * exception, ignore it and continue
    */
-  function testRunAll_Continue_Exception() {
+  public function testRunAll_Continue_Exception() {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
         array('CRM_Queue_RunnerTest', '_recordValue'),
@@ -160,7 +160,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * Run a series of tasks; when one throws an exception,
    * abort processing and return it to the queue.
    */
-  function testRunAll_Abort_Exception() {
+  public function testRunAll_Abort_Exception() {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
         array('CRM_Queue_RunnerTest', '_recordValue'),
@@ -197,7 +197,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * Run a series of tasks; when one returns false,
    * abort processing and return it to the queue.
    */
-  function testRunAll_Abort_False() {
+  public function testRunAll_Abort_False() {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
         array('CRM_Queue_RunnerTest', '_recordValue'),
@@ -242,7 +242,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * @return bool
    */
   static
-  function _recordValue($taskCtx, $value) {
+  public function _recordValue($taskCtx, $value) {
     self::$_recordedValues[] = $value;
     return TRUE;
   }
@@ -253,7 +253,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * @return bool
    */
   static
-  function _returnFalse($taskCtx) {
+  public function _returnFalse($taskCtx) {
     return FALSE;
   }
 
@@ -264,7 +264,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * @throws Exception
    */
   static
-  function _throwException($taskCtx, $value) {
+  public function _throwException($taskCtx, $value) {
     throw new Exception("Manufactured error: $value");
   }
 
@@ -276,7 +276,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * @return bool
    */
   static
-  function _enqueueNumbers($taskCtx, $low, $high) {
+  public function _enqueueNumbers($taskCtx, $low, $high) {
     for ($i = $low; $i <= $high; $i++) {
       $taskCtx->queue->createItem(new CRM_Queue_Task(
         array('CRM_Queue_RunnerTest', '_recordValue'),

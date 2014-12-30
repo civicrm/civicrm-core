@@ -21,7 +21,7 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
    * @param string $targetKey
    * @param null $optionGroupName
    */
-  function __construct($refTable, $refKey, $targetTable = NULL, $targetKey = 'id', $optionGroupName) {
+  public function __construct($refTable, $refKey, $targetTable = NULL, $targetKey = 'id', $optionGroupName) {
     parent::__construct($refTable, $refKey, $targetTable, $targetKey, NULL);
     $this->targetOptionGroupName = $optionGroupName;
   }

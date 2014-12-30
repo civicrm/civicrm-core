@@ -68,7 +68,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    */
   public $_contactID;
 
-  function preProcess() {
+  public function preProcess() {
 
     $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     if ($this->_crid) {
@@ -132,7 +132,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
 
     $this->_defaults = array();
     $this->_defaults['amount'] = $this->_subscriptionDetails->amount;

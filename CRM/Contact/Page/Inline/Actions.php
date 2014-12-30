@@ -48,7 +48,7 @@ class CRM_Contact_Page_Inline_Actions extends CRM_Core_Page {
    * @access public
    *
    */
-  function run() {
+  public function run() {
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 
     $this->assign('contactId', $contactId);

@@ -52,7 +52,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function browse() {
+  public function browse() {
     $links = self::links('all', $this->_isPaymentProcessor, $this->_accessContribution);
 
     $membership = array();
@@ -223,7 +223,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function view() {
+  public function view() {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Member_Form_MembershipView',
       ts('View Membership'),
@@ -242,7 +242,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function edit() {
+  public function edit() {
     // set https for offline cc transaction
     $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
     if ($mode == 'test' || $mode == 'live') {
@@ -285,7 +285,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     return $controller->run();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -316,7 +316,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     // check if we can process credit card membership
@@ -557,7 +557,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * @return array self::$_membershipTypesLinks array of action links
    * @access public
    */
-  static function &membershipTypesLinks() {
+  public static function &membershipTypesLinks() {
     if (!self::$_membershipTypesLinks) {
       self::$_membershipTypesLinks = array(
         CRM_Core_Action::VIEW => array(
@@ -606,7 +606,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Member_BAO_Membership';
   }
 }

@@ -52,7 +52,7 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
    * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
 

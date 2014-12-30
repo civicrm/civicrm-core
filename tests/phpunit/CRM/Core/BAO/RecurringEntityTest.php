@@ -54,7 +54,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   /**
    * Testing Activity Generation through Entity Recursion
    */
-  function testActivityGeneration() {
+  public function testActivityGeneration() {
     //Activity set initial params
     $daoActivity = new CRM_Activity_DAO_Activity();
     $daoActivity->activity_type_id = 1;
@@ -113,7 +113,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   /**
    * Testing Event Generation through Entity Recursion
    */
-  function testEventGeneration() {
+  public function testEventGeneration() {
        //Event set initial params
     $daoEvent = new CRM_Event_DAO_Event();
     $daoEvent->title = 'Test event for Recurring Entity';

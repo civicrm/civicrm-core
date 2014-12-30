@@ -45,7 +45,7 @@ class CRM_Core_Payment_ProcessorForm {
    *
    * @throws Exception
    */
-  static function preProcess(&$form, $type = NULL, $mode = NULL ) {
+  public static function preProcess(&$form, $type = NULL, $mode = NULL ) {
     if ($type) {
       $form->_type = $type;
     }
@@ -104,7 +104,7 @@ class CRM_Core_Payment_ProcessorForm {
   /**
    * @param $form
    */
-  static function buildQuickform(&$form) {
+  public static function buildQuickform(&$form) {
     //@todo document why this addHidden is here
     //CRM-15743 - we should not set/create hidden element for pay later
     // because payment processor is not selected
