@@ -381,8 +381,9 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT)) {
       if (CRM_Core_Permission::access('CiviContribute')) {
         $fields['Contribution'] = CRM_Contribute_BAO_Contribution::exportableFields();
-        unset($fields['Contribution']['contribution_contact_id']);
-        unset($fields['Contribution']['contribution_status_id']);
+        foreach (array('contribution_contact_id', 'contribution_soft_credit_name', 'contribution_soft_credit_amount', 'contribution_soft_credit_type', 'contribution_soft_credit_contribution_id') as $element) {
+          unset($fields['Contribution'][$element]);
+        }
         $compArray['Contribution'] = ts('Contribution');
       }
     }
@@ -400,7 +401,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           $fields['Participant'] = array_merge($fields['Participant'], $componentPaymentFields);
         }
 
-        unset($fields['Participant']['participant_contact_id']);
         $compArray['Participant'] = ts('Participant');
       }
     }
@@ -999,7 +999,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
 
           if ($v[0] == 'Contribution' && substr($fldName, 0, 7) != 'custom_'
-            && substr($fldName, 0, 10) != 'financial_') {
+            && substr($fldName, 0, 10) != 'financial_'
+            && substr($fldName, 0, 8) != 'payment_') {
             if (substr($fldName, 0, 13) != 'contribution_') {
               $fldName = 'contribution_' . $fldName;
             }
@@ -1231,4 +1232,3 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     }
   }
 }
-

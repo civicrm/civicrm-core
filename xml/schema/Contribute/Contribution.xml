@@ -77,7 +77,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <export>false</export>
     <type>int unsigned</type>
     <comment>FK to Financial Type for (total_amount - non_deductible_amount).</comment>
@@ -99,7 +99,7 @@
   </foreignKey>
   <field>
     <name>contribution_page_id</name>
-    <title>Contribution Page</title>
+    <title>Contribution Page ID</title>
     <type>int unsigned</type>
     <import>true</import>
     <comment>The Contribution Page which triggered this contribution</comment>
@@ -122,7 +122,7 @@
   <field>
     <name>payment_instrument_id</name>
     <uniqueName>contribution_payment_instrument_id</uniqueName>
-    <title>Payment Instrument</title>
+    <title>Payment Instrument ID</title>
     <type>int unsigned</type>
     <comment>FK to Payment Instrument</comment>
     <pseudoconstant>
@@ -377,7 +377,7 @@
   </field>
   <field>
     <name>contribution_status_id</name>
-    <title>Contribution Status</title>
+    <title>Contribution Status ID</title>
     <type>int unsigned</type>
     <default>1</default>
     <import>true</import>

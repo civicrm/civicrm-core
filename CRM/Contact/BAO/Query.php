@@ -619,7 +619,9 @@ class CRM_Contact_BAO_Query {
       if (
         (substr($name, 0, 12) == 'participant_') ||
         (substr($name, 0, 7) == 'pledge_') ||
-        (substr($name, 0, 5) == 'case_')
+        (substr($name, 0, 5) == 'case_') ||
+        (substr($name, 0, 13) == 'contribution_') ||
+        (substr($name, 0, 8) == 'payment_')
       ) {
         continue;
       }
@@ -1417,7 +1419,7 @@ class CRM_Contact_BAO_Query {
    *
    * @return array
    */
-  static function convertFormValues(&$formValues, $wildcard = 0, $useEquals = FALSE) {
+  static function convertFormValues(&$formValues, $wildcard = 0, $useEquals = FALSE, $apiEntity = NULL) {
     $params = array();
     if (empty($formValues)) {
       return $params;
@@ -1468,7 +1470,7 @@ class CRM_Contact_BAO_Query {
         }
       }
       else {
-        $values = CRM_Contact_BAO_Query::fixWhereValues($id, $values, $wildcard, $useEquals);
+        $values = CRM_Contact_BAO_Query::fixWhereValues($id, $values, $wildcard, $useEquals, $apiEntity);
 
         if (!$values) {
           continue;
@@ -1487,7 +1489,7 @@ class CRM_Contact_BAO_Query {
    *
    * @return array|null
    */
-  static function &fixWhereValues($id, &$values, $wildcard = 0, $useEquals = FALSE) {
+  static function &fixWhereValues($id, &$values, $wildcard = 0, $useEquals = FALSE, $apiEntity = NULL) {
     // skip a few search variables
     static $skipWhere = NULL;
     static $likeNames = NULL;
@@ -1510,6 +1512,13 @@ class CRM_Contact_BAO_Query {
       substr($id, 0, 7) == 'hidden_'
     ) {
       return $result;
+    }
+
+    if ($apiEntity &&
+      (substr($id, 0, strlen($apiEntity)) != $apiEntity) &&
+      (substr($id, 0, 10) != 'financial_' && substr($id, 0, 8) != 'payment_')
+    ) {
+      $id = $apiEntity . '_' . $id;
     }
 
     if (!$likeNames) {
@@ -1585,6 +1594,7 @@ class CRM_Contact_BAO_Query {
       (substr($values[0], 0, 7) == 'pledge_') ||
       (substr($values[0], 0, 5) == 'case_') ||
       (substr($values[0], 0, 10) == 'financial_') ||
+      (substr($values[0], 0, 8) == 'payment_') ||
       (substr($values[0], 0, 11) == 'membership_')
     ) {
       return;
@@ -1701,9 +1711,11 @@ class CRM_Contact_BAO_Query {
       case 'activity_date_low':
       case 'activity_date_high':
       case 'activity_role':
+      case 'activity_status_id':
       case 'activity_status':
       case 'followup_parent_id':
       case 'parent_id':
+      case 'source_contact_id':
       case 'activity_subject':
       case 'test_activities':
       case 'activity_type_id':
@@ -5487,12 +5499,13 @@ AND   displayRelType.is_active = 1
         }
         // FIX ME: we should potentially move this to component Query and write a wrapper function that
         // handles pseudoconstant fixes for all component
-        elseif ($value['pseudoField'] == 'participant_role') {
-          $viewRoles = array();
+        elseif (in_array($value['pseudoField'], array('participant_status', 'participant_role'))) {
+          $pseudoOptions = $viewValues = array();
+          $pseudoOptions = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', $value['pseudoField'], array('flip' => 1));
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, $val) as $k => $v) {
-            $viewRoles[] = CRM_Event_PseudoConstant::participantRole($v);
+            $viewValues[] = $pseudoOptions[$v];
           }
-          $dao->$key = implode(', ', $viewRoles);
+          $dao->$key = implode(', ', $viewValues);
         }
         else {
           $labels = CRM_Core_OptionGroup::values($value['pseudoField']);
@@ -5569,5 +5582,42 @@ AND   displayRelType.is_active = 1
     $this->_simpleFromClause = $this->_simpleFromClause . $presentSimpleFromClause;
 
     return array($presentClause, $presentSimpleFromClause);
+  }
+
+  static function buildQillForFieldValue($daoName, $fieldName, $fieldValue, $op, $pseduoExtraParam = array()) {
+    $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
+    $qillOperators = CRM_Core_SelectValues::getSearchBuilderOperators();
+    if ($fieldName == 'activity_type_id') {
+      $pseduoOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+    }
+
+    //For those $fieldName which don't have any associated pseudoconstant defined
+    if (empty($pseduoOptions)) {
+      if (is_array($fieldValue)) {
+        $op = key($fieldValue);
+        $fieldValue = $fieldValue[$op];
+        if (is_array($fieldValue)) {
+          $fieldValue = implode(', ', $fieldValue);
+        }
+      }
+    }
+    elseif (is_array($fieldValue)) {
+      $qillString = array();
+      if (in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators())) {
+        $op = key($fieldValue);
+        $fieldValue = $fieldValue[$op];
+      }
+      foreach ((array)$fieldValue as $val) {
+        $qillString[] = $pseduoOptions[$val];
+      }
+      $fieldValue = implode(', ', $qillString);
+    }
+    else {
+      if (array_key_exists($fieldValue, $pseduoOptions)) {
+        $fieldValue = $pseduoOptions[$fieldValue];
+      }
+    }
+
+    return array(CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue);
   }
 }
