@@ -228,4 +228,3 @@ class CRM_Core_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 }
-

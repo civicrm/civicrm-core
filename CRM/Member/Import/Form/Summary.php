@@ -101,4 +101,3 @@ class CRM_Member_Import_Form_Summary extends CRM_Import_Form_Summary {
   }
 
 }
-

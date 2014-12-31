@@ -175,4 +175,3 @@ UPDATE civicrm_membership_type
     return $relationshipType->delete();
   }
 }
-

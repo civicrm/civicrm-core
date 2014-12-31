@@ -548,4 +548,3 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 }
-

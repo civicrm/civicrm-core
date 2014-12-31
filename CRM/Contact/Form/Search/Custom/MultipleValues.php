@@ -346,4 +346,3 @@ contact_a.sort_name    as sort_name,
     CRM_Utils_System::setTitle($title);
   }
 }
-

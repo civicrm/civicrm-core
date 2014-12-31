@@ -343,4 +343,3 @@ SELECT module,is_reserved
     return $errors;
   }
 }
-

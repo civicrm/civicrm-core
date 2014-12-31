@@ -115,4 +115,3 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
 
   }
 }
-

@@ -489,4 +489,3 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
     return ts('Memberships');
   }
 }
-

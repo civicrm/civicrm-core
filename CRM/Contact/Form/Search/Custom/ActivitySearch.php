@@ -404,4 +404,3 @@ ORDER BY contact_a.sort_name';
     return NULL;
   }
 }
-

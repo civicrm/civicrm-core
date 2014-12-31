@@ -91,4 +91,3 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
     return parent::run();
   }
 }
-

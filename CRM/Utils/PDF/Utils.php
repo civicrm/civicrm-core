@@ -407,4 +407,3 @@ class CRM_Utils_PDF_Utils {
     }
   }
 }
-

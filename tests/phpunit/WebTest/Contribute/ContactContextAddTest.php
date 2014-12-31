@@ -195,4 +195,3 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     }
   }
 }
-

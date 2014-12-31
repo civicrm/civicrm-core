@@ -201,4 +201,3 @@ WHERE cft.id = %1
      return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 }
-

@@ -448,4 +448,3 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
   }
 
 }
-

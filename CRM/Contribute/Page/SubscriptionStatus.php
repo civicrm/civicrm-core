@@ -59,4 +59,3 @@ class CRM_Contribute_Page_SubscriptionStatus extends CRM_Core_Page {
     return parent::run();
   }
 }
-

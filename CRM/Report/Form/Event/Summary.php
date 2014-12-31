@@ -413,4 +413,3 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     }
   }
 }
-

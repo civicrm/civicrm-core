@@ -221,4 +221,3 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
     $rgDao->delete();
   }
 }
-

@@ -196,4 +196,3 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
     return $data;
   }
 }
-

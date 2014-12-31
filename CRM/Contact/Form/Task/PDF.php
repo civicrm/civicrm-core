@@ -129,4 +129,3 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
     CRM_Contact_Form_Task_PDFLetterCommon::postProcess($this);
   }
 }
-

@@ -83,4 +83,3 @@ class CRM_Upgrade_Headless {
     );
   }
 }
-

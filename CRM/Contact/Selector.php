@@ -1242,4 +1242,3 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
     return $properties;
   }
 }
-

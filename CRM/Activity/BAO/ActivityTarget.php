@@ -130,4 +130,3 @@ AND        contact_a.is_deleted = 0
     return $targetNames;
   }
 }
-

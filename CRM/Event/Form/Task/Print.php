@@ -102,4 +102,3 @@ class CRM_Event_Form_Task_Print extends CRM_Event_Form_Task {
     // redirect to the main search page after printing is over
   }
 }
-

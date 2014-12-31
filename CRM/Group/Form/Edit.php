@@ -485,4 +485,3 @@ WHERE  title = %1
     return $parentGroups;
   }
 }
-

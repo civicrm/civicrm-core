@@ -178,4 +178,3 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
     }
   }
 }
-

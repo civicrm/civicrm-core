@@ -440,4 +440,3 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     CRM_Core_Session::setStatus($params['statusMsg'], ts('Saved'), 'success');
   }
 }
-

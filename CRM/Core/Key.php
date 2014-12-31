@@ -153,4 +153,3 @@ class CRM_Core_Key {
     return preg_match('#[0-9a-f]{32}#i', $hash) ? TRUE : FALSE;
   }
 }
-

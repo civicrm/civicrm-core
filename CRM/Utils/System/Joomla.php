@@ -871,4 +871,3 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $list[] = 'js/crm.joomla.js';
   }
 }
-

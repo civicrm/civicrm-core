@@ -167,4 +167,3 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
 
   }
 }
-

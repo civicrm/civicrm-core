@@ -305,4 +305,3 @@ class CRM_Utils_Address {
     return $newSequence;
   }
 }
-

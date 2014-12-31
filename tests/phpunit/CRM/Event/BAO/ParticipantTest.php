@@ -431,5 +431,3 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     Event::delete($eventId);
   }
 }
-
-

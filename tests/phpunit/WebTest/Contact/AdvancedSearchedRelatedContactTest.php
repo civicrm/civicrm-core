@@ -332,4 +332,3 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
 }
 
 }
-

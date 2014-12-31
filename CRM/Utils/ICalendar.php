@@ -117,4 +117,3 @@ class CRM_Utils_ICalendar {
     echo $calendar;
   }
 }
-

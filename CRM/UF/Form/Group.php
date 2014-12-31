@@ -376,4 +376,3 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     CRM_Utils_System::updateCategories();
   }
 }
-

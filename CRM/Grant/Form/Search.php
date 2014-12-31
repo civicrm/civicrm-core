@@ -323,4 +323,3 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
     return ts('Find Grants');
   }
 }
-

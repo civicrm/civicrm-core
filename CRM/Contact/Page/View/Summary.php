@@ -436,4 +436,3 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     return parent::getTemplateFileName();
   }
 }
-

@@ -91,4 +91,3 @@ class CRM_Mailing_Config extends CRM_Core_Component_Config {
    */
   public $mailThrottleTime = 0;
 }
-

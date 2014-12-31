@@ -78,4 +78,3 @@ class CRM_Contact_Page_View_Tag extends CRM_Core_Page {
     return parent::run();
   }
 }
-

@@ -430,4 +430,3 @@ AND    v.is_active = 1
     return "Blah";
   }
 }
-

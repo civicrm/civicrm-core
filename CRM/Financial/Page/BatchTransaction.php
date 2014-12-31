@@ -156,5 +156,3 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
     return 'civicrm/batchtransaction';
   }
 }
-
-

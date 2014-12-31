@@ -113,4 +113,3 @@ class CRM_Contact_Form_Edit_CustomData {
     $defaults += CRM_Custom_Form_CustomData::setDefaultValues($form);
   }
 }
-

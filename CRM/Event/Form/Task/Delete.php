@@ -132,4 +132,3 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
     }
   }
 }
-

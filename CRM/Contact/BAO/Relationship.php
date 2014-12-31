@@ -1723,4 +1723,3 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
 }
-

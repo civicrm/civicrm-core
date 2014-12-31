@@ -64,4 +64,3 @@ class WebTest_Release_InstallScript extends WebTest_Release_ReleaseTestCase {
     $this->assertTrue($this->isTextPresent("CiviCRM Home"));
   }
 }
-

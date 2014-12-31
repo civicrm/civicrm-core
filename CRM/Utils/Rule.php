@@ -799,4 +799,3 @@ class CRM_Utils_Rule {
     return ($key) ? CRM_Core_Key::valid($key) : FALSE;
   }
 }
-

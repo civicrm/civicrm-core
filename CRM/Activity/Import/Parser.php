@@ -409,4 +409,3 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   }
 
 }
-

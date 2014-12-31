@@ -482,4 +482,3 @@ class CRM_Badge_BAO_Badge {
     $eventBadgeClass->createLabels($rows, $layoutInfo);
   }
 }
-

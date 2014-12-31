@@ -271,4 +271,3 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     }
   }
 }
-

@@ -326,4 +326,3 @@ ORDER BY weight, label
     return parent::run();
   }
 }
-

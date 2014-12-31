@@ -125,5 +125,3 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
 
   }
 }
-
-

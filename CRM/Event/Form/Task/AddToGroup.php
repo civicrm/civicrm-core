@@ -239,4 +239,3 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
     CRM_Core_Session::setStatus($status, ts('Added Contact to %1', array(1 => $groupName, 'count' => $added, 'plural' => 'Added Contacts to %1')), 'success', array('expires' => 0));
   }
 }
-

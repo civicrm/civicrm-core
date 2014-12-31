@@ -284,4 +284,3 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     return ts('Find Contacts');
   }
 }
-

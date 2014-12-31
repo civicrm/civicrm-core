@@ -177,4 +177,3 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[8]", 'United States');
   }
 }
-

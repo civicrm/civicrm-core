@@ -296,4 +296,3 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
     $controller->run();
   }
 }
-

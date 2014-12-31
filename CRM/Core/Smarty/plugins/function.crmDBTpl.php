@@ -46,5 +46,3 @@ function smarty_function_crmDBTpl($params, &$smarty) {
   );
   $smarty->assign($params['var'], $contextNameData);
 }
-
-

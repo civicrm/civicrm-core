@@ -87,4 +87,3 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
     return empty($errors) ? TRUE : $errors;
   }
 }
-

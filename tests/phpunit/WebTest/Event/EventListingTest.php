@@ -163,4 +163,3 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->waitForText("crm-notification-container", "'Event Location' information has been saved.");
   }
 }
-

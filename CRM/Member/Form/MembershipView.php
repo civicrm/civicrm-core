@@ -405,4 +405,3 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
     );
   }
 }
-

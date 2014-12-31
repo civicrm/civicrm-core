@@ -446,4 +446,3 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     return $vars;
   }
 }
-

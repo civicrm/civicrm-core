@@ -287,4 +287,3 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     return 'civicrm/admin/options' . (self::$_gName ? '/' . self::$_gName : '');
   }
 }
-

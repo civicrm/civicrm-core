@@ -217,4 +217,3 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     return ts('Enable Personal Campaign Pages');
   }
 }
-

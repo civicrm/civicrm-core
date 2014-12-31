@@ -118,4 +118,3 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->enableDisablePopups(TRUE);
   }
 }
-

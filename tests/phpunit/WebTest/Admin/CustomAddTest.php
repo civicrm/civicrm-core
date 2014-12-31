@@ -194,4 +194,3 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('customData', $radioOptionLabel2);
   }
 }
-

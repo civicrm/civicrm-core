@@ -173,4 +173,3 @@ SELECT count( civicrm_contact.id )
     return $sort->orderBy();
   }
 }
-

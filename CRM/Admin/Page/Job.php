@@ -216,4 +216,3 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
     return 'civicrm/admin/job';
   }
 }
-

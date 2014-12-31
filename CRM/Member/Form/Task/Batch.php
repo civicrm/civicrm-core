@@ -282,4 +282,3 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     }
   }
 }
-

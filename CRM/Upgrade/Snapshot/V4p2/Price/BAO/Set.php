@@ -1121,4 +1121,3 @@ return 0;
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $id, 'is_quick_config', $isQuickConfig);
   }
 }
-

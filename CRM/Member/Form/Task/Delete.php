@@ -89,4 +89,3 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
     CRM_Core_Session::setStatus(ts('Total Selected Membership(s): %1', array(1 => count($this->_memberIds))), '', 'info');
   }
 }
-

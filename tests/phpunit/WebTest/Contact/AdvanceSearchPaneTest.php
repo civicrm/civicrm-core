@@ -401,4 +401,3 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
     return $_advance_search_panes;
   }
 }
-

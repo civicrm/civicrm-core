@@ -63,4 +63,3 @@ class CRM_Case_Form_Task_Result extends CRM_Case_Form_Task {
     );
   }
 }
-

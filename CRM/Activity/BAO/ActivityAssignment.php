@@ -156,4 +156,3 @@ AND        civicrm_activity_contact.record_type_id = $assigneeID
     return $assigneeNames;
   }
 }
-

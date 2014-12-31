@@ -1012,4 +1012,3 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     return ts('Online Registration');
   }
 }
-

@@ -671,4 +671,3 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     CRM_Contribute_Form_Task_Invoice::printPDF($contributionIDs, $params, $contactId, CRM_Core_DAO::$_nullObject);
   }
 }
-

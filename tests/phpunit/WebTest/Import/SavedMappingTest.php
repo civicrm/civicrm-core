@@ -137,4 +137,3 @@ class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 }
-

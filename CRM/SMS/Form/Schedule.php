@@ -209,4 +209,3 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     return ts('Schedule or Send');
   }
 }
-

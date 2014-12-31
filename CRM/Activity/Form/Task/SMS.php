@@ -79,4 +79,3 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
     CRM_Contact_Form_Task_SMSCommon::postProcess($this);
   }
 }
-

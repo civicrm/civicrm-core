@@ -317,4 +317,3 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     }
   }
 }
-

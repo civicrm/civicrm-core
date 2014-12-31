@@ -63,4 +63,3 @@ class CRM_Campaign_Controller_Search extends CRM_Core_Controller {
     $this->addActions();
   }
 }
-

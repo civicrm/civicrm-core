@@ -50,4 +50,3 @@ class CRM_Core_Permission_Soap extends CRM_Core_Permission_Base {
     return TRUE;
   }
 }
-

@@ -568,4 +568,3 @@ SELECT  count( id ) as statusCount
     $upgrade->processSQL($rev);
   }
 }
-

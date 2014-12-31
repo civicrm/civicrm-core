@@ -981,4 +981,3 @@ currency varchar(3)
     // foreach ends
   }
 }
-

@@ -273,6 +273,3 @@ DELETE FROM civicrm_contact_type
     CRM_Contact_BAO_Contact::deleteContact($contact->id);
   }
 }
-
-
-

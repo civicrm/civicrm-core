@@ -231,4 +231,3 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
   }
 
 }
-

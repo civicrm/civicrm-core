@@ -1222,4 +1222,3 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     }
   }
 }
-

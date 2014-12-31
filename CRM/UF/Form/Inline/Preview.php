@@ -76,4 +76,3 @@ class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
   }
 
 }
-

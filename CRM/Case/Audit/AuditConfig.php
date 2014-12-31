@@ -272,4 +272,3 @@ class CRM_Case_Audit_AuditConfig {
     return $x - $y;
   }
 }
-

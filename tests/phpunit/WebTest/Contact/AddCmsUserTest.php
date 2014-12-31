@@ -124,4 +124,3 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.crm-search-results', '1234');
   }
 }
-

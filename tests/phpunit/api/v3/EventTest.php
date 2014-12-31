@@ -520,4 +520,3 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values']['id']['api.required']);
   }
 }
-

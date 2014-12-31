@@ -378,4 +378,3 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->assertEquals('1-2@example.com', $get['values'][$emailID]['email'], 'In line ' . __LINE__);
   }
 }
-

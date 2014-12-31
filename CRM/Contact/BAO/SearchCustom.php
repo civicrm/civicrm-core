@@ -165,4 +165,3 @@ class CRM_Contact_BAO_SearchCustom {
     return array($from, $where);
   }
 }
-

@@ -188,4 +188,3 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
     return new CRM_Event_Cart_Form_MerParticipant($this);
   }
 }
-

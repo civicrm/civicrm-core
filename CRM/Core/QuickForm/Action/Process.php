@@ -62,4 +62,3 @@ class CRM_Core_QuickForm_Action_Process extends CRM_Core_QuickForm_Action {
     $this->popUserContext();
   }
 }
-

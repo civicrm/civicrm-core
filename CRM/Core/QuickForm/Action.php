@@ -87,4 +87,3 @@ class CRM_Core_QuickForm_Action extends HTML_QuickForm_Action {
     }
   }
 }
-

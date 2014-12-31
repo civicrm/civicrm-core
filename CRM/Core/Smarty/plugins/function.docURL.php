@@ -50,4 +50,3 @@ function smarty_function_docURL($params, &$smarty) {
     return CRM_Utils_System::docURL($params);
   }
 }
-

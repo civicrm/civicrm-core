@@ -295,4 +295,3 @@ class api_v3_JobTest extends CiviUnitTestCase {
     }
   }
 }
-

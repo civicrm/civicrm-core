@@ -194,5 +194,3 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
     return 'civicrm/admin/financial/financialAccount';
   }
 }
-
-

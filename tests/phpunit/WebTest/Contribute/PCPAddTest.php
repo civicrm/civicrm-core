@@ -201,4 +201,3 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->verifyText("PCP", preg_quote("{$lastName}, {$firstName}"));
   }
 }
-

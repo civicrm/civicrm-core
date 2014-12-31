@@ -132,4 +132,3 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
     );
   }
 }
-

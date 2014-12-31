@@ -149,4 +149,3 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 }
-

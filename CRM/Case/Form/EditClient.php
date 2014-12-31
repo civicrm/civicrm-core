@@ -134,4 +134,3 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
     CRM_Core_Session::singleton()->pushUserContext($url);
   }
 }
-

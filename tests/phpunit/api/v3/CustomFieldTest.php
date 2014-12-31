@@ -497,4 +497,3 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     return $r;
   }
 }
-

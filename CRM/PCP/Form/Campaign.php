@@ -353,4 +353,3 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
   }
 }
-

@@ -497,4 +497,3 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     $this->assign('tabHeader', $allTabs);
   }
 }
-

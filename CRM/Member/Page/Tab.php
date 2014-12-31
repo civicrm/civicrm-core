@@ -604,4 +604,3 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     return 'CRM_Member_BAO_Membership';
   }
 }
-

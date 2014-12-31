@@ -388,4 +388,3 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     return $statusIds;
   }
 }
-

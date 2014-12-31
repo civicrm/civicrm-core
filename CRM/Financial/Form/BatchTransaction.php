@@ -194,5 +194,3 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     return self::$_links;
   }
 }
-
-

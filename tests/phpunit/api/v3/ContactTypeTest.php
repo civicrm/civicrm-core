@@ -391,4 +391,3 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', $params);
   }
 }
-

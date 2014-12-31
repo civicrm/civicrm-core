@@ -353,4 +353,3 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     return $groupAdditions;
   }
 }
-

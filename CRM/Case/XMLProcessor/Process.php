@@ -665,4 +665,3 @@ AND        a.is_deleted = 0
     return ( string ) $xml->NaturalActivityTypeSort ? 1 : 0;
   }
 }
-

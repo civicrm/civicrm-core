@@ -303,4 +303,3 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     return $savedSearch;
   }
 }
-

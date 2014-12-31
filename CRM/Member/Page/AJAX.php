@@ -70,4 +70,3 @@ WHERE   id = %1";
     CRM_Utils_JSON::output($details);
   }
 }
-

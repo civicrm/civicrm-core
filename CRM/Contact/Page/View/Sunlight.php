@@ -66,4 +66,3 @@ class CRM_Contact_Page_View_Sunlight extends CRM_Contact_Page_View {
     return parent::run();
   }
 }
-

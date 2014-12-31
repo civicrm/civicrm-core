@@ -294,4 +294,3 @@ civicrm_contact AS contact_a
     return NULL;
   }
 }
-

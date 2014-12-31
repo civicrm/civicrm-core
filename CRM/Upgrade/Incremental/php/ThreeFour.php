@@ -369,4 +369,3 @@ VALUES
     $upgrade->processSQL($rev);
   }
 }
-

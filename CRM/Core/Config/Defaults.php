@@ -246,4 +246,3 @@ class CRM_Core_Config_Defaults {
     }
   }
 }
-

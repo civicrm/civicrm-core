@@ -750,4 +750,3 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     }
   }
 }
-

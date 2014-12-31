@@ -40,4 +40,3 @@ WHERE on_hold = 1 AND hold_date is not null AND contact_id in (" . implode(",", 
     }
   }
 }
-

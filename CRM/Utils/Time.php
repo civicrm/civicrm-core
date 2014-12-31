@@ -101,4 +101,3 @@ class CRM_Utils_Time {
     return (abs($diff) <= $threshold);
   }
 }
-

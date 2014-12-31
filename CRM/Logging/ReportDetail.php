@@ -234,4 +234,3 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $this->assign('revertConfirm', ts('Are you sure you want to revert all these changes?'));
   }
 }
-

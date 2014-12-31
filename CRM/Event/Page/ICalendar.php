@@ -103,4 +103,3 @@ class CRM_Event_Page_ICalendar extends CRM_Core_Page {
     CRM_Utils_System::civiExit();
   }
 }
-

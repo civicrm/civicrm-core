@@ -413,4 +413,3 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-container', '1 Contact');
   }
 }
-

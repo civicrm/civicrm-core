@@ -289,4 +289,3 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('page-title', "{$client['display_name']} - $caseTypeLabel");
   }
 }
-

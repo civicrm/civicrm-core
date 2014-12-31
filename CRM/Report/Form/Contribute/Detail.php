@@ -912,4 +912,3 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
     }
   }
 }
-

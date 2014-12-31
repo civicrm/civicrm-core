@@ -34,4 +34,3 @@
  */
 class CRM_Utils_Hook_Drupal6 extends CRM_Utils_Hook_DrupalBase {
 }
-

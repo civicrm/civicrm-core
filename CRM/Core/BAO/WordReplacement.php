@@ -281,4 +281,3 @@ WHERE  domain_id = %1
     CRM_Core_BAO_WordReplacement::rebuild();
   }
 }
-

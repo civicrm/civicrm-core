@@ -406,4 +406,3 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id )
     $upgrade->processSQL($rev);
   }
 }
-

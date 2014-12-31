@@ -321,4 +321,3 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     // You should delete this function if the base-classes are properly rearranged.
   }
 }
-

@@ -130,4 +130,3 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
     return parent::run();
   }
 }
-

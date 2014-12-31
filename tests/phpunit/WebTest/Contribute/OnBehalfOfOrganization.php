@@ -1551,4 +1551,3 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='crm-contact-thumbnail']/div/a/img"));
   }
 }
-

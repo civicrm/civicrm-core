@@ -543,4 +543,3 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
     $this->removeDuplicates($rows);
   }
 }
-

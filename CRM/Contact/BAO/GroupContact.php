@@ -767,4 +767,3 @@ AND    contact_id IN ( $contactStr )
     return array($numContactsAdded, $numContactsNotAdded);
   }
 }
-

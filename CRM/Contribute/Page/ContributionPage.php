@@ -692,4 +692,3 @@ SELECT count(id)
     return $formattedConfLinks;
   }
 }
-

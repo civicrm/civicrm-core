@@ -557,4 +557,3 @@ class CRM_Contact_Form_Search_Criteria {
     CRM_Case_BAO_Query::buildSearchForm($form);
   }
 }
-

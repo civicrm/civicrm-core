@@ -898,4 +898,3 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->uFFieldCreate(array('uf_group_id' => $profileID, 'field_name' => 'custom_' . $ids['custom_field_id'], 'contact_type' => 'Contact'));
   }
 }
-

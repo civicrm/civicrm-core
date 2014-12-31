@@ -449,4 +449,3 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
     return TRUE;
   }
 }
-

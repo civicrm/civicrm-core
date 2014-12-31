@@ -801,4 +801,3 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
 }
-

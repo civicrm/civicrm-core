@@ -643,4 +643,3 @@ AND    domain_id    = %4
     return $ufValues[$ufID];
   }
 }
-

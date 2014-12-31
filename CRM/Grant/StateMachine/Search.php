@@ -99,4 +99,3 @@ class CRM_Grant_StateMachine_Search extends CRM_Core_StateMachine {
     return CRM_Utils_String::getClassName($this->_task);
   }
 }
-

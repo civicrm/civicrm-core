@@ -509,4 +509,3 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledge = $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
 }
-

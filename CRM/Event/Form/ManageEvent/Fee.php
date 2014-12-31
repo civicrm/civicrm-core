@@ -815,4 +815,3 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     return ts('Event Fees');
   }
 }
-

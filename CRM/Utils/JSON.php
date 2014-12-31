@@ -155,4 +155,3 @@ class CRM_Utils_JSON {
     return $sOutput;
   }
 }
-

@@ -79,4 +79,3 @@ class CRM_Case_Page_CaseDetails extends CRM_Core_Page {
     return parent::run();
   }
 }
-

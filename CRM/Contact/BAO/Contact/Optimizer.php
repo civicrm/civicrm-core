@@ -187,4 +187,3 @@ class CRM_Contact_BAO_Contact_Optimizer {
     unset( $newValues['email'] );
   }
 }
-

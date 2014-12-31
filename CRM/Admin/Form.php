@@ -136,4 +136,3 @@ class CRM_Admin_Form extends CRM_Core_Form {
     }
   }
 }
-

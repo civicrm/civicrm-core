@@ -171,4 +171,3 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   }
 
 }
-

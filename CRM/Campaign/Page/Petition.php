@@ -60,4 +60,3 @@ class CRM_Campaign_Page_Petition extends CRM_Core_Page {
     return parent::run();
   }
 }
-

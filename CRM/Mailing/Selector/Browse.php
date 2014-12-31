@@ -596,4 +596,3 @@ ORDER BY LEFT(name, 1)
     $this->_parent->assign('aToZ', $aToZBar);
   }
 }
-

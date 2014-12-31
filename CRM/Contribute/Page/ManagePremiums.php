@@ -208,4 +208,3 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
     return 'civicrm/admin/contribute/managePremiums';
   }
 }
-

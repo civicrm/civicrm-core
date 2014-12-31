@@ -382,4 +382,3 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
   }
 
 }
-

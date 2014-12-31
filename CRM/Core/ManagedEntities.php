@@ -396,4 +396,3 @@ class CRM_Core_ManagedEntities {
     throw new Exception('API error: ' . $result['error_message']);
   }
 }
-

@@ -438,4 +438,3 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
   }
 
 }
-

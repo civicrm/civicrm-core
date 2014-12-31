@@ -58,4 +58,3 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase{
     return \Drupal::currentUser()->hasPermission($str);
   }
 }
-

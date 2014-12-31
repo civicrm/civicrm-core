@@ -402,4 +402,3 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     return ts('Title and Settings');
   }
 }
-

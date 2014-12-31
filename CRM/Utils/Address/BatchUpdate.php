@@ -286,4 +286,3 @@ class CRM_Utils_Address_BatchUpdate {
     return $result;
   }
 }
-

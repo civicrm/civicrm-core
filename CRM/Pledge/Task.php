@@ -170,4 +170,3 @@ class CRM_Pledge_Task {
     );
   }
 }
-

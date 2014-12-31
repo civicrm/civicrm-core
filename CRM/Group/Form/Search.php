@@ -109,4 +109,3 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
     }
   }
 }
-

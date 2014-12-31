@@ -87,4 +87,3 @@ class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
     $this->assertChecked('is_active');
   }
 }
-

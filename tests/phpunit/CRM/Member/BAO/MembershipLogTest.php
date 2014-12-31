@@ -165,4 +165,3 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 }
-

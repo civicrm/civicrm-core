@@ -252,4 +252,3 @@ function civicrm_mysql_real_escape_string($string) {
   }
   return $dao->escape($string);
 }
-

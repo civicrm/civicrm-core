@@ -513,4 +513,3 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 }
 // class CRM_Member_Form_MembershipTest
-

@@ -432,4 +432,3 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     return ts('SMS Content');
   }
 }
-

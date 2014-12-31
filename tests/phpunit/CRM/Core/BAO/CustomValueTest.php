@@ -152,4 +152,3 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     $this->assertEquals($result, NULL, 'Checking the returned value of type Memo.');
   }
 }
-

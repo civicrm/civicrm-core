@@ -275,4 +275,3 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     //------end delivery verification---------
   }
 }
-

@@ -145,4 +145,3 @@ EOS;
     $this->cart->save();
   }
 }
-

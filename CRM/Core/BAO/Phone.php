@@ -272,4 +272,3 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Phone', $id);
   }
 }
-

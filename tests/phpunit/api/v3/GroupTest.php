@@ -147,4 +147,3 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
 }
-

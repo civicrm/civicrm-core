@@ -210,4 +210,3 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
   }
 }
-

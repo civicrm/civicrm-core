@@ -79,4 +79,3 @@ class CRM_Contact_Form_Edit_Phone {
     // $form->addRule( "location[$locationId][phone][$locationId][phone]", ts('Phone number is not valid.'), 'phone' );
   }
 }
-

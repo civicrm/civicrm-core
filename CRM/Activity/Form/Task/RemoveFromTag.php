@@ -143,4 +143,3 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
     }
   }
 }
-

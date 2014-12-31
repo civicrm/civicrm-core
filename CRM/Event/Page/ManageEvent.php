@@ -570,4 +570,3 @@ SELECT count(id)
     $this->assign('aToZ', $aToZBar);
   }
 }
-

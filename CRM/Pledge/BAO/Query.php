@@ -638,4 +638,3 @@ class CRM_Pledge_BAO_Query {
     }
   }
 }
-

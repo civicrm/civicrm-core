@@ -520,4 +520,3 @@ SELECT count(*)
     }
   }
 }
-

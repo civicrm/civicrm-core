@@ -74,4 +74,3 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
     return parent::view();
   }
 }
-

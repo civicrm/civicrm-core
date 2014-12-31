@@ -458,4 +458,3 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
     }
   }
 }
-

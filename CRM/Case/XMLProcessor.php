@@ -132,4 +132,3 @@ class CRM_Case_XMLProcessor {
     self::$relationshipTypes = NULL;
   }
 }
-

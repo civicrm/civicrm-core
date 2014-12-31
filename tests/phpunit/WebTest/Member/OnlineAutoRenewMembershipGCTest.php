@@ -187,4 +187,3 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     return $pageId;
   }
 }
-

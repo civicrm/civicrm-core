@@ -305,4 +305,3 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
     }
   }
 }
-

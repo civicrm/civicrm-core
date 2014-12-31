@@ -113,4 +113,3 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
     $this->_cache = array();
   }
 }
-

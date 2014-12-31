@@ -393,4 +393,3 @@ ORDER BY log_date
     return array($titles, $values);
   }
 }
-

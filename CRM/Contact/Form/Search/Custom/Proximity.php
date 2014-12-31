@@ -301,4 +301,3 @@ AND cgc.group_id = {$this->_group}
     }
   }
 }
-

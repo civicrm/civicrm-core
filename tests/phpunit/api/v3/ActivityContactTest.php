@@ -103,4 +103,3 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
     $this->callAPIFailure('ActivityContact', 'Get', array('record_type_id' => 'abc'));
   }
 }
-

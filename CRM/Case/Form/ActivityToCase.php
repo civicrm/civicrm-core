@@ -99,4 +99,3 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
     $this->add('text', 'file_on_case_activity_subject', ts('Subject'), array('size' => 50));
   }
 }
-

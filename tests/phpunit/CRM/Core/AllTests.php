@@ -71,4 +71,3 @@ class CRM_Core_AllTests extends CiviTestSuite {
 // c-hanging-comment-ender-p: nil
 // indent-tabs-mode: nil
 // End:
-

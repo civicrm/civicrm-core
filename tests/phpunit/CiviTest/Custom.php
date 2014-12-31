@@ -118,5 +118,3 @@ class Custom extends CiviUnitTestCase {
     return $deleteCustomGroup;
   }
 }
-
-

@@ -387,6 +387,3 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
   }
 }
-
-
-

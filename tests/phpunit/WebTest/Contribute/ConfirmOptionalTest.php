@@ -111,4 +111,3 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }
-

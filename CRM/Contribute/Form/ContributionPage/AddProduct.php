@@ -289,4 +289,3 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
     return ts('Add Premium to Contribution Page');
   }
 }
-

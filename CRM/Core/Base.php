@@ -48,4 +48,3 @@ class CRM_Core_Base {
    */
   public function __construct() {}
 }
-

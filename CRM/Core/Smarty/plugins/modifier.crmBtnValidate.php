@@ -54,4 +54,3 @@ function smarty_modifier_crmBtnValidate($btnName) {
   }
   return 'cancel';
 }
-

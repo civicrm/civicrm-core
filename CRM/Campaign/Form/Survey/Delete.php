@@ -106,4 +106,3 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
     }
   }
 }
-

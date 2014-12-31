@@ -240,4 +240,3 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
     $page->assign_by_ref('span', $span);
   }
 }
-

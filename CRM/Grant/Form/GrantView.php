@@ -137,4 +137,3 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
     );
   }
 }
-

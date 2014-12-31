@@ -503,4 +503,3 @@ class CRM_Core_BAO_CMSUser {
     return $db_uf;
   }
 }
-

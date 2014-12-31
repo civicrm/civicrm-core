@@ -46,4 +46,3 @@ Class CRM_Contact_Form_Edit_Notes {
     $form->add('textarea', 'note', ts('Notes'), array('cols' => '60', 'rows' => '3'));
   }
 }
-

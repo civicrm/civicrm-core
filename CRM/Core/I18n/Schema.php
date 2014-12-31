@@ -590,4 +590,3 @@ class CRM_Core_I18n_Schema {
     }
   }
 }
-

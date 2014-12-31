@@ -13,4 +13,3 @@ function civicrm_api3_test_entity_example_action3($params) {
     'example_action3'
   );
 }
-

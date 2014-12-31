@@ -329,4 +329,3 @@ class CRM_Utils_SoapServer {
     return civicrm_api('contact', 'get', $params);
   }
 }
-

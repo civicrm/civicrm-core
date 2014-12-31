@@ -64,4 +64,3 @@ class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
     parent::buildQuickForm();
   }
 }
-

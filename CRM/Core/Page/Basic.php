@@ -383,4 +383,3 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     $controller->run();
   }
 }
-

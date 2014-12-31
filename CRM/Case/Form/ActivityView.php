@@ -180,4 +180,3 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
     );
   }
 }
-

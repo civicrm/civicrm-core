@@ -511,5 +511,3 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
 }
-
-

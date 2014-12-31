@@ -168,4 +168,3 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->_testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector);
   }
 }
-

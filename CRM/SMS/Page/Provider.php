@@ -188,4 +188,3 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
     return 'civicrm/admin/sms/provider';
   }
 }
-

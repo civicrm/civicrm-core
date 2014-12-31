@@ -687,6 +687,3 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     }
   }
 }
-
-
-

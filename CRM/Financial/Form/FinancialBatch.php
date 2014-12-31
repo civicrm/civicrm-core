@@ -308,5 +308,3 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   }
 
 }
-
-

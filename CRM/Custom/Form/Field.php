@@ -1008,4 +1008,3 @@ SELECT id
     $this->ajaxResponse['customField'] = $customField->toArray();
   }
 }
-

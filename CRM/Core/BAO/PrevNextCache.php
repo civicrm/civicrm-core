@@ -497,4 +497,3 @@ WHERE  cacheKey LIKE %1
     return $params;
   }
 }
-

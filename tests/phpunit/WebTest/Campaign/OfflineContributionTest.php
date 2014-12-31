@@ -271,4 +271,3 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->offlineContributionTest($pastCampaignTitle, $campaignId, TRUE);
   }
 }
-

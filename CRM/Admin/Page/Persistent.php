@@ -151,4 +151,3 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
     $this->assign('rows', $rows);
   }
 }
-

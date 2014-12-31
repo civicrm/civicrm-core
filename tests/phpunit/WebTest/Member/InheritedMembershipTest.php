@@ -522,4 +522,3 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_rel']/a/em"));
   }
 }
-

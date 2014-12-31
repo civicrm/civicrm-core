@@ -608,5 +608,3 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->ids['pledge_payment'][] = $pledgePayment['id'];
   }
 }
-
-

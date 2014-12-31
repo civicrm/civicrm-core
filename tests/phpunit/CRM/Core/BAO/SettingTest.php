@@ -266,4 +266,3 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   }
 
 }
-

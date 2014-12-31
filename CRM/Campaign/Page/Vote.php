@@ -134,4 +134,3 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
     $this->assign('tabHeader', empty($allTabs) ? FALSE : $allTabs);
   }
 }
-

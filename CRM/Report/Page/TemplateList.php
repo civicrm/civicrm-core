@@ -120,4 +120,3 @@ LEFT  JOIN civicrm_component comp
     return parent::run();
   }
 }
-

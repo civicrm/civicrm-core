@@ -79,4 +79,3 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
     $history->delete();
   }
 }
-

@@ -545,4 +545,3 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//div[@id='PCPView']/div[2]//table[@class='crm-info-panel']/tbody/tr[2]/td[2]", preg_quote($softCreditor), 'In line ' . __LINE__);
   }
 }
-

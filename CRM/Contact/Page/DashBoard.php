@@ -126,4 +126,3 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     return parent::run();
   }
 }
-

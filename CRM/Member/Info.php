@@ -194,4 +194,3 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
     }
   }
 }
-

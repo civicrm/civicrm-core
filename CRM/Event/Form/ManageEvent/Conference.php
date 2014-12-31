@@ -119,4 +119,3 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
     return ts('Conference Slots');
   }
 }
-

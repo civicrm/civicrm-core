@@ -406,4 +406,3 @@ SELECT     civicrm_email.id as email_id
     }
   }
 }
-

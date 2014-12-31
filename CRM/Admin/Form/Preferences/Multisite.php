@@ -78,4 +78,3 @@ class CRM_Admin_Form_Preferences_Multisite extends CRM_Admin_Form_Preferences {
     parent::preProcess();
   }
 }
-

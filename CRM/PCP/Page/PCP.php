@@ -410,4 +410,3 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     $this->assign('aToZ', $aToZBar);
   }
 }
-

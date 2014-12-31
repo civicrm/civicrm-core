@@ -90,4 +90,3 @@ AND    c.id IN ( $contactIDs )";
    */
   public function postProcess() {}
 }
-

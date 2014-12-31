@@ -1355,4 +1355,3 @@ class CRM_Profile_Form extends CRM_Core_Form {
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
 }
-

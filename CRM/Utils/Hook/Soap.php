@@ -68,4 +68,3 @@ class CRM_Utils_Hook_Soap extends CRM_Utils_Hook {
     return;
   }
 }
-

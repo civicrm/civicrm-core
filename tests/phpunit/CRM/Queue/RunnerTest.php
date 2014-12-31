@@ -289,4 +289,3 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
     return TRUE;
   }
 }
-

@@ -175,4 +175,3 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     return $container['values'][$page_name];
   }
 }
-

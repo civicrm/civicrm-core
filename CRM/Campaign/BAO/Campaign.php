@@ -652,4 +652,3 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     $form->assign('campaignInfo', $campaignInfo);
   }
 }
-

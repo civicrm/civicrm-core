@@ -177,4 +177,3 @@ class CRM_Case_Task {
     );
   }
 }
-

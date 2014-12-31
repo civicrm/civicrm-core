@@ -49,4 +49,3 @@ class CRM_Case_Form_ActivityChangeStatus extends CRM_Core_Form {
     $this->add('select', 'activity_change_status', ts('New Status'), $activityStatus);
   }
 }
-

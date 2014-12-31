@@ -293,4 +293,3 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     return array($memTypeTitle1, $memTypeTitle2, $memTypeTitle3);
   }
 }
-

@@ -920,4 +920,3 @@ INNER JOIN civicrm_uf_group ufgroup
     }
   }
 }
-

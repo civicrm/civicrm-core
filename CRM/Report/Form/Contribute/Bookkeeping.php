@@ -508,4 +508,3 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     }
   }
 }
-

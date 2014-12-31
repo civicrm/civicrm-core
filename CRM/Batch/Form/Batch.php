@@ -131,4 +131,3 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
     }
   }
 }
-

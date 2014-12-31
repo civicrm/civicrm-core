@@ -419,4 +419,3 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     return CRM_Core_DAO::singleValueQuery($query);
   }
 }
-

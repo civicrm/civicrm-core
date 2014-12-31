@@ -2010,4 +2010,3 @@ WHERE  {$whereClause}";
     return $componentPaymentFields;
   }
 }
-

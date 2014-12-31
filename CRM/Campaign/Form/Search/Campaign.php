@@ -123,4 +123,3 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
     $this->assign('searchParams', json_encode($this->_searchParams));
   }
 }
-

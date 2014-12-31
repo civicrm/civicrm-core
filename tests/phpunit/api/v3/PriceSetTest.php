@@ -138,4 +138,3 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
     $unitTest->quickCleanup($tablesToTruncate);
   }
 }
-

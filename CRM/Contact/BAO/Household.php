@@ -69,4 +69,3 @@ class CRM_Contact_BAO_Household extends CRM_Contact_DAO_Contact {
     return CRM_Core_DAO::executeQuery($queryString, $params);
   }
 }
-

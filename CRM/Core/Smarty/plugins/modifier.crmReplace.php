@@ -51,4 +51,3 @@ function smarty_modifier_crmReplace($string, $attribute, $value) {
   $pattern = '/' . $attribute . '="([^"]+?)"/';
   return preg_replace($pattern, $attribute . '="' . $value . '"', $string);
 }
-

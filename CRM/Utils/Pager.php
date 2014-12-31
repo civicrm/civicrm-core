@@ -340,4 +340,3 @@ class CRM_Utils_Pager extends Pager_Sliding {
     return sprintf('<a class="crm-pager-link action-item crm-hover-button" href="%s" title="%s">%s</a>', $href, $title, $image);
   }
 }
-

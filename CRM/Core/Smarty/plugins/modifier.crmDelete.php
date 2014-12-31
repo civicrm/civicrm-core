@@ -53,4 +53,3 @@ function smarty_modifier_crmDelete($string, $attribute) {
   $pattern = '/' . $attribute . '="([^"]+?)"/';
   return preg_replace($pattern, '', $string);
 }
-

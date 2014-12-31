@@ -214,4 +214,3 @@ ORDER BY entity_id
     return 'civicrm/acl/basic';
   }
 }
-

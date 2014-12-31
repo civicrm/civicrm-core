@@ -61,4 +61,3 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   }
 
 }
-

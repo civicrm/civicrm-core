@@ -368,4 +368,3 @@ FROM {$from}
     return ts('CiviCRM Respondent Search');
   }
 }
-

@@ -187,4 +187,3 @@ class CRM_Member_Form_Task extends CRM_Core_Form {
     );
   }
 }
-

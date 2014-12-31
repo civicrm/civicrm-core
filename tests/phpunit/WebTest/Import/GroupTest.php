@@ -137,4 +137,3 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 }
-

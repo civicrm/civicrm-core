@@ -166,4 +166,3 @@ class CRM_Custom_Form_CustomData {
     CRM_Core_BAO_CustomGroup::buildQuickForm($form, $form->_groupTree);
   }
 }
-

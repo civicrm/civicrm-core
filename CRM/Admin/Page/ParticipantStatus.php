@@ -137,4 +137,3 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
     return 'civicrm/admin/participant_status';
   }
 }
-

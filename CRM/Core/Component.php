@@ -464,4 +464,3 @@ class CRM_Core_Component {
     return $components;
   }
 }
-

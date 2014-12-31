@@ -416,4 +416,3 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 }
-

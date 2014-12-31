@@ -109,4 +109,3 @@ interface CRM_Report_Interface {
    */
   public function &columns();
 }
-

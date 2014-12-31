@@ -100,4 +100,3 @@ class CRM_Contact_Form_Edit_Household {
     return empty($errors) ? TRUE : $errors;
   }
 }
-

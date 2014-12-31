@@ -544,4 +544,3 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
     CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
   }
 }
-

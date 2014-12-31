@@ -430,4 +430,3 @@ class CRM_Grant_BAO_Query {
    */
   public static function tableNames(&$tables) {}
 }
-

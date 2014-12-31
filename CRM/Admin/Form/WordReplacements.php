@@ -278,4 +278,3 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     }
   }
 }
-

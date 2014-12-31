@@ -81,4 +81,3 @@ class CRM_Contribute_Form extends CRM_Admin_Form {
   }
 
 }
-

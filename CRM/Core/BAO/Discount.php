@@ -137,4 +137,3 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   }
 
 }
-

@@ -108,4 +108,3 @@ class CRM_Event_StateMachine_Search extends CRM_Core_StateMachine {
     return FALSE;
   }
 }
-

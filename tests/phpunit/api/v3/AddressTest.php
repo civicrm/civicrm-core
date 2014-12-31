@@ -273,4 +273,3 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'delete', array('id' => $address1['id']));
   }
 }
-

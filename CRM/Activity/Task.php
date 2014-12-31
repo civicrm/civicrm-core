@@ -208,4 +208,3 @@ class CRM_Activity_Task {
     );
   }
 }
-

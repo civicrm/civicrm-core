@@ -119,4 +119,3 @@ class CRM_Badge_Page_Layout extends CRM_Core_Page_Basic {
     return 'civicrm/admin/badgelayout';
   }
 }
-

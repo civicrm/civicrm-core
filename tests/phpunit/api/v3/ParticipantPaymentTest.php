@@ -377,4 +377,3 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
   }
 }
-

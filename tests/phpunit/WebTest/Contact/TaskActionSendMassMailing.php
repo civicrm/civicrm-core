@@ -133,4 +133,3 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }
-

@@ -314,6 +314,3 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($relType->id);
   }
 }
-
-
-

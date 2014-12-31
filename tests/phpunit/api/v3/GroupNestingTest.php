@@ -237,4 +237,3 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     $result = $this->callAPIFailure('group_nesting', 'delete', array());
   }
 }
-

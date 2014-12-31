@@ -1858,4 +1858,3 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    }
  }
 }
-

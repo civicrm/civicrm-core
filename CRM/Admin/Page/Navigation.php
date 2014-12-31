@@ -105,4 +105,3 @@ class CRM_Admin_Page_Navigation extends CRM_Core_Page_Basic {
       ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
   }
 }
-
