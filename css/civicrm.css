@@ -1148,6 +1148,7 @@ input.crm-form-entityref {
   width: auto;
   line-height: normal;
   border-top: 3px solid #bbb;
+  text-align: center;
 }
 
 #crm-container ul.wizard-bar li {
@@ -1155,7 +1156,7 @@ input.crm-form-entityref {
   background-color: #FAFAFA;
   border: 1px solid #999999;
   height: auto;
-  margin-right: 1em;
+  margin: -2px;
   padding: .5em 1em .5em;
   text-decoration: none;
   font-size: .95em;
@@ -1163,14 +1164,23 @@ input.crm-form-entityref {
 }
 
 #crm-container ul.wizard-bar li.current-step {
-  background-color: #FAFAFA;
-  border-color: #999999;
+  background-color: #4A89DC;
+  border-color: #4A89DC;
+  color: #ffffff;
   font-weight: bold;
 }
 
 #crm-container ul.wizard-bar li.past-step {
   background-color: #F5F5F5;
   color: #666;
+}
+
+#crm-container ul.wizard-bar li:first-child {
+  border-radius: 8px 0px 0px 8px;
+}
+
+#crm-container ul.wizard-bar li:last-child {
+  border-radius: 0px 8px 8px 0px;
 }
 
 /* Recently Viewed bar */
