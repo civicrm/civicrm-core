@@ -44,7 +44,6 @@ class CRM_Utils_Request {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @access private
    * @static
    */
   static private $_singleton = NULL;
@@ -65,7 +64,6 @@ class CRM_Utils_Request {
    * @param string $method where should we look for the variable
    *
    * @return mixed the value of the variable
-   * @access public
    * @static
    */
   public static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {

@@ -37,7 +37,6 @@ class CRM_Contribute_Form_SearchContribution extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */

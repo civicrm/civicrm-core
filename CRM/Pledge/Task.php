@@ -63,7 +63,6 @@ class CRM_Pledge_Task {
    *
    * @return array the set of tasks for a group of contacts
    * @static
-   * @access public
    */
   public static function &tasks() {
     if (!self::$_tasks) {
@@ -102,7 +101,6 @@ class CRM_Pledge_Task {
    *
    * @return array the set of task titles
    * @static
-   * @access public
    */
   public static function &taskTitles() {
     self::tasks();
@@ -118,7 +116,6 @@ class CRM_Pledge_Task {
    *
    * @return array the set of optional tasks for a group of contacts
    * @static
-   * @access public
    */
   public static function &optionalTaskTitle() {
     $tasks = array();
@@ -132,7 +129,6 @@ class CRM_Pledge_Task {
    * @param int $permission
    *
    * @return array set of tasks that are valid for the user
-   * @access public
    */
   public static function &permissionedTaskTitles($permission) {
     $tasks = array();
@@ -161,7 +157,6 @@ class CRM_Pledge_Task {
    *
    * @return array the set of tasks for a group of pledge holders
    * @static
-   * @access public
    */
   public static function getTask($value) {
     self::tasks();

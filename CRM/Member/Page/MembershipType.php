@@ -91,7 +91,6 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -106,7 +105,6 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    *
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse() {

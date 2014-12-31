@@ -49,7 +49,6 @@ class CRM_Badge_BAO_Badge {
    * @param   array $layoutInfo   associated array which contains meta data about format/layout
    *
    * @return  void
-   * @access  public
    */
   public function createLabels(&$participants, &$layoutInfo) {
     $this->pdf = new CRM_Utils_PDF_Label($layoutInfo['format'], 'mm');
@@ -356,7 +355,6 @@ class CRM_Badge_BAO_Badge {
    * @param null $h
    *
    * @return void
-   * @access public
    */
   public function printImage($img, $x = '', $y = '', $w = NULL, $h = NULL) {
     if (!$x) {
@@ -400,7 +398,6 @@ class CRM_Badge_BAO_Badge {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    * @static
    */
   public static function buildBadges(&$params, &$form) {

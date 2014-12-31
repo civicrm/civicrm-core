@@ -42,7 +42,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @param array $params values
    *
-   * @access public
    * @static
    *
    * @return object
@@ -62,7 +61,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @param boolean $checkPermission all or only authorized for the current user
    *
    * @return array $widgets  array of dashlets
-   * @access public
    * @static
    */
   public static function getDashlets($all = TRUE, $checkPermission = TRUE) {
@@ -102,7 +100,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * passed rather than the current user.
    *
    * @return array $dashlets array of dashlets
-   * @access public
    * @static
    */
   public static function getContactDashlets($flatFormat = FALSE, $contactID = NULL) {
@@ -265,7 +262,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @param int $dashletID widget ID
    *
    * @return array associted array title and content
-   * @access public
    * @static
    */
   public static function getDashletInfo($dashletID) {
@@ -337,7 +333,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @throws RuntimeException
    * @return void
-   * @access public
    * @static
    */
   public static function saveDashletChanges($columns, $contactID=NULL) {
@@ -403,7 +398,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @param array $params associated array
    *
    * @return object $dashlet returns dashlet object
-   * @access public
    * @static
    */
   public static function addDashlet(&$params) {

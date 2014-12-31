@@ -70,7 +70,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * This method returns the links that are given for each search row.
    *
    * @return array
-   * @access public
    *
    */
   public static function &links() {
@@ -83,7 +82,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * @param $action
    * @param array $params
    *
-   * @access public
    */
   public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;
@@ -101,7 +99,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * @param enum   $output what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
@@ -186,7 +183,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * @param
    *
    * @return int Total number of rows
-   * @access public
    */
   public function getTotalCount($action) {
     $job        = CRM_Mailing_BAO_MailingJob::getTableName();

@@ -92,7 +92,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   /**
    * Class constructor
    *
-   * @access public
    * @return \CRM_Contact_DAO_Contact
    */
   /**
@@ -112,7 +111,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Contact_BAO_Contact object
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -275,7 +273,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *
    * @throws Exception
    * @return CRM_Contact_BAO_Contact object
-   * @access public
    * @static
    */
   public static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE, $skipDelete = FALSE) {
@@ -471,7 +468,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param bool $type
    *
    * @return array the displayName and contactImage for this contact
-   * @access public
    * @static
    */
   public static function getDisplayAndImage($id, $type = FALSE) {
@@ -557,7 +553,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param boolean $reverse  true if we want to resolve the values in the reverse direction (value -> name)
    *
    * @return void
-   * @access public
    * @static
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
@@ -689,7 +684,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param boolean $microformat  for location in microformat
    *
    * @return CRM_Contact_BAO_Contact object
-   * @access public
    * @static
    */
   public static function &retrieve(&$params, &$defaults, $microformat = FALSE) {
@@ -736,7 +730,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *
    * @return null|string     display name of the contact if found
    * @static
-   * @access public
    */
   public static function displayName($id) {
     $displayName = NULL;
@@ -755,7 +748,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param  bool $skipUndelete  whether to force contact delete or not
    *
    * @return boolean true if contact deleted, false otherwise
-   * @access public
    * @static
    */
   public static function deleteContact($id, $restore = FALSE, $skipUndelete = FALSE) {
@@ -1069,7 +1061,6 @@ WHERE id={$id}; ";
    *
    * @return string contact_type if $id found else null ""
    *
-   * @access public
    *
    * @static
    *
@@ -1087,7 +1078,6 @@ WHERE id={$id}; ";
    *
    * @return string contact_sub_type if $id found else null ""
    *
-   * @access public
    *
    * @static
    */
@@ -1112,7 +1102,6 @@ WHERE id={$id}; ";
    *
    * @return array
    *
-   * @access public
    *
    * @static
    *
@@ -1154,7 +1143,6 @@ WHERE id={$id}; ";
    * @param bool $withMultiCustomFields
    *
    * @return array array of importable Fields
-   * @access public
    * @static
    */
   static function importableFields($contactType = 'Individual',
@@ -1347,7 +1335,6 @@ WHERE id={$id}; ";
    * @param bool $withMultiRecord
    *
    * @return array array of exportable Fields
-   * @access public
    * @static
    */
   public static function &exportableFields($contactType = 'Individual', $status = FALSE, $export = FALSE, $search = FALSE, $withMultiRecord = FALSE) {
@@ -1581,7 +1568,6 @@ WHERE id={$id}; ";
    *
    * @return $values array contains the contact details
    * @static
-   * @access public
    */
   public static function getHierContactDetails($contactId, &$fields) {
     $params = array(array('contact_id', '=', $contactId, 0, 0));
@@ -1607,7 +1593,6 @@ WHERE id={$id}; ";
    * @param int $contactId contact id
    *
    * @return array a hierarchical property tree if appropriate
-   * @access public
    * @static
    */
   public static function &makeHierReturnProperties($fields, $contactId = NULL) {
@@ -1678,7 +1663,6 @@ WHERE id={$id}; ";
    * @param null $block
    *
    * @return int $locationType location_type_id
-   * @access public
    * @static
    */
   public static function getPrimaryLocationType($contactId, $skipDefaultPriamry = FALSE, $block = NULL) {
@@ -1742,7 +1726,6 @@ WHERE  civicrm_contact.id = %1 ";
    *
    * @return array  of display_name, email if found, do_not_email or (null,null,null)
    * @static
-   * @access public
    */
   public static function getContactDetails($id) {
     // check if the contact type
@@ -1793,7 +1776,6 @@ ORDER BY civicrm_email.is_primary DESC";
    *
    * @return int contact id created/edited
    * @static
-   * @access public
    */
   static function createProfileContact(
     &$params,
@@ -2350,7 +2332,6 @@ WHERE      civicrm_openid.openid = %1";
    *
    * @return string $dao->email  email address if present else null
    * @static
-   * @access public
    */
   public static function getPrimaryEmail($contactID) {
     // fetch the primary email
@@ -2378,7 +2359,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
    *
    * @return string $dao->openid   OpenID if present else null
    * @static
-   * @access public
    */
   public static function getPrimaryOpenId($contactID) {
     // fetch the primary OpenID
@@ -2407,7 +2387,6 @@ AND       civicrm_openid.is_primary = 1";
    * @param array $values output values of the object
    *
    * @return CRM_Contact_BAO_Contact|null the found object or null
-   * @access public
    * @static
    */
   public static function getValues(&$params, &$values) {
@@ -2492,7 +2471,6 @@ AND       civicrm_openid.is_primary = 1";
    * @param string  $tableName optional tableName if component is custom group
    *
    * @return total number of count of occurence in database
-   * @access public
    * @static
    */
   public static function getCountComponent($component, $contactId, $tableName = NULL) {
@@ -2569,7 +2547,6 @@ AND       civicrm_openid.is_primary = 1";
    * @param boolean $useDefaults use default greeting values
    *
    * @return void
-   * @access public
    * @static
    */
   public static function processGreetings(&$contact, $useDefaults = FALSE) {
@@ -3033,7 +3010,6 @@ AND       civicrm_openid.is_primary = 1";
    * @param  int    $contactId   contact id.
    *
    * @return display name |null the found display name or null.
-   * @access public
    * @static
    */
   public static function getMasterDisplayName($masterAddressId = NULL, $contactId = NULL) {
@@ -3104,7 +3080,6 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    *
    * @link https://issues.civicrm.org/jira/browse/CRM-15602
    * @see triggerInfo
-   * @access public
    * @static
    */
   public static function generateTimestampTriggers(&$info, $reqTableName, $relatedTableNames, $contactRefColumn) {
@@ -3204,7 +3179,6 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * @param  int     $contactId   contact id.
    *
    * @return bool true if present else false.
-   * @access public
    * @static
    */
   public static function checkDomainContact($contactId) {

@@ -58,7 +58,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
    * Set default values for the form.
    * The default values are retrieved from the database.
    *
-   * @access public
    *
    * @return void
    */
@@ -113,7 +112,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -200,7 +198,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

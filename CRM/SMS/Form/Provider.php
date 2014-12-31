@@ -65,7 +65,6 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -166,7 +165,6 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

@@ -58,7 +58,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @return uid if user exists, false otherwise
    *
-   * @access public
    */
   public function createUser(&$params, $mail) {
     $baseDir = JPATH_SITE;
@@ -181,7 +180,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param string $pageTitle
    *
    * @return void
-   * @access public
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
@@ -206,7 +204,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @internal param string $url
    *
    * @return void
-   * @access public
    */
   public function appendBreadCrumb($breadCrumbs) {
     $template = CRM_Core_Smarty::singleton();
@@ -238,7 +235,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @internal param string $bc the new breadcrumb to be appended
    *
    * @return void
-   * @access public
    */
   public function resetBreadCrumb() {
     return;
@@ -252,7 +248,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @internal param string $head the new string to be appended
    *
    * @return void
-   * @access public
    */
   public static function addHTMLHead($string = NULL) {
     if ($string) {
@@ -271,7 +266,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScriptUrl($url, $region) {
     return FALSE;
@@ -287,7 +281,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScript($code, $region) {
     return FALSE;
@@ -303,7 +296,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyleUrl($url, $region) {
     if ($region == 'html-header') {
@@ -324,7 +316,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyle($code, $region) {
     if ($region == 'html-header') {
@@ -350,7 +341,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param bool $forceBackend
    *
    * @return string            an HTML string containing a link to the given path.
-   * @access public
    */
   function url($path = NULL, $query = NULL, $absolute = TRUE,
     $fragment = NULL, $htmlize = TRUE,
@@ -427,7 +417,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param $action the default action if one is pre-specified
    *
    * @return string the url to post the form
-   * @access public
    */
   public function postURL($action) {
     if (!empty($action)) {
@@ -445,7 +434,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param object $user handle to the user object
    *
    * @return void
-   * @access public
    */
   public function setEmail(&$user) {
     global $database;
@@ -464,7 +452,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @return mixed false if no auth
    *               array(
       contactID, ufID, unique string ) if success
-   * @access public
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE) {
     require_once 'DB.php';
@@ -558,7 +545,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @param array $data  array with user specific data
    *
-   * @access public
    */
   public function setUserSession($data) {
     list($userID, $ufID) = $data;
@@ -574,7 +560,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @param string $message  the message to set
    *
-   * @access public
    */
   public function setMessage($message) {
     return;

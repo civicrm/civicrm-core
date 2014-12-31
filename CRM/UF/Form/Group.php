@@ -42,7 +42,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * The form id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -50,7 +49,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * The title for group
    *
    * @var int
-   * @access protected
    */
   protected $_title;
   protected $_groupElement;
@@ -61,7 +59,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // current form id
@@ -112,7 +109,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & (CRM_Core_Action::DISABLE | CRM_Core_Action::DELETE)) {
@@ -211,7 +207,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -291,7 +286,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * @param array $self    current form object.
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -316,7 +310,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

@@ -45,7 +45,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * All the fields that are listings related
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
@@ -53,7 +52,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * The mailing id of the mailing we're operating on
    *
    * @int
-   * @access protected
    */
   protected $_mailingId;
 
@@ -61,7 +59,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * The action that we are performing (in CRM_Core_Action terms)
    *
    * @int
-   * @access protected
    */
   protected $_action;
 
@@ -74,7 +71,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * Scheduled mailing
    *
    * @boolean
-   * @access public
    */
   public $_scheduled;
 
@@ -85,7 +81,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
   public function preProcess() {

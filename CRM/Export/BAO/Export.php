@@ -62,7 +62,6 @@ class CRM_Export_BAO_Export {
    * @param string $queryOperator
    *
    * @static
-   * @access public
    */
   static function exportComponents($selectAll,
     $ids,

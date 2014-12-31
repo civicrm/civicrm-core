@@ -80,7 +80,6 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    * @param null
    *
    * @return array    array of default values
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
@@ -103,7 +102,6 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $optionGroups = CRM_Campaign_BAO_Survey::getResultSets();
@@ -349,7 +347,6 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // store the submitted values in an array

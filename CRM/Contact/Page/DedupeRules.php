@@ -100,7 +100,6 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
    * method.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -139,7 +138,6 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
    * Browse all rule groups
    *
    * @return void
-   * @access public
    */
   public function browse() {
     // get all rule groups

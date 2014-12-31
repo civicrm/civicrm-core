@@ -42,7 +42,6 @@ class CRM_Contact_Form_ProfileContact {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
   public static function preProcess(&$form) {
     $session = CRM_Core_Session::singleton();

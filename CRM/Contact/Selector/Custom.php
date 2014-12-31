@@ -69,7 +69,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
-   * @access protected
    */
   public $_formValues;
 
@@ -77,7 +76,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * Params is the array in a value used by the search query creator
    *
    * @var array
-   * @access protected
    */
   public $_params;
 
@@ -85,7 +83,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * Represent the type of selector
    *
    * @var int
-   * @access protected
    */
   protected $_action;
 
@@ -95,7 +92,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * The public visible fields to be shown to the user
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
@@ -166,7 +162,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * - Edit
    *
    * @return array
-   * @access public
    *
    */
   public static function &links() {
@@ -212,7 +207,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @param $action
    * @param array $params
    *
-   * @access public
    */
   public function getPagerParams($action, &$params) {
     $params['status']    = ts('Contact %%StatusMessage%%');
@@ -231,7 +225,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @param enum   $output what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     $columns = $this->_search->columns();
@@ -262,7 +255,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @param
    *
    * @return int Total number of rows
-   * @access public
    */
   public function getTotalCount($action) {
     return $this->_search->count();
@@ -380,7 +372,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
      reference)   $formValues   submitted formValues
    *
    * @return array              $qill         which contains an array of strings
-   * @access public
    */
   public function getQILL() {
     return NULL;

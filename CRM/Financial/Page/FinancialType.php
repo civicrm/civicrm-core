@@ -105,7 +105,6 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -130,7 +129,6 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    *
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse() {

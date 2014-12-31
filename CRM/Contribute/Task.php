@@ -63,7 +63,6 @@ class CRM_Contribute_Task {
    *
    * @return array the set of tasks for a group of contacts
    * @static
-   * @access public
    */
   public static function &tasks() {
     if (!(self::$_tasks)) {
@@ -149,7 +148,6 @@ class CRM_Contribute_Task {
    *
    * @return array the set of task titles
    * @static
-   * @access public
    */
   public static function &taskTitles() {
     self::tasks();
@@ -169,7 +167,6 @@ class CRM_Contribute_Task {
    * @param bool $softCreditFiltering
    *
    * @return array set of tasks that are valid for the user
-   * @access public
    */
   public static function &permissionedTaskTitles($permission, $softCreditFiltering = FALSE) {
     $tasks = array();
@@ -204,7 +201,6 @@ class CRM_Contribute_Task {
    *
    * @return array the set of tasks for a group of contributors
    * @static
-   * @access public
    */
   public static function getTask($value) {
     self::tasks();

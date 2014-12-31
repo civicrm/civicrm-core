@@ -44,7 +44,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
   public function preProcess() {
@@ -91,7 +90,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -111,7 +109,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * Edit name and address of a contact
    *
    * @return void
-   * @access public
    */
   public function edit() {
     // set the userContext stack
@@ -129,7 +126,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * View summary details of a contact
    *
    * @return void
-   * @access public
    */
   public function view() {
     // Add js for tabs, in-place editing, and jstree for tags

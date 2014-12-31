@@ -48,7 +48,6 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_OptionGroup object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -80,7 +79,6 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
    *
-   * @access public
    * @static
    *
    * @return object
@@ -113,7 +111,6 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *
    * @return void
    *
-   * @access public
    * @static
    */
   public static function del($optionGroupId) {
@@ -134,7 +131,6 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *
    * @return String title
    *
-   * @access public
    * @static
    */
   public static function getTitle($optionGroupId) {

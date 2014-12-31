@@ -38,7 +38,6 @@ class CRM_Contact_Page_View_Sunlight extends CRM_Contact_Page_View {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
   public function browse() {
     // get the primary city, state and zip for the contact
@@ -58,7 +57,6 @@ class CRM_Contact_Page_View_Sunlight extends CRM_Contact_Page_View {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     $this->preProcess();

@@ -54,7 +54,6 @@ class CRM_ACL_API {
    *
    * @return boolean true if yes, else false
    * @static
-   * @access public
    */
   public static function check($str, $contactID = NULL) {
     if ($contactID == NULL) {
@@ -82,7 +81,6 @@ class CRM_ACL_API {
    *               this means it is handled by generating query
    *
    * @return string the group where clause for this user
-   * @access public
    */
   public static function whereClause($type,
     &$tables,
@@ -145,7 +143,6 @@ class CRM_ACL_API {
    * @param null $includedGroups
    *
    * @return array the ids of the groups for which the user has permissions
-   * @access public
    */
   public static function group(
     $type,
@@ -180,7 +177,6 @@ class CRM_ACL_API {
    * @param bool $flush
    *
    * @return array the ids of the groups for which the user has permissions
-   * @access public
    */
   public static function groupPermission(
     $type,

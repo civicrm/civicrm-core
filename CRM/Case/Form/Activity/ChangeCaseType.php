@@ -54,7 +54,6 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
@@ -108,7 +107,6 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($values, $files, $form) {
     return TRUE;
@@ -117,7 +115,6 @@ class CRM_Case_Form_Activity_ChangeCaseType {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param array $params
@@ -141,7 +138,6 @@ class CRM_Case_Form_Activity_ChangeCaseType {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param array $params

@@ -52,7 +52,6 @@ class CRM_Core_QuickForm_NestedAdvMultiSelect extends HTML_QuickForm_advmultisel
    * @param mixed $param3   (optional) See function detail
    * @param mixed $param4   (optional) See function detail
    *
-   * @access     public
    * @since      version 1.5.0 (2009-02-15)
    * @return     PEAR_Error|NULL on error and TRUE on success
    * @throws     PEAR_Error

@@ -41,7 +41,6 @@ class CRM_Activity_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function select(&$query) {
     if (!empty($query->_returnProperties['activity_id'])) {
@@ -167,7 +166,6 @@ class CRM_Activity_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function where(&$query) {
     $grouping = NULL;
@@ -188,7 +186,6 @@ class CRM_Activity_BAO_Query {
    * @param $values
    * @param $query
    * @return void
-   * @access public
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -455,7 +452,6 @@ class CRM_Activity_BAO_Query {
    * Getter for the qill object
    *
    * @return string
-   * @access public
    */
   public function qill() {
     return (isset($this->_qill)) ? $this->_qill : "";
@@ -464,7 +460,6 @@ class CRM_Activity_BAO_Query {
   /**
    * Add all the elements shared between case activity search and advanced search
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @return void

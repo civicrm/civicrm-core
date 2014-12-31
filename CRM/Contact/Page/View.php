@@ -43,7 +43,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * The id of the object being viewed (note/relationship etc)
    *
    * @int
-   * @access protected
    */
   protected $_id;
 
@@ -51,7 +50,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * The contact id of the contact being viewed
    *
    * @int
-   * @access protected
    */
   protected $_contactId;
 
@@ -59,7 +57,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * The action that we are performing
    *
    * @string
-   * @access protected
    */
   protected $_action;
 
@@ -67,7 +64,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * The permission we have on this contact
    *
    * @string
-   * @access protected
    */
   protected $_permission;
 
@@ -76,7 +72,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
   public function preProcess() {
@@ -262,7 +257,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * @param int $contactId
    *
    * @return array contact fields in fixed order
-   * @access public
    */
   public static function getContactDetails($contactId) {
     return list($displayName,

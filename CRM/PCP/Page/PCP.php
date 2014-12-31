@@ -116,7 +116,6 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    * @param
    *
    * @return void
-   * @access public
    */
   public function run() {
     // get the requested action
@@ -164,7 +163,6 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    * @param null $action
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse($action = NULL) {

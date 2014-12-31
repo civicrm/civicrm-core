@@ -51,7 +51,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem object
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -79,7 +78,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -179,7 +177,6 @@ WHERE     %2.id = %1";
    *                          lineItem array)
    *
    * @return void
-   * @access static
    */
   public static function format($fid, &$params, &$fields, &$values) {
     if (empty($params["price_{$fid}"])) {
@@ -236,7 +233,6 @@ WHERE     %2.id = %1";
    * @param int $entityTable
    *
    * @return bool
-   * @access public
    * @static
    */
   public static function deleteLineItems($entityId, $entityTable) {

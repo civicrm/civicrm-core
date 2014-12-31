@@ -58,7 +58,6 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
   public function preProcess() {
@@ -167,7 +166,6 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * Build the outcome basing on the CRM_Profile_Page_Dynamic's HTML
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -204,7 +202,6 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
@@ -219,7 +216,6 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   /**
    * @return string

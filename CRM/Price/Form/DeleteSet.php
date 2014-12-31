@@ -69,7 +69,6 @@ class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->assign('title', $this->_title);
@@ -91,7 +90,6 @@ class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     if (CRM_Price_BAO_PriceSet::deleteSet($this->_sid)) {

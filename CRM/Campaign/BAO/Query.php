@@ -70,7 +70,6 @@ class CRM_Campaign_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function select(&$query) {
     self::$_applySurveyClause = FALSE;
@@ -338,7 +337,6 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
    * Add all the elements shared between,
    * normal voter search and voter listing (GOTV form)
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @return void

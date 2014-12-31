@@ -69,7 +69,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param NULL
    *
    * @return array        Data type => Description
-   * @access public
    * @static
    */
   public static function &dataType() {
@@ -129,7 +128,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Core_DAO_CustomField object
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -319,7 +317,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_DAO_CustomField object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -334,7 +331,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -353,7 +349,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return string name
    *
-   * @access public
    * @static
    *
    */
@@ -375,7 +370,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return array      $fields - an array of active custom fields.
    *
-   * @access public
    * @static
    */
   public static function &getFields($customDataType = 'Individual',
@@ -594,7 +588,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return array   $fields -
    *
-   * @access public
    * @static
    */
   public static function &getFieldsForImport($contactType = 'Individual',
@@ -660,7 +653,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @param bool $all
    * @return int|null         The id (if exists)
-   * @access public
    * @static
    */
   public static function getKeyID($key, $all = FALSE) {
@@ -724,7 +716,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param boolean $search true if used for search else false
    * @param string $label label for custom field
    *
-   * @access public
    * @static
    */
   public static function addQuickFormElement(&$qf,
@@ -1047,7 +1038,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return  boolean
    *
-   * @access public
    * @static
    *
    */
@@ -1085,7 +1075,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return  string   the display value
    *
    * @static
-   * @access public
    */
   public static function getDisplayValue($value, $id, &$options, $contactID = NULL, $fieldID = NULL) {
     $option     = &$options[$id];
@@ -1321,7 +1310,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *                               just format the given value
    *
    * @static
-   * @access public
    */
   static function setProfileDefaults($customFieldId,
     $elementName,
@@ -2033,7 +2021,6 @@ AND    cf.id = %1";
    * Currently this is required in the cases where option groups are to be included
    * for inactive fields : CRM-5369
    *
-   * @access public
    *
    * @return mixed $customOptionGroup@static
    */
@@ -2077,7 +2064,6 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
    * @param int $customFieldId custom field id
    * @param int $optionGroupId option group id
    *
-   * @access public
    * @return void
    * @static
    */

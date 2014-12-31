@@ -73,7 +73,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -130,7 +129,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -217,7 +215,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -449,7 +446,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -478,7 +474,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

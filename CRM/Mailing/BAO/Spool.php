@@ -61,7 +61,6 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
    * @return mixed Returns true on success, or a CRM_Eore_Error
    *               containing a descriptive error message on
    *               failure.
-   * @access public
    */
   public function send($recipient, $headers, $body, $job_id = null) {
     $headerStr = array();

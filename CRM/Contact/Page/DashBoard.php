@@ -43,7 +43,6 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
    * Run dashboard
    *
    * @return void
-   * @access public
    */
   public function run() {
     // Add dashboard js and css

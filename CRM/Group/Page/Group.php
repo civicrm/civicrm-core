@@ -46,7 +46,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * Define action links
    *
    * @return array self::$_links array of action links
-   * @access public
    */
   public function &links() {}
 
@@ -54,7 +53,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * Return class name of edit form
    *
    * @return string
-   * @access public
    */
   public function editForm() {
     return 'CRM_Group_Form_Edit';
@@ -64,7 +62,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * Return name of edit form
    *
    * @return string
-   * @access public
    */
   public function editName() {
     return ts('Edit Group');
@@ -74,7 +71,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * Return name of delete form
    *
    * @return string
-   * @access public
    */
   public function deleteName() {
     return 'Delete Group';
@@ -86,7 +82,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @param null $mode
    *
    * @return string
-   * @access public
    */
   public function userContext($mode = NULL) {
     return 'civicrm/group';
@@ -98,7 +93,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @param null $mode
    *
    * @return string
-   * @access public
    */
   public function userContextParams($mode = NULL) {
     return 'reset=1&action=browse';
@@ -111,7 +105,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @param int $title name or title of the object
    *
    * @return string   the permission that the user has (or null)
-   * @access public
    */
   public function checkPermission($id, $title) {
     return CRM_Contact_BAO_Group::checkPermission($id, $title);
@@ -124,7 +117,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @param int $action
    *
    * @return void
-   * @access public
    */
   public function browse($action = NULL) {
     $groupPermission = CRM_Core_Permission::check('edit groups') ? CRM_Core_Permission::EDIT : CRM_Core_Permission::VIEW;

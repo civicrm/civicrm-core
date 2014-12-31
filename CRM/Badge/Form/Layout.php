@@ -44,7 +44,6 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -159,7 +158,6 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -187,7 +185,6 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

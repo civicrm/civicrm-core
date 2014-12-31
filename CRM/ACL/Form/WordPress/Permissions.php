@@ -42,7 +42,6 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @access public
    * @return void
    */
   public function buildQuickForm( ) {
@@ -101,7 +100,6 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    * @return void
    */
   public function postProcess() {
@@ -172,7 +170,6 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    * This function should be shared from a similar one in
    * distmaker/utils/joomlaxml.php
    *
-   * @access public
    * @return array   civicrm permissions
    */
   public static function getPermissionArray(){

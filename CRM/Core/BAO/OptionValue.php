@@ -128,7 +128,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_OptionValue object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -160,7 +159,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
    *
-   * @access public
    * @static
    *
    * @return CRM_Core_DAO_OptionValue
@@ -228,7 +226,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return boolean
    *
-   * @access public
    * @static
    */
   public static function del($optionValueId) {
@@ -248,7 +245,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return array  label and description
    * @static
-   * @access public
    */
   public static function getActivityTypeDetails($activityTypeId) {
     $query = "SELECT civicrm_option_value.label, civicrm_option_value.description
@@ -271,7 +267,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return string title
    *
-   * @access public
    * @static
    *
    */
@@ -415,7 +410,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $opWeights options value , weight pair
    *
    * @return void
-   * @access public
    * @static
    */
   public static function updateOptionWeights($opGroupId, $opWeights) {

@@ -46,7 +46,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * @return uid if user exists, false otherwise
    *
-   * @access public
    *
    */
   public function createUser(&$params, $mail) {
@@ -231,7 +230,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @param string $pageTitle
    *
    * @return void
-   * @access public
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
@@ -250,7 +248,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @internal param string $url
    *
    * @return void
-   * @access public
    */
   public function appendBreadCrumb($breadcrumbs) {
     $civicrmPageState = \Drupal::service('civicrm.page_state');
@@ -263,7 +260,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Reset an additional breadcrumb tag to the existing breadcrumb
    *
    * @return void
-   * @access public
    */
   public function resetBreadCrumb() {
     \Drupal::service('civicrm.page_state')->resetBreadcrumbs();
@@ -275,7 +271,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @param string $header the new string to be appended
    *
    * @return void
-   * @access public
    */
   public function addHTMLHead($header) {
     \Drupal::service('civicrm.page_state')->addHtmlHeader($header);
@@ -291,7 +286,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScriptUrl($url, $region) {
     $options = array('group' => JS_LIBRARY, 'weight' => 10);
@@ -319,7 +313,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScript($code, $region) {
     $options = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
@@ -345,7 +338,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header') {
@@ -368,7 +360,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyle($code, $region) {
     if ($region != 'html-header') {
@@ -410,7 +401,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function mapConfigToSSL() {
   }
@@ -458,7 +448,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return mixed false if no auth
    *               array(
    *  contactID, ufID, unique string ) if success
-   * @access public
    *
    * This always bootstraps Drupal
    */
@@ -510,7 +499,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * @param string $message the message to set
    *
-   * @access public
    */
   public function setMessage($message) {
     drupal_set_message($message);

@@ -422,7 +422,6 @@ class CRM_Core_Component {
    * @param array $tables  array of tables
    *
    * @return null
-   * @access public
    * @static
    */
   public static function tableNames(&$tables) {

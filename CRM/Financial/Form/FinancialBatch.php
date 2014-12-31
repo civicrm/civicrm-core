@@ -43,7 +43,6 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * The financial batch id, used when editing the field
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -51,7 +50,6 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -86,7 +84,6 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -153,7 +150,6 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -181,7 +177,6 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($values, $files, $self) {
     $errors = array();
@@ -207,7 +202,6 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   /**
    * Process the form submission
    *
-   * @access public
    * @return void
    */
   public function postProcess() {
@@ -301,7 +295,6 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public function checkPermissions($action, $permissions, $createdID, $userContactID, $actionName) {
     if ((CRM_Core_Permission::check($permissions[0]) || CRM_Core_Permission::check($permissions[1]))) {

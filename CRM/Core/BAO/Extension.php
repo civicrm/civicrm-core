@@ -46,7 +46,6 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_LocationType object on success, null otherwise
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -66,7 +65,6 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    *
    * @return void
    *
-   * @access public
    * @static
    */
   public static function del($id) {

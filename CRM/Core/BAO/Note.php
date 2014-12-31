@@ -51,7 +51,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *
    * @return string   the note text or null if note not found
    *
-   * @access public
    * @static
    */
   public static function getNoteText($id) {
@@ -65,7 +64,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *
    * @return string   the note subject or null if note not found
    *
-   * @access public
    * @static
    */
   public static function getNoteSubject($id) {
@@ -79,7 +77,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *
    * @return boolean TRUE if the note should be displayed, otherwise FALSE
    *
-   * @access public
    * @static
    */
   public static function getNotePrivacyHidden($note) {
@@ -135,7 +132,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param array $ids (deprecated) associated array with note id - preferably set $params['id']
    *
    * @return object $note CRM_Core_BAO_Note object
-   * @access public
    * @static
    */
   public static function &add(&$params, $ids = array()) {
@@ -222,7 +218,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function dataExists(&$params) {
@@ -242,7 +237,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param int $numNotes the maximum number of notes to return (0 if all)
    *
    * @return object $notes  Object of CRM_Core_BAO_Note
-   * @access public
    * @static
    */
   public static function &getValues(&$params, &$values, $numNotes = self::MAX_NOTES) {
@@ -334,7 +328,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *
    * @return void
    *
-   * @access public
    * @static
    */
   public static function deleteContact($id) {
@@ -359,7 +352,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *
    * @return array $viewNote array of note properties
    *
-   * @access public
    * @static
    */
   public static function &getNote($id, $entityTable = 'civicrm_relationship') {
@@ -391,7 +383,6 @@ ORDER BY  modified_date desc";
    *
    * @return int $count count of log records
    *
-   * @access public
    * @static
    */
   public static function getContactNoteCount($contactID) {
@@ -418,7 +409,6 @@ ORDER BY  modified_date desc";
    * @return array Nested associative array beginning with direct children of given note.
    *
    * @static
-   * @access public
    */
   public static function getNoteTree($parentId, $maxDepth = 0, $snippet = FALSE) {
     return self::buildNoteTree($parentId, $maxDepth, $snippet);
@@ -432,7 +422,6 @@ ORDER BY  modified_date desc";
    * @return int $count Number of notes having the give note as parent
    *
    * @static
-   * @access public
    */
   public static function getChildCount($id) {
     $note               = new CRM_Core_DAO_Note();

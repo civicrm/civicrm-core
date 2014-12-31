@@ -118,7 +118,6 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
@@ -160,7 +159,6 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   /**
    * @return string

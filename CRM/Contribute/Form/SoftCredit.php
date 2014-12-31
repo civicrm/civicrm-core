@@ -44,7 +44,6 @@ class CRM_Contribute_Form_SoftCredit {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access static
    */
   public static function preProcess(&$form) {
     $contriDAO = new CRM_Contribute_DAO_Contribution();
@@ -71,7 +70,6 @@ class CRM_Contribute_Form_SoftCredit {
    * Function used to build form element for soft credit block
    *
    * @param CRM_Core_Form $form
-   * @access public
    *
    * @return void
    */
@@ -200,7 +198,6 @@ class CRM_Contribute_Form_SoftCredit {
    * @param $self
    *
    * @return array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $errors, $self) {

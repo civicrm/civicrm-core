@@ -258,7 +258,6 @@ class CRM_Core_BAO_CustomValueTable {
    * @param int $maxLength
    *
    * @return the mysql data store placeholder
-   * @access public
    * @static
    */
   public static function fieldToSQLType($type, $maxLength = 255) {
@@ -388,7 +387,6 @@ class CRM_Core_BAO_CustomValueTable {
    * @return array      $fields        Array of custom values for the entity with key=>value
    *                                   pairs specified as civicrm_custom_field.id => custom value.
    *                                   Empty array if no custom values found.
-   * @access public
    * @static
    */
   public static function &getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE) {

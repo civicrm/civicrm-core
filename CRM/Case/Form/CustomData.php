@@ -61,7 +61,6 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    * Entity sub type of the table id
    *
    * @var string
-   * @access protected
    */
   protected $_subTypeID;
 
@@ -74,7 +73,6 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    *
    * @return void
    *
-   * @access public
    *
    */
   public function preProcess() {
@@ -114,7 +112,6 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // make this form an upload since we dont know if the custom data injected dynamically
@@ -136,7 +133,6 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   /**
    * Process the user submitted custom data values.
    *
-   * @access public
    *
    * @return void
    */

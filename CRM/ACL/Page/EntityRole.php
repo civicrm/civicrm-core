@@ -104,7 +104,6 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -151,7 +150,6 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
    * Browse all acls
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse() {

@@ -50,7 +50,6 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
    *
    * @return void
    *
-   * @access public
    *
    */
   public function preProcess() {
@@ -61,7 +60,6 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @return array the default array reference
    */
@@ -104,7 +102,6 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // Is proximity search enabled for this profile?
@@ -130,7 +127,6 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   /**
    *
    *
-   * @access public
    *
    * @return void
    */

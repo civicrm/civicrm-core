@@ -52,7 +52,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Pledge_BAO_PledgeBlock object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -71,7 +70,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Pledge_BAO_PledgeBlock object
-   * @access public
    * @static
    */
   public static function &create(&$params) {
@@ -95,7 +93,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
@@ -152,7 +149,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param int $id pledgeBlock id
    *
    * @return mixed|null
-   * @access public
    * @static
    */
   public static function deletePledgeBlock($id) {

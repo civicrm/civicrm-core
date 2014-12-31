@@ -58,7 +58,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -208,7 +207,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * no help display needed
    *
    * @return int
-   * @access public
    */
   public function getAction() {
     if ($this->_action & CRM_Core_Action::PREVIEW) {
@@ -223,7 +221,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
@@ -420,7 +417,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -953,7 +949,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @param bool $isAdditionalAmount
    *
    * @return void
-   * @access public
    */
   static function processContribution(&$form, $params, $result, $contactID,
     $pending = FALSE, $isAdditionalAmount = FALSE
@@ -1071,7 +1066,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
   public static function fixLocationFields(&$params, &$fields, &$form) {
     if (!empty($form->_fields)) {
@@ -1120,7 +1114,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
   public static function updateContactFields($contactID, $params, $fields, &$form) {
     //add the contact to group, if add to group is selected for a

@@ -210,7 +210,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -365,7 +364,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
@@ -748,7 +746,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    *
    * @throws CiviCRM_API3_Exception
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
   public static function formRule($params, $files, $self) {
@@ -982,7 +979,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

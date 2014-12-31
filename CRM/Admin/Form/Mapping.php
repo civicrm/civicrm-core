@@ -43,7 +43,6 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -91,7 +90,6 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

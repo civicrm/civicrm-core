@@ -45,7 +45,6 @@ class CRM_Contact_Form_Inline_Lock {
    * @param CRM_Core_Form $form form object
    * @param int $contactID
    *
-   * @access public
    * @return void
    */
   public static function buildQuickForm(&$form, $contactID) {
@@ -70,7 +69,6 @@ class CRM_Contact_Form_Inline_Lock {
    * @param int $contactID
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $contactID = NULL) {

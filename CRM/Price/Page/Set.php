@@ -56,7 +56,6 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param null
    *
    * @return  array   array of action links that we need to display for the browse screen
-   * @access public
    */ function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
@@ -121,7 +120,6 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -205,7 +203,6 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param string $action the action to be invoked
    *
    * @return void
-   * @access public
    */
   public function edit($sid, $action) {
     // create a simple controller for editing price sets
@@ -226,7 +223,6 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param int $sid price set id
    *
    * @return void
-   * @access public
    */
   public function preview($sid) {
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Preview', ts('Preview Price Set'), NULL);
@@ -250,7 +246,6 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param string $action   the action to be invoked
    *
    * @return void
-   * @access public
    */
   public function browse($action = NULL) {
     // get all price sets
@@ -319,7 +314,6 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * all the fields in the page
    *
    * @return void
-   * @access public
    */
   public function copy() {
     $id = CRM_Utils_Request::retrieve('sid', 'Positive',

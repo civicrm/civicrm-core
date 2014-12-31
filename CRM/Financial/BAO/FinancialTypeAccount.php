@@ -58,7 +58,6 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * @param array $allValues
    *
    * @return CRM_Contribute_BAO_ContributionType object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults, &$allValues = array()) {
@@ -78,7 +77,6 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
    *
-   * @access public
    * @static
    * @return object
    */

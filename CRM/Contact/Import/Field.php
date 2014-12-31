@@ -31,7 +31,6 @@
 class CRM_Contact_Import_Field {
 
   /**#@+
-   * @access protected
    * @var string
    */
 

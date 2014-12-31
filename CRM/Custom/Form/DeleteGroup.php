@@ -85,7 +85,6 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -107,7 +106,6 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $group = new CRM_Core_DAO_CustomGroup();

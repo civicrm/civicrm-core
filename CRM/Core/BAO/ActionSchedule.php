@@ -90,7 +90,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *
    * @return array  associated array of all the drop downs in the form
    * @static
-   * @access public
    */
   public static function getSelection($id = NULL) {
     $mapping = self::getMapping();
@@ -323,7 +322,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *
    * @return array  (reference)   reminder list
    * @static
-   * @access public
    */
   public static function &getList($namesOnly = FALSE, $entityValue = NULL, $id = NULL) {
     $activity_type = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
@@ -584,7 +582,6 @@ AND   cas.entity_value = $id AND
    * @param array $ids    the array that holds all the db ids
    *
    * @return CRM_Core_DAO_ActionSchedule
-   * @access public
    * @static
    *
    */
@@ -604,7 +601,6 @@ AND   cas.entity_value = $id AND
    * @param array $values (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_DAO_ActionSchedule object on success, null otherwise
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$values) {
@@ -630,7 +626,6 @@ AND   cas.entity_value = $id AND
    *
    * @param  int  $id     ID of the Reminder to be deleted.
    *
-   * @access public
    * @static
    */
   public static function del($id) {

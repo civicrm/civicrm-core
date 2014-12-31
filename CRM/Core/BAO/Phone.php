@@ -71,7 +71,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return object       CRM_Core_BAO_Phone object on success, null otherwise
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -96,7 +95,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @param array entityBlock input parameters to find object
    *
    * @return array    array of phone objects
-   * @access public
    * @static
    */
   public static function &getValues($entityBlock) {
@@ -114,7 +112,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @param array $filters
    *
    * @return array  the array of phone ids which are potential numbers
-   * @access public
    * @static
    */
   public static function allPhones($id, $updateBlankLocInfo = FALSE, $type = NULL, $filters = array()) {
@@ -186,7 +183,6 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
    * @param null $type
    *
    * @return array  the array of phone ids which are potential numbers
-   * @access public
    * @static
    */
   public static function allEntityPhones($entityElements, $type = NULL) {

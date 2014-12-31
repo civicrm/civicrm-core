@@ -43,7 +43,6 @@ class CRM_Contact_BAO_Contact_Utils {
    * @param boolean $addProfileOverlay  if profile overlay class should be added
    *
    * @return string
-   * @access public
    * @static
    */
   public static function getImage($contactType, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE) {
@@ -118,7 +117,6 @@ class CRM_Contact_BAO_Contact_Utils {
    *
    * @return boolen true or false true if mix contact array else fale
    *
-   * @access public
    * @static
    */
   public static function checkContactType(&$contactIds) {
@@ -151,7 +149,6 @@ WHERE  id IN ( $idString )
    *
    * @return array ( $cs, $ts, $live )
    * @static
-   * @access public
    */
   public static function generateChecksum($entityId, $ts = NULL, $live = NULL, $hash = NULL, $entityType = 'contact', $hashSize = NULL) {
     // return a warning message if we dont get a entityId
@@ -219,7 +216,6 @@ WHERE  id IN ( $idString )
    *
    * @return boolean           true if valid, else false
    * @static
-   * @access public
    */
   public static function validChecksum($contactID, $inputCheck) {
 
@@ -252,7 +248,6 @@ WHERE  id IN ( $idString )
    *
    * @return int $locationCount max locations for the contact
    * @static
-   * @access public
    */
   public static function maxLocations($contactId) {
     $contactLocations = array();
@@ -280,7 +275,6 @@ UNION
    * @param int $previousEmployerID
    * @param bool $newContact
    *
-   * @access public
    * @static
    */
   public static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
@@ -360,7 +354,6 @@ UNION
    * @param int $previousEmpID
    *
    * @throws CiviCRM_API3_Exception
-   * @access public
    * @static
    */
   public static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
@@ -569,7 +562,6 @@ UPDATE civicrm_contact
    *
    * @return array $contactViewLinks returns array with links to contact view
    * @static
-   * @access public
    */
   public static function formatContactIDSToLinks($contactIDs, $addViewLink = TRUE, $addEditLink = TRUE, $originalId = NULL) {
     $contactLinks = array();
@@ -799,7 +791,6 @@ Group By  componentId";
    *
    * @return void
    * @static
-   * @access public
    */
   public static function processSharedAddress(&$address) {
     if (!is_array($address)) {

@@ -48,7 +48,6 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -74,7 +73,6 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $slots = CRM_Core_OptionGroup::values('conference_slot');
@@ -116,7 +114,6 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Conference Slots');

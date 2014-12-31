@@ -53,7 +53,6 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_LocaationType object on success, null otherwise
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -74,7 +73,6 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    *
    * @return Object             DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -89,7 +87,6 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @return object           The default payment processor object on success,
    *                          null otherwise
    * @static
-   * @access public
    */
   public static function &getDefault() {
     if (self::$_defaultPaymentProcessorType == NULL) {
@@ -107,7 +104,6 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    *
    * @throws Exception
    * @return CRM_Financial_DAO_PaymentProcessorType
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -175,7 +171,6 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @param  int $paymentProcessorTypeId ID of the processor to be deleted.
    *
    * @return bool
-   * @access public
    * @static
    */
   public static function del($paymentProcessorTypeId) {

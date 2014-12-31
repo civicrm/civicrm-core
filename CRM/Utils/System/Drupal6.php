@@ -47,7 +47,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param boolean $maintenance  for maintenance mode
    *
    * @return void           prints content on stdout
-   * @access public
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
     // TODO: Simplify; this was copied verbatim from CiviCRM 3.4's multi-UF theming function, but that's more complex than necessary
@@ -80,7 +79,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @return uid if user exists, false otherwise
    *
-   * @access public
    */
   public function createUser(&$params, $mail) {
     $form_state = array();
@@ -257,7 +255,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @paqram string $pageTitle
    *
    * @return void
-   * @access public
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
@@ -278,7 +275,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @internal param string $url
    *
    * @return void
-   * @access public
    */
   public function appendBreadCrumb($breadCrumbs) {
     $breadCrumb = drupal_get_breadcrumb();
@@ -306,7 +302,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Reset an additional breadcrumb tag to the existing breadcrumb
    *
    * @return void
-   * @access public
    */
   public function resetBreadCrumb() {
     $bc = array();
@@ -319,7 +314,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param string $head the new string to be appended
    *
    * @return void
-   * @access public
    */
   public function addHTMLHead($head) {
     drupal_set_html_head($head);
@@ -335,7 +329,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScriptUrl($url, $region) {
     // CRM-15450 - D6 doesn't order internal/external links correctly so we can't use drupal_add_js
@@ -352,7 +345,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScript($code, $region) {
     // CRM-15450 - ensure scripts are in correct order
@@ -369,7 +361,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header' || !$this->formatResourceUrl($url)) {
@@ -389,7 +380,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyle($code, $region) {
     return FALSE;
@@ -401,7 +391,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function mapConfigToSSL() {
     global $base_url;
@@ -414,7 +403,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param mix $action the default action if one is pre-specified
    *
    * @return string the url to post the form
-   * @access public
    */
   public function postURL($action) {
     if (!empty($action)) {
@@ -435,7 +423,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @return mixed false if no auth
    *               array(
    *  contactID, ufID, unique string ) if success
-   * @access public
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
    //@todo this 'PEAR-y' stuff is only required when bookstrap is not being loaded which is rare
@@ -537,7 +524,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @param string $message the message to set
    *
-   * @access public
    */
   public function setMessage($message) {
     drupal_set_message($message);

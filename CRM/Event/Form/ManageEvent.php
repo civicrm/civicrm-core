@@ -50,7 +50,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * Is this the first page?
    *
    * @var boolean
-   * @access protected
    */
   protected $_first = FALSE;
 
@@ -58,7 +57,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * Are we in single form mode or wizard mode?
    *
    * @var boolean
-   * @access protected
    */
   protected $_single;
 
@@ -93,7 +91,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
@@ -227,7 +224,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -258,7 +254,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();

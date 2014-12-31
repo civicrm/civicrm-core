@@ -44,7 +44,6 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
    *
    * @return void
    *
-   * @access public
    */
   public function browse() {
     $this->assign('admin', FALSE);
@@ -123,7 +122,6 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
   public function preProcess() {
@@ -166,7 +164,6 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
    *
    * @return void
    *
-   * @access public
    */
   public function run() {
     $context   = CRM_Utils_Request::retrieve('context', 'String', $this);

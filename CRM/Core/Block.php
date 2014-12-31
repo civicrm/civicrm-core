@@ -226,7 +226,6 @@ class CRM_Core_Block {
    * Creates the info block for drupal
    *
    * @return array
-   * @access public
    */
   public static function getInfo() {
 
@@ -283,7 +282,6 @@ class CRM_Core_Block {
    * @param int $id
    *
    * @return void
-   * @access private
    */
   private static function setTemplateValues($id) {
     switch ($id) {
@@ -340,7 +338,6 @@ class CRM_Core_Block {
    * Create the list of options to create New objects for the application and format is as a block
    *
    * @return void
-   * @access private
    */
   private static function setTemplateShortcutValues() {
     $config = CRM_Core_Config::singleton();
@@ -457,7 +454,6 @@ class CRM_Core_Block {
    * Create the list of dashboard links
    *
    * @return void
-   * @access private
    */
   private static function setTemplateDashboardValues() {
     static $dashboardLinks = array();
@@ -493,7 +489,6 @@ class CRM_Core_Block {
    * Create the list of mail urls for the application and format is as a block
    *
    * @return void
-   * @access private
    */
   private static function setTemplateMailValues() {
     static $shortCuts = NULL;
@@ -526,7 +521,6 @@ class CRM_Core_Block {
    * Create the list of shortcuts for the application and format is as a block
    *
    * @return void
-   * @access private
    */
   private static function setTemplateMenuValues() {
     $config = CRM_Core_Config::singleton();
@@ -542,7 +536,6 @@ class CRM_Core_Block {
    * Create the event blocks for upcoming events
    *
    * @return void
-   * @access private
    */
   private static function setTemplateEventValues() {
     $config = CRM_Core_Config::singleton();
@@ -570,7 +563,6 @@ class CRM_Core_Block {
    * @param int $id id of the block
    *
    * @return array
-   * @access public
    */
   public static function getContent($id) {
     // return if upgrade mode
@@ -650,7 +642,6 @@ class CRM_Core_Block {
    * @param array  $properties template variables
    *
    * @return array
-   * @access public
    */
   public static function fetch($id, $fileName, $properties) {
     $template = CRM_Core_Smarty::singleton();

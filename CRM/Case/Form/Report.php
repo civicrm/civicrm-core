@@ -60,7 +60,6 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */ function preProcess() {
     $this->_caseID = CRM_Utils_Request::retrieve('caseid', 'Integer', $this, TRUE);
     $this->_clientID = CRM_Utils_Request::retrieve('cid', 'Integer', $this, TRUE);
@@ -120,7 +119,6 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

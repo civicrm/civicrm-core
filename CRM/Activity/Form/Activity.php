@@ -210,7 +210,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
@@ -510,7 +509,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -821,7 +819,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @param $self
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -863,7 +860,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @param array $params
    * @return array|null
@@ -1002,7 +998,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @param array $params associated array of submitted values
    *
    * @return $this|null|object
-   * @access protected
    */
   protected function processActivity(&$params) {
     $activityAssigned = array();
@@ -1141,7 +1136,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * Shorthand for getting id by display name (makes code more readable)
    *
-   * @access protected
    */
   protected function _getIdByDisplayName($displayName) {
     return CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
@@ -1154,7 +1148,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * Shorthand for getting display name by id (makes code more readable)
    *
-   * @access protected
    */
   protected function _getDisplayNameById($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',

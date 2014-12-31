@@ -65,7 +65,6 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    * Build the form object elements for phone object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -103,7 +102,6 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    * @param array $errors list of errors to be posted back to the form
    *
    * @return array $errors@static
-   * @access public
    */
   public static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
@@ -138,7 +136,6 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    * Set defaults for the form
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -159,7 +156,6 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();

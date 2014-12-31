@@ -76,7 +76,6 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return None
    */
@@ -165,7 +164,6 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    *
    * @param array $listOfRelatedEntities list of related event ids
    *
-   * @access public
    * @static
    *
    * @return array

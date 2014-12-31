@@ -44,7 +44,6 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -77,7 +76,6 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -207,7 +205,6 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    *
    * @return  array  list of errors to be posted back to the form
    * @static
-   * @access  public
    */
   public static function formRule($fields) {
     if ($fields['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
@@ -242,7 +239,6 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    * Set default values for the form.
    * default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */

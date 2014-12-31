@@ -45,7 +45,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
   public static function preProcess(&$form) {
     $messageText    = array();
@@ -209,7 +208,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param array $self      additional values form 'this'
    *
    * @return true if no errors, else array of errors
-   * @access public
    *
    */
   public static function formRule($fields, $dontCare, $self) {
@@ -238,7 +236,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * Part of the post process which prepare and extract information from the template
    *
-   * @access protected
    *
    * @param CRM_Core_Form $form
    *
@@ -313,7 +310,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *

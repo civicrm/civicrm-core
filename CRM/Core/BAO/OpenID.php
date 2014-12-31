@@ -44,7 +44,6 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return object       CRM_Core_BAO_OpenID object on success, null otherwise
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -66,7 +65,6 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    * @param array $entityBlock   input parameters to find object
    *
    * @return mixed
-   * @access public
    * @static
    */
   public static function &getValues($entityBlock) {
@@ -79,7 +77,6 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    * @param  string  $identity_url the OpenID to check
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function isAllowedToLogin($identity_url) {
@@ -99,7 +96,6 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    * @param bool $updateBlankLocInfo
    *
    * @return array  the array of openid's
-   * @access public
    * @static
    */
   public static function allOpenIDs($id, $updateBlankLocInfo = FALSE) {

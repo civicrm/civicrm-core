@@ -176,7 +176,6 @@ SELECT  petition.id                         as id,
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Campaign_BAO_Petition
-   * @access public
    * @static
    */
   public function createSignature(&$params) {
@@ -466,7 +465,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    * @param object $tag    an object of a tag.
    *
    * @return  array   $contactIds    array of contact ids
-   * @access public
    */
   public function getEntitiesByTag($tag) {
     $contactIds = array();

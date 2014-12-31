@@ -185,7 +185,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    *
    * @return void
    *
-   * @access public
    */
   public function preProcess() {
     $this->_id         = $this->get('id');
@@ -409,7 +408,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -582,7 +580,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->add('hidden', 'gid', $this->_gid);
@@ -874,7 +871,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @param CRM_Core_Form $form   the form object
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $form) {
@@ -1049,7 +1045,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
   /**
    * Process the user submitted custom data values.
    *
-   * @access public
    *
    * @return void
    */
@@ -1337,7 +1332,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
@@ -1352,7 +1346,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   /**
    * @return string

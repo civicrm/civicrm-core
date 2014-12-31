@@ -53,7 +53,6 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -92,7 +91,6 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if (isset($this->_id)) {
@@ -109,7 +107,6 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -143,7 +140,6 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Tell a Friend');

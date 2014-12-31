@@ -156,7 +156,6 @@ UPDATE civicrm_log
    * @param int $contactID
    *
    * @return int count of log records
-   * @access public
    * @static
    */
   public static function getContactLogCount($contactID) {
@@ -170,7 +169,6 @@ UPDATE civicrm_log
    * summary, instead of normal log entries.
    *
    * @return int report id of Contact Logging Report (Summary) / false
-   * @access public
    * @static
    */
   public static function useLoggingReport() {

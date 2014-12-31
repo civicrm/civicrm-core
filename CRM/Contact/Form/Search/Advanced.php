@@ -46,7 +46,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    * Processing needed for buildForm and later
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->set('searchFormName', 'Advanced');
@@ -60,7 +59,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -181,7 +179,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
@@ -204,7 +201,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @return array the default array reference
    */
@@ -236,7 +232,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    * @param
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $this->set('isAdvanced', '1');
@@ -334,7 +329,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    * multiple purposes (queries, save/edit etc)
    *
    * @return void
-   * @access private
    */
   public function normalizeFormValues() {
     $contactType = CRM_Utils_Array::value('contact_type', $this->_formValues);
@@ -396,7 +390,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    *
    * @param $defaults array
    * @return array
-   * @access private
    */
   public function normalizeDefaultValues(&$defaults) {
     if (!is_array($defaults)) {

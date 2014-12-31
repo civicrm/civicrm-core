@@ -47,7 +47,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * The contact id of the person we are viewing
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -55,7 +54,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * The profile group are are interested in
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
@@ -63,7 +61,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * The profile types we restrict this page to display
    *
    * @var string
-   * @access protected
    */
   protected $_restrict;
 
@@ -71,7 +68,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * Should we bypass permissions
    *
    * @var boolean
-   * @access protected
    */
   protected $_skipPermission;
 
@@ -115,7 +111,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * @param null $profileIds
    *
    * @return \CRM_Profile_Page_Dynamic
-   * @access public
    */
   public function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
     parent::__construct();
@@ -183,7 +178,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * type of action and executes that action.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -415,7 +409,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
@@ -430,7 +423,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   /**
    * @return string

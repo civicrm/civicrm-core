@@ -75,7 +75,6 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -89,7 +88,6 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

@@ -51,7 +51,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -78,7 +77,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm( ) {
     parent::buildQuickForm( );
@@ -138,7 +136,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule( $values, $files, $self ) {
     $errorMsg = array( );
@@ -176,7 +173,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -191,7 +187,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   /**
    * Process the form submission
    *
-   * @access public
    * @return void
    */
   public function postProcess() {

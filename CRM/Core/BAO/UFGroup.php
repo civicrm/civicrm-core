@@ -55,7 +55,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param array $defaults    (reference) an assoc array to hold the flattened values
    *
    * @return object   CRM_Core_DAO_UFGroup object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -99,7 +98,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return string title
    *
-   * @access public
    * @static
    *
    */
@@ -114,7 +112,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param boolean  $is_active    value we want to set the is_active field
    *
    * @return Object             CRM_Core_DAO_UFGroup object on success, null otherwise
-   * @access public
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -131,7 +128,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return array the fields that are needed for registration
    * @static
-   * @access public
    */
   public static function getRegistrationFields($action, $mode, $ctype = NULL) {
     if ($mode & CRM_Profile_Form::MODE_REGISTER) {
@@ -190,7 +186,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param int $permissionType
    * @return array   the fields that are listings related
    * @static
-   * @access public
    */
   static function getListingFields(
     $action,
@@ -264,7 +259,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return array   the fields that belong to this ufgroup(s)
    * @static
-   * @access public
    */
   static function getFields(
     $id,
@@ -692,7 +686,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @pram  boolean $register is this the registrtion form
    * @return boolean   true if form is valid
    * @static
-   * @access public
    */
   public static function isValid($userID, $title, $register = FALSE, $action = NULL) {
     if ($register) {
@@ -738,7 +731,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return string       the html for the form on success, otherwise empty string
    * @static
-   * @access public
    */
   static function getEditHTML($userID,
     $title,
@@ -883,7 +875,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param string $contactType
    *
    * @return int|null contact_id if found, null otherwise
-   * @access public
    * @static
    */
   public static function findContact(&$params, $id = NULL, $contactType = 'Individual') {
@@ -911,7 +902,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param null $additionalWhereClause
    *
    * @return void
-   * @access public
    * @static
    */
   public static function getValues($cid, &$fields, &$values,
@@ -1322,7 +1312,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return boolean
    *
-   * @access public
    * @static
    *
    */
@@ -1349,7 +1338,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return boolean
    *
-   * @access public
    * @static
    *
    */
@@ -1380,7 +1368,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
    *
-   * @access public
    * @static
    *
    * @return object
@@ -1424,7 +1411,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param int   $ufGroupId    ufgroup id
    *
    * @return void
-   * @access public
    * @static
    */
   public static function createUFJoin(&$params, $ufGroupId) {
@@ -1496,7 +1482,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return array $ufGroupJoinRecords
    *
-   * @access public
    * @static
    */
   public static function getUFJoinRecord($ufGroupId = NULL, $displayName = NULL, $status = NULL) {
@@ -1541,7 +1526,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Core_BAO_UFJoin object
-   * @access public
    * @static
    */
   public static function addUFJoin(&$params) {
@@ -1557,7 +1541,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array  $params    (reference) an assoc array of name/value pairs
    *
    * @return void
-   * @access public
    * @static
    */
   public static function delUFJoin(&$params) {
@@ -1572,7 +1555,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param int $ufGroupId     if $ufGroupId get update weight or add weight
    *
    * @return int   weight of the UFGroup
-   * @access public
    * @static
    */
   public static function getWeight($ufGroupId = NULL) {
@@ -1606,7 +1588,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array|NULL $returnFields list of UFGroup fields to return; NULL for default
    *
    * @return array $ufGroups array of ufgroups for a module
-   * @access public
    * @static
    */
   public static function getModuleUFGroup($moduleName = NULL, $count = 0, $skipPermission = TRUE, $op = CRM_Core_Permission::VIEW, $returnFields = NULL) {
@@ -1680,7 +1661,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return boolean true or false
    * @static
-   * @access public
    */
   public static function filterUFGroups($ufGroupId, $contactID = NULL) {
     if (!$contactID) {
@@ -1728,7 +1708,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return null
    * @static
-   * @access public
    */
   static function buildProfile(
     &$form,
@@ -2231,7 +2210,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return null
    * @static
-   * @access public
    */
   static function setProfileDefaults($contactId, &$fields, &$defaults,
     $singleProfile = TRUE, $componentId = NULL, $component = NULL
@@ -2481,7 +2459,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return array  $profiles  associative array of profiles
    * @static
-   * @access public
    */
   public static function getProfiles($types, $onlyPure = FALSE) {
     $profiles = array();
@@ -2510,7 +2487,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return array  $profiles  associative array of profiles
    * @static
-   * @access public
    */
   public static function getValidProfiles($required, $optional = NULL) {
     if (!is_array($required) || empty($required)) {
@@ -2541,7 +2517,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return array  $profiles  associative array of profiles
    * @static
-   * @access public
    */
   public static function checkValidProfile($ufId, $required = NULL) {
     $validProfile = FALSE;
@@ -2582,7 +2557,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param $defaults
    *
    * @return mixed $defaults@static
-   * @access public
    */
   public static function setRegisterDefaults(&$fields, &$defaults) {
     $config = CRM_Core_Config::singleton();
@@ -2608,7 +2582,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param int $id the profile id to copy
    *
    * @return void
-   * @access public
    */
   public static function copy($id) {
     $fieldsFix = array('prefix' => array('title' => ts('Copy of ')));
@@ -2666,7 +2639,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array   $values         associative array of name/value pair
    *
    * @return void
-   * @access public
    */
 
   public static function commonSendMail($contactID, &$values) {
@@ -2727,7 +2699,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param bool $skipCheck
    *
    * @return array
-   * @access public
    */
   public function checkFieldsEmptyValues($gid, $cid, $params, $skipCheck = FALSE) {
     if ($gid) {
@@ -2761,7 +2732,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param CRM_Core_Smarty $template
    *
    * @return void
-   * @access public
    */
   public function profileDisplay($gid, $values, $template) {
     $groupTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gid, 'title');
@@ -2779,7 +2749,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param int $contactId
    *
    * @return array $data assoicated formatted array
-   * @access public
    * @static
    */
   public static function formatFields($params, $contactId = NULL) {
@@ -3361,7 +3330,6 @@ SELECT  group_id
    *
    * @return boolean $mixProfile true if profile is mixed
    * @static
-   * @access public
    */
   public static function checkForMixProfiles($profileIds) {
     $mixProfile = FALSE;
@@ -3412,7 +3380,6 @@ SELECT  group_id
    *
    * @return boolean true if profile should be shown else false
    * @static
-   * @access public
    */
   public static function showOverlayProfile() {
     $showOverlay = TRUE;
@@ -3440,7 +3407,6 @@ SELECT  group_id
    *
    * @return Array   group type values
    * @static
-   * @access public
    */
   public static function groupTypeValues($profileId, $groupType = NULL) {
     $groupTypeValue = array();

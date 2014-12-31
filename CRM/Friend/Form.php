@@ -145,7 +145,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -175,7 +174,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // Details of User
@@ -231,7 +229,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
    * @param array $fields
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields) {
@@ -267,7 +264,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

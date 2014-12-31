@@ -108,7 +108,6 @@ class CRM_Core_Form_RecurringEntity {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return None
    */
@@ -232,7 +231,6 @@ class CRM_Core_Form_RecurringEntity {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($values) {
     $errors = array();
@@ -313,7 +311,6 @@ class CRM_Core_Form_RecurringEntity {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return None
    */
@@ -481,7 +478,6 @@ class CRM_Core_Form_RecurringEntity {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Repeat Entity');

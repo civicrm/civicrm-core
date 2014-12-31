@@ -44,7 +44,6 @@ class CRM_Utils_File {
    * @param string $name name of file
    *
    * @return boolean     true if file is ascii
-   * @access public
    */
   public static function isAscii($name) {
     $fd = fopen($name, "r");
@@ -71,7 +70,6 @@ class CRM_Utils_File {
    * @param string $name name of file
    *
    * @return boolean     true if file is html
-   * @access public
    */
   public static function isHtml($name) {
     $fd = fopen($name, "r");
@@ -102,7 +100,6 @@ class CRM_Utils_File {
    * @param boolean $abort should we abort or just return an invalid code
    *
    * @return void
-   * @access public
    * @static
    */
   public static function createDir($path, $abort = TRUE) {
@@ -135,7 +132,6 @@ class CRM_Utils_File {
    *
    * @throws Exception
    * @return void
-   * @access public
    * @static
    */
   public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
@@ -201,7 +197,6 @@ class CRM_Utils_File {
    * @param string $name name of file
    *
    * @return boolean  whether the file was recoded properly
-   * @access public
    */
   public static function toUtf8($name) {
     static $config = NULL;
@@ -248,7 +243,6 @@ class CRM_Utils_File {
    * @param string $slash
    *
    * @return string
-   * @access public
    * @static
    */
   public static function addTrailingSlash($path, $slash = NULL) {

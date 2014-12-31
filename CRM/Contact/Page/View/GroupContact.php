@@ -38,7 +38,6 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
   public function browse() {
 
@@ -76,7 +75,6 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    * @param int $groupId
    *
    * return null
-   * @access public
    */
   public function edit($groupId = NULL) {
     $controller = new CRM_Core_Controller_Simple(
@@ -122,7 +120,6 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    * to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     $this->preProcess();

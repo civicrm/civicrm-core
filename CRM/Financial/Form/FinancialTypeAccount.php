@@ -43,7 +43,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * The financial type id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_aid;
 
@@ -51,7 +50,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * The financial type accounts id, used when editing the field
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -73,7 +71,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_aid = CRM_Utils_Request::retrieve('aid', 'Positive', $this);
@@ -124,7 +121,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -242,7 +238,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($values, $files, $self) {
     $errorMsg = array();
@@ -307,7 +302,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   /**
    * Process the form submission
    *
-   * @access public
    * @return void
    */
   public function postProcess() {

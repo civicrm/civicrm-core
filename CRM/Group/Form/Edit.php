@@ -162,7 +162,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * Set default values for the form. LocationType that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    * @return array
    */
   public function setDefaultValues() {
@@ -212,7 +211,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action == CRM_Core_Action::DELETE) {
@@ -316,7 +314,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($fields, $fileParams, $options) {
     $errors = array();
@@ -372,7 +369,6 @@ WHERE  title = %1
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     CRM_Utils_System::flushCache('CRM_Core_DAO_Group');
@@ -444,7 +440,6 @@ WHERE  title = %1
    *
    * @return array parent groups
    * @static
-   * @access public
    */
   public static function buildParentGroups(&$form) {
     $groupNames = CRM_Core_PseudoConstant::group();

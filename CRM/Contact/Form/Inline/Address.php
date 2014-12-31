@@ -123,7 +123,6 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
    * Build the form object elements for an address object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -134,7 +133,6 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
    * Set defaults for the form
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
@@ -164,7 +162,6 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();

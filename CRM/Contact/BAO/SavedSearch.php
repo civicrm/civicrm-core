@@ -53,7 +53,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    *
    * @return array $aSavedSearch - contains the search name as value and and id as key
    *
-   * @access public
    */
   public function getAll() {
     $savedSearch = new CRM_Contact_DAO_SavedSearch();
@@ -74,7 +73,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contact_BAO_SavedSearch
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -93,7 +91,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @param int $id the id of the saved search
    *
    * @return array the values of the posted saved search
-   * @access public
    * @static
    */
   public static function &getFormValues($id) {
@@ -157,7 +154,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @param  array $whereTables (reference ) add the tables that are needed for the where clause
    *
    * @return string the where clause for this saved search
-   * @access public
    * @static
    */
   public static function whereClause($id, &$tables, &$whereTables) {
@@ -271,7 +267,6 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
    * @param string $value
    *
    * @return string the name of the saved search
-   * @access public
    * @static
    */
   public static function getName($id, $value = 'name') {

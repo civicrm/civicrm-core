@@ -176,7 +176,6 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

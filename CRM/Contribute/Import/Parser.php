@@ -405,7 +405,6 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * @param array mapped array of values
    *
    * @return void
-   * @access public
    */
   public function setActiveFields($fieldKeys) {
     $this->_activeFieldCount = count($fieldKeys);
@@ -441,7 +440,6 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * Format the field values for input to the api
    *
    * @return array (reference ) associative array of name/value pairs
-   * @access public
    */
   public function &getActiveFieldParams() {
     $params = array();
@@ -499,7 +497,6 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * @param int $mode
    *
    * @return void
-   * @access public
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('fileSize', $this->_fileSize);
@@ -568,7 +565,6 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * @param array $data
    *
    * @return void
-   * @access public
    */
   public static function exportCSV($fileName, $header, $data) {
     $output = array();

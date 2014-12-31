@@ -66,7 +66,6 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
    * @param  string    $actionName Current action name, as one Action object can serve multiple actions
    *
    * @return void
-   * @access public
    */
   public function perform(&$page, $actionName) {
     $pageName = $page->getAttribute('id');
@@ -107,7 +106,6 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
    *
    *
    * @return void
-   * @access public
    */
   public function renderForm(&$page) {
     $this->_setRenderTemplates($page);
@@ -191,7 +189,6 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
    * @param CRM_Core_Form  $page the CRM_Core_Form page
    *
    * @return void
-   * @access public
    */
   public function _setRenderTemplates(&$page) {
     if (self::$_requiredTemplate === NULL) {
@@ -208,7 +205,6 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
    * Initialize the various templates
    *
    * @return void
-   * @access public
    */
   public function initializeTemplates() {
     if (self::$_requiredTemplate !== NULL) {

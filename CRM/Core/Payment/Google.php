@@ -139,7 +139,6 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @param $component
    *
    * @return void
-   * @access public
    */
   public function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);
@@ -212,7 +211,6 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @param object $cart      object of googel cart
    *
    * @return void
-   * @access public
    *
    */
   public function submitPostParams($params, $component, $cart) {

@@ -69,7 +69,6 @@ class CRM_Contribute_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function select(&$query) {
     // if contribute mode add contribution id
@@ -956,7 +955,6 @@ class CRM_Contribute_BAO_Query {
   /**
    * Add all the elements shared between contribute search and advnaced search
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *

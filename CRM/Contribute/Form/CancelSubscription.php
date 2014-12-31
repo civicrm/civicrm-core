@@ -56,7 +56,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_mid  = CRM_Utils_Request::retrieve('mid',  'Integer', $this, FALSE);
@@ -135,7 +134,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // Determine if we can cancel recurring contribution via API with this processor
@@ -191,7 +189,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
    * @param null
    *
    * @return array    array of default values
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = array('is_notify' => 1);
@@ -201,7 +198,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

@@ -60,7 +60,6 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -204,7 +203,6 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
@@ -509,7 +507,6 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
    * @param $self
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
   public static function formRule($params, $files, $self) {
@@ -678,7 +675,6 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
   /**
    * Display Name of the form
    *
-   * @access public
    *
    * @return string
    */

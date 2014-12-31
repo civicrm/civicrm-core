@@ -55,7 +55,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Member_BAO_MembershipType object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -87,7 +86,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids array contains the id (deprecated)
    *
-   * @access public
    * @static
    *
    * @return object
@@ -635,7 +633,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @return array arrays of organization and membership types
    *
    * @static
-   * @access public
    */
   public static function getMembershipTypeInfo() {
     if (!self::$_membershipTypeInfo) {

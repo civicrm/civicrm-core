@@ -57,7 +57,6 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
 
@@ -143,7 +142,6 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -181,7 +179,6 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    * @param object $self form object
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -196,7 +193,6 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

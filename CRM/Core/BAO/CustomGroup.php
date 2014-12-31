@@ -54,7 +54,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Core_DAO_CustomGroup object
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -230,7 +229,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_DAO_CustomGroup object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -245,7 +243,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
-   * @access public
    */
   public static function setIsActive($id, $is_active) {
     // reset the cache
@@ -329,7 +326,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * The reason for the info array in unclear and it could be determined from parsing the group tree after creation
    * With caching the performance impact would be small & the function would be cleaner
    *
-   * @access public
    *
    * @static
    */
@@ -852,7 +848,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return string title
    *
-   * @access public
    * @static
    *
    */
@@ -873,7 +868,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return array $groupTree - array consisting of all group and field details
    *
-   * @access public
    *
    * @static
    */
@@ -1073,7 +1067,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return string $tableName
    *
-   * @access public
    * @static
    *
    * @see _apachesolr_civiAttachments_dereference_file_parent
@@ -1153,7 +1146,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return void
    *
-   * @access private
    * @static
    */
   private static function _addWhereAdd(&$customGroupDAO, $entityType, $entityID = NULL, $allSubtypes = FALSE) {
@@ -1219,7 +1211,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return boolean   false if field exists for this group, true if group gets deleted.
    *
-   * @access public
    * @static
    *
    */
@@ -1528,7 +1519,6 @@ ORDER BY civicrm_custom_group.weight,
    * @param string    $prefix           prefix for custom grouptree assigned to template
    *
    * @return void
-   * @access public
    * @static
    */
   public static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
@@ -1563,7 +1553,6 @@ ORDER BY civicrm_custom_group.weight,
    * @param string $type the type of custom group we are using
    *
    * @return array
-   * @access public
    * @static
    */
   public static function extractGetParams(&$form, $type) {
@@ -1672,7 +1661,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return boolean false if it matches else true
    * @static
-   * @access public
    */
   public static function checkCustomField($customFieldId, &$removeCustomFieldTypes) {
     $query = "SELECT cg.extends as extends
@@ -2173,7 +2161,6 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param  array $fieldIds - array of custom field ids.
    *
    * @return array $groupLabels - array consisting of groups and fields labels with ids.
-   * @access public
    */
   public static function getGroupTitles($fieldIds) {
     if (!is_array($fieldIds) && empty($fieldIds)) {
@@ -2219,7 +2206,6 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @param   int $gID - custom group id.
    *
    * @return boolean true if empty otherwise false.
-   * @access public
    */
   public static function isGroupEmpty($gID) {
     if (!$gID) {
@@ -2247,7 +2233,6 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @param  array $types - var which should have the list appended.
    *
    * @return array of types.
-   * @access public
    */
   public static function getExtendedObjectTypes(&$types = array()) {
     static $flag = FALSE, $objTypes = array();

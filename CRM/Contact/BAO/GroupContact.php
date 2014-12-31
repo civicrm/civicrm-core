@@ -51,7 +51,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Contact_BAO_Group object
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -74,7 +73,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function dataExists(&$params) {
@@ -94,7 +92,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param array $values output values of the object
    *
    * @return array (reference)   the values that could be potentially assigned to smarty
-   * @access public
    * @static
    */
   public static function getValues(&$params, &$values) {
@@ -126,7 +123,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param int $tracking
    *
    * @return array             (total, added, notAdded) count of contacts added to group
-   * @access public
    * @static
    */
   static function addContactsToGroup(
@@ -175,7 +171,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param null $tracking
    *
    * @return array             (total, removed, notRemoved) count of contacts removed to group
-   * @access public
    * @static
    */
   static function removeContactsFromGroup(
@@ -272,7 +267,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @param bool $visibility
    *
-   * @access public
    *
    * @return array $values this array has key-> group id and value group title
    * @static
@@ -447,7 +441,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param  string $method    If we want the subscription history details for a specific method
    *
    * @return object of group contact
-   * @access public
    * @static
    */
   public static function getMembershipDetail($contactId, $groupID, $method = 'Email') {
@@ -488,7 +481,6 @@ SELECT    *
    *
    *
    * @return groupID
-   * @access public
    * @static
    */
   public static function getGroupId($groupContactID) {
@@ -510,7 +502,6 @@ SELECT    *
    * @param string $method
    *
    * @return void
-   * @access public
    * @static
    */
   public static function create(&$params, $contactId, $visibility = FALSE, $method = 'Admin') {
@@ -704,7 +695,6 @@ AND       group_id IN ( $groupIDString )
    * @param null $tracking
    *
    * @return array             (total, added, notAdded) count of contacts added to group
-   * @access public
    * @static
    */
   static function bulkAddContactsToGroup(

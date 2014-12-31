@@ -255,7 +255,6 @@ class CRM_Core_Selector_Controller {
    * @param int $reset are we being reset
    *
    * @return boolean   if the GET params are different from the session params
-   * @access public
    */
   public function hasChanged($reset) {
 
@@ -388,7 +387,6 @@ class CRM_Core_Selector_Controller {
    * @param CRM_Core_Form $form
    *
    * @return array of rows
-   * @access public
    */
   public function getRows($form) {
     if ($form->_output == self::EXPORT || $form->_output == self::SCREEN) {
@@ -407,7 +405,6 @@ class CRM_Core_Selector_Controller {
    * expect the subclass to do it
    *
    * @return string the status message
-   * @access public
    */
   public function getQill() {
     return $this->_object->getQill();
@@ -424,7 +421,6 @@ class CRM_Core_Selector_Controller {
    * Getter for pager
    *
    * @return CRM_Utils_Pager
-   * @access public
    */
   public function getPager() {
     return $this->_pager;
@@ -434,7 +430,6 @@ class CRM_Core_Selector_Controller {
    * Getter for sort
    *
    * @return CRM_Utils_Sort
-   * @access public
    */
   public function getSort() {
     return $this->_sort;
@@ -444,7 +439,6 @@ class CRM_Core_Selector_Controller {
    * Move the variables from the session to the template
    *
    * @return void
-   * @access public
    */
   public function moveFromSessionToTemplate() {
     self::$_template->assign_by_ref("{$this->_prefix}pager", $this->_pager);
@@ -489,7 +483,6 @@ class CRM_Core_Selector_Controller {
    * @param boolean $embedded
    *
    * @return void
-   * @access public
    */
   public function setEmbedded($embedded) {
     $this->_embedded = $embedded;
@@ -499,7 +492,6 @@ class CRM_Core_Selector_Controller {
    * Getter for embedded
    *
    * @return boolean return the embedded value
-   * @access public
    */
   public function getEmbedded() {
     return $this->_embedded;
@@ -511,7 +503,6 @@ class CRM_Core_Selector_Controller {
    * @param boolean $print
    *
    * @return void
-   * @access public
    */
   public function setPrint($print) {
     $this->_print = $print;
@@ -521,7 +512,6 @@ class CRM_Core_Selector_Controller {
    * Getter for print
    *
    * @return boolean return the print value
-   * @access public
    */
   public function getPrint() {
     return $this->_print;

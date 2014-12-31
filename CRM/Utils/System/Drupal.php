@@ -46,7 +46,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *
    * @return uid if user exists, false otherwise
    *
-   * @access public
    *
    */
   public function createUser(&$params, $mail) {
@@ -240,7 +239,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @paqram string $pageTitle
    *
    * @return void
-   * @access public
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (arg(0) == 'civicrm') {
@@ -260,7 +258,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @internal param string $url
    *
    * @return void
-   * @access public
    */
   public function appendBreadCrumb($breadCrumbs) {
     $breadCrumb = drupal_get_breadcrumb();
@@ -288,7 +285,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * Reset an additional breadcrumb tag to the existing breadcrumb
    *
    * @return void
-   * @access public
    */
   public function resetBreadCrumb() {
     $bc = array();
@@ -301,7 +297,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @param string $header the new string to be appended
    *
    * @return void
-   * @access public
    */
   public function addHTMLHead($header) {
     static $count = 0;
@@ -325,7 +320,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScriptUrl($url, $region) {
     $params = array('group' => JS_LIBRARY, 'weight' => 10);
@@ -353,7 +347,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScript($code, $region) {
     $params = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
@@ -379,7 +372,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header') {
@@ -402,7 +394,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyle($code, $region) {
     if ($region != 'html-header') {
@@ -419,7 +410,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function mapConfigToSSL() {
     global $base_url;
@@ -432,7 +422,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @param mix $action the default action if one is pre-specified
    *
    * @return string the url to post the form
-   * @access public
    */
   public function postURL($action) {
     if (!empty($action)) {
@@ -454,7 +443,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @return mixed false if no auth
    *               array(
    *  contactID, ufID, unique string ) if success
-   * @access public
    */
    public static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     require_once 'DB.php';
@@ -586,7 +574,6 @@ AND    u.status = 1
    *
    * @param string $message the message to set
    *
-   * @access public
    */
   public function setMessage($message) {
     drupal_set_message($message);

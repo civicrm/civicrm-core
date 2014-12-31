@@ -48,7 +48,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param array $defaults    (reference ) an assoc array to hold the flattened values
    *
    * @return object     CRM_Core_DAO_Mapping object on success, otherwise null
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -67,7 +66,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $id   mapping id
    *
    * @return boolean
-   * @access public
    * @static
    *
    */
@@ -99,7 +97,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param array  $params an array of name/value pairs
    *
    * @return object    CRM_Core_DAO_Mapper object on success, otherwise null
-   * @access public
    * @static
    */
   public static function add($params) {
@@ -116,7 +113,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param string  $mappingTypeId  mapping type id
    *
    * @return array $mapping array of mapping name
-   * @access public
    * @static
    */
   public static function getMappings($mappingTypeId) {
@@ -138,7 +134,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $mappingId  mapping id
    *
    * @return array $mappingFields array of mapping fields
-   * @access public
    * @static
    */
   public static function getMappingFields($mappingId) {
@@ -245,7 +240,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param null $exportMode
    *
    * @return void
-   * @access public
    * @static
    */
   public static function buildMappingForm(&$form, $mappingType = 'Export', $mappingId = NULL, $columnNo, $blockCount = 3, $exportMode = NULL) {
@@ -1147,7 +1141,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return null
    * @static
-   * @access public
    */
   public static function saveMappingFields(&$params, $mappingId) {
     //delete mapping fields records for exixting mapping

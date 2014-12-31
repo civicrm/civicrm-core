@@ -100,7 +100,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * View details of a case
    *
    * @return void
-   * @access public
    */
   public function view() {
     $controller = new CRM_Core_Controller_Simple(
@@ -144,7 +143,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
   public function browse() {
 
@@ -168,7 +166,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * This function is called when action is update or new
    *
    * return null
-   * @access public
    */
   public function edit() {
     $config = CRM_Core_Config::singleton();
@@ -189,7 +186,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullArray);

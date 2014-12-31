@@ -268,7 +268,6 @@ abstract class CRM_Import_Parser {
    * Format the field values for input to the api
    *
    * @return array (reference) associative array of name/value pairs
-   * @access public
    */
   public function &getActiveFieldParams() {
     $params = array();
@@ -340,7 +339,6 @@ abstract class CRM_Import_Parser {
    *
    * @return void
    * @static
-   * @access public
    */
   public static function encloseScrub(&$values, $enclosure = "'") {
     if (empty($values)) {
@@ -358,7 +356,6 @@ abstract class CRM_Import_Parser {
    * @param int $max
    *
    * @return void
-   * @access public
    */
   public function setMaxLinesToProcess($max) {
     $this->_maxLinesToProcess = $max;

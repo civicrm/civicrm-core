@@ -37,7 +37,6 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   /**
    * Class constructor
    *
-   * @access public
    * @return \CRM_Financial_DAO_FinancialTrxn
    */
   /**
@@ -55,7 +54,6 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @param string $trxnEntityTable entity_table
    *
    * @return CRM_Core_BAO_FinancialTrxn object
-   * @access public
    * @static
    */
   public static function create(&$params, $trxnEntityTable = null ) {
@@ -126,7 +124,6 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contribute_BAO_ContributionType object
-   * @access public
    * @static
    */
   public static function retrieve( &$params, &$defaults ) {
@@ -149,7 +146,6 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @return array $tag array of category id's the contact belongs to.
    *
-   * @access public
    * @static
    */
   public static function getFinancialTrxnId($entity_id, $orderBy = 'ASC', $newTrxn = FALSE) {
@@ -192,7 +188,6 @@ LIMIT 1;";
    *
    * @return array $tag array of catagory id's the contact belongs to.
    *
-   * @access public
    * @static
    */
   public static function getFinancialTrxnTotal($entity_id) {
@@ -215,7 +210,6 @@ WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
    *
    * @return array $payment array of previous payments
    *
-   * @access public
    * @static
    */
   public static function getPayments($financial_trxn_id) {
@@ -267,7 +261,6 @@ WHERE  ef2.financial_trxn_id =%1
    *
    * @return array $tag array of catagory id's the contact belongs to.
    *
-   * @access public
    * @static
    */
   public static function getFinancialTrxnLineTotal($entity_id, $entity_table = 'civicrm_contribution') {
@@ -294,7 +287,6 @@ WHERE lt.entity_id = %1 ";
    *
    * @param int $entity_id
    * @return true on success, false otherwise
-   * @access public
    * @static
    */
   public static function deleteFinancialTrxn($entity_id) {
@@ -313,7 +305,6 @@ WHERE ceft.entity_id = %1";
   /**
    * Create financial transaction for premium
    *
-   * @access public
    * @static
    */
   public static function createPremiumTrxn($params) {
@@ -363,7 +354,6 @@ WHERE ceft.entity_id = %1";
    *
    * @param array $params to create trxn entries
    *
-   * @access public
    * @static
    */
   public static function recordFees($params) {

@@ -86,7 +86,6 @@ class CRM_Core_State {
    * @param CRM_Core_StateMachine $stateMachine statemachine that this states belongs to
    *
    * @return CRM_Core_State
-   * @access public
    */
   public function __construct($name, $type, $back, $next, &$stateMachine) {
     $this->_name = $name;
@@ -107,7 +106,6 @@ class CRM_Core_State {
    * @param object the CRM_Core_Form element under consideration
    *
    * @return mixed does a jump to the back state
-   * @access public
    */
   public function handleBackState(&$page) {
     if ($this->_type & self::START) {
@@ -125,7 +123,6 @@ class CRM_Core_State {
    * @param object the CRM_Core_Form element under consideration
    *
    * @return mixed does a jump to the nextstate
-   * @access public
    */
   public function handleNextState(&$page) {
     if ($this->_type & self::FINISH) {
@@ -142,7 +139,6 @@ class CRM_Core_State {
    * to display the navigation labels or potential path
    *
    * @return string
-   * @access public
    */
   public function getNextState() {
     if ($this->_type & self::FINISH) {
@@ -161,7 +157,6 @@ class CRM_Core_State {
    * @param object the QFC data container
    *
    * @return void
-   * @access public
    */
   public function validate(&$data) {
     $data['valid'][$this->_name] = TRUE;
@@ -174,7 +169,6 @@ class CRM_Core_State {
    * @param object the QFC data container
    *
    * @return void
-   * @access public
    */
   public function invalidate(&$data) {
     $data['valid'][$this->_name] = NULL;
@@ -184,7 +178,6 @@ class CRM_Core_State {
    * Getter for name
    *
    * @return string
-   * @access public
    */
   public function getName() {
     return $this->_name;
@@ -196,7 +189,6 @@ class CRM_Core_State {
    * @param string
    *
    * @return void
-   * @access public
    */
   public function setName($name) {
     $this->_name = $name;
@@ -206,7 +198,6 @@ class CRM_Core_State {
    * Getter for type
    *
    * @return int
-   * @access public
    */
   public function getType() {
     return $this->_type;

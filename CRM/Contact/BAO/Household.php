@@ -48,7 +48,6 @@ class CRM_Contact_BAO_Household extends CRM_Contact_DAO_Contact {
    * @param integer $contactId            contact id
    *
    * @return Object     DAO object on success
-   * @access public
    * @static
    */
   public static function updatePrimaryContact($primaryContactId, $contactId) {

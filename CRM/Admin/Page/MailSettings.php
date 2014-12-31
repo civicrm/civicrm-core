@@ -88,7 +88,6 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
    * Browse all mail settings.
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse() {

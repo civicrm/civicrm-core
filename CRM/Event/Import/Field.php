@@ -31,7 +31,6 @@
 class CRM_Event_Import_Field {
 
   /**#@+
-   * @access protected
    * @var string
    */
 

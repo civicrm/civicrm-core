@@ -42,7 +42,6 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     if (CRM_Mailing_Info::workflowEnabled() &&
@@ -71,7 +70,6 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -94,7 +92,6 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
   public function buildQuickform() {
     $this->addDateTime('start_date', ts('Schedule Mailing'), FALSE, array('formatType' => 'mailing'));
@@ -261,7 +258,6 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = array();
@@ -349,7 +345,6 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
   /**
    * Display Name of the form
    *
-   * @access public
    *
    * @return string
    */

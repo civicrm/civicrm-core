@@ -53,7 +53,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @paqram string $pageTitle
    *
    * @return void
-   * @access public
    */
   public function setTitle($title, $pageTitle) {
     return;
@@ -66,7 +65,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @return boolean true if yes, else false
    * @static
-   * @access public
    */
   public function checkPermission($str) {
     return TRUE;
@@ -79,7 +77,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param string $url
    *
    * @return void
-   * @access public
    */
   public function appendBreadCrumb($title, $url) {
     return;
@@ -91,7 +88,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param string $head the new string to be appended
    *
    * @return void
-   * @access public
    */
   public function addHTMLHead($head) {
     return;
@@ -108,7 +104,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param $fragment string   A fragment identifier (named anchor) to append to the link.
    *
    * @return string            an HTML string containing a link to the given path.
-   * @access public
    *
    */
   public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
@@ -128,7 +123,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param the default action if one is pre-specified
    *
    * @return string the url to post the form
-   * @access public
    */
   public function postURL($action) {
     return NULL;
@@ -140,7 +134,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param object $user handle to the user object
    *
    * @return void
-   * @access public
    */
   public function setEmail(&$user) {}
 
@@ -151,7 +144,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param string $pass      Login password
    *
    * @return array            Result array
-   * @access public
    */
   public function &authenticate($name, $pass) {
     if (isset(self::$ufClass)) {
@@ -167,7 +159,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * Swap the current UF for soap
    *
-   * @access public
    */
   public function swapUF() {
     $config = CRM_Core_Config::singleton();

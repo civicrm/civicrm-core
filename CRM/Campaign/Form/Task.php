@@ -80,7 +80,6 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */ function preProcess() {
     $values = $this->controller->exportValues('Search');
 
@@ -141,7 +140,6 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
    * @param bool $submitOnce
    *
    * @return void
-   * @access public
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(

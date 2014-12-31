@@ -67,7 +67,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    * @param bool $check
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
@@ -170,7 +169,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

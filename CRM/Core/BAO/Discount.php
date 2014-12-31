@@ -48,7 +48,6 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @param string $entityTable
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function del($entityId,$entityTable) {
@@ -71,7 +70,6 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @param array  $params         (reference) an assoc array of name/value pairs
    *
    * @return object    CRM_Core_DAO_Discount object on success, otherwise null
-   * @access public
    * @static
    */
   public static function add(&$params) {

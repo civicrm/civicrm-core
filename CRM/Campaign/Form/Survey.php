@@ -95,7 +95,6 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();

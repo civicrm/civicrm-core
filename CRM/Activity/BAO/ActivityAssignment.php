@@ -52,7 +52,6 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return object activity type of object that is added
-   * @access public
    */
   public static function create(&$params) {
     $assignment = new CRM_Activity_BAO_ActivityContact();
@@ -72,7 +71,6 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    *
    * @return array
    *
-   * @access public
    */
   public static function retrieveAssigneeIdsByActivityId($activity_id) {
     $assigneeArray = array();
@@ -108,7 +106,6 @@ AND        civicrm_contact.is_deleted = 0
    *
    * @return array
    *
-   * @access public
    *
    */
   public static function getAssigneeNames($activityIDs, $isDisplayName = FALSE, $skipDetails = TRUE) {

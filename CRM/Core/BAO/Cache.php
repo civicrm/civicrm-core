@@ -60,7 +60,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * @return object The data if present in cache, else null
    * @static
-   * @access public
    */
   public static function &getItem($group, $path, $componentID = NULL) {
     if (self::$_cache === NULL) {
@@ -98,7 +97,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * @return object The data if present in cache, else null
    * @static
-   * @access public
    */
   public static function &getItems($group, $componentID = NULL) {
     if (self::$_cache === NULL) {
@@ -140,7 +138,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * @return void
    * @static
-   * @access public
    */
   public static function setItem(&$data, $group, $path, $componentID = NULL) {
     if (self::$_cache === NULL) {
@@ -194,7 +191,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * @return void
    * @static
-   * @access public
    */
   public static function deleteGroup($group = NULL, $path = NULL, $clearAll = TRUE) {
     $dao = new CRM_Core_DAO_Cache();
@@ -236,7 +232,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * @return void
    * @static
-   * @access private
    */
   public static function storeSessionToCache($names, $resetSession = TRUE) {
     foreach ($names as $key => $sessionName) {
@@ -275,7 +270,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
      *
      * @return void
      * @static
-     * @access private
      */
 
   /**
@@ -312,7 +306,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * @return void
    * @static
-   * @access private
    */
   public static function cleanup($session = false, $table = false, $prevNext = false) {
     // clean up the session cache every $cacheCleanUpNumber probabilistically

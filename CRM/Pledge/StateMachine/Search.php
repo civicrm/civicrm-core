@@ -78,7 +78,6 @@ class CRM_Pledge_StateMachine_Search extends CRM_Core_StateMachine {
    * @param string $formName
    *
    * @return string the name of the form that will handle the task
-   * @access protected
    */
   public function taskName($controller, $formName = 'Search') {
     // total hack, check POST vars and then session to determine stuff
@@ -94,7 +93,6 @@ class CRM_Pledge_StateMachine_Search extends CRM_Core_StateMachine {
    * Return the form name of the task
    *
    * @return string
-   * @access public
    */
   public function getTaskFormName() {
     return CRM_Utils_String::getClassName($this->_task);

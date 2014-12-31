@@ -44,7 +44,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * formatted custom field names.
    *
    * @var array
-   * @access protected
    */
   protected $_formattedFieldNames;
 
@@ -67,7 +66,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param mapperFields
    *
    * @return string
-   * @access public
    */
   public function defaultFromColumnName($columnName, &$patterns) {
 
@@ -96,7 +94,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $dataSource = $this->get('dataSource');
@@ -202,7 +199,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //to save the current mappings
@@ -628,7 +624,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($fields) {
     $errors = array();
@@ -665,7 +660,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * preview the file and extract some summary statistics
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->controller->exportValues('MapField');
@@ -983,7 +977,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param $fields
    *
    * @return void
-   * @access public
    */
   public function formatCustomFieldName(&$fields) {
     //CRM-2676, replacing the conflict for same custom field name from different custom group.

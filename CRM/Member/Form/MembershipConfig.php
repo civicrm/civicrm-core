@@ -62,7 +62,6 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array defaults
    */
@@ -101,7 +100,6 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::RENEW) {

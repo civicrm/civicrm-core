@@ -140,7 +140,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param
    *
    * @return void
-   * @access public
    */
   public function run() {
     // get the requested action
@@ -193,7 +192,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * all the fields in the profile
    *
    * @return void
-   * @access public
    */
   public function copy() {
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive',
@@ -208,7 +206,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * This function is for profile mode (standalone html form ) for uf group
    *
    * @return void
-   * @access public
    */
   public function profile() {
     $config = CRM_Core_Config::singleton();
@@ -275,7 +272,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param string $action the action to be invoked
    *
    * @return void
-   * @access public
    */
   public function edit($id, $action) {
     // create a simple controller for editing uf data
@@ -293,7 +289,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse($action = NULL) {
@@ -390,7 +385,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param $action
    *
    * @return void
-   * @access public
    */
   public function preview($id, $action) {
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Preview', ts('CiviCRM Profile Group Preview'), NULL);

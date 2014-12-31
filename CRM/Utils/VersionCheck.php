@@ -98,7 +98,6 @@ class CRM_Utils_VersionCheck {
   /**
    * Class constructor
    *
-   * @access private
    */
   public function __construct() {
     global $civicrm_root;

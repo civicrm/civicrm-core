@@ -85,7 +85,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * Sets the title.
    *
    * @return void
-   * @access public
    *
    */
   public function preProcess() {
@@ -233,7 +232,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    *
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse() {

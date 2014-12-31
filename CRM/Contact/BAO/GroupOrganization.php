@@ -47,7 +47,6 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Contact_DAO_GroupOrganization
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -73,7 +72,6 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    * @param array  $formatedValues (reference ) an assoc array of name/value pairs
    *
    * @return void
-   * @access public
    * @static
    */
   public static function formatValues(&$params, &$formatedValues) {
@@ -96,7 +94,6 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    * @param array  $params  (reference ) an assoc array of name/value pairs
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function dataExists($params) {
@@ -126,7 +123,6 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    * @param int $contactID
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function hasGroupAssociated($contactID) {

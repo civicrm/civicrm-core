@@ -77,7 +77,6 @@ class CRM_Core_Config_Defaults {
   /**
    * Format size
    *
-   * @access public
    * @static
    */
 
@@ -114,7 +113,6 @@ class CRM_Core_Config_Defaults {
    *                           this variable is set true for GUI
    *                           mode (eg: Global setting >> Components)
    *
-   * @access public
    * @static
    */
   public static function setValues(&$defaults, $formMode = FALSE) {

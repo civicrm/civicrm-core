@@ -40,7 +40,6 @@
  * @param
  *
  * @return void
- * @access public
  */
 class CRM_Mailing_Form_Browse extends CRM_Core_Form {
 
@@ -49,7 +48,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
   public function preProcess() {
@@ -74,7 +72,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
 
   public function buildQuickForm() {
@@ -93,7 +90,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
   }
 
   /**
-   * @access public
    *
    * @return void
    */

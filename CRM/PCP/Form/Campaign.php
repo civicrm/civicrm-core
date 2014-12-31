@@ -98,7 +98,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->add('text', 'pcp_title', ts('Title'), NULL, TRUE);
@@ -155,7 +154,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -172,7 +170,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

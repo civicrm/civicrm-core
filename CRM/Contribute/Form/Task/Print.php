@@ -42,7 +42,6 @@ class CRM_Contribute_Form_Task_Print extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preprocess();
@@ -71,7 +70,6 @@ class CRM_Contribute_Form_Task_Print extends CRM_Contribute_Form_Task {
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
    *
-   * @access public
    *
    * @return void
    */
@@ -97,7 +95,6 @@ class CRM_Contribute_Form_Task_Print extends CRM_Contribute_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

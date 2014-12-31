@@ -44,7 +44,6 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -80,7 +79,6 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
   /**
    * Process the form submission
    *
-   * @access public
    * @return void
    */
   public function postProcess() {

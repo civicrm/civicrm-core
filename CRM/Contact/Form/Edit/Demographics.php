@@ -44,7 +44,6 @@ class CRM_Contact_Form_Edit_Demographics {
    * @param CRM_Core_Form $form       reference to the form object
    *
    * @return void
-   * @access public
    * @static
    */
   public static function buildQuickForm(&$form) {
@@ -69,7 +68,6 @@ class CRM_Contact_Form_Edit_Demographics {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param $defaults

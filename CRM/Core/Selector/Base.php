@@ -68,7 +68,6 @@ class CRM_Core_Selector_Base {
    *
    * @return string            the attribute that matches the action if any
    *
-   * @access public
    *
    */
   public function getActionAttribute($match, $attribute = 'name') {
@@ -104,7 +103,6 @@ class CRM_Core_Selector_Base {
    * @param string $action the action being performed
    *
    * @return string template file name
-   * @access public
    */
   public function getTemplateFileName($action = NULL) {
     return (str_replace('_', DIRECTORY_SEPARATOR, CRM_Utils_System::getClassName($this)) . ".tpl");
@@ -116,7 +114,6 @@ class CRM_Core_Selector_Base {
    * @param string action the action being performed
    *
    * @return array the elements that can be sorted along with their properties
-   * @access public
    */
   public function &getSortOrder($action) {
     $columnHeaders = &$this->getColumnHeaders(NULL);
@@ -151,7 +148,6 @@ class CRM_Core_Selector_Base {
    * Setter for permission
    *
    * @var string
-   * @access public
    */
   public function setPermission($permission) {
     $this->_permission = $permission;
@@ -162,7 +158,6 @@ class CRM_Core_Selector_Base {
    * to display on the results page
    *
    * @return string
-   * @access public
    */
   public function getQill() {
     return NULL;

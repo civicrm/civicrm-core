@@ -47,7 +47,6 @@ class CRM_Core_Report_Excel {
    *
    * @return  mixed    empty if output is printed, else output
    *
-   * @access  public
    * @static
    */
   public static function makeCSVTable(&$header, &$rows, $titleHeader = NULL, $print = TRUE, $outputHeader = TRUE) {

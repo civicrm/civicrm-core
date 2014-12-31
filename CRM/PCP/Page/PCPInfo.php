@@ -47,7 +47,6 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {

@@ -52,7 +52,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * Are we in single form mode or wizard mode?
    *
    * @var boolean
-   * @access protected
    */
   public $_single;
 
@@ -144,7 +143,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $id = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
@@ -230,7 +228,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -249,7 +246,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

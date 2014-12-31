@@ -73,7 +73,6 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     self::preProcessCommon($this);
@@ -165,7 +164,6 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
    * @param bool $submitOnce
    *
    * @return void
-   * @access public
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(

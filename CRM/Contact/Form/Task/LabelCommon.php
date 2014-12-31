@@ -65,7 +65,6 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @param   string   $fileName    The name of the file to save the label in
    *
    * @return  null
-   * @access  public
    */
   public static function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
@@ -96,7 +95,6 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @param bool $mergeSameHousehold UNUSED
    *
    * @return array of rows for labels
-   * @access  public
    */
 
   public static function getRows($contactIDs, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold) {

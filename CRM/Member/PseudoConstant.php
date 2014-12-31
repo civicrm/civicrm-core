@@ -56,7 +56,6 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the membership types
    *
-   * @access public
    *
    * @param int $id
    * @param bool $force
@@ -86,7 +85,6 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the membership statuss
    *
-   * @access public
    *
    * @param int $id
    * @param null $cond
@@ -127,7 +125,6 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @access public
    * @static
    *
    * @param bool|string $name pseudoconstant to be flushed

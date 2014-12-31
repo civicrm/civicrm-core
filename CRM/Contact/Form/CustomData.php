@@ -61,7 +61,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * Entity sub type of the table id
    *
    * @var string
-   * @access protected
    */
   protected $_entitySubType;
 
@@ -97,7 +96,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * Custom group id
    *
    * @int
-   * @access public
    */
   public $_groupID;
 
@@ -113,7 +111,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    *
    * @return void
    *
-   * @access public
    *
    */
   public function preProcess() {
@@ -178,7 +175,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
@@ -236,7 +232,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @return array the default array reference
    */
@@ -294,7 +289,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   /**
    * Process the user submitted custom data values.
    *
-   * @access public
    *
    * @return void
    */

@@ -54,7 +54,6 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -87,7 +86,6 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_PCP_BAO_PCP::buildPCPForm($this);
@@ -107,7 +105,6 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * @param $self
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
   public static function formRule($params, $files, $self) {
@@ -143,7 +140,6 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -177,7 +173,6 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Enable Personal Campaign Pages');

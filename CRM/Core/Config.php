@@ -404,7 +404,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Initialize the DataObject framework
    *
    * @return void
-   * @access private
    */
   private function _initDAO() {
     CRM_Core_DAO::init($this->dsn);
@@ -421,7 +420,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Returns the singleton logger for the application
    *
    * @param
-   * @access private
    *
    * @return object
    */
@@ -437,7 +435,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Initialize the config variables
    *
    * @return void
-   * @access private
    */
   private function _initVariables() {
     // retrieve serialised settings
@@ -538,7 +535,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Retrieve a mailer to send any mail from the application
    *
    * @param boolean $persist open a persistent smtp connection, should speed up mailings
-   * @access private
    * @return object
    */
   public static function &getMailer($persist = FALSE) {
@@ -669,7 +665,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    *
    * @return boolean
    * @static
-   * @access public
    */
   public static function check(&$config, &$required) {
     foreach ($required as $name) {

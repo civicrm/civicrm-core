@@ -58,7 +58,6 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */ function preProcess() {
     // get the controller vars
     $groupId = $this->get('groupId');
@@ -92,7 +91,6 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
    * @param null
    *
    * @return array   the default array reference
-   * @access protected
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -121,7 +119,6 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->assign('groupTree', $this->_groupTree);

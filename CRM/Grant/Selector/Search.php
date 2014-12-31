@@ -82,7 +82,6 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
@@ -90,7 +89,6 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
@@ -98,7 +96,6 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   /**
    * What context are we being invoked from
    *
-   * @access protected
    * @var string
    */
   protected $_context = NULL;
@@ -108,7 +105,6 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
-   * @access protected
    */
   public $_queryParams;
 
@@ -116,7 +112,6 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * Represent the type of selector
    *
    * @var int
-   * @access protected
    */
   protected $_action;
 
@@ -185,7 +180,6 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * @param null $key
    *
    * @return array
-   * @access public
    */
   public static function &links($key = NULL) {
     $cid = CRM_Utils_Request::retrieve('cid', 'Integer', $this);
@@ -227,7 +221,6 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * @param $action
    * @param array $params
    *
-   * @access public
    */
   public function getPagerParams($action, &$params) {
     $params['status'] = ts('Grant') . ' %%StatusMessage%%';
@@ -249,7 +242,6 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * @param
    *
    * @return int Total number of rows
-   * @access public
    */
   public function getTotalCount($action) {
     return $this->_query->searchQuery(0, 0, NULL,
@@ -331,7 +323,6 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
   /**
    * @return array              $qill         which contains an array of strings
-   * @access public
    */
 
   // the current internationalisation is bad, but should more or less work
@@ -348,7 +339,6 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * @param enum   $output what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {

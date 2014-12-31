@@ -89,7 +89,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_batchId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -117,7 +116,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -268,7 +266,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($params, $files, $self) {
     $errors = array();
@@ -332,7 +329,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -374,7 +370,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -412,7 +407,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @param array $params associated array of submitted values
    *
-   * @access public
    *
    * @return void
    */
@@ -582,7 +576,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @param array $params associated array of submitted values
    *
-   * @access public
    *
    * @return bool
    */
@@ -825,7 +818,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @param array $value associated array of submitted values
    *
-   * @access public
    *
    * @return void
    */

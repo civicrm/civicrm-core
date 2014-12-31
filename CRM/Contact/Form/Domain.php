@@ -94,7 +94,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    * @return void
    */
   /**
@@ -153,7 +152,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -190,7 +188,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   /**
    * Add local and global form rules
    *
-   * @access protected
    *
    * @return void
    */
@@ -205,7 +202,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($fields) {
     // check for state/country mapping
@@ -237,7 +233,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();

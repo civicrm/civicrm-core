@@ -178,7 +178,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -463,7 +462,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Assign the minimal set of variables to the template
    *
    * @return void
-   * @access public
    */
   public function assignToTemplate() {
     //process only primary participant params
@@ -563,7 +561,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param bool $viewOnly
    *
    * @return void
-   * @access public
    */
   public function buildCustom($id, $name, $viewOnly = FALSE) {
     if ($id) {
@@ -725,7 +722,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param null $payment
    *
    * @return void
-   * @access public
    */
   public function confirmPostProcess($contactID = NULL, $contribution = NULL, $payment = NULL) {
     // add/update contact information
@@ -827,7 +823,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $contactID
    *
    * @return void
-   * @access public
    */
   public static function addParticipant(&$form, $contactID) {
     if (empty($form->_params)) {
@@ -932,7 +927,6 @@ WHERE  v.option_group_id = g.id
    * @param  array $params user params.
    *
    * @return $totalCount total participant count.
-   * @access public
    */
   /**
    * @param CRM_Core_Form $form
@@ -1031,7 +1025,6 @@ WHERE  v.option_group_id = g.id
    *
    *
    * @return array $formatted, formatted price set params.
-   * @access public
    */
   /**
    * @param CRM_Core_Form $form
@@ -1081,7 +1074,6 @@ WHERE  v.option_group_id = g.id
    *
    *
    * @return array $optionsCount, array of each option w/ count total.
-   * @access public
    */
   /**
    * @param $form

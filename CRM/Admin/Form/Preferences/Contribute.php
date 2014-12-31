@@ -8,7 +8,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -88,7 +87,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->add('checkbox', 'invoicing', ts('Enable Tax and Invoicing'));
@@ -99,7 +97,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
    * Set default values for the form.
    * default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -111,7 +108,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

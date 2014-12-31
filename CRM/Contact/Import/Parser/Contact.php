@@ -126,7 +126,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function init() {
     $contactFields = CRM_Contact_BAO_Contact::importableFields($this->_contactType);
@@ -249,7 +248,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean
-   * @access public
    */
   public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
@@ -261,7 +259,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -273,7 +270,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function summary(&$values) {
     $erroneousField = NULL;
@@ -445,7 +441,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param bool $doGeocodeAddress
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function import($onDuplicate, &$values, $doGeocodeAddress = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -1071,7 +1066,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * Get the array of successfully imported contact id's
    *
    * @return array
-   * @access public
    */
   public function &getImportedContacts() {
     return $this->_newContacts;
@@ -1081,7 +1075,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * Get the array of successfully imported related contact id's
    *
    * @return array
-   * @access public
    */
   public function &getRelatedImportedContacts() {
     return $this->_newRelatedContacts;
@@ -1091,7 +1084,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function fini() {}
 
@@ -1104,7 +1096,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param null $csType
    * @param null $relationships
    *
-   * @access public
    */
   public static function isErrorInCustomData($params, &$errorMessage, $csType = NULL, $relationships = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -1292,7 +1283,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * retunr gender value / false
    *
    * @return bool
-   * @access public
    */
   public function checkGender($gender) {
     $gender = trim($gender, '.');
@@ -1322,7 +1312,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $params
    * @param String $errorMessage A string containing all the error-fields.
    *
-   * @access public
    */
   public function isErrorInCoreData($params, &$errorMessage) {
     foreach ($params as $key => $value) {
@@ -1595,7 +1584,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *
    * @return bool
    *
-   * @access public
    */
   public function in_value($value, $valueArray) {
     foreach ($valueArray as $key => $v) {
@@ -1614,7 +1602,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param String   $errorMessage   A string containing all the error-fields, where the new errorName is concatenated.
    *
    * @static
-   * @access public
    */
   public static function addToErrorMsg($errorName, &$errorMessage) {
     if ($errorMessage) {
@@ -2041,7 +2028,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param $returnCode
    *
    * @return int
-   * @access public
    */
   public function processMessage(&$values, $statusFieldName, $returnCode) {
     if (empty($this->_unparsedStreetAddressContacts)) {

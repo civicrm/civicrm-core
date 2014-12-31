@@ -57,7 +57,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * @param string $context
    *
    * @return array
-   * @access public
    */
   public static function &recurLinks($recurID = FALSE, $context = 'contribution') {
     if (!(self::$_links)) {
@@ -106,7 +105,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
   public function browse() {
     // add annual contribution
@@ -203,7 +201,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * This function is called when action is view
    *
    * return null
-   * @access public
    */
   public function view() {
     $controller = new CRM_Core_Controller_Simple(
@@ -222,7 +219,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * This function is called when action is update or new
    *
    * return null
-   * @access public
    */
   public function edit() {
     // set https for offline cc transaction
@@ -275,7 +271,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * loads, it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     $this->preProcess();

@@ -55,7 +55,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_DAO_Domain object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -68,7 +67,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param null $reset
    *
    * @return null|object CRM_Core_BAO_Domain
-   * @access public
    * @static
    */
   public static function &getDomain($reset = null) {
@@ -135,7 +133,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param NULL
    *
    * @return array        Location::getValues
-   * @access public
    */
   public function &getLocationValues() {
     if ($this->_location == NULL) {
@@ -159,7 +156,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param int $id
    *
    * @return array domain
-   * @access public
    */
   public static function edit(&$params, &$id) {
     $domain = new CRM_Core_DAO_Domain();
@@ -175,7 +171,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param array $params
    *
    * @return array domain
-   * @access public
    */
   public static function create($params) {
     $domain = new CRM_Core_DAO_Domain();

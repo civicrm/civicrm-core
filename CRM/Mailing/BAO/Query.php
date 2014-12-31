@@ -56,7 +56,6 @@ class CRM_Mailing_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function select(&$query) {
     // if Mailing mode add mailing id
@@ -377,7 +376,6 @@ class CRM_Mailing_BAO_Query {
   /**
    * Add all the elements shared between Mailing search and advnaced search
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @return void

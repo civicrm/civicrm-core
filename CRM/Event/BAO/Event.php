@@ -48,7 +48,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Event_BAO_ManageEvent object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -79,7 +78,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
@@ -120,7 +118,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param array $params reference array contains the values submitted by the form
    *
    * @return object
-   * @access public
    * @static
    *
    */
@@ -179,7 +176,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param int $id event id
    *
    * @return mixed|null
-   * @access public
    * @static
    *
    */
@@ -230,7 +226,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param $locBlockId location block id to be deleted
    * @param int $eventId event with which loc block is associated
    *
-   * @access public
    * @static
    */
   public static function deleteEventLocBlock($locBlockId, $eventId = NULL) {
@@ -582,7 +577,6 @@ $event_summary_limit
    * @param  boolean $considerRole consider role for participant count.
    * @param  boolean $role consider counted( is filter role) participant.
    *
-   * @access public
    *
    * @return array array with count of participants for each event based on status/role
    */
@@ -641,7 +635,6 @@ $event_summary_limit
    *
    * @return null|string     title of the event
    * @static
-   * @access public
    */
   public static function &getMapInfo(&$id) {
 
@@ -709,7 +702,6 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
    *
    * @return  array  $all      array of all the events that are searched
    * @static
-   * @access public
    */
   static function &getCompleteInfo(
     $start = NULL,
@@ -896,7 +888,6 @@ WHERE civicrm_event.is_active = 1
    * @param bool $afterCreate
    *
    * @return void
-   * @access public
    */
   public static function copy($id, $newEvent = NULL, $afterCreate = FALSE) {
 
@@ -1046,7 +1037,6 @@ WHERE civicrm_event.is_active = 1
    * @param bool $returnMessageText
    *
    * @return void
-   * @access public
    */
   public static function sendMail($contactID, &$values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
 
@@ -1241,7 +1231,6 @@ WHERE civicrm_event.is_active = 1
    * @param array $participantParams
    *
    * @return void
-   * @access public
    */
   static function buildCustomDisplay($id,
     $name,
@@ -1423,7 +1412,6 @@ WHERE civicrm_event.is_active = 1
    * @param array $profileFields
    *
    * @return void
-   * @access public
    * @static
    */
   public static function displayProfile(&$params, $gid, &$groupTitle, &$values, &$profileFields = array()) {
@@ -1688,7 +1676,6 @@ WHERE  id = $cfID
    * @param bool $skipCancel
    *
    * @return array $customProfile array of Additional participant's info OR array of Ids.
-   * @access public
    */
   static function buildCustomProfile($participantId,
     $values,
@@ -1889,7 +1876,6 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @param  array   $values key/value event info
    * @return boolean true if allow registration otherwise false
-   * @access public
    */
   /**
    * @param $values
@@ -1926,7 +1912,6 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @param  array   $params key/value participant info
    * @return boolean $alreadyRegistered true/false
-   * @access public
    */
   /**
    * @param array $params
@@ -1961,7 +1946,6 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param int $type
    *
    * @return string   the permission that the user has (or null)
-   * @access public
    * @static
    */
   public static function checkPermission($eventId = NULL, $type = CRM_Core_Permission::VIEW) {
@@ -2025,7 +2009,6 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param int $eventId   the id of the event
    *
    * @return array         an array of email ids
-   * @access public
    * @static
    */
   public static function getFromEmailIds($eventId = NULL) {
@@ -2059,7 +2042,6 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param sting  $extraWhereClause extra filter on participants.
    *
    * @return int   event total seats w/ given criteria.
-   * @access public
    * @static
    */
   public static function eventTotalSeats($eventId, $extraWhereClause = NULL) {

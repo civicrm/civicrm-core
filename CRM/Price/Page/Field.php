@@ -49,7 +49,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * The price set group id of the field
    *
    * @var int
-   * @access protected
    */
   protected $_sid;
 
@@ -57,7 +56,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @access private
    */
   private static $_actionLinks;
 
@@ -65,7 +63,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * The price set is reserved or not
    *
    * @var boolean
-   * @access protected
    */
   protected $_isSetReserved = false;
 
@@ -75,7 +72,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @param null
    *
    * @return array  array of action links that we need to display for the browse screen
-   * @access public
    */ function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
@@ -118,7 +114,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function browse() {
     $resourceManager = CRM_Core_Resources::singleton();
@@ -223,7 +218,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
    *
    * @return void
-   * @access public
    */
   public function edit($action) {
     // create a simple controller for editing price data
@@ -248,7 +242,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function run() {
 
@@ -343,7 +336,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @internal param int $id price field id
    *
    * @return void
-   * @access public
    */
   public function preview($fid) {
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Preview', ts('Preview Form Field'), CRM_Core_Action::PREVIEW);

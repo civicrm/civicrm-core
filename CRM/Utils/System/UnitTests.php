@@ -54,7 +54,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @paqram string $pageTitle
    *
    * @return void
-   * @access public
    */
   /**
    * @param string $title
@@ -75,7 +74,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @return mixed false if no auth
    *               array(
    *  contactID, ufID, unique string ) if success
-   * @access public
    */
   /**
    * @param string $name
@@ -99,7 +97,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @internal param string $url
    *
    * @return void
-   * @access public
    */
   /**
    * @param $breadCrumbs
@@ -118,7 +115,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param string $header the new string to be appended
    *
    * @return void
-   * @access public
    */
   /**
    * @param string $head
@@ -138,7 +134,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param mix $action the default action if one is pre-specified
    *
    * @return string the url to post the form
-   * @access public
    */
   /**
    * @param mix $action
@@ -163,7 +158,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param $forceBackend boolean  a gross joomla hack
    *
    * @return string an HTML string containing a link to the given path.
-   * @access public
    *
    */
   /**
@@ -259,7 +253,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *
    * @param string $message the message to set
    *
-   * @access public
    */
   /**
    * @param string $message

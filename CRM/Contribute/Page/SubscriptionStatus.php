@@ -40,7 +40,6 @@ class CRM_Contribute_Page_SubscriptionStatus extends CRM_Core_Page {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     $task    = CRM_Utils_Request::retrieve('task', 'String',   CRM_Core_DAO::$_nullObject);

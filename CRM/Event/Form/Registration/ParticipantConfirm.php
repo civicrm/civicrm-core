@@ -47,7 +47,6 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
@@ -94,7 +93,6 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $params = array('id' => $this->_eventId);
@@ -166,7 +164,6 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

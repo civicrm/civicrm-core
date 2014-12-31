@@ -86,7 +86,6 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
    * Browse all event templates.
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse() {

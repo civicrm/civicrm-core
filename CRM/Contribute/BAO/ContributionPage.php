@@ -44,7 +44,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Contribute_DAO_ContributionPage object
-   * @access public
    * @static
    */
   public static function &create(&$params) {
@@ -119,7 +118,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param null $fieldTypes
    *
    * @return void
-   * @access public
    * @static
    */
   public static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
@@ -465,7 +463,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param bool|object $autoRenewMembership is it a auto renew membership.
    *
    * @return void
-   * @access public
    * @static
    */
   public static function recurringNotify($type, $contactID, $pageID, $recur, $autoRenewMembership = FALSE) {
@@ -565,7 +562,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param null $fieldTypes
    *
    * @return void
-   * @access public
    * @static
    */
   public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = NULL) {
@@ -612,7 +608,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param int $id the contribution page id to copy
    *
    * @return the copy object
-   * @access public
    * @static
    */
   public static function copy($id) {
@@ -709,7 +704,6 @@ WHERE entity_table = 'civicrm_contribution_page'
    * @return boolean true if payment processor supports recurring
    * else false
    *
-   * @access public
    * @static
    */
   public static function checkRecurPaymentProcessor($contributionPageId) {
@@ -733,7 +727,6 @@ WHERE entity_table = 'civicrm_contribution_page'
    *
    * @param array $contribPageIds
    * @return array $info info regarding all sections.
-   * @access public
    * @static
    */
   public static function getSectionInfo($contribPageIds = array()) {

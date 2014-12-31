@@ -92,7 +92,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     self::preProcessCommon($this);
@@ -330,7 +329,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * Set default values for the form. Relationship that in edit/view action
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
@@ -343,7 +341,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * This function is used to add the rules for form.
    *
    * @return void
-   * @access public
    */
   public function addRules() {
   }
@@ -352,7 +349,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addDefaultButtons(ts('Confirm Action'));
@@ -361,7 +357,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -378,7 +373,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * @param bool $submitOnce
    *
    * @return void
-   * @access public
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
@@ -399,7 +393,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * Replace ids of household members in $this->_contactIds with the id of their household.
    * CRM-8338
    *
-   * @access public
    *
    * @return void
    */

@@ -79,7 +79,6 @@ class CRM_Contact_Form_Location {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
   public static function buildQuickForm(&$form) {
     // required for subsequent AJAX requests.

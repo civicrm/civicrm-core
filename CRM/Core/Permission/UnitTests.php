@@ -47,7 +47,6 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
    * @param string $str the permission to check
    *
    * @return boolean true if yes, else false
-   * @access public
    */
   public function check($str) {
     if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
@@ -69,7 +68,6 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
    * @param  array $whereTables (reference ) add the tables that are needed for the where clause
    *
    * @return string the group where clause for this user
-   * @access public
    */
   public function whereClause($type, &$tables, &$whereTables) {
     return '( 1 )';

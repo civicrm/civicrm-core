@@ -40,7 +40,6 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
   /**
    * Class constructor
    *
-   * @access public
    * @return \CRM_Contact_DAO_SubscriptionHistory
    */
   /**
@@ -56,7 +55,6 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
    * @param array $params     Values for the new history record
    *
    * @return object $history  The new history object
-   * @access public
    * @static
    */
   public static function &create(&$params) {
@@ -73,7 +71,6 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
    * @param int $id       The contact id
    *
    * @return void
-   * @access public
    * @static
    */
   public static function deleteContact($id) {

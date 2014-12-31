@@ -95,7 +95,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the n events
    *
-   * @access public
    *
    * @param int $id
    * @param bool $all
@@ -132,7 +131,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the n participant statuses
    *
-   * @access public
    *
    * @param int $id
    * @param null $cond
@@ -181,7 +179,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the n participant roles
    *
-   * @access public
    *
    * @param int $id
    * @param null $cond
@@ -214,7 +211,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the participant listings
    *
-   * @access public
    *
    * @param int $id
    *
@@ -237,7 +233,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all  event types.
    *
-   * @access public
    *
    * @param int $id
    * @return array - array reference of all event types.
@@ -283,7 +278,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * nex time it's requested.
    *
-   * @access public
    * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
@@ -297,7 +291,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the Personal campaign pages
    *
-   * @access public
    *
    * @param int $id
    * @return array - array reference of all pcp if any

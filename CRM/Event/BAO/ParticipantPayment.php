@@ -90,7 +90,6 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
    *
    * @return boolean  true if deleted false otherwise
    * @static
-   * @access public
    */
   public static function deleteParticipantPayment($params) {
     $participantPayment = new CRM_Event_DAO_ParticipantPayment();

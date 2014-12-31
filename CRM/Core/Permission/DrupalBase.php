@@ -68,7 +68,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * @param string $groupType type of group(Access/Mailing)
    * @param bool $excludeHidden exclude hidden groups.
    *
-   * @access public
    *
    * @return array - array reference of all groups.
    */
@@ -141,7 +140,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * @param  array $whereTables (reference) add the tables that are needed for the where clause
    *
    * @return string the clause to add to the query retrieving viewable groups
-   * @access public
    */
   public function groupClause($type, &$tables, &$whereTables) {
     if (!isset($this->_viewPermissionedGroups)) {
@@ -254,7 +252,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * @param array $array the roles to check
    *
    * @return boolean true if yes, else false
-   * @access public
    *
    */
   public function checkGroupRole($array) {

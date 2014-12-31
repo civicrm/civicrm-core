@@ -76,7 +76,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * @param bool $isLogin
    *
    * @return void
-   * @access public
    * @static
    */
   public static function synchronize(&$user, $update, $uf, $ctype, $isLogin = FALSE) {
@@ -182,7 +181,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * @param bool $isLogin
    *
    * @return the ufmatch object that was found or created
-   * @access public
    * @static
    */
   public static function &synchronizeUFMatch(&$user, $userKey, $uniqId, $uf, $status = NULL, $ctype = NULL, $isLogin = FALSE) {
@@ -362,7 +360,6 @@ AND    domain_id    = %4
    * @param int    $contactId id of the contact to update
    *
    * @return void
-   * @access public
    * @static
    */
   public static function updateUFName($contactId) {
@@ -417,7 +414,6 @@ AND    domain_id    = %4
    * @param $emailAddress email to be modified for the user
    *
    * @return void
-   * @access public
    * @static
    */
   public static function updateContactEmail($contactId, $emailAddress) {
@@ -472,7 +468,6 @@ AND    domain_id    = %4
    * @param  int  $ufID id of the user to delete
    *
    * @return void
-   * @access public
    * @static
    */
   public static function deleteUser($ufID) {
@@ -489,7 +484,6 @@ AND    domain_id    = %4
    * @param int  $ufID  Id of UF for which related contact_id is required
    *
    * @return int    contact_id on success, null otherwise
-   * @access public
    * @static
    */
   public static function getContactId($ufID) {
@@ -513,7 +507,6 @@ AND    domain_id    = %4
    * @param int  $contactID   ID of the contact for which related uf_id is required
    *
    * @return int    uf_id of the given contact_id on success, null otherwise
-   * @access public
    * @static
    */
   public static function getUFId($contactID) {
@@ -544,7 +537,6 @@ AND    domain_id    = %4
    *
    *
    * @return int    contact_id on success, null otherwise
-   * @access public
    * @static
    */
   public static function getContactIDs() {
@@ -564,7 +556,6 @@ AND    domain_id    = %4
    * @param int $openId
    *
    * @return bool     true if allowed to login, false otherwise
-   * @access public
    * @static
    */
   public static function getAllowedToLogin($openId) {
@@ -583,7 +574,6 @@ AND    domain_id    = %4
    *
    *
    * @return int     next highest unused value for uf_id
-   * @access public
    * @static
    */
   public static function getNextUfIdValue() {

@@ -90,7 +90,6 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
    *
    * @param  int  $entityRoleId ID of the EntityRole record to be deleted.
    *
-   * @access public
    * @static
    */
   public static function del($entityRoleId) {

@@ -48,7 +48,6 @@ class CRM_Contact_Form_Edit_Address {
    *
    * @return void
    *
-   * @access public
    * @static
    */
   public static function buildQuickForm(&$form, $addressBlockCount = NULL, $sharing = TRUE, $inlineEdit = FALSE) {
@@ -261,7 +260,6 @@ class CRM_Contact_Form_Edit_Address {
    *
    * @return array|bool if no errors
    *
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -318,7 +316,6 @@ class CRM_Contact_Form_Edit_Address {
    * @param CRM_Core_Form $form     form object
    *
    * @static
-   * @access public
    */
   public static function setDefaultValues( &$defaults, &$form ) {
     $addressValues = array();

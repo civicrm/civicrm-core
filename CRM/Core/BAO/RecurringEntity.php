@@ -137,7 +137,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
@@ -171,7 +170,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param int $entityId Child entity id
    * @param String $entityTable Name of the entity table
    *
-   * @access public
    * @static
    *
    * @return object
@@ -191,7 +189,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @param int $mode Mode of the entity to cascade changes across parent/child relations eg 1 - only this entity, 2 - this and the following entities, 3 - All the entity
    *
-   * @access public
    *
    * @return void
    */
@@ -394,7 +391,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param int $mode 1. retrieve only one entity. 2. retrieve all future entities in the repeating set. 3. all entities in the repeating set.
    * @param int $initiatorId the instance where this function is invoked from
    *
-   * @access public
    * @static
    *
    * @return array an array of child ids
@@ -459,7 +455,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param boolean $includeParent Include parent in result set
    * @param int $mode 1. retrieve only one entity. 2. retrieve all future entities in the repeating set. 3. all entities in the repeating set.
    *
-   * @access public
    * @static
    *
    * @return array array of connected ids
@@ -479,7 +474,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param string $entityTable Entity table name
    * @param boolean $includeParent Include parent in result set
    *
-   * @access public
    * @static
    *
    * @return int unsigned $parentId Parent ID
@@ -514,7 +508,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param array $newParams  array of all the fields & values to be copied besides the other fields
    * @param boolean $createRecurringEntity if to create a record in recurring_entity table
    *
-   * @access public
    * @static
    *
    * @return object
@@ -544,7 +537,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @param object $event An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just updated
    *
-   * @access public
    * @static
    *
    * @return void
@@ -617,7 +609,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @param object $event An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just inserted
    *
-   * @access public
    * @static
    *
    * @return void
@@ -727,7 +718,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @param object $event An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just deleted
    *
-   * @access public
    * @static
    *
    * @return void
@@ -770,7 +760,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param int $entityId Entity id
    * @param string $entityTable Name of the entity table
    *
-   * @access public
    * @static
    *
    * @return boolean|object Returns either boolean value or CRM_Core_DAO_RecurringEntity object
@@ -889,7 +878,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @param int $scheduleReminderId primary key of civicrm_action_schedule table
    *
-   * @access public
    * @static
    *
    * @return object
@@ -1037,7 +1025,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param DateTime $startDate Start Date
    * @param DateTime $endDate End Date
    *
-   * @access public
    * @static
    *
    * @return object DateTime object which contain time difference
@@ -1056,7 +1043,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param int $entityId Entity ID
    * @param string $used_for Specifies for which entity type it's used for
    *
-   * @access public
    * @static
    *
    * @return object

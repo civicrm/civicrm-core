@@ -57,7 +57,6 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * @param string $groupElementType
    *
    * @static
-   * @access public
    */
   static function buildQuickForm(&$form,
     $contactId = 0,
@@ -205,7 +204,6 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * @param string $groupElementType
    *
    * @return void
-   * @access public
    * @static
    */
   public static function setDefaults($id, &$defaults, $type = self::ALL, $fieldName = NULL, $groupElementType = 'checkbox') {
@@ -248,7 +246,6 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param $defaults

@@ -40,7 +40,6 @@
  *
  * @return string  button type, one of: 'upload', 'next', 'back', 'cancel', 'refresh'
  *                                      'submit', 'done', 'display', 'jump' 'process'
- * @access public
  */
 function smarty_modifier_crmBtnType($btnName) {
   // split the string into 5 or more

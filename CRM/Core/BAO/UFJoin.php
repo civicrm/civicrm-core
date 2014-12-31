@@ -44,7 +44,6 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Core_DAO_UFJoin object
-   * @access public
    * @static
    */
   public static function &create($params) {
@@ -95,7 +94,6 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return int or null
-   * @access public
    * @static
    */
   public static function findJoinEntryId(&$params) {
@@ -132,7 +130,6 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return int or null
-   * @access public
    * @static
    */
   public static function findUFGroupId(&$params) {

@@ -43,7 +43,6 @@ class CRM_Core_Joomla {
    * to the smarty instance
    *
    * @return void
-   * @access public
    * @static
    */
   public static function sidebarLeft() {

@@ -42,7 +42,6 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
    * The field id
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -94,7 +93,6 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -137,7 +135,6 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

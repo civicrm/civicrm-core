@@ -33,7 +33,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function init() {
     $this->setFields();
@@ -55,7 +54,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean
-   * @access public
    */
   public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
@@ -67,7 +65,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -128,7 +125,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function import($onDuplicate, &$values) {
     $response = $this->summary($values);
@@ -201,7 +197,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function fini() {}
 
@@ -212,7 +207,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    *
    * @return array   $importableFields
    *
-   * @access public
    * @static
    */
    public function getGroupFieldsForImport( $id ) {

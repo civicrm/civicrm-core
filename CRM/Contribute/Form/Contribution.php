@@ -226,7 +226,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
 
@@ -484,7 +483,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //@todo document the purpose of cdType (if still in use)
@@ -937,7 +935,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -996,7 +993,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

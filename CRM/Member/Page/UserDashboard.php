@@ -42,7 +42,6 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    * List memberships for the UF user
    *
    * return null
-   * @access public
    */
   public function listMemberships() {
     $membership      = array();
@@ -96,7 +95,6 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    * loads, it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     parent::preProcess();

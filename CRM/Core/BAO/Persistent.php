@@ -41,7 +41,6 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_Persistent object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -64,7 +63,6 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
    *
-   * @access public
    * @static
    *
    * @return object

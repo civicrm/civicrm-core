@@ -47,7 +47,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
    * @return object soft contribution of object that is added
-   * @access public
    *
    */
   public static function add(&$params) {
@@ -69,7 +68,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contribute_BAO_ContributionSoft object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

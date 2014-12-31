@@ -61,7 +61,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * The sql params we use to get the list of contacts
    *
    * @var string
-   * @access protected
    */
   protected $_params;
 
@@ -69,7 +68,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * The public visible fields to be shown to the user
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
@@ -77,7 +75,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * The custom fields for this domain
    *
    * @var array
-   * @access protected
    */
   protected $_customFields;
 
@@ -85,7 +82,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * Cache the query object
    *
    * @var object
-   * @access protected
    */
   protected $_query;
 
@@ -93,7 +89,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * Cache the expanded options list if any
    *
    * @var object
-   * @access protected
    */
   protected $_options;
 
@@ -219,7 +214,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param null $gids
    *
    * @return array
-   * @access public
    */
   public static function &links($map = FALSE, $editLink = FALSE, $ufLink = FALSE, $gids = NULL) {
     if (!self::$_links) {
@@ -282,7 +276,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param $action
    * @param array $params
    *
-   * @access public
    */
   public function getPagerParams($action, &$params) {
     $status =
@@ -303,7 +296,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param enum   $output what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     static $skipFields = array('group', 'tag');
@@ -394,7 +386,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param
    *
    * @return int Total number of rows
-   * @access public
    */
   public function getTotalCount($action) {
     $additionalWhereClause = 'contact_a.is_deleted = 0';
@@ -425,7 +416,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * Return the qill for this selector
    *
    * @return string
-   * @access public
    */
   public function getQill() {
     return $this->_query->qill();

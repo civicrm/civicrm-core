@@ -50,7 +50,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_DAO_PrintLabel object on success, null otherwise
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -71,7 +70,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *
    * @return Object             DAO object on success, null otherwise
    *
-   * @access public
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -83,7 +81,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
@@ -125,7 +122,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *
    * @param  int $printLabelId ID of the name label to be deleted.
    *
-   * @access public
    * @static
    */
   public static function del($printLabelId) {
@@ -138,7 +134,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *  get the list of print labels
    *
    * @return array list of labels
-   * @access public
    * @static
    */
   public static function getList() {
@@ -158,7 +153,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @param array $params associated array of submitted values
    *
    * @return array $formattedLayout array formatted array
-   * @access public
    */
   public static function buildLayout(&$params) {
     $layoutParams = array('id' => $params['badge_id']);

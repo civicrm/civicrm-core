@@ -66,7 +66,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function init() {
     $activityContact = CRM_Activity_BAO_ActivityContact::import();
@@ -133,7 +132,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean
-   * @access public
    */
   public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
@@ -145,7 +143,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -157,7 +154,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function summary(&$values) {
     $erroneousField = NULL;
@@ -240,7 +236,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function import($onDuplicate, &$values) {
     // first make sure this is a valid line
@@ -396,7 +391,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function fini() {}
 

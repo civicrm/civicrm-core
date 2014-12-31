@@ -262,7 +262,6 @@ WHERE  v.option_group_id = g.id
    *
    * @return void
    *
-   * @access public
    * @static
    */
   public static function lookupValues(&$params, &$names, $flip = FALSE) {
@@ -400,7 +399,6 @@ WHERE  v.option_group_id = g.id
    *
    * @param string $groupName the name of the option group
    *
-   * @access public
    * @static
    *
    * @return string   the value from the row where is_default = true
@@ -445,7 +443,6 @@ WHERE  v.option_group_id = g.id
    * @param int $defaultID (reference) - the option value ID of the default element (if set) is returned else 'null'
    * @param null $groupTitle the optional label of the option group else set to group name
    *
-   * @access public
    * @static
    *
    * @return int   the option group ID

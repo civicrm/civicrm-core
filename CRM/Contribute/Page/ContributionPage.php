@@ -272,7 +272,6 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -371,7 +370,6 @@ AND         cp.page_type = 'contribute'
    * all the fields in the page
    *
    * @return void
-   * @access public
    */
   public function copy() {
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive',
@@ -389,7 +387,6 @@ AND         cp.page_type = 'contribute'
    * @param null $action
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse($action = NULL) {

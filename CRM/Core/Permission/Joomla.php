@@ -43,7 +43,6 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    * @param string $str the permission to check
    *
    * @return boolean true if yes, else false
-   * @access public
    */
   public function check($str) {
     $config = CRM_Core_Config::singleton();
@@ -101,7 +100,6 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    *
    * @return boolean true if yes, else false
    * @static
-   * @access public
    */
   public function checkGroupRole($array) {
     return FALSE;

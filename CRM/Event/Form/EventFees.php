@@ -45,7 +45,6 @@ class CRM_Event_Form_EventFees {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
   public static function preProcess(&$form) {
     //as when call come from register.php
@@ -71,7 +70,6 @@ class CRM_Event_Form_EventFees {
    * This function sets the default values for the form in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
@@ -253,7 +251,6 @@ class CRM_Event_Form_EventFees {
   /**
    * This function sets the default values for price set.
    *
-   * @access public
    *
    * @param int $participantID
    * @param int $eventID
@@ -344,7 +341,6 @@ SELECT  id, html_type
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
   public static function buildQuickForm(&$form) {
     if ($form->_eventId) {

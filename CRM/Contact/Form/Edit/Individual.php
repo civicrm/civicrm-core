@@ -48,7 +48,6 @@ class CRM_Contact_Form_Edit_Individual {
    * @param int $inlineEditMode ( 1 for contact summary
    * top bar form and 2 for display name edit )
    *
-   * @access public
    * @return void
    */
   public static function buildQuickForm(&$form, $inlineEditMode = NULL) {
@@ -150,7 +149,6 @@ class CRM_Contact_Form_Edit_Individual {
    * @param int $contactID
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $contactID = NULL) {

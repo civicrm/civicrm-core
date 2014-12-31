@@ -39,7 +39,6 @@
  * @param string $string the html to be tweaked with
  *
  * @return string
- * @access public
  */
 function smarty_modifier_crmFirstWord($string) {
   $string = trim($string);

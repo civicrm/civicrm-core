@@ -54,7 +54,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_LocaationType object on success, null otherwise
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -75,7 +74,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    *
    * @return Object             DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -90,7 +88,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @return object           The default location type object on success,
    *                          null otherwise
    * @static
-   * @access public
    */
   public static function &getDefault() {
     if (self::$_defaultLocationType == NULL) {
@@ -121,7 +118,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
@@ -149,7 +145,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    *
    * @param  int  $locationTypeId     ID of the location type to be deleted.
    *
-   * @access public
    * @static
    */
   public static function del($locationTypeId) {

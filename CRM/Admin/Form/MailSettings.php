@@ -43,7 +43,6 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -94,7 +93,6 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   /**
    * Add local and global form rules
    *
-   * @access protected
    *
    * @return void
    */
@@ -109,7 +107,6 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($fields) {
     $errors = array();
@@ -124,7 +121,6 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

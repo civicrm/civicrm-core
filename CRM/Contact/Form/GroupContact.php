@@ -63,7 +63,6 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // get the list of all the groups
@@ -116,7 +115,6 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
   }
 
   /**
-   * @access public
    *
    * @return void
    */

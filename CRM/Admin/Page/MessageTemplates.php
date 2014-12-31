@@ -239,7 +239,6 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    * Browse all entities.
    *
    * @return void
-   * @access public
    */
   public function browse() {
     $action = func_num_args() ? func_get_arg(0) : NULL;

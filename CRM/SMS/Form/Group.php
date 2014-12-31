@@ -43,7 +43,6 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     if (!CRM_SMS_BAO_Provider::activeProviderCount()) {
@@ -58,7 +57,6 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -106,7 +104,6 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -299,7 +296,6 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   /**
    * Display Name of the form
    *
-   * @access public
    *
    * @return string
    */
@@ -314,7 +310,6 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($fields) {
     $errors = array();

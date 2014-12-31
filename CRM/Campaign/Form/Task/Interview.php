@@ -73,7 +73,6 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_votingTab = $this->get('votingTab');
@@ -281,7 +280,6 @@ WHERE {$clause}
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -381,7 +379,6 @@ WHERE {$clause}
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -438,7 +435,6 @@ WHERE {$clause}
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

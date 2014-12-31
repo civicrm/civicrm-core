@@ -50,7 +50,6 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
    * Build the static pattern array
    *
    * @return void
-   * @access public
    * @static
    */
   public static function buildPatterns() {
@@ -78,7 +77,6 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
    * @param string $message       The message to be matched
    *
    * @return array                Tuple (bounce_type, bounce_reason)
-   * @access public
    * @static
    */
   public static function &match(&$message) {

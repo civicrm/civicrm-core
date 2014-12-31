@@ -58,7 +58,6 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
    * Browse all rule groups
    *
    * @return void
-   * @access public
    */
   public function run() {
     $gid     = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
@@ -315,7 +314,6 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
    * Browse all rule groups
    *
    * @return void
-   * @access public
    */
   public function browse() {
     $this->assign('main_contacts', $this->_mainContacts);

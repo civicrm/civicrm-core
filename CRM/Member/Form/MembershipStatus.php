@@ -43,7 +43,6 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig 
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -61,7 +60,6 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig 
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -109,7 +107,6 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig 
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
