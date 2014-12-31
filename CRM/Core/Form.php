@@ -325,7 +325,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *                          and bury it deeper down in the controller
    */
   function mainProcess($allowAjax = TRUE) {
-    $this->postProcess();
+    $values = $this->controller->exportValues($this->_name);
+    $this->postProcess($values);
     $this->postProcessHook();
 
     // Respond with JSON if in AJAX context (also support legacy value '6')
