@@ -716,9 +716,8 @@ class CRM_Core_Resources {
       array('key' => 'status_id', 'value' => ts('Activity Status')),
     );
 
-    $contactTypes = CRM_Utils_Array::makeNonAssociative(CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '.'));
     $filters['contact'] = array(
-      array('key' => 'contact_type', 'value' => ts('Contact Type'), 'options' => $contactTypes),
+      array('key' => 'contact_type', 'value' => ts('Contact Type')),
       array('key' => 'group', 'value' => ts('Group'), 'entity' => 'group_contact'),
       array('key' => 'tag', 'value' => ts('Tag'), 'entity' => 'entity_tag'),
       array('key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'address'),

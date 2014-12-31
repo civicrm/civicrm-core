@@ -493,9 +493,9 @@ CRM.strings = CRM.strings || {};
       filter = $.extend({}, $el.data('user-filter') || {});
     if (filter.key && filter.value) {
       // Special case for contact type/sub-type combo
-      if (filter.key === 'contact_type' && (filter.value.indexOf('.') > 0)) {
-        combined.params.contact_type = filter.value.split('.')[0];
-        combined.params.contact_sub_type = filter.value.split('.')[1];
+      if (filter.key === 'contact_type' && (filter.value.indexOf('__') > 0)) {
+        combined.params.contact_type = filter.value.split('__')[0];
+        combined.params.contact_sub_type = filter.value.split('__')[1];
       } else {
         // Allow json-encoded api filters e.g. {"BETWEEN":[123,456]}
         combined.params[filter.key] = filter.value.charAt(0) === '{' ? $.parseJSON(filter.value) : filter.value;
@@ -556,7 +556,7 @@ CRM.strings = CRM.strings || {};
       }
       else if (this.key == 'contact_type' && typeof params.contact_sub_type === 'undefined') {
         this.options = _.remove(this.options, function(option) {
-          return option.key.indexOf(params.contact_type + '.') === 0;
+          return option.key.indexOf(params.contact_type + '__') === 0;
         });
         result.push(this);
       }
@@ -602,7 +602,7 @@ CRM.strings = CRM.strings || {};
         CRM.utils.setOptions($valField, filterSpec.options, false, filter.value);
       } else {
         $valField.prop('disabled', true);
-        CRM.api3(filterSpec.entity || $el.data('api-entity'), 'getoptions', {field: filter.key, sequential: 1})
+        CRM.api3(filterSpec.entity || $el.data('api-entity'), 'getoptions', {field: filter.key, context: 'search', sequential: 1})
           .done(function(result) {
             var entity = $el.data('api-entity').toLowerCase(),
               globalFilterSpec = _.find(CRM.config.entityRef.filters[entity], {key: filter.key}) || {};
