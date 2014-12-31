@@ -51,7 +51,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *  "we are moving away from the $ids param "
    *
    * @return CRM_Contact_BAO_Relationship object
-   * @access public
    * @static
    */
   public static function create(&$params, $ids = array()) {
@@ -195,7 +194,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param array $ids          the array that holds all the db ids
    *
    * @return CRM_Contact_BAO_Relationship
-   * @access public
    * @static
    */
   public static function add(&$params, $ids = array(), $contactId = NULL) {
@@ -269,7 +267,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * Specifiy defaults for creating a relationship
    *
    * @return array $defaults array of defaults for creating relationship
-   * @access public
    * @static
    */
   public static function getdefaults() {
@@ -291,7 +288,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function dataExists(&$params) {
@@ -316,7 +312,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param boolean $onlySubTypeRelationTypes if set only subtype which is passed by $contactSubType
    *                                          related relationshiptypes get return
    *
-   * @access public
    * @static
    *
    * @return array - array reference of all relationship types with context to current contact.
@@ -444,7 +439,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $id relationship id
    *
    * @return null
-   * @access public
    *
    * @static
    */
@@ -495,7 +489,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param $action
    *
    * @return null
-   * @access public
    * @static
    */
   public static function disableEnableRelationship($id, $action) {
@@ -537,7 +530,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param  int  $contactId id of the contact to delete
    *
    * @return void
-   * @access public
    * @static
    */
   public static function deleteContact($contactId) {
@@ -560,7 +552,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * $returns  returns the contact ids in the realtionship
    *
    * @return \CRM_Contact_DAO_Relationship
-   * @access public
    * @static
    */
   public static function getContactIds($id) {
@@ -582,7 +573,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $relationshipTypeId relationship type id
    *
    * @return boolean  true if it is valid relationship else false
-   * @access public
    * @static
    */
   public static function checkRelationshipType($contact_a, $contact_b, $relationshipTypeId) {
@@ -651,7 +641,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param integer $relationshipId this is relationship id for the contact
    *
    * @return boolean true if record exists else false
-   * @access public
    * @static
    */
   public static function checkDuplicateRelationship(&$params, $id, $contactId = 0, $relationshipId = 0) {
@@ -760,7 +749,6 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    * @param array $values output values of the object
    *
    * @return array (reference)   the values that could be potentially assigned to smarty
-   * @access public
    * @static
    */
   public static function &getValues(&$params, &$values) {
@@ -802,7 +790,6 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    *
    * @return array
    * @static
-   * @access public
    */
   public static function makeURLClause($contactId, $status, $numRelationship, $count, $relationshipId, $direction, $params = array()) {
     $select = $from = $where = '';
@@ -949,7 +936,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    *
    * @return array|int
    * @static
-   * @access public
    */
   static function getRelationship($contactId = NULL,
     $status              = 0, $numRelationship = 0,
@@ -1629,7 +1615,6 @@ AND cc.sort_name LIKE '%$name%'";
    * @param  array   $params associated array for params record id.
    *
    * @return array   $contactRelationships associated array of contact relationships
-   * @access public
    */
   public static function getContactRelationshipSelector(&$params) {
     // format the params

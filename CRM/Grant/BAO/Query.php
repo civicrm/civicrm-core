@@ -49,7 +49,6 @@ class CRM_Grant_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function select(&$query) {
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_GRANT) || !empty($query->_returnProperties)) {
@@ -106,7 +105,6 @@ class CRM_Grant_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function where(&$query) {
     foreach ($query->_params as $id => $values) {
@@ -317,7 +315,6 @@ class CRM_Grant_BAO_Query {
    * Getter for the qill object
    *
    * @return string
-   * @access public
    */
   public function qill() {
     return (isset($this->_qill)) ? $this->_qill : "";
@@ -355,7 +352,6 @@ class CRM_Grant_BAO_Query {
   /**
    * Add all the elements shared between grant search and advanaced search
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *

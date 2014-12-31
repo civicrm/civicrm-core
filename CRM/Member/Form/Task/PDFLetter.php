@@ -54,7 +54,6 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->skipOnHold = $this->skipDeceased = FALSE;
@@ -75,7 +74,6 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -88,7 +86,6 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

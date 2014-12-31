@@ -64,7 +64,6 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -101,7 +100,6 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

@@ -57,7 +57,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param string $context string
    *
    * @return object $batch batch object
-   * @access public
    */
   public static function create(&$params, $ids = NULL, $context = NULL) {
     if (empty($params['id'])) {
@@ -81,7 +80,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return array CRM_Batch_BAO_Batch object on success, null otherwise
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -137,7 +135,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * Create entity batch entry
    * @param array $params associated array
    * @return batch array
-   * @access public
    */
   public static function addBatchEntity(&$params) {
     $entityBatch = new CRM_Batch_DAO_EntityBatch();
@@ -164,7 +161,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param int $batchId batch id
    *
    * @return void
-   * @access public
    */
   public static function deleteBatch($batchId) {
     // delete entry from batch table
@@ -180,7 +176,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param  array   $params associated array for params record id.
    *
    * @return array   $batchList associated array of batch list
-   * @access public
    */
   public function getBatchListSelector(&$params) {
     // format the params
@@ -246,7 +241,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param  array $params associated array for params
    *
    * @return array
-   * @access public
    */
   public static function getBatchList(&$params) {
     $whereClause = self::whereClause($params);
@@ -352,7 +346,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param  array $params associated array for params
    *
    * @return null|string
-   * @access public
    */
   public static function getBatchCount(&$params) {
     $args = array();
@@ -369,7 +362,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param  array $params associated array for params
    *
    * @return string
-   * @access public
    */
   public static function whereClause($params) {
     $clauses = array();
@@ -417,7 +409,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param null $context
    *
    * @return array $links array of action links
-   * @access public
    */
   public function links($context = NULL) {
     if ($context == 'financialBatch') {
@@ -570,7 +561,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @return void
    *
    * @static
-   * @access public
    */
   public static function exportFinancialBatch($batchIds, $exportFormat) {
     if (empty($batchIds)) {

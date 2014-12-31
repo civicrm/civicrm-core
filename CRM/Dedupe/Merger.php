@@ -564,7 +564,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return array|bool
    * @static
-   * @access public
    */
   public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $redirectForPerformance = FALSE) {
     $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
@@ -609,7 +608,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return array|bool
    * @static
-   * @access public
    */
   public static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe',
     $autoFlip = TRUE, $redirectForPerformance = FALSE
@@ -696,7 +694,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return bool
    * @static
-   * @access public
    */
   public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe') {
     $conflicts = array();
@@ -804,7 +801,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return array|bool|int
    * @static
-   * @access public
    */
   public static function getRowsElementsAndInfo($mainId, $otherId) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
@@ -1202,7 +1198,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return bool
    * @static
-   * @access public
    */
   public static function moveAllBelongings($mainId, $otherId, $migrationInfo) {
     if (empty($migrationInfo)) {

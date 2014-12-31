@@ -42,7 +42,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * The set id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -50,7 +49,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *  set is empty or not
    *
    * @var bool
-   * @access protected
    */
   protected $_isGroupEmpty = TRUE;
 
@@ -58,7 +56,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * Array of existing subtypes set for a custom set
    *
    * @var array
-   * @access protected
    */
   protected $_subtypes = array();
 
@@ -66,7 +63,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * Array of default params
    *
    * @var array
-   * @access protected
    */
   protected $_defaults = array();
 
@@ -76,7 +72,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // current set id
@@ -118,7 +113,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -180,7 +174,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    * @see valid_date
    */
   public function addRules() {
@@ -193,7 +186,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -410,7 +402,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param null
    *
    * @return array   array of default values
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = &$this->_defaults;
@@ -462,7 +453,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.

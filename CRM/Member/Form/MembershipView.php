@@ -142,7 +142,6 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
 
@@ -393,7 +392,6 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(

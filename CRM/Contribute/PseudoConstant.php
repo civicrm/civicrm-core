@@ -117,7 +117,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * Get all the financial types
    *
-   * @access public
    *
    * @param int $id
    *
@@ -149,7 +148,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * Get all the financial Accounts
    *
-   * @access public
    *
    * @param int $id
    * @param int $financialAccountTypeId
@@ -189,7 +187,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * nex time it's requested.
    *
-   * @access public
    * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
@@ -208,7 +205,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param integer $id  id of the contribution page
    * @param boolean $all do we want all pages or only active pages
    *
-   * @access public
    *
    * @return array - array reference of all contribution pages if any
    * @static
@@ -239,7 +235,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * Get all the payment instruments
    *
-   * @access public
    *
    * @param string $columnName
    *
@@ -259,7 +254,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the valid accepted credit cards
    *
-   * @access public
    *
    * @return array - array reference of all payment instruments if any
    * @static
@@ -271,7 +265,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all premiums
    *
-   * @access public
    *
    * @param int $pageID
    * @return array - array of all Premiums if any
@@ -319,7 +312,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the contribution statuses
    *
-   * @access public
    *
    * @param int $id
    * @param string $columnName
@@ -344,7 +336,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the Personal campaign pages
    *
-   * @access public
    *
    * @param null $pageType
    * @param int $id
@@ -378,7 +369,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array pcpStatus is returned
    *
-   * @access public
    * @static
    *
    * @param string $column
@@ -403,7 +393,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array  $financialTypeAccount is returned
    *
-   * @access public
    * @static
    *
    * @param int $financialTypeId
@@ -435,7 +424,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all batches
    *
-   * @access public
    *
    * @param int $id
    * @return array - array reference of all batches if any

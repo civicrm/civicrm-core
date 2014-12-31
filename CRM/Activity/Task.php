@@ -68,7 +68,6 @@ class CRM_Activity_Task {
    *
    * @return array the set of tasks for a group of contacts
    * @static
-   * @access public
    */
   public static function &tasks() {
     if (!(self::$_tasks)) {
@@ -152,7 +151,6 @@ class CRM_Activity_Task {
    *
    * @return array the set of task titles
    * @static
-   * @access public
    */
   public static function &taskTitles() {
     self::tasks();
@@ -170,7 +168,6 @@ class CRM_Activity_Task {
    * @param int $permission
    *
    * @return array set of tasks that are valid for the user
-   * @access public
    */
   public static function &permissionedTaskTitles($permission) {
     $tasks = array();
@@ -198,7 +195,6 @@ class CRM_Activity_Task {
    *
    * @return array the set of tasks for a group of activity
    * @static
-   * @access public
    */
   public static function getTask($value) {
     self::tasks();

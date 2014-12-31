@@ -550,7 +550,6 @@ class CRM_Core_PseudoConstant {
    * @param null $force
    *
    * @return void
-   * @access public
    * @static
    */
   public static function populate(
@@ -603,7 +602,6 @@ class CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * nex time it's requested.
    *
-   * @access public
    * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
@@ -624,7 +622,6 @@ class CRM_Core_PseudoConstant {
    *
    * The static array activityType is returned
    *
-   * @access public
    * @static
    *
    * @return array - array reference of all activity types.
@@ -699,7 +696,6 @@ class CRM_Core_PseudoConstant {
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @access public
    * @static
    *
    * @param bool|int $id -  Optional id to return
@@ -755,7 +751,6 @@ class CRM_Core_PseudoConstant {
    *
    * Same as above, except gets the abbreviations instead of the names.
    *
-   * @access public
    * @static
    *
    * @param bool|int $id -     Optional id to return
@@ -823,7 +818,6 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @access public
    * @static
    *
    * @param bool|int $id - Optional id to return
@@ -901,7 +895,6 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @access public
    * @static
    *
    * @param bool $id
@@ -937,7 +930,6 @@ WHERE  id = %1";
    * @param string $groupType type of group(Access/Mailing)
    * @param bool $excludeHidden exclude hidden groups.
    *
-   * @access public
    * @static
    *
    * @return array - array reference of all groups.
@@ -966,7 +958,6 @@ WHERE  id = %1";
    * called for the first time
    *
    *
-   * @access public
    * @static
    *
    * @param bool $styledLabels
@@ -996,7 +987,6 @@ WHERE  id = %1";
    * @param string $groupType type of group(Access/Mailing)
    * @param bool $excludeHidden exclude hidden groups.
    *
-   * @access public
    * @static
    *
    * @return array - array reference of all groups.
@@ -1026,7 +1016,6 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @access public
    * @static
    *
    * @param bool $onlyPublic
@@ -1068,7 +1057,6 @@ WHERE  id = %1";
    * @param string $valueColumnName db column name/label.
    * @param boolean $reset          reset relationship types if true
    *
-   * @access public
    * @static
    *
    * @return array - array reference of all relationship types.
@@ -1108,7 +1096,6 @@ WHERE  id = %1";
    *
    * so far, we use this for validation only, so there's no point of putting this into the database
    *
-   * @access public
    *
    * @return array - array reference of all currency codes
    * @static
@@ -1397,7 +1384,6 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @access public
    * @static
    *
    * @param bool|int $id -  Optional id to return
@@ -1428,7 +1414,6 @@ WHERE  id = %1";
    *
    * The static array paymentProcessor is returned
    *
-   * @access public
    * @static
    *
    * @param boolean $all - get payment processors     - default is to get only active ones.
@@ -1463,7 +1448,6 @@ WHERE  id = %1";
    *
    * The static array paymentProcessorType is returned
    *
-   * @access public
    * @static
    *
    * @param boolean $all - get payment processors     - default is to get only active ones.
@@ -1487,7 +1471,6 @@ WHERE  id = %1";
   /**
    * Get all the World Regions from Database
    *
-   * @access public
    *
    * @param bool $id
    *
@@ -1518,7 +1501,6 @@ WHERE  id = %1";
    *
    * The static array activityStatus is returned
    *
-   * @access public
    * @static
    *
    * @param string $column
@@ -1545,7 +1527,6 @@ WHERE  id = %1";
    *
    * The static array visibility is returned
    *
-   * @access public
    * @static
    *
    * @param string $column
@@ -1706,7 +1687,6 @@ WHERE  id = %1
    *
    * The static array of greeting is returned
    *
-   * @access public
    * @static
    *
    * @param $filter - get All Email Greetings - default is to get only active ones.
@@ -1757,7 +1737,6 @@ WHERE  id = %1
   /**
    * Construct array of default greeting values for contact type
    *
-   * @access public
    * @static
    *
    * @return array - array reference of default greetings.
@@ -1791,7 +1770,6 @@ WHERE  id = %1
    * FIXME: This is called by civix but not by any core code. We
    * should provide an API call which civix can use instead.
    *
-   * @access public
    * @static
    *
    * @return array - array($fullyQualifiedName => $label) list of extensions
@@ -1818,7 +1796,6 @@ WHERE  id = %1
    *
    * The static array option values is returned
    *
-   * @access public
    * @static
    *
    * @param boolean $optionGroupName - get All  Option Group values- default is to get only active ones.
@@ -1844,7 +1821,6 @@ WHERE  id = %1
    * Fetch the list of active extensions of type 'module'
    *
    * @param $fresh bool whether to forcibly reload extensions list from canonical store
-   * @access public
    * @static
    *
    * @return array - array(array('prefix' => $, 'file' => $))
@@ -1859,7 +1835,6 @@ WHERE  id = %1
    *
    * The static array tax rates is returned
    *
-   * @access public
    * @static
    *
    * @return array - array list of tax rates with the financial type

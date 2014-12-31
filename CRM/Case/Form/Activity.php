@@ -71,7 +71,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $caseIds = CRM_Utils_Request::retrieve('caseid', 'String', $this);
@@ -222,7 +221,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -362,7 +360,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    * @param $self
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -377,7 +374,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @param array $params
    *

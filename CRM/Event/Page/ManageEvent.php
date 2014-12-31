@@ -186,7 +186,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -399,7 +398,6 @@ ORDER BY start_date desc
    * all the fields in the event wizard
    *
    * @return void
-   * @access public
    */
   public function copy() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE, 0, 'GET');

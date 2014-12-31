@@ -41,7 +41,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *
    * @return array collection of info about this data source
    *
-   * @access public
    *
    */
   public function getInfo() {
@@ -51,7 +50,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   /**
    * Set variables up before form is built
    *
-   * @access public
    */
   public function preProcess(&$form) {}
 
@@ -63,7 +61,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @param CRM_Core_Form $form
    *
    * @return void (operates directly on form argument)
-   * @access public
    */
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
@@ -85,7 +82,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   /**
    * Process the form submission
    *
-   * @access public
    */
   public function postProcess(&$params, &$db, &$form) {
     $file = $params['uploadFile']['name'];

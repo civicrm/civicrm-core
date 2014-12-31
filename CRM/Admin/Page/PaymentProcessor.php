@@ -98,7 +98,6 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -122,7 +121,6 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
    * @param null $action
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse($action = NULL) {

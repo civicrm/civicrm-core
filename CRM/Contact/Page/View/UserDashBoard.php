@@ -92,7 +92,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     if (!$this->_contactId) {
@@ -113,7 +112,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    * Build user dashboard
    *
    * @return void
-   * @access public
    */
   public function buildUserDashBoard() {
     //build component selectors
@@ -205,7 +203,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    *
    * @return void
    *
-   * @access public
    */
   public function run() {
     $this->preProcess();

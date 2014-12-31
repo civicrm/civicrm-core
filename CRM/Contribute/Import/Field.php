@@ -35,7 +35,6 @@
 class CRM_Contribute_Import_Field {
 
   /**#@+
-   * @access protected
    * @var string
    */
 

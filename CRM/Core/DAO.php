@@ -100,7 +100,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param string $dsn   the database connection string
    *
    * @return void
-   * @access private
    * @static
    */
   public static function init($dsn) {
@@ -273,7 +272,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * by resetting some of DAO's internal fields. Use this with caution
    *
    * @return void
-   * @access public
    *
    */
   public function reset() {
@@ -331,7 +329,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param object $factory  the factory application object
    *
    * @return void
-   * @access public
    * @static
    */
   public static function setFactory(&$factory) {
@@ -344,7 +341,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param string $table
    *
    * @return void
-   * @access public
    */
   public function factory($table = '') {
     if (!isset(self::$_factory)) {
@@ -359,7 +355,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * we need to set the links manually.
    *
    * @return void
-   * @access protected
    */
   public function initialize() {
     $this->_connect();
@@ -369,7 +364,6 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Defines the default key as 'id'.
    *
-   * @access protected
    *
    * @return array
    */
@@ -385,7 +379,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * Tells DB_DataObject which keys use autoincrement.
    * 'id' is autoincrementing by default.
    *
-   * @access protected
    *
    * @return array
    */
@@ -401,7 +394,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * Returns list of FK relationships
    *
    * @static
-   * @access public
    *
    * @return array of CRM_Core_Reference_Interface
    */
@@ -412,7 +404,6 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Returns all the column names of this table
    *
-   * @access public
    *
    * @return array
    */
@@ -424,7 +415,6 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Get/set an associative array of table columns
    *
-   * @access public
    * @param  array key=>type array
    * @return array (associative)
    */
@@ -511,7 +501,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param array $params (reference ) associative array of name/value pairs
    *
    * @return boolean      did we copy all null values into the object
-   * @access public
    */
   public function copyValues(&$params) {
     $fields = &$this->fields();
@@ -553,7 +542,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param array  $values (reference ) associative array of name/value pairs
    *
    * @return void
-   * @access public
    * @static
    */
   public static function storeValues(&$object, &$values) {
@@ -575,7 +563,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param array $field the field under task
    *
    * @return array|null the attributes for the object
-   * @access public
    * @static
    */
   public static function makeAttribute($field) {
@@ -627,7 +614,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *                          you want the attributes for all DAO text fields
    *
    * @return array assoc array of name => attribute pairs
-   * @access public
    * @static
    */
   public static function getAttribute($class, $fieldName = NULL) {
@@ -672,7 +658,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param string $fieldName the name of the field in the DAO
    *
    * @return boolean     true if object exists
-   * @access public
    * @static
    */
   public static function objectExists($value, $daoName, $daoID, $fieldName = 'name') {
@@ -963,7 +948,6 @@ FROM   civicrm_domain
    *
    * @return string|null          Value of $returnColumn in the retrieved record
    * @static
-   * @access public
    */
   public static function getFieldValue($daoName, $searchValue, $returnColumn = 'name', $searchColumn = 'id', $force = FALSE) {
     if (
@@ -1009,7 +993,6 @@ FROM   civicrm_domain
    *
    * @return boolean          true if we found and updated the object, else false
    * @static
-   * @access public
    */
   public static function setFieldValue($daoName, $searchValue, $setColumn, $setValue, $searchColumn = 'id') {
     $object = new $daoName( );
@@ -1034,7 +1017,6 @@ FROM   civicrm_domain
    * @param string $default - default sort value
    *
    * @return string - sortString
-   * @access public
    * @static
    */
   public static function getSortString($sort, $default = NULL) {
@@ -1062,7 +1044,6 @@ FROM   civicrm_domain
    * @param array  $returnProperities     an assoc array of fields that need to be returned, eg array( 'first_name', 'last_name')
    *
    * @return object an object of type referenced by daoName
-   * @access public
    * @static
    */
   public static function commonRetrieve($daoName, &$params, &$defaults, $returnProperities = NULL) {
@@ -1089,7 +1070,6 @@ FROM   civicrm_domain
    * @param  int  $contactId id of the contact to delete
    *
    * @return void
-   * @access public
    * @static
    */
   public static function deleteEntityContact($daoName, $contactId) {
@@ -1114,7 +1094,6 @@ FROM   civicrm_domain
    *
    * @return CRM_Core_DAO object that holds the results of the query
    * @static
-   * @access public
    */
   static function &executeQuery(
     $query,
@@ -1164,7 +1143,6 @@ FROM   civicrm_domain
    * @return string|null the result of the query if any
    *
    * @static
-   * @access public
    */
   static function &singleValueQuery($query,
     $params      = array(),
@@ -1289,7 +1267,6 @@ FROM   civicrm_domain
    *
    *
    * @return (reference )                   the newly created copy of the object
-   * @access public
    */
   static function &copyGeneric($daoName, $criteria, $newData = NULL, $fieldsFix = NULL, $blockCopyOfDependencies = NULL) {
     $object = new $daoName( );
@@ -1439,7 +1416,6 @@ SELECT contact_id
    * @param array $returnProperities an assoc array of fields that need to be returned, eg array( 'first_name', 'last_name')
    *
    * @return object an object of type referenced by daoName
-   * @access public
    * @static
    */
   public static function commonRetrieveAll($daoName, $fieldIdName = 'id', $fieldId, &$details, $returnProperities = NULL) {

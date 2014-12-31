@@ -47,7 +47,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param $ids
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
-   * @access public
    * @static
    */
   public static function &add(&$params, $ids) {
@@ -76,7 +75,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param $ids
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
-   * @access public
    * @static
    */
   public static function create(&$params, $ids) {
@@ -117,7 +115,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -134,7 +131,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @return array $values
    *
-   * @access public
    * @static
    */
   public static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
@@ -160,7 +156,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @return string name
    *
-   * @access public
    * @static
    *
    */
@@ -176,7 +171,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -190,7 +184,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @return boolean
    *
-   * @access public
    * @static
    */
   public static function deleteValues($fieldId) {
@@ -210,7 +203,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @return  boolean
    *
-   * @access public
    * @static
    */
   public static function del($id) {

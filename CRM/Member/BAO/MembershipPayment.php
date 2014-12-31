@@ -46,7 +46,6 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object

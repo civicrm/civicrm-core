@@ -44,7 +44,6 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Campaign_DAO_Campaign object
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -123,7 +122,6 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return \CRM_Campaign_DAO_Campaign|null
-   * @access public
    */
   public function retrieve(&$params, &$defaults) {
     $campaign = new CRM_Campaign_DAO_Campaign();

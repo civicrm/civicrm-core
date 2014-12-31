@@ -43,7 +43,6 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -54,7 +53,6 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -69,7 +67,6 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
    * @param null
    *
    * @return array   array of default values
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -84,7 +81,6 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

@@ -42,14 +42,12 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * The params that are sent to the query
    *
    * @var array
-   * @access protected
    */
   protected $_queryParams;
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
@@ -57,7 +55,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
@@ -74,7 +71,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
 
@@ -159,7 +155,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -197,7 +192,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * @param
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     if ($this->_done) {
@@ -292,7 +286,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * All local rules are added near the element
    *
    * @return void
-   * @access public
    * @see valid_date
    */
   public function addRules() {
@@ -306,7 +299,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    *
    * @return void
    * @static
-   * @access public
    */
   public static function formRule($fields) {
     $errors = array();
@@ -321,7 +313,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @return array the default array reference
    */
@@ -427,7 +418,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Find Pledges');

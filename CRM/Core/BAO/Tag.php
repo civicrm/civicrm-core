@@ -48,7 +48,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param array $defaults    (reference ) an assoc array to hold the flattened values
    *
    * @return object     CRM_Core_DAO_Tag object on success, otherwise null
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -311,7 +310,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param int $id   tag id
    *
    * @return boolean
-   * @access public
    * @static
    *
    */
@@ -350,7 +348,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * signatures
    *
    * @return object    CRM_Core_DAO_Tag object on success, otherwise null
-   * @access public
    * @static
    */
   public static function add(&$params, $ids = array()) {
@@ -400,7 +397,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function dataExists(&$params) {
@@ -419,7 +415,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param string $entityTable entity_table
    *
    * @return array $tagSets array of tag sets
-   * @access public
    * @static
    */
   public static function getTagSet($entityTable) {

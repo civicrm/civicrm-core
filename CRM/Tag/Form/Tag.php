@@ -69,7 +69,6 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Core_Resources::singleton()
@@ -113,7 +112,6 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
   }
 
   /**
-   * @access public
    *
    * @return void
    */

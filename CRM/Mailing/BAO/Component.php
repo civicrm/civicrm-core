@@ -48,7 +48,6 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_LocaationType object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -82,7 +81,6 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    *
    * @return CRM_Mailing_BAO_Component object
    *
-   * @access public
    * @static
    */
   public static function add(&$params, $ids = array()) {

@@ -106,7 +106,6 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -162,7 +161,6 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     CRM_Core_BAO_CustomField::moveField($this->_srcFID, $this->_dstGID);

@@ -217,7 +217,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * Getter function for title. Should be over-ridden by derived class
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
@@ -244,7 +243,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string

@@ -153,7 +153,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @param $forceBackend boolean  a gross joomla hack
    *
    * @return string an HTML string containing a link to the given path.
-   * @access public
    *
    */
   function url($path = NULL, $query = NULL, $absolute = FALSE,
@@ -470,7 +469,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @param mix $action the default action if one is pre-specified
    *
    * @return string the url to post the form
-   * @access public
    */
   public function postURL($action) {
     if (!empty($action)) {

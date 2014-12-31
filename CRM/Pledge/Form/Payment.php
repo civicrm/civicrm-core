@@ -50,7 +50,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // check for edit permission
@@ -67,7 +66,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -91,7 +89,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //add various dates
@@ -137,7 +134,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

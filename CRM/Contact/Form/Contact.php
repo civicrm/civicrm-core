@@ -82,7 +82,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Name of de-dupe button
    *
    * @var string
-   * @access protected
    */
   protected $_dedupeButtonName;
 
@@ -90,7 +89,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Name of optional save duplicate button
    *
    * @var string
-   * @access protected
    */
   protected $_duplicateButtonName;
 
@@ -133,7 +131,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
@@ -388,7 +385,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -558,7 +554,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * All local rules are added near the element
    *
    * @return void
-   * @access public
    * @see valid_date
    */
   public function addRules() {
@@ -591,7 +586,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param int $contactId contact id if doing update.
    *
    * @return bool $primaryID email/openId@static
-   * @access public
    */
   public static function formRule($fields, &$errors, $contactId = NULL) {
     $config = CRM_Core_Config::singleton();
@@ -718,7 +712,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //load form for child blocks
@@ -849,7 +842,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   /**
    * Form submission of new/edit contact is processed.
    *
-   * @access public
    *
    * @return void
    */
@@ -1066,7 +1058,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @return boolean true if data exists, false otherwise
    * @static
-   * @access public
    */
   public static function blockDataExists(&$fields) {
     if (!is_array($fields)) {
@@ -1176,7 +1167,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   public function getTemplateFileName() {
     if ($this->_contactSubType) {

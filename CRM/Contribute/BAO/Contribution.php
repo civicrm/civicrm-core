@@ -72,7 +72,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   /**
    * Class constructor
    *
-   * @access public
    * @return \CRM_Contribute_DAO_Contribution
    */
   /**
@@ -93,7 +92,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids    the array that holds all the db ids
    *
    * @return CRM_Contribute_BAO_Contribution object
-   * @access public
    * @static
    */
   public static function add(&$params, $ids = array()) {
@@ -224,7 +222,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids    the array that holds all the db ids
    *
    * @return CRM_Contribute_BAO_Contribution|null the found object or null
-   * @access public
    * @static
    */
   public static function &getValues($params, &$values, &$ids) {
@@ -295,7 +292,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids    the array that holds all the db ids
    *
    * @return CRM_Contribute_BAO_Contribution object
-   * @access public
    * @static
    */
   public static function create(&$params, $ids = array()) {
@@ -484,7 +480,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param boolean $reverse  true if we want to resolve the values in the reverse direction (value -> name)
    *
    * @return void
-   * @access public
    * @static
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
@@ -535,7 +530,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids      (reference) the array that holds all the db ids
    *
    * @return CRM_Contribute_BAO_Contribution object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults, &$ids) {
@@ -554,7 +548,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param bool $status
    *
    * @return array array of importable Fields
-   * @access public
    * @static
    */
   public static function &importableFields($contactType = 'Individual', $status = TRUE) {
@@ -839,7 +832,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    * @param int $id
    *
    * @return boolean true if duplicate, false otherwise
-   * @access public
    * static
    */
   public static function checkDuplicate($input, &$duplicates, $id = NULL) {
@@ -892,7 +884,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Contribute_BAO_ContributionProduct object
-   * @access public
    * @static
    */
   public static function addPremium(&$params) {
@@ -910,7 +901,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *
    * @return array the list of contribution fields
    * @static
-   * @access public
    */
   public static function getContributionFields($addExtraFields = TRUE) {
     $contributionFields = CRM_Contribute_DAO_Contribution::export();
@@ -1007,7 +997,6 @@ GROUP BY p.id
    *
    * @return return the list of contribution fields
    *
-   * @access public
    * @static
    */
   public static function getHonorContacts($honorId) {
@@ -1045,7 +1034,6 @@ GROUP BY p.id
    *
    * @return null|string     sort name of the contact if found
    * @static
-   * @access public
    */
   public static function sortName($id) {
     $id = CRM_Utils_Type::escape($id, 'Integer');
@@ -1144,7 +1132,6 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    * @param array  $params an assoc array of name/value pairs
    *
    * @return array contribution id if success else NULL
-   * @access public
    * static
    */
   public static function checkDuplicateIds($params) {
@@ -1177,7 +1164,6 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    * @return array associated array
    *
    * @static
-   * @access public
    */
   public static function getContributionDetails($exportMode, $componentIds) {
     $paymentDetails = array();
@@ -1275,7 +1261,6 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
    * @param int $contributionId
    * @param int $contactId
    *
-   * @access public
    * @static
    */
   public static function deleteAddress($contributionId = NULL, $contactId = NULL) {
@@ -1815,7 +1800,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @param int $contributorId  contributor id
    *
    * @return array $ids containing organization id and individual id
-   * @access public
    */
   public static function getOnbehalfIds($contributionId, $contributorId = NULL) {
 
@@ -2556,7 +2540,6 @@ WHERE  contribution_id = %1 ";
    * @param bool $isNotCancelled
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function isCancelSubscriptionSupported($contributionId, $isNotCancelled = TRUE) {
@@ -2587,7 +2570,6 @@ WHERE  contribution_id = %1 ";
    * @param int $contributionId contribution id
    *
    * @return string $status contribution status
-   * @access public
    * @static
    */
   public static function isSubscriptionCancelled($contributionId) {
@@ -2614,7 +2596,6 @@ WHERE  contribution_id = %1 ";
    * @param array $financialTrxnValues
    *
    * @return null|object
-   * @access public
    * @static
    */
   public static function recordFinancialAccounts(&$params, $financialTrxnValues = NULL) {
@@ -2901,7 +2882,6 @@ WHERE  contribution_id = %1 ";
    *
    * @param null $skipTrxn
    *
-   * @access public
    * @static
    */
   public static function updateFinancialAccounts(&$params, $context = NULL, $skipTrxn = NULL) {
@@ -3069,7 +3049,6 @@ WHERE  contribution_id = %1 ";
    * @param array $errors list of errors
    *
    * @return bool
-   * @access public
    * @static
    */
   public static function checkStatusValidation($values, &$fields, &$errors) {
@@ -3100,7 +3079,6 @@ WHERE  contribution_id = %1 ";
    *
    * @param integer $contactId contact id
    *
-   * @access public
    * @static
    */
   public static function deleteContactContribution($contactId) {
@@ -3159,7 +3137,6 @@ WHERE  contribution_id = %1 ";
    * @param string $relationName
    *
    * @return array|bool
-   * @access public
    * @static
    */
   public static function validateFinancialType($financialTypeId, $relationName = 'Expense Account is') {

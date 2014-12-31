@@ -126,7 +126,6 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
    * @param boolean $is_distinct  Group by queue ID?
    *
    * @return int                  Number of rows in result set
-   * @access public
    * @static
    */
   public static function getTotalCount($mailing_id, $job_id = NULL, $is_distinct = FALSE, $toDate = NULL) {
@@ -181,7 +180,6 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
    * @param array $sort           sort array
    *
    * @return array                Result set
-   * @access public
    * @static
    */
   public static function &getRows($mailing_id, $job_id = NULL,

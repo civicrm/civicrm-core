@@ -176,7 +176,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param object PEAR_Error
    *
    * @return void
-   * @access public
    */
   public static function handle($pearError) {
 
@@ -308,7 +307,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @return void
    * @static
-   * @access public
    */
   public static function fatal($message = NULL, $code = NULL, $email = NULL) {
     $vars = array(
@@ -396,7 +394,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @return void
    * @static
-   * @access public
    */
   public static function handleUnhandledException($exception) {
     $config = CRM_Core_Config::singleton();
@@ -471,7 +468,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *                subsystem is not initialized - CRM-13765
    *
    * @return string the generated output
-   * @access public
    * @static
    */
   public static function debug($name, $variable = NULL, $log = TRUE, $html = TRUE, $checkPermission = TRUE) {
@@ -519,7 +515,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @return string the generated output
    *
-   * @access public
    *
    * @static
    *
@@ -566,7 +561,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param string $comp message to be output
    * @return string format of the backtrace
    *
-   * @access public
    *
    * @static
    */
@@ -831,7 +825,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param null $redirect
    * @param string $title
    * @return void
-   * @access public
    * @static
    */
   public static function statusBounce($status, $redirect = NULL, $title = NULL) {
@@ -852,7 +845,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Reset the error stack
    *
-   * @access public
    * @static
    */
   public static function reset() {
@@ -877,7 +869,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param object $obj       The PEAR_ERROR object
    * @return object $obj
-   * @access public
    * @static
    */
   public static function nullHandler($obj) {

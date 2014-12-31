@@ -85,7 +85,6 @@ class CRM_Core_Payment_Form {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access protected
    */
   static protected function setBillingDetailsFields(&$form) {
     $bltID = $form->_bltID;

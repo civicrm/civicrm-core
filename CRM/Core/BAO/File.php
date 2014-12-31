@@ -626,7 +626,6 @@ AND       CEF.entity_id    = %2";
    * Delete a file attachment from an entity table / entity ID
    *
    * @static
-   * @access public
    */
   public static function deleteAttachment() {
     $params = array();
@@ -655,7 +654,6 @@ AND       CEF.entity_id    = %2";
    * @return array|NULL          list of HTML snippets; one HTML snippet for each attachment. If none found, then NULL
    *
    * @static
-   * @access public
    */
   public static function paperIconAttachment($entityTable, $entityID) {
     if (empty($entityTable) || !$entityID) {

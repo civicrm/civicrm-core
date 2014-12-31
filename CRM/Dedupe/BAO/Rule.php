@@ -190,7 +190,6 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
    * @param array contains the rule group property to identify rule group
    *
    * @return rule fields array associated to rule group
-   * @access public
    */
   public static function dedupeRuleFields($params) {
     $rgBao               = new CRM_Dedupe_BAO_RuleGroup();

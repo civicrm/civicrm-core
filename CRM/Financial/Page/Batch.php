@@ -95,7 +95,6 @@ class CRM_Financial_Page_Batch extends CRM_Core_Page_Basic {
    * Browse all entities.
    *
    * @return void
-   * @access public
    */
   public function browse() {
     $status = CRM_Utils_Request::retrieve('status', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1);

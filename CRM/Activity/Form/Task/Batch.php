@@ -61,7 +61,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     /*
@@ -100,7 +99,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -205,7 +203,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -226,7 +223,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

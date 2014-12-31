@@ -142,7 +142,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -238,7 +237,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -256,7 +254,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

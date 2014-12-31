@@ -40,7 +40,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array  $params           (reference ) an assoc array of name/value pairs
    *
    * @return object activity contact object
-   * @access public
    *
    */
   public static function create(&$params) {
@@ -57,7 +56,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Contribute_BAO_Contribution object
-   * @access public
    * @static
    * @todo move hook calls / extended logic to create - requires changing calls to call create not add
    */
@@ -111,7 +109,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array  $duplicates (reference ) store ids of duplicate contribs
    *
    * @return boolean true if duplicate, false otherwise
-   * @access public
    * static
    */
   public static function checkDuplicate($params, &$duplicates) {
@@ -181,7 +178,6 @@ SELECT r.payment_processor_id
    * @param array  $ids (reference ) an array of recurring contribution ids
    *
    * @return array $totalCount an array of recurring ids count
-   * @access public
    * static
    */
   public static function getCount(&$ids) {
@@ -208,7 +204,6 @@ SELECT r.payment_processor_id
    * @param int $recurId
    *
    * @return bool
-   * @access public
    * @static
    */
   public static function deleteRecurContribution($recurId) {
@@ -234,7 +229,6 @@ SELECT r.payment_processor_id
    * @param array $activityParams
    *
    * @return bool
-   * @access public
    * @static
    */
   public static function cancelRecurContribution($recurId, $objects, $activityParams = array()) {
@@ -329,7 +323,6 @@ SELECT r.payment_processor_id
    *
    * @return array list of recurring contribution fields
    *
-   * @access public
    * @static
    */
   public static function getRecurContributions($contactId) {

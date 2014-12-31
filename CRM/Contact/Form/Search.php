@@ -63,7 +63,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * The contextMenu
    *
    * @var array
-   * @access protected
    */
   protected $_contextMenu;
 
@@ -71,7 +70,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * The groupId retrieved from the GET vars
    *
    * @var int
-   * @access public
    */
   public $_groupID;
 
@@ -80,7 +78,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * retrieved from the GET vars
    *
    * @var int
-   * @access protected
    */
   protected $_amtgID;
 
@@ -88,7 +85,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * The saved search ID retrieved from the GET vars
    *
    * @var int
-   * @access protected
    */
   protected $_ssID;
 
@@ -96,7 +92,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * The group elements
    *
    * @var array
-   * @access public
    */
   public $_group;
   public $_groupElement;
@@ -106,7 +101,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * The tag elements
    *
    * @var array
-   * @access protected
    */
   public $_tag;
   public $_tagElement;
@@ -115,7 +109,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * The params used for search
    *
    * @var array
-   * @access protected
    */
   protected $_params;
 
@@ -123,7 +116,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * The return properties used for search
    *
    * @var array
-   * @access protected
    */
   protected $_returnProperties;
 
@@ -131,7 +123,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * The sort by character
    *
    * @var string
-   * @access protected
    */
   protected $_sortByCharacter;
 
@@ -139,7 +130,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * The profile group id used for display
    *
    * @var integer
-   * @access protected
    */
   protected $_ufGroupID;
 
@@ -147,7 +137,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * Csv - common search values
    *
    * @var array
-   * @access protected
    * @static
    */
   static $csv = array('contact_type', 'group', 'tag');
@@ -178,7 +167,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * Define the set of valid contexts that the search form operates on
    *
    * @return array the valid context set and the titles
-   * @access protected
    * @static
    */
   public static function &validContext() {
@@ -330,7 +318,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   /**
    * Build the common elements between the search/advanced form
    *
-   * @access public
    *
    * @return void
    */
@@ -481,7 +468,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // set the various class variables
@@ -737,7 +723,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * Common post processing
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     /*
@@ -876,7 +861,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Search');

@@ -46,7 +46,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    * @param string $value The data to be validated
    *
    * @return boolean True if the value is of the specified type
-   * @access public
    * @static
    */
   public static function typecheck($type, $value) {
@@ -123,7 +122,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    * @param string $type the civicrm type string
    *
    * @return the mysql data store placeholder
-   * @access public
    * @static
    */
   public static function typeToField($type) {

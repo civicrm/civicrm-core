@@ -226,7 +226,6 @@ class CRM_Utils_Rule {
    *
    * @return bool true if valid date
    * @static
-   * @access public
    */
   public static function currentDate($date, $monthRequired = TRUE) {
     $config = CRM_Core_Config::singleton();
@@ -318,7 +317,6 @@ class CRM_Utils_Rule {
    *
    * @return bool true if valid date
    * @static
-   * @access public
    */
   public static function mysqlDate($date) {
     // allow date to be null
@@ -557,7 +555,6 @@ class CRM_Utils_Rule {
    * Checks to make sure the uploaded file is ascii
    *
    * @param     array     Uploaded file info (from $_FILES)
-   * @access    private
    *
    * @return    bool      true if file has been uploaded, false otherwise
    */
@@ -574,7 +571,6 @@ class CRM_Utils_Rule {
    * Checks to make sure the uploaded file is in UTF-8, recodes if it's not
    *
    * @param     array     Uploaded file info (from $_FILES)
-   * @access    private
    *
    * @return    bool      whether file has been uploaded properly and is now in UTF-8
    */
@@ -604,7 +600,6 @@ class CRM_Utils_Rule {
    * Checks to make sure the uploaded file is html
    *
    * @param     array     Uploaded file info (from $_FILES)
-   * @access    private
    *
    * @return    bool      true if file has been uploaded, false otherwise
    */
@@ -624,7 +619,6 @@ class CRM_Utils_Rule {
    * @param array  $options   the daoName and fieldName (optional )
    *
    * @return boolean     true if object exists
-   * @access public
    * @static
    */
   public static function objectExists($value, $options) {
@@ -753,7 +747,6 @@ class CRM_Utils_Rule {
    *
    * @return bool true if valid date
    * @static
-   * @access public
    */
   public static function qfDate($date) {
     $config = CRM_Core_Config::singleton();

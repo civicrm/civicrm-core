@@ -69,7 +69,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function init() {
     $fields = CRM_Event_BAO_Participant::importableFields($this->_contactType, FALSE);
@@ -129,7 +128,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean
-   * @access public
    */
   public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
@@ -141,7 +139,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -153,7 +150,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function summary(&$values) {
     $erroneousField = NULL;
@@ -270,7 +266,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function import($onDuplicate, &$values) {
 
@@ -493,7 +488,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    * Get the array of successfully imported Participation ids
    *
    * @return array
-   * @access public
    */
   public function &getImportedParticipations() {
     return $this->_newParticipants;
@@ -503,7 +497,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function fini() {}
 }

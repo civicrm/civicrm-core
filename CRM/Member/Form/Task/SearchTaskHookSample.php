@@ -42,7 +42,6 @@ class CRM_Member_Form_Task_SearchTaskHookSample extends CRM_Member_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -75,7 +74,6 @@ WHERE      mem.id IN ( $memberIDs )";
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(

@@ -114,7 +114,6 @@ class CRM_Core_Permission {
    *
    * @return boolean true if yes, else false
    * @static
-   * @access public
    */
   public static function check($permissions) {
     $permissions = (array) $permissions;
@@ -162,7 +161,6 @@ class CRM_Core_Permission {
    *
    * @return boolean true if yes, else false
    * @static
-   * @access public
    */
   public static function checkGroupRole($array) {
     $config = CRM_Core_Config::singleton();
@@ -177,7 +175,6 @@ class CRM_Core_Permission {
    * @param  array $whereTables (reference ) add the tables that are needed for the where clause
    *
    * @return string the group where clause for this user
-   * @access public
    */
   public static function getPermissionedStaticGroupClause($type, &$tables, &$whereTables) {
     $config = CRM_Core_Config::singleton();
@@ -191,7 +188,6 @@ class CRM_Core_Permission {
    * @param string $groupType type of group(Access/Mailing)
    * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
-   * @access public
    * @static
    *
    * @return array - array reference of all groups.

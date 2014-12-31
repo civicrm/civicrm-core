@@ -52,7 +52,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contact_BAO_Group object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -73,7 +72,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param int $id group id
    *
    * @return null
-   * @access public
    * @static
    *
    */
@@ -160,7 +158,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $countChildGroups
    *
    * @return int count of members in the group with above status
-   * @access public
    */
   public static function memberCount($id, $status = 'Added', $countChildGroups = FALSE) {
     $groupContact = new CRM_Contact_DAO_GroupContact();
@@ -205,7 +202,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $useCache
    *
    * @return array $aMembers this array contains the list of members for this group id
-   * @access public
    * @static
    */
   public static function &getMember($groupID, $useCache = TRUE) {
@@ -234,7 +230,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @return array of group objects.
    *
-   * @access public
    *
    * @todo other BAO functions that use returnProperties (e.g. Query Objects) receive the array flipped & filled with 1s and
    * add in essential fields (e.g. id). This should follow a regular pattern like the others
@@ -308,7 +303,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param int $id   the id of the object
    *
    * @return string   the permission that the user has (or null)
-   * @access public
    * @static
    */
   public static function checkPermission($id) {
@@ -347,7 +341,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params     Associative array of parameters
    *
    * @return object|null      The new group BAO (if created)
-   * @access public
    * @static
    */
   public static function &create(&$params) {
@@ -529,7 +522,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params     Associative array of parameters
    *
    * @return object|null      The new group BAO (if created)
-   * @access public
    * @static
    */
   public static function createSmartGroup(&$params) {
@@ -643,7 +635,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param  array $params ( reference ) an assoc array of name/value pairs
    *
    * @return array ( smartGroupId, ssId ) smart group id and saved search id
-   * @access public
    * @static
    */
   public static function createHiddenSmartGroup($params) {
@@ -717,7 +708,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *  -page= offset
    *  @todo there seems little reason for the small number of functions that call this to pass in
    *  params that then need to be translated in this function since they are coding them when calling
-   * @access public
    */
   static public function getGroupListSelector(&$params) {
     // format the params
@@ -782,7 +772,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param  array $params associated array for params
    *
    * @return array
-   * @access public
    */
   public static function getGroupList(&$params) {
     $config = CRM_Core_Config::singleton();
@@ -989,7 +978,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $titleOnly
    *
    * @return array
-   * @access public
    */
   static function getGroupsHierarchy(
     $groupIDs,
@@ -1229,7 +1217,6 @@ WHERE {$whereClause}";
    * Define action links
    *
    * @return array $links array of action links
-   * @access public
    */
   public static function actionLinks() {
     $links = array(

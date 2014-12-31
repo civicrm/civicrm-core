@@ -43,7 +43,6 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
@@ -108,7 +107,6 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
    * preview the file and extract some summary statistics
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $fileName         = $this->controller->exportValue('DataSource', 'uploadFile');

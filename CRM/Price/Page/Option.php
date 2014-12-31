@@ -49,7 +49,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * The field id of the option
    *
    * @var int
-   * @access protected
    */
   protected $_fid;
 
@@ -57,7 +56,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * The field id of the option
    *
    * @var int
-   * @access protected
    */
   protected $_sid;
 
@@ -65,7 +63,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * The price set is reserved or not
    *
    * @var boolean
-   * @access protected
    */
   protected $_isSetReserved = false;
 
@@ -73,7 +70,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @access private
    */
   private static $_actionLinks;
 
@@ -83,7 +79,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @param null
    *
    * @return array  array of action links that we need to display for the browse screen
-   * @access public
    */ function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
@@ -126,7 +121,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function browse() {
     $customOption = array();
@@ -206,7 +200,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @param string  $action   the action to be invoked
    *
    * @return void
-   * @access public
    */
   public function edit($action) {
     $oid = CRM_Utils_Request::retrieve('oid', 'Positive',
@@ -262,7 +255,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function run() {
 

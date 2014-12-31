@@ -48,7 +48,6 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * class.
    *
    * @return array collection of required component settings
-   * @access public
    *
    */
   /**
@@ -76,7 +75,6 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * @param bool $getAllUnconditionally
    *
    * @return array|null collection of permissions, null if none
-   * @access public
    */
   /**
    * @param bool $getAllUnconditionally
@@ -114,7 +112,6 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    *
    * @return array|null collection of required dashboard settings,
    *                    null if no element offered
-   * @access public
    *
    */
   /**
@@ -135,7 +132,6 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    *
    * @return array|null collection of required dashboard settings,
    *                    null if no element offered
-   * @access public
    *
    */
   /**
@@ -155,7 +151,6 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    *
    * @return array|null collection of required pane settings,
    *                    null if no element offered
-   * @access public
    *
    */
   /**
@@ -176,7 +171,6 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * class.
    *
    * @return array|null collection of activity types
-   * @access public
    *
    */
   /**

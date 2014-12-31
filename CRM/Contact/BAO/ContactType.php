@@ -41,7 +41,6 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contact_BAO_ContactType object on success, null otherwise
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -570,7 +569,6 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    * @param  int $contactTypeId ID of the Contact Subtype to be deleted.
    *
    * @return bool
-   * @access public
    * @static
    */
   public static function del($contactTypeId) {
@@ -623,7 +621,6 @@ WHERE name = %1";
    * @param  array $params  an assoc array of name/value pairs
    *
    * @return object
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -884,7 +881,6 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
    * @param  array $subtypes - list of subtypes related to which entry is to be removed.
    *
    * @return void
-   * @access public
    */
   public static function deleteCustomRowsOfSubtype($gID, $subtypes = array()) {
     if (!$gID or empty($subtypes)) {
@@ -921,7 +917,6 @@ WHERE ($subtypeClause)";
    * @param  int $entityID - entity id.
    *
    * @return void
-   * @access public
    */
   public function deleteCustomRowsForEntityID($customTable, $entityID) {
     $customTable = CRM_Utils_Type::escape($customTable, 'String');

@@ -49,7 +49,6 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    * The Group id of the option
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
@@ -57,7 +56,6 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    * The field id of the option
    *
    * @var int
-   * @access protected
    */
   protected $_fid;
 
@@ -65,7 +63,6 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @access private
    */
   private static $_actionLinks;
 
@@ -75,7 +72,6 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    * @param null
    *
    * @return array  array of action links that we need to display for the browse screen
-   * @access public
    */
   public function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
@@ -119,7 +115,6 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function browse() {
     //get the default value from custom fields
@@ -245,7 +240,6 @@ ORDER BY weight, label
    * @param string  $action   the action to be invoked
    *
    * @return void
-   * @access public
    */
   public function edit($action) {
     // create a simple controller for editing custom data
@@ -271,7 +265,6 @@ ORDER BY weight, label
    * @param null
    *
    * @return void
-   * @access public
    */
   public function run() {
 

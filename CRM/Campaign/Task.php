@@ -64,7 +64,6 @@ class CRM_Campaign_Task {
    *
    * @return array the set of tasks for a group of voters.
    * @static
-   * @access public
    */
   public static function &tasks() {
     if (!(self::$_tasks)) {
@@ -111,7 +110,6 @@ class CRM_Campaign_Task {
    *
    * @return array the set of task titles
    * @static
-   * @access public
    */
   public static function &taskTitles() {
     self::tasks();
@@ -130,7 +128,6 @@ class CRM_Campaign_Task {
    * @param int $permission
    *
    * @return array set of tasks that are valid for the user
-   * @access public
    */
   public static function &permissionedTaskTitles($permission) {
     $tasks = self::taskTitles();
@@ -146,7 +143,6 @@ class CRM_Campaign_Task {
    *
    * @return array the set of tasks for a group of voters.
    * @static
-   * @access public
    */
   public static function getTask($value) {
     self::tasks();

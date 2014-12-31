@@ -148,7 +148,6 @@ class CRM_Utils_Sort {
    * Function returns the string for the order by clause
    *
    * @return string the order by clause
-   * @access public
    */
   public function orderBy() {
     if (empty($this->_vars[$this->_currentSortID])) {
@@ -175,7 +174,6 @@ class CRM_Utils_Sort {
    *
    * @return string  the string to append to the url
    * @static
-   * @access public
    */
   public static function sortIDValue($index, $dir) {
     return ($dir == self::DESCENDING) ? $index . '_d' : $index . '_u';
@@ -187,7 +185,6 @@ class CRM_Utils_Sort {
    * @param string $defaultSortOrder the sort order to use by default
    *
    * @return returns null if $url- (sort url) is not found
-   * @access public
    */
   public function initSortID($defaultSortOrder) {
     $url = CRM_Utils_Array::value(self::SORT_ID, $_GET, $defaultSortOrder);
@@ -224,7 +221,6 @@ class CRM_Utils_Sort {
    * @param string $defaultSortOrder the sort order to use by default
    *
    * @return void
-   * @access public
    */
   public function initialize($defaultSortOrder) {
     $this->initSortID($defaultSortOrder);
@@ -281,7 +277,6 @@ class CRM_Utils_Sort {
    * @param $b
    *
    * @return int (-1 or 1)
-   * @access public
    */
   public static function cmpFunc($a, $b) {
     $cmp_order = array('weight', 'id', 'title', 'name');

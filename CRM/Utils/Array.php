@@ -39,7 +39,6 @@ class CRM_Utils_Array {
    * If $list is not actually an array at all, then the default value is
    * returned.
    *
-   * @access public
    *
    * @param string $key
    *   Key value to look up in the array.
@@ -71,7 +70,6 @@ class CRM_Utils_Array {
    *
    * @return mixed
    *   The value of the key, or null if the key is not found.
-   * @access public
    */
   public static function retrieveValueRecursive(&$params, $key) {
     if (!is_array($params)) {
@@ -99,7 +97,6 @@ class CRM_Utils_Array {
    * version 4.2.0, which was to return NULL on failure. This function also
    * checks that $list is an array before attempting to search it.
    *
-   * @access public
    *
    * @param mixed $value
    *   The value to search for.
@@ -135,7 +132,6 @@ class CRM_Utils_Array {
    * @param string $seperator
    *   (optional) String to be appended after open/close tags.
    *
-   * @access public
    *
    * @return string
    *   XML fragment representing $list.
@@ -236,7 +232,6 @@ class CRM_Utils_Array {
    * @param string $seperator
    *   (optional) String that separates the concatenated keys.
    *
-   * @access public
    */
   public static function flatten(&$list, &$flat, $prefix = '', $seperator = ".") {
     foreach ($list as $name => $value) {
@@ -265,7 +260,6 @@ class CRM_Utils_Array {
    * @return array
    *   Array-encoded tree
    *
-   * @access public
    */
   public function unflatten($delim, &$arr) {
     $result = array();
@@ -301,7 +295,6 @@ class CRM_Utils_Array {
    *
    * @return array
    *   The merged array.
-   * @access public
    */
   public static function crmArrayMerge($a1, $a2) {
     if (empty($a1)) {
@@ -343,7 +336,6 @@ class CRM_Utils_Array {
    *
    * @return bool
    *   True if $list contains at least one sub-array, false otherwise.
-   * @access public
    */
   public static function isHierarchical(&$list) {
     foreach ($list as $n => $v) {
@@ -381,7 +373,6 @@ class CRM_Utils_Array {
    * @return bool
    *   True if $value was found, false otherwise.
    *
-   * @access public
    */
   public static function crmInArray($value, $params, $caseInsensitive = TRUE) {
     foreach ($params as $item) {
@@ -453,7 +444,6 @@ class CRM_Utils_Array {
    *
    * @return boolean
    *   True if the array is empty.
-   * @access public
    */
   public static function crmIsEmptyArray($array = array()) {
     if (!is_array($array)) {

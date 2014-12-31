@@ -95,7 +95,6 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -123,7 +122,6 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * Browse all Financial Type Account data
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse() {
@@ -205,7 +203,6 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * @param string $action the action to be invoked
    *
    * @return void
-   * @access public
    */
   public function edit( $action ) {
     // create a simple controller for editing CiviCRM Profile data

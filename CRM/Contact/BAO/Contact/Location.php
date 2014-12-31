@@ -44,7 +44,6 @@ class CRM_Contact_BAO_Contact_Location {
    *
    * @return array  of display_name, email, location type and location id if found, or (null,null,null, null)
    * @static
-   * @access public
    */
   public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {
     $primaryClause = NULL;
@@ -84,7 +83,6 @@ WHERE     civicrm_contact.id = %1";
    *
    * @return array    tuple of display_name and sms if found, or (null,null)
    * @static
-   * @access public
    */
   public static function getPhoneDetails($id, $type = NULL) {
     if (!$id) {
@@ -124,7 +122,6 @@ LEFT JOIN civicrm_phone ON ( civicrm_phone.contact_id = civicrm_contact.id )
    *
    * @return null|string     display name of the contact if found
    * @static
-   * @access public
    */
   public static function &getMapInfo($ids, $locationTypeID = NULL, $imageUrlOnly = FALSE) {
     $idString = ' ( ' . implode(',', $ids) . ' ) ';

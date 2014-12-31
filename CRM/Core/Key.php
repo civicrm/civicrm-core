@@ -42,7 +42,6 @@ class CRM_Core_Key {
    *
    * @return string private key for this session
    * @static
-   * @access private
    */
   public static function privateKey() {
     if (!self::$_key) {
@@ -80,7 +79,6 @@ class CRM_Core_Key {
    *
    * @return string       valid formID
    * @static
-   * @access public
    */
   public static function get($name, $addSequence = FALSE) {
     $privateKey = self::privateKey();
@@ -104,7 +102,6 @@ class CRM_Core_Key {
    *
    * @return string $formKey if valid, else null
    * @static
-   * @access public
    */
   public static function validate($key, $name, $addSequence = FALSE) {
     if (!is_string($key)) {

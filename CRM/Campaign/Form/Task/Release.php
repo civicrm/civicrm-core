@@ -66,7 +66,6 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */ function preProcess() {
     $this->_interviewToRelease = $this->get('interviewToRelease');
     if ($this->_interviewToRelease) {
@@ -134,7 +133,6 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */

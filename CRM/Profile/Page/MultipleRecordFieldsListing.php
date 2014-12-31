@@ -137,7 +137,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    * method.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -168,7 +167,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    * Browse the listing
    *
    * @return void
-   * @access public
    */
   public function browse() {
     $dateFields = NULL;

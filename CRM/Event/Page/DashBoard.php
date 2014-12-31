@@ -43,7 +43,6 @@ class CRM_Event_Page_DashBoard extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
   public function preProcess() {
@@ -77,7 +76,6 @@ class CRM_Event_Page_DashBoard extends CRM_Core_Page {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     $this->preProcess();

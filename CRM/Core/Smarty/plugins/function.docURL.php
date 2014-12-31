@@ -41,7 +41,6 @@
  * @param object $smarty reference to the smarty object
  *
  * @return string HTML code of a link to documentation
- * @access public
  */
 function smarty_function_docURL($params, &$smarty) {
   if (!isset($smarty)) {

@@ -37,7 +37,6 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
   /**
    * Returns the HTML generated for the advanced mutliple select component
    *
-   * @access     public
    * @return     string
    * @since      version 0.4.0 (2005-06-25)
    */

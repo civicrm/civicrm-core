@@ -69,7 +69,6 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * @param int $contactID
    *
    * @return boolean true if yes, else false
-   * @access public
    */
   public function check($str, $contactID = NULL) {
     $str = $this->translatePermission($str, 'Drupal6', array(
@@ -94,7 +93,6 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * @param array $array the roles to check
    *
    * @return boolean true if yes, else false
-   * @access public
    */
 
   public function checkGroupRole($array) {

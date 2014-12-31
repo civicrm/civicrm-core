@@ -100,7 +100,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * @param boolean $acl_role -  For grant operations, this flag determines if we're granting a single acl (false) or an entire group.
    *
    * @return string           -   The WHERE clause, or 0 on failure
-   * @access public
    * @static
    */
   public static function permissionClause(&$tables, $operation,
@@ -333,7 +332,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @return string|null  -   WHERE-style clause to filter results,
    * or null if $table or $id is null
-   * @access public
    * @static
    */
   public static function getClause($table, $id, &$tables) {
@@ -363,7 +361,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * @param   bool $hideEmpty only return elements that have a value set.
    *
    * @return array    - Assoc. array of the ACL rule's properties
-   * @access public
    */
   public function toArray($format = '%s', $hideEmpty = false) {
     $result = array();
@@ -390,7 +387,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * @param boolean $aclRoles    -   Should we include ACL Roles
    *
    * @return array                -   Array of assoc. arrays of ACL rules
-   * @access public
    * @static
    */
   public static function &getACLs($contact_id = NULL, $group_id = NULL, $aclRoles = FALSE) {
@@ -455,7 +451,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * @param int $group_id     -   ID of a group to search for
    *
    * @return array            -   Array of assoc. arrays of ACL rules
-   * @access public
    * @static
    */
   public static function &getACLRoles($contact_id = NULL, $group_id = NULL) {
@@ -520,7 +515,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * @param boolean $aclRoles     -   Include ACL Roles?
    *
    * @return array                -   Assoc array of ACL rules
-   * @access public
    * @static
    */
   public static function &getGroupACLs($contact_id, $aclRoles = FALSE) {
@@ -565,7 +559,6 @@ SELECT      $acl.*
    * @param int $contact_id   -   ID of a contact to search for
    *
    * @return array            -   Array of assoc. arrays of ACL rules
-   * @access public
    * @static
    */
   public static function &getGroupACLRoles($contact_id) {
@@ -638,7 +631,6 @@ SELECT $acl.*
    * @param int $contact_id   -   The contact ID
    *
    * @return array            -   Assoc array of ACL rules
-   * @access public
    * @static
    */
   public static function &getAllByContact($contact_id) {
@@ -967,7 +959,6 @@ ORDER BY a.object_id
    *
    * @param  int  $aclId     ID of the ACL record to be deleted.
    *
-   * @access public
    * @static
    */
   public static function del($aclId) {

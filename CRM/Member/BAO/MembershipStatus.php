@@ -53,7 +53,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Member_BAO_MembershipStatus object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -87,7 +86,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    *
    * @throws Exception
    * @return CRM_Member_BAO_MembershipStatus object
-   * @access public
    * @static
    */
   public static function create($params){
@@ -112,7 +110,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids array contains the id - this param is deprecated
    *
-   * @access public
    * @static
    *
    * @return object

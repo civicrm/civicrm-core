@@ -56,7 +56,6 @@ interface CRM_Core_Selector_API {
    *
    * @return void
    *
-   * @access public
    *
    */
   public function getPagerParams($action, &$params);
@@ -67,7 +66,6 @@ interface CRM_Core_Selector_API {
    * @param string action the action being performed
    *
    * @return array the elements that can be sorted along with their properties
-   * @access public
    *
    */
   public function &getSortOrder($action);
@@ -80,7 +78,6 @@ interface CRM_Core_Selector_API {
    * @param enum   $type   what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
   public function &getColumnHeaders($action = NULL, $type = NULL);
 
@@ -91,7 +88,6 @@ interface CRM_Core_Selector_API {
    *
    * @return int   the total number of rows for this action
    *
-   * @access public
    *
    */
   public function getTotalCount($action);
@@ -106,7 +102,6 @@ interface CRM_Core_Selector_API {
    * @param enum   $type     what should the result set include (web/email/csv)
    *
    * @return int   the total number of rows for this action
-   * @access public
    */
   public function &getRows($action, $offset, $rowCount, $sort, $type = NULL);
 
@@ -116,7 +111,6 @@ interface CRM_Core_Selector_API {
    * @param string $action the action being performed
    *
    * @return string
-   * @access public
    *
    */
   public function getTemplateFileName($action = NULL);

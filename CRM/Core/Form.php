@@ -163,7 +163,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $name The name of the form if different from class name
    *
    * @return \CRM_Core_Form
-   * @access public
    */
   function __construct(
     $state = NULL,
@@ -216,7 +215,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Register all the standard rules that most forms potentially use
    *
    * @return void
-   * @access private
    *
    */
   public function registerRules() {
@@ -248,7 +246,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $extra (attributes for select elements)
    *
    * @return HTML_QuickForm_Element could be an error object
-   * @access public
    */
   function &add($type, $name, $label = '',
     $attributes = '', $required = FALSE, $extra = NULL
@@ -297,7 +294,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * This is a virtual function and should be redefined if needed
    *
-   * @access public
    *
    * @return void
    *
@@ -312,7 +308,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * This is a virtual function and should be redefined if needed
    *
-   * @access public
    *
    * @return void
    *
@@ -356,7 +351,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * buildForm associated with QuickForm_Page. This allows us to put
    * preProcess in front of the actual form building routine
    *
-   * @access public
    *
    * @return void
    *
@@ -379,7 +373,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * the form. Keeping it distinct from the form to keep code small
    * and localized in the form building code
    *
-   * @access public
    *
    * @return void
    *
@@ -388,7 +381,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Performs the server side validation
-   * @access    public
    * @since     1.0
    * @return    boolean   true if no error found
    * @throws    HTML_QuickForm_Error
@@ -490,7 +482,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return void
    *
-   * @access public
    *
    */
   public function addButtons($params) {
@@ -550,7 +541,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Getter function for Name
    *
    * @return string
-   * @access public
    */
   public function getName() {
     return $this->_name;
@@ -560,7 +550,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Getter function for State
    *
    * @return object
-   * @access public
    */
   public function &getState() {
     return $this->_state;
@@ -570,7 +559,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Getter function for StateType
    *
    * @return int
-   * @access public
    */
   public function getStateType() {
     return $this->_state->getType();
@@ -580,7 +568,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Getter function for title. Should be over-ridden by derived class
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return $this->_title ? $this->_title : ts('ERROR: Title is not Set');
@@ -592,7 +579,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $title the title of the form
    *
    * @return void
-   * @access public
    */
   public function setTitle($title) {
     $this->_title = $title;
@@ -604,7 +590,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param mixed
    *
    * @return void
-   * @access public
    */
   public function setOptions($options) {
     $this->_options = $options;
@@ -614,7 +599,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Getter function for link.
    *
    * @return string
-   * @access public
    */
   public function getLink() {
     $config = CRM_Core_Config::singleton();
@@ -627,7 +611,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Boolean function to determine if this is a one form page
    *
    * @return boolean
-   * @access public
    */
   public function isSimpleForm() {
     return $this->_state->getType() & (CRM_Core_State::START | CRM_Core_State::FINISH);
@@ -637,7 +620,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Getter function for Form Action
    *
    * @return string
-   * @access public
    */
   public function getFormAction() {
     return $this->_attributes['action'];
@@ -649,7 +631,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string
    *
    * @return void
-   * @access public
    */
   public function setFormAction($action) {
     $this->_attributes['action'] = $action;
@@ -659,7 +640,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Render form and return contents
    *
    * @return string
-   * @access public
    */
   public function toSmarty() {
     $this->preProcessChainSelectFields();
@@ -677,7 +657,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * create one and initialize it
    *
    * @return object
-   * @access public
    */
   public function &getRenderer() {
     if (!isset($this->_renderer)) {
@@ -690,7 +669,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   public function getTemplateFileName() {
     $ext = CRM_Extension_System::singleton()->getMapper();
@@ -722,7 +700,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   public function overrideExtraTemplateFileName() {
     return NULL;
@@ -736,7 +713,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param CRM_Core_DAO $dao     A data access object on which we perform a rollback if non - empty
    *
    * @return void
-   * @access public
    */
   public function error($message, $code = NULL, $dao = NULL) {
     if ($dao) {
@@ -754,7 +730,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param  string name  : name  of the variable
    * @param  mixed  value : value of the variable
    *
-   * @access public
    *
    * @return void
    *
@@ -768,7 +743,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param  string name  : name  of the variable
    *
-   * @access public
    *
    * @return mixed
    *
@@ -781,7 +755,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Getter for action
    *
    * @return int
-   * @access public
    */
   public function getAction() {
     return $this->_action;
@@ -793,7 +766,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param  int  $action the mode we want to set the form
    *
    * @return void
-   * @access public
    */
   public function setAction($action) {
     $this->_action = $action;
@@ -806,7 +778,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param mixed $value value of variable
    *
    * @return void
-   * @access public
    */
   public function assign($var, $value = NULL) {
     self::$_template->assign($var, $value);
@@ -819,7 +790,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param mixed $value value of varaible
    *
    * @return void
-   * @access public
    */
   public function assign_by_ref($var, &$value) {
     self::$_template->assign_by_ref($var, $value);
@@ -966,7 +936,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool|string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
    *
    * @return void
-   * @access public
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $buttons = array();
@@ -1422,7 +1391,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *  - class, etc. - other html properties
    * @param bool $required
    *
-   * @access public
    * @return HTML_QuickForm_Element
    */
   public function addEntityRef($name, $label = '', $props = array(), $required = FALSE) {
@@ -1511,7 +1479,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Function that can be defined in Form to override or
    * perform specific action on cancel action
    *
-   * @access public
    */
   public function cancelAction() {}
 

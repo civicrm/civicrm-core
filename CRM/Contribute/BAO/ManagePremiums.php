@@ -53,7 +53,6 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contribute_BAO_ManagePremium object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -91,7 +90,6 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
    *
-   * @access public
    * @static
    *
    * @return object

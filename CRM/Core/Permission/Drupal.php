@@ -70,7 +70,6 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
    * @param int $contactID
    *
    * @return boolean true if yes, else false
-   * @access public
    */
   public function check($str, $contactID = NULL) {
     $str = $this->translatePermission($str, 'Drupal', array(
@@ -95,7 +94,6 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
    * @param array $array the roles to check
    *
    * @return boolean true if yes, else false
-   * @access public
    */
   public function checkGroupRole($array) {
     if (function_exists('user_load') && isset($array)) {

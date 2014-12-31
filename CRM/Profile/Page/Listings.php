@@ -45,7 +45,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * All the fields that are listings related
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
@@ -53,7 +52,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * The custom fields for this domain
    *
    * @var array
-   * @access protected
    */
   protected $_customFields;
 
@@ -61,7 +59,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * The input params from the request
    *
    * @var array
-   * @access protected
    */
   protected $_params;
 
@@ -97,7 +94,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * the selector object to do a query
    *
    * @return void
-   * @access public
    *
    */
   public function preProcess() {
@@ -403,7 +399,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * @param int $gid
    *
    * @return array
-   * @access public
    */
   public function getProfileContact($gid) {
     $session = CRM_Core_Session::singleton();
@@ -486,7 +481,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
@@ -501,7 +495,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   /**
    * @return string

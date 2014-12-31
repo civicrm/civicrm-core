@@ -108,7 +108,6 @@ class CRM_Core_Session {
    *
    * @param boolean $isRead is this a read operation, in this case, the session will not be touched
    *
-   * @access private
    *
    * @return void
    */
@@ -152,7 +151,6 @@ class CRM_Core_Session {
   /**
    * Resets the session store
    *
-   * @access public
    *
    * @param int $all
    *
@@ -179,7 +177,6 @@ class CRM_Core_Session {
    * @param string $prefix local scope name
    * @param boolean $isRead is this a read operation, in this case, the session will not be touched
    *
-   * @access public
    *
    * @return void
    */
@@ -199,7 +196,6 @@ class CRM_Core_Session {
    * Resets the session local scope
    *
    * @param string $prefix local scope name
-   * @access public
    *
    * @return void
    */
@@ -223,7 +219,6 @@ class CRM_Core_Session {
    * to store complex objects in the session. I suspect it
    * is supported but we need to verify this
    *
-   * @access public
    *
    * @param  string $name    name  of the variable
    * @param  mixed  $value   value of the variable
@@ -259,7 +254,6 @@ class CRM_Core_Session {
    * This function takes a name and retrieves the value of this
    * variable from the session scope.
    *
-   * @access public
    *
    * @param string $name  : name  of the variable
    * @param string $prefix : adds another level of scope to the session
@@ -292,7 +286,6 @@ class CRM_Core_Session {
    * Gets all the variables in the current session scope
    * and stuffs them in an associate array
    *
-   * @access public
    *
    * @param array $vars associative array to store name/value pairs
    * @param string $prefix will be stripped from the key before putting it in the return
@@ -324,7 +317,6 @@ class CRM_Core_Session {
    * Returns true-ish values if the timer is not set or expired, and false if the timer is still running
    * If you want to get more nuanced, you can check the type of the return to see if it's 'not set' or actually expired at a certain time
    *
-   * @access public
    *
    * @param string $name : name of the timer
    * @param int $expire  : expiry time (in seconds)
@@ -349,7 +341,6 @@ class CRM_Core_Session {
    *
    * @return void
    *
-   * @access public
    *
    */
   public function pushUserContext($userContext, $check = TRUE) {
@@ -388,7 +379,6 @@ class CRM_Core_Session {
    *
    * @return void
    *
-   * @access public
    *
    */
   public function replaceUserContext($userContext) {

@@ -86,7 +86,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -140,7 +139,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *- For payment processors of billing mode 'Notify' - return from setDefaults before the code for billing profile population execution .
    * (done this is because for payment processors with 'Notify' mode billing profile form doesn't get rendered on UI)
    *
-   * @access public
    *
    * @return void
    */
@@ -315,7 +313,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // build profiles first so that we can determine address fields etc
@@ -550,7 +547,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @param int      $discountId discount id for the event
    *
    * @return void
-   * @access public
    * @static
    */
   static public function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
@@ -801,7 +797,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -963,7 +958,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -1397,7 +1391,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @param boolean $useDedupeRules force usage of dedupe rules
    *
    * @return void
-   * @access public
    */
   public static function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
     // CRM-3907, skip check for preview registrations

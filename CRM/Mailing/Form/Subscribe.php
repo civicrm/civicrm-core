@@ -81,7 +81,6 @@ SELECT   title, description
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // add the email address
@@ -188,7 +187,6 @@ ORDER BY title";
   }
 
   /**
-   * @access public
    *
    * @return void
    */

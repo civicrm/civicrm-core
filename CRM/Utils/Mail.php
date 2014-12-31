@@ -54,7 +54,6 @@ class CRM_Utils_Mail {
    *
    * @param array $params (by reference)
    *
-   * @access public
    *
    * @return boolean true if a mail was sent, else false
    */
@@ -272,7 +271,6 @@ class CRM_Utils_Mail {
    * Get the Active outBound email
    *
    * @return boolean true if valid outBound email configuration found, false otherwise
-   * @access public
    * @static
    */
   public static function validOutBoundMail() {

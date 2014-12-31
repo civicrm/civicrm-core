@@ -82,7 +82,6 @@ class CRM_Core_Smarty extends Smarty {
    * Class constructor
    *
    * @return CRM_Core_Smarty
-   * @access private
    */
   private function __construct() {
     parent::__construct();

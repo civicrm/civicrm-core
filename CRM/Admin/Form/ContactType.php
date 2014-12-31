@@ -43,7 +43,6 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -91,7 +90,6 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
    * @param $self
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -120,7 +118,6 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

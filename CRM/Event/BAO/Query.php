@@ -61,7 +61,6 @@ class CRM_Event_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function select(&$query) {
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_EVENT) ||
@@ -549,7 +548,6 @@ class CRM_Event_BAO_Query {
    * Getter for the qill object
    *
    * @return string
-   * @access public
    */
   public function qill() {
     return (isset($this->_qill)) ? $this->_qill : "";

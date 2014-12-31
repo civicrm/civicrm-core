@@ -69,7 +69,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -188,7 +187,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Set the default values
    *
    * @return void
-   * @access public
    */
   /**
    *
@@ -377,7 +375,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // build profiles first so that we can determine address fields etc
@@ -630,7 +627,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Build elements to enable pay on behalf of an organization.
    *
-   * @access public
    */
   public function buildOnBehalfOrganization() {
     if ($this->_membershipContactID) {
@@ -652,7 +648,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Build elements to collect information for recurring contributions
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    */
@@ -731,7 +726,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -1129,7 +1123,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

@@ -54,7 +54,6 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -92,7 +91,6 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_PCP_BAO_PCP::buildPCPForm($this);
@@ -138,7 +136,6 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    * @param $self
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
   public static function formRule($params, $files, $self) {
@@ -174,7 +171,6 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -216,7 +212,6 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Enable Personal Campaign Pages');

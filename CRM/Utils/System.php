@@ -65,7 +65,6 @@ class CRM_Utils_System {
    *
    * @return string
    *   The URL fragment.
-   * @access public
    */
   public static function makeURL($urlVar, $includeReset = FALSE, $includeForce = TRUE, $path = NULL, $absolute = FALSE) {
     if (empty($path)) {
@@ -103,7 +102,6 @@ class CRM_Utils_System {
    *   (optional)
    *
    * @return string
-   * @access public
    */
   public static function getLinksUrl($urlVar, $includeReset = FALSE, $includeForce = TRUE, $skipUFVar = TRUE) {
     // Sort out query string to prevent messy urls
@@ -185,7 +183,6 @@ class CRM_Utils_System {
    *
    * @return string
    *
-   * @access public
    */
   static function theme(
     &$content,
@@ -232,7 +229,6 @@ class CRM_Utils_System {
    * @param bool $forceBackend
    * @return string
    *   An HTML string containing a link to the given path.
-   * @access public
    */
   static function url(
     $path = NULL,
@@ -301,7 +297,6 @@ class CRM_Utils_System {
    * What menu path are we currently on. Called for the primary tpl
    *
    * @return string the current menu path
-   * @access public
    */
   public static function currentPath() {
     $config = CRM_Core_Config::singleton();
@@ -315,7 +310,6 @@ class CRM_Utils_System {
    *   List of parameters.
    *
    * @return string url
-   * @access public
    */
   public static function crmURL($params) {
     $p = CRM_Utils_Array::value('p', $params);
@@ -340,7 +334,6 @@ class CRM_Utils_System {
    * @param string $title
    * @param string $pageTitle
    *
-   * @access public
    */
   public static function setTitle($title, $pageTitle = NULL) {
     self::$title = $title;
@@ -358,7 +351,6 @@ class CRM_Utils_System {
    * @param string $default
    *   (optional) The default userContext if no match found.
    *
-   * @access public
    */
   public static function setUserContext($names, $default = NULL) {
     $url = $default;
@@ -389,7 +381,6 @@ class CRM_Utils_System {
    * @return string
    *   The class name of the object.
    *
-   * @access public
    */
   public static function getClassName($object) {
     return get_class($object);
@@ -401,7 +392,6 @@ class CRM_Utils_System {
    * @param string $url
    *   The URL to provide to the browser via the Location header.
    *
-   * @access public
    */
   public static function redirect($url = NULL) {
     if (!$url) {
@@ -437,7 +427,6 @@ class CRM_Utils_System {
    * @param string $message
    *   (optional) The message to provide in the body of the redirect page.
    *
-   * @access public
    */
   static function jsRedirect(
     $url     = NULL,
@@ -477,7 +466,6 @@ class CRM_Utils_System {
    *
    * @param $breadCrumbs
    *
-   * @access public
    */
   public static function appendBreadCrumb($breadCrumbs) {
     $config = CRM_Core_Config::singleton();
@@ -487,7 +475,6 @@ class CRM_Utils_System {
   /**
    * Reset an additional breadcrumb tag to the existing breadcrumb.
    *
-   * @access public
    */
   public static function resetBreadCrumb() {
     $config = CRM_Core_Config::singleton();
@@ -499,7 +486,6 @@ class CRM_Utils_System {
    *
    * @param string $bc
    *
-   * @access public
    */
   public static function addHTMLHead($bc) {
     $config = CRM_Core_Config::singleton();
@@ -514,7 +500,6 @@ class CRM_Utils_System {
    *
    * @return string
    *   The URL to post the form.
-   * @access public
    */
   public static function postURL($action) {
     $config = CRM_Core_Config::singleton();
@@ -524,7 +509,6 @@ class CRM_Utils_System {
   /**
    * Rewrite various system URLs to https.
    *
-   * @access public
    */
   public static function mapConfigToSSL() {
     $config = CRM_Core_Config::singleton();
@@ -542,7 +526,6 @@ class CRM_Utils_System {
    * Get the base URL of the system.
    *
    * @return string
-   * @access public
    */
   public static function baseURL() {
     $config = CRM_Core_Config::singleton();
@@ -676,7 +659,6 @@ class CRM_Utils_System {
    * @param $realPath
    *
    * @return false|array
-   * @access public
    */
   public static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $config = CRM_Core_Config::singleton();
@@ -699,7 +681,6 @@ class CRM_Utils_System {
    * @param string $message
    *   The message to set.
    *
-   * @access public
    */
   public static function setUFMessage($message) {
     $config = CRM_Core_Config::singleton();
@@ -1072,7 +1053,6 @@ class CRM_Utils_System {
    *
    * @return string
    *   civicrm version
-   * @access public
    */
   public static function version() {
     static $version;
@@ -1246,7 +1226,6 @@ class CRM_Utils_System {
    *
    * @return string
    *   The previous page URL
-   * @access public
    */
   public static function refererPath() {
     return CRM_Utils_Array::value('HTTP_REFERER', $_SERVER);
@@ -1257,7 +1236,6 @@ class CRM_Utils_System {
    *
    * @return string
    *   Base URL of the CRM documentation.
-   * @access public
    */
   public static function getDocBaseURL() {
     // FIXME: move this to configuration at some stage
@@ -1268,7 +1246,6 @@ class CRM_Utils_System {
    * Returns wiki (alternate) documentation URL base.
    *
    * @return string documentation url
-   * @access public
    */
   public static function getWikiBaseURL() {
     // FIXME: move this to configuration at some stage
@@ -1297,7 +1274,6 @@ class CRM_Utils_System {
    *
    * @return string
    *   URL or link to documentation page, based on provided parameters.
-   * @access public
    */
   public static function docURL2($page, $URLonly = FALSE, $text = NULL, $title = NULL, $style = NULL, $resource = NULL) {
     // if ts function doesn't exist, it means that CiviCRM hasn't been fully initialised yet -
@@ -1333,7 +1309,6 @@ class CRM_Utils_System {
    *
    * @return string
    *   URL or link to documentation page, based on provided parameters.
-   * @access public
    */
   public static function docURL($params) {
 
@@ -1723,7 +1698,6 @@ class CRM_Utils_System {
    *   An array of files that exist in one or more of the directories that are
    *   referenced by the relative path when appended to each element of the PHP
    *   include path.
-   * @access public
    */
   public static function listIncludeFiles($relpath) {
     $file_list = array();
@@ -1762,7 +1736,6 @@ class CRM_Utils_System {
    * @return array
    *   List of plugins, where the plugin name is both the key and the value of
    *   each element.
-   * @access public
    */
   public static function getPluginList($relpath, $fext = '.php', $skipList = array()) {
     $fext_len = strlen($fext);

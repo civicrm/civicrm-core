@@ -42,7 +42,6 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     //when user come from search context.
@@ -60,7 +59,6 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -104,7 +102,6 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -253,7 +250,6 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
   /**
    * Display Name of the form
    *
-   * @access public
    *
    * @return string
    */

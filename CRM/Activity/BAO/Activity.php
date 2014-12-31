@@ -61,7 +61,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return boolean
-   * @access public
    */
   public static function dataExists(&$params) {
     if (!empty($params['source_contact_id']) || !empty($params['id'])) {
@@ -77,7 +76,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Activity_DAO_Activity object
-   * @access public
    */
   public static function retrieve(&$params, &$defaults) {
     $activity = new CRM_Activity_DAO_Activity();
@@ -146,7 +144,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param bool $moveToTrash
    *
    * @return void
-   * @access public
    */
   public static function deleteActivity(&$params, $moveToTrash = FALSE) {
     // CRM-9137
@@ -253,7 +250,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param int $recordTypeID
    *
    * @return null
-   * @access public
    */
   public static function deleteActivityContact($activityId, $recordTypeID = NULL) {
     $activityContact = new CRM_Activity_BAO_ActivityContact();
@@ -270,7 +266,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param array $params associated array of the submitted values
    *
    * @throws CRM_Core_Exception
-   * @access public
    *
    * @return $this|null|object
    */
@@ -658,7 +653,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *
    * @return array (reference)      $values the relevant data object values of open activities
    *
-   * @access public
    * @static
    */
   public static function &getActivities($input) {
@@ -947,7 +941,6 @@ ORDER BY    fixed_sort_order
    *
    * @return int   count of activities
    *
-   * @access public
    * @static
    */
   public static function &getActivitiesCount($input) {
@@ -984,7 +977,6 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
    *
    * @return int   count of activities
    *
-   * @access public
    * @static
    */
   public static function getActivitySQLClause($input) {
@@ -1168,7 +1160,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @param string $additionalDetails the additional information of CC and BCC appended to the activity Details
    *
    * @return array               ( sent, activityId) if any email is sent and activityId
-   * @access public
    * @static
    */
   static function sendEmail(
@@ -1494,7 +1485,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @param int $userID
    *
    * @return mixed                    true on success or PEAR_Error object
-   * @access public
    * @static
    */
   static function sendSMSMessage($toID,
@@ -1572,7 +1562,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @param null $bcc
    *
    * @return boolean             true if successfull else false.
-   * @access public
    * @static
    */
   static function sendMessage($from,
@@ -1644,7 +1633,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @param bool $status
    *
    * @return array    array of importable Fields
-   * @access public
    * @static
    */
   public static function &importableFields($status = FALSE) {
@@ -1698,7 +1686,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @param int $contactId Id of the contact whose activities need to find
    *
    * @return array    array of activity fields
-   * @access public
    */
   public static function getContactActivity($contactId) {
     $activities = array();
@@ -1774,7 +1761,6 @@ WHERE      activity.id IN ($activityIds)";
    *
    * @return bool
    * @static
-   * @access public
    */
   static function addActivity(&$activity,
     $activityType = 'Membership Signup',
@@ -1889,7 +1875,6 @@ SELECT  display_name
    * @param int  $activityId   current activity id
    *
    * @return int $parentId  Id of parent activity otherwise false.
-   * @access public
    */
   public static function getParentActivity($activityId) {
     static $parentActivities = array();
@@ -1916,7 +1901,6 @@ SELECT  display_name
    * @param $activityID current activity id
    *
    * @return int $params  count of prior activities otherwise false.
-   * @access public
    */
   public static function getPriorCount($activityID) {
     static $priorCounts = array();
@@ -1954,7 +1938,6 @@ AND id < {$activityID}
    * @param bool $onlyPriorRevisions
    *
    * @return array $result  prior activities info.
-   * @access public
    */
   public static function getPriorAcitivities($activityID, $onlyPriorRevisions = FALSE) {
     static $priorActivities = array();
@@ -2003,7 +1986,6 @@ AND cl.modified_id  = c.id
    * @param int $activityID  prior activity id
    *
    * @return int current activity id.
-   * @access public
    */
   public static function getLatestActivityId($activityID) {
     static $latestActivityIds = array();
@@ -2037,7 +2019,6 @@ AND cl.modified_id  = c.id
    *
    * @return $this|null|object
    *
-   * @access public
    */
   public static function createFollowupActivity($activityId, $params) {
     if (!$activityId) {
@@ -2109,7 +2090,6 @@ AND cl.modified_id  = c.id
    * @param array  $params  associated array
    *
    * @return void
-   * @access public
    *
    */
   public static function restoreActivity(&$params) {
@@ -2128,7 +2108,6 @@ AND cl.modified_id  = c.id
    * @param string $name if it is called by case $name = Case else $name = Activity
    *
    * @return array array of exportable Fields
-   * @access public
    * @static
    */
   public static function &exportableFields($name = 'Activity') {
@@ -2183,7 +2162,6 @@ AND cl.modified_id  = c.id
    * Get the allowed profile fields for Activities
    *
    * @return array array of activity profile Fields
-   * @access public
    */
   public static function getProfileFields() {
     $exportableFields = self::exportableFields('Activity');
@@ -2222,7 +2200,6 @@ AND cl.modified_id  = c.id
    * @param  int $contactId contactId
    *
    * @return true/null
-   * @access public
    */
   public static function cleanupActivity($contactId) {
     $result = NULL;
@@ -2270,7 +2247,6 @@ AND cl.modified_id  = c.id
    * @param  int   $action     edit/view
    *
    * @return boolean $allow true/false
-   * @access public
    */
   public static function checkPermission($activityId, $action) {
     $allow = FALSE;
@@ -2418,7 +2394,6 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
    * @param  array   $params associated array for params record id.
    *
    * @return array   $contactActivities associated array of contact activities
-   * @access public
    */
   public static function getContactActivitySelector(&$params) {
     // format the params

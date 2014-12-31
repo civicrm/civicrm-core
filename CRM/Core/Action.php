@@ -43,7 +43,6 @@ class CRM_Core_Action {
    *
    * @var integer const
    *
-   * @access public
    */
   const
     NONE = 0,
@@ -78,7 +77,6 @@ class CRM_Core_Action {
    *
    * @var array $_names  type of variable name to action constant
    *
-   * @access private
    * @static
    *
    */
@@ -116,7 +114,6 @@ class CRM_Core_Action {
    * @param string $str the action to be resolved
    *
    * @return int the action mask corresponding to the input string
-   * @access public
    * @static
    */
   public static function resolve($str) {
@@ -135,7 +132,6 @@ class CRM_Core_Action {
    * @param mixed $item either a single string or an array of strings
    *
    * @return int the action mask corresponding to the input args
-   * @access public
    * @static
    *
    */
@@ -159,7 +155,6 @@ class CRM_Core_Action {
    * @param string $item the input action to process
    *
    * @return int the action mask corresponding to the input string
-   * @access public
    * @static
    *
    */
@@ -175,7 +170,6 @@ class CRM_Core_Action {
    * @param int $mask the action mask
    *
    * @return string the corresponding action description
-   * @access public
    * @static
    *
    */
@@ -202,7 +196,6 @@ class CRM_Core_Action {
    * @param int $objectId
    *
    * @return string       the html string
-   * @access public
    * @static
    */
   static function formLink($links,
@@ -312,7 +305,6 @@ class CRM_Core_Action {
    * @param array  $values the array of values for parameter substitution in the str
    *
    * @return string        the substituted string
-   * @access public
    * @static
    */
   public static function &replace(&$str, &$values) {
@@ -329,7 +321,6 @@ class CRM_Core_Action {
    *
    * @return int   the mask for the above permission
    * @static
-   * @access public
    */
   public static function mask($permissions) {
     $mask = NULL;

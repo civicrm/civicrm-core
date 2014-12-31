@@ -51,7 +51,6 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
    *
    *
    * @return \CRM_Core_Controller_Simple
-   * @access public
    */
   function __construct(
     $path,

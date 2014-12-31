@@ -67,7 +67,6 @@ class CRM_Core_OptionValue {
    *
    * @return array of option-values
    *
-   * @access public
    * @static
    */
   public static function getRows($groupParams, $links, $orderBy = 'weight') {
@@ -179,7 +178,6 @@ class CRM_Core_OptionValue {
    *
    * @return CRM_Core_DAO_OptionValue
    *
-   * @access public
    * @static
    */
   public static function addOptionValue(&$params, &$groupParams, &$action, &$optionValueID) {
@@ -247,7 +245,6 @@ class CRM_Core_OptionValue {
    * @param string $fieldName the name of the field in the DAO
    *
    * @return boolean     true if object exists
-   * @access public
    * @static
    */
   public static function optionExists($value, $daoName, $daoID, $optionGroupID, $fieldName = 'name') {
@@ -270,7 +267,6 @@ class CRM_Core_OptionValue {
    * @param string $contactType
    *
    * @return boolean     true if object exists
-   * @access public
    * @static
    */
   public static function getFields($mode = '', $contactType = 'Individual') {
@@ -343,7 +339,6 @@ class CRM_Core_OptionValue {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function select(&$query) {
     if (!empty($query->_params) || !empty($query->_returnProperties)) {
@@ -377,7 +372,6 @@ class CRM_Core_OptionValue {
    *
    * @return array of option-values
    *
-   * @access public
    * @static
    */
   public static function getValues($groupParams, &$values, $orderBy = 'weight', $isActive = FALSE) {

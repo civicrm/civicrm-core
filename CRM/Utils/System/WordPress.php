@@ -58,7 +58,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param null $pageTitle
    *
    * @return void
-   * @access public
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
@@ -103,7 +102,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @internal param string $url
    *
    * @return void
-   * @access public
    * @static
    */
   public function appendBreadCrumb($breadCrumbs) {
@@ -135,7 +133,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Reset an additional breadcrumb tag to the existing breadcrumb
    *
    * @return void
-   * @access public
    * @static
    */
   public function resetBreadCrumb() {
@@ -149,7 +146,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param string $head the new string to be appended
    *
    * @return void
-   * @access public
    * @static
    */
   public function addHTMLHead($head) {
@@ -182,7 +178,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScriptUrl($url, $region) {
     return FALSE;
@@ -198,7 +193,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScript($code, $region) {
     return FALSE;
@@ -214,7 +208,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyleUrl($url, $region) {
     return FALSE;
@@ -230,7 +223,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyle($code, $region) {
     return FALSE;
@@ -242,7 +234,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param null
    *
    * @return void
-   * @access public
    * @static
    */
   public function mapConfigToSSL() {
@@ -256,7 +247,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param mix $action the default action if one is pre-specified
    *
    * @return string the url to post the form
-   * @access public
    * @static
    */
   public function postURL($action) {
@@ -282,7 +272,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param bool $forceBackend
    *
    * @return string            an HTML string containing a link to the given path.
-   * @access public
    */
   function url(
     $path = NULL,
@@ -400,7 +389,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @return mixed false if no auth
    *               array(
    * contactID, ufID, unique string ) if success
-   * @access public
    * @static
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
@@ -430,7 +418,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *
    * @param string $message the message to set
    *
-   * @access public
    * @static
    */
   public function setMessage($message) {

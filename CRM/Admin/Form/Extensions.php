@@ -43,7 +43,6 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    * For pre-processing
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -88,7 +87,6 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -101,7 +99,6 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -159,7 +156,6 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    * @param array $self    this object.
    *
    * @return true if no errors, else an array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -171,7 +167,6 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

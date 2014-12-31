@@ -85,7 +85,6 @@ class CRM_Contact_Form_Task_SMSCommon {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
@@ -307,7 +306,6 @@ class CRM_Contact_Form_Task_SMSCommon {
    * @param array $self      additional values form 'this'
    *
    * @return true if no errors, else array of errors
-   * @access public
    *
    */
   public static function formRule($fields, $dontCare, $self) {
@@ -339,7 +337,6 @@ class CRM_Contact_Form_Task_SMSCommon {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *

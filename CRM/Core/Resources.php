@@ -479,7 +479,6 @@ class CRM_Core_Resources {
    *
    * @param string $region
    * @return CRM_Core_Resources
-   * @access public
    */
   public function addCoreResources($region = 'html-header') {
     if (!isset($this->addedCoreResources[$region]) && !self::isAjaxMode()) {

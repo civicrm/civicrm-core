@@ -68,7 +68,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
    * @param null
    *
    * @return void
-   * @access public
    */ function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
 
@@ -102,7 +101,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
    * @param null
    *
    * @return array    array of default values
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
@@ -119,7 +117,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -151,7 +148,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

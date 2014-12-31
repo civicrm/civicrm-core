@@ -102,7 +102,6 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
    *
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse() {

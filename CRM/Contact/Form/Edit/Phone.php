@@ -46,7 +46,6 @@ class CRM_Contact_Form_Edit_Phone {
    * @param boolean       $blockEdit         is it block edit
    *
    * @return void
-   * @access public
    * @static
    */
   public static function buildQuickForm(&$form, $addressBlockCount = NULL, $blockEdit = FALSE) {

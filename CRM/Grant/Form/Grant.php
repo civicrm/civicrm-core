@@ -59,7 +59,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     //custom data related code
@@ -171,7 +170,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
@@ -259,7 +257,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

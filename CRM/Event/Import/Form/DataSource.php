@@ -42,7 +42,6 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $session = CRM_Core_Session::singleton();
@@ -55,7 +54,6 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //Setting Upload File Size
@@ -156,7 +154,6 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
    * Process the uploaded file
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $this->controller->resetPage('MapField');
@@ -196,7 +193,6 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Upload Data');

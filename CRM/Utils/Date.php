@@ -795,7 +795,6 @@ class CRM_Utils_Date {
    * @param date $birthDate Birth Date
    *
    * @return int array $results contains years or months
-   * @access public
    * @static
    */
   static public function calculateAge($birthDate) {
@@ -857,7 +856,6 @@ class CRM_Utils_Date {
    * @param bool $dontCareTime
    *
    * @return array $result contains new date with added interval
-   * @access public
    */
   public static function intervalAdd($unit, $interval, $date, $dontCareTime = FALSE) {
     if (is_array($date)) {
@@ -1617,7 +1615,6 @@ class CRM_Utils_Date {
    * @param  int $fyMonth   Fiscal Start Month
    *
    * @return int $fy       Current Fiscl Year
-   * @access public
    * @static
    */
   public static function calculateFiscalYear($fyDate, $fyMonth) {

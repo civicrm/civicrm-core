@@ -38,7 +38,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -48,7 +47,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -116,7 +114,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -223,7 +220,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($values, $files, $self) {
     $errors = array();
@@ -295,7 +291,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -402,7 +397,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Title and Settings');

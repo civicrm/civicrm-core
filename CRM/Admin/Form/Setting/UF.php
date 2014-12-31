@@ -47,7 +47,6 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();

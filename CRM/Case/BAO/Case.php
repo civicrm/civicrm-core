@@ -74,7 +74,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Case_BAO_Case object
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -92,7 +91,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $ids    the array that holds all the db ids
    *
    * @return CRM_Case_BAO_Case|null the found object or null
-   * @access public
    * @static
    */
   public static function &getValues(&$params, &$values, &$ids) {
@@ -114,7 +112,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Case_BAO_Case object
-   * @access public
    * @static
    */
   public static function &create(&$params) {
@@ -159,7 +156,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array    case_id, contact_id
    *
    * @return object
-   * @access public
    */
   public static function addCaseToContact($params) {
     $caseContact = new CRM_Case_DAO_CaseContact();
@@ -202,7 +198,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param int    case_id
    *
    * @return Void
-   * @access public
    */
   public static function deleteCaseContact($caseID) {
     $caseContact = new CRM_Case_DAO_CaseContact();
@@ -258,7 +253,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $ids      (reference) the array that holds all the db ids
    *
    * @return CRM_Case_BAO_Case object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults, &$ids) {
@@ -272,7 +266,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @access public
    * @static
    */
   public static function processCaseActivity(&$params) {
@@ -290,7 +283,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param int $activityId  activity id
    *
    * @return  case subject or null
-   * @access public
    * @static
    */
   public static function getCaseSubject($activityId) {
@@ -310,7 +302,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param string $colName
    *
    * @return  case type
-   * @access public
    * @static
    */
   public static function getCaseType($caseId, $colName = 'title') {
@@ -334,7 +325,6 @@ WHERE civicrm_case.id = %1";
    * @param bool $moveToTrash
    *
    * @return bool is successful
-   * @access public
    * @static
    */
   public static function deleteCase($caseId, $moveToTrash = FALSE) {
@@ -387,7 +377,6 @@ WHERE civicrm_case.id = %1";
    * @param boolean $enable action
    *
    * @return void
-   * @access public
    * @static
    */
   public static function enableDisableCaseRelationships($caseId, $enable) {
@@ -412,7 +401,6 @@ WHERE civicrm_case.id = %1";
    * @param  int $activityId id of the activity
    *
    * @return void
-   * @access public
    * @static
    */
   public static function deleteCaseActivity($activityId) {
@@ -429,7 +417,6 @@ WHERE civicrm_case.id = %1";
    * @param int $contactID
    *
    * @return array
-   * @access public
    */
   public static function retrieveContactIdsByCaseId($caseId, $contactID = NULL) {
     $caseContact = new CRM_Case_DAO_CaseContact();
@@ -476,7 +463,6 @@ WHERE civicrm_case.id = %1";
    *
    * @return array
    *
-   * @access public
    *
    */
   public static function getContactNames($caseId) {
@@ -523,7 +509,6 @@ WHERE civicrm_case.id = %1";
    *
    * @return array
    *
-   * @access public
    */
   public static function retrieveCaseIdsByContactId($contactID, $includeDeleted = FALSE, $caseType = NULL) {
     $query = "
@@ -726,7 +711,6 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
    *
    * @return array     Array of Cases
    *
-   * @access public
    */
   public static function getCases($allCases = TRUE, $userID = NULL, $type = 'upcoming', $context = 'dashboard') {
     $condition = NULL;
@@ -1427,7 +1411,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $caseId
    *
    * @return void
-   * @access public
    */
   public static function sendActivityCopy($clientId, $activityId, $contacts, $attachments = NULL, $caseId) {
     if (!$activityId) {
@@ -1567,7 +1550,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *
    * @return array
    *
-   * @access public
    *
    */
   public static function getCaseActivityCount($caseId, $activityTypeId) {
@@ -1687,7 +1669,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *
    * @return array  $activityInfo Array of scheduled activity type and date
    *
-   * @access public
    *
    * @static
    */
@@ -1726,7 +1707,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * Combine all the exportable fields from the lower levels object
    *
    * @return array array of exportable Fields
-   * @access public
    * @static
    */
   public static function &exportableFields() {
@@ -1757,7 +1737,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param  int $caseId id of the case to restore
    *
    * @return true if success.
-   * @access public
    * @static
    */
   public static function restoreCase($caseId) {
@@ -2171,7 +2150,6 @@ LEFT JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.case
    *
    * @return an array of cases.
    *
-   * @access public
    */
   public static function getContactCases($contactId, $excludeDeleted = TRUE) {
     $cases = array();
@@ -2213,7 +2191,6 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    *
    * @return an array of related cases.
    *
-   * @access public
    */
   public static function getRelatedCases($mainCaseId, $contactId, $excludeDeleted = TRUE) {
     //FIXME : do check for permissions.

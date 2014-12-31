@@ -42,7 +42,6 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     //when user come from search context.
@@ -59,7 +58,6 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -177,7 +175,6 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
    * @param array $self an current this object
    *
    * @return boolean          true on successful SMTP handoff
-   * @access public
    */
   public static function testMail($testParams, $files, $self) {
     $error = NULL;
@@ -374,7 +371,6 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
   /**
    * Display Name of the form
    *
-   * @access public
    *
    * @return string
    */

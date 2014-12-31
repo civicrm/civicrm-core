@@ -47,7 +47,6 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
    * View details of a recurring contribution
    *
    * @return void
-   * @access public
    */ function view() {
     $recur = new CRM_Contribute_DAO_ContributionRecur();
     $recur->id = $this->_id;
@@ -95,7 +94,6 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     $this->preProcess();

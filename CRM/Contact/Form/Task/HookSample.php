@@ -43,7 +43,6 @@ class CRM_Contact_Form_Task_HookSample extends CRM_Contact_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -76,7 +75,6 @@ AND    c.id IN ( $contactIDs )";
   /**
    * Build the form object - it consists of
    *
-   * @access public
    *
    * @return void
    */
@@ -87,7 +85,6 @@ AND    c.id IN ( $contactIDs )";
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

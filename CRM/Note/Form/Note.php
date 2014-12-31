@@ -90,7 +90,6 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -117,7 +116,6 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -160,7 +158,6 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
   }
 
   /**
-   * @access public
    *
    * @return void
    */

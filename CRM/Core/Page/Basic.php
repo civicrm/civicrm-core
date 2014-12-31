@@ -48,7 +48,6 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * Name of the BAO to perform various DB manipulations
    *
    * @return string
-   * @access public
    */
 
   abstract function getBAOName();
@@ -57,7 +56,6 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * An array of action links
    *
    * @return array (reference)
-   * @access public
    */
   abstract function &links();
 
@@ -65,7 +63,6 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * Name of the edit form class
    *
    * @return string
-   * @access public
    */
   abstract function editForm();
 
@@ -73,7 +70,6 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * Name of the form
    *
    * @return string
-   * @access public
    */
   abstract function editName();
 
@@ -83,7 +79,6 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * @param int $mode mode that we are in
    *
    * @return string
-   * @access public
    */
   abstract function userContext($mode = NULL);
 
@@ -93,7 +88,6 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * @param int $mode mode that we are in
    *
    * @return string
-   * @access public
    */
   public function userContextParams($mode = NULL) {
     return 'reset=1&action=browse';
@@ -106,7 +100,6 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * @param int $name the name or title of the object
    *
    * @return string   permission value if permission is granted, else null
-   * @access public
    */
   public function checkPermission($id, $name) {
     return CRM_Core_Permission::EDIT;
@@ -119,7 +112,6 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * @param CRM_Core_Controller $controller the controller object
    *
    * @return void
-   * @access public
    */
   public function addValues($controller) {}
 
@@ -196,7 +188,6 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * Browse all entities.
    *
    * @return void
-   * @access public
    */
   public function browse() {
     $n      = func_num_args();
@@ -293,7 +284,6 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * @param bool $forceAction
    *
    * @return void
-   * @access private
    */
   public function action(&$object, $action, &$values, &$links, $permission, $forceAction = FALSE) {
     $values['class'] = '';

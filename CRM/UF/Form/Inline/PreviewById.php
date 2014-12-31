@@ -49,7 +49,6 @@ class CRM_UF_Form_Inline_PreviewById extends CRM_UF_Form_AbstractPreview {
    *
    * @return void
    *
-   * @access public
    *
    */
   public function preProcess() {

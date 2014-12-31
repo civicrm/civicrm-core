@@ -44,7 +44,6 @@ class CRM_Contact_Form_Edit_CustomData {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
   public static function preProcess(&$form) {
     $form->_type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
@@ -72,7 +71,6 @@ class CRM_Contact_Form_Edit_CustomData {
    * @param CRM_Core_Form $form       reference to the form object
    *
    * @return void
-   * @access public
    * @static
    */
   public static function buildQuickForm(&$form) {
@@ -105,7 +103,6 @@ class CRM_Contact_Form_Edit_CustomData {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param $defaults

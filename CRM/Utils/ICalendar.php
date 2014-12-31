@@ -90,7 +90,6 @@ class CRM_Utils_ICalendar {
    * - 'text/plain'    : used for iCal formatted feed
    * - 'text/xml'      : used for gData or rss formatted feeds
    *
-   * @access public
    *
    * @param string $calendar The calendar data to be published.
    * @param string $content_type

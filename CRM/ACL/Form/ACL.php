@@ -45,7 +45,6 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -116,7 +115,6 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -270,7 +268,6 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

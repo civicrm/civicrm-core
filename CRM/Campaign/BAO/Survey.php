@@ -47,7 +47,6 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    * @param array  $params   (reference ) an assoc array of name/value pairs
    * @param array  $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @access public
    */
 
   /**
@@ -80,7 +79,6 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    * @param array $params
    *
    * @return CRM_Survey_DAO_Survey object
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -392,7 +390,6 @@ SELECT  survey.id    as id,
    * @param int $id survey id
    *
    * @return mixed|null
-   * @access public
    * @static
    *
    */

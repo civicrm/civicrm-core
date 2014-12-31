@@ -57,7 +57,6 @@ class CRM_Case_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function select(&$query) {
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_CASE) || !empty($query->_returnProperties['case_id'])) {
@@ -225,7 +224,6 @@ class CRM_Case_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function where(&$query) {
     foreach ($query->_params as $id => $values) {
@@ -250,7 +248,6 @@ class CRM_Case_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -607,7 +604,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    * Getter for the qill object
    *
    * @return string
-   * @access public
    */
   public function qill() {
     return (isset($this->_qill)) ? $this->_qill : "";
@@ -698,7 +694,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   /**
    * Add all the elements shared between case search and advanaced search
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *

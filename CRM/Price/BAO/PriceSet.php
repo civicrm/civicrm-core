@@ -60,7 +60,6 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Price_DAO_PriceSet object
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -82,7 +81,6 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Price_DAO_PriceSet object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -99,7 +97,6 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
-   * @access public
    */
   public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_active', $isActive);
@@ -113,7 +110,6 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    *
    * @return array $defaultPriceSet default price set
    *
-   * @access public
    * @static
    *
    */
@@ -159,7 +155,6 @@ WHERE       ps.name = '{$entityName}'
    *
    * @return string   title
    *
-   * @access public
    * @static
    *
    */
@@ -282,7 +277,6 @@ WHERE     ct.id = cp.financial_type_id AND
    * @return boolean false if fields exist for this set, true if the
    * set could be deleted
    *
-   * @access public
    * @static
    */
   public static function deleteSet($id) {
@@ -405,7 +399,6 @@ WHERE     ct.id = cp.financial_type_id AND
    *
    * @return integer|NULL price set id on success, null  otherwise
    * @static
-   * @access public
    */
   public static function getSetId(&$params) {
     $fid = NULL;
@@ -887,7 +880,6 @@ WHERE  id = %1";
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
   public static function buildPriceSet(&$form) {
     $priceSetId = $form->get('priceSetId');
@@ -1005,7 +997,6 @@ WHERE  id = %1";
    * @param $defaults
    *
    * @return array $defaults
-   * @access public
    */
   public static function setDefaultPriceSet(&$form, &$defaults) {
     if (!isset($form->_priceSet) || empty($form->_priceSet['fields'])) {
@@ -1075,7 +1066,6 @@ WHERE  id = %1";
    *
    * @return array of the field ids
    *
-   * @access public
    * @static
    */
   public static function getFieldIds($id) {
@@ -1095,7 +1085,6 @@ WHERE  id = %1";
    * @param int $id the price set id to copy
    *
    * @return the copy object
-   * @access public
    * @static
    */
   public static function copy($id) {
@@ -1162,7 +1151,6 @@ WHERE  id = %1";
    * @param bool $onlyActive
    *
    * @return int|null|string
-   * @access public
    * @static
    */
   public static function getPricesetCount($sid, $onlyActive = TRUE) {
@@ -1270,7 +1258,6 @@ GROUP BY     mt.member_of_contact_id";
    *
    * @return array associate array of frequency interval and unit
    * @static
-   * @access public
    */
   public static function getRecurDetails($priceSetId) {
     $query = 'SELECT mt.duration_interval, mt.duration_unit
@@ -1303,7 +1290,6 @@ GROUP BY     mt.member_of_contact_id";
    *
    * @return Object                   DAO object on sucess, null otherwise
    * @static
-   * @access public
    */
   public static function setIsQuickConfig($id, $isQuickConfig) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_quick_config', $isQuickConfig);
@@ -1313,7 +1299,6 @@ GROUP BY     mt.member_of_contact_id";
    * Check if price set id provides option for
    * user to select both auto-renew and non-auto-renew memberships
    *
-   * @access public
    * @static
    *
    */

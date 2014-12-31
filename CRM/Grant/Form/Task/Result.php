@@ -44,7 +44,6 @@ class CRM_Grant_Form_Task_Result extends CRM_Grant_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $session = CRM_Core_Session::singleton();
@@ -69,7 +68,6 @@ class CRM_Grant_Form_Task_Result extends CRM_Grant_Form_Task {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(

@@ -42,7 +42,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * Number of columns in where
    *
    * @var int
-   * @access public
    */
   public $_columnCount;
 
@@ -50,7 +49,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * Number of blocks to be shown
    *
    * @var int
-   * @access public
    */
   public $_blockCount;
 
@@ -58,7 +56,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->set('searchFormName', 'Builder');
@@ -128,7 +125,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   /**
    * Add local and global form rules
    *
-   * @access protected
    *
    * @return void
    */
@@ -145,7 +141,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($values, $files, $self) {
     if (!empty($values['addMore']) || !empty($values['addBlock'])) {
@@ -322,7 +317,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * Process the uploaded file
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $this->set('isAdvanced', '2');

@@ -91,14 +91,12 @@ abstract class CRM_SMS_Provider {
   /**
    * Send an SMS Message via the API Server
    *
-   * @access public
    */
   abstract function send($recipients, $header, $message, $dncID = NULL);
 
   /**
    * Return message text. Child class could override this function to have better control over the message being sent.
    *
-   * @access public
    */
   public function getMessage($message, $contactID, $contactDetails) {
     $html = $message->getHTMLBody();

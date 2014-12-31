@@ -41,7 +41,6 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
   public function browse() {
     $controller = new CRM_Core_Controller_Simple(
@@ -74,7 +73,6 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    * This function is called when action is view
    *
    * return null
-   * @access public
    */
   public function view() {
     // build associated contributions
@@ -96,7 +94,6 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    * This function is called when action is update or new
    *
    * return null
-   * @access public
    */
   public function edit() {
     // set https for offline cc transaction
@@ -152,7 +149,6 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    * This function is the main function that is called when the page loads, it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     $this->preProcess();
@@ -288,7 +284,6 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    * contribution for the participant
    *
    * return null
-   * @access public
    */
   public function associatedContribution() {
     if (CRM_Core_Permission::access('CiviContribute')) {

@@ -76,7 +76,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * Obtains the group name from url and sets the title.
    *
    * @return void
-   * @access public
    *
    */
   public function preProcess() {
@@ -153,7 +152,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse() {
@@ -212,7 +210,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * @param int $mode mode that we are in
    *
    * @return string
-   * @access public
    */
   public function userContextParams($mode = NULL) {
     return 'reset=1';

@@ -84,7 +84,6 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
    * or by component ($compID)
    *
    * @return array  $rows
-   * @access public
    * @static
    */
   public function &info() {

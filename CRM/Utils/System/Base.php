@@ -49,7 +49,6 @@ abstract class CRM_Utils_System_Base {
    * @param boolean $maintenance  for maintenance mode
    *
    * @return void           prints content on stdout
-   * @access public
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
     $ret = FALSE;
@@ -166,7 +165,6 @@ abstract class CRM_Utils_System_Base {
    *
    * @param array $data  array with user specific data
    *
-   * @access public
    */
   public function setUserSession($data) {
     list($userID, $ufID) = $data;

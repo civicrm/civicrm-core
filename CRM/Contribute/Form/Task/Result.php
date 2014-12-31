@@ -44,7 +44,6 @@ class CRM_Contribute_Form_Task_Result extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {}
 
@@ -52,7 +51,6 @@ class CRM_Contribute_Form_Task_Result extends CRM_Contribute_Form_Task {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(

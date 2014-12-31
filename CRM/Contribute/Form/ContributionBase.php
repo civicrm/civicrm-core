@@ -200,7 +200,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
@@ -523,7 +522,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Set the default values
    *
    * @return void
-   * @access public
    */
   public function setDefaultValues() {
     return $this->_defaults;
@@ -533,7 +531,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Assign the minimal set of variables to the template
    *
    * @return void
-   * @access public
    */
   public function assignToTemplate() {
     $name = CRM_Utils_Array::value('billing_first_name', $this->_params);
@@ -666,7 +663,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @param null $fieldTypes
    *
    * @return void
-   * @access public
    */
   public function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
     if ($id) {
@@ -797,7 +793,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
@@ -812,7 +807,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
@@ -825,7 +819,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Authenticate pledge user during online payment.
    *
-   * @access public
    *
    * @return void
    */

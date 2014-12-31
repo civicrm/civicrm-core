@@ -81,7 +81,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * @param null $mode
    *
    * @return void
-   * @access public
    * @static
    */
   public static function runJobs($testParams = NULL, $mode = NULL) {
@@ -485,7 +484,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
    * @param array $testParams
    *
    * @return void
-   * @access public
    */
   public function deliver(&$mailer, $testParams = NULL) {
     $mailing = new CRM_Mailing_BAO_Mailing();
@@ -869,7 +867,6 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
    * @param string $status        The status enum
    *
    * @return string               The translated version
-   * @access public
    * @static
    */
   public static function status($status) {
@@ -892,7 +889,6 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
    * to only process jobs that are approved.
    *
    * @return string        For use in a WHERE clause
-   * @access public
    * @static
    */
   public static function workflowClause() {

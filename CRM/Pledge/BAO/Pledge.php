@@ -60,7 +60,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Pledge_BAO_Pledge object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -78,7 +77,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
@@ -127,7 +125,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $returnProperties  if you want to return specific fields
    *
    * @return array associated array of field values
-   * @access public
    * @static
    */
   public static function &getValues(&$params, &$values, $returnProperties = NULL) {
@@ -144,7 +141,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Pledge_BAO_Pledge object
-   * @access public
    * @static
    */
   public static function &create(&$params) {
@@ -258,7 +254,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param int $id pledge id
    *
    * @return mixed
-   * @access public
    * @static
    *
    */
@@ -448,7 +443,6 @@ GROUP BY  currency
    *
    * @return array return the list of pledge fields
    *
-   * @access public
    * @static
    */
   public static function getHonorContacts($honorId) {
@@ -491,7 +485,6 @@ GROUP BY  currency
    *
    * @param CRM_Core_Form $form form object.
    * @param array $params an assoc array of name/value pairs.
-   * @access public
    *
    * @return void.
    */
@@ -685,7 +678,6 @@ GROUP BY  currency
    * Combine all the exportable fields from the lower levels object
    *
    * @return array array of exportable Fields
-   * @access public
    * @static
    */
   public static function &exportableFields() {
@@ -794,7 +786,6 @@ GROUP BY  currency
    * @param int $contactID
    *
    * @return int count of pledge records
-   * @access public
    * @static
    */
   public static function getContactPledgeCount($contactID) {

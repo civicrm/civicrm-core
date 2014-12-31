@@ -43,7 +43,6 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_activityId = CRM_Utils_Request::retrieve('activityId', 'Positive', CRM_Core_DAO::$_nullObject);
@@ -60,7 +59,6 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
@@ -94,7 +92,6 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->add('text', 'file_on_case_unclosed_case_id', ts('Select Case'), array('class' => 'huge'), TRUE);

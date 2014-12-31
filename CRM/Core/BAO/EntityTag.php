@@ -46,7 +46,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @return array(
      ) reference $tag array of category id's the contact belongs to.
    *
-   * @access public
    * @static
    */
   public static function &getTag($entityID, $entityTable = 'civicrm_contact') {
@@ -73,7 +72,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Core_BAO_EntityTag object
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -104,7 +102,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param array  $params an assoc array of name/value pairs
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function dataExists($params) {
@@ -117,7 +114,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Core_BAO_EntityTag object
-   * @access public
    * @static
    *
    */
@@ -139,7 +135,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param string $entityTable name of entity table default:civicrm_contact
    *
    * @return array (total, added, notAdded) count of enities added to tag
-   * @access public
    * @static
    */
   public static function addEntitiesToTag(&$entityIds, $tagId, $entityTable = 'civicrm_contact') {
@@ -182,7 +177,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param string $entityTable name of entity table default:civicrm_contact
    *
    * @return array (total, removed, notRemoved) count of entities removed from tags
-   * @access public
    * @static
    */
   public static function removeEntitiesFromTag(&$entityIds, $tagId, $entityTable = 'civicrm_contact') {
@@ -225,7 +219,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param int $entityID
    *
    * @return void
-   * @access public
    * @static
    */
   public static function create(&$params, $entityTable, $entityID) {
@@ -268,7 +261,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param object  $tag    an object of a tag.
    *
    * @return  array   $entityIds    array of entity ids
-   * @access public
    */
   public function getEntitiesByTag($tag) {
     $entityIds = array();

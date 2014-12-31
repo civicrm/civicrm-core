@@ -49,7 +49,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contribute_BAO_FinancialItem object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -69,7 +68,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param object $contribution contribution object
    * @param boolean $taxTrxnID
    *
-   * @access public
    * @static
    * @return void
    */
@@ -133,7 +131,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $ids financial item ids
    * @param array $trxnIds financial item ids
    *
-   * @access public
    * @static
    * @return object
    */
@@ -183,7 +180,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Core_BAO_FinancialTrxn object
-   * @access public
    * @static
    */
   public static function createEntityTrxn($params) {
@@ -200,7 +196,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param bool $maxId to retrive max id
    *
    * @return array
-   * @access public
    * @static
    */
   public static function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
@@ -239,7 +234,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $error error to display
    *
    * @return array
-   * @access public
    * @static
    */
   public static function checkContactPresent($contactIds, &$error) {

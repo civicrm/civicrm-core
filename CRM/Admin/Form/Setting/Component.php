@@ -43,7 +43,6 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Enable Components'));
@@ -73,7 +72,6 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
    * @param array $options additional user data
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $options) {

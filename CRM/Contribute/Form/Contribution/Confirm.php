@@ -160,7 +160,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
@@ -439,7 +438,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
@@ -636,7 +634,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * no help display needed
    *
    * @return int
-   * @access public
    */
   public function getAction() {
     if ($this->_action & CRM_Core_Action::PREVIEW) {
@@ -651,7 +648,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -661,7 +657,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $contactID = $this->getContactID();
@@ -1066,7 +1061,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param $contribution
    *
    * @return void
-   * @access public
    */
   public function postProcessPremium($premiumParams, $contribution) {
     $hour = $minute = $second = 0;
@@ -1200,7 +1194,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @throws Exception
    * @return CRM_Contribute_DAO_Contribution
-   * @access public
    */
   static function processContribution(
     &$form,
@@ -1609,7 +1602,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param null $fields
    *
    * @return void
-   * @access public
    */
   public static function processOnBehalfOrganization(&$behalfOrganization, &$contactID, &$values, &$params, $fields = NULL) {
     $isCurrentEmployer = FALSE;
@@ -1715,7 +1707,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param object $contribution   contribution object
    *
    * @static
-   * @access public
    */
   public static function processPcpSoft(&$params, &$contribution) {
     //add soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
@@ -1749,7 +1740,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @return array
    * @static
-   * @access public
    */
   public static function processPcp(&$page, $params) {
     $params['pcp_made_through_id'] = $page->_pcpId;

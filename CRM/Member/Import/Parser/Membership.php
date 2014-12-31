@@ -67,7 +67,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function init() {
     $fields = CRM_Member_BAO_Membership::importableFields($this->_contactType, FALSE);
@@ -113,7 +112,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean
-   * @access public
    */
   public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
@@ -125,7 +123,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -137,7 +134,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function summary(&$values) {
     $erroneousField = NULL;
@@ -252,7 +248,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function import($onDuplicate, &$values) {
     try{
@@ -569,7 +564,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * Get the array of successfully imported membership id's
    *
    * @return array
-   * @access public
    */
   public function &getImportedMemberships() {
     return $this->_newMemberships;
@@ -579,7 +573,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function fini() {}
 
@@ -592,7 +585,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    *
    * @return Array formatted containing date values
    *
-   * @access public
    */
   public function formattedDates($calcDates, &$formatted) {
     $dates = array(
@@ -628,7 +620,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    *
    * @throws Exception
    * @return array|error
-   * @access public
    */
   public function membership_format_params($params, &$values, $create = FALSE) {
     require_once 'api/v3/utils.php';

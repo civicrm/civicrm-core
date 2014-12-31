@@ -51,7 +51,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Price_BAO_PriceField object
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -75,7 +74,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Price_DAO_PriceField object
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -174,7 +172,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Price_DAO_PriceField object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -189,7 +186,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -210,7 +206,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *
    * @return string name
    *
-   * @access public
    * @static
    *
    */
@@ -233,7 +228,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *
    * @return null
    * @internal param bool $search true if used for search else false
-   * @access public
    * @static
    */
   public static function addQuickFormElement(&$qf,
@@ -618,7 +612,6 @@ WHERE
    *
    * @return  boolean
    *
-   * @access public
    * @static
    *
    */
@@ -669,7 +662,6 @@ WHERE
    * @param $error
    * @param bool $allowNoneSelection
    *
-   * @access public
    * @static
    */
 
@@ -767,7 +759,6 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
    *
    * @return string $label tax label for custom field
    *
-   * @access public
    * @static
    *
    */

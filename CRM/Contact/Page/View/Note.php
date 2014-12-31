@@ -59,7 +59,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    * View details of a note
    *
    * @return void
-   * @access public
    */
   public function view() {
     $note = new CRM_Core_DAO_Note();
@@ -86,7 +85,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
   public function browse() {
     $note               = new CRM_Core_DAO_Note();
@@ -166,7 +164,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    * This function is called when action is update or new
    *
    * return null
-   * @access public
    */
   public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Note_Form_Note', ts('Contact Notes'), $this->_action);
@@ -220,7 +217,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     $this->preProcess();
@@ -244,7 +240,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    * Delete the note object from the db
    *
    * @return void
-   * @access public
    */
   public function delete() {
     CRM_Core_BAO_Note::del($this->_id);

@@ -43,7 +43,6 @@ abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Preview');
@@ -53,7 +52,6 @@ abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 

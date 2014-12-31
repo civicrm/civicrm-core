@@ -139,7 +139,6 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -183,7 +182,6 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

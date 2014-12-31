@@ -47,7 +47,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_MessageTemplate object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -78,7 +77,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
@@ -98,7 +96,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Delete the Message Templates
    *
-   * @access public
    * @static
    *
    * @param int $messageTemplatesID
@@ -128,7 +125,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Get the Message Templates
    *
-   * @access public
    * @static
    *
    * @param bool $all

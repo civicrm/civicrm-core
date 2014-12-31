@@ -47,7 +47,6 @@ class CRM_Core_Page {
    * The name of the page (auto generated from class name)
    *
    * @var string
-   * @access protected
    */
   protected $_name;
 
@@ -55,7 +54,6 @@ class CRM_Core_Page {
    * The title associated with this page
    *
    * @var object
-   * @access protected
    */
   protected $_title;
 
@@ -63,7 +61,6 @@ class CRM_Core_Page {
    * A page can have multiple modes. (i.e. displays
    * a different set of data based on the input
    * @var int
-   * @access protected
    */
   protected $_mode;
 
@@ -73,7 +70,6 @@ class CRM_Core_Page {
    * parent object takes care of the display)
    *
    * @var boolean
-   * @access protected
    */
   protected $_embedded = FALSE;
 
@@ -82,7 +78,6 @@ class CRM_Core_Page {
    * functionality to do a minimal display :)
    *
    * @var boolean
-   * @access protected
    */
   protected $_print = FALSE;
 
@@ -90,7 +85,6 @@ class CRM_Core_Page {
    * Cache the smarty template for efficiency reasons
    *
    * @var CRM_Core_Smarty
-   * @access protected
    * @static
    */
   static protected $_template;
@@ -99,7 +93,6 @@ class CRM_Core_Page {
    * Cache the session for efficiency reasons
    *
    * @var CRM_Core_Session
-   * @access protected
    * @static
    */
   static protected $_session;
@@ -253,7 +246,6 @@ class CRM_Core_Page {
    * @param  string|array $name  name  of the variable or an assoc array of name/value pairs
    * @param  mixed        $value value of the variable if string
    *
-   * @access public
    *
    * @return void
    *
@@ -267,7 +259,6 @@ class CRM_Core_Page {
    *
    * @param  string name  : name  of the variable
    *
-   * @access public
    *
    * @return mixed
    *
@@ -283,7 +274,6 @@ class CRM_Core_Page {
    * @param mixed $value value of varaible
    *
    * @return void
-   * @access public
    */
   public function assign($var, $value = NULL) {
     self::$_template->assign($var, $value);
@@ -296,7 +286,6 @@ class CRM_Core_Page {
    * @param mixed $value (reference) value of varaible
    *
    * @return void
-   * @access public
    */
   public function assign_by_ref($var, &$value) {
     self::$_template->assign_by_ref($var, $value);
@@ -327,7 +316,6 @@ class CRM_Core_Page {
   /**
    * Destroy all the session state of this page.
    *
-   * @access public
    *
    * @return void
    */
@@ -339,7 +327,6 @@ class CRM_Core_Page {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   public function getTemplateFileName() {
     return str_replace('_',
@@ -363,7 +350,6 @@ class CRM_Core_Page {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   public function overrideExtraTemplateFileName() {
     return NULL;
@@ -375,7 +361,6 @@ class CRM_Core_Page {
    * @param boolean $embedded
    *
    * @return void
-   * @access public
    */
   public function setEmbedded($embedded) {
     $this->_embedded = $embedded;
@@ -385,7 +370,6 @@ class CRM_Core_Page {
    * Getter for embedded
    *
    * @return boolean return the embedded value
-   * @access public
    */
   public function getEmbedded() {
     return $this->_embedded;
@@ -397,7 +381,6 @@ class CRM_Core_Page {
    * @param boolean $print
    *
    * @return void
-   * @access public
    */
   public function setPrint($print) {
     $this->_print = $print;
@@ -407,7 +390,6 @@ class CRM_Core_Page {
    * Getter for print
    *
    * @return boolean return the print value
-   * @access public
    */
   public function getPrint() {
     return $this->_print;

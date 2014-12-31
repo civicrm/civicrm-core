@@ -46,7 +46,6 @@ require_once 'api/v3/utils.php';
  *                             be used for CRM_vent_BAO_Participant:create()
  *
  * @return array|CRM_Error
- * @access public
  */
 function _civicrm_api3_deprecated_participant_formatted_param($params, &$values, $create = FALSE) {
   $fields = CRM_Event_DAO_Participant::fields();
@@ -218,7 +217,6 @@ function _civicrm_api3_deprecated_participant_formatted_param($params, &$values,
  * @param null $onDuplicate
  *
  * @return array|CRM_Error
- * @access public
  */
 function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = FALSE, $onDuplicate = Null) {
   // copy all the contribution fields as is
@@ -678,7 +676,6 @@ function _civicrm_api3_deprecated_check_contact_dedupe($params) {
  *                             be used for CRM_Activity_BAO_Activity::create()
  *
  * @return array|CRM_Error
- * @access public
  */
 function _civicrm_api3_deprecated_activity_formatted_param(&$params, &$values, $create = FALSE) {
   // copy all the activity fields as is
@@ -755,7 +752,6 @@ function _civicrm_api3_deprecated_activity_formatted_param(&$params, &$values, $
  * @param array  $params    The structured parameter list
  *
  * @return bool|CRM_Utils_Error
- * @access public
  */
 function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
   /* Crawl through the possible classes:
@@ -970,7 +966,6 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
  * @param array  $params    The structured parameter list
  *
  * @return bool
- * @access public
  */
 function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$params) {
   static $fields = NULL;
@@ -1160,7 +1155,6 @@ function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
  * @param array $params  Structured parameter list (as in crm_format_params)
  *
  * @return bool|CRM_Core_Error
- * @access public
  */
 function _civicrm_api3_deprecated_validate_formatted_contact(&$params) {
   /* Look for offending email addresses */
@@ -1295,7 +1289,6 @@ function _civicrm_api3_deprecated_participant_check_params($params, $checkDuplic
  * @param string  $csType          contact subtype if exists/passed.
  *
  * @return null on success, error message otherwise
- * @access public
  */
 function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType = NULL) {
   empty($csType) ? $onlyParent = TRUE : $onlyParent = FALSE;

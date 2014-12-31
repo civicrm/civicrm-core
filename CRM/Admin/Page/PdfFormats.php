@@ -120,7 +120,6 @@ class CRM_Admin_Page_PdfFormats extends CRM_Core_Page_Basic {
    * @param null $action
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse($action = NULL) {

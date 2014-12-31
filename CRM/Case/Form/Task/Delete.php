@@ -59,7 +59,6 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */ function preProcess() {
     //check for delete
     if (!CRM_Core_Permission::checkActionPermission('CiviCase', CRM_Core_Action::DELETE)) {
@@ -71,7 +70,6 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -82,7 +80,6 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

@@ -42,7 +42,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * The price field id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_fid;
 
@@ -50,7 +49,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * Option value  id, used when editing the Option
    *
    * @var int
-   * @access protected
    */
   protected $_oid;
 
@@ -60,7 +58,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->setPageTitle(ts('Price Option'));
@@ -79,7 +76,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @param null
    *
    * @return array   array of default values
-   * @access public
    */
   public function setDefaultValues() {
     if ($this->_action == CRM_Core_Action::DELETE) {
@@ -121,7 +117,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action == CRM_Core_Action::DELETE) {
@@ -282,7 +277,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise
    * @static
-   * @access public
    */
   public static function formRule($fields, $files, $form) {
     $errors = array();
@@ -301,7 +295,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::DELETE) {

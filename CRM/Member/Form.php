@@ -84,7 +84,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array defaults
    */
@@ -121,7 +120,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_mode) {

@@ -51,7 +51,6 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * ContactId - contact id of contact whose activies are displayed
    *
    * @var int
-   * @access protected
    */
   protected $_contactId;
 
@@ -107,7 +106,6 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * @param null $compContext
    *
    * @return array
-   * @access public
    */
   public static function actionLinks($activityTypeId,
                                      $sourceRecordId      = NULL,
@@ -277,7 +275,6 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * @param $action
    * @param array $params
    *
-   * @access public
    */
   public function getPagerParams($action, &$params) {
     $params['status']    = ts('Activities %%StatusMessage%%');
@@ -296,7 +293,6 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * @param enum   $output what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if ($output == CRM_Core_Selector_Controller::EXPORT || $output == CRM_Core_Selector_Controller::SCREEN) {
@@ -321,7 +317,6 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * @param null $case
    *
    * @return int Total number of rows
-   * @access public
    */
   public function getTotalCount($action, $case = NULL) {
     $params = array(
@@ -479,7 +474,6 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    *
    * @return array $_columnHeaders
-   * @access private
    */
   private static function &_getColumnHeaders() {
     if (!isset(self::$_columnHeaders)) {

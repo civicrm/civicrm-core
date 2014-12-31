@@ -45,7 +45,6 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
    * All the fields that are listings related
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 

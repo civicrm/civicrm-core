@@ -42,7 +42,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * The page id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -50,7 +49,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * The pledgeBlock id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_pledgeBlockID;
 
@@ -58,7 +56,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Are we in single form mode or wizard mode?
    *
    * @var boolean
-   * @access protected
    */
   protected $_single;
 
@@ -66,7 +63,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Is this the first page?
    *
    * @var boolean
-   * @access protected
    */
   protected $_first = FALSE;
 
@@ -74,7 +70,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Store price set id.
    *
    * @var int
-   * @access protected
    */
   protected $_priceSetID = NULL;
 
@@ -84,7 +79,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // current contribution page id
@@ -145,7 +139,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -243,7 +236,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array defaults
    */
@@ -346,7 +338,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $pageId = $this->get('id');
@@ -439,7 +430,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string

@@ -44,7 +44,6 @@ class CRM_Contact_Page_View_Useradd extends CRM_Core_Page {
    * This method is called after the page is created.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {

@@ -57,7 +57,6 @@ class CRM_Core_QuickForm_Action_Done extends CRM_Core_QuickForm_Action {
    * @param  string    $actionName Current action name, as one Action object can serve multiple actions
    *
    * @return void
-   * @access public
    */
   public function perform(&$page, $actionName) {
     $page->isFormBuilt() or $page->buildForm();

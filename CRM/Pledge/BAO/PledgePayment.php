@@ -209,7 +209,6 @@ WHERE     pledge_id = %1
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Pledge_BAO_PledgePayment object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -255,7 +254,6 @@ WHERE     pledge_id = %1
    * @param int $id pledge id
    *
    * @return bool
-   * @access public
    * @static
    *
    */
@@ -290,7 +288,6 @@ WHERE     pledge_id = %1
    * @param int $contributionID contribution id
    *
    * @return bool
-   * @access public
    * @static
    */
   public static function resetPledgePayment($contributionID) {

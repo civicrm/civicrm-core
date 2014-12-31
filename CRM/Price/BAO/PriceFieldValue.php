@@ -47,7 +47,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param $ids
    *
    * @return CRM_Price_DAO_PriceFieldValue object
-   * @access public
    * @static
    */
   public static function add(&$params, $ids = array()) {
@@ -76,7 +75,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param $ids
    *
    * @return CRM_Price_DAO_PriceFieldValue object
-   * @access public
    * @static
    */
   public static function create(&$params, $ids = array()) {
@@ -130,7 +128,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Price_DAO_PriceFieldValue object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -147,7 +144,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @return array $values
    *
-   * @access public
    * @static
    */
   public static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
@@ -173,7 +169,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @return string name
    *
-   * @access public
    * @static
    *
    */
@@ -189,7 +184,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -202,7 +196,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param  int    $fieldId    Price field id
    *
    *
-   * @access public
    * @static
    */
   public static function deleteValues($fieldId) {
@@ -222,7 +215,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @return  boolean
    *
-   * @access public
    * @static
    */
   public static function del($id) {
@@ -243,7 +235,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param   String $entityTable entity table
    * @param   String $financialTypeID financial type id
    *
-   * @access public
    * @static
    */
   public static function updateFinancialType($entityId, $entityTable, $financialTypeID) {

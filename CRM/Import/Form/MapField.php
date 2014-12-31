@@ -43,7 +43,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Cache of preview data values
    *
    * @var array
-   * @access protected
    */
   protected $_dataValues;
 
@@ -51,7 +50,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Mapper fields
    *
    * @var array
-   * @access protected
    */
   protected $_mapperFields;
 
@@ -59,7 +57,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Loaded mapping ID
    *
    * @var int
-   * @access protected
    */
   protected $_loadedMappingId;
 
@@ -67,7 +64,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Number of columns in import file
    *
    * @var int
-   * @access protected
    */
   protected $_columnCount;
 
@@ -75,7 +71,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Column headers, if we have them
    *
    * @var array
-   * @access protected
    */
   protected $_columnHeaders;
 
@@ -84,7 +79,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * form building already.
    *
    * @var array
-   * @access protected
    */
   protected $_fieldUsed;
 
@@ -92,7 +86,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Match Fields');
@@ -105,7 +98,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * @param mapperFields
    *
    * @return string
-   * @access public
    */
   public function defaultFromHeader($header, &$patterns) {
     foreach ($patterns as $key => $re) {
@@ -130,7 +122,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * @param index
    *
    * @return string
-   * @access public
    */
   public function defaultFromData(&$patterns, $index) {
     $best     = '';

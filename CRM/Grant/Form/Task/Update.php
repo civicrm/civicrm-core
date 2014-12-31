@@ -44,7 +44,6 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -58,7 +57,6 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -80,7 +78,6 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

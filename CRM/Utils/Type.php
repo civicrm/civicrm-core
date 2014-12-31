@@ -145,7 +145,6 @@ class CRM_Utils_Type {
    * @param boolean $abort        Should we abort if invalid
    *
    * @return mixed                The data, escaped if necessary
-   * @access public
    * @static
    */
   public static function escape($data, $type, $abort = TRUE) {
@@ -261,7 +260,6 @@ class CRM_Utils_Type {
    * @name string   $name    The name of the attribute
    *
    * @return mixed                The data, escaped if necessary
-   * @access public
    * @static
    */
   public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ') {

@@ -51,7 +51,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
 
@@ -128,7 +127,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
 
   public function buildQuickForm() {
@@ -300,7 +298,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    * and then setup some common data structures for the next step
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $this->controller->resetPage('MapField');
@@ -377,7 +374,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    * @param string $importTableName
    *
    * @return array
-   * @access private
    */
   private function _prepareImportTable($db, $importTableName) {
     /* TODO: Add a check for an existing _status field;
@@ -414,7 +410,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    *
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Choose Data Source');

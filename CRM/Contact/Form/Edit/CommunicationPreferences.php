@@ -51,7 +51,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    * @param CRM_Core_Form $form       reference to the form object
    *
    * @return void
-   * @access public
    * @static
    */
   public static function buildQuickForm(&$form) {
@@ -138,7 +137,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    * @param $self
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -160,7 +158,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param $defaults
@@ -210,7 +207,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    * @param $contactType
    *
    * @return void
-   * @access public
    */
   public static function getGreetingFields($contactType) {
     if (empty(self::$greetings[$contactType])) {

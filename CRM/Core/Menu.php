@@ -165,7 +165,6 @@ class CRM_Core_Menu {
    * @param boolen $fetchFromXML fetch the menu items from xml and not from cache
    *
    * @static
-   * @access public
    */
   public static function &items($fetchFromXML = FALSE) {
     return self::xmlItems($fetchFromXML);
@@ -486,7 +485,6 @@ class CRM_Core_Menu {
    * @return array  The breadcrumb for this path
    *
    * @static
-   * @access public
    */
   public static function buildBreadcrumb(&$menu, $path) {
     $crumbs = array();

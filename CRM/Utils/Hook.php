@@ -276,7 +276,6 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed             based on op. pre-hooks return a boolean or
    *                           an error message which aborts the operation
-   * @access public
    */
   public static function post($op, $objectName, $objectId, &$objectRef) {
     $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
@@ -439,7 +438,6 @@ abstract class CRM_Utils_Hook {
    * @param array $entities List of pending entities
    *
    * @return null the return value is ignored
-   * @access public
    */
   public static function managed(&$entities) {
     return self::singleton()->invoke(1, $entities,
@@ -456,7 +454,6 @@ abstract class CRM_Utils_Hook {
    * relative to the activity list
    *
    * @return string the html snippet to include in the dashboard
-   * @access public
    */
   public static function dashboard($contactID, &$contentPlacement = self::DASHBOARD_BELOW) {
     $retval = self::singleton()->invoke(2, $contactID, $contentPlacement,
@@ -482,7 +479,6 @@ abstract class CRM_Utils_Hook {
    * @param array $recentArray - an array of recently viewed or processed items, for in place modification
    *
    * @return array
-   * @access public
    */
   public static function recent(&$recentArray) {
     return self::singleton()->invoke(1, $recentArray,
@@ -516,7 +512,6 @@ abstract class CRM_Utils_Hook {
    * @param array  $amount   - the amount structure to be displayed
    *
    * @return null
-   * @access public
    */
   public static function buildAmount($pageType, &$form, &$amount) {
     return self::singleton()->invoke(3, $pageType, $form, $amount, self::$_nullObject,
@@ -578,7 +573,6 @@ abstract class CRM_Utils_Hook {
    * @param array $tokens    - the list of tokens that can be used for the contact
    *
    * @return null
-   * @access public
    */
   public static function tokens(&$tokens) {
     return self::singleton()->invoke(1, $tokens,
@@ -597,7 +591,6 @@ abstract class CRM_Utils_Hook {
    * @param string $className  - the top level className from where the hook is invoked
    *
    * @return null
-   * @access public
    */
   static function tokenValues(&$details,
     $contactIDs,
@@ -615,7 +608,6 @@ abstract class CRM_Utils_Hook {
    * @param object $page - the page that will be rendered
    *
    * @return null
-   * @access public
    */
   public static function pageRun(&$page) {
     return self::singleton()->invoke(1, $page,
@@ -632,7 +624,6 @@ abstract class CRM_Utils_Hook {
    * @param object $object     - reference to the copy
    *
    * @return null
-   * @access public
    */
   public static function copy($objectName, &$object) {
     return self::singleton()->invoke(2, $objectName, $object,
@@ -883,7 +874,6 @@ abstract class CRM_Utils_Hook {
    *
    * @return array of data to be displayed, where the key is a unique id to be used for styling (div id's)
    * and the value is an array with keys 'label' and 'value' specifying label/value pairs
-   * @access public
    */
   public static function caseSummary($caseID) {
     return self::singleton()->invoke(1, $caseID,
@@ -1020,7 +1010,6 @@ abstract class CRM_Utils_Hook {
    * @param array $query set of queries
    *
    * @return mixed
-   * @access public
    */
   public static function dupeQuery($obj, $type, &$query) {
     return self::singleton()->invoke(3, $obj, $type, $query,
@@ -1039,7 +1028,6 @@ abstract class CRM_Utils_Hook {
    * @param string $action (optional ) the requested action to be performed if the types was 'mailing'
    *
    * @return mixed
-   * @access public
    */
   public static function emailProcessor($type, &$params, $mail, &$result, $action = NULL) {
     return self::singleton()->invoke(5, $type, $params, $mail, $result, $action, self::$_nullObject, 'civicrm_emailProcessor');
@@ -1061,7 +1049,6 @@ abstract class CRM_Utils_Hook {
    *                  fields          - import fields
    *
    * @return void
-   * @access public
    */
   public static function import($object, $usage, &$objectRef, &$params) {
     return self::singleton()->invoke(4, $object, $usage, $objectRef, $params,
@@ -1150,7 +1137,6 @@ abstract class CRM_Utils_Hook {
    * @param array $ufGroups array of ufgroups for a module.
    *
    * @return null
-   * @access public
    */
   public static function buildUFGroupsForModule($moduleName, &$ufGroups) {
     return self::singleton()->invoke(2, $moduleName, $ufGroups,
@@ -1173,7 +1159,6 @@ abstract class CRM_Utils_Hook {
    *                          CRM_Utils_Mail_Incoming::EMAILPROCESSOR_IGNORE   - skip this email address
    *
    * @return null
-   * @access public
    */
   public static function emailProcessorContact($email, $contactID, &$result) {
     return self::singleton()->invoke(3, $email, $contactID, $result,
@@ -1231,7 +1216,6 @@ abstract class CRM_Utils_Hook {
    * @param $object   a reference to the page or form object
    *
    * @return mixed
-   * @access public
    */
   public static function alterContent(&$content, $context, $tplName, &$object) {
     return self::singleton()->invoke(4, $content, $context, $tplName, $object,
@@ -1250,7 +1234,6 @@ abstract class CRM_Utils_Hook {
    * @param $tplName reference the file name of the tpl
    *
    * @return mixed
-   * @access public
    */
   public static function alterTemplateFile($formName, &$form, $context, &$tplName) {
     return self::singleton()->invoke(4, $formName, $form, $context, $tplName,
@@ -1676,7 +1659,6 @@ abstract class CRM_Utils_Hook {
    *
    * @param array $angularModules list of modules
    * @return null the return value is ignored
-   * @access public
    *
    * @code
    * function mymod_civicrm_angularModules(&$angularModules) {

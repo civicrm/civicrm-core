@@ -42,7 +42,6 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // set the error message path to display
@@ -114,7 +113,6 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
    * Clean up the import table we used
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $dao = new CRM_Core_DAO();

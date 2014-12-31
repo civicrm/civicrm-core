@@ -48,21 +48,18 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * Gives all the statues for conribution
    *
-   * @access public
    */
   public $_contributionStatusId;
 
   /**
    * Gives the HTML template of PDF Invoice
    *
-   * @access public
    */
   public $_messageInvoice;
 
   /**
    * This variable is used to assign parameters for HTML template of PDF Invoice
    *
-   * @access public
    */
   public $_invoiceTemplate;
 
@@ -75,7 +72,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
@@ -147,7 +143,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -233,7 +228,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($values) {
     $errors = array();
@@ -248,7 +242,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -606,7 +599,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @param string $fileName gives the location with name of the file
    * @param array $params for invoices
    *
-   * @access public
    * @static
    */
   static public function addActivities($subject, $contactIds, $fileName, $params) {

@@ -512,7 +512,6 @@ class CRM_Contact_Form_Search_Criteria {
    * Generate the custom Data Fields based
    * on the is_searchable
    *
-   * @access private
    *
    * @param $form
    *

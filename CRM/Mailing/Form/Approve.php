@@ -47,7 +47,6 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     if (CRM_Mailing_Info::workflowEnabled()) {
@@ -84,7 +83,6 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -104,7 +102,6 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
   public function buildQuickform() {
     $title = ts('Approve/Reject Mailing') . " - {$this->_mailing->name}";
@@ -165,7 +162,6 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -252,7 +248,6 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
   /**
    * Display Name of the form
    *
-   * @access public
    *
    * @return string
    */

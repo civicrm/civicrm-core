@@ -59,7 +59,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @throws CRM_Core_Exception
    *
    * @return CRM_Case_BAO_CaseType object
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -104,7 +103,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param array $definition the case-type defintion expressed as an array-tree
    * @return string XML
    * @static
-   * @access public
    */
   public static function convertDefinitionToXML($name, $definition) {
     $xmlFile = '<?xml version="1.0" encoding="utf-8" ?>' . "\n\n<CaseType>\n";
@@ -246,7 +244,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param array $values output values of the object
    *
    * @return CRM_Case_BAO_CaseType|null the found object or null
-   * @access public
    * @static
    */
   public static function &getValues(&$params, &$values) {
@@ -267,7 +264,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Case_BAO_CaseType object
-   * @access public
    * @static
    */
   public static function &create(&$params) {
@@ -310,7 +306,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *                        in a hierarchical manner
    *
    * @return CRM_Case_BAO_CaseType object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

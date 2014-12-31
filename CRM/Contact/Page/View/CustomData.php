@@ -43,7 +43,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
    * The id of the object being viewed (note/relationship etc)
    *
    * @int
-   * @access protected
    */
   public $_groupId;
 
@@ -60,7 +59,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
    * Add a few specific things to view contact
    *
    * @return void
-   * @access public
    *
    */
   public function preProcess() {
@@ -87,7 +85,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    *
-   * @access public
    *
    * @return void
    * @static

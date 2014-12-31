@@ -76,7 +76,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
-   * @access protected
    */
   public $_formValues;
 
@@ -84,7 +83,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * The contextMenu
    *
    * @var array
-   * @access protected
    */
   protected $_contextMenu;
 
@@ -92,7 +90,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * Params is the array in a value used by the search query creator
    *
    * @var array
-   * @access protected
    */
   public $_params;
 
@@ -100,7 +97,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * The return properties used for search
    *
    * @var array
-   * @access protected
    */
   protected $_returnProperties;
 
@@ -108,7 +104,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * Represent the type of selector
    *
    * @var int
-   * @access protected
    */
   protected $_action;
 
@@ -127,7 +122,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * The public visible fields to be shown to the user
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
@@ -146,7 +140,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param null $contextMenu
    *
    * @return CRM_Contact_Selector
-   * @access public
    */
   function __construct(
     $customSearchClass,
@@ -229,7 +222,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * - Edit
    *
    * @return array
-   * @access public
    *
    */
   public static function &links() {
@@ -305,7 +297,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param $action
    * @param array $params
    *
-   * @access public
    */
   public function getPagerParams($action, &$params) {
     $params['status']    = ts('Contact %%StatusMessage%%');
@@ -336,7 +327,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param enum   $output what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     $headers = NULL;
@@ -488,7 +478,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param
    *
    * @return int Total number of rows
-   * @access public
    */
   public function getTotalCount($action) {
     // Use count from cache during paging/sorting
@@ -1082,7 +1071,6 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
      reference)   $formValues   submitted formValues
    *
    * @return array              $qill         which contains an array of strings
-   * @access public
    */
 
   // the current internationalisation is bad, but should more or less work
@@ -1107,7 +1095,6 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    *
    *
    * @return array $_columnHeaders
-   * @access private
    */
   private static function &_getColumnHeaders() {
     if (!isset(self::$_columnHeaders)) {

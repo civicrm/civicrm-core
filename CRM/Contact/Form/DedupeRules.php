@@ -48,7 +48,6 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    * Pre processing
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // Ensure user has permission to be here
@@ -98,7 +97,6 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $foo = CRM_Core_DAO::getAttribute('CRM_Dedupe_DAO_Rule', 'title');
@@ -151,7 +149,6 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();
@@ -178,7 +175,6 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
@@ -192,7 +188,6 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

@@ -101,7 +101,6 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
    * @param int $petition_id
    *
    * @return boolean              True on success
-   * @access public
    * @static
    */
   public static function confirm($contact_id, $subscribe_id, $hash, $activity_id, $petition_id) {

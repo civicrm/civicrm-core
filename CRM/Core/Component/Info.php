@@ -126,7 +126,6 @@ abstract class CRM_Core_Component_Info {
    * class.
    *
    * @return array collection of required component settings
-   * @access public
    *
    */
   abstract public function getInfo();
@@ -162,7 +161,6 @@ abstract class CRM_Core_Component_Info {
    * @param bool $getAllUnconditionally
    *
    * @return array|null collection of permissions, null if none
-   * @access public
    */
   abstract public function getPermissions($getAllUnconditionally = FALSE);
 
@@ -185,7 +183,6 @@ abstract class CRM_Core_Component_Info {
    *
    * @return array|null collection of required dashboard settings,
    *                    null if no element offered
-   * @access public
    *
    */
   abstract public function getUserDashboardElement();
@@ -196,7 +193,6 @@ abstract class CRM_Core_Component_Info {
    *
    * @return array|null collection of required dashboard settings,
    *                    null if no element offered
-   * @access public
    *
    */
   abstract public function registerTab();
@@ -207,7 +203,6 @@ abstract class CRM_Core_Component_Info {
    *
    * @return array|null collection of required pane settings,
    *                    null if no element offered
-   * @access public
    *
    */
   abstract public function registerAdvancedSearchPane();
@@ -219,7 +214,6 @@ abstract class CRM_Core_Component_Info {
    * class.
    *
    * @return array|null collection of activity types
-   * @access public
    *
    */
   abstract public function getActivityTypes();
@@ -229,7 +223,6 @@ abstract class CRM_Core_Component_Info {
    * marked as enabled in configuration.
    *
    * @return boolean true if component is enabled, false if not
-   * @access public
    *
    */
   public function isEnabled() {
@@ -244,7 +237,6 @@ abstract class CRM_Core_Component_Info {
    * Provides component's configuration object.
    *
    * @return mixed component's configuration object
-   * @access public
    *
    */
   public function getConfigObject() {
@@ -255,7 +247,6 @@ abstract class CRM_Core_Component_Info {
    * Provides component's menu definition object.
    *
    * @return mixed component's menu definition object
-   * @access public
    *
    */
   public function getMenuObject() {
@@ -266,7 +257,6 @@ abstract class CRM_Core_Component_Info {
    * Provides component's invocation object.
    *
    * @return mixed component's invocation object
-   * @access public
    *
    */
   public function getInvokeObject() {
@@ -277,7 +267,6 @@ abstract class CRM_Core_Component_Info {
    * Provides component's BAO Query object.
    *
    * @return mixed component's BAO Query object
-   * @access public
    *
    */
   public function getBAOQueryObject() {
@@ -287,7 +276,6 @@ abstract class CRM_Core_Component_Info {
   /**
    * Builds advanced search form's component specific pane.
    *
-   * @access public
    *
    */
   public function buildAdvancedSearchPaneForm(&$form) {
@@ -299,7 +287,6 @@ abstract class CRM_Core_Component_Info {
    * Provides component's user dashboard page object.
    *
    * @return mixed component's User Dashboard applet object
-   * @access public
    *
    */
   public function getUserDashboardObject() {
@@ -310,7 +297,6 @@ abstract class CRM_Core_Component_Info {
    * Provides component's contact record tab object.
    *
    * @return mixed component's contact record tab object
-   * @access public
    *
    */
   public function getTabObject() {
@@ -321,7 +307,6 @@ abstract class CRM_Core_Component_Info {
    * Provides component's advanced search pane's template path.
    *
    * @return string component's advanced search pane's template path
-   * @access public
    *
    */
   public function getAdvancedSearchPaneTemplatePath() {
@@ -333,7 +318,6 @@ abstract class CRM_Core_Component_Info {
    * Provides information whether given component uses system wide search.
    *
    * @return boolean true if component needs search integration
-   * @access public
    *
    */
   public function usesSearch() {
@@ -344,7 +328,6 @@ abstract class CRM_Core_Component_Info {
    * Provides the xml menu files
    *
    * @return array array of menu files
-   * @access public
    *
    */
   public function menuFiles() {
@@ -357,7 +340,6 @@ abstract class CRM_Core_Component_Info {
    * FIXME: accessed from beyond component infrastructure.
    *
    * @return string component keyword
-   * @access public
    *
    */
   public function getKeyword() {
@@ -368,7 +350,6 @@ abstract class CRM_Core_Component_Info {
    * Helper for figuring out menu XML file location.
    *
    * @return mixed component's element as class instance
-   * @access private
    *
    */
   private function _getMenuXMLPath() {
@@ -383,7 +364,6 @@ abstract class CRM_Core_Component_Info {
    * @param $cl
    *
    * @return mixed component's element as class instance
-   * @access private
    */
   private function _instantiate($cl) {
     $className = $this->namespace . '_' . $cl;

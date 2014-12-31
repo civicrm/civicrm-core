@@ -49,7 +49,6 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -108,7 +107,6 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

@@ -37,7 +37,6 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Build the form object for Premium Information.
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
@@ -88,7 +87,6 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Build the form object for Additional Details.
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
@@ -176,7 +174,6 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * Build the form object for PaymentReminders Information.
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
@@ -196,7 +193,6 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Process the Premium Information
    *
-   * @access public
    *
    * @param array $params
    * @param int $contributionID
@@ -256,7 +252,6 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Process the Note
    *
-   * @access public
    *
    * @param array $params
    * @param int $contactID
@@ -284,7 +279,6 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Process the Common data
    *
-   * @access public
    *
    * @param array $params
    * @param $formatted
@@ -342,7 +336,6 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param array $params (reference ) an assoc array of name/value pairs.
    * @$ccContribution boolen,  is it credit card contribution.
    * @param bool $ccContribution
-   * @access public.
    *
    * @return array
    */

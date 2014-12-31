@@ -45,7 +45,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_mapperFields = $this->get('fields');
@@ -103,7 +102,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //to save the current mappings
@@ -346,7 +344,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();
@@ -474,7 +471,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * preview the file and extract some summary statistics
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->controller->exportValues('MapField');

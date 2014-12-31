@@ -33,7 +33,6 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Are we forced to run a search
    *
    * @var int
-   * @access protected
    */
   protected $_force;
 
@@ -41,7 +40,6 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Name of search button
    *
    * @var string
-   * @access protected
    */
   protected $_searchButtonName;
 
@@ -49,7 +47,6 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Name of action button
    *
    * @var string
-   * @access protected
    */
   protected $_actionButtonName;
 
@@ -57,14 +54,12 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Form values that we will be using
    *
    * @var array
-   * @access public
    */
   public $_formValues;
 
   /**
    * Have we already done this search
    *
-   * @access protected
    * @var boolean
    */
   protected $_done;
@@ -72,7 +67,6 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   /**
    * What context are we being invoked from
    *
-   * @access protected
    * @var string
    */
   protected $_context = NULL;

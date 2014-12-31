@@ -58,7 +58,6 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // get the controller vars
@@ -98,7 +97,6 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    * @param null
    *
    * @return array   the default array reference
-   * @access protected
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -114,7 +112,6 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if (is_array($this->_groupTree[$this->_groupId])) {

@@ -86,7 +86,6 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
    * multiple purposes (queries, save/edit etc)
    *
    * @return void
-   * @access private
    */
   public function normalize() {
     $contactType = CRM_Utils_Array::value('contact_type', $this->_formValues);

@@ -51,7 +51,6 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Price_DAO_LineItem object
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -94,7 +93,6 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Price_BAO_LineItem object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -268,7 +266,6 @@ AND li.entity_id = {$entityId}
    *                          lineItem array)
    *
    * @return void
-   * @access static
    */
   public static function format($fid, &$params, &$fields, &$values) {
     if (empty($params["price_{$fid}"])) {
@@ -332,7 +329,6 @@ AND li.entity_id = {$entityId}
    * @param int $entityTable
    *
    * @return bool
-   * @access public
    * @static
    */
   public static function deleteLineItems($entityId, $entityTable) {
@@ -359,7 +355,6 @@ AND li.entity_id = {$entityId}
    *
    * @param bool $update
    *
-   * @access public
    * @return void
    * @static
    */
@@ -468,7 +463,6 @@ AND li.entity_id = {$entityId}
    *
    * @param string $entityTable entity Table
    *
-   * @access public
    * @return void
    * @static
    */
@@ -529,7 +523,6 @@ AND li.entity_id = {$entityId}
    *
    * @return tax rate
    *
-   * @access public
    * @static
    */
   public static function calculateTaxRate($lineItemId) {

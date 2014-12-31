@@ -55,7 +55,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Friend_BAO_Friend object
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -71,7 +70,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array  $values output values of the object
    *
    * @return array $values values
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$values) {
@@ -92,7 +90,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Contact_BAO_Contact object
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -241,7 +238,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param CRM_Core_Form $form form object
    *
    * @return void
-   * @access public
    */
   public static function buildFriendForm($form) {
     $form->addElement('checkbox', 'tf_is_active', ts('Tell a Friend enabled?'), NULL, array('onclick' => "friendBlock(this)"));
@@ -292,7 +288,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array $values
    *
    * @return void
-   * @access public
    */
   public static function sendMail($contactID, &$values) {
     list($fromName, $email) = CRM_Contact_BAO_Contact::getContactDetails($contactID);
@@ -342,7 +337,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Friend_BAO_Friend object
-   * @access public
    * @static
    */
   public static function addTellAFriend(&$params) {

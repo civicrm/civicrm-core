@@ -54,7 +54,6 @@ class CRM_Core_QuickForm_Action_Refresh extends CRM_Core_QuickForm_Action {
    * @param  string $actionName Current action name, as one Action object can serve multiple actions
    *
    * @return void
-   * @access public
    */
   public function perform(&$page, $actionName) {
     // save the form values and validation status to the session

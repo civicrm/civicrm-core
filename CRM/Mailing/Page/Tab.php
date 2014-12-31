@@ -52,7 +52,6 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
   public function browse() {
   }
@@ -61,7 +60,6 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
@@ -85,7 +83,6 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     $this->preProcess();

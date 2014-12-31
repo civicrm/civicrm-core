@@ -69,7 +69,6 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   /**
    * Constructor
    *
-   * @access public
    */ function __construct() {
     $template = CRM_Core_Smarty::singleton();
     parent::__construct($template);
@@ -93,7 +92,6 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * work, but then we add some CiviCRM specific enhancements to
    * make the html compliant with our css etc
    *
-   * @access private
    *
    * @param  $element HTML_QuickForm_element
    * @param  $required bool - Whether an element is required
@@ -142,7 +140,6 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * Update the attributes of this element and add a few CiviCRM
    * based attributes so we can style this form element better
    *
-   * @access private
    *
    * @param  $element  HTML_QuickForm_element object
    * @param  $required bool      Whether an element is required

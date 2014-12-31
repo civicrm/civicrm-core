@@ -42,7 +42,6 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
    * Are we forced to run a search
    *
    * @var int
-   * @access protected
    */
   protected $_force;
 
@@ -50,7 +49,6 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
    * Processing needed for buildForm and later
    *
    * @return void
-   * @access public
    */ function preProcess() {
     $this->_search    = CRM_Utils_Array::value('search', $_GET);
     $this->_force     = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE, FALSE);
@@ -72,7 +70,6 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */

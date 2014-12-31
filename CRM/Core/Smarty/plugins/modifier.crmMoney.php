@@ -43,7 +43,6 @@
  * @param bool $onlyNumber
  *
  * @return string  formatted monetary amount
- * @access public
  */
 function smarty_modifier_crmMoney($amount, $currency = NULL, $format = NULL, $onlyNumber = FALSE) {
   return CRM_Utils_Money::format($amount, $currency, $format, $onlyNumber);

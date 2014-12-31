@@ -44,7 +44,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -72,7 +71,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    * no help display needed
    *
    * @return int
-   * @access public
    */
   public function getAction() {
     if ($this->_action & CRM_Core_Action::PREVIEW) {
@@ -87,7 +85,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // Assign the email address from a contact id lookup as in CRM_Event_BAO_Event->sendMail()
@@ -241,7 +238,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -251,7 +247,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Thank You Page');

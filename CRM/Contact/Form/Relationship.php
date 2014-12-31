@@ -214,7 +214,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Set default values for the form. Relationship that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -280,7 +279,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * This function is used to add the rules for form.
    *
    * @return void
-   * @access public
    */
   public function addRules() {
     if ($this->_cdType) {
@@ -296,7 +294,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
@@ -402,7 +399,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   /**
    *  This function is called when the form is submitted
    *
-   * @access public
    *
    * @return void
    */
@@ -546,7 +542,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
   public static function dateRule($params) {

@@ -63,7 +63,6 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return object       CRM_Core_BAO_Email object on success, null otherwise
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -116,7 +115,6 @@ WHERE  contact_id = {$params['contact_id']}
    * @param array $entityBlock   input parameters to find object
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function &getValues($entityBlock) {
@@ -131,7 +129,6 @@ WHERE  contact_id = {$params['contact_id']}
    * @param bool $updateBlankLocInfo
    *
    * @return array  the array of email id's
-   * @access public
    * @static
    */
   public static function allEmails($id, $updateBlankLocInfo = FALSE) {
@@ -188,7 +185,6 @@ ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
    * entity_table name
    *
    * @return array  the array of email id's
-   * @access public
    * @static
    */
   public static function allEntityEmails(&$entityElements) {
@@ -283,7 +279,6 @@ AND    reset_date IS NULL
    * the domain email id
    *
    * @return array         an array of email ids
-   * @access public
    * @static
    */
   public static function getFromEmail() {

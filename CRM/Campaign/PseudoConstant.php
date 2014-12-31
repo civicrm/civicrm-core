@@ -70,7 +70,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    * Get all the survey activity types
    *
-   * @access public
    *
    * @param string $returnColumn
    *
@@ -99,7 +98,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array campaignType is returned
    *
-   * @access public
    * @static
    *
    * @return array - array reference of all campaign types.
@@ -119,7 +117,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array campaignStatus is returned
    *
-   * @access public
    * @static
    *
    * @return array - array reference of all campaign status.
@@ -139,7 +136,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array Engagement Level is returned
    *
-   * @access public
    * @static
    *
    * @return array - array reference of all Engagement Level.
@@ -156,7 +152,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @access public
    * @static
    *
    * @param bool|string $name pseudoconstant to be flushed

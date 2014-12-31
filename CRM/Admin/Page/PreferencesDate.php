@@ -82,7 +82,6 @@ class CRM_Admin_Page_PreferencesDate extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {

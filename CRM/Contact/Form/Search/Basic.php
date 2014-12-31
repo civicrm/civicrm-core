@@ -47,7 +47,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * csv - common search values
    *
    * @var array
-   * @access protected
    * @static
    */
   static $csv = array('contact_type', 'group', 'tag');
@@ -55,7 +54,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -106,7 +104,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @return array the default array reference
    */
@@ -138,7 +135,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   /**
    * Add local and global form rules
    *
-   * @access protected
    *
    * @return void
    */
@@ -150,7 +146,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * Processing needed for buildForm and later
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->set('searchFormName', 'Basic');
@@ -169,7 +164,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * This method is called for processing a submitted search form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $this->set('isAdvanced', '0');
@@ -222,7 +216,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * multiple purposes (queries, save/edit etc)
    *
    * @return void
-   * @access private
    */
   public function normalizeFormValues() {
     $contactType = CRM_Utils_Array::value('contact_type', $this->_formValues);
@@ -283,7 +276,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   /**
    * @return string

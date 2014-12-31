@@ -50,7 +50,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @param array  $contact  contact object
    *
    * @return CRM_Contact_BAO_Contact object
-   * @access public
    * @static
    */
   public static function format(&$params, &$contact) {
@@ -396,7 +395,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function dataExists(&$params) {

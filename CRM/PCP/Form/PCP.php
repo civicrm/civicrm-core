@@ -46,7 +46,6 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -127,7 +126,6 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    * @param null
    *
    * @return array   array of default values
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -144,7 +142,6 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -199,7 +196,6 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
   public static function formRule($fields, $files, $form) {}
 
@@ -209,7 +205,6 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

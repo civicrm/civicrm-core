@@ -51,7 +51,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field object
-   * @access public
    * @static
    */
   public static function &add(&$params) {
@@ -75,7 +74,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -160,7 +158,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -175,7 +172,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -189,7 +185,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *
    * @return string name
    *
-   * @access public
    * @static
    *
    */
@@ -210,7 +205,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $freezeOptions
    *
    * @return null
-   * @access public
    * @static
    */
   public static function addQuickFormElement(&$qf,
@@ -505,7 +499,6 @@ WHERE
    *
    * @return  boolean
    *
-   * @access public
    * @static
    *
    */
@@ -555,7 +548,6 @@ WHERE
    * @param $fields
    * @param $error
    *
-   * @access public
    * @static
    */
 

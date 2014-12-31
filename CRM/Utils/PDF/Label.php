@@ -97,7 +97,6 @@ class CRM_Utils_PDF_Label extends TCPDF {
    *                  or an array of Label Format values.
    * @param string|\Unit $unit Unit of measure for the PDF document
    *
-   * @access public
    */
   public function __construct($format, $unit = 'mm') {
     if (is_array($format)) {

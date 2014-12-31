@@ -49,7 +49,6 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * The group id of the field
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
@@ -57,7 +56,6 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @access private
    */
   private static $_actionLinks;
 
@@ -106,7 +104,6 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * Browse all CiviCRM Profile group fields.
    *
    * @return void
-   * @access public
    * @static
    */
   public function browse() {
@@ -211,7 +208,6 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * @param string $action the action to be invoked
    *
    * @return void
-   * @access public
    */
   public function edit($action) {
     // create a simple controller for editing CiviCRM Profile data
@@ -235,7 +231,6 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * type of action and executes that action.
    *
    * @return void
-   * @access public
    *
    */
   public function run() {
@@ -287,7 +282,6 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * @param int $groupId
    *
    * @return void
-   * @access public
    */
   public function preview($fieldId, $groupId) {
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Preview', ts('Preview Custom Data'), CRM_Core_Action::PREVIEW);

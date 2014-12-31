@@ -73,7 +73,6 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
    * @param string $uploadName the name of the uploaded file
    *
    * @return void
-   * @access private
    */
   public function upload(&$page, &$data, $pageName, $uploadName) {
     // make sure uploadName exists in the QF array
@@ -115,7 +114,6 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
    * @param  string    $actionName Current action name, as one Action object can serve multiple actions
    *
    * @return void
-   * @access public
    */
   public function perform(&$page, $actionName) {
     // like in Action_Next

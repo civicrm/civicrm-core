@@ -45,7 +45,6 @@ class CRM_Core_Invoke {
    * @return string, HTML
    *
    * @static
-   * @access public
    */
   public static function invoke($args) {
     try {
@@ -349,7 +348,6 @@ class CRM_Core_Invoke {
    * @param $contact_sub_type
    *
    * @static
-   * @access public
    */
   public static function form($action, $contact_type, $contact_sub_type) {
     CRM_Utils_System::setUserContext(array('civicrm/contact/search/basic', 'civicrm/contact/view'));

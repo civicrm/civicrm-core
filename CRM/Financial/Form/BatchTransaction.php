@@ -76,7 +76,6 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_batchStatusId == 2) {

@@ -44,7 +44,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return object       CRM_Core_BAO_Website object on success, null otherwise
-   * @access public
    * @static
    */
   public static function add(&$params) {
@@ -68,7 +67,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param $skipDelete
    *
    * @return void
-   * @access public
    * @static
    */
   public static function create(&$params, $contactID, $skipDelete) {
@@ -133,7 +131,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param $values
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function &getValues(&$params, &$values) {
@@ -162,7 +159,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param bool $updateBlankLocInfo
    *
    * @return array  the array of website details
-   * @access public
    * @static
    */
   public static function allWebsites($id, $updateBlankLocInfo = FALSE) {

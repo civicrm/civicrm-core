@@ -415,7 +415,6 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    * @param int $orderNo <order-total> send by google
    *
    * @return amount
-   * @access public
    */
   public function getAmount($orderNo) {
     $contribution = new CRM_Contribute_DAO_Contribution();

@@ -41,7 +41,6 @@
  * @return string
  *
  * @see smarty_modifier_crmBtnType
- * @access public
  */
 function smarty_modifier_crmBtnValidate($btnName) {
   // split the string into 5 or more

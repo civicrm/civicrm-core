@@ -68,7 +68,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function init() {
     $fields = CRM_Contribute_BAO_Contribution::importableFields($this->_contactType, FALSE);
@@ -141,7 +140,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @param array $values the array of values belonging to this line
    *
    * @return boolean
-   * @access public
    */
   public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
@@ -153,7 +151,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -165,7 +162,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function summary(&$values) {
     $erroneousField = NULL;
@@ -242,7 +238,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
   public function import($onDuplicate, &$values) {
     // first make sure this is a valid line
@@ -592,7 +587,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * Get the array of successfully imported contribution id's
    *
    * @return array
-   * @access public
    */
   public function &getImportedContributions() {
     return $this->_newContributions;
@@ -602,7 +596,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
   public function fini() {}
 }

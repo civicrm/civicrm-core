@@ -130,7 +130,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Grant_BAO_ManageGrant object
-   * @access public
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -149,7 +148,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
    *
-   * @access public
    * @static
    *
    * @return object
@@ -251,7 +249,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * @param array $ids reference array contains the id
    *
    * @return object
-   * @access public
    * @static
    *
    */
@@ -314,7 +311,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @return bool
    *
-   * @access public
    * @static
    */
   public static function deleteContact($id) {
@@ -330,7 +326,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * @param int $id grant id
    *
    * @return bool|mixed
-   * @access public
    * @static
    *
    */
@@ -361,7 +356,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * Combine all the exportable fields from the lower levels object
    *
    * @return array array of exportable Fields
-   * @access public
    * @static
    */
   public static function &exportableFields() {
@@ -418,7 +412,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * @param int $contactID
    *
    * @return int count of grant records
-   * @access public
    * @static
    */
   public static function getContactGrantCount($contactID) {

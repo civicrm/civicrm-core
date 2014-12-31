@@ -48,7 +48,6 @@ class CRM_Member_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
   public static function select(&$query) {
     // if membership mode add membership id

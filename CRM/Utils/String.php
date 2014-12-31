@@ -57,7 +57,6 @@ class CRM_Utils_String {
    *
    * @return string  An equivalent variable name
    *
-   * @access public
    *
    * @return string (or null)
    * @static
@@ -82,7 +81,6 @@ class CRM_Utils_String {
    * @param string $char the character to use for non-valid chars
    * @param int    $len  length of valid variables
    *
-   * @access public
    *
    * @return string returns the manipulated string
    * @static
@@ -130,7 +128,6 @@ class CRM_Utils_String {
    * @param int     $len  length of valid variables
    *
    * @return string  Randomized Variable Name
-   * @access public
    * @static
    */
   public static function rename($name, $len = 4) {
@@ -145,7 +142,6 @@ class CRM_Utils_String {
    * @param string $string the input string
    * @param \char|string $char $char   the character used to demarcate the componets
    *
-   * @access public
    *
    * @return string the last component
    * @static
@@ -169,7 +165,6 @@ class CRM_Utils_String {
    * @param mixed  $name  the string (or array of strings) to append
    *
    * @return void
-   * @access public
    * @static
    */
   public static function append(&$str, $delim, $name) {
@@ -207,7 +202,6 @@ class CRM_Utils_String {
    * @param boolean $utf8 attempt utf8 match on failure (default yes)
    *
    * @return boolean    true if string is ascii
-   * @access public
    * @static
    */
   public static function isAscii($str, $utf8 = TRUE) {
@@ -250,7 +244,6 @@ class CRM_Utils_String {
    * @param array  $regexRules regular expression to be matched w/ replacements
    *
    * @return array $match      array of strings w/ corresponding redacted outputs
-   * @access public
    * @static
    */
   public static function regex($str, $regexRules) {
@@ -307,7 +300,6 @@ class CRM_Utils_String {
    * Determine if a string is composed only of utf8 characters
    *
    * @param string $str  input string
-   * @access public
    * @static
    *
    * @return boolean
@@ -339,7 +331,6 @@ class CRM_Utils_String {
    * @param string $url2 the second url to be matched against
    *
    * @return boolean true if the urls match, else false
-   * @access public
    * @static
    */
   public static function match($url1, $url2) {
@@ -363,7 +354,6 @@ class CRM_Utils_String {
    * @param  mix $query this is basically url
    *
    * @return mix $v  returns civicrm url (eg: civicrm/contact/search/...)
-   * @access public
    * @static
    */
   public static function extractURLVarValue($query) {
@@ -388,7 +378,6 @@ class CRM_Utils_String {
    * @param string $str  the string to be translated
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function strtobool($str) {
@@ -408,7 +397,6 @@ class CRM_Utils_String {
    * @param string $str  the string to be translated
    *
    * @return boolean
-   * @access public
    * @static
    */
   public static function strtoboolstr($str) {
@@ -433,7 +421,6 @@ class CRM_Utils_String {
    * @param string $html  the string to be converted
    *
    * @return string       the converted string
-   * @access public
    * @static
    */
   public static function htmlToText($html) {
@@ -547,7 +534,6 @@ class CRM_Utils_String {
    * @param string  $string input string to be cleaned
    *
    * @return string the cleaned string
-   * @access public
    * @static
    */
   public static function stripSpaces($string) {
@@ -563,7 +549,6 @@ class CRM_Utils_String {
    * @param string $replace the character to replace it with
    *
    * @return string the sanitized string
-   * @access public
    * @static
    */
   static function stripPathChars($string,

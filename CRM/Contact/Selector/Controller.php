@@ -38,7 +38,6 @@ class CRM_Contact_Selector_Controller extends CRM_Core_Selector_Controller {
    * expect the subclass to do it
    *
    * @return string the status message
-   * @access public
    */
   /**
    * @return string

@@ -48,7 +48,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @param null $entity
    *
    * @return array $blocks array of created address
-   * @access public
    * @static
    */
   public static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
@@ -139,7 +138,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *                               before inserting in db
    *
    * @return object       CRM_Core_BAO_Address object on success, null otherwise
-   * @access public
    * @static
    */
   public static function add(&$params, $fixAddress) {
@@ -201,7 +199,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return void
-   * @access public
    * @static
    */
   public static function fixAddress(&$params) {
@@ -402,7 +399,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @return boolean
    *
-   * @access public
    * @static
    */
   public static function dataExists(&$params) {
@@ -460,7 +456,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @param int|string $fieldName conditional field name
    *
    * @return array  $addresses     array with address fields
-   * @access public
    * @static
    */
   public static function &getValues($entityBlock, $microformat = FALSE, $fieldName = 'contact_id') {
@@ -546,7 +541,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @param bool $microformat
    *
    * @return void
-   * @access public
    */
   public function addDisplay($microformat = FALSE) {
     $fields = array(
@@ -585,7 +579,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @param bool $updateBlankLocInfo
    *
    * @return array  the array of adrress data
-   * @access public
    * @static
    */
   public static function allAddress($id, $updateBlankLocInfo = FALSE) {
@@ -621,7 +614,6 @@ ORDER BY civicrm_address.is_primary DESC, address_id ASC";
    * entity_table name
    *
    * @return array  the array of adrress data
-   * @access public
    * @static
    */
   public static function allEntityAddress(&$entityElements) {
@@ -699,7 +691,6 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * @param  string   Locale - to set locale used to parse address
    *
    * @return array    $parseFields    parsed fields values.
-   * @access public
    * @static
    */
   public static function parseStreetAddress($streetAddress, $locale = NULL) {
@@ -834,7 +825,6 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * @param  array   $fields an array of importable/exportable contact fields
    *
    * @return array   $fields an array of contact fields and only the enabled address options
-   * @access public
    * @static
    */
   public static function validateAddressOptions($fields) {
@@ -863,7 +853,6 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * @param int $addressId address id
    *
    * @return count of contacts that use this shared address
-   * @access public
    * @static
    */
   public static function checkContactSharedAddress($addressId) {
@@ -877,7 +866,6 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * @param array    $fields    address fields in profile
    * @param int      $contactId contact id
    *
-   * @access public
    * @static
    */
   public static function checkContactSharedAddressFields(&$fields, $contactId) {
@@ -949,7 +937,6 @@ SELECT is_primary,
    * @param array  $params    associated array of address params
    *
    * @return void
-   * @access public
    * @static
    */
   public static function processSharedAddress($addressId, $params) {
@@ -981,7 +968,6 @@ SELECT is_primary,
    * @param array  $params          associated array of submitted values
    *
    * @return void
-   * @access public
    * @static
    */
   public static function processSharedAddressRelationship($masterAddressId, $params) {
@@ -1053,7 +1039,6 @@ SELECT is_primary,
    * @param boolean $returnStatus by default false
    *
    * @return string $statusMessage
-   * @access public
    * @static
    */
   public static function setSharedAddressDeleteStatus($addressId = NULL, $contactId = NULL, $returnStatus = FALSE) {

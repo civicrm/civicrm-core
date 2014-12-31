@@ -49,7 +49,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * The group id of the field
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
@@ -57,7 +56,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @access private
    */
   private static $_actionLinks;
 
@@ -67,7 +65,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @param null
    *
    * @return array  array of action links that we need to display for the browse screen
-   * @access public
    */
   public function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
@@ -124,7 +121,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function browse() {
     $resourceManager = CRM_Core_Resources::singleton();
@@ -207,7 +203,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @param string  $action    the action to be invoked
    *
    * @return void
-   * @access public
    */
   public function edit($action) {
     // create a simple controller for editing custom dataCRM/Custom/Page/Field.php
@@ -232,7 +227,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function run() {
 
@@ -311,7 +305,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @param int  $id    custom field id
    *
    * @return void
-   * @access public
    */
   public function preview($id) {
     $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Preview', ts('Preview Custom Data'), CRM_Core_Action::PREVIEW);

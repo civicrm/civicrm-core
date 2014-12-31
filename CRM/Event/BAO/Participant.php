@@ -84,7 +84,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Event_BAO_Participant object
-   * @access public
    * @static
    */
   public static function &add(&$params) {
@@ -164,7 +163,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @param $ids
    *
    * @return CRM_Event_BAO_Participant|null the found object or null
-   * @access public
    * @static
    */
   public static function getValues(&$params, &$values, &$ids) {
@@ -189,7 +187,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Event_BAO_Participant object
-   * @access public
    * @static
    */
   public static function create(&$params) {
@@ -347,7 +344,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @param bool $considerTestParticipant
    *
    * @return bool|int|null|string 1. false                 => If event having some empty spaces.@static
-   * @access public
    */
   static function eventFull(
     $eventId,
@@ -490,7 +486,6 @@ SELECT  event.event_full_text,
    *
    * @return array $optionsCount an array of each option id and total count
    * @static
-   * @access public
    */
   static function priceSetOptionsCount(
     $eventId,
@@ -568,7 +563,6 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
    *
    * @return int $spaces  Number of Empty Seats/null.
    * @static
-   * @access public
    */
   public static function pendingToConfirmSpaces($eventId) {
     $emptySeats = 0;
@@ -617,7 +611,6 @@ GROUP BY  participant.event_id
    * @param bool $onlyParticipant
    *
    * @return array array of importable Fields
-   * @access public
    * @static
    */
   public static function &importableFields($contactType = 'Individual', $status = TRUE, $onlyParticipant = FALSE) {
@@ -726,7 +719,6 @@ GROUP BY  participant.event_id
    * Combine all the exportable fields from the lower levels object
    *
    * @return array array of exportable Fields
-   * @access public
    * @static
    */
   public static function &exportableFields() {
@@ -783,7 +775,6 @@ GROUP BY  participant.event_id
    *
    * @return array $name associated array with sort_name and event title
    * @static
-   * @access public
    */
   public static function participantDetails($participantId) {
     $query = "
@@ -812,7 +803,6 @@ WHERE  civicrm_participant.id = {$participantId}
    * @param boolean $reverse  true if we want to resolve the values in the reverse direction (value -> name)
    *
    * @return void
-   * @access public
    * @static
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
@@ -856,7 +846,6 @@ WHERE  civicrm_participant.id = {$participantId}
    * @param  int  $id id of the participation to delete
    *
    * @return void
-   * @access public
    * @static
    */
   public static function deleteParticipant($id) {
@@ -919,7 +908,6 @@ WHERE  civicrm_participant.id = {$participantId}
    * from other function
    *
    * @return CRM_Contribute_BAO_Contribution object
-   * @access public
    * @static
    */
   public static function checkDuplicate($input, &$duplicates) {
@@ -1134,7 +1122,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @param bool $updatePrimaryStatus
    *
    * @return bool|void
-   * @access public
    * @static
    */
   public static function updateParticipantStatus($participantID, $oldStatusID, $newStatusID = NULL, $updatePrimaryStatus = FALSE) {
@@ -1170,7 +1157,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    *
    * @return void
    *
-   * @access public
    * @static
    */
   public static function updateStatus($participantIds, $statusId, $updateRegisterDate = FALSE) {
@@ -1210,7 +1196,6 @@ UPDATE  civicrm_participant
    * @param bool $skipCascadeRule
    *
    * @return array
-   * @access public
    * @static
    */
   static function transitionParticipants($participantIds, $toStatusId,
@@ -1442,7 +1427,6 @@ UPDATE  civicrm_participant
    * return  void
    *
    * @return bool
-   * @access public
    * @static
    */
   static function sendTransitionParticipantMail(
@@ -1546,7 +1530,6 @@ UPDATE  civicrm_participant
    * @param int $fromStatusId
    *
    * @return string
-   * @access public
    */
   public function updateStatusMessage($participantId, $statusChangeTo, $fromStatusId) {
     $statusMsg = NULL;
@@ -1583,7 +1566,6 @@ UPDATE  civicrm_participant
    * @param int $participantId
    *
    * @return string
-   * @access public
    */
   public static function eventFullMessage($eventId, $participantId = NULL) {
     $eventfullMsg = $dbStatusId = NULL;
@@ -1644,7 +1626,6 @@ UPDATE  civicrm_participant
    * @param int $participantId
    *
    * @return true if participant is primary
-   * @access public
    */
   public static function isPrimaryParticipant($participantId) {
 
@@ -1665,7 +1646,6 @@ UPDATE  civicrm_participant
    * @param  int  $newStatusId     new status
    *
    * @return true if allowed
-   * @access public
    */
   public static function getValidAdditionalIds($participantId, $oldStatusId, $newStatusId) {
 
@@ -1692,7 +1672,6 @@ UPDATE  civicrm_participant
    * @param int $contactID
    *
    * @return int count of participant records
-   * @access public
    * @static
    */
   public static function getContactParticipantCount($contactID) {
@@ -1710,7 +1689,6 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @param bool $excludeCancelled   Exclude cancelled additional participant
    *
    * @return array $participantsId
-   * @access public
    * @static
    */
   public static function getParticipantIds($contributionId, $excludeCancelled = FALSE) {
@@ -1741,7 +1719,6 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @param array $participantIds an array of additional participant ids.
    *
    * @return array of Urls.
-   * @access public
    * @static
    */
   public static function getAdditionalParticipantUrl($participantIds) {
@@ -1804,7 +1781,6 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
    *
    * @param integer $contactId contact id
    *
-   * @access public
    * @static
    */
   public static function deleteContactParticipant($contactId) {

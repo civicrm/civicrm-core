@@ -63,7 +63,6 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     /*
@@ -75,7 +74,6 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param $proxSearch
@@ -115,7 +113,6 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    * @param CRM_Core_Form $form
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $form) {
@@ -138,7 +135,6 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @param CRM_Core_Form $form
    *

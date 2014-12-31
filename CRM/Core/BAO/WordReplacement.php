@@ -41,7 +41,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Class constructor
    *
-   * @access public
    * @return \CRM_Core_DAO_WordReplacement
    */
   /**
@@ -58,7 +57,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_DAO_WordRepalcement object
-   * @access public
    * @static
    */
 
@@ -72,7 +70,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @param null $reset
    *
    * @return null|object CRM_Core_BAO_WordRepalcement
-   * @access public
    * @static
    */
   public static function getWordReplacement($reset = NULL) {
@@ -95,7 +92,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @param int $id
    *
    * @return WordReplacement array
-   * @access public
    */
   public static function edit(&$params, &$id) {
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
@@ -114,7 +110,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @param array $params
    *
    * @return WordReplacement array
-   * @access public
    */
   public static function create($params) {
     if(array_key_exists("domain_id",$params) === FALSE) {

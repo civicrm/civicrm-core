@@ -237,7 +237,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -326,7 +325,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * @param $errors
    *
    * @return void
-   * @access public
    * @see valid_date
    */
 
@@ -339,7 +337,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   /**
    * Form submission of petition signature
    *
-   * @access public
    *
    * @return void
    */
@@ -592,7 +589,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * @param bool $viewOnly
    *
    * @return void
-   * @access public
    */
   public function buildCustom($id, $name, $viewOnly = FALSE) {
     if ($id) {

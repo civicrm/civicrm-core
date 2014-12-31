@@ -37,7 +37,6 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
   /**
    * Build the form object for Advance Settings.
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *

@@ -38,7 +38,6 @@ class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
   public function listPledges() {
     $controller = new CRM_Core_Controller_Simple(
@@ -74,7 +73,6 @@ class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    * loads, it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   public function run() {
     parent::preProcess();

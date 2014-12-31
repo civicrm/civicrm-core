@@ -42,7 +42,6 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
    * Contribution amount block.
    *
    * @var array
-   * @access protected
    */
   protected $_amountBlock = array();
 
@@ -55,7 +54,6 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -188,7 +186,6 @@ SELECT id
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
@@ -280,7 +277,6 @@ SELECT id
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
   public static function formRule($fields, $files, $self) {
@@ -407,7 +403,6 @@ SELECT id
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -759,7 +754,6 @@ SELECT id
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Amounts');

@@ -52,7 +52,6 @@ class CRM_Core_Form_Tag {
    * @param string $tagsetElementName if you need to create tagsetlist with specific name
    *
    * @return void
-   * @access public
    * @static
    */
   static function buildQuickForm(&$form, $parentNames, $entityTable, $entityId = NULL, $skipTagCreate = FALSE,
@@ -124,7 +123,6 @@ class CRM_Core_Form_Tag {
    * @param CRM_Core_Form  $form        form object
    *
    * @return void
-   * @access public
    * @static
    */
   public static function postProcess(&$params, $entityId, $entityTable = 'civicrm_contact', &$form) {

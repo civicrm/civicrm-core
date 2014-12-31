@@ -45,7 +45,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $values        = $ids = array();
@@ -223,7 +222,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
